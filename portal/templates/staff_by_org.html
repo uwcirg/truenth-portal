@@ -26,15 +26,18 @@
                data-show-toggle="true"
                data-show-columns="true"
                data-unique-id="id"
+               data-filter-control="true"
+               data-show-export="true"
+               data-export-data-type="all"
                data-id-field="id">
             <thead>
             <tr>
                 <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
-                <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
-                <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
-                <th data-field="email" data-sortable="true" class="email-data-field">{{ _("Email") }}</th>
-                <th data-field="organization" data-sortable="true" class="org-data-field">{{ _("Site(s)") }}</th>
+                <th data-field="firstname" data-sortable="true" data-filter-control="input">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
+                <th data-field="email" data-sortable="true" class="email-data-field" data-filter-control="input">{{ _("Email") }}</th>
+                <th data-field="organization" data-sortable="true" class="org-data-field" data-filter-control="select">{{ _("Site(s)") }}</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
@@ -64,6 +67,20 @@ $("#adminTable").bootstrapTable({
         return rowInfo;
     }
 });
+
+/*
+ * add placeholder text for filter controls
+ */
+ (function() {
+   function addFilterPlaceHolders() {
+     $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
+     $("#adminTable .filterControl select option[value='']").text("Select");
+   }
+   $("#adminTable").on("reset-view.bs.table", function() {
+      addFilterPlaceHolders();
+   });
+   addFilterPlaceHolders();
+ })();
 
 /** Example of how we could have a select to limit to a particular role. Needs more work
 because only looks at entire field
