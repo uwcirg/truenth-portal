@@ -616,7 +616,7 @@ def admin():
             org_list.update(OrgTree().here_and_below_id(orgId))
 
         users = User.query.join(UserOrganization).filter(
-                    and_(User.deleted_id == None,
+                    and_(User.deleted_id.is_(None),
                          UserOrganization.user_id == User.id,
                          UserOrganization.organization_id != 0,
                          UserOrganization.organization_id.in_(org_list)))
@@ -691,7 +691,7 @@ def staff():
     admin_staff = User.query.join(UserRoles).filter(
         and_(User.id==UserRoles.user_id,
              UserRoles.role_id.in_([admin_role_id, staff_admin_role_id]),
-             User.deleted_id==None
+             User.deleted_id.is_(None)
              )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
@@ -706,7 +706,7 @@ def staff():
         and_(User.id==UserRoles.user_id,
             ~User.id.in_(admin_list),
              UserRoles.role_id==staff_role_id,
-             User.deleted_id==None
+             User.deleted_id.is_(None)
              )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,

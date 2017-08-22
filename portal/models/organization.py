@@ -646,9 +646,9 @@ class OrgTree(object):
         now = datetime.utcnow()
         query = db.session.query(User.id).join(
             UserRoles).join(UserConsent).join(UserOrganization).filter(
-                User.deleted_id == None,
+                User.deleted_id.is_(None),
                 UserRoles.role_id == patient_role_id,
-                UserConsent.deleted_id == None,
+                UserConsent.deleted_id.is_(None),
                 UserConsent.expires > now,
                 UserOrganization.organization_id.in_(staff_user_orgs))
 

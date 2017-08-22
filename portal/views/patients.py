@@ -43,7 +43,7 @@ def patients_root():
     consented_users = []
 
     consent_query = UserConsent.query.filter(and_(
-                         UserConsent.deleted_id == None,
+                         UserConsent.deleted_id.is_(None),
                          UserConsent.expires > now)).with_entities(
                              UserConsent.user_id)
     consented_users = [u.user_id for u in consent_query]
@@ -74,7 +74,7 @@ def patients_root():
         org_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
+                 User.deleted_id.is_(None),
                  User.id.in_(consented_users)
                  )
             ).join(UserOrganization).filter(
@@ -92,7 +92,7 @@ def patients_root():
         ui_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
+                 User.deleted_id.is_(None),
                  User.id.in_(consented_users))
                  ).join(UserIntervention).filter(
                  and_(UserIntervention.user_id==User.id,

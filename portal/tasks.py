@@ -96,7 +96,7 @@ def cache_assessment_status(job_id=None):
     users_with_potential_assessment_status = User.query.join(
         UserRoles).filter(
             and_(User.id == UserRoles.user_id,
-                 User.deleted_id == None,
+                 User.deleted_id.is_(None),
                  UserRoles.role_id == patient_role_id))
 
     for user in users_with_potential_assessment_status:
