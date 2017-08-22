@@ -12,6 +12,7 @@ from tests import TestCase, TEST_USER_ID
 from urlparse import urlparse, parse_qsl
 from urllib import unquote_plus
 
+
 class Url(object):
     '''A url object that can be compared with other url orbjects
     without regard to the vagaries of encoding, escaping, and ordering
@@ -28,6 +29,7 @@ class Url(object):
         return self.parts == other.parts
 
     def __hash__(self): return hash(self.parts)
+
 
 class TestAppText(TestCase):
 
@@ -49,12 +51,19 @@ class TestAppText(TestCase):
         self.assertRaises(ValueError, render_template, 'landing.html')
 
     def test_permanent_url(self):
-        sample = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668&version=latest'
-        version = '1.3'
-        expected = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=52668&version=1.3'
+        args = {
+            'uuid': 'cbe17d0d-f25d-27fb-0d92-c22bc687bb0f',
+            'origin': self.app.config['LR_ORIGIN'],
+            'version': '1.3'}
+        sample = (
+            '{origin}/c/portal/truenth/asset/detailed?'
+            '&uuid={uuid}&version=latest'.format(**args))
+        expected = (
+            '{origin}/c/portal/truenth/asset?uuid={uuid}&'
+            'version={version}'.format(**args))
 
         result = VersionedResource(sample)._permanent_url(
-            generic_url=sample, version=version)
+            generic_url=sample, version=args['version'])
         self.assertTrue(Url(result) == Url(expected))
 
     def test_config_value_in_custom_text(self):
@@ -71,7 +80,8 @@ class TestAppText(TestCase):
 
     def test_fetch_elements_invalid_url(self):
         sample_url = "https://notarealwebsitebeepboop.com"
-        sample_error = "Could not retrieve remove content - Server could not be reached"
+        sample_error = (
+            "Could not retrieve remove content - Server could not be reached")
         result = VersionedResource(sample_url)
         self.assertEquals(result.error_msg, sample_error)
         self.assertEquals(result.url, sample_url)
@@ -101,7 +111,7 @@ class TestAppText(TestCase):
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test", "bodykey1": "123", "bodykey2": "456"}
-        tmr = MailResource(None,variables=testvars)
+        tmr = MailResource(None, variables=testvars)
         self.assertEquals(tmr.subject, "TESTING")
         self.assertEquals(tmr.body, "[TESTING - fake response]")
         tmr._subject = "Replace this: {subjkey}"
