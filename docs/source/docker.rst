@@ -51,7 +51,7 @@ If you would like to create a package from a topic branch or fork you can overri
 Building the portal
 -------------------
 
-The portal Docker image can be built using Debian packages from a remote Debian repository (default Bintray) or locally, from packages placed in the ``artifacts`` directory.
+The portal Docker image can be built using Debian packages from a remote Debian repository (default Bintray) or locally, from packages placed in the ``debian/artifacts`` directory.
 
 Remote Debian Repo
 ~~~~~~~~~~~~~~~~~~
@@ -71,9 +71,9 @@ If you would like to use your own repo, the default Debian repo can be overridde
 Local Debian Repo
 ~~~~~~~~~~~~~~~~~
 
-To build an image of the portal with a locally created Debian portal package first create the package as described in `Building a Debian Package`_. After checking that a package exists in the artifacts directory, run the below command to build an image of the portal with the aforementioned package. ::
+To build an image of the portal with a locally created Debian portal package first create the package as described in `Building a Debian Package`_. After checking that a package exists in the ``debian/artifacts`` directory, run the below command to build an image of the portal with the aforementioned package. ::
 
-    # Use the packages available in artifacts/
+    # Use the packages available in debian/artifacts/
     docker build --file docker/Dockerfile --build-arg --tag "portal_web:local_deb" .
 
 Orchestration

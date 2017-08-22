@@ -157,7 +157,7 @@ deploy:
         - -v BINTRAY_API_KEY
     script:
       curl
-        --upload-file artifacts/*.deb
+        --upload-file debian/artifacts/*.deb
         --user "$GH_USERNAME:$BINTRAY_API_KEY"
         https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
@@ -173,6 +173,7 @@ deploy:
       curl
         --upload-file artifacts/*.deb
         --verbose
+        --upload-file debian/artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
