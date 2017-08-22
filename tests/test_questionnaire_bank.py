@@ -4,6 +4,7 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.assessment_status import QuestionnaireDetails
+from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -125,10 +126,46 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qd = QuestionnaireDetails(self.test_user, datetime.utcnow())
         results = list(qd.baseline())
-        self.assertTrue(3, len(results))
+        self.assertEquals(3, len(results))
         # confirm rank sticks
         self.assertEquals(results[0]['name'], 'epic26')
         self.assertEquals(results[2]['name'], 'comorb')
+
+    def test_lookup_with_intervention(self):
+        intv = Intervention(name='TEST', description='Test Intervention')
+        epic26 = Questionnaire(name='epic26')
+        eproms_add = Questionnaire(name='eproms_add')
+        with SessionScope(db):
+            db.session.add(intv)
+            db.session.add(epic26)
+            db.session.add(eproms_add)
+            db.session.commit()
+        intv, epic26, eproms_add = map(
+            db.session.merge, (intv, epic26, eproms_add))
+
+        bank = QuestionnaireBank(name='CRV', intervention_id=intv.id)
+        for rank, q in enumerate((epic26, eproms_add)):
+            qbq = QuestionnaireBankQuestionnaire(
+                questionnaire_id=q.id,
+                days_till_due=7,
+                days_till_overdue=90,
+                rank=rank)
+            bank.questionnaires.append(qbq)
+
+        self.test_user.interventions.append(intv)
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+
+        # User associated with INTV intervention should generate appropriate
+        # questionnaires
+        self.test_user = db.session.merge(self.test_user)
+        qd = QuestionnaireDetails(self.test_user, datetime.utcnow())
+        results = list(qd.baseline())
+        self.assertEquals(2, len(results))
+        # confirm rank sticks
+        self.assertEquals(results[0]['name'], 'epic26')
+        self.assertEquals(results[1]['name'], 'eproms_add')
 
     def test_questionnaire_gets(self):
         crv = Organization(name='CRV')
