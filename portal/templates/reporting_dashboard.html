@@ -95,7 +95,7 @@
                 <td>{{ counts['roles']['staff'] }}</td>
             </tr>
         </table>
-        <p>{{ _("Intervention counts are tallied from User.interventions (e.g. a User with both the 'Care Plan' and 'Symptom Tracker' interventions, would add 1 to both Interventions' counts)") }}</p>
+        <p>{{ _("Intervention counts only apply to those interventions that control their subject list manually (eg Sexual Recovery, Care Plan, Community of Wellness). They are tallied from User.interventions (e.g. a User with both the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to both Interventions' counts)") }}</p>
         <p>{{ _("Completed Reports are tallied for each User that has <i>any number</i> of PatientReports for that Intervention (e.g. whether a User has 1 or 100 PatientReports for 'Symptom Tracker', that User only adds 1 to that Intervention's Completed Reports tally)") }}</p>
         <p>{{ _("Completed Reports are only shown for an Intervention if the report count is above 0") }}</p>
         <table id="userIntervStatsTable"
