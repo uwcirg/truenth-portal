@@ -45,7 +45,7 @@ def qbs_for_user(user, classification):
     """Return questionnaire banks for the given (user, classification)
 
     QuestionnaireBanks are associated with a user through the top
-    level organization affiliation.
+    level organization affiliation, or through interventions
 
     :return: matching QuestionnaireBanks if found, else empty list
 
@@ -55,6 +55,13 @@ def qbs_for_user(user, classification):
         top = OrgTree().find(org.id).top_level()
         qbs = QuestionnaireBank.query.filter(
             QuestionnaireBank.organization_id == top,
+            QuestionnaireBank.classification == classification).all()
+        if qbs:
+            results.extend(qbs)
+
+    for intv in (i for i in user.interventions if i.id):
+        qbs = QuestionnaireBank.query.filter(
+            QuestionnaireBank.intervention_id == intv.id,
             QuestionnaireBank.classification == classification).all()
         if qbs:
             results.extend(qbs)

@@ -1,6 +1,6 @@
 """Questionnaire Bank module"""
 from flask import url_for
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
@@ -17,6 +17,12 @@ classification_types_enum = ENUM(
 
 class QuestionnaireBank(db.Model):
     __tablename__ = 'questionnaire_banks'
+    __table_args__ = (
+        CheckConstraint('NOT(organization_id IS NULL AND '
+                            'intervention_id IS NULL) '
+                        'AND NOT(organization_id IS NOT NULL AND '
+                                'intervention_id IS NOT NULL)'),
+        )
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
     classification = db.Column(
@@ -27,10 +33,12 @@ class QuestionnaireBank(db.Model):
         back_populates='questionnaire_bank',
         order_by="QuestionnaireBankQuestionnaire.rank")
 
-    # Currently using organizations to associate which questionnaire
-    # bank to give to a user.
+    # QuestionnaireBank is associated with an Organization OR an Intervention,
+    # either of which dictate whether it's given to a User
     organization_id = db.Column(
-        db.ForeignKey('organizations.id'), nullable=False)
+        db.ForeignKey('organizations.id'), nullable=True)
+    intervention_id = db.Column(
+        db.ForeignKey('interventions.id'), nullable=True)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
