@@ -23,6 +23,7 @@ from ..models.app_text import app_text, AppText, VersionedResource, UndefinedApp
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
                                StaffRegistrationEmail_ATMA)
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
+from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import Encounter
@@ -762,8 +763,22 @@ def profile(user_id):
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    return render_template(
-        'profile.html', user=user, consent_agreements=consent_agreements, terms=terms)
+    top_org = user.first_top_organization()
+    first_org = user.organizations[0]
+    invite_vars = {
+                   'first_name': user.first_name,
+                   'last_name': user.last_name,
+                   'parent_org': top_org.name if top_org else '',
+                   'clinic_name': first_org.name if first_org else '',
+                   'registrationlink': url_for('user_api.access_url',
+                                               _external=True,
+                                               user_id=user.id)
+                  }
+    invite_email = MailResource(app_text(UserInviteEmail_ATMA.name_key()),
+                                variables=invite_vars)
+    return render_template('profile.html', user=user,
+                           invite_email=invite_email, terms=terms,
+                           consent_agreements=consent_agreements)
 
 @portal.route('/privacy')
 def privacy():

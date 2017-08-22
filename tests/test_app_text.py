@@ -4,7 +4,7 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.app_text import AppText, app_text, VersionedResource
-from portal.models.app_text import UnversionedResource
+from portal.models.app_text import UnversionedResource, MailResource
 from portal.models.user import User
 from tests import TestCase, TEST_USER_ID
 
@@ -98,3 +98,11 @@ class TestAppText(TestCase):
                                        variables=test_vars)
         error_key = resource.asset.split()[-1]
         self.assertEquals(error_key, "'variable'")
+
+    def test_mail_resource(self):
+        testvars = {"testkey": "testval"}
+        tmr = MailResource(None,variables=testvars)
+        self.assertEquals(tmr.subject, "TESTING")
+        self.assertEquals(tmr.body, "[TESTING - fake response]")
+        tmr._body = "Replace this: {testkey}"
+        self.assertEquals(tmr.body.split()[2], "testval")

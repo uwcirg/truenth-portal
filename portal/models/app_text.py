@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
 import requests
-from requests.exceptions import MissingSchema
+from requests.exceptions import MissingSchema, ConnectionError
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -196,6 +196,22 @@ class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
                     format(kwargs.get('organization').name)
 
 
+class UserInviteEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for User Invite Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for User Invite Email Content
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+
+        :returns: string for AppText.name field
+
+        """
+        return "profileSendEmail invite email"
+
+
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 
@@ -265,7 +281,7 @@ class UnversionedResource(object):
                 else:
                     self.error_msg = (
                         "Could not retrieve remote content - Invalid URL")
-            except:
+            except ConnectionError:
                 self.error_msg = (
                     "Could not retrieve remove content - Server could not be "
                     "reached")
@@ -329,7 +345,7 @@ class VersionedResource(object):
                 self.error_msg = (
                     "Could not retrieve remote content - " "{} {}".format(
                         response.status_code, response.reason))
-        except:
+        except ConnectionError:
             self.error_msg = (
                 "Could not retrieve remove content - Server could not be "
                 "reached")
@@ -345,6 +361,117 @@ class VersionedResource(object):
                 return self._asset.format(**self.variables)
             except KeyError, e:
                 self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
+        return self.error_msg
+
+    def _permanent_url(self, generic_url, version):
+        """Produce a permanent url from the metadata provided
+
+        Resources are versioned - but the link maintained in the app_text
+        table is not.
+
+        When requesting the detailed resource, the effective version number is
+        returned.  This method returns a permanent URL including the version
+        number, useful for audit and tracking information.
+
+        """
+        parsed = urlparse(generic_url)
+        qs = dict(parse_qsl(parsed.query))
+        if version:
+            qs['version'] = version
+
+        path = parsed.path
+        if path.endswith('/detailed'):
+            path = path[:-(len('/detailed'))]
+        format_dict = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': path,
+            'qs': urlencode(qs)}
+        url = "{scheme}://{netloc}{path}?{qs}".format(**format_dict)
+        return url
+
+
+class MailResource(object):
+    """Helper to manage versioned mail resource URLs (typically on Liferay)"""
+
+    def __init__(self, url, variables=None):
+        """Initialize based on requested URL
+
+        Attempts to fetch the mail fields, permanent version of URL and link
+        for content editing.
+
+        In the event of an error, details are logged, and self.error_msg
+        will be defined, and returned in a request for the asset attribute.
+
+        :param url: the URL to pull details and asset from
+
+        :attribute subject: will contain the email subject download, found
+            in the cache, or the error message if that fails.
+        :attribute body: will contain the email subject body, found
+            in the cache, or the error message if that fails.
+        :attribute editor_url: defined if such was available, else None
+        :attribute url: the `permanent url` for the resource if available,
+            otherwise the original url.
+
+        """
+        self._subject, self._body = None, None
+        self.error_msg, self.editor_url = None, None
+        self.url = url
+        self.variables = variables or {}
+        try:
+            response = requests.get(url)
+            self._subject = str(response.json().get('subject'))
+            self._body = str(response.json().get('body'))
+            self.url = self._permanent_url(
+                generic_url=url, version=response.json().get('version'))
+            self.editor_url = response.json().get('editorUrl')
+        except MissingSchema:
+            if current_app.config.get('TESTING'):
+                self._subject = 'TESTING'
+                self._body = '[TESTING - fake response]'
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - Invalid URL")
+        except ValueError:  # raised when no json is available in response
+            if response.status_code == 200:
+                self._subject = response.text
+                self._body = response.text
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - " "{} {}".format(
+                        response.status_code, response.reason))
+        except ConnectionError:
+            self.error_msg = (
+                "Could not retrieve remove content - Server could not be "
+                "reached")
+
+        if self.error_msg:
+            current_app.logger.error(self.error_msg + ": {}".format(url))
+
+    @property
+    def subject(self):
+        """Return subject if available else error message"""
+        if self._subject:
+            try:
+                formatted = self._subject.format(**self.variables)
+                return formatted
+            except KeyError, e:
+                self.error_msg = "Missing subject variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
+        return self.error_msg
+
+    @property
+    def body(self):
+        """Return body if available else error message"""
+        if self._body:
+            try:
+                formatted = self._body.format(**self.variables)
+                return formatted.encode('string-escape')
+            except KeyError, e:
+                self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
         return self.error_msg
