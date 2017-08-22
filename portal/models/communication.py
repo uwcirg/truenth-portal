@@ -2,7 +2,9 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from .app_text import app_text, MailResource
 from ..database import db
+from .message import EmailMessage
 
 
 # https://www.hl7.org/fhir/valueset-event-status.html
@@ -46,3 +48,24 @@ class Communication(db.Model):
         return (
             'Communication for {0.user_id}'
             ' of {0.communication_request_id}'.format(self))
+
+    def app_text_key(self):
+        return ('CommunicationRequest {0.name} {0.notify_days_after_event}'
+                ''.format(self))
+
+    def generate_and_send(self):
+        "Collate message details and send"
+        args = {'first_name': self.user.first_name,
+                'last_name': self.user.last_name}
+
+        mailresource = MailResource(
+            app_text(self.app_text_key()),
+            variables=args)
+
+        self.message = EmailMessage(
+            subject=mailresource.subject,
+            body=mailresource.body,
+            recipients=self.user.email,
+            user_id=self.user.id)
+        self.message.send_message()
+        self.status = 'completed'
