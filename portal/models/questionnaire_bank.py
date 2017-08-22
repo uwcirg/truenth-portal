@@ -1,10 +1,11 @@
 """Questionnaire Bank module"""
-from flask import url_for
+from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
@@ -132,6 +133,43 @@ class QuestionnaireBank(db.Model):
             'entry': objs,
         }
         return bundle
+
+    @staticmethod
+    def qbs_for_user(user, classification):
+        """Return questionnaire banks applicable to (user, classification)
+
+        QuestionnaireBanks are associated with a user through the top
+        level organization affiliation, or through interventions
+
+        :return: matching QuestionnaireBanks if found, else empty list
+
+        """
+        users_top_orgs = set()
+        for org in (o for o in user.organizations if o.id):
+            users_top_orgs.add(OrgTree().find(org.id).top_level())
+
+        results = [] if not users_top_orgs else (
+            QuestionnaireBank.query.filter(
+                QuestionnaireBank.organization_id.in_(users_top_orgs),
+                QuestionnaireBank.classification == classification).all())
+
+        for intv in (i for i in user.interventions if i.id):
+            qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id == intv.id,
+                QuestionnaireBank.classification == classification).all()
+            if qbs:
+                results.extend(qbs)
+
+        def validate_classification_count(qbs):
+            if len(qbs) > 1:
+                current_app.logger.error(
+                    "multiple QuestionnaireBanks for {user} with "
+                    "{classification} found.  The UI won't correctly display "
+                    "more than one at this time.".format(
+                        user=user, classification=classification))
+
+        validate_classification_count(results)
+        return results
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
