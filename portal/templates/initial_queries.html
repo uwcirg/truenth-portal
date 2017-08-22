@@ -767,7 +767,7 @@ $(document).ready(function(){
           config: "website_terms_of_use,subject_website_consent,privacy_policy",
           subsections: {
             "termsCheckbox": {
-                fields: [$("[data-type='terms'][data-required='true']")],
+                fields: [$("[data-type='terms'][data-required='true']"), $("[data-type='terms']").has("*[data-required='true']")],
                 event: termsEvent
             }
         }

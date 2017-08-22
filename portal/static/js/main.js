@@ -1350,7 +1350,8 @@ var assembleContent = {
             } else {
                 //'__no_email__'
                 demoArray["telecom"].push({ "system": "email", "value": "__no_email__" });
-            }
+            };
+
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
         };
@@ -2010,6 +2011,17 @@ var tnthAjax = {
                                 self.show().removeClass("tnth-hide");
                                 self.attr("data-required", "true");
                             };
+                        });
+                        /*
+                         * need to check sub-types e.g. privacy policy, that is required of user 
+                         * in addition to website terms of use
+                         */
+                        $(this).find("[data-core-data-subtype]").each(function() {
+                             if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
+                                var parentNode = $(this).closest("[data-type='terms']");
+                                parentNode.show().removeClass("tnth-hide");
+                                parentNode.attr("data-required", "true");
+                             };
                         });
                     });
                     if (item == "localized") __localizedFound = true;
