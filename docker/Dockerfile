@@ -11,7 +11,7 @@ RUN \
         python2.7 && \
     apt-get clean
 
-ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
+ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
 
 COPY debian/artifacts /tmp/artifacts
 
