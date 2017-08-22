@@ -20,6 +20,7 @@ class EncounterCodings(db.Model):
     encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
+
 # http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.status
 status_types = ENUM(
     'planned', 'arrived', 'in-progress', 'onleave', 'finished', 'cancelled',
@@ -44,7 +45,10 @@ class Encounter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column('status', status_types, nullable=False)
     user_id = db.Column(
-        db.ForeignKey('users.id', name='encounters_user_id_fk'), nullable=False)
+        db.ForeignKey(
+            'users.id',
+            name='encounters_user_id_fk'),
+        nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     """required whereas end_time is optional
     """
@@ -53,6 +57,7 @@ class Encounter(db.Model):
     """
     auth_method = db.Column('auth_method', auth_method_types, nullable=False)
     type = db.relationship("Coding", secondary='encounter_codings')
+
     def __str__(self):
         """Log friendly string format"""
         def period():
@@ -120,13 +125,14 @@ def initiate_encounter(user, auth_method):
     db.session.add(encounter)
     db.session.commit()
 
+
 def finish_encounter(user):
     """On logout, terminate user's active encounter, if found """
     assert(user)
     now = datetime.utcnow()
     # Look for any stale encounters needing to be closed out.
-    query = Encounter.query.filter(Encounter.user_id==user.id).filter(
-        Encounter.status=='in-progress').filter(Encounter.end_time.is_(None))
+    query = Encounter.query.filter(Encounter.user_id == user.id).filter(
+        Encounter.status == 'in-progress').filter(Encounter.end_time.is_(None))
     for encounter in query:
         encounter.status = 'finished'
         encounter.end_time = now
