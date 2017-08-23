@@ -100,7 +100,7 @@ def patients_root():
         patients = patients.union(ui_patients)
 
     # get assessment status only if it is needed as specified by config
-    if 'status' in  current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
             patient.assessment_status = overall_assessment_status(patient.id)
