@@ -724,8 +724,8 @@ h4.detail-title {
 #adminTable th.status-field .loading-message-indicator {
   display: none;
 }
-#adminTable .bootstrap-table-filter-control-status {
-  opacity: 0;
+#adminTable .filterControl * {
+  font-size: 0.9em;
 }
 #adminTableToolbar div.orglist-selector {
   display: inline-block;

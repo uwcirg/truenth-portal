@@ -725,7 +725,7 @@ div.right-panel {
   display: flex;
 }
 #adminTable .organization-field {
-  min-width: 130px;
+  min-width: 150px;
 }
 #adminTable div.filterControl select,
 #adminTable div.filterControl input
@@ -744,8 +744,8 @@ div.right-panel {
   opacity: 0.6;
   font-size: 0.85em;
 }
-#adminTable .bootstrap-table-filter-control-status {
-  opacity: 0;
+#adminTable .filterControl * {
+  font-size: 1em;
 }
 .truenth-id-label {
    display: none;

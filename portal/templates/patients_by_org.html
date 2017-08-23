@@ -79,7 +79,7 @@
                         <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<td></td>{% endif %}
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{{patient.assessment_status if patient.assessment_status}}</td>{% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{%if patient.external_study_id%}<a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.external_study_id }}</a>{%endif%}</a></td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
@@ -115,28 +115,40 @@ $(document).ready(function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
 
+  /*
+   * client side population of assessment status
+   * comment this out for now
+   */
+  
+  /************************************************************************
+   * start commented out code
+   */
   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-    //client side update of assessment status, for performance
-    setTimeout(function() { AT.updateData();}, 100);
-    $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
-        e.stopPropagation();
-        AT.abortRequests(function() {
-          if (e.target && !$(e.target).hasClass("rowlink-skip")) {
-            $(e.target).trigger('click.bs.rowlink');
-          };
-        }, true);
-    });
-    $(document).delegate("#createUserLink", "click touchstart", function(e) {
-        e.stopPropagation();
-        AT.abortRequests(function() {
-          window.location = $("#createUserLink").attr("href");
-        }, true);
-    });
-    /*
-     * appending loading indicator for status column at runtime
-     */
-    $("#adminTable th.status-field").prepend(__getLoaderHTML('{{_("retrieving data ...")}}'));
+  //client side update of assessment status, for performance
+  //  setTimeout(function() { AT.updateData();}, 100);
+  //  $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
+  //      e.stopPropagation();
+  //      AT.abortRequests(function() {
+  //        if (e.target && !$(e.target).hasClass("rowlink-skip")) {
+  //          $(e.target).trigger('click.bs.rowlink');
+  //        };
+  //      }, true);
+  //  });
+  //  $(document).delegate("#createUserLink", "click touchstart", function(e) {
+  //      e.stopPropagation();
+  //      AT.abortRequests(function() {
+  //        window.location = $("#createUserLink").attr("href");
+  //     }, true);
+  //  });
+  //  /*
+  // * appending loading indicator for status column at runtime
+  //   */
+  //  $("#adminTable th.status-field").prepend(__getLoaderHTML('{{_("retrieving data ...")}}'));
   {% endif %}
+  /************************************************************************
+   * end commented out code
+   */
+
 
   /*
    * add placeholder text for filter controls
