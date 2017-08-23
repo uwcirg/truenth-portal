@@ -173,7 +173,7 @@ deploy:
       curl
         --upload-file artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
-        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
+        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
 after_deploy:
   # Deploy to Artifactory, if configured
