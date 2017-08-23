@@ -1309,7 +1309,7 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    invalidate_assessment_status_cache(patient)
+    invalidate_assessment_status_cache(patient.id)
     return jsonify(response)
 
 
@@ -1319,7 +1319,7 @@ def invalidate(user_id):
     user = get_user(user_id)
     if not user:
         abort(404)
-    invalidate_assessment_status_cache(user)
+    invalidate_assessment_status_cache(user_id)
     return jsonify(invalidated=user.as_fhir())
 
 
