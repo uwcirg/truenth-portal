@@ -461,6 +461,7 @@ class MailResource(object):
                 self.error_msg = "Missing subject variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
+                raise
         return self.error_msg
 
     @property
@@ -474,6 +475,7 @@ class MailResource(object):
                 self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
+                raise
         return self.error_msg
 
     def _permanent_url(self, generic_url, version):
