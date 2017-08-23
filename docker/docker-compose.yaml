@@ -29,7 +29,8 @@ services:
     ports:
       - "5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - source: postgres-data
+        target: /var/lib/postgresql/data
+        type: volume
 volumes:
-  postgres-data:
-    driver: local
+    postgres-data: {}

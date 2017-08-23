@@ -16,7 +16,10 @@ services:
       - BRANCH=${BRANCH:-develop}
       - REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
     volumes:
-      - debian-repo:/tmp/artifacts
+      - debian-repo:
+    volumes:
+      - source: debian-repo
+        target: /tmp/artifacts
+        type: volume
 volumes:
-  debian-repo:
-    driver: local
+    debian-repo: {}
