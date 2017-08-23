@@ -6,7 +6,7 @@ from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
-from ..models.assessment_status import AssessmentStatus
+from ..models.assessment_status import overall_assessment_status
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
@@ -103,10 +103,7 @@ def patients_root():
     if 'status' in  current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            assessment_status = AssessmentStatus(user=patient)
-            patient.assessment_status = (
-                    assessment_status.overall_status if assessment_status else
-                    None)
+            patient.assessment_status = overall_assessment_status(patient.id)
             patient_list.append(patient)
         patients = patient_list
 
