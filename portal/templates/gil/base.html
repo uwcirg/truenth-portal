@@ -82,7 +82,7 @@
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.reporting_dashboard')}}">{{_("Reporting Dashboard")}}</a></li>
           {% endif %}
           {% if user and user.has_role(ROLE.RESEARCHER) %}
-              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Dashboard")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Data")}}</a></li>
           {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
