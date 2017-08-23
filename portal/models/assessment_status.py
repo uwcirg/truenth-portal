@@ -393,6 +393,15 @@ class AssessmentStatus(object):
             return self._overall_status
 
 
+def invalidate_assessment_status_cache(user):
+    """Invalidate the assessment status cache values for this user"""
+    dogpile_cache.invalidate(
+        overall_assessment_status, user.id)
+    for consent in user.all_consents:
+        dogpile_cache.invalidate(
+            overall_assessment_status, user.id, consent.id)
+
+
 @dogpile_cache.region('hourly')
 def overall_assessment_status(user_id, consent_id=None):
     """Cachable interface for expensive assessment status lookup
