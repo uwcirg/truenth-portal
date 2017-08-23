@@ -4,6 +4,7 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
+from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
@@ -39,6 +40,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
+    invalidate_assessment_status_cache(user_id)
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
@@ -161,10 +163,11 @@ def mock_questionnairebanks():
         db.session.commit()
 
 
-class TestAssessmentStatus(TestCase):
+class TestQuestionnaireSetup(TestCase):
+    "Base for test classes needing mock questionnaire setup"
 
     def setUp(self):
-        super(self.__class__, self).setUp()
+        super(TestQuestionnaireSetup, self).setUp()
         mock_questionnairebanks()
         self.localized_org_id = Organization.query.filter_by(
             name='localized').one().id
@@ -179,6 +182,8 @@ class TestAssessmentStatus(TestCase):
         self.test_user.organizations.append(Organization.query.get(
             self.metastatic_org_id))
 
+
+class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""
         self.bless_with_basics()
