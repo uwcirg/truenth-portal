@@ -2050,7 +2050,7 @@ div.biopsy-option:last-of-type {
 }
 .modal button,
 .modal a.btn {
-  font-size: 1em;
+  font-size: 0.9em;
 }
 .hide {
   display: none;
