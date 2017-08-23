@@ -172,6 +172,7 @@ deploy:
     script:
       curl
         --upload-file artifacts/*.deb
+        --verbose
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
