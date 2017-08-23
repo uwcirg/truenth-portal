@@ -99,7 +99,7 @@ def patients_root():
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
-    #get assessment status only if it is needed as specified by config
+    # get assessment status only if it is needed as specified by config
     if 'status' in  current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
