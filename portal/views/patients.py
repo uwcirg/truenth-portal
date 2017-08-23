@@ -99,8 +99,19 @@ def patients_root():
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
+    #get assessment status only if it is needed as specified by config
+    if 'status' in  current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+        patient_list = []
+        for patient in patients:
+            assessment_status = AssessmentStatus(user=patient)
+            patient.assessment_status = (
+                    assessment_status.overall_status if assessment_status else
+                    None)
+            patient_list.append(patient)
+        patients = patient_list
+
     return render_template(
-        'patients_by_org.html', patients_list=patients.all(),
+        'patients_by_org.html', patients_list=patients,
         user=user, org_list=org_list,
         wide_container="true")
 
