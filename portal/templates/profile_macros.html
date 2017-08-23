@@ -2162,7 +2162,7 @@
         </div>
     {%- endif %}
 
-    {%- if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF)) %}
+    {%- if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
