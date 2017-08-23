@@ -14,6 +14,7 @@ from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
 
+from .database import db
 from .dogpile import dogpile_cache
 from .extensions import celery
 from .models.assessment_status import overall_assessment_status
@@ -94,21 +95,7 @@ def cache_assessment_status(job_id=None):
     """
     before = datetime.now()
     current_app.logger.debug(__name__)
-
-    patient_role_id = Role.query.filter(
-        Role.name == ROLE.PATIENT).with_entities(Role.id).first()[0]
-    valid_patients = User.query.join(
-        UserRoles).filter(
-            and_(User.id == UserRoles.user_id,
-                 User.deleted_id.is_(None),
-                 UserRoles.role_id == patient_role_id))
-
-    for user in valid_patients:
-        dogpile_cache.refresh(overall_assessment_status, user.id)
-        for qb in QuestionnaireBank.qbs_for_user(
-                user=user, classification='baseline'):
-            queue_outstanding_messages(user=user, questionnaire_bank=qb)
-
+    update_patient_loop(update_cache=True, queue_messages=True)
     duration = datetime.now() - before
     message = (
         'Assessment Cache updated and messages queued in {0.seconds}'
@@ -118,12 +105,43 @@ def cache_assessment_status(job_id=None):
     return message
 
 
+def update_patient_loop(update_cache=True, queue_messages=True):
+    """Function to loop over valid patients and update as per settings
+
+    Typically called as a scheduled_job - also directly from tests
+    """
+    patient_role_id = Role.query.filter(
+        Role.name == ROLE.PATIENT).with_entities(Role.id).first()[0]
+    valid_patients = User.query.join(
+        UserRoles).filter(
+            and_(User.id == UserRoles.user_id,
+                 User.deleted_id.is_(None),
+                 UserRoles.role_id == patient_role_id))
+
+    for user in valid_patients:
+        if update_cache:
+            dogpile_cache.refresh(overall_assessment_status, user.id)
+        if queue_messages:
+            for qb in QuestionnaireBank.qbs_for_user(
+                    user=user, classification='baseline'):
+                queue_outstanding_messages(user=user, questionnaire_bank=qb)
+    db.session.commit()
+
+
 @celery.task
 def send_queued_communications(job_id=None):
     "Look for communication objects ready to send"
+    send_messages()
+    update_runtime(job_id)
+
+
+def send_messages():
+    """Function to send all queued messages
+
+    Typically called as a scheduled_job - also directly from tests
+    """
     ready = Communication.query.filter(Communication.status == 'prepared')
     for communication in ready:
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
         communication.generate_and_send()
-    update_runtime(job_id)
