@@ -41,6 +41,9 @@ class QuestionnaireBank(db.Model):
     intervention_id = db.Column(
         db.ForeignKey('interventions.id'), nullable=True)
 
+    communication_requests = db.relationship(
+        'CommunicationRequest')
+
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(

@@ -2,9 +2,11 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
-from .app_text import app_text, MailResource
+from .app_text import MailResource
 from ..database import db
+from .intervention import Intervention
 from .message import EmailMessage
+from .user import User
 
 
 # https://www.hl7.org/fhir/valueset-event-status.html
@@ -49,23 +51,26 @@ class Communication(db.Model):
             'Communication for {0.user_id}'
             ' of {0.communication_request_id}'.format(self))
 
-    def app_text_key(self):
-        return ('CommunicationRequest {0.name} {0.notify_days_after_event}'
-                ''.format(self))
-
     def generate_and_send(self):
         "Collate message details and send"
-        args = {'first_name': self.user.first_name,
-                'last_name': self.user.last_name}
+        user = User.query.get(self.user_id)
+        # TODO fix hardcoded hack till we figure out how to better encode
+        st = Intervention.query.filter_by(name='self_management').one()
+        # in testing, link_url isn't set:
+        if not st.link_url:
+            st.link_url = 'https://stg-sm.cirg.washington.edu'
+        args = {'first_name': user.first_name,
+                'last_name': user.last_name,
+                'st_link': st.link_url}
 
         mailresource = MailResource(
-            app_text(self.app_text_key()),
+            url=self.communication_request.lr_url,
             variables=args)
 
         self.message = EmailMessage(
             subject=mailresource.subject,
             body=mailresource.body,
-            recipients=self.user.email,
-            user_id=self.user.id)
+            recipients=user.email,
+            user_id=user.id)
         self.message.send_message()
         self.status = 'completed'
