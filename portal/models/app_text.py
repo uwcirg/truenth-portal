@@ -462,7 +462,7 @@ class MailResource(object):
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
                 raise
-        return self.error_msg
+        raise ValueError(self.error_msg)
 
     @property
     def body(self):
@@ -476,7 +476,7 @@ class MailResource(object):
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
                 raise
-        return self.error_msg
+        raise ValueError(self.error_msg)
 
     def _permanent_url(self, generic_url, version):
         """Produce a permanent url from the metadata provided
