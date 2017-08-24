@@ -5,14 +5,15 @@ var __i18next = (function() {
                 if (window.localStorage.getItem("i18nextLng")) window.localStorage.removeItem("i18nextLng");
             };
             if (!options) options = {};
+            /*
+             * consuming translation json from each corresponding locale
+             */
             var source = options.loadPath? options.loadPath : '/static/files/locales/{{lng}}/translation.json';
 
             i18next.use(i18nextXHRBackend)
                     .use(i18nextBrowserLanguageDetector)
                     .init({
                     fallbackLng: options.fallbackLng ? options.fallbackLng : 'en-US',
-                    //saveMissing: true,
-                    // lng: 'en-US',
                     debug: options.debug ? options.debug : true,
                     ns: options.ns ? options.ns : ['translation'],
                     defaultNS: 'translation',

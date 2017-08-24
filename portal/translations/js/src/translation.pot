@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-08-17T16:56:34.397Z\n"
-"PO-Revision-Date: 2017-08-17T16:56:34.397Z\n"
+"POT-Creation-Date: 2017-08-24T17:51:14.801Z\n"
+"PO-Revision-Date: 2017-08-24T17:51:14.801Z\n"
 
 msgid "Error occurred updating user organization."
 msgstr ""
@@ -24,6 +24,9 @@ msgid "No affiliated clinic"
 msgstr ""
 
 msgid "No clinic selected"
+msgstr ""
+
+msgid "Patient has deceased"
 msgstr ""
 
 msgid "Consent Status"
@@ -93,6 +96,9 @@ msgid "for this agreement to:"
 msgstr ""
 
 msgid "Submit"
+msgstr ""
+
+msgid "Sharing information with clinics "
 msgstr ""
 
 msgid "No Consent Record Found"
@@ -217,9 +223,6 @@ msgstr ""
 msgid "Unable to set default consent agreement"
 msgstr ""
 
-msgid "Server error occurred removing consent: "
-msgstr ""
-
 msgid "Server error occurred retrieving demographics information."
 msgstr ""
 
@@ -256,7 +259,16 @@ msgstr ""
 msgid "Server error occurred updating clinical data."
 msgstr ""
 
+msgid "no url returned"
+msgstr ""
+
 msgid "Server error occurred retrieving tou url."
+msgstr ""
+
+msgid "Server error"
+msgstr ""
+
+msgid "error retrieving instruments list"
 msgstr ""
 
 msgid "Server error occurred retrieving tou data."
@@ -296,6 +308,11 @@ msgid "Date must not be in the future. Please try again."
 msgstr ""
 
 msgid "Date must not be before 1900. Please try again."
+msgstr ""
+
+msgid ""
+"Date/time zone conversion is not supported in current browser. All "
+"date/time fields are converted to local time zone instead."
 msgstr ""
 
 msgid "Error occurred when converting timezone: "

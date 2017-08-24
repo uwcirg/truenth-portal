@@ -104,13 +104,13 @@ var fillViews = {
         var topLevelOrgs = $("#fillOrgs legend[data-checked]");
         if (topLevelOrgs.length > 0) {
             topLevelOrgs.each(function() {
-                content += "<p class='capitalize'>" + $(this).text() + "</p>";
+                content += "<p class='capitalize'>" + i18next.t($(this).text()) + "</p>";
             });
         };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
                 if ($(this).val() == "0") content += "<p>" + i18next.t("No affiliated clinic") + "</p>";
-                else content += "<p>" + $(this).closest("label").text() + "</p>";
+                else content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
             };
         });
         if (!hasValue(content)) content = "<p class='text-muted'>" + i18next.t("No clinic selected") + "</p>";
@@ -131,7 +131,7 @@ var fillViews = {
     },
     "name": function() {
         if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-            var content = $("#firstname").val() + " " + $("#lastname").val();
+            var content = i18next.t($("#firstname").val()) + " " + i18next.t($("#lastname").val());
             if (hasValue($.trim(content))) $("#name_view").text(content);
             else $("#name_view").html("<p class='text-muted'></p>");
         };
@@ -140,7 +140,7 @@ var fillViews = {
         if (!$("#bdGroup").hasClass("has-error")) {
             if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
                 var displayString = tnthDates.displayDateString($("#month option:selected").val(), $("#date").val(), $("#year").val());
-                $("#dob_view").text(displayString);
+                $("#dob_view").text(i18next.t(displayString));
             } else $("#dob_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
@@ -161,7 +161,7 @@ var fillViews = {
     "email": function() {
         if (!$("#emailGroup").hasClass("has-error")) {
             var content = $("#email").val();
-            if (hasValue(content)) $("#email_view").text(content);
+            if (hasValue(content)) $("#email_view").text(i18next.t(content));
             else $("#email_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
@@ -189,7 +189,7 @@ var fillViews = {
         if ($("#genderGroup").length > 0) {
             if (!$("#genderGroup").hasClass("has-error")) {
                 var content = $("input[name=sex]:checked").val();
-                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + content + "</p>");
+                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + i18next.t(content) + "</p>");
                 else $("#gender_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
             };
         } else $(".gender-view").hide();
@@ -199,7 +199,7 @@ var fillViews = {
             if (!$("#userRace").hasClass("has-error")) {
                 var content = "";
                 $("#userRace input:checkbox").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
                 })
                 if (hasValue(content)) $("#race_view").html($.trim(content));
                 else $("#race_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
@@ -213,7 +213,7 @@ var fillViews = {
             if (!$("#userEthnicity").hasClass("has-error")) {
                 var content = "";
                 $("#userEthnicity input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
                 })
                 if (hasValue(content)) $("#ethnicity_view").html($.trim(content));
                 else $("#ethnicity_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
@@ -225,7 +225,7 @@ var fillViews = {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).next("label").text()) + "</p>";
                 })
                 if (hasValue($.trim(content))) $("#indigenous_view").html($.trim(content));
                 else $("#indigenous_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
@@ -246,29 +246,29 @@ var fillViews = {
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-            if (hasValue(content)) $("#biopsy_view").html("<div>" + content + "</div>");
+            if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_diag_view").html("<div>" + content + "</div>");
+        if (hasValue(content)) $("#pca_diag_view").html("<div>" + i18next.t(content) + "</div>");
         else $("#pca_diag_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         content = $("#patMeta input[name='pca_localized']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_localized_view").html("<div>" + content + "</div>");
+        if (hasValue(content)) $("#pca_localized_view").html("<div>" + i18next.t(content) + "</div>");
         else $("#pca_localized_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
-            $("#boolDeath_view").text("Patient has deceased");
+            $("#boolDeath_view").text(i18next.t("Patient has deceased"));
             if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
-                $("#deathDate_view").text(displayString);
+                $("#deathDate_view").text(i18next.t(displayString));
             };
         } else $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
     },
     "locale": function() {
         if ($("#locale").length > 0) {
             var content = $("#locale option:selected").text();
-            if (hasValue(content)) $("#locale_view").text(content);
+            if (hasValue(content)) $("#locale_view").text(i18next.t(content));
             else $("#locale_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
 
         } else $(".locale-view").hide();
@@ -276,7 +276,7 @@ var fillViews = {
     "timezone": function() {
         if ($("#profileTimeZone").length > 0) {
             var content = $("#profileTimeZone").find("option:selected").val();
-            if (hasValue(content)) $("#timezone_view").text(content);
+            if (hasValue(content)) $("#timezone_view").text(i18next.t(content));
             else $("#timezone_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         } else $(".timezone-view").hide();
     },
@@ -285,7 +285,7 @@ var fillViews = {
             var content = "";
             $("#userProcedures tr[data-id]").each(function() {
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + $(this).text() + "</div>";
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + i18next.t($(this).text()) + "</div>";
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
@@ -507,7 +507,7 @@ var fillContent = {
                     orgStates.forEach(function(state) {
                         ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
                         ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(state);
+                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
                     });
                     $(".noOrg-container").show();
                 } else {
@@ -526,7 +526,7 @@ var fillContent = {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
                 if (item.system == SYSTEM_IDENTIFIER_ENUM["external_study_id"]) {
-                    if (hasValue(item.value)) $("#profileStudyId").val(item.value);
+                    if (hasValue(item.value)) $("#profileStudyId").val(i18next.t(item.value));
                 };
             });
         };
@@ -536,7 +536,7 @@ var fillContent = {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
                 if (item.system == SYSTEM_IDENTIFIER_ENUM["external_site_id"]) {
-                    if (hasValue(item.value)) $("#profileSiteId").val(item.value);
+                    if (hasValue(item.value)) $("#profileSiteId").val(i18next.t(item.value));
                 };
             });
         };
@@ -607,7 +607,7 @@ var fillContent = {
                 //wording is not spec'd out for EPROMs. won't add anything specific until instructed
                 touObj.forEach(function(item, index) {
                     var org = OT.orgsList[item.organization_id];
-                    touContent += "<tr data-tou-type='" + i18next.t("" + item.type) + "'>";
+                    touContent += "<tr data-tou-type='" + item.type + "'>";
                     touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
                     touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
                     touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.display_type + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
@@ -1044,7 +1044,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + (role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();})) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + i18next.t((role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}))) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1601,13 +1601,13 @@ OrgTool.prototype.populateUI = function() {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                    container.append("<legend orgId='" + org + "'>"+ i18next.t(""+orgsList[org].name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                    container.append("<legend orgId='" + org + "'>"+ i18next.t(orgsList[org].name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
                     parentOrgsCt++;
                 };
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
                     container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
-                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t("" + orgsList[org].name) + '</label>');
+                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t(orgsList[org].name) + '</label>');
                 };
             };
         };
@@ -1629,14 +1629,14 @@ OrgTool.prototype.populateUI = function() {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t("" + item.name) +
+                    i18next.t(item.name) +
                     '</label>';
 
                  } else {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t("" + item.name) +
+                    i18next.t(item.name) +
                     '</label>';
                 };
 
@@ -1971,7 +1971,7 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? message: i18next.t("Not provided");
+        params.message = hasValue(message) ? i18next.t(message) : i18next.t("Not provided");
 
         $.ajax ({
             type: "GET",
@@ -2248,7 +2248,7 @@ var tnthAjax = {
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
-                        var errorMessage = i18next.t("Server error occurred removing consent: ") + xhr.responseText;
+                        var errorMessage = i18next.t("Server error occurred removing consent: " + xhr.responseText);
                         if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
                         else $(".delete-consent-error").html(errorMessage)
                     });
@@ -2851,14 +2851,14 @@ var tnthAjax = {
                 });
                 if (callback) callback({"url": data.url});
             } else {
-                if (callback) callback({"error": "no url returned"});
+                if (callback) callback({"error": i18next.t("no url returned")});
             }
             //fillContent.terms(data);
         }).fail(function() {
            var errorMessage = i18next.t("Server error occurred retrieving tou url.");
            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
            else $(".get-tou-error").html(errorMessage);
-           if (callback) callback({"error": "Server error"});
+           if (callback) callback({"error": i18next.t("Server error")});
         });
     },
     /*
@@ -2872,7 +2872,7 @@ var tnthAjax = {
         }).done(function(data){
             if (data && data.entry) {
                 if ((data.entry).length === 0) {
-                    if (callback) callback({"error": "no data returned"});
+                    if (callback) callback({"error": i18next.t("no data returned")});
                 } else {
                     var qList = {};
                     (data.entry).forEach(function(item) {
@@ -2899,11 +2899,11 @@ var tnthAjax = {
                     if (callback) callback(qList);
                 };
             } else {
-                if (callback) callback({"error": "no data returned"});
+                if (callback) callback({"error": i18next.t("no data returned")});
             };
 
         }).fail(function() {
-            if (callback) callback({"error": "error retrieving instruments list"});
+            if (callback) callback({"error": i18next.t("error retrieving instruments list")});
         });
     },
     "getTerms": function(userId, type, sync, callback) {
@@ -3658,7 +3658,7 @@ var tnthDates = {
                 } else {
                     if (timeZone != "UTC") {
                         convertedDate = convertToLocalTime(dateString);
-                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead.");
+                        $(".timezone-warning").addClass("text-warning").html(i18next.t("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead."));
                         $(".gmt").each(function() { $(this).hide()});
                     };
                 }

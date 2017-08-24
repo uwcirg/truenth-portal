@@ -155,7 +155,7 @@
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>{%trans%}' + o.display + '{%endtrans%}</label></div>';
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + i18next.t(o.display) + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -1646,7 +1646,7 @@
                                 var errorMsg = "";
 
                                 if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                                    if (iy < 1900) errorMsg = "Year must be after 1900";
+                                    if (iy < 1900) errorMsg = "{{_('Year must be after 1900')}}";
                                     // Only allow if birthdate is before today
                                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                                         errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
@@ -2454,7 +2454,7 @@
         };
         this.__handleError = function(errorMessage) {
             if (hasValue(errorMessage)) {
-                $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                $('#serviceErrorMsg').html('<small>' + i18next.t("[Processing error] " + errorMessage) + '</small>').fadeIn();
                 tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
             };
         };
