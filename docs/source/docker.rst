@@ -22,59 +22,25 @@ Building a Debian Package
 
 To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)::
 
-    # Create the volume to hold artifacts
-    docker volume create --name debian-repo
+    # Build debian package from develop branch on Github
+    COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+    docker-compose run builder
 
-    # Build the image
-    docker build --file docker/Dockerfile.build --tag "portal_builddeb:latest" .
-
-    # ...or download a pre-existing image
-    docker pull "uwcirg-docker-true_nth.bintray.io/portal_builddeb:latest"
-
-    # Run the container (build the package)
-    docker run --volume debian-repo:/tmp/artifacts "portal_builddeb:latest"
-
-    # Copy finished packages out of volume onto host filesystem
-    sudo cp -R $(docker volume inspect --format '{{ .Mountpoint }}' debian-repo) artifacts
 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
 If you would like to create a package from a topic branch or fork you can override the Github repo and branch as below::
 
+    # Override defaults with environmental variables
+    REPO_SLUG='USERNAME/true_nth_usa_portal'
+    BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+
     # Run the container (override defaults)
-    docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG='USERNAME/true_nth_usa_portal' -e BRANCH='feature/feature-branch-name' "portal_builddeb:latest"
+    docker-compose run builder
 
 .. note::
     The branch specified must exist on Github
-
-Building the portal
--------------------
-
-The portal Docker image can be built using Debian packages from a remote Debian repository (default Bintray) or locally, from packages placed in the ``debian/artifacts`` directory.
-
-Remote Debian Repo
-~~~~~~~~~~~~~~~~~~
-
-To build an image of the portal (``portal_web``) with defaults::
-
-    # Build the image
-    docker build --file docker/Dockerfile --tag "portal_web:latest" .
-
-If you would like to use your own repo, the default Debian repo can be overridden as follows::
-
-    docker build --file docker/Dockerfile --build-arg debian_repo="http://dl.bintray.com/v1/content/myaccount/myrepo" --tag "portal_web:myrepo" .
-
-.. note::
-    The artifacts/ directory must exist even if you don't build a package locally
-
-Local Debian Repo
-~~~~~~~~~~~~~~~~~
-
-To build an image of the portal with a locally created Debian portal package first create the package as described in `Building a Debian Package`_. After checking that a package exists in the ``debian/artifacts`` directory, run the below command to build an image of the portal with the aforementioned package. ::
-
-    # Use the packages available in debian/artifacts/
-    docker build --file docker/Dockerfile --build-arg --tag "portal_web:local_deb" .
 
 Orchestration
 -------------
@@ -82,21 +48,24 @@ Docker-compose (through docker-compose.yaml) defines the relationship (exposed p
 
 Docker-compose offers a higher-level interface to build and run containers together but may be supplanted by Docker stacks in the future.
 
-As it stands Docker Compose lacks a way to build the prerequisite Debian package before building the ``portal_web`` container and will use the default Debian repository unless packages are placed in the artifact directory beforehand.
-
 To download and start the set of containers that comprise Shared Services issue the following command::
 
-    docker-compose -f docker/docker-compose.yaml up
+    # Download and start web container and dependencies
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
 
 By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
 
-    IMAGE_TAG='stable' docker-compose -f docker/docker-compose.yaml up
+    IMAGE_TAG='stable'
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
 
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Build the "web" service locally instead of downloading from a docker registry
-    docker-compose -f docker/docker-compose.yaml build web
-    docker-compose -f docker/docker-compose.yaml up
+    COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+    docker-compose build web
+    docker-compose up web
 
 PostgreSQL Access
 -----------------
@@ -151,6 +120,7 @@ Copy and edit the default environment file (from the project root)::
     # update SERVER_NAME to include port if not binding with 80/443
     # SERVER_NAME=localhost:8080
 
-Build and run the generated images::
+Download and run the generated images::
 
-    docker-compose -f docker/docker-compose.yaml up
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
