@@ -469,7 +469,7 @@ class MailResource(object):
         if self._body:
             try:
                 formatted = self._body.format(**self.variables)
-                return formatted.encode('string-escape')
+                return formatted
             except KeyError, e:
                 self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +
