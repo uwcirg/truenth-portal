@@ -33,10 +33,6 @@ const translationSourceDir = path.join(__dirname, './translations/js/src/');
  */
 const translationDestinationDir = path.join(__dirname,'./static/files/locales/');
 /*
- * supported languages
- */
-const languagesArray = ['en-US', 'en-AU'];
-/*
  * namespace
  */
 const nameSpace = "translation";
@@ -58,7 +54,6 @@ gulp.task('i18next-extraction', function() {
     del(['translations/js/src/translation.json']);
     return gulp.src(['static/**/*.{js,html}'])
                .pipe(scanner({
-                    lngs: languagesArray, // supported languages
                     keySeparator: "|",
                     nsSeparator: "|",
                     attr: {
@@ -117,22 +112,36 @@ gulp.task('i18nextConvertPOToJSON', function() {
   console.log("converting po to json ...")
   const options = {/* you options here */}
 
-  del(['static/files/**/translation.json']);
+  del([translationDestinationDir + '/*.json']);
 
    /*
     * translating po file to json for supported languages
     */
-  languagesArray.forEach(function(lng) {
-      var destination = translationDestinationDir+lng+"/translation.json";
-      fs.open(destination, 'w+', function(err, fd) {
-        if (err) console.log("error occurred writing " + lng + " json: " + err);
-        else {
-          i18nextConv.gettextToI18next(lng, fs.readFileSync(path.join(__dirname,'./translations/' + lng.replace('-', '_') + '/LC_MESSAGES/messages.po')), options)
-          .then(save(destination));
-          fs.close(fd, function(err) {
-              if (err) console.log("error occurred closing " + destination);
+  var __path = path.join(__dirname,'./translations');
+  fs.readdir(__path, function(err, files) {
+      files.forEach(function(file) {
+          let filePath = __path + '/' + file; 
+          fs.stat(filePath, function(err, stat) {
+              if (stat.isDirectory()) {
+                /*
+                 * directories are EN_US, EN_AU, etc.
+                 * so check to see if each has a PO file
+                 */
+                let poFilePath = __path + "/" + file + "/LC_MESSAGES/messages.po";
+                if (fs.existsSync(poFilePath)) {
+                    let destDir = translationDestinationDir+file.replace("_", "-");
+                    console.log("locale found: " + file);
+                    if (!fs.existsSync(destDir)){
+                      fs.mkdirSync(destDir);
+                    };
+                    /* 
+                     * write corresponding json file from each po file
+                     */
+                    i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
+                    .then(save(destDir+"/translation.json"));
+                };
+              };
           });
-        };
       });
   });
 });
