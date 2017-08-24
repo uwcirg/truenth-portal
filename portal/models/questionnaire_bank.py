@@ -58,8 +58,12 @@ class QuestionnaireBank(db.Model):
         self.name = data['name']
         if 'classification' in data:
             self.classification = data['classification']
-        self.organization_id = Reference.parse(
-            data['organization']).id
+        if 'organization' in data:
+            self.organization_id = Reference.parse(
+                data['organization']).id
+        if 'intervention' in data:
+            self.intervention_id = Reference.parse(
+                data['intervention']).id
         self = self.add_if_not_found(commit_immediately=True)
         qs_named = set()
         for q in data['questionnaires']:
@@ -83,8 +87,12 @@ class QuestionnaireBank(db.Model):
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
         d['classification'] = self.classification
-        d['organization'] = Reference.organization(
-            self.organization_id).as_fhir()
+        if self.organization_id:
+            d['organization'] = Reference.organization(
+                self.organization_id).as_fhir()
+        if self.intervention_id:
+            d['intervention'] = Reference.intervention(
+                self.intervention_id).as_fhir()
         d['questionnaires'] = [q.as_json() for q in self.questionnaires]
         return d
 
