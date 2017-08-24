@@ -12,6 +12,24 @@ Docker is an open-source project that automates the deployment of applications i
 
 Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
 
+Getting Started
+===============
+Install `docker-compose` as per environment.  For example, from a debian system::
+
+    sudo usermod -aG docker $USER # add user to docker group
+    sudo pip install docker_compose
+
+Copy and edit the default environment file (from the project root)::
+
+    cp docker/portal.env.default docker/portal.env
+    # update SERVER_NAME to include port if not binding with 80/443
+    # SERVER_NAME=localhost:8080
+
+Download and run the generated images::
+
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
+
 Containers
 ==========
 
@@ -107,20 +125,3 @@ Most if not all values needed to build and deploy Shared Services are available 
     job
         A discrete unit of work that is part of a build. All jobs part of a build must pass for the build to pass (unless a job is set as an `allowed failure <https://docs.travis-ci.com/user/customizing-the-build#rows-that-are-allowed-to-fail>`_).
 
-Getting Started
-===============
-Install `docker-compose` as per environment.  For example, from a debian system::
-
-    sudo usermod -aG docker $USER # add user to docker group
-    sudo pip install docker_compose
-
-Copy and edit the default environment file (from the project root)::
-
-    cp docker/portal.env.default docker/portal.env
-    # update SERVER_NAME to include port if not binding with 80/443
-    # SERVER_NAME=localhost:8080
-
-Download and run the generated images::
-
-    COMPOSE_FILE='docker/docker-compose.yaml'
-    docker-compose up web
