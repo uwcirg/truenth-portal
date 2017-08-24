@@ -6,6 +6,7 @@
  * run gulp --gulpfile i18next_gulpfile.js will perform default task -
  * which will perform text extraction and translate resulting json to pot file
  * run gulp --gulpfile i18next_gulpfile.js [task name]  will run individual task
+ * NB:  should NOT run this in Production environment, the resulting modules in node_modules/ folder from running `npm install` should never be checked in
  */
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
