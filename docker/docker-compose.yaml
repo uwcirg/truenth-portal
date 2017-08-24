@@ -3,6 +3,9 @@ version: "3.3"
 services:
   web:
     image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
+    depends_on:
+      - db
+      - redis
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     env_file:
