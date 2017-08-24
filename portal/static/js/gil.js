@@ -611,7 +611,7 @@ module.exports = OrgTool = (function() {
         }).done(function(data) {
             demoArray = data;
         }).fail(function() {
-            errorMessage = "Error retrieving demographics information for user.";
+            errorMessage = i18next.t("Error retrieving demographics information for user.");
         });
 
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
@@ -753,11 +753,11 @@ module.exports = OrgTool = (function() {
         for (org in orgsList) {
             if (orgsList[org].isTopLevel) {
                 if (orgsList[org].children.length > 0) {
-                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+i18next.t(orgsList[org].name)+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
 
                 } else {
                   $("#fillOrgs").append('<div id="' + orgsList[org].id + '_container" data-parent-id="'+ orgsList[org].name +'"  data-parent-name="' + orgsList[org].name + '" class="org-container"><label id="org-label-' + orgsList[org].id + '" class="org-label"><input class="clinic" type="radio" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
-                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + orgsList[org].name + '</span></label></div>');
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + i18next.t(orgsList[org].name) + '</span></label></div>');
                 };
                 parentOrgsCt++;
             };
@@ -774,14 +774,14 @@ module.exports = OrgTool = (function() {
                         childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        i18next.t("" + item.name) +
+                        i18next.t(item.name) +
                         '</span></label>';
 
                      } else {
                         childClinic += '<label class="org-label">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        i18next.t("" + item.name) +
+                        i18next.t(item.name) +
                         '</span></label>';
                     };
 
@@ -843,7 +843,7 @@ module.exports = OrgTool = (function() {
           };
         };
       } else {
-        $("#modal-org-error").html(i18next.t("" + errorMessage));
+        $("#modal-org-error").html(i18next.t(errorMessage));
       };
     };
   };
@@ -936,7 +936,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                               var eitem = $("#intervention_item_" + ct);
                               if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t(n) + '</a></li>');
                                 ct++;
                               };
                           };
