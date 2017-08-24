@@ -54,11 +54,10 @@ class Communication(db.Model):
     def generate_and_send(self):
         "Collate message details and send"
         user = User.query.get(self.user_id)
+
         # TODO fix hardcoded hack till we figure out how to better encode
         st = Intervention.query.filter_by(name='self_management').one()
-        # in testing, link_url isn't set:
-        if not st.link_url:
-            st.link_url = 'https://stg-sm.cirg.washington.edu'
+
         args = {'first_name': user.first_name,
                 'last_name': user.last_name,
                 'st_link': st.link_url}
