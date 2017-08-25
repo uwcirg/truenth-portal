@@ -770,9 +770,7 @@ def profile(user_id):
                    'last_name': user.last_name,
                    'parent_org': top_org.name if top_org else '',
                    'clinic_name': first_org.name if first_org else '',
-                   'registrationlink': url_for('user_api.access_url',
-                                               _external=True,
-                                               user_id=user.id)
+                   'registrationlink': 'url_placeholder'
                   }
     invite_email = MailResource(app_text(UserInviteEmail_ATMA.name_key()),
                                 variables=invite_vars)
