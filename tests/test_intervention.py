@@ -818,8 +818,8 @@ class TestIntervention(TestCase):
 
     def test_truenth_st_conditions(self):
         # Test the list of conditions expected for SymptomTracker in truenth
-        ds_sm = INTERVENTION.SELF_MANAGEMENT
-        ds_sm.public_access = False
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.public_access = False
         user = self.test_user
         add_role(user, ROLE.PATIENT)
         sm_identifier = Identifier(
@@ -876,10 +876,10 @@ class TestIntervention(TestCase):
             # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
-        user, ds_sm = map(db.session.merge, (user, ds_sm))
+        user, sm = map(db.session.merge, (user, sm))
 
         # only first two strats true so far, therfore, should be False
-        self.assertFalse(ds_sm.display_for_user(user).access)
+        self.assertFalse(sm.display_for_user(user).access)
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -890,26 +890,26 @@ class TestIntervention(TestCase):
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
-        user, ds_sm = map(db.session.merge, (user, ds_sm))
+        user, sm = map(db.session.merge, (user, sm))
 
         # All conditions now met, should have access
-        self.assertTrue(ds_sm.display_for_user(user).access)
+        self.assertTrue(sm.display_for_user(user).access)
 
         # Remove all clinics, should still have access
         user.organizations = []
         with SessionScope(db):
             db.session.commit()
-        user, ds_sm = map(db.session.merge, (user, ds_sm))
+        user, sm = map(db.session.merge, (user, sm))
         self.assertEquals(user.organizations.count(), 0)
-        self.assertTrue(ds_sm.display_for_user(user).access)
+        self.assertTrue(sm.display_for_user(user).access)
 
         # Finally, remove the PATIENT role and it should disappear
         user.roles.pop()
         with SessionScope(db):
             db.session.add(user)
             db.session.commit()
-        user, ds_sm = map(db.session.merge, (user, ds_sm))
-        self.assertFalse(ds_sm.display_for_user(user).access)
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertFalse(sm.display_for_user(user).access)
 
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
