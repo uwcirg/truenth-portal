@@ -2095,6 +2095,12 @@ sub.pointer:hover {
   position: relative;
   top: -2px;
 }
+.withdrawn-label [data-eproms] {
+  display: none;
+}
+.withdrawn-label [data-truenth] {
+  display: inline;
+}
 #profileConsentList {
   font-size: 0.95em;
   max-width: 100%;
