@@ -2436,9 +2436,11 @@ div.biopsy-option:last-of-type{
   top:-2px;
 }
 
-.withdrawn-label:before,
-.withdrawn-label::before {
-  content: "Withdrawn - Suspend Data Collection and Report Historic Data";
+.withdrawn-label [data-eproms] {
+  display: inline;
+}
+.withdrawn-label [data-truenth] {
+  display: none;
 }
 
 #consentDateEditContainer {
@@ -2831,7 +2833,7 @@ div.timezone-warning.text-warning {
   .org-container .org-label {
     font-size: 0.9em;
   }
-  
+
   #aboutForm .iq-container .tnth-headline:first-of-type{
     margin-left: 0.3em;
     margin-right: 0.3em;
