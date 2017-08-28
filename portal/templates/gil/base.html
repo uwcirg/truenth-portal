@@ -46,6 +46,8 @@
             $("#modal-login > div > div > div > form").append('<input id="csrf_token" name="csrf_token" type="hidden" value="'+ result.attr("value") +'">');
         }
     });
+    var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+    __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true), "initImmediate": true});
     </script>
   </head>
   {%- endblock -%}
@@ -554,12 +556,6 @@
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("__loader(false);", 0);
 
-
-            var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
-
-             __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true)}, function() {
-                __NOT_PROVIDED_TEXT = i18next.t("Not provided");
-             });
           });
 
       </script>

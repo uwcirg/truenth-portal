@@ -843,7 +843,7 @@ module.exports = OrgTool = (function() {
           };
         };
       } else {
-        $("#modal-org-error").html(i18next.t(errorMessage));
+        $("#modal-org-error").html(i18next.t("Error updating organization"));
       };
     };
   };
@@ -880,7 +880,6 @@ module.exports = OrgTool = (function() {
                       var d = item.description;
                       var b = item.link_url;
                       var n = item.name.replace(/\_/g, " ");
-                          n = i18next.t("" + n);
                       var disabled = item.link_url == "disabled";
                       var dm = /decision\s?support/gi;
                       var sm = /symptom\s?tracker/gi;
