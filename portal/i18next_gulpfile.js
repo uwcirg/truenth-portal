@@ -12,11 +12,8 @@ var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var request = require('request');
 var merge = require('merge2');
-var concat = require('gulp-concat');
 var buffer = require('gulp-buffer');
 var del = require('del');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
 var scanner = require('i18next-scanner');
 var concatPo = require('gulp-concat-po');
 const path = require('path');
@@ -35,7 +32,8 @@ const translationDestinationDir = path.join(__dirname,'./static/files/locales/')
 /*
  * namespace
  */
-const nameSpace = "translation";
+const nameSpace = 'frontend';
+const srcPotFileName = translationSourceDir+nameSpace+'.pot';
 
 /*
  * helper function for writing file
@@ -49,9 +47,8 @@ function save(target) {
 /*
  * extracting text from js/html files into json file
  */
-gulp.task('i18next-extraction', function() {
-    console.log("extracting text and generate json file ...")
-    del(['translations/js/src/translation.json']);
+gulp.task('i18next-extraction', ['clean-src'], function() {
+    console.log('extracting text and generate json file ...');
     return gulp.src(['static/**/*.{js,html}'])
                .pipe(scanner({
                     keySeparator: "|",
@@ -63,8 +60,7 @@ gulp.task('i18next-extraction', function() {
                     func: {
                         list: ['i18next.t', 'i18n.t'],
                         extensions: ['.js', '.jsx']
-                    }
-                    ,
+                    },
                     resource: {
                         //the source path is relative to current working directory as specified in the destination folder
                         savePath: './src/' + nameSpace + '.json'
@@ -82,9 +78,8 @@ gulp.task('i18nextConvertJSONToPOT', ['i18next-extraction'], function() {
    /*
     * converting json to pot
     */
-    console.log("converting JSON to POT...");
-    del(['translations/js/src/translation.pot']);
-    i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(save(translationSourceDir+nameSpace+".pot"));
+    console.log('converting JSON to POT...');
+    i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+nameSpace+'.json'), options).then(save(srcPotFileName));
 
 });
 
@@ -94,7 +89,7 @@ gulp.task('i18nextConvertJSONToPOT', ['i18next-extraction'], function() {
  */
 gulp.task('combineAllPotFiles', ['i18nextConvertJSONToPOT'], function() {
     console.log("combine all pot files ...")
-    return gulp.src([translationSourceDir+nameSpace+".pot", 'translations/messages.pot'])
+    return gulp.src([srcPotFileName, 'translations/messages.pot'])
           .pipe(concatPo('messages.pot'))
           .pipe(gulp.dest('translations'));
 });
@@ -108,37 +103,34 @@ gulp.task('combineAllPotFiles', ['i18nextConvertJSONToPOT'], function() {
  *    3. merged new POT into main POT file [need to check about this step]
  *    4. Po files have been returned from translator after uploading POT file from #3
  */
-gulp.task('i18nextConvertPOToJSON', function() {
-  console.log("converting po to json ...")
+gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
+  console.log('converting po to json ...');
   const options = {/* you options here */}
-
-  del([translationDestinationDir + '/*.json']);
-
    /*
     * translating po file to json for supported languages
     */
   var __path = path.join(__dirname,'./translations');
   fs.readdir(__path, function(err, files) {
       files.forEach(function(file) {
-          let filePath = __path + '/' + file; 
+          let filePath = __path + '/' + file;
           fs.stat(filePath, function(err, stat) {
               if (stat.isDirectory()) {
                 /*
                  * directories are EN_US, EN_AU, etc.
                  * so check to see if each has a PO file
                  */
-                let poFilePath = __path + "/" + file + "/LC_MESSAGES/messages.po";
+                let poFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
                 if (fs.existsSync(poFilePath)) {
-                    let destDir = translationDestinationDir+file.replace("_", "-");
-                    console.log("locale found: " + file);
+                    let destDir = translationDestinationDir+file.replace('_', '-');
+                    console.log('locale found: ' + file);
                     if (!fs.existsSync(destDir)){
                       fs.mkdirSync(destDir);
                     };
-                    /* 
+                    /*
                      * write corresponding json file from each po file
                      */
                     i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
-                    .then(save(destDir+"/translation.json"));
+                    .then(save(destDir+'/translation.json'));
                 };
               };
           });
@@ -147,43 +139,19 @@ gulp.task('i18nextConvertPOToJSON', function() {
 });
 
 /*
- * concating all necessary i18next JS files into one
- * don't run this unless files have been changed
+ * clean all generated source files
  */
-gulp.task('i18nextConcatScripts', function() {
-  console.log("concat i18next scripts ...")
-  var i18nextMain = request('https://unpkg.com/i18next/i18next.js')
-    .pipe(source('i18nextMain.js'));
-  var i18nextXHRBackend = request('https://unpkg.com/i18next-xhr-backend/i18nextXHRBackend.js')
-    .pipe(source('i18nextXHRBackend.js'));
-  var i18nextLnDetection = request('https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js')
-    .pipe(source('i18nextBrowserLanguageDetector.js'));
-
-  return merge(i18nextMain, i18nextXHRBackend, i18nextLnDetection)
-    .pipe(buffer())
-    .pipe(concat('i18next.js'))
-    .pipe(gulp.dest('static/js'));
+gulp.task('clean-src', function() {
+  del([translationSourceDir + '*']);
 });
 
 /*
- * minify combined i18next JS file
- * don't run this unless files have been changed
+ * clean all generated destination json files
  */
-gulp.task("minifyi18nextScripts", ["i18nextConcatScripts"], function() {
-  console.log("minify i18next scripts ...")
-  del(['static/js/i18next*.js']);
-  return gulp.src("static/js/i18next.js")
-    .pipe(uglify())
-    .pipe(rename('i18next.min.js'))
-    .pipe(gulp.dest('static/js'));
+gulp.task('clean-dest', function() {
+  del([translationDestinationDir + '*/translation.json']);
 });
 
-/*
- * clean all generated files
- */
-gulp.task('clean', function() {
-  del(['static/files/**/translation.json', 'translations/js/src/*']);
-});
 
 /*
  * NOTE, the task - converting po to json file is not included, as I think we need to upload pot to smartling first to have

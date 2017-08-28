@@ -20,6 +20,7 @@ var __i18next = (function() {
                     initImmediate: options.initImmediate ? options.initImmediate : false,
                     load: 'currentOnly', //this reads language code in en-US, en-AU format
                     returnEmptyString: false,
+                    returnNull: false,
                     saveMissing: true,
                     missingKeyHandler: function(lng, ns, key, fallbackValue) {
                         if (options.missingKeyHandler) options.missingKeyHandler(lng, ns, key, fallbackValue);

@@ -273,7 +273,7 @@ var fillViews = {
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
-            $("#boolDeath_view").text(i18next.t("Patient has deceased"));
+            $("#boolDeath_view").text(i18next.t("Patient is deceased"));
             if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
                 $("#deathDate_view").text(i18next.t(displayString));
@@ -591,7 +591,7 @@ var fillContent = {
                               "status": i18next.t("Status"),
                               "agreement": i18next.t("Agreement"),
                               "consentDate": i18next.t("Consent Date"),
-                              "registrationDate": i18next.t("Regiatration Date"),
+                              "registrationDate": i18next.t("Registration Date"),
                               "locale": i18next.t("GMT")
                              };
             var headerArray = ['Organization',
@@ -638,7 +638,7 @@ var fillContent = {
                     touContent += "<tr data-tou-type='" + item.type + "'>";
                     touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
                     touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.display_type + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
                 });
                 return touContent;
@@ -717,7 +717,7 @@ var fillContent = {
                             + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to:") + '</h4>'
+                            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
                             + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
                             + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>' + consentLabels["withdrawn"] + '</input></label></div>'
@@ -1679,12 +1679,14 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 + '<div class="modal-dialog" role="document">' +
                 '<div class="modal-content">' +
                 '<div class="modal-header">' +
-                '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + "<span aria-hidden='true'>&times;</span></button>" +
                 '<h4 class="modal-title">' + i18next.t("Consent to share information") + '</h4>' +
                 '</div>' +
                 '<div class="modal-body">' +
                 '<h4>Terms</h4>' +
-                '<p>' + i18next.t("I consent to sharing information with the ") + '<span class="consent-clinic-name">' + orgName + '.</span></p>' +
+                '<p>' + i18next.t("I consent to sharing information with") +
+                '<span class="consent-clinic-name">&nbsp;' + i18next.t(orgName) +
+                '</p>' +
                 '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
                 '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>' + i18next.t("Yes") + '</label>' +
@@ -2268,7 +2270,7 @@ var tnthAjax = {
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
-                        var errorMessage = i18next.t("Server error occurred removing consent: " + xhr.responseText);
+                        var errorMessage = i18next.t("Server error occurred removing consent.");
                         if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
                         else $(".delete-consent-error").html(errorMessage)
                     });
@@ -3057,11 +3059,9 @@ $(document).ready(function() {
 
     tnthAjax.beforeSend();
 
-    //setTimeout('LRKeyEvent();', 1500);
-    __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true}, function() {
-        __NOT_PROVIDED_TEXT = i18next.t("Not provided");
-    });
+    __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
+    //setTimeout('LRKeyEvent();', 1500);
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
         custom: {

@@ -5,10 +5,34 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-08-24T17:51:14.801Z\n"
-"PO-Revision-Date: 2017-08-24T17:51:14.801Z\n"
+"POT-Creation-Date: 2017-08-28T17:48:43.529Z\n"
+"PO-Revision-Date: 2017-08-28T17:48:43.529Z\n"
+
+msgid "Select All"
+msgstr ""
+
+msgid "Clear All"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Error occurred retrieving data from server."
+msgstr ""
+
+msgid "Please choose at least one instrument."
+msgstr ""
+
+msgid "Please choose one download type."
+msgstr ""
+
+msgid "Error retrieving demographics information for user."
+msgstr ""
 
 msgid "Error occurred updating user organization."
+msgstr ""
+
+msgid "Error updating organization"
 msgstr ""
 
 msgid "Decision Support"
@@ -26,7 +50,7 @@ msgstr ""
 msgid "No clinic selected"
 msgstr ""
 
-msgid "Patient has deceased"
+msgid "Patient is deceased"
 msgstr ""
 
 msgid "Consent Status"
@@ -41,7 +65,7 @@ msgstr ""
 msgid "Consent Date"
 msgstr ""
 
-msgid "Regiatration Date"
+msgid "Registration Date"
 msgstr ""
 
 msgid "GMT"
@@ -77,10 +101,7 @@ msgstr ""
 msgid "Consent Status Editor"
 msgstr ""
 
-msgid "Modify the consent status for this user to:"
-msgstr ""
-
-msgid "Close"
+msgid "Modify the consent status for this user to"
 msgstr ""
 
 msgid "Consent Date Editor"
@@ -169,7 +190,7 @@ msgstr ""
 msgid "Consent to share information"
 msgstr ""
 
-msgid "I consent to sharing information with the "
+msgid "I consent to sharing information with"
 msgstr ""
 
 msgid "Cannot ununcheck.  A staff member must be associated with an organization"
@@ -221,6 +242,9 @@ msgid "Server error occurred setting consent status."
 msgstr ""
 
 msgid "Unable to set default consent agreement"
+msgstr ""
+
+msgid "Server error occurred removing consent."
 msgstr ""
 
 msgid "Server error occurred retrieving demographics information."
@@ -275,6 +299,9 @@ msgid "Server error occurred retrieving tou data."
 msgstr ""
 
 msgid "Server error occurred saving terms of use information."
+msgstr ""
+
+msgid "not provided"
 msgstr ""
 
 msgid "All fields must be complete."

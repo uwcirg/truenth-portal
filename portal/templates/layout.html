@@ -133,6 +133,8 @@ var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
 var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+ __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true, "initImmediate": true});
+
 {% block document_ready -%}
 $(document).ready(function(){
    $('[data-toggle="popover"]').popover();
