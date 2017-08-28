@@ -764,7 +764,7 @@ def profile(user_id):
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     top_org = user.first_top_organization()
-    first_org = user.organizations[0]
+    first_org = user.organizations[0] if len(list(user.organizations)) > 0 else None
     invite_vars = {
                    'first_name': user.first_name,
                    'last_name': user.last_name,

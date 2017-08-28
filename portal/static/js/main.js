@@ -683,7 +683,7 @@ var fillContent = {
                                     else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>" + consentLabels["widthdrawn"] + "</span>";
+                                    sDisplay = "<span class='text-warning small-text withdrawn-label'></span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
                                     sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
@@ -698,7 +698,11 @@ var fillContent = {
                     var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
-                        /****** modal content doe modifying consent status *******/
+                        /****** modal content for modifying consent status *******/
+                        /*
+                         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
+                         * verbiage is populated via css - see .withdrawn-label class in respective css files
+                         */
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -710,7 +714,7 @@ var fillContent = {
                             + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
                             + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>' + consentLabels["widthdrawn"] + '</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label"></span></input></label></div>'
                             + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
