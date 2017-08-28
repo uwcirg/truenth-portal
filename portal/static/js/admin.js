@@ -55,6 +55,9 @@ AdminTool.prototype.getPatientsIdList = function() {
   };
   return self.patientsIdList;
 };
+/*
+ * currently not being used - client side retrieval of assessment status
+ */
 AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
     if (self.ajaxAborted) {
@@ -292,7 +295,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
             });
           });
 
-          $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
+          $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Select All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Clear All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Close") + "</span></label></div>");
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               var orgsList = [];
@@ -320,7 +323,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
 
     }).fail(function() {
         //console.log("Problem retrieving data from server.");
-        $("#org-menu").append("<span class='indent text-danger'>Error occurred retrieving data from server.</span>");
+        $("#org-menu").append("<span class='indent text-danger'>" + i18next.t("Error occurred retrieving data from server.") + "</span>");
     });
 
     //orglist-dropdown
@@ -406,8 +409,8 @@ AdminTool.prototype.handleDownloadModal = function() {
           $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
           $("#_downloadLink")[0].click();
       } else {
-          message = (instruments == "" ? "Please choose at least one instrument.": "");
-          if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+          message = (instruments == "" ? i18next.t("Please choose at least one instrument."): "");
+          if (dataType == "") message += (message != "" ? "<br/>": "") + i18next.t("Please choose one download type.");
           $("#_downloadMessage").html(message);
       };
     });

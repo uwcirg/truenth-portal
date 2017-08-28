@@ -85,7 +85,6 @@ var loader = function(show) {
     };
 };
 
-
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
 var CONSENT_ENUM = {
@@ -111,6 +110,8 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
 };
 
+var __NOT_PROVIDED_TEXT = "not provided";
+
 var fillViews = {
     "org": function() {
         var content = "";
@@ -118,16 +119,16 @@ var fillViews = {
         var topLevelOrgs = $("#fillOrgs legend[data-checked]");
         if (topLevelOrgs.length > 0) {
             topLevelOrgs.each(function() {
-                content += "<p class='capitalize'>" + $(this).text() + "</p>";
+                content += "<p class='capitalize'>" + i18next.t($(this).text()) + "</p>";
             });
         };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
-                if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
-                else content += "<p>" + $(this).closest("label").text() + "</p>";
+                if ($(this).val() == "0") content += "<p>" + i18next.t("No affiliated clinic") + "</p>";
+                else content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
             };
         });
-        if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
+        if (!hasValue(content)) content = "<p class='text-muted'>" + i18next.t("No clinic selected") + "</p>";
         $("#userOrgs_view").html(content);
     },
     "demo":function() {
@@ -145,52 +146,52 @@ var fillViews = {
     },
     "name": function() {
         if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-            var content = $("#firstname").val() + " " + $("#lastname").val();
+            var content = i18next.t($("#firstname").val()) + " " + i18next.t($("#lastname").val());
             if (hasValue($.trim(content))) $("#name_view").text(content);
-            else $("#name_view").html("<p class='text-muted'>Not provided</p>");
+            else $("#name_view").html("<p class='text-muted'></p>");
         };
     },
     "dob": function() {
         if (!$("#bdGroup").hasClass("has-error")) {
             if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
                 var displayString = tnthDates.displayDateString($("#month option:selected").val(), $("#date").val(), $("#year").val());
-                $("#dob_view").text(displayString);
-            } else $("#dob_view").html("<p class='text-muted'>Not provided</p>");
+                $("#dob_view").text(i18next.t(displayString));
+            } else $("#dob_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "phone": function() {
         if (!$("#phoneGroup").hasClass("has-error")) {
             var content = $("#phone").val();
             if (hasValue(content)) $("#phone_view").text(content);
-            else $("#phone_view").html("<p class='text-muted'>Not provided</p>");
+            else $("#phone_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "altPhone": function() {
         if (!$("#altPhoneGroup").hasClass("has-error")) {
             var content = $("#altPhone").val();
             if (hasValue(content)) $("#alt_phone_view").text(content);
-            else $("#alt_phone_view").html("<p class='text-muted'>Not provided</p>");
+            else $("#alt_phone_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "email": function() {
         if (!$("#emailGroup").hasClass("has-error")) {
             var content = $("#email").val();
-            if (hasValue(content)) $("#email_view").text(content);
-            else $("#email_view").html("<p class='text-muted'>Not provided</p>");
+            if (hasValue(content)) $("#email_view").text(i18next.t(content));
+            else $("#email_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "studyId": function() {
         if (!$("#profileStudyIDContainer").hasClass("has-error")) {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
-            else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
+            else $("#study_id_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "siteId": function() {
         if (!$("#profileSiteIDContainer").hasClass("has-error")) {
             var content = $("#profileSiteId").val();
             if (hasValue(content)) $("#site_id_view").text(content);
-            else $("#site_id_view").html("<p class='text-muted'>Not provided</p>");
+            else $("#site_id_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
     "detail": function() {
@@ -203,8 +204,8 @@ var fillViews = {
         if ($("#genderGroup").length > 0) {
             if (!$("#genderGroup").hasClass("has-error")) {
                 var content = $("input[name=sex]:checked").val();
-                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + content + "</p>");
-                else $("#gender_view").html("<p class='text-muted'>Not provided</p>");
+                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + i18next.t(content) + "</p>");
+                else $("#gender_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
             };
         } else $(".gender-view").hide();
     },
@@ -213,10 +214,10 @@ var fillViews = {
             if (!$("#userRace").hasClass("has-error")) {
                 var content = "";
                 $("#userRace input:checkbox").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
                 })
                 if (hasValue(content)) $("#race_view").html($.trim(content));
-                else $("#race_view").html("<p class='text-muted'>Not provided</p>");
+                else $("#race_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
             };
         } else {
             $(".race-view").hide();
@@ -227,10 +228,10 @@ var fillViews = {
             if (!$("#userEthnicity").hasClass("has-error")) {
                 var content = "";
                 $("#userEthnicity input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).closest("label").text()) + "</p>";
                 })
                 if (hasValue(content)) $("#ethnicity_view").html($.trim(content));
-                else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
+                else $("#ethnicity_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
             };
         } else $(".ethnicity-view").hide();
     },
@@ -239,10 +240,10 @@ var fillViews = {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + i18next.t($(this).next("label").text()) + "</p>";
                 })
                 if (hasValue($.trim(content))) $("#indigenous_view").html($.trim(content));
-                else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
+                else $("#indigenous_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
             };
         } else $(".indigenous-view").hide();
     },
@@ -256,42 +257,42 @@ var fillViews = {
                 if (hasValue($.trim($("#biopsy_month option:selected").val()+$("#biopsy_year").val()+$("#biopsy_day").val()))) {
                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
                 };
-                if (!hasValue(displayDate)) displayDate = "Not provided";
+                if (!hasValue(displayDate)) displayDate = __NOT_PROVIDED_TEXT;
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-            if (hasValue(content)) $("#biopsy_view").html("<div>" + content + "</div>");
-            else $("#biopsy_view").html("<p class='text-muted'>No answer provided</p>");
+            if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
+            else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_diag_view").html("<div>" + content + "</div>");
-        else $("#pca_diag_view").html("<p class='text-muted'>No answer provided</p>");
+        if (hasValue(content)) $("#pca_diag_view").html("<div>" + i18next.t(content) + "</div>");
+        else $("#pca_diag_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         content = $("#patMeta input[name='pca_localized']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_localized_view").html("<div>" + content + "</div>");
-        else $("#pca_localized_view").html("<p class='text-muted'>No answer provided</p>");
+        if (hasValue(content)) $("#pca_localized_view").html("<div>" + i18next.t(content) + "</div>");
+        else $("#pca_localized_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
-            $("#boolDeath_view").text("Patient has deceased");
+            $("#boolDeath_view").text(i18next.t("Patient is deceased"));
             if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
-                $("#deathDate_view").text(displayString);
+                $("#deathDate_view").text(i18next.t(displayString));
             };
-        } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
+        } else $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
     },
     "locale": function() {
         if ($("#locale").length > 0) {
             var content = $("#locale option:selected").text();
-            if (hasValue(content)) $("#locale_view").text(content);
-            else $("#locale_view").html("<p class='text-muted'>No information provided.</p>");
+            if (hasValue(content)) $("#locale_view").text(i18next.t(content));
+            else $("#locale_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
 
         } else $(".locale-view").hide();
     },
     "timezone": function() {
         if ($("#profileTimeZone").length > 0) {
             var content = $("#profileTimeZone").find("option:selected").val();
-            if (hasValue(content)) $("#timezone_view").text(content);
-            else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
+            if (hasValue(content)) $("#timezone_view").text(i18next.t(content));
+            else $("#timezone_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         } else $(".timezone-view").hide();
     },
     "procedure": function() {
@@ -299,12 +300,12 @@ var fillViews = {
             var content = "";
             $("#userProcedures tr[data-id]").each(function() {
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + $(this).text() + "</div>";
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + i18next.t($(this).text()) + "</div>";
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
-            else $("#procedure_view").html("<p class='text-muted'>No information provided.</p>");
-        } else $("#procedure_view").html("<p class='text-muted'>No information available.</p>");
+            else $("#procedure_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+        } else $("#procedure_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
     }
 };
 
@@ -533,7 +534,7 @@ var fillContent = {
                     orgStates.forEach(function(state) {
                         ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
                         ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(state);
+                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
                     });
                     $(".noOrg-container").show();
                 } else {
@@ -552,7 +553,7 @@ var fillContent = {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
                 if (item.system == SYSTEM_IDENTIFIER_ENUM["external_study_id"]) {
-                    if (hasValue(item.value)) $("#profileStudyId").val(item.value);
+                    if (hasValue(item.value)) $("#profileStudyId").val(i18next.t(item.value));
                 };
             });
         };
@@ -562,7 +563,7 @@ var fillContent = {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
                 if (item.system == SYSTEM_IDENTIFIER_ENUM["external_site_id"]) {
-                    if (hasValue(item.value)) $("#profileSiteId").val(item.value);
+                    if (hasValue(item.value)) $("#profileSiteId").val(i18next.t(item.value));
                 };
             });
         };
@@ -586,9 +587,18 @@ var fillContent = {
                  Use css class to hide/show headings accordingly
                  please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
              ********/
-            var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
-                                '<span class="agreement">Agreement</span>',
-                                '<span class="eproms-consent-date-header">' + (typeof CONSENT_DATE_LABEL != "undefined" ? CONSENT_DATE_LABEL : "Consent Date") + '</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+            var headerEnum = {"consentStatus": i18next.t("Consent Status"),
+                              "status": i18next.t("Status"),
+                              "agreement": i18next.t("Agreement"),
+                              "consentDate": i18next.t("Consent Date"),
+                              "registrationDate": i18next.t("Registration Date"),
+                              "locale": i18next.t("GMT")
+                             };
+            var headerArray = ['Organization',
+                                '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
+                                '<span class="agreement">' + headerEnum["agreement"] + '</span>',
+                                '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
+
             headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
@@ -626,9 +636,9 @@ var fillContent = {
                 touObj.forEach(function(item) {
                     var org = OT.orgsList[item.organization_id];
                     touContent += "<tr data-tou-type='" + item.type + "'>";
-                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + item.display_type + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.display_type + "</a></span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
                 });
                 return touContent;
@@ -664,18 +674,18 @@ var fillContent = {
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
                     var consentLabels = {
-                        "default": "Consented",
-                        "consented": "Consented / Enrolled",
-                        "widthdrawn": "Withdrawn - Suspend Data Collection and Report Historic Data",
-                        "purged": "Purged / Removed"
+                        "default": i18next.t("Consented"),
+                        "consented": i18next.t("Consented / Enrolled"),
+                        "withdrawn": i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data"),
+                        "purged": i18next.t("Purged / Removed")
                     };
 
                     switch(consentStatus) {
                         case "deleted":
-                            sDisplay = "<span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(deleted on " + deleteDate.replace("T", " ") + " GMT)</span>";
+                            sDisplay = "<span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(" + i18next.t("deleted on") + " " + deleteDate.replace("T", " ") + " GMT)</span>";
                             break;
                         case "expired":
-                            sDisplay = "<span class='text-warning'>&#10007; <br><span>(expired)</span>"
+                            sDisplay = "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>";
                             break;
                         case "active":
                             if (se && sr && ir) {
@@ -683,7 +693,7 @@ var fillContent = {
                                     else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>" + consentLabels["widthdrawn"] + "</span>";
+                                    sDisplay = "<span class='text-warning small-text'>" + consentLabels["withdrawn"] + "</span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
                                     sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
@@ -703,19 +713,19 @@ var fillContent = {
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
                             + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">Consent Status Editor</h5>'
+                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") +'"><span aria-hidden="true">&times;</span></button>'
+                            + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
+                            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
                             + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>' + consentLabels["widthdrawn"] + '</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>' + consentLabels["withdrawn"] + '</input></label></div>'
                             + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">' + i18next.t("Close", {"": "Close"}) + '</button>'
                             + '</div>'
                             + '</div></div></div>';
 
@@ -724,12 +734,12 @@ var fillContent = {
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
                             + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">Consent Date Editor</h5>'
+                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '"><span aria-hidden="true">&times;</span></button>'
+                            + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
                             + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
-                            + '<p style="margin-bottom: 0.6em">Modify the consent date <span class="text-muted">(GMT 24-hour format)</span> for this agreement to: </p>'
+                            + '<p style="margin-bottom: 0.6em">' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
                             + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
                             + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
                             + '<div class="row">'
@@ -748,8 +758,8 @@ var fillContent = {
                             + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">Submit</button>'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">' + i18next.t("Submit") + '</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
                             + '</div>'
                             + '</div></div></div>';
 
@@ -770,10 +780,10 @@ var fillContent = {
                         {
                             content: function(item) {
                                 var s = "";
-                                if (isDefault) s = "Sharing information with clinics <span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>View</em></a></span>";
+                                if (isDefault) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
                                 else {
                                     s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "")
                                 };
                                 return s;
                             } (item)
@@ -806,7 +816,7 @@ var fillContent = {
                         content += getTOUTableHTML(true);
                         content += "</table>"
                         $("#profileConsentList").html(content);
-                } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
             };
 
             if (editable) {
@@ -856,7 +866,7 @@ var fillContent = {
                         if (hasValue(d.val())) {
                             var isValid = tnthDates.isValidDefaultDateFormat(d.val());
                             if (!isValid) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Date must in the valid format."
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Date must in the valid format.");
                                 d.datepicker("hide");
                             };
                         };
@@ -864,20 +874,20 @@ var fillContent = {
                         /**** validate hour [0]0 ****/
                         if (hasValue(h)) {
                             if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Hour must be in valid format, range 0 to 23.";
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Hour must be in valid format, range 0 to 23.");
                             };
                         };
 
                         /***** validate minute [0]0 *****/
                         if (hasValue(m)) {
                             if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Minute must be in valid format, range 0 to 59."
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Minute must be in valid format, range 0 to 59.");
                             };
                         };
                         /***** validate second [0]0 *****/
                         if (hasValue(s)) {
                             if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Second must be in valid format, range 0 to 59.");
                             };
                         };
 
@@ -924,9 +934,10 @@ var fillContent = {
                                 $("#consentListTable button[data-dismiss]").attr("disabled", true);
 
                                 //serId, params, status, sync, callback)
+                                var serverErrorMessage = i18next.t("Error processing data.  Make sure the date is in the correct format.");
                                 setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {"
                                             + " if (data && data.error) { "
-                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("Error processing data.  Make sure the date is in the correct format."); '
+                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("' + serverErrorMessage + '"); '
                                             + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
                                             + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); })(), 450);'
                                             + '  $("#consentListTable button[data-dismiss]").attr("disabled", false);'
@@ -937,7 +948,7 @@ var fillContent = {
                                             + '  }; '
                                             + ' }})', 100);
                             };
-                        } else  $("#consentDateError_" + dataIndex).text("You must enter a valid date/time");
+                        } else  $("#consentDateError_" + dataIndex).text(i18next.t("You must enter a valid date/time"));
 
                     });
                 });
@@ -945,9 +956,9 @@ var fillContent = {
 
         } else {
             if (hasValue(errorMessage)) {
-                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : ("<p class='text-muted'>" + i18next.t("No consent found for this user.") + "</p>"));
             } else if (parseInt(errorCode) == 401) {
-                var msg = " You do not have permission to edit this patient record.";
+                var msg = i18next.t("You do not have permission to edit this patient record.");
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
             } else {
                 if (showInitialConsentTerms) {
@@ -955,7 +966,7 @@ var fillContent = {
                     content += getTOUTableHTML(true);
                     content += "</table>";
                     $("#profileConsentList").html(content);
-                } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
             };
         };
         $("#profileConsentList").animate({opacity: 1});
@@ -972,7 +983,7 @@ var fillContent = {
     },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
-            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
+            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({opacity: 1});
             $("#pastTreatmentsContainer").hide();
             fillViews.procedure();
             return false;
@@ -1000,16 +1011,16 @@ var fillContent = {
                 var creator = val.resource.meta.by.reference;
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
-                    creator = "you";
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.95em; padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                    creator = i18next.t("you");
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.95em; padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
                 }
                 else if (creator == subjectId) {
-                    creator = "this patient";
+                    creator = i18next.t("this patient");
                 }
-                else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
+                else creator = i18next.t("staff member") + ", <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(" + i18next.t("data entered by ") + creator + i18next.t(" on ") + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 };
@@ -1029,7 +1040,7 @@ var fillContent = {
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
-            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added") + "!</em></small>");
         }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
@@ -1052,7 +1063,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + i18next.t((role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}))) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1112,7 +1123,7 @@ var fillContent = {
         setTimeout(function() {
             var agreedCheckboxes = $("#termsCheckbox [data-type='terms'][data-agree='false']:visible");
             if (agreedCheckboxes.length > 1) {
-                $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
+                $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
             };
             if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
         }, 2000);
@@ -1493,7 +1504,6 @@ OrgTool.prototype.getOrgsList = function() {
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
     if (leafOrgs.length == 0) return false;
-
     var self = this;
 
     $("input[name='organization']").each(function() {
@@ -1611,13 +1621,13 @@ OrgTool.prototype.populateUI = function() {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                    container.append("<legend orgId='" + org + "'>"+ i18next.t(orgsList[org].name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
                     parentOrgsCt++;
                 };
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
                     container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
-                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t(orgsList[org].name) + '</label>');
                 };
             };
         };
@@ -1629,6 +1639,7 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
+                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
 
                 if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
 
@@ -1638,14 +1649,14 @@ OrgTool.prototype.populateUI = function() {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    item.name +
+                    i18next.t(item.name) +
                     '</label>';
 
                  } else {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    item.name +
+                    i18next.t(item.name) +
                     '</label>';
                 };
 
@@ -1668,25 +1679,27 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 + '<div class="modal-dialog" role="document">' +
                 '<div class="modal-content">' +
                 '<div class="modal-header">' +
-                '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Consent to share information</h4>' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + "<span aria-hidden='true'>&times;</span></button>" +
+                '<h4 class="modal-title">' + i18next.t("Consent to share information") + '</h4>' +
                 '</div>' +
                 '<div class="modal-body">' +
                 '<h4>Terms</h4>' +
-                '<p>I consent to sharing information with the <span class="consent-clinic-name">' + orgName + '.</span></p>' +
+                '<p>' + i18next.t("I consent to sharing information with") +
+                '<span class="consent-clinic-name">&nbsp;' + i18next.t(orgName) +
+                '</p>' +
                 '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>' + i18next.t("Yes") + '</label>' +
                 '<br/>' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>' + i18next.t("No") + '</label>' +
                 '</div>' +
                 '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
                 '</div>' +
                 '<br/>' +
                 '<div class="modal-footer" >' +
                 '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="Close">Close</button>' +
+                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + i18next.t("Close") + '</button>' +
                 '</div></div></div></div>';
             if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
             $("#defaultConsentContainer").append(s);
@@ -1810,7 +1823,7 @@ OrgTool.prototype.handleEvent = function() {
                     var isStaff = false;
                      $("#rolesGroup input[name='user_type']").each(function() {
                         if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
-                            $("#userOrgs .help-block").addClass("error-message").text("Cannot ununcheck.  A staff member must be associated with an organization");
+                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot ununcheck.  A staff member must be associated with an organization"));
                             isStaff = true;
                         };
                      });
@@ -1926,13 +1939,13 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
   var mainOrgsList = this.getOrgsList(), self = this;
   var here_below_orgs = [];
   if (!userOrgs) {
-   var selectedOrg = this.getSelectedOrg();
-   if (selectedOrg.length > 0) {
+    var selectedOrg = this.getSelectedOrg();
+    if (selectedOrg.length > 0) {
         userOrgs = [];
         selectedOrg.each(function() {
             userOrgs.push($(this).val());
         });
-   };
+    };
   };
   if (userOrgs) {
       userOrgs.forEach(function(orgId) {
@@ -1959,6 +1972,7 @@ OrgTool.prototype.morphPatientOrgs = function() {
         };
     });
 };
+
 var OT = new OrgTool();
 
 var tnthAjax = {
@@ -1979,7 +1993,7 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? message: "Not provided";
+        params.message = hasValue(message) ? i18next.t(message) : i18next.t("Not provided");
 
         $.ajax ({
             type: "GET",
@@ -2013,9 +2027,9 @@ var tnthAjax = {
                             };
                         });
                         /*
-                         * need to check terms of use types e.g. privacy policy, that is required of user 
+                         * need to check terms of use types e.g. privacy policy, that is required of user
                          * in addition to website terms of use
-                         * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore 
+                         * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
                          * for the purpose of checking, they need to be broken up into sub items and be checked respectively
                          */
                         $(this).find("[data-core-data-subtype]").each(function() {
@@ -2032,11 +2046,11 @@ var tnthAjax = {
                 else $("#patientQ").show();
             } else {
                 if (callback) {
-                    callback({"error": "no data returned"});
+                    callback({"error": i18next.t("no data returned")});
                 };
             };
         }).fail(function(){
-            if (callback) callback({"error": "unable to get needed core data"});
+            if (callback) callback({"error": i18next.t("unable to get needed core data")});
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
@@ -2050,10 +2064,10 @@ var tnthAjax = {
             if (data && data.required) {
                 if (callback) callback(data.still_needed);
             } else {
-                if (callback) callback({"error": "no data returned"});
+                if (callback) callback({"error": i18next.t("no data returned")});
             };
         }).fail(function(){
-            if (callback) callback({"error": "unable to get required core data"});
+            if (callback) callback({"error": i18next.t("unable to get required core data")});
         });
     },
     "getOptionalCoreData": function(userId, sync, target, callback, entry_method) {
@@ -2083,7 +2097,7 @@ var tnthAjax = {
                         } else {
                             $(this).hide();
                             if (visibleRows == 0) {
-                                noDataContainer.html("<p class='text-muted'>No information available</p>");
+                                noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
                                 btn.hide();
                             };
                         };
@@ -2091,13 +2105,13 @@ var tnthAjax = {
                 });
                 if (callback) callback(data);
             } else {
-                if (callback) callback({"error": "no data found"});
+                if (callback) callback({"error": i18next.t("no data found")});
             };
             if (target) {
                 target.find(".profile-item-loader").hide();
             };
         }).fail(function(){
-            if (callback) callback({"error": "unable to get required core data"});
+            if (callback) callback({"error": i18next.t("unable to get required core data")});
             if (target) {
                 target.find(".profile-item-loader").hide();
             };
@@ -2105,7 +2119,7 @@ var tnthAjax = {
     },
     "getPortalFooter": function(userId, sync, containerId, callback) {
         if (!userId) {
-            if (callback) callback("<div class='error-message'>User Id is required</div>");
+            if (callback) callback("<div class='error-message'>" + i18next.t("User Id is required") + "</div>");
             return false;
         };
         $.ajax ({
@@ -2117,10 +2131,10 @@ var tnthAjax = {
                 if (hasValue(containerId)) $("#" + containerId).html(data);
                 if (callback) callback(data);
             } else {
-                if (callback) callback("<div class='error-message'>No data found</div>");
+                if (callback) callback("<div class='error-message'>" + i18next.t("No data found") + "</div>");
             }
         }).fail(function() {
-           if (callback) callback("<div class='error-message'>Unable to retrieve portal footer html</div>");
+           if (callback) callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
         });
 
     },
@@ -2143,7 +2157,7 @@ var tnthAjax = {
             };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           var errorMessage = "Server error occurred retrieving organization/clinic information."
+           var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
            if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
            else $(".get-orgs-error").html(errorMessage)
            loader();
@@ -2163,9 +2177,9 @@ var tnthAjax = {
            return true;
         }).fail(function(xhr) {
             //console.log("Problem retrieving data from server.");
-            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
+            fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server.") + "<br/>" + i18next.t("Error Status Code: ") + xhr.status + (xhr.status == 401 ? "<br/>" + i18next.t("Permission denied to access patient record"): ""), xhr.status);
             loader();
-            var errorMessage = "Server error occurred retrieving consent information.";
+            var errorMessage = i18next.t("Server error occurred retrieving consent information.");
             if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
             else $(".get-consent-error").html(errorMessage)
             return false;
@@ -2198,7 +2212,7 @@ var tnthAjax = {
                     //console.log("request to updated consent failed.");
                     //console.log(xhr.responseText)
                     if (callback) callback({"error": xhr.responseText});
-                    var errorMessage = "Server error occurred setting consent status.";
+                    var errorMessage = i18next.t("Server error occurred setting consent status.");
                     if ($(".set-consent-error").length == 0) $(".default-error-message-container").append("<div class='set-consent-error error-message'>" + errorMessage + "</div>");
                     else $(".set-consent-error").html(errorMessage);
                 });
@@ -2222,7 +2236,7 @@ var tnthAjax = {
             if (typeof reloadConsentList != "undefined") reloadConsentList();
             $($("#consentContainer .error-message").get(0)).text("");
         } else {
-            $($("#consentContainer .error-message").get(0)).text("Unable to set default consent agreement");
+            $($("#consentContainer .error-message").get(0)).text(i18next.t("Unable to set default consent agreement"));
         }
     },
     deleteConsent: function(userId, params) {
@@ -2256,7 +2270,7 @@ var tnthAjax = {
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
-                        var errorMessage = "Server error occurred removing consent: " + xhr.responseText;
+                        var errorMessage = i18next.t("Server error occurred removing consent.");
                         if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
                         else $(".delete-consent-error").html(errorMessage)
                     });
@@ -2452,7 +2466,7 @@ var tnthAjax = {
            // console.log("Problem retrieving data from server.");
             loader();
             if (callback) callback();
-            var errorMessage = "Server error occurred retrieving demographics information.";
+            var errorMessage = i18next.t("Server error occurred retrieving demographics information.");
             if ($(".get-demo-error").length == 0) $(".default-error-message-container").append("<div class='get-demo-error error-message'>" + errorMessage + "</div>");
             else $(".get-demo-error").html(errorMessage);
         });
@@ -2475,7 +2489,7 @@ var tnthAjax = {
             fillViews.detail();
             fillViews.org();
         }).fail(function() {
-            var errorMessage = "Server error occurred setting demographics information.";
+            var errorMessage = i18next.t("Server error occurred setting demographics information.");
             if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
             else $(".put-demo-error").html(errorMessage);
             flo.showError(targetField);
@@ -2527,7 +2541,7 @@ var tnthAjax = {
             };
 
         }).fail(function() {
-            var errorMessage = "Server error occurred retrieving locale information.";
+            var errorMessage = i18next.t("Server error occurred retrieving locale information.");
             if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
             else $(".get-locale-error").html(errorMessage);
         });
@@ -2568,7 +2582,7 @@ var tnthAjax = {
             fillContent.treatment(data);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           $("#userProcedures").html("<span class='error-message'>Error retrieving data from server</span>");
+           $("#userProcedures").html("<span class='error-message'>" + i18next.t("Error retrieving data from server") + "</span>");
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
@@ -2645,7 +2659,7 @@ var tnthAjax = {
             $(".get-procs-error").html("");
         }).fail(function() {
            // console.log("Problem updating procedure on server.");
-           var errorMessage = "Server error occurred saving procedure/treatment information.";
+           var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
             if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
             else $(".get-procs-error").html(errorMessage);
             flo.showError(targetField);
@@ -2663,7 +2677,7 @@ var tnthAjax = {
             $(".del-procs-error").html("");
         }).fail(function() {
             // console.log("Problem deleting procedure on server.");
-            var errorMessage = "Server error occurred removing procedure/treatment information.";
+            var errorMessage = i18next.t("Server error occurred removing procedure/treatment information.");
             if ($(".del-procs-error").length == 0) $("#userProcuedures").append("<div class='del-procs-error error-message'>" + errorMessage + "</div>");
             else $(".del-procs-error").html(errorMessage);
             flo.showError(targetField);
@@ -2677,7 +2691,7 @@ var tnthAjax = {
             fillContent.roleList(data);
             if (callback) callback();
         }).fail(function() {
-            $(".get-roles-error").html("Server error occurred retrieving roles information.");
+            $(".get-roles-error").html(i18next.t("Server error occurred retrieving roles information."));
         });
     },
     "getRoles": function(userId,isProfile) {
@@ -2692,7 +2706,7 @@ var tnthAjax = {
             fillContent.roles(data,isProfile);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           var errorMessage = "Server error occurred retrieving user role information.";
+           var errorMessage = i18next.t("Server error occurred retrieving user role information.");
            if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
            else $(".get-roles-error").html(errorMessage);
         });
@@ -2710,7 +2724,7 @@ var tnthAjax = {
             $(".put-roles-error").html("");
         }).fail(function(jhr) {
             flo.showError(targetField);
-            var errorMessage = "Server error occurred setting user role information."
+            var errorMessage = i18next.t("Server error occurred setting user role information.");
            if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
            else $(".put-roles-error").html(errorMessage);
            //console.log(jhr.responseText);
@@ -2727,7 +2741,7 @@ var tnthAjax = {
             $(".delete-roles-error").html("");
         }).fail(function() {
            // console.log("Problem updating role on server.");
-           var errorMessage = "Server error occurred deleting user role.";
+           var errorMessage = i18next.t("Server error occurred deleting user role.");
            if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
            else $(".delete-roles-error").html(errorMessage);
 
@@ -2741,7 +2755,7 @@ var tnthAjax = {
             $(".get-clinical-error").html("");
             fillContent.clinical(data);
         }).fail(function() {
-            var errorMessage = "Server error occurred retrieving clinical data."
+            var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
            if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
            else $(".get-clinical-error").html(errorMessage);
         });
@@ -2760,7 +2774,7 @@ var tnthAjax = {
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = "Server error occurred updating clinical data.";
+            var errorMessage = i18next.t("Server error occurred updating clinical data.");
             if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
             else $(".put-clinical-error").html(errorMessage);
             flo.showError(targetField);
@@ -2838,7 +2852,7 @@ var tnthAjax = {
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = "Server error occurred updating clinical data.";
+            var errorMessage = i18next.t("Server error occurred updating clinical data.");
             if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
             else $(".post-clinical-error").html(errorMessage);
             flo.showError(targetField);
@@ -2859,14 +2873,14 @@ var tnthAjax = {
                 });
                 if (callback) callback({"url": data.url});
             } else {
-                if (callback) callback({"error": "no url returned"});
+                if (callback) callback({"error": i18next.t("no url returned")});
             }
             //fillContent.terms(data);
         }).fail(function() {
-           var errorMessage = "Server error occurred retrieving tou url.";
+           var errorMessage = i18next.t("Server error occurred retrieving tou url.");
            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
            else $(".get-tou-error").html(errorMessage);
-           if (callback) callback({"error": "Server error"});
+           if (callback) callback({"error": i18next.t("Server error")});
         });
     },
     /*
@@ -2880,7 +2894,7 @@ var tnthAjax = {
         }).done(function(data){
             if (data && data.entry) {
                 if ((data.entry).length === 0) {
-                    if (callback) callback({"error": "no data returned"});
+                    if (callback) callback({"error": i18next.t("no data returned")});
                 } else {
                     var qList = {};
                     (data.entry).forEach(function(item) {
@@ -2907,11 +2921,11 @@ var tnthAjax = {
                     if (callback) callback(qList);
                 };
             } else {
-                if (callback) callback({"error": "no data returned"});
+                if (callback) callback({"error": i18next.t("no data returned")});
             };
 
         }).fail(function() {
-            if (callback) callback({"error": "error retrieving instruments list"});
+            if (callback) callback({"error": i18next.t("error retrieving instruments list")});
         });
     },
     "getTerms": function(userId, type, sync, callback) {
@@ -2925,7 +2939,7 @@ var tnthAjax = {
             fillContent.terms(data);
             if (callback) callback(data);
         }).fail(function() {
-           var errorMessage = "Server error occurred retrieving tou data."
+           var errorMessage = i18next.t("Server error occurred retrieving tou data.");
            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
            else $(".get-tou-error").html(errorMessage);
            if (callback) callback({"error": errorMessage})
@@ -2944,7 +2958,7 @@ var tnthAjax = {
            $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = "Server error occurred saving terms of use information.";
+            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
             if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
             else $(".post-tou-error").html(errorMessage);
         });
@@ -2961,7 +2975,7 @@ var tnthAjax = {
            $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = "Server error occurred saving terms of use information.";
+            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
             if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
             else $(".post-tou-error").html(errorMessage);
         });
@@ -3043,9 +3057,11 @@ $(document).ready(function() {
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
 
-    //setTimeout('LRKeyEvent();', 1500);
     tnthAjax.beforeSend();
 
+    __NOT_PROVIDED_TEXT = i18next.t("not provided");
+
+    //setTimeout('LRKeyEvent();', 1500);
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
         custom: {
@@ -3059,14 +3075,14 @@ $(document).ready(function() {
                 // If NaN then the values haven't been entered yet, so we
                 // validate as true until other fields are entered
                 if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                    $("#errorbirthday").html('All fields must be complete.').hide();
+                    $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
                     goodDate = false;
                 } else if (isNaN(d)) {
-                    errorMsg = "Please enter a valid date.";
+                    errorMsg = i18next.t("Please enter a valid date.");
                 } else if (isNaN(m)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
                 } else if (isNaN(y)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
                 };
 
                 if (hasValue(errorMsg)) {
@@ -3108,10 +3124,10 @@ $(document).ready(function() {
                                 assembleContent.demo($el.attr("data-user-id"),true, $el);
                             };
                         } else {
-                            $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
+                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass('has-error');
                         }
                     }).fail(function() {
-                        console.log("Problem retrieving data from server.")
+                        console.log(i18next.t("Problem retrieving data from server."));
                     });
                 }
                 return emailReg.test(emailVal);
@@ -3124,9 +3140,9 @@ $(document).ready(function() {
             }
         },
         errors: {
-            htmltags: "Please remove invalid characters and try again.",
-            birthday: "Sorry, this isn't a valid date. Please try again.",
-            customemail: "This isn't a valid e-mail address, please double-check."
+            htmltags: i18next.t("Please remove invalid characters and try again."),
+            birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
+            customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
         },
         disable: false
     }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
@@ -3151,15 +3167,15 @@ var tnthDates = {
                 // Check to see if this is a real date
                 var date = new Date(y,m-1,d);
                 if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    errorField.html("Invalid date. Please try again.").show();
+                    errorField.html(i18next.t("Invalid date. Please try again.")).show();
                     return false;
                 }
                 else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    errorField.html("Date must not be in the future. Please try again.").show();
+                    errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
                     return false; //shouldn't be in the future
                 }
                 else if (y < 1900) {
-                    errorField.html("Date must not be before 1900. Please try again.").show();
+                    errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
                     return false;
                 };
 
@@ -3662,12 +3678,12 @@ var tnthDates = {
                 } else {
                     if (timeZone != "UTC") {
                         convertedDate = convertToLocalTime(dateString);
-                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                        $(".timezone-warning").addClass("text-warning").html(i18next.t("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead."));
                         $(".gmt").each(function() { $(this).hide()});
                     };
                 }
             } catch(e) {
-                errorMessage = "Error occurred when converting timezone: " + e.message;
+                errorMessage = i18next.t("Error occurred when converting timezone: ") + e.message;
             };
             if (hasValue(errorMessage)) {
                 $(".timezone-error").each(function() {
@@ -3963,7 +3979,7 @@ function __convertToNumericField(field) {
             $(this).prop("type", "tel");
         })
     }
-}
+};
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };
@@ -3998,7 +4014,7 @@ function escapeHtml(text) {
             '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
         }[a];
     });
-}
+};
 function containHtmlTags(text) {
     if (!hasValue(text)) return false;
     return /[<>]/.test(text);
@@ -4022,7 +4038,5 @@ $.fn.sortOptions = function() {
             else return 0; });
       return selectOptions;
 };
-var stateDict={AL:"Alabama",AK:"Alaska",AS:"American Samoa",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District Of Columbia",FM:"Federated States Of Micronesia",FL:"Florida",GA:"Georgia",GU:"Guam",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MH:"Marshall Islands",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",MP:"Northern Mariana Islands",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PW:"Palau",PA:"Pennsylvania",PR:"Puerto Rico",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VI:"Virgin Islands",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
 //Promise polyfill - IE doesn't support Promise - so need this
 !function(e){function n(){}function t(e,n){return function(){e.apply(n,arguments)}}function o(e){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(e,this)}function i(e,n){for(;3===e._state;)e=e._value;return 0===e._state?void e._deferreds.push(n):(e._handled=!0,void o._immediateFn(function(){var t=1===e._state?n.onFulfilled:n.onRejected;if(null===t)return void(1===e._state?r:u)(n.promise,e._value);var o;try{o=t(e._value)}catch(i){return void u(n.promise,i)}r(n.promise,o)}))}function r(e,n){try{if(n===e)throw new TypeError("A promise cannot be resolved with itself.");if(n&&("object"==typeof n||"function"==typeof n)){var i=n.then;if(n instanceof o)return e._state=3,e._value=n,void f(e);if("function"==typeof i)return void s(t(i,n),e)}e._state=1,e._value=n,f(e)}catch(r){u(e,r)}}function u(e,n){e._state=2,e._value=n,f(e)}function f(e){2===e._state&&0===e._deferreds.length&&o._immediateFn(function(){e._handled||o._unhandledRejectionFn(e._value)});for(var n=0,t=e._deferreds.length;n<t;n++)i(e,e._deferreds[n]);e._deferreds=null}function c(e,n,t){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof n?n:null,this.promise=t}function s(e,n){var t=!1;try{e(function(e){t||(t=!0,r(n,e))},function(e){t||(t=!0,u(n,e))})}catch(o){if(t)return;t=!0,u(n,o)}}var a=setTimeout;o.prototype["catch"]=function(e){return this.then(null,e)},o.prototype.then=function(e,t){var o=new this.constructor(n);return i(this,new c(e,t,o)),o},o.all=function(e){var n=Array.prototype.slice.call(e);return new o(function(e,t){function o(r,u){try{if(u&&("object"==typeof u||"function"==typeof u)){var f=u.then;if("function"==typeof f)return void f.call(u,function(e){o(r,e)},t)}n[r]=u,0===--i&&e(n)}catch(c){t(c)}}if(0===n.length)return e([]);for(var i=n.length,r=0;r<n.length;r++)o(r,n[r])})},o.resolve=function(e){return e&&"object"==typeof e&&e.constructor===o?e:new o(function(n){n(e)})},o.reject=function(e){return new o(function(n,t){t(e)})},o.race=function(e){return new o(function(n,t){for(var o=0,i=e.length;o<i;o++)e[o].then(n,t)})},o._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},o._unhandledRejectionFn=function(e){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)},o._setImmediateFn=function(e){o._immediateFn=e},o._setUnhandledRejectionFn=function(e){o._unhandledRejectionFn=e},"undefined"!=typeof module&&module.exports?module.exports=o:e.Promise||(e.Promise=o)}(this);
-

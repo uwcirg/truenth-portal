@@ -1164,7 +1164,6 @@ def spec():
     return jsonify(swag)
 
 
-
 @portal.route("/celery-test")
 def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""

@@ -26,6 +26,10 @@
     <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.js"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-table-filter-control.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js"></script>
+    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
 </head>
 {# sets container to full-width #}
 {%- set splashView = false -%}
@@ -128,6 +132,9 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
+var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+ __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true, "initImmediate": true});
+
 {% block document_ready -%}
 $(document).ready(function(){
    $('[data-toggle="popover"]').popover();
