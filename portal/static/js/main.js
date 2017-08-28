@@ -1679,7 +1679,7 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 '<br/>' +
                 '<div class="modal-footer" >' +
                 '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="Close">' + i18next.t("Close") + '</button>' +
+                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + i18next.t("Close") + '</button>' +
                 '</div></div></div></div>';
             if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
             $("#defaultConsentContainer").append(s);
