@@ -2,6 +2,7 @@
 version: "3.3"
 services:
   web:
+    image: "${IMAGE_NAME:-portal_web}:${TAG:-latest}"
     build:
       context: ..
       dockerfile: docker/Dockerfile
