@@ -99,6 +99,7 @@ after_success:
   # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
 
+  - cp docker/portal.env.default docker/portal.env
   - export COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
   # Build debian package from current repo and branch (else "develop")
   - REPO_SLUG="$TRAVIS_REPO_SLUG"
