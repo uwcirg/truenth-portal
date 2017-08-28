@@ -111,7 +111,7 @@ after_success:
   # Copy artifacts off volume mounted on previous container
   - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"):/tmp/artifacts /tmp
   # Copy artifacts to current directory to allow local installation
-  - cp --recursive --verbose /tmp/artifacts artifacts
+  - cp --recursive --verbose /tmp/artifacts debian/artifacts
   - docker build
       --file docker/Dockerfile
       --tag "$IMAGE_NAME:$TAG"
@@ -171,7 +171,6 @@ deploy:
         - -v ARTIFACTORY_TOKEN
     script:
       curl
-        --upload-file artifacts/*.deb
         --verbose
         --upload-file debian/artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
