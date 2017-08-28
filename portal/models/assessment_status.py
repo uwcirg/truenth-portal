@@ -5,7 +5,7 @@ from flask import current_app
 
 from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
-from .organization import Organization, OrgTree
+from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
 from .user_consent import UserConsent
@@ -41,43 +41,6 @@ def most_recent_survey(user, instrument_id=None):
     return results
 
 
-def qbs_for_user(user, classification):
-    """Return questionnaire banks for the given (user, classification)
-
-    QuestionnaireBanks are associated with a user through the top
-    level organization affiliation, or through interventions
-
-    :return: matching QuestionnaireBanks if found, else empty list
-
-    """
-    results = []
-    for org in (o for o in user.organizations if o.id):
-        top = OrgTree().find(org.id).top_level()
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.organization_id == top,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
-
-    for intv in (i for i in user.interventions if i.id):
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.intervention_id == intv.id,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
-
-    def validate_classification_count(qbs):
-        if len(qbs) > 1:
-            current_app.logger.error(
-                "multiple QuestionnaireBanks for {user} with "
-                "{classification} found.  The UI won't correctly display "
-                "more than one at this time.".format(
-                    user=user, classification=classification))
-
-    validate_classification_count(results)
-    return results
-
-
 class QuestionnaireDetails(object):
     """Encapsulate details needed for a questionnaire
 
@@ -92,7 +55,7 @@ class QuestionnaireDetails(object):
         self._recurring_qs = OrderedDict()
         self._indefinite_qs = OrderedDict()
         for classification in ('baseline', 'recurring', 'indefinite'):
-            for qb in qbs_for_user(user, classification):
+            for qb in QuestionnaireBank.qbs_for_user(user, classification):
                 for questionnaire in qb.questionnaires:
                     self._append_questionnaire(
                         classification=classification,
@@ -428,6 +391,12 @@ class AssessmentStatus(object):
                 else:
                     self._overall_status = 'In Progress'
             return self._overall_status
+
+
+def invalidate_assessment_status_cache(user_id):
+    """Invalidate the assessment status cache values for this user"""
+    dogpile_cache.invalidate(
+        overall_assessment_status, user_id)
 
 
 @dogpile_cache.region('hourly')

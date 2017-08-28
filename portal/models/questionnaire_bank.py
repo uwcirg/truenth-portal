@@ -1,10 +1,11 @@
 """Questionnaire Bank module"""
-from flask import url_for
+from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
@@ -40,6 +41,9 @@ class QuestionnaireBank(db.Model):
     intervention_id = db.Column(
         db.ForeignKey('interventions.id'), nullable=True)
 
+    communication_requests = db.relationship(
+        'CommunicationRequest')
+
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
@@ -54,8 +58,12 @@ class QuestionnaireBank(db.Model):
         self.name = data['name']
         if 'classification' in data:
             self.classification = data['classification']
-        self.organization_id = Reference.parse(
-            data['organization']).id
+        if 'organization' in data:
+            self.organization_id = Reference.parse(
+                data['organization']).id
+        if 'intervention' in data:
+            self.intervention_id = Reference.parse(
+                data['intervention']).id
         self = self.add_if_not_found(commit_immediately=True)
         qs_named = set()
         for q in data['questionnaires']:
@@ -79,8 +87,12 @@ class QuestionnaireBank(db.Model):
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
         d['classification'] = self.classification
-        d['organization'] = Reference.organization(
-            self.organization_id).as_fhir()
+        if self.organization_id:
+            d['organization'] = Reference.organization(
+                self.organization_id).as_fhir()
+        if self.intervention_id:
+            d['intervention'] = Reference.intervention(
+                self.intervention_id).as_fhir()
         d['questionnaires'] = [q.as_json() for q in self.questionnaires]
         return d
 
@@ -132,6 +144,43 @@ class QuestionnaireBank(db.Model):
             'entry': objs,
         }
         return bundle
+
+    @staticmethod
+    def qbs_for_user(user, classification):
+        """Return questionnaire banks applicable to (user, classification)
+
+        QuestionnaireBanks are associated with a user through the top
+        level organization affiliation, or through interventions
+
+        :return: matching QuestionnaireBanks if found, else empty list
+
+        """
+        users_top_orgs = set()
+        for org in (o for o in user.organizations if o.id):
+            users_top_orgs.add(OrgTree().find(org.id).top_level())
+
+        results = [] if not users_top_orgs else (
+            QuestionnaireBank.query.filter(
+                QuestionnaireBank.organization_id.in_(users_top_orgs),
+                QuestionnaireBank.classification == classification).all())
+
+        for intv in (i for i in user.interventions if i.id):
+            qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id == intv.id,
+                QuestionnaireBank.classification == classification).all()
+            if qbs:
+                results.extend(qbs)
+
+        def validate_classification_count(qbs):
+            if len(qbs) > 1:
+                current_app.logger.error(
+                    "multiple QuestionnaireBanks for {user} with "
+                    "{classification} found.  The UI won't correctly display "
+                    "more than one at this time.".format(
+                        user=user, classification=classification))
+
+        validate_classification_count(results)
+        return results
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

@@ -1,6 +1,7 @@
 """Unit test module for Reference class"""
 from tests import TestCase, TEST_USER_ID
 
+from portal.models.intervention import Intervention
 from portal.models.reference import Reference
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -29,3 +30,9 @@ class TestDemographics(TestCase):
         q_ref = Reference.questionnaire_bank(q.name)
         self.assertEquals(
             q_ref.as_fhir()['display'], 'testy')
+
+    def test_intervention(self):
+        i = Intervention.query.filter_by(name='self_management').one()
+        i_ref = Reference.intervention(i.id)
+        self.assertEquals(
+            i_ref.as_fhir()['display'], 'self_management')
