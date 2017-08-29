@@ -377,13 +377,16 @@
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
-                    if (hasValue(return_url)) {
-                        {#- javascript variables are not available at template
-                           rendering time.  insert a placeholder and then
-                           replace once the variable is available. -#}
-                        body = '{{ invite_email.body | safe }}';
-                        subject = '{{ invite_email.subject }}';
-                    };
+                    {% if invite_email %}
+                        if (hasValue(return_url)) {
+                            {#- javascript variables are not available at template
+                               rendering time.  insert a placeholder and then
+                               replace once the variable is available. -#}
+                            body = '{{ invite_email.body.encode("string-escape") | safe}}';
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
+                            subject = '{{ invite_email.subject }}';
+                        };
+                    {% endif %}
                 }
                 else { // reminder
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);

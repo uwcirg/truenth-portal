@@ -55,4 +55,5 @@ CMD \
     dpkg-buildpackage -us -uc && \
     mv /root/portal_* /tmp/artifacts && \
     cd /tmp/artifacts && \
-    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz
+    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz && \
+    chown --verbose nobody:nogroup /tmp/artifacts/*

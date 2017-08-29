@@ -99,23 +99,15 @@ after_success:
   # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
 
-  - docker pull "uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"
-  - docker volume create --name debian-repo
-  # Build artifacts from current repo and branch (else "develop")
-  - docker run
-      --volume debian-repo:/tmp/artifacts
-      --env REPO_SLUG=$TRAVIS_REPO_SLUG
-      --env BRANCH=${TRAVIS_BRANCH:-develop}
-    "uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"
+  - cp docker/portal.env.default docker/portal.env
+  - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+  # Build debian package from current repo and branch (else "develop")
+  - REPO_SLUG="$TRAVIS_REPO_SLUG"
+    BRANCH="${TRAVIS_BRANCH:-develop}"
+    docker-compose run builder
 
-  # Copy artifacts off volume mounted on previous container
-  - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"):/tmp/artifacts /tmp
-  # Copy artifacts to current directory to allow local installation
-  - cp --recursive --verbose /tmp/artifacts artifacts
-  - docker build
-      --file docker/Dockerfile
-      --tag "$IMAGE_NAME:$TAG"
-    .
+  # Build portal docker image from debian package
+  - docker-compose build web
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
@@ -157,7 +149,7 @@ deploy:
         - -v BINTRAY_API_KEY
     script:
       curl
-        --upload-file artifacts/*.deb
+        --upload-file debian/artifacts/*.deb
         --user "$GH_USERNAME:$BINTRAY_API_KEY"
         https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
@@ -171,8 +163,8 @@ deploy:
         - -v ARTIFACTORY_TOKEN
     script:
       curl
-        --upload-file artifacts/*.deb
         --verbose
+        --upload-file debian/artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 

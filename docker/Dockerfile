@@ -11,13 +11,13 @@ RUN \
         python2.7 && \
     apt-get clean
 
-ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
+ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
 
-COPY artifacts /tmp/artifacts
+COPY debian/artifacts /tmp/artifacts
 
 # Only add local repository if packages available in artifacts/
 RUN \
-    if [ -n "$(ls -A /tmp/artifacts)" ]; then \
+    if [ -n "$(ls /tmp/artifacts)" ]; then \
         echo deb file:/tmp/artifacts ./ > /etc/apt/sources.list.d/truenth.local.list; \
     else \
         echo deb "${debian_repo}" stable main > /etc/apt/sources.list.d/truenth.list; \
