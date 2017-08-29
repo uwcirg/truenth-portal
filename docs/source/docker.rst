@@ -41,7 +41,7 @@ Building a Debian Package
 To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)::
 
     # Build debian package from develop branch on Github
-    COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
 
 
@@ -52,7 +52,7 @@ If you would like to create a package from a topic branch or fork you can overri
 
     # Override defaults with environmental variables
     REPO_SLUG='USERNAME/true_nth_usa_portal'
-    BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+    BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
     # Run the container (override defaults)
     docker-compose run builder
@@ -81,7 +81,7 @@ By default, the ``portal_web`` image with the ``latest`` tag is downloaded and u
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Build the "web" service locally instead of downloading from a docker registry
-    COMPOSE_FILE='docker/docker-compose.build.yaml:docker/docker-compose.yaml'
+    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose build web
     docker-compose up web
 
