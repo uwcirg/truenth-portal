@@ -24,7 +24,7 @@ def time_request(url):
     start = timeit.default_timer()
     response = requests.get(url)
     duration = timeit.default_timer() - start
-    message = ('TIME {duration} seconds to GET {url}'.format(
+    message = ('TIME {duration:.4f} seconds to GET {url}'.format(
         url=url, duration=duration))
     if duration > 5.0:
         current_app.logger.error(message)
