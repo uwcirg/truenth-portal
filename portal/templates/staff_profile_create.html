@@ -39,32 +39,34 @@
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
                         var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
+                        aco.getOrgs(function(data) {
+                            if (data) {
+                                if (!data.error) {
+                                    OT.populateOrgsList(data.entry);
+                                    OT.populateUI();
 
-                        $.ajax ({
-                            type: "GET",
-                            url: '/api/organization'
-                        }).done(function(data) {
+                                    if (orgList) {
+                                        OT.filterOrgs(orgList);
+                                    };
 
-                            OT.populateOrgsList(data.entry);
-                            OT.populateUI();
+                                    var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
 
-                            if (orgList) {
-                                OT.filterOrgs(orgList);
+                                    $("#userOrgs input[name='organization']").each(function() {
+                                        $(this).on("click", function() {
+                                            $("#userOrgs").find(".help-block").html("");
+                                        });
+                                    });
+
+                                    var visibleOrgs = $("#userOrgs input[name='organization']:visible");
+                                    if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+
+                                } else {
+                                    $("#userOrgs .get-orgs-error").html(data.error);
+                                };
+
+                            } else {
+                                $("#userOrgs .get-orgs-error").html('{{_("No clinics data available.")}}');
                             };
-
-                            var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-
-                            $("#userOrgs input[name='organization']").each(function() {
-                                $(this).on("click", function() {
-                                    $("#userOrgs").find(".help-block").html("");
-                                });
-                            });
-
-                            var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                            if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
-
-                        }).fail(function() {
-                            $("#userOrgs .get-orgs-error").html('{{_("Error occurred retrieving clinics data. Try reloading the page.")}}');
                         });
 
                     });</script>
