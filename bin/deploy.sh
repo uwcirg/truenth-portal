@@ -75,6 +75,7 @@ update_repo
 activate_once
 
 echo "Updating python dependancies"
+cd "${GIT_WORK_TREE}"
 env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 
 echo "Synchronizing database"
