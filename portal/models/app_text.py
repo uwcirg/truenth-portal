@@ -8,6 +8,7 @@ SitePersistence mechanism, and looked up in a template using the
 
 """
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 from flask import current_app
 from flask_babel import gettext
 import requests
@@ -327,7 +328,17 @@ class VersionedResource(object):
         self.url = url
         self.variables = variables or {}
         try:
+            start = datetime.now()
             response = requests.get(url)
+            duration = datetime.now() - start
+            if duration.seconds > 5:
+                current_app.logger.error(
+                    "Fetch of {url} took {seconds} secs".format(
+                        url=url, seconds=duration.seconds))
+            elif duration.seconds > 2:
+                current_app.logger.warning(
+                    "Fetch of {url} took {seconds} secs".format(
+                        url=url, seconds=duration.seconds))
             self._asset = response.json().get('asset')
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
