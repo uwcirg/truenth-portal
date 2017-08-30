@@ -8,11 +8,11 @@ SitePersistence mechanism, and looked up in a template using the
 
 """
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
 from flask import current_app
 from flask_babel import gettext
 import requests
 from requests.exceptions import MissingSchema, ConnectionError
+import timeit
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -274,7 +274,12 @@ class UnversionedResource(object):
             self._asset = asset
         else:
             try:
+                start = timeit.default_timer()
                 response = requests.get(url)
+                duration = timeit.default_timer() - start
+                current_app.logger.debug(
+                    'TIME fetch {url} took {duration} seconds'.format(
+                        url=url, duration=duration))
                 self._asset = response.text
             except MissingSchema:
                 if current_app.config.get('TESTING'):
@@ -328,17 +333,17 @@ class VersionedResource(object):
         self.url = url
         self.variables = variables or {}
         try:
-            start = datetime.now()
+            start = timeit.default_timer()
             response = requests.get(url)
-            duration = datetime.now() - start
-            if duration.seconds > 5:
-                current_app.logger.error(
-                    "Fetch of {url} took {seconds} secs".format(
-                        url=url, seconds=duration.seconds))
-            elif duration.seconds > 2:
-                current_app.logger.warning(
-                    "Fetch of {url} took {seconds} secs".format(
-                        url=url, seconds=duration.seconds))
+            duration = timeit.default_timer() - start
+            message = ('TIME fetch {url} took {duration} seconds'.format(
+                url=url, duration=duration))
+            if duration > 5.0:
+                current_app.logger.error(message)
+            elif duration > 2.0:
+                current_app.logger.warning(message)
+            else:
+                current_app.logger.debug(message)
             self._asset = response.json().get('asset')
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
