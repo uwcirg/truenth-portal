@@ -34,7 +34,7 @@
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
-                        <div class="help-block with-errors"></div>
+                        <div class="help-block with-errors get-orgs-error error-message"></div>
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
@@ -64,7 +64,7 @@
                             if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
 
                         }).fail(function() {
-                            console.log("Problem retrieving data from server.");
+                            $("#userOrgs .get-orgs-error").html('{{_("Error occurred retrieving clinics data. Try reloading the page.")}}');
                         });
 
                     });</script>
