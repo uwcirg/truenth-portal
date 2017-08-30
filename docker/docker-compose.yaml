@@ -2,7 +2,7 @@
 version: "3.2"
 services:
   web:
-    image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
+    image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     depends_on:
       - db
       - redis
