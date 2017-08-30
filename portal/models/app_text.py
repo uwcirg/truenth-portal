@@ -19,6 +19,22 @@ from urlparse import parse_qsl, urlparse
 from ..database import db
 
 
+def time_request(url):
+    """Wrap the requests.get(url) and log the timing"""
+    start = timeit.default_timer()
+    response = requests.get(url)
+    duration = timeit.default_timer() - start
+    message = ('TIME {duration} seconds to GET {url}'.format(
+        url=url, duration=duration))
+    if duration > 5.0:
+        current_app.logger.error(message)
+    elif duration > 2.0:
+        current_app.logger.warning(message)
+    else:
+        current_app.logger.debug(message)
+    return response
+
+
 class AppText(db.Model):
     """Model representing application specific strings for customization
 
@@ -274,12 +290,7 @@ class UnversionedResource(object):
             self._asset = asset
         else:
             try:
-                start = timeit.default_timer()
-                response = requests.get(url)
-                duration = timeit.default_timer() - start
-                current_app.logger.debug(
-                    'TIME fetch {url} took {duration} seconds'.format(
-                        url=url, duration=duration))
+                response = time_request(url)
                 self._asset = response.text
             except MissingSchema:
                 if current_app.config.get('TESTING'):
@@ -333,17 +344,7 @@ class VersionedResource(object):
         self.url = url
         self.variables = variables or {}
         try:
-            start = timeit.default_timer()
-            response = requests.get(url)
-            duration = timeit.default_timer() - start
-            message = ('TIME fetch {url} took {duration} seconds'.format(
-                url=url, duration=duration))
-            if duration > 5.0:
-                current_app.logger.error(message)
-            elif duration > 2.0:
-                current_app.logger.warning(message)
-            else:
-                current_app.logger.debug(message)
+            response = time_request(url)
             self._asset = response.json().get('asset')
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
@@ -437,7 +438,7 @@ class MailResource(object):
         self.url = url
         self.variables = variables or {}
         try:
-            response = requests.get(url)
+            response = time_request(url)
             self._subject = str(response.json().get('subject'))
             self._body = str(response.json().get('body'))
             self.url = self._permanent_url(
