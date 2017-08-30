@@ -316,7 +316,7 @@
             var message = '';
             if (this.value != '' && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
-                $('#profileEmailMessage').text(message);
+                $('#profileEmailMessage').html(message);
                 $('#btnProfileSendEmail').removeClass('disabled');
             } else {
                 $('#profileEmailMessage').text('');
@@ -399,7 +399,9 @@
                         data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
                        //console.log('data ' + data);
-                        $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
+                        $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                        $('#profileEmailSelect').val("");
+                        $('#btnProfileSendEmail').addClass('disabled');
                     }).fail(function() {
                         console.log('failed request');
                         $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
