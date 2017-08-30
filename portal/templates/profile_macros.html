@@ -739,7 +739,7 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div class="form-group profile-section standard" id="userOrgs">
-            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
+            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{ _("Main clinic for prostate cancer care") }}</p>{%else%}
             <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
             <div class="indent">
             <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
@@ -931,7 +931,7 @@
                     toolbar: "#prTableToolBar",
                     rowStyle: function rowStyle(row, index) {
                           return {
-                            css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                           };
                     },
                     undefinedText: '--',
@@ -1099,7 +1099,7 @@
                         toolbar: "#auditTableToolBar",
                         rowStyle: function rowStyle(row, index) {
                               return {
-                                css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                                css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                               };
                         },
                         undefinedText: '--',
@@ -2623,12 +2623,12 @@
         });
         $("#noEmail").on("click, change", function() {
             if ($(this).is(":checked")) {
-                $("#erroremail").hide();
+                $("#erroremail").css("visibility", "hidden");
                 $("#email").val("").attr("disabled", true).removeAttr("required").removeAttr("data-customemail");
                 setTimeout('$("#erroremail").text(""); $("#email").closest("form-group").removeClass("has-error"); $("#email").css("border-color", "#ccc");', 600);
             }
             else {
-                $("#erroremail").show();
+                $("#erroremail").css("visibility", "visible");
                 $("#email").attr("disabled", false).attr("required", "required").attr("data-customemail", "true");
             };
         });
