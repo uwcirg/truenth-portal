@@ -2535,7 +2535,34 @@
             if (hasError) $("#" + elementId).find(".help-block").text(message).addClass("error-message")
             else $("#" + elementId).find(".help-block").text("").removeClass("error-message");
         };
-
+        this.getOrgs = function(callback) {
+            var self = this;
+            self.attempts++;
+            $.ajax ({
+                type: "GET",
+                url: '/api/organization'
+            }).done(function(data) {
+                self.attempts = 0;
+                if (data) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) {
+                        callback({"error": "{{_('no data returned')}}"});
+                    };
+                };
+            }).fail(function() {
+                /*
+                 * retry here
+                 */
+                if (self.attempts < self.max_attempts) {
+                    setTimeout ( function() { self.getOrgs( callback ) } , $.ajaxSetup().retryAfter );
+                } else {
+                    var errorMessage = '{{_("Error occurred retrieving clinics data.")}}';
+                    if (callback) callback({"error": errorMessage});
+                    self.attempts = 0;
+                };
+            });
+        };
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
             if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
