@@ -83,7 +83,9 @@ If you would like to build a Shared Services container against a topic branch on
     # Build the "web" service locally instead of downloading from a docker registry
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose build web
-    docker-compose up web
+
+    # Disable remote repo so locally-built image is used
+    REPO='' docker-compose up web
 
 PostgreSQL Access
 -----------------
