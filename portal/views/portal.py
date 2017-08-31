@@ -9,6 +9,7 @@ from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
 from pprint import pformat
+import requests
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
@@ -1217,6 +1218,21 @@ def celery_info():
 def celery_result(task_id):
     retval = add.AsyncResult(task_id).get(timeout=1.0)
     return repr(retval)
+
+
+@portal.route("/uuid-lookup/<int:article_id>")
+def uuid_lookup(article_id):
+    response = requests.get(
+        "{LR_ORIGIN}/c/portal/truenth/asset/detailed?"
+        "group_id={LR_GROUP}&"
+        "articleId={article_id}&version=latest".format(
+            LR_ORIGIN=current_app.config['LR_ORIGIN'],
+            LR_GROUP=current_app.config['LR_GROUP'],
+            article_id=article_id))
+    if response.status_code == 404:
+        return jsonify(response='article_id not found at {url}'.format(
+            url=response.url))
+    return jsonify(detailed=response.json())
 
 
 @portal.route("/post-result/<task_id>")
