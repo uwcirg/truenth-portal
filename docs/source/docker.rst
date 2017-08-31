@@ -38,9 +38,9 @@ Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a Debian p
 Building a Debian Package
 -------------------------
 
-To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)::
+To build a Debian package from your current ``develop``::
 
-    # Build debian package from develop branch on Github
+    # Build debian package from local develop branch
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
 
@@ -48,10 +48,10 @@ To build a Debian package from the latest latest code on Github (develop branch 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
-If you would like to create a package from a topic branch or fork you can override the Github repo and branch as below::
+If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
 
     # Override defaults with environmental variables
-    REPO_SLUG='USERNAME/true_nth_usa_portal'
+    REPO='USERNAME/true_nth_usa_portal'
     BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
     # Run the container (override defaults)
