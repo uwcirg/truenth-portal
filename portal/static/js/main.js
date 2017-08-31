@@ -588,7 +588,7 @@ var fillContent = {
              ********/
             var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
                                 '<span class="agreement">Agreement</span>',
-                                '<span class="eproms-consent-date-header">' + (typeof CONSENT_DATE_LABEL != "undefined" ? CONSENT_DATE_LABEL : "Consent Date") + '</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+                                '<span class="eproms-consent-date-header">Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
             headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
