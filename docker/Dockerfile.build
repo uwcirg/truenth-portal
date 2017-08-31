@@ -36,16 +36,14 @@ RUN \
         python-pip && \
     apt-get clean
 
-RUN pip install --upgrade pip setuptools
-RUN pip install make-deb
+RUN pip install --upgrade pip setuptools && pip install make-deb
 
-RUN mkdir -p /tmp/artifacts
+RUN mkdir --parents /tmp/artifacts
 
-# Allow branch to be overridden with environmental variable
-ENV BRANCH="${BRANCH:-develop}"
-
-# Allow repo to be overridden with environmental variable
-ENV GIT_REPO=${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}
+# Allow repo and branch to be overridden with environmental variable
+ENV \
+    GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
+    BRANCH="${BRANCH:-develop}"
 
 CMD \
     git clone --verbose --branch "${BRANCH}" "${GIT_REPO}" /root/portal && \
