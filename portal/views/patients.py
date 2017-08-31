@@ -168,7 +168,8 @@ def patient_profile(patient_id):
                    'parent_org': top_org.name if top_org else '',
                    'clinic_name': first_org.name if first_org else '',
                    'registrationlink': 'url_placeholder',
-                   'verify_account_link': 'url_placeholder',
+                   'verify_account_link': ('<a href=\"url_placeholder\">'
+                                           'url_placeholder</a>'),
                    'verify_account_button': ('<div class=\"btn\"><a href='
                                              '\"url_placeholder\">Verify '
                                              'your account</a></div>')
