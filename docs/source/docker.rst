@@ -91,7 +91,7 @@ PostgreSQL Access
 -----------------
 To interact with the database image started via the ``docker-compose`` instructions above, use ``docker exec`` such as::
 
-    docker exec -it docker_db_1 /usr/lib/postgresql/9.6/bin/psql -U postgres
+    docker-compose exec db psql --username postgres
 
 Continuous Delivery
 ===================
