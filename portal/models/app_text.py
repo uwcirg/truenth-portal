@@ -222,11 +222,15 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
+        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
 
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+            return "profileSendEmail invite email {}".format(kwargs.get('org'))
         return "profileSendEmail invite email"
+
 
 
 class AboutATMA(AppTextModelAdapter):
