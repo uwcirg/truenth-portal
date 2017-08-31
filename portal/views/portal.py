@@ -794,8 +794,11 @@ def profile(user_id):
                    'clinic_name': first_org.name if first_org else '',
                    'registrationlink': 'url_placeholder'
                   }
-    invite_email = MailResource(app_text(UserInviteEmail_ATMA.name_key()),
-                                variables=invite_vars)
+    if top_org:
+        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+    else:
+        name_key = UserInviteEmail_ATMA.name_key()
+    invite_email = MailResource(app_text(name_key), variables=invite_vars)
     return render_template('profile.html', user=user,
                            invite_email=invite_email, terms=terms,
                            consent_agreements=consent_agreements)
