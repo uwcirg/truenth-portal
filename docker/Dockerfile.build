@@ -45,10 +45,10 @@ RUN mkdir -p /tmp/artifacts
 ENV BRANCH="${BRANCH:-develop}"
 
 # Allow repo to be overridden with environmental variable
-ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+ENV GIT_REPO=${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}
 
 CMD \
-    git clone --branch "${BRANCH}" "https://github.com/${REPO_SLUG}.git" /root/portal && \
+    git clone --verbose --branch "${BRANCH}" "${GIT_REPO}" /root/portal && \
     cd /root/portal && \
     yes | make-deb && \
     git checkout debian/rules && \
