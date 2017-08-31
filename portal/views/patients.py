@@ -167,7 +167,11 @@ def patient_profile(patient_id):
                    'last_name': patient.last_name,
                    'parent_org': top_org.name if top_org else '',
                    'clinic_name': first_org.name if first_org else '',
-                   'registrationlink': 'url_placeholder'
+                   'registrationlink': 'url_placeholder',
+                   'verify_account_link': 'url_placeholder',
+                   'verify_account_button': ('<div class=\"btn\"><a href='
+                                             '\"url_placeholder\">Verify '
+                                             'your account</a></div>')
                   }
     if top_org:
         name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
