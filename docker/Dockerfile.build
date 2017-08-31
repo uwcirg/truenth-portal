@@ -1,24 +1,6 @@
-FROM debian:jessie
+FROM debian:stretch
 
 ENV DEBIAN_FRONTEND noninteractive
-
-# Use newest version of dh-virtualenv from testing release
-# Todo: try specifying version in `apt-get install` invocation
-RUN echo '\n\
-Package: dh-virtualenv\n\
-Pin: release a=testing\n\
-Pin-Priority: 750\n\
-\n'\
-> /etc/apt/preferences.d/dh-virtualenv.pref
-
-RUN echo '\n\
-Package: *\n\
-Pin: release a=testing\n\
-Pin-Priority: 75\n\
-\n'\
-> /etc/apt/preferences.d/testing.pref
-
-RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
 
 RUN \
     apt-get update && \
@@ -36,7 +18,7 @@ RUN \
         python-pip && \
     apt-get clean
 
-RUN pip install --upgrade pip setuptools && pip install make-deb
+RUN pip install --upgrade pip setuptools && pip install wheel && pip install make-deb
 
 RUN mkdir --parents /tmp/artifacts
 
