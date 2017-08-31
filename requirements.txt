@@ -8,7 +8,7 @@ amqp==2.2.1
 anyjson==0.3.3
 argcomplete==1.8.2
 Authomatic==0.1.0.post1
-Babel==2.4.0
+Babel==2.5.0
 backports.shutil-get-terminal-size==1.0.0
 bcrypt==3.1.3
 beautifulsoup4==4.6.0
