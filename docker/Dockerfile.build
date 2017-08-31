@@ -33,7 +33,7 @@ CMD \
     cd /root/portal && \
     yes | make-deb && \
     git checkout debian/rules && \
-    dpkg-buildpackage -us -uc && \
+    dpkg-buildpackage --unsigned-source --unsigned-changes && \
     mv /root/portal_* /tmp/artifacts && \
     cd /tmp/artifacts && \
     dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz && \
