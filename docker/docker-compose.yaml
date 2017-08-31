@@ -12,14 +12,11 @@ services:
       - portal.env
     environment:
       - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
-      # compose-specific overrides
       - PGUSER=${PGUSER:-postgres}
       - PGPASSWORD=${PGPASSWORD:-""}
       - PGHOST=${PGHOST:-db}
       - PGDATABASE=${PGDATABASE:-postgres}
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
-      - REQUEST_CACHE_URL=${REQUEST_CACHE_URL:-redis://redis:6379/0}
-      - SESSION_REDIS_URL=${SESSION_REDIS_URL:-redis://redis:6379/0}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     depends_on:
       - db
       - redis
