@@ -398,12 +398,10 @@
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                         data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
-                       //console.log('data ' + data);
                         $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
                         $('#profileEmailSelect').val("");
                         $('#btnProfileSendEmail').addClass('disabled');
                     }).fail(function() {
-                        console.log('failed request');
                         $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                     });
                 };
