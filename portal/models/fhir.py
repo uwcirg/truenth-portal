@@ -625,6 +625,7 @@ def generate_qnr_csv(qnr_bundle):
         'instrument',
         'question_code',
         'answer_code',
+        'option_text',
         'other_text',
     )
 
@@ -670,8 +671,9 @@ def generate_qnr_csv(qnr_bundle):
                         answer_data.update({
                             'answer_code': answer['valueCoding']['code'],
 
-                            # Add suplementary text added earlier
-                            # 'answer': answer['valueCoding'].get('text'),
+                            # Add supplementary text added earlier
+                            # Todo: lookup option text from stored Questionnaire
+                            'option_text': answer['valueCoding'].get('text', None),
                             'other_text': None,
                         })
                     row_data.update(answer_data)
