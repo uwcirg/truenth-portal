@@ -88,7 +88,6 @@
  **/
  @bodyFontFamily:  "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
 
-
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -147,7 +146,6 @@ a.btn {
 .btn {
   cursor: pointer;
   border-radius: 0;
-  /*font-size: @btnSize;*/
   padding: 0.8em;
   letter-spacing: 2px;
   color: #333f4b;
@@ -186,6 +184,19 @@ a.btn {
     color: #FFF;
   }
 }
+.feature-btn {
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  border: 2px solid @featureBtnColor;
+}
+.feature-btn-primary {
+  background-color: @bodyBgColor;
+  color: @featureBtnColor;
+  &:hover, &:active {
+    color: @featureBtnHoverColor;
+    background-color: @linkHover;
+  }
+}
 .btn-tnth-back {
   color: @labelColor;
   padding: 0;
@@ -204,9 +215,6 @@ a.btn {
     margin: 0 0.5em;
     display: inline-block;
   }
-}
-#consentDateEditContainer {
-  display: none;
 }
 .button--LR.data-show,
 #profileConsentList .button--LR[data-show = 'true'] {
@@ -254,24 +262,8 @@ select:not([multiple]) {
     font-weight: normal;
   }
 }
-.feature-btn {
-  transition: all 0.2s ease-in-out 0s;
-  -webkit-transition: all 0.2s ease-in-out 0s;
-  border: 2px solid @featureBtnColor;
-}
-.feature-btn-primary {
-  background-color: @bodyBgColor;
-  color: @featureBtnColor;
-  &:hover, &:active {
-    color: @featureBtnHoverColor;
-    background-color: @linkHover;
-  }
-}
-
-#iqFooterWrapper.footerWrapper {
+#consentDateEditContainer {
   display: none;
-  border-top: solid 1px #eee;
-  margin-top: 2em;
 }
 
 #mainHolder {
@@ -307,74 +299,6 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
 }
-
-#stickyMenu {
-  position: fixed;
-  top: 14.5em;
-  left: 0;
-  -webkit-transform: translate(-500px, 0);
-  transform: translate(-500px, 0);
-  transition: transform 0.5s ease;
-  right: 0;
-  padding: 1.5em 0.8em;
-  font-size: 0.9em;
-  min-height: 370px;
-  height: 60%;
-  color: @menuTextColor;
-  width: 200px;
-  border: solid 1px @sectionBorderColor;
-  margin-left: 3.5em;
-  z-index: 11;
-  background-color: @bodyBgColor;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: all 500ms ease-out;
-  display: block;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-  &.sticky-show {
-    -webkit-transform: translate(0, 0);
-    transform: translate(0, 0);
-  }
-  &::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
-      width: 0px;  /* remove scrollbar space */
-      background: transparent;  /* make scrollbar invisible */
-  }
-  .title {
-    color: @menuTitleColor;
-    font-weight: bold;
-  }
-  ul {
-    padding:0;
-    margin:0;
-    list-style-type:none;
-  }
-  li {
-    cursor: pointer;
-    margin-bottom: 1.2em;
-    transform-origin: 0 100%;
-    max-width: 130px;
-    cursor:pointer;
-  }
-  li:hover {
-    color: @linkHover;
-    transform: scale(1.05);
-  }
-}
-a.open, a.back {
-  position: fixed;
-  left: 1em;
-  top: 12.3em;
-  z-index: 11;
-  cursor: pointer;
-  display: none;
-}
-a.open {
-  top: 14.5em;
-}
-a.open .glyphicon,
-a.back .glyphicon {
-  font-size: 1.2em;
-}
 div.left-panel {
   position:fixed;
   padding: 10px;
@@ -396,10 +320,6 @@ div.right-panel {
   transition:margin ease .5s;
   max-width: 991px;
   margin: auto;
-}
-
-h4.detail-title {
-  display: none;
 }
 /***** initial queries page style ****/
 .hide-terms {
@@ -535,9 +455,6 @@ h4.detail-title {
   div.noOrg-container label {
     font-size: 0.99em;
   }
-  .modal label {
-    font-size: @modalLabelSize;
-  }
   .prompt {
     color: @labelColor;
   }
@@ -638,6 +555,11 @@ h4.detail-title {
    margin-bottom: 1em;
    cursor: pointer;
    }
+}
+#iqFooterWrapper.footerWrapper {
+  display: none;
+  border-top: solid 1px #eee;
+  margin-top: 2em;
 }
 #iqErrorMessage {
   position: relative;
@@ -878,7 +800,6 @@ h4.detail-title {
       border-color: @linkHover;
     }
 }
-
 #accessCodeWrapper {
     margin: 0 auto;
     width: 600px;
@@ -1469,6 +1390,10 @@ h4.detail-title {
   min-height: 110vh;
   overflow: hidden;
   background: @profileBgColor;
+
+  h4.detail-title {
+    display: none;
+  }
 
   .profile-item-edit-btn {
     position: absolute;
@@ -2213,7 +2138,6 @@ color: @labelColor
     border-left-color: @tooltipColor;
 }
 
-
 #consentContainer {
   .fade {
     transition: opacity .45s ease-out;
@@ -2692,11 +2616,6 @@ div.timezone-warning.text-warning {
  #indexNavBar span.index-list, #indexContainer {
     display: none;
   }
-  /********
-  div.left-panel, a.back, a.open {
-    display: block;
-  }
-  *****/
 }
 @media (min-width: 991px) {
   #mainNav {
@@ -2926,61 +2845,6 @@ div.timezone-warning.text-warning {
 @media (max-width: 1745px) {
   body.open-nav .right-panel {
     margin-left: 30px;
-  }
-}
-@media (max-width: 1632px) {
-  body.open-nav .right-panel {
-    margin-left: 50px;
-  }
-}
-@media (max-width: 1560px) {
-  body.open-nav .right-panel {
-    margin-left:90px;
-  }
-}
-@media (max-width: 1491px) {
-  body.open-nav .right-panel {
-    margin-left:130px;
-  }
-}
-@media (max-width: 1399px) {
-  body.open-nav .right-panel {
-    margin-left:150px;
-  }
-}
-@media (max-width: 1341px) {
-  body.open-nav .right-panel {
-    margin-left:120px;
-  }
-}
-@media (max-width: 1243px) {
-  body.open-nav .right-panel {
-    margin-left:1450px;
-  }
-}
-@media (max-width: 1199px) {
-  body.open-nav .right-panel {
-    margin-left:110px;
-  }
-}
-@media (max-width: 1077px) {
-  body.open-nav .right-panel {
-    margin-left:160px;
-  }
-}
-@media (max-width: 991px) {
-  body.open-nav .right-panel {
-    margin-left:160px;
-  }
-}
-@media (max-width: 940px) {
-  body.open-nav .right-panel {
-    margin-left: 180px;
-  }
-}
-@media (max-width: 881px) {
-  body.open-nav .right-panel {
-    margin-left:210px;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/

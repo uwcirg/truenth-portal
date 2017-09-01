@@ -80,7 +80,6 @@ a.btn {
 .btn {
   cursor: pointer;
   border-radius: 0;
-  /*font-size: @btnSize;*/
   padding: 0.8em;
   letter-spacing: 2px;
   color: #333f4b;
@@ -119,6 +118,20 @@ a.btn {
 .btn-tnth-primary .glyphicon {
   color: #FFF;
 }
+.feature-btn {
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  border: 2px solid #333;
+}
+.feature-btn-primary {
+  background-color: #FFF;
+  color: #333;
+}
+.feature-btn-primary:hover,
+.feature-btn-primary:active {
+  color: #FFF;
+  background-color: #576e76;
+}
 .btn-tnth-back {
   color: #777;
   padding: 0;
@@ -134,9 +147,6 @@ a.btn {
 #profileConsentList .button--LR {
   margin: 0 0.5em;
   display: inline-block;
-}
-#consentDateEditContainer {
-  display: none;
 }
 .button--LR.data-show,
 #profileConsentList .button--LR[data-show='true'] {
@@ -186,24 +196,8 @@ select:not([multiple]) {
 .form-group label {
   font-weight: normal;
 }
-.feature-btn {
-  transition: all 0.2s ease-in-out 0s;
-  -webkit-transition: all 0.2s ease-in-out 0s;
-  border: 2px solid #333;
-}
-.feature-btn-primary {
-  background-color: #FFF;
-  color: #333;
-}
-.feature-btn-primary:hover,
-.feature-btn-primary:active {
-  color: #FFF;
-  background-color: #576e76;
-}
-#iqFooterWrapper.footerWrapper {
+#consentDateEditContainer {
   display: none;
-  border-top: solid 1px #eee;
-  margin-top: 2em;
 }
 #mainHolder {
   visibility: hidden;
@@ -234,77 +228,6 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
 }
-#stickyMenu {
-  position: fixed;
-  top: 14.5em;
-  left: 0;
-  -webkit-transform: translate(-500px, 0);
-  transform: translate(-500px, 0);
-  transition: transform 0.5s ease;
-  right: 0;
-  padding: 1.5em 0.8em;
-  font-size: 0.9em;
-  min-height: 370px;
-  height: 60%;
-  color: #494e37;
-  width: 200px;
-  border: solid 1px #bcc2a6;
-  margin-left: 3.5em;
-  z-index: 11;
-  background-color: #FFF;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: all 500ms ease-out;
-  display: block;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-}
-#stickyMenu.sticky-show {
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
-}
-#stickyMenu::-webkit-scrollbar,
-#stickyMenu div.home--item-container::-webkit-scrollbar,
-#stickyMenu div.modal.fade::-webkit-scrollbar {
-  width: 0px;
-  /* remove scrollbar space */
-  background: transparent;
-  /* make scrollbar invisible */
-}
-#stickyMenu .title {
-  color: #5b5e61;
-  font-weight: bold;
-}
-#stickyMenu ul {
-  padding: 0;
-  margin: 0;
-  list-style-type: none;
-}
-#stickyMenu li {
-  margin-bottom: 1.2em;
-  transform-origin: 0 100%;
-  max-width: 130px;
-  cursor: pointer;
-}
-#stickyMenu li:hover {
-  color: #576e76;
-  transform: scale(1.05);
-}
-a.open,
-a.back {
-  position: fixed;
-  left: 1em;
-  top: 12.3em;
-  z-index: 11;
-  cursor: pointer;
-  display: none;
-}
-a.open {
-  top: 14.5em;
-}
-a.open .glyphicon,
-a.back .glyphicon {
-  font-size: 1.2em;
-}
 div.left-panel {
   position: fixed;
   padding: 10px;
@@ -325,9 +248,6 @@ div.right-panel {
   transition: margin ease .5s;
   max-width: 991px;
   margin: auto;
-}
-h4.detail-title {
-  display: none;
 }
 /***** initial queries page style ****/
 .hide-terms {
@@ -462,9 +382,6 @@ h4.detail-title {
 #aboutForm div.noOrg-container label {
   font-size: 0.99em;
 }
-#aboutForm .modal label {
-  font-size: 1.02em;
-}
 #aboutForm .prompt {
   color: #777;
 }
@@ -565,6 +482,11 @@ h4.detail-title {
     margin-bottom: 1em;
     cursor: pointer;
   }
+}
+#iqFooterWrapper.footerWrapper {
+  display: none;
+  border-top: solid 1px #eee;
+  margin-top: 2em;
 }
 #iqErrorMessage {
   position: relative;
@@ -1345,6 +1267,9 @@ h4.detail-title {
   min-height: 110vh;
   overflow: hidden;
   background: #5f676e;
+}
+#mainDiv.profile h4.detail-title {
+  display: none;
 }
 #mainDiv.profile .profile-item-edit-btn {
   position: absolute;
@@ -2505,11 +2430,6 @@ div.timezone-warning.text-warning {
   #indexContainer {
     display: none;
   }
-  /********
-  div.left-panel, a.back, a.open {
-    display: block;
-  }
-  *****/
 }
 @media (min-width: 991px) {
   #mainNav {
@@ -2729,61 +2649,6 @@ div.timezone-warning.text-warning {
 @media (max-width: 1745px) {
   body.open-nav .right-panel {
     margin-left: 30px;
-  }
-}
-@media (max-width: 1632px) {
-  body.open-nav .right-panel {
-    margin-left: 50px;
-  }
-}
-@media (max-width: 1560px) {
-  body.open-nav .right-panel {
-    margin-left: 90px;
-  }
-}
-@media (max-width: 1491px) {
-  body.open-nav .right-panel {
-    margin-left: 130px;
-  }
-}
-@media (max-width: 1399px) {
-  body.open-nav .right-panel {
-    margin-left: 150px;
-  }
-}
-@media (max-width: 1341px) {
-  body.open-nav .right-panel {
-    margin-left: 120px;
-  }
-}
-@media (max-width: 1243px) {
-  body.open-nav .right-panel {
-    margin-left: 1450px;
-  }
-}
-@media (max-width: 1199px) {
-  body.open-nav .right-panel {
-    margin-left: 110px;
-  }
-}
-@media (max-width: 1077px) {
-  body.open-nav .right-panel {
-    margin-left: 160px;
-  }
-}
-@media (max-width: 991px) {
-  body.open-nav .right-panel {
-    margin-left: 160px;
-  }
-}
-@media (max-width: 940px) {
-  body.open-nav .right-panel {
-    margin-left: 180px;
-  }
-}
-@media (max-width: 881px) {
-  body.open-nav .right-panel {
-    margin-left: 210px;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/

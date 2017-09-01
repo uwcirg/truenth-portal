@@ -178,12 +178,6 @@ select:not([multiple]) {
   color: #FFF;
   background-color: #576e76;
 }
-.tnth-hide {
-  display: none;
-}
-.capitalize {
-  text-transform: capitalize;
-}
 #fullSizeBox a[href*="register"] {
   display: none;
 }
@@ -298,61 +292,6 @@ select:not([multiple]) {
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
-}
-#stickyMenu {
-  position: fixed;
-  top: 14.5em;
-  left: 0;
-  -webkit-transform: translate(-500px, 0);
-  transform: translate(-500px, 0);
-  transition: transform 0.5s ease;
-  right: 0;
-  padding: 1.5em 0.8em;
-  font-size: 0.9em;
-  min-height: 370px;
-  height: 30%;
-  color: #494e37;
-  width: 200px;
-  border: solid 1px #E0E6E3;
-  margin-left: 3.5em;
-  z-index: 11;
-  background-color: #FFF;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: transform 500ms ease-out;
-  display: block;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-}
-#stickyMenu.sticky-show {
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
-}
-#stickyMenu::-webkit-scrollbar,
-#stickyMenu div.home--item-container::-webkit-scrollbar,
-#stickyMenu div.modal.fade::-webkit-scrollbar {
-  width: 0px;
-  /* remove scrollbar space */
-  background: transparent;
-  /* make scrollbar invisible */
-}
-#stickyMenu .title {
-  color: #5b5e61;
-  font-weight: bold;
-}
-#stickyMenu ul {
-  padding: 0;
-  margin: 0;
-  list-style-type: none;
-}
-#stickyMenu li {
-  margin-bottom: 1.2em;
-  transform-origin: 0 100%;
-  max-width: 130px;
-  cursor: pointer;
-}
-#stickyMenu li:hover {
-  color: #576e76;
-  transform: scale(1.05);
 }
 a.open,
 a.back {
@@ -2453,6 +2392,12 @@ div.timezone-warning.text-warning {
 .gradient {
   background-image: linear-gradient(to top right, #FFF, #e1e2e1);
 }
+.tnth-hide {
+  display: none;
+}
+.capitalize {
+  text-transform: capitalize;
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -2677,12 +2622,6 @@ div.timezone-warning.text-warning {
     max-width: 100%;
   }
 }
-/*******
-@media (max-width: 730px) {
-  #userSessionsList {
-    font-size: @smallerText;
-  }
-}*******/
 @media (min-width: 768px) {
   #fullSizeBox {
     /*background-image: none;
