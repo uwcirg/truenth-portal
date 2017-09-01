@@ -625,7 +625,7 @@ def generate_qnr_csv(qnr_bundle):
         'instrument',
         'question_code',
         'answer_code',
-        'answer',
+        'other_text',
     )
 
     yield ','.join('"' + column + '"' for column in columns) + '\n'
@@ -655,7 +655,7 @@ def generate_qnr_csv(qnr_bundle):
             row_data.update({
                 'question_code': question['linkId'],
                 'answer_code': None,
-                'answer': None,
+                'other_text': None,
             })
 
             answers = consolidate_answer_pairs(question['answer']) or ({},)
@@ -663,7 +663,7 @@ def generate_qnr_csv(qnr_bundle):
             for answer in answers:
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'answer': answer.values()[0]}
+                    answer_data = {'other_text': answer.values()[0]}
 
                     # ...unless nested code (ie valueCode)
                     if answer.keys()[0] == 'valueCoding':
@@ -672,7 +672,7 @@ def generate_qnr_csv(qnr_bundle):
 
                             # Add suplementary text added earlier
                             # 'answer': answer['valueCoding'].get('text'),
-                            'answer': None,
+                            'other_text': None,
                         })
                     row_data.update(answer_data)
 
