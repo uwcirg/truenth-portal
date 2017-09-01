@@ -656,6 +656,7 @@ def generate_qnr_csv(qnr_bundle):
             row_data.update({
                 'question_code': question['linkId'],
                 'answer_code': None,
+                'option_text': None,
                 'other_text': None,
             })
 
