@@ -41,13 +41,9 @@ function xhr_function(){
 function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
-        .html(data).promise().done(function() {
-            //for firefox? need to figure out why it doesn't show the content if not deling this call??
-            if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("loader();", 300);
-                //console.log("in firefox")
-            } else setTimeout("loader();", 0);
-
+        .html(data);
+        setTimeout(function() {
+            loader();
             $("#tnthTopLinks li a, #tnthNavbarXs li a").each(function() {
                 $(this).on("click", function(e) {
                     e.preventDefault();
@@ -55,8 +51,7 @@ function embed_page(data){
                     window.location = $(this).attr("href");
                 });
             });
-
-        });
+        }, 500)
 }
 
 function showMain() {
@@ -71,22 +66,6 @@ function showMain() {
 
 }
 
-function showWrapper(hasLoader) {
-    var cssProp = {"visibility":"visible", "display": "block"};
-    //adding this for firefox fix
-    if (!$("#tnthNavWrapper").is(":visible") || navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-        if (hasLoader) {
-            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-                //delay removal of loading div to prevent FOUC
-                if (!DELAY_LOADING) {
-                    setTimeout('$("#loadingIndicator").fadeOut();', 1000);
-                };
-            });
-
-        } else $("#tnthNavWrapper").css(cssProp);
-    };
-};
-
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
     //landing page
@@ -99,9 +78,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 1000);
+        setTimeout("showMain();", 500);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 1500);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
         };
     };
 };
@@ -567,7 +546,6 @@ var fillContent = {
                 };
             };
         });
-        OT.drawStudyIDLabel();
         fillViews.org();
     },
     "subjectId": function(data) {
@@ -610,7 +588,7 @@ var fillContent = {
              ********/
             var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
                                 '<span class="agreement">Agreement</span>',
-                                '<span class="eproms-consent-date-header">Consented Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+                                '<span class="eproms-consent-date-header">Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
             headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
@@ -685,6 +663,13 @@ var fillContent = {
                     var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
+                    var consentLabels = {
+                        "default": "Consented",
+                        "consented": "Consented / Enrolled",
+                        "withdrawn": "<span data-eproms='true'>Withdrawn - Suspend Data Collection and Report Historic Data</span>" +
+                                      "<span data-truenth='true'>Suspend Data Collection and Report Historic Data</span>",
+                        "purged": "Purged / Removed"
+                    };
 
                     switch(consentStatus) {
                         case "deleted":
@@ -695,18 +680,18 @@ var fillContent = {
                             break;
                         case "active":
                             if (se && sr && ir) {
-                                    if (isDefault) sDisplay = "<span class='text-success small-text'>Consented</span>";
-                                    else sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                    if (isDefault) sDisplay = "<span class='text-success small-text'>" + consentLabels["default"] + "</span>";
+                                    else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Report Historic Data</span>";
+                                    sDisplay = "<span class='text-warning small-text withdrawn-label'>" + consentLabels["withdrawn"] + "</span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
-                                    sDisplay = "<span class='text-danger small-text'>Purged/Removed</span>";
+                                    sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
                                     cflag = "purged";
                             } else {
                                 //backward compatible?
-                                sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                 cflag = "consented";
                             };
                             break;
@@ -714,7 +699,11 @@ var fillContent = {
                     var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
-                        /****** modal content doe modifying consent status *******/
+                        /****** modal content for modifying consent status *******/
+                        /*
+                         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
+                         * different verbiage is hidden/shown via css - see .withdrawn-label class in respective css files
+                         */
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -725,9 +714,9 @@ var fillContent = {
                             + '<div class="modal-body" style="padding: 0 2em">'
                             + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
+                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
+                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
@@ -857,6 +846,9 @@ var fillContent = {
                     });
                 });
                 $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+                    __convertToNumericField($(this));
+                });
                 $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
                     $(this).on("change", function() {
                         var dataIndex = $.trim($(this).attr("data-index"));
@@ -1101,7 +1093,6 @@ var fillContent = {
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
-                        if (type == "subject website consent" || type == "website terms of use") $("#termsText").addClass("agreed");
                     };
                 });
                 var additional = $(this).find("[data-core-data-subtype]");
@@ -1122,9 +1113,14 @@ var fillContent = {
                     };
                 };
             });
-            //});
         };
-        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
+        setTimeout(function() {
+            var agreedCheckboxes = $("#termsCheckbox [data-type='terms'][data-agree='false']:visible");
+            if (agreedCheckboxes.length > 1) {
+                $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
+            };
+            if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
+        }, 2000);
     }
 };
 
@@ -1356,7 +1352,11 @@ var assembleContent = {
             var emailVal = $("input[name=email]").val();
             if ($.trim(emailVal) != "") {
                 demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
+            } else {
+                //'__no_email__'
+                demoArray["telecom"].push({ "system": "email", "value": "__no_email__" });
             };
+
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
         };
@@ -1498,6 +1498,7 @@ OrgTool.prototype.getOrgsList = function() {
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
     if (leafOrgs.length == 0) return false;
+
     var self = this;
 
     $("input[name='organization']").each(function() {
@@ -1662,6 +1663,7 @@ OrgTool.prototype.populateUI = function() {
         };
         if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
     };
+    if (!hasValue(container.text())) container.html("No organizations available");
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
@@ -1826,8 +1828,6 @@ OrgTool.prototype.handleEvent = function() {
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
-            OT.drawStudyIDLabel();
-
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
                     assembleContent.demo(userId,true, $(this), true);
@@ -1927,12 +1927,17 @@ OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
       return this.getChildOrgs(childOrgs, orgList);
     };
 };
-OrgTool.prototype.getHereBelowOrgs = function() {
-  var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
+OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
+  var mainOrgsList = this.getOrgsList(), self = this;
   var here_below_orgs = [];
   if (!userOrgs) {
-    var selectedOrg = this.getSelectedOrg();
-   if (selectedOrg.length > 0) userOrgs = [selectedOrg.val()];
+   var selectedOrg = this.getSelectedOrg();
+   if (selectedOrg.length > 0) {
+        userOrgs = [];
+        selectedOrg.each(function() {
+            userOrgs.push($(this).val());
+        });
+   };
   };
   if (userOrgs) {
       userOrgs.forEach(function(orgId) {
@@ -1958,46 +1963,6 @@ OrgTool.prototype.morphPatientOrgs = function() {
             $(this).prop("checked", true);
         };
     });
-};
-OrgTool.prototype.drawStudyIDLabel = function(arrParents, isTableHeader) {
-
-    /******** specific study ID label based on parent org *******/
-    /******** see story:  https://www.pivotaltracker.com/story/show/149439247 ******/
-    var self = this;
-
-    if (!arrParents) {
-        arrParents = [];
-        var selectedOrgs = self.getSelectedOrg();
-        selectedOrgs.each(function() {
-            var parentOrg = self.getTopLevelParentOrg($(this).val());
-            if (hasValue(parentOrg)) arrParents.push(parentOrg);
-        });
-    };
-
-    $(".custom-study-id-label").remove();
-
-    if (arrParents.length == 1) {
-        arrParents.forEach(function(parentOrg) {
-            if ($(".custom-study-id-label[data-org-id='" + parentOrg + "']").length == 0) {
-                var orgName = self.orgsList[parentOrg].name;
-                if (hasValue(orgName)) {
-                    var content = "<span class='custom-study-id-label' data-org-id='" + parentOrg + "'>" + $.trim(orgName + " Subject ID") + "</span>";
-                    if (isTableHeader) {
-                        $("th.profile-study-id-label .th-inner").prepend(content);
-                    } else {
-                        $(".profile-study-id-label").each(function() {
-                            $(this).prepend(content);
-                        });
-                    };
-                };
-            };
-        });
-        //if no custom study id label is drawn, then show default label
-        if ($(".custom-study-id-label").length == 0)  $(".default-study-id-label").show();
-
-    } else {
-        $(".default-study-id-label").show();
-    };
 };
 var OT = new OrgTool();
 
@@ -2042,13 +2007,28 @@ var tnthAjax = {
             if (data && data.still_needed) {
                 if (callback) callback(data.still_needed);
                 var __localizedFound = false;
+                if ((data.still_needed).length > 0) $("#termsText").show();
                 (data.still_needed).forEach(function(item) {
                     $("#termsCheckbox [data-type='terms']").each(function() {
                         var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
                         dataTypes.forEach(function(type) {
-                            if (type == item) {
+                            if ($.trim(type) == $.trim(item)) {
                                 self.show().removeClass("tnth-hide");
+                                self.attr("data-required", "true");
                             };
+                        });
+                        /*
+                         * need to check terms of use types e.g. privacy policy, that is required of user
+                         * in addition to website terms of use
+                         * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
+                         * for the purpose of checking, they need to be broken up into sub items and be checked respectively
+                         */
+                        $(this).find("[data-core-data-subtype]").each(function() {
+                             if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
+                                var parentNode = $(this).closest("[data-type='terms']");
+                                parentNode.show().removeClass("tnth-hide");
+                                parentNode.attr("data-required", "true");
+                             };
                         });
                     });
                     if (item == "localized") __localizedFound = true;
@@ -2694,13 +2674,15 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "getRoleList": function() {
+    "getRoleList": function(callback) {
         $.ajax({
             type: "GET",
-            url: "/api/roles",
-            async: false
+            url: "/api/roles"
         }).done(function(data) {
             fillContent.roleList(data);
+            if (callback) callback();
+        }).fail(function() {
+            $(".get-roles-error").html("Server error occurred retrieving roles information.");
         });
     },
     "getRoles": function(userId,isProfile) {
@@ -2720,7 +2702,8 @@ var tnthAjax = {
            else $(".get-roles-error").html(errorMessage);
         });
     },
-    "putRoles": function(userId,toSend) {
+    "putRoles": function(userId,toSend, targetField) {
+        flo.showLoader(targetField);
         $.ajax ({
             type: "PUT",
             url: '/api/user/'+userId+'/roles',
@@ -2728,8 +2711,10 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
+            flo.showUpdate(targetField);
             $(".put-roles-error").html("");
         }).fail(function(jhr) {
+            flo.showError(targetField);
             var errorMessage = "Server error occurred setting user role information."
            if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
            else $(".put-roles-error").html(errorMessage);
@@ -2887,6 +2872,51 @@ var tnthAjax = {
            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
            else $(".get-tou-error").html(errorMessage);
            if (callback) callback({"error": "Server error"});
+        });
+    },
+    /*
+     *  return instruments list by organization(s)
+     */
+    "getInstrumentsList": function(sync, callback) {
+        $.ajax({
+            type: "GET",
+            url: "api/questionnaire_bank",
+            async: (sync?false:true)
+        }).done(function(data){
+            if (data && data.entry) {
+                if ((data.entry).length === 0) {
+                    if (callback) callback({"error": "no data returned"});
+                } else {
+                    var qList = {};
+                    (data.entry).forEach(function(item) {
+                        if (item.organization) {
+                            var orgID = (item.organization.reference).split("/")[2];
+                            /*
+                             * don't assign orgID to object if it was already present
+                             */
+                            if (!qList[orgID]) qList[orgID] = [];
+                            if (item.questionnaires) {
+                                (item.questionnaires).forEach(function(q) {
+                                    /*
+                                     * add instrument name to instruments array for the org
+                                     * will not add if it is already in the array
+                                     * NOTE: inArray returns -1 if the item is NOT in the array
+                                     */
+                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
+                                        qList[orgID].push(q.questionnaire.display);
+                                    };
+                                });
+                            };
+                        };
+                    });
+                    if (callback) callback(qList);
+                };
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+
+        }).fail(function() {
+            if (callback) callback({"error": "error retrieving instruments list"});
         });
     },
     "getTerms": function(userId, type, sync, callback) {
@@ -3090,7 +3120,7 @@ $(document).ready(function() {
                     });
                 }
                 return emailReg.test(emailVal);
-            }, 
+            },
             htmltags: function($el) {
                 var invalid = containHtmlTags($el.val());
                 if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
@@ -3457,7 +3487,6 @@ var tnthDates = {
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) return false;
         var day = dArray[0], month = dArray[1], year = dArray[2];
-        //console.log("day: " + day + " month: " + month + " year: " + year)
         if (day.length < 1) return false;
         if (month.length < 3) return false;
         if (year.length < 4) return false;
@@ -3493,8 +3522,14 @@ var tnthDates = {
         var givenDate = this.getGivenDate(y, m, d);
         return ( givenDate == convertedDate);
     },
-    "getDateObj": function(y, m, d) {
-        return new Date(y,parseInt(m)-1,d);
+    /*
+     * method does not check for valid numbers, will return NaN if conversion failed
+     */
+    "getDateObj": function(y, m, d, h, mi, s) {
+        if (!h) h = 0;
+        if (!mi) mi = 0;
+        if (!s) s = 0;
+        return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
     },
     "getConvertedDate": function(dateObj) {
         if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
@@ -3729,6 +3764,52 @@ var tnthTables = {
         //if (aa < bb) return -1;
         //return 0;
         return  bb - aa;
+    },
+    /***
+     * Quick way to sort when text is wrapped in an <a href> or other tag
+     * NOTE for text that is NOT number
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksTextSorter": function(a,b) {
+        var aa = $(a).text();
+        var bb = $(b).text();
+        if(aa < bb) return -1;
+        if(aa > bb) return 1;
+        return 0;
+    },
+    /***
+     * sorting date string,
+     * @param a,b - the two items to compare - note, this assumes that the parameters
+     * are in valid date format e.g. 3 August 2017
+     * @returns 1,-1 or 0 for sorting
+     */
+    "dateSorter": function(a,b) {
+        if (!hasValue(a)) a = 0;
+        if (!hasValue(b)) b = 0;
+        /*
+         * make sure the string passed in does not have line break element
+         * if so it is a possible mult-line text, split it up and use
+         * the first item in the resulting array
+         */
+        var regex = /<br\s*[\/]?>/gi;
+        a = a.replace(regex, "\n");
+        b = b.replace(regex, "\n");
+        var ar = a.split("\n");
+        if (ar.length > 0) a = ar[0];
+        var br = b.split("\n");
+        if (br.length > 0) b = br[0];
+        /* note getTime return returns the numeric value
+         * corresponding to the time for the specified date according to universal time
+         * therefore, can be used for sorting
+         */
+        var a_d = (new Date(a)).getTime();
+        var b_d = (new Date(b)).getTime();
+
+        if (isNaN(a_d)) a_d = 0;
+        if (isNaN(b_d)) b_d = 0;
+
+        return  b_d - a_d;
     }
 };
 
@@ -3875,13 +3956,19 @@ function getSaveLoaderDiv(parentID, containerID) {
     };
 };
 
-function __getLoaderHTML() {
-    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+function __getLoaderHTML(message) {
+    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message)?"&nbsp;"+message:"") + '</div>';
 }
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 };
-
+function __convertToNumericField(field) {
+    if (field) {
+        if (_isTouchDevice()) field.each(function() {
+            $(this).prop("type", "tel");
+        })
+    }
+}
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };

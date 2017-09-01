@@ -1,3 +1,4 @@
+---
 language: python
 python: "2.7"
 sudo: false
@@ -13,8 +14,10 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
-    - SQLALCHEMY_DATABASE_TEST_URI='postgresql://postgres:@localhost/portal_unit_tests'
-    - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
+    - PGUSER='postgres'
+    - PGPASSWORD=''
+    - PGHOST='localhost'
+    - PGDATABASE='portal_unit_tests'
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}
     - DEB_REPO=${DEB_REPO:-portal-deb}
@@ -51,6 +54,8 @@ before_install:
   - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
   - export GH_USERNAME GH_REPO
   - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
+  # Reuse PG* env vars - each TravisCI job gets its own DB
+  - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
 
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
@@ -65,7 +70,10 @@ before_install:
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
 
-  - psql --command 'create database portal_unit_tests owner postgres;' --username postgres
+  - createdb
+      --owner "$PGUSER"
+      --username "$PGUSER"
+    "$PGDATABASE"
 
   - pip install --upgrade pip setuptools
   - export PORTAL_VERSION="$(python setup.py --version)"
@@ -80,31 +88,26 @@ after_success:
   # Only run build steps in corresponding tox env
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
-  # Set docker tag based on branch
+  # Set primary docker tag (TAG) based on branch, or current tag
+  # Precedence: current git tag, current branch (with develop and master mapped to latest and stable respectively)
   - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
     export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
   - export TAG=${TRAVIS_TAG:-${TAG}}
+
+  # List of tags to apply to docker image
   # TravisCI doesn't support Bash arrays
   # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
 
-  - docker pull "uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"
-  - docker volume create --name debian-repo
-  # Build artifacts from current repo and branch (else "develop")
-  - docker run
-      --volume debian-repo:/tmp/artifacts
-      --env REPO_SLUG=$TRAVIS_REPO_SLUG
-      --env BRANCH=${TRAVIS_BRANCH:-develop}
-    "uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"
+  - cp docker/portal.env.default docker/portal.env
+  - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+  # Build debian package from current repo and branch (else "develop")
+  - REPO_SLUG="$TRAVIS_REPO_SLUG"
+    BRANCH="${TRAVIS_BRANCH:-develop}"
+    docker-compose run builder
 
-  # Copy artifacts off volume mounted on previous container
-  - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-$DOCKER_REPO.jfrog.io/deb_builder:latest"):/tmp/artifacts /tmp
-  # Copy artifacts to current directory to allow local installation
-  - cp --recursive --verbose /tmp/artifacts artifacts
-  - docker build
-      --file docker/Dockerfile
-      --tag "$IMAGE_NAME:$TAG"
-    .
+  # Build portal docker image from debian package
+  - docker-compose build web
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
@@ -146,7 +149,7 @@ deploy:
         - -v BINTRAY_API_KEY
     script:
       curl
-        --upload-file artifacts/*.deb
+        --upload-file debian/artifacts/*.deb
         --user "$GH_USERNAME:$BINTRAY_API_KEY"
         https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
@@ -160,9 +163,10 @@ deploy:
         - -v ARTIFACTORY_TOKEN
     script:
       curl
-        --upload-file artifacts/*.deb
+        --verbose
+        --upload-file debian/artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
-        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
+        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
 after_deploy:
   # Deploy to Artifactory, if configured
@@ -212,6 +216,7 @@ after_deploy:
       docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
+  - docker images --digests --all
 
   # Wait for background jobs to finish (if they haven't already)
   - wait

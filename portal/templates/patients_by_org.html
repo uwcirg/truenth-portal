@@ -4,62 +4,15 @@
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
     <div id="patientListOptions">
+      {%- if user.has_role(ROLE.STAFF) -%}
       <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
+      {%- endif -%}
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
-    <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
-  {% if config.STAFF_BULK_DATA_ACCESS %}
-      <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                {{ _("Export questionnaire data") }}
-              </div>
-              <div class="modal-body">
-                  <div class="form-group">
-                    <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
-                    <div id="patientsInstrumentListWrapper">
-                      <div id="patientsInstrumentList" class="profile-radio-list">
-                        {% for instrument_code in config["INSTRUMENTS"] | sort() %}
-                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
-                        </div>
-                        {% endfor %}
-                      </div>
-                      <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
-                    </div>
-                    </div>
-                  <div class="form-group">
-                    <label class="text-muted">{{ _("Data type:")}}</label>
-                    <div id="patientsDownloadTypeList" class="profile-radio-list">
-                      <label class="radio-inline">
-                          <input type="radio" name="downloadType" id="csv" value="csv" checked/>
-                          {{ _("CSV") }}
-                      </label>
-                      <label class="radio-inline">
-                          <input type="radio" name="downloadType" id="_json" value="json"/>
-                          {{ _("JSON") }}
-                      </label>
-                    </div>
-                  </div>
-                  <div id="_downloadMessage"></div>
-                  <br/>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="patientsDownloadButton">{{ _("Export") }}</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-              </div>
-            </div>
-          </div>
-      </div>
-  {% endif %}
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
-        {% if config.STAFF_BULK_DATA_ACCESS %}
-          <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
-        {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
             <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
@@ -89,23 +42,26 @@
              data-smart-display="true"
              data-unique-id="id"
              data-id-field="id"
+             data-filter-control="true"
+             data-show-export="true"
+             data-export-data-type="all"
              >
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                   <!-- need to hide the ID column specifically for EPROMs -->
-                  <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
+                  <th data-field="userid" data-sortable="true" data-class="id-field" data-sorter="tnthTables.stripLinksSorter" data-width="1%" {%if config.HIDE_TRUENTH_ID_FIELD%}data-visible="false"{%endif%}>TrueNTH ID</th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
-                  <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
-                  <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
-                  <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
-                  <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
-                  <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field">{{ _("Phone (Other)") }}</th>
-                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field profile-study-id-label"><span class="default-study-id-label">{{ _("Study ID") }}</span></th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
-                  <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
+                  <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
+                  <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
+                  <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Email") }}</th>
+                  <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field" data-filter-control="input">{{ _("Cell") }}</th>
+                  <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field" data-filter-control="input">{{ _("Phone (Other)") }}</th>
+                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center" data-filter-control="input">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.stripLinksTextSorter">{{ _("Study ID") }}</th>{% endif %}
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
+                  <th data-field="organization" data-sortable="true" data-class="organization-field" data-filter-control="select">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
           <tbody id="admin-table-body" data-link="row" class="rowlink">
@@ -123,14 +79,11 @@
                         <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td><span class="field-loading-indicator text-muted smaller-text"><i class="fa fa-spinner fa-spin"></i> loading ...</span></td>
-                      {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{{patient.assessment_status if patient.assessment_status}}</td>{% endif %}
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{%if patient.external_study_id%}<a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.external_study_id }}</a>{%endif%}</a></td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
-                          <span class="tnth-hide">{{consent.audit.timestamp}}</span>
                           {{consent.audit.timestamp.strftime('%-d %b %Y')}}<br/>
                         {%-endfor-%}
                       {%-endif-%}
@@ -151,40 +104,74 @@
 {% endblock %}
 {% block document_ready %}
 
-var org_list = {};
-{% if org_list %}
-  {% for org in org_list %}
-      org_list[{{org}}] = true;
-  {% endfor %}
-{% endif %}
-
 var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
+  /*
+   *  scroll to the top of page on each page change
+   */
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
 
+  /*
+   * client side population of assessment status
+   * comment this out for now
+   */
+  
+  /************************************************************************
+   * start commented out code
+   */
   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-    //client side update of assessment status, for performance
-    setTimeout(function() { AT.updateData();}, 100);
-    $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
-        e.stopPropagation();
-        AT.abortRequests(function() {
-          $(e.target).trigger('click.bs.rowlink');
-        });
-    });
-    $(document).delegate("#createUserLink", "click touchstart", function(e) {
-        e.stopPropagation();
-        AT.abortRequests(function() {
-          window.location = $("#createUserLink").attr("href");
-        });
-    });
-  {% else %}
-    AT.fadeLoader();
+  //client side update of assessment status, for performance
+  //  setTimeout(function() { AT.updateData();}, 100);
+  //  $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
+  //      e.stopPropagation();
+  //      AT.abortRequests(function() {
+  //        if (e.target && !$(e.target).hasClass("rowlink-skip")) {
+  //          $(e.target).trigger('click.bs.rowlink');
+  //        };
+  //      }, true);
+  //  });
+  //  $(document).delegate("#createUserLink", "click touchstart", function(e) {
+  //      e.stopPropagation();
+  //      AT.abortRequests(function() {
+  //        window.location = $("#createUserLink").attr("href");
+  //     }, true);
+  //  });
+  //  /*
+  // * appending loading indicator for status column at runtime
+  //   */
+  //  $("#adminTable th.status-field").prepend(__getLoaderHTML('{{_("retrieving data ...")}}'));
   {% endif %}
+  /************************************************************************
+   * end commented out code
+   */
 
+
+  /*
+   * add placeholder text for filter controls
+   */
+   (function() {
+     function addFilterPlaceHolders() {
+       $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
+       $("#adminTable .filterControl select option[value='']").text("Select");
+     }
+     $("#adminTable").on("reset-view.bs.table", function() {
+        addFilterPlaceHolders();
+     });
+     addFilterPlaceHolders();
+   })();
+
+  /*
+   * fade loading spinner on page load
+   */
+  AT.fadeLoader();
+
+  /*
+   * initializing bootstrapTable
+   */
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");
@@ -194,34 +181,20 @@ $(document).ready(function() {
     }
   });
 
+  /*
+   *  hide checkbox for hidden id field from side menu
+   */
   $("input[data-field='id']:checkbox").hide();
 
-  $(document).delegate("#patientsDownloadButton", "click", function(event){
-    var instruments = "", dataType = "";
-    $("input[name='instrument'").each(function() {
-        if ($(this).is(":checked")) {
-          instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
-        };
-    });
-    $("input[name='downloadType']").each(function() {
-        if ($(this).is(":checked")) dataType = $(this).val();
-    });
-    if (instruments != "" && dataType != "") {
-        //alert(instruments)
-        $("#_downloadMessage").text("");
-        $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
-        $("#_downloadLink")[0].click();
-        //$("#dataDownloadModal").modal("hide");
-    } else {
-        message = (instruments == "" ? "{{_('Please choose at least one instrument.')}}": "");
-        if (dataType == "") message += (message != "" ? "<br/>": "") + "{{_('Please choose one download type.')}}";
-        $("#_downloadMessage").html(message);
-    };
-  });
-
-  $("input[name='instrument'], input[name='downloadType']").on("click", function() {
-      if ($(this).is(":checked")) $("#_downloadMessage").text("");
-  });
+  /*
+   * variable passed into orgs dropdown to check selected org(s)
+   */
+  var org_list = {};
+  {% if org_list %}
+    {% for org in org_list %}
+        org_list[{{org}}] = true;
+    {% endfor %}
+  {% endif %}
 
   AT.initOrgsList(org_list, 'patients');
 

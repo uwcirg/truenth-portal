@@ -5,6 +5,7 @@ from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
 from flask_babel import gettext as _
 from flask_user import roles_required
+from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
 from pprint import pformat
@@ -17,13 +18,16 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
+from ..dogpile import dogpile_cache
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
                                StaffRegistrationEmail_ATMA)
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
+from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
 from ..models.coredata import Coredata
+from ..models.encounter import Encounter
 from ..models.fhir import CC
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
@@ -76,6 +80,27 @@ def debug_request_dump():
         if request.form:
             output += " {0.form}"
         current_app.logger.debug(output.format(request))
+
+
+@portal.after_app_request
+def report_slow_queries(response):
+    """Log slow database queries
+
+    This will only function if BOTH values are set in the config:
+        DATABASE_QUERY_TIMEOUT = 0.5  # threshold in seconds
+        SQLALCHEMY_RECORD_QUERIES = True
+
+    """
+    threshold = current_app.config.get('DATABASE_QUERY_TIMEOUT')
+    if threshold:
+        for query in get_debug_queries():
+            if query.duration >= threshold:
+                current_app.logger.warning(
+                    "SLOW QUERY: {0.statement}\n"
+                    "Duration: {0.duration:.4f} seconds\n"
+                    "Parameters: {0.parameters}\n"
+                    "Context: {0.context}".format(query))
+    return response
 
 
 @portal.route('/report-error')
@@ -575,6 +600,8 @@ def home():
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
+    if user.has_role(ROLE.RESEARCHER):
+        return redirect(url_for('.research_dashboard'))
 
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
@@ -611,7 +638,7 @@ def admin():
             org_list.update(OrgTree().here_and_below_id(orgId))
 
         users = User.query.join(UserOrganization).filter(
-                    and_(User.deleted_id == None,
+                    and_(User.deleted_id.is_(None),
                          UserOrganization.user_id == User.id,
                          UserOrganization.organization_id != 0,
                          UserOrganization.organization_id.in_(org_list)))
@@ -686,7 +713,7 @@ def staff():
     admin_staff = User.query.join(UserRoles).filter(
         and_(User.id==UserRoles.user_id,
              UserRoles.role_id.in_([admin_role_id, staff_admin_role_id]),
-             User.deleted_id==None
+             User.deleted_id.is_(None)
              )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
@@ -701,7 +728,7 @@ def staff():
         and_(User.id==UserRoles.user_id,
             ~User.id.in_(admin_list),
              UserRoles.role_id==staff_role_id,
-             User.deleted_id==None
+             User.deleted_id.is_(None)
              )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
@@ -758,8 +785,28 @@ def profile(user_id):
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    return render_template(
-        'profile.html', user=user, consent_agreements=consent_agreements, terms=terms)
+    top_org = user.first_top_organization()
+    first_org = user.organizations[0] if len(list(user.organizations)) > 0 else None
+    invite_vars = {
+                   'first_name': user.first_name,
+                   'last_name': user.last_name,
+                   'parent_org': top_org.name if top_org else '',
+                   'clinic_name': first_org.name if first_org else '',
+                   'registrationlink': 'url_placeholder',
+                   'verify_account_link': ('<a href=\"url_placeholder\">'
+                                           'url_placeholder</a>'),
+                   'verify_account_button': ('<div class=\"btn\"><a href='
+                                             '\"url_placeholder\">Verify '
+                                             'your account</a></div>')
+                  }
+    if top_org:
+        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+    else:
+        name_key = UserInviteEmail_ATMA.name_key()
+    invite_email = MailResource(app_text(name_key), variables=invite_vars)
+    return render_template('profile.html', user=user,
+                           invite_email=invite_email, terms=terms,
+                           consent_agreements=consent_agreements)
 
 @portal.route('/privacy')
 def privacy():
@@ -969,11 +1016,23 @@ def settings():
 @oauth.require_oauth()
 def config_settings(config_key):
     key = config_key.upper()
-    available = ['LR_ORIGIN', 'LR_GROUP']
-    if key in available:
+    # Only handing out LifeRay keys at this time
+    if key.startswith('LR_'):
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))
+
+
+@portal.route('/research')
+@roles_required([ROLE.RESEARCHER])
+@oauth.require_oauth()
+def research_dashboard():
+    """Research Dashboard
+
+    Only accessible to those with the Researcher role.
+
+    """
+    return render_template('research.html', user=current_user())
 
 
 @portal.route('/reporting')
@@ -995,12 +1054,25 @@ def reporting_dashboard():
                referral sources for new visitors, etc)
 
     """
+    return render_template('reporting_dashboard.html', now=datetime.utcnow(),
+                           counts=get_reporting_counts())
+
+
+@dogpile_cache.region('hourly')
+def get_reporting_counts():
+    """Cachable interface for expensive reporting data queries
+
+    The following code is only run on a cache miss.
+
+    """
     counts = {}
     counts['roles'] = defaultdict(int)
     counts['patients'] = defaultdict(int)
     counts['interventions'] = defaultdict(int)
     counts['intervention_reports'] = defaultdict(int)
     counts['organizations'] = defaultdict(int)
+    counts['registrations'] = []
+    counts['encounters'] = {'all': [], 'interventions': defaultdict(list)}
 
     for user in User.query.filter_by(active=True):
         if ROLE.TEST in [r.name for r in user.roles]:
@@ -1024,10 +1096,21 @@ def reporting_dashboard():
             counts['interventions'][interv.description] += 1
             if (any(doc.intervention == interv for doc in user.documents)):
                 counts['intervention_reports'][interv.description] += 1
-        for org in user.organizations:
-            counts['organizations'][org.name] += 1
+        if not user.organizations:
+            counts['organizations']['Unspecified'] += 1
+        else:
+            for org in user.organizations:
+                counts['organizations'][org.name] += 1
+        counts['registrations'].append(user.registered)
 
-    return render_template('reporting_dashboard.html', counts=counts)
+    for enc in Encounter.query.filter_by(auth_method='password_authenticated'):
+        st = enc.start_time
+        counts['encounters']['all'].append(st)
+        user = get_user(enc.user_id)
+        for interv in user.interventions:
+            counts['encounters']['interventions'][interv.description].append(st)
+
+    return counts
 
 
 @portal.route('/spec')

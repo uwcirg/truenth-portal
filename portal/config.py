@@ -12,13 +12,6 @@ def best_sql_url():
                 PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
-    elif 'SQLALCHEMY_DATABASE_URI' in env:
-        return env.get('SQLALCHEMY_DATABASE_URI')
-    else:
-        return env.get(
-            'DATABASE_URL',
-            'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
-        )
 
 
 class BaseConfig(object):
@@ -51,6 +44,8 @@ class BaseConfig(object):
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
+    SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
+
     LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
     LOG_LEVEL = 'DEBUG'
 
@@ -105,7 +100,8 @@ class BaseConfig(object):
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'
     LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
-    LR_GROUP = 20139
+    LR_GROUP = 20144
+    LR_FOLDER_ST = 32149
 
     SYSTEM_TYPE = 'development'
 

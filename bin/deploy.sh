@@ -1,57 +1,50 @@
-#!/bin/bash
+#!/bin/bash -e
+
+cmdname=$(basename $0)
 
 usage() {
-    echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
-    echo "Usage: $0 [-v] [-f] [-b <branch>] [-p <path>]" >&2
-    echo -e "\nOptions: " >&2
-    echo -e "-s\n 'seed' the database" >&2
-    echo -e "-v\n Be verbose" >&2
-    echo -e "-f\n Force all conditional deployment processes" >&2
+    cat << USAGE >&2
+Simple script to make deployments of fresh code a one-command operation"
+Usage:
+    $cmdname [-b <branch>] [-p <path>]
+    -b     Remote branch to checkout (default: develop)
+    -p     Path to repository (default: current working directory)
+USAGE
     exit 1
 }
 
 update_repo(){
-    if [[ $VERBOSE ]]; then
-        echo "Updating repository"
-    fi
+    echo "Updating repository"
     branch_name=$(git symbolic-ref -q HEAD)
+
+    git fetch origin
+    git fetch --tags
 
     if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
         git checkout $BRANCH
     fi
 
-    git fetch --tags
+
     git pull origin $BRANCH
 }
 
 # Prevent reading virtualenv environmental variables multiple times
 activate_once(){
     if [[ $(which python) != "${GIT_WORK_TREE}"* ]]; then
-        if [[ $VERBOSE ]]; then
-            echo "Activating virtualenv"
-        fi
+        echo "Activating virtualenv"
         source "${GIT_WORK_TREE}/env/bin/activate"
     fi
 }
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-while getopts ":b:p:ivsf" option; do
+while getopts ":b:p:" option; do
     case "${option}" in
         b)
             BRANCH=${OPTARG}
             ;;
         p)
             repo_path=${OPTARG}
-            ;;
-        v)
-            VERBOSE=true
-            ;;
-        s)
-            SEED=true
-            ;;
-        f)
-            FORCE=true
             ;;
         *)
             usage
@@ -78,78 +71,22 @@ if [[ -z $BRANCH ]]; then
     fi
 fi
 
-old_head=$(git rev-parse origin/$BRANCH)
-
 update_repo
-new_head=$(git rev-parse origin/$BRANCH)
+activate_once
 
+echo "Updating python dependancies"
+cd "${GIT_WORK_TREE}"
+env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 
-# New modules
-if [[
-    $FORCE ||
-    ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ) ||
-    ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/requirements.txt) && $? -eq 0 )
-]]; then
-    activate_once
+echo "Synchronizing database"
+flask sync
 
-    if [[ $VERBOSE ]]; then
-        echo "Updating python dependancies"
-    fi
-    cd "${GIT_WORK_TREE}"
-    env -u GIT_WORK_TREE pip install --requirement requirements.txt
-
-    # Restart in case celery module updates
-    sudo service celeryd restart
-fi
-
-# DB Changes
-if [[
-    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/migrations) && $? -eq 0 ))
-]]; then
-    activate_once
-
-    if [[ $VERBOSE ]]; then
-        echo "Running database migrations"
-    fi
-
-    # Prevent config bootstrap issue by removing old config
-    rm --verbose ${GIT_WORK_TREE}/instance/site.cfg
-    flask sync
-fi
-
-# New seed data
-if [[ $FORCE || $SEED || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
-    activate_once
-    echo "Seeding database"
-    flask seed
-fi
-
-
-# Celery Changes
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ) ]]; then
-    activate_once
-
-    if [[ $VERBOSE ]]; then
-        echo "Restarting celeryd"
-    fi
-    sudo service celeryd restart
-fi
-
-# Code changes - update package metadata
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}) && $? -eq 0 ) ]]; then
-    activate_once
-
-    if [[ $VERBOSE ]]; then
-        echo "Updating package metadata"
-    fi
-    cd "${GIT_WORK_TREE}"
-    python setup.py egg_info
-fi
+echo "Updating package metadata"
+python setup.py egg_info --quiet
 
 # Restart apache if application is served by apache
 if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
-    if [[ $VERBOSE ]]; then
-        echo "Restarting apache"
-    fi
+    echo "Restarting services"
     sudo service apache2 restart
+    sudo service celeryd restart
 fi

@@ -42,17 +42,18 @@ RUN pip install make-deb
 RUN mkdir -p /tmp/artifacts
 
 # Allow branch to be overridden with environmental variable
-ENV BRANCH=${BRANCH:-develop}
+ENV BRANCH="${BRANCH:-develop}"
 
 # Allow repo to be overridden with environmental variable
 ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
 
 CMD \
-    git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
+    git clone --branch "${BRANCH}" "https://github.com/${REPO_SLUG}.git" /root/portal && \
     cd /root/portal && \
     yes | make-deb && \
     git checkout debian/rules && \
     dpkg-buildpackage -us -uc && \
     mv /root/portal_* /tmp/artifacts && \
     cd /tmp/artifacts && \
-    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz
+    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz && \
+    chown --verbose nobody:nogroup /tmp/artifacts/*

@@ -418,6 +418,12 @@ div.right-panel {
 #topTerms .terms-checkbox-container i:hover {
   cursor: pointer;
 }
+.website-consent-script #termsText {
+  display: none;
+}
+.hide-terms {
+  display: none;
+}
 .terms-tick-box {
   float: left;
   width: 2%;
@@ -487,6 +493,7 @@ div.right-panel {
   letter-spacing: 4px;
   text-transform: uppercase;
   padding: 1em;
+  display: none;
 }
 #aboutForm #updateProfile {
   opacity: 0;
@@ -509,8 +516,13 @@ div.right-panel {
   font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
   width: 100%;
   min-height: 30vh;
-  margin-top: 11%;
+  margin-top: 20%;
   display: none;
+}
+@media (min-width: 500px) {
+  #aboutForm .iq-container {
+    margin-top: 11%;
+  }
 }
 #aboutForm .iq-container .tnth-headline:first-of-type {
   margin-bottom: 1.5em;
@@ -707,12 +719,36 @@ div.right-panel {
   background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
   letter-spacing: 0.1px;
   border-bottom: 1px solid #dad8d8;
+  font-size: 0.93em;
 }
 #adminTable div.card-view {
   display: flex;
 }
-.truenth-id-label {
+#adminTable .organization-field {
+  min-width: 150px;
+}
+#adminTable div.filterControl select,
+#adminTable div.filterControl input
+{
+  font-weight: normal;
+  min-height: 2.5em;
+}
+#adminTable th.status-field {
+  position: relative;
+}
+#adminTable th.status-field .loading-message-indicator {
+  position: absolute;
+  top: 50%;
+  left: 2%;
   display: none;
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+#adminTable .filterControl * {
+  font-size: 1em;
+}
+.truenth-id-label {
+   display: none;
 }
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
@@ -1489,12 +1525,15 @@ div.right-panel {
 }
 #mainDiv.profile .profile-item-container .edit-container {
   display: none;
+  max-width: 100%;
 }
 #mainDiv.profile .profile-item-container.edit .edit-container {
   display: inline-block;
 }
 .profile-item-container .view-container {
   display: none;
+  max-width: 100%;
+  word-break: break-word;
 }
 #mainDiv.profile .profile-item-container .view-container {
   display: block;
@@ -1694,6 +1733,9 @@ div.noOrg-container span {
   top: -1px;
   left: 1px;
 }
+#createProfileForm .btn-tnth-back {
+  background: none;
+}
 #emailInfoText {
   display: none;
 }
@@ -1746,21 +1788,6 @@ div.noOrg-container span {
   width: 300px;
   max-width: 100%;
 }
-span.custom-study-id-label {
-  display: none;
-}
-span.default-study-id-label {
-  display: block;
-}
-span.custom-study-id-label[data-org-id='20000'] {
-  display: block;
-}
-
-span.custom-study-id-label[data-org-id='20000'] + .default-study-id-label,
-span.custom-study-id-label[data-org-id='20000'] + .custom-study-id-label{
-  display: none;
-}
-
 #createProfileForm #profileStudyIDContainer {
   margin-top: 2em;
   margin-bottom: 1em;
@@ -1877,6 +1904,7 @@ table.profile-audit-log TH,
   z-index: 99999;
   color: #444;
   margin: auto;
+  background: transparent;
 }
 #loadingIndicator:before {
   content: ' ';
@@ -2233,6 +2261,15 @@ div.biopsy-option:last-of-type{
   position: relative;
   top: -2px;
 }
+.withdrawn-label [data-eproms] {
+  display: inline;
+}
+.withdrawn-label [data-truenth] {
+  display: none;
+}
+#consentDateEditContainer {
+  margin-top: 2.5em;
+}
 #profileConsentList {
   font-size: 0.95em;
   max-width: 100%;
@@ -2402,14 +2439,15 @@ div.timezone-warning.text-warning {
   .text-on-img p:last-child {
     margin-bottom: 0;
   }
-  #profileForm #bdGroup .flex {
-    flex-wrap: nowrap !important;
-  }
   #profileForm #month {
     width: 140px !important;
   }
 }
 @media (max-width: 506px) {
+  #aboutForm .bd-element,
+  #aboutForm .biopsy-date-element {
+    margin: 0.5em 0;
+  }
   div.admin-table div.pull-right {
     width: 100%;
     max-width: 100%;
@@ -2418,6 +2456,10 @@ div.timezone-warning.text-warning {
   div.admin-table div.pull-right.search {
     width: 50%;
     float: left !important;
+    max-width: 100%;
+  }
+  #consentListTable {
+    font-size: 0.7em;
     max-width: 100%;
   }
 }
@@ -2436,10 +2478,9 @@ div.timezone-warning.text-warning {
   .tnth-form .form-group > label{
     font-size: 14px;
   }
-  #createUserLink,
-  .btn,
-  .btn-tnth-primary  {
-    font-size: 0.95em;
+  .tnth-headline,
+  .tnth-subhead {
+    font-size: 1em;
   }
   /**************
   #indexNavBar {
@@ -2468,8 +2509,11 @@ div.timezone-warning.text-warning {
     padding: 1em;
     max-width: 100%;
   }
-  .fixed-table-pagination {
-    font-size: 0.9em;
+  #mainDiv.profile .profile-item-container .profile-item-title {
+    max-width: 150px;
+  }
+  #mainDiv.profile .profile-item-container .view-container {
+    padding-bottom: 1em;
   }
   #userSessionsList,
   #fillOrgs legend {
@@ -2506,9 +2550,10 @@ div.timezone-warning.text-warning {
     top: -2px;
   }
   .create-account-container {
-    padding: 3.5em 3em;
-    width: 90%;
+    padding: 1em 2em;
+    width: 100%;
     max-width: 100%;
+    overflow: hidden;
   }
   #identityVerificationContainer {
     width: 100%;
@@ -2567,6 +2612,18 @@ div.timezone-warning.text-warning {
   }
   .timezone-container {
     padding-bottom: 0;
+  }
+  #consentContainer .radio-inline input {
+    position: relative;
+    top: 1px;
+    left: -1px;
+  }
+  #aboutForm .iq-container .tnth-headline:first-of-type{
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+  }
+  .org-container .org-label {
+    font-size: 0.9em;
   }
 }
 @media (max-width: 730px) {
@@ -2688,6 +2745,9 @@ div.timezone-warning.text-warning {
   }
   #profileStudyIDContainer {
     margin-top: -1.5em;
+  }
+  #aboutForm .bd-element {
+    margin-bottom: 1em;
   }
 }
 @media (min-width: 992px) {

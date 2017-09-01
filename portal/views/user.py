@@ -9,7 +9,9 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
+from ..dogpile import dogpile_cache
 from ..extensions import oauth, user_manager
+from ..models.assessment_status import overall_assessment_status
 from ..models.audit import Audit
 from ..models.auth import Client, Token
 from ..models.group import Group
@@ -72,7 +74,7 @@ def me():
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                 ROLE.STAFF])
+                 ROLE.STAFF, ROLE.STAFF_ADMIN])
 def account():
     """Create a user account
 
@@ -571,6 +573,15 @@ def set_user_consents(user_id):
         description: if user_id doesn't exist
 
     """
+    # TODO: refactor common code to better home
+    def invalidate_assessment_status_cache(user):
+        """Invalidate the assessment status cache values for this user"""
+        dogpile_cache.invalidate(
+            overall_assessment_status, user.id)
+        for consent in user.all_consents:
+            dogpile_cache.invalidate(
+                overall_assessment_status, user.id, consent.id)
+
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
     user = current_user()
@@ -588,6 +599,9 @@ def set_user_consents(user_id):
         consent_list = [consent, ]
         user.update_consents(
             consent_list=consent_list, acting_user=current_user())
+        # The updated consent may have altered the cached assessment
+        # status - invalidate this user's data at this time.
+        invalidate_assessment_status_cache(user)
     except ValueError as e:
         abort(400, str(e))
 

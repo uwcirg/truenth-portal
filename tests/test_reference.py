@@ -3,6 +3,7 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.models.reference import Reference
 from portal.models.questionnaire import Questionnaire
+from portal.models.questionnaire_bank import QuestionnaireBank
 
 
 class TestDemographics(TestCase):
@@ -20,5 +21,11 @@ class TestDemographics(TestCase):
     def test_questionnaire(self):
         q = Questionnaire(name='testy')
         q_ref = Reference.questionnaire(q.name)
+        self.assertEquals(
+            q_ref.as_fhir()['display'], 'testy')
+
+    def test_questionnaire_bank(self):
+        q = QuestionnaireBank(name='testy')
+        q_ref = Reference.questionnaire_bank(q.name)
         self.assertEquals(
             q_ref.as_fhir()['display'], 'testy')

@@ -21,7 +21,6 @@ AdminTool.prototype = Object.create(OrgTool.prototype);
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
   setTimeout(function() { $("#loadingIndicator").fadeOut(); }, 1000);
-  this.setLoadingMessageVis("hide");
 };
 AdminTool.prototype.setLoadingMessageVis = function(vis) {
   switch(vis) {
@@ -33,24 +32,44 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
       break;
   };
 };
+AdminTool.prototype.setStatusLoadingVis = function(vis) {
+  switch(vis) {
+    case "hide":
+      $("#adminTable th.status-field .loading-message-indicator").fadeOut();
+      $("#adminTable .bootstrap-table-filter-control-status").css("opacity", 1);
+      break;
+    case "show":
+      $("#adminTable th.status-field .loading-message-indicator").fadeIn();
+      break;
+  };
+};
 AdminTool.prototype.getPatientsIdList = function() {
   var self = this;
   if (self.patientsIdList.length == 0) {
     var all = $("#adminTable").bootstrapTable("getData");
-    all.forEach(function(o) {
-      self.patientsIdList.push(o.id);
-    });
+    if (all) {
+      all.forEach(function(o) {
+        self.patientsIdList.push(o.id);
+      });
+    };
   };
   return self.patientsIdList;
 };
 AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
-    if (self.ajaxAborted) return false;
+    if (self.ajaxAborted) {
+        return false;
+    };
+    if (!requests || requests.length == 0) {
+        return false;
+    };
     var userString = requests.shift();
-    if (!hasValue(userString)) return false;
+    if (!hasValue(userString)) {
+        return false;
+    };
     /*
      *  load the data sequentially
-     *  Note, NO concurrent ajax calls here, 
+     *  Note, NO concurrent ajax calls here,
      *  one request will wait after the previous one has finished
      */
     var ajaxRequest = $.ajax ({
@@ -59,11 +78,17 @@ AdminTool.prototype.getData = function(requests, callback) {
                               contentType: "application/json; charset=utf-8",
                               data: userString,
                               cache: false,
-                              timeout: 25000,
+                              timeout: 5000,
+                              beforeSend: function() {
+                                self.setStatusLoadingVis("show");
+                                /*
+                                 * disable export functionality while status is being populated
+                                 */
+                                $("div.export button").attr("disabled", true);
+                              },
                               dataType: 'json'
                           }).done(function(data) {
-                                if (data.status) {
-                                  var arrData = [];
+                                if (data && data.status) {
                                   data.status.forEach(function(status) {
                                       var c = status.consents;
                                       var a = "", s = "", prevItem = {};
@@ -109,73 +134,63 @@ AdminTool.prototype.getData = function(requests, callback) {
                                       rowData["status"] = a;
                                       /* persist data here, help with debugging */
                                       self.arrData[status.user_id] = { id: status.user_id, row: rowData};
-                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]); 
-        
+                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]);
+
                                     };
                               });
-
-                              if (arrData.length > 0) {
-                                  arrData.forEach(function(d) {
-                                    setTimeout(function() { $("#adminTable").bootstrapTable('updateByUniqueId', { id: d.id, row: d.data}); }, (__index++)*150);
-                                  });
-                              };
                             };
                             if (requests.length > 0) {
                               self.getData(requests, callback);
-                              setTimeout(function() { self.fadeLoader(); }, 500);
                             }
                             else {
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
-                              setTimeout(function() { self.fadeLoader(); }, 500);
+                              self.setStatusLoadingVis("hide");
+                              $("div.export button").attr("disabled", false);
                             };
                         }).fail(function(xhr) {
-                            //console.log("request failed.");
+                            self.setStatusLoadingVis("hide");
+                            $("div.export button").attr("disabled", false);
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
-                            self.fadeLoader();
                         });
         self.ajaxRequests.push(ajaxRequest);
         return ajaxRequest;
 };
-AdminTool.prototype.loadData = function(list, callback, timeout) {
-    var self = this;
-    $("#admin-table-error-message").text("");
-    this.setLoadingMessageVis("show");
-    if (!timeout) timeout = 100;
-    self.getData(list, function() { if (callback) callback.call(self); });
-};
 AdminTool.prototype.updateData = function() {
-  /**** compile patients list Id *****/
-  this.getPatientsIdList();
+  /* compile user IDs array from patients list ID */
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
-    //loader(true);
-    self.loadData(arrUsers);
-  } else {
-    self.fadeLoader();
+     self.getData(arrUsers);
   };
 };
-
-AdminTool.prototype.abortRequests = function(callback) {
+AdminTool.prototype.abortRequests = function(callback, showLoader) {
     var self = this;
-   //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
+   //NEED TO ABORT THE AJAX REQUESTS OTHERWISE CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
    if (self.ajaxRequests.length > 0) {
       self.ajaxAborted = true;
       self.ajaxRequests.forEach(function(request, index, array) {
+
           try {
-            if (request.readyState != 4) {
+            if (parseInt(request.readyState) != 4) {
+                /*
+                 * aborting the request here to quit immediately, instead of waiting for the
+                 * maximum timeout specified
+                 */
+                request.timeout = 100;
                 request.abort();
             }
           } catch(e) {
           };
           if (index == array.length - 1) {
             $("#admin-table-error-message").text("");
-                  if (callback) setTimeout(function() { callback();}, 100);
-                  setTimeout(function() { DELAY_LOADING=true;loader(true);}, 300);
+            if (callback) {
+              setTimeout(function() { callback();}, 100);
+              if (showLoader) loader(true)
+            };
           };
       });
     } else {
-      if (callback) callback();
+      if (callback) setTimeout(function() { callback();}, 100);
     };
 
 };
@@ -196,7 +211,6 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
         ct = 0;
      };
   };
-
   return arrUsers;
 };
 AdminTool.prototype.setUserOrgs = function() {
@@ -204,8 +218,8 @@ AdminTool.prototype.setUserOrgs = function() {
   if (!hasValue(this.userId)) return false;
   $.ajax ({
           type: "GET",
-          url: '/api/demographics/'+this.userId,
-          async: false
+          async: false,
+          url: '/api/demographics/'+this.userId
   }).done(function(data) {
     if (data && data.careProvider) {
       $.each(data.careProvider,function(i,val){
@@ -227,6 +241,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
     //set user orgs
     var self = this;
     self.setUserOrgs();
+
+    //check if the location contains filtered orgs list
     var iterated = /org_list/.test(location.href);
 
     var noPatientData = $("#admin-table-body").find("tr.no-records-found").length > 0;
@@ -235,42 +251,34 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         type: "GET",
         url: '/api/organization'
     }).done(function(data) {
+
+        /*
+         * building an orgs array object for reference later
+         */
         self.populateOrgsList(data.entry);
+        /*
+         * populate orgs dropdown UI
+         */
         self.populateUI();
+
+        /*
+         * filter orgs UI based on user's orgs
+         */
         if (!noPatientData) {
-            var hbOrgs = self.getHereBelowOrgs();
+            var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
 	          self.filterOrgs(hbOrgs);
+        } else {
+          $("div.fixed-table-toolbar").hide();
         };
 
-        if ($("#adminTable .study-id-field").length > 0) {
-          AT.drawStudyIDLabel(AT.getUserTopLevelParentOrgs(AT.getUserOrgs()), true);
-        };
-
-        $("#dataDownloadModal").on('shown.bs.modal', function () {
-              var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
-              if (parentOrgList && parentOrgList.length > 0) {
-                 var instrumentList = self.getInstrumentList();
-                 var instrumentItems = [];
-                 parentOrgList.forEach(function(o) {
-                    var il = instrumentList[o];
-                    if (il) {
-                      il.forEach(function(n) {
-                        instrumentItems.push(n);
-                      });
-                    };
-                 });
-                 if (instrumentItems.length > 0) {
-                    $(".instrument-container").hide();
-                    instrumentItems.forEach(function(item) {
-                      $("#" + item + "_container").show();
-                    });
-                 };
-              };
-              $("#patientsInstrumentList").addClass("ready");
-        });
         var ofields = $("#userOrgs input[name='organization']");
-        ofields.each(function() {
-            if ((AT.getHereBelowOrgs()).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
+        if (ofields.length > 0) {
+          /* attach orgs related events to UI components */
+          ofields.each(function() {
+            if ((self.getHereBelowOrgs(self.getUserOrgs())).length == 1 ||
+                (iterated && request_org_list && request_org_list[$(this).val()])) {
+                $(this).prop("checked", true);
+            }
             $(this).on("click touchstart", function(e) {
                 e.stopPropagation();
                 AT.abortRequests();
@@ -282,9 +290,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                   location.replace("/" + context + "?org_list=" + orgsList.join(","));
                } else location.replace("/" + context);
             });
-        });
+          });
 
-        if (ofields.length > 0) {
           $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -296,7 +303,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                   };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
-              location.replace("/" + context + "?org_list=" + orgsList.join(","));
+              if (orgsList.length > 0) location.replace("/" + context + "?org_list=" + orgsList.join(","));
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -318,31 +325,100 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
 
     //orglist-dropdown
     $('#orglist-dropdown').on('click touchstart', function () {
-        setTimeout('__setOrgsMenuHeight(100); __clearFilterButtons();', 10);
+        setTimeout('AT.__setOrgsMenuHeight(100); AT.__clearFilterButtons();', 10);
     });
 
     if (noPatientData) $("#patientListExportDataContainer").hide();
+
+    /*
+     * private functions used only within the context of the class
+     */
+    this.__setOrgsMenuHeight = function(padding) {
+      if (!padding) padding = 100;
+      var h = parseInt($("#fillOrgs").height());
+      if (!isNaN(h) && h > 0) {
+        $("#org-menu").height(h + padding);
+        if ($("div.admin-table").height() < $("#org-menu").height()) {
+            setTimeout('$("div.admin-table").height($("#org-menu").height() + ' + padding + ');', 0);
+        };
+      };
+    };
+    this.__clearFilterButtons = function() {
+      $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
+    };
 };
 AdminTool.prototype.getInstrumentList = function() {
-  return {
-    //CRV
-    '10000': ['epic26', 'eproms_add', 'comorb'],
-    //IRONMAN
-    '20000': ['eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems', 'irondemog']
-  };
-};
-__setOrgsMenuHeight = function(padding) {
-  if (!padding) padding = 100;
-  var h = parseInt($("#fillOrgs").height());
-  if (!isNaN(h) && h > 0) {
-    $("#org-menu").height(h + padding);
-    if ($("div.admin-table").height() < $("#org-menu").height()) {
-        setTimeout('$("div.admin-table").height($("#org-menu").height() + ' + padding + ');', 0);
+  var iList;
+  tnthAjax.getInstrumentsList(true, function(data) {
+    if (data && !data.error) {
+      iList = data;
     };
-  };
+  });
+  return iList ? iList : false;
 };
-__clearFilterButtons = function() {
-  $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
-};
+
+AdminTool.prototype.handleDownloadModal = function() {
+
+    var self = this;
+     /*
+      *populate instruments list based on user's parent org
+      */
+    $("#dataDownloadModal").on('shown.bs.modal', function () {
+        var instrumentList = self.getInstrumentList();
+        if (instrumentList) {
+          var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
+          if (parentOrgList && parentOrgList.length > 0) {
+             var instrumentItems = [];
+             parentOrgList.forEach(function(o) {
+                var il = instrumentList[o];
+                if (il) {
+                  il.forEach(function(n) {
+                    instrumentItems.push(n);
+                  });
+                };
+             });
+             if (instrumentItems.length > 0) {
+                $(".instrument-container").hide();
+                instrumentItems.forEach(function(item) {
+                  $("#" + item + "_container").show();
+                });
+             };
+          };
+        };
+        $("#patientsInstrumentList").addClass("ready");
+    });
+    /*
+     * attach on click event to submit button in the download modal
+     */
+    $(document).delegate("#patientsDownloadButton", "click", function(event){
+      var instruments = "", dataType = "";
+      $("input[name='instrument'").each(function() {
+          if ($(this).is(":checked")) {
+            instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
+          };
+      });
+      $("input[name='downloadType']").each(function() {
+          if ($(this).is(":checked")) dataType = $(this).val();
+      });
+      if (instruments != "" && dataType != "") {
+          //alert(instruments)
+          $("#_downloadMessage").text("");
+          $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
+          $("#_downloadLink")[0].click();
+      } else {
+          message = (instruments == "" ? "Please choose at least one instrument.": "");
+          if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+          $("#_downloadMessage").html(message);
+      };
+    });
+
+    /*
+     * attach event to each checkbox in the download instruments modal
+     */
+    $("input[name='instrument'], input[name='downloadType']").on("click", function() {
+        if ($(this).is(":checked")) $("#_downloadMessage").text("");
+    });
+}
+
 
 

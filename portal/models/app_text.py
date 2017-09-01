@@ -11,11 +11,28 @@ from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
 import requests
-from requests.exceptions import MissingSchema
+from requests.exceptions import MissingSchema, ConnectionError
+import timeit
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
 from ..database import db
+
+
+def time_request(url):
+    """Wrap the requests.get(url) and log the timing"""
+    start = timeit.default_timer()
+    response = requests.get(url)
+    duration = timeit.default_timer() - start
+    message = ('TIME {duration:.4f} seconds to GET {url}'.format(
+        url=url, duration=duration))
+    if duration > 5.0:
+        current_app.logger.error(message)
+    elif duration > 2.0:
+        current_app.logger.warning(message)
+    else:
+        current_app.logger.debug(message)
+    return response
 
 
 class AppText(db.Model):
@@ -38,12 +55,12 @@ class AppText(db.Model):
     def __str__(self):
         if self.custom_text:
             return self.custom_text
-        return self.text
+        return self.name
 
     def __unicode__(self):
         if self.custom_text:
             return self.custom_text
-        return self.text
+        return self.name
 
     @classmethod
     def from_json(cls, data):
@@ -103,7 +120,7 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
 class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for website consent terms presented at initial queries
+        """Generate AppText name key for website consent terms
 
         :param organization: for which the consent agreement applies
         :param role: for specific role selections, but only if
@@ -121,8 +138,9 @@ class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
                 organization.name, role)
         return "{} organization website consent URL".format(organization.name)
 
+
 class InitialConsent_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
+    """AppTextModelAdapter for Initial Consent Terms"""
 
     @staticmethod
     def name_key(**kwargs):
@@ -136,8 +154,9 @@ class InitialConsent_ATMA(AppTextModelAdapter):
         """
         return "Initial Consent Terms URL"
 
+
 class Terms_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for New Terms Of Use agreements, used for /terms"""
+    """AppTextModelAdapter for Terms Of Use agreements, used for /terms"""
 
     @staticmethod
     def name_key(**kwargs):
@@ -194,6 +213,26 @@ class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
                     format(kwargs.get('organization').name)
 
 
+class UserInviteEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for User Invite Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for User Invite Email Content
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
+
+        :returns: string for AppText.name field
+
+        """
+        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+            return "profileSendEmail invite email {}".format(kwargs.get('org'))
+        return "profileSendEmail invite email"
+
+
+
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 
@@ -227,13 +266,14 @@ class PrivacyATMA(AppTextModelAdapter):
         elif kwargs.get('role') and not kwargs.get('organization'):
             raise ValueError("'organization' parameter not defined")
         elif kwargs.get('organization') and kwargs.get('role'):
-            return "{} {} privacy URL".format(kwargs.get('organization').name, kwargs.get('role'))
+            return "{} {} privacy URL".format(
+                kwargs.get('organization').name, kwargs.get('role'))
         return "Privacy URL"
 
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
-    def __init__(self, url, asset=None):
+    def __init__(self, url, asset=None, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch asset and mock a versioned URL
@@ -249,11 +289,12 @@ class UnversionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables or {}
         if asset:
             self._asset = asset
         else:
             try:
-                response = requests.get(url)
+                response = time_request(url)
                 self._asset = response.text
             except MissingSchema:
                 if current_app.config.get('TESTING'):
@@ -261,7 +302,7 @@ class UnversionedResource(object):
                 else:
                     self.error_msg = (
                         "Could not retrieve remote content - Invalid URL")
-            except:
+            except ConnectionError:
                 self.error_msg = (
                     "Could not retrieve remove content - Server could not be "
                     "reached")
@@ -273,14 +314,19 @@ class UnversionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
 
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    def __init__(self, url):
+    def __init__(self, url, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch the asset, permanent version of URL and link
@@ -300,10 +346,11 @@ class VersionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables or {}
         try:
-            response = requests.get(url)
+            response = time_request(url)
             self._asset = response.json().get('asset')
-            self.url =  self._permanent_url(
+            self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
         except MissingSchema:
@@ -319,7 +366,7 @@ class VersionedResource(object):
                 self.error_msg = (
                     "Could not retrieve remote content - " "{} {}".format(
                         response.status_code, response.reason))
-        except:
+        except ConnectionError:
             self.error_msg = (
                 "Could not retrieve remove content - Server could not be "
                 "reached")
@@ -327,12 +374,127 @@ class VersionedResource(object):
         if self.error_msg:
             current_app.logger.error(self.error_msg + ": {}".format(url))
 
-
     @property
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
+        return self.error_msg
+
+    def _permanent_url(self, generic_url, version):
+        """Produce a permanent url from the metadata provided
+
+        Resources are versioned - but the link maintained in the app_text
+        table is not.
+
+        When requesting the detailed resource, the effective version number is
+        returned.  This method returns a permanent URL including the version
+        number, useful for audit and tracking information.
+
+        """
+        parsed = urlparse(generic_url)
+        qs = dict(parse_qsl(parsed.query))
+        if version:
+            qs['version'] = version
+
+        path = parsed.path
+        if path.endswith('/detailed'):
+            path = path[:-(len('/detailed'))]
+        format_dict = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': path,
+            'qs': urlencode(qs)}
+        url = "{scheme}://{netloc}{path}?{qs}".format(**format_dict)
+        return url
+
+
+class MailResource(object):
+    """Helper to manage versioned mail resource URLs (typically on Liferay)"""
+
+    def __init__(self, url, variables=None):
+        """Initialize based on requested URL
+
+        Attempts to fetch the mail fields, permanent version of URL and link
+        for content editing.
+
+        In the event of an error, details are logged, and self.error_msg
+        will be defined, and returned in a request for the asset attribute.
+
+        :param url: the URL to pull details and asset from
+
+        :attribute subject: will contain the email subject download, found
+            in the cache, or the error message if that fails.
+        :attribute body: will contain the email subject body, found
+            in the cache, or the error message if that fails.
+        :attribute editor_url: defined if such was available, else None
+        :attribute url: the `permanent url` for the resource if available,
+            otherwise the original url.
+
+        """
+        self._subject, self._body = None, None
+        self.error_msg, self.editor_url = None, None
+        self.url = url
+        self.variables = variables or {}
+        try:
+            response = time_request(url)
+            self._subject = str(response.json().get('subject'))
+            self._body = str(response.json().get('body'))
+            self.url = self._permanent_url(
+                generic_url=url, version=response.json().get('version'))
+            self.editor_url = response.json().get('editorUrl')
+        except MissingSchema:
+            if current_app.config.get('TESTING'):
+                self._subject = 'TESTING'
+                self._body = '[TESTING - fake response]'
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - Invalid URL")
+        except ValueError:  # raised when no json is available in response
+            if response.status_code == 200:
+                self._subject = response.text
+                self._body = response.text
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - " "{} {}".format(
+                        response.status_code, response.reason))
+        except ConnectionError:
+            self.error_msg = (
+                "Could not retrieve remove content - Server could not be "
+                "reached")
+
+        if self.error_msg:
+            current_app.logger.error(self.error_msg + ": {}".format(url))
+
+    @property
+    def subject(self):
+        """Return subject if available else error message"""
+        if self._subject:
+            try:
+                formatted = self._subject.format(**self.variables)
+                return formatted
+            except KeyError, e:
+                self.error_msg = "Missing subject variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
+        return self.error_msg
+
+    @property
+    def body(self):
+        """Return body if available else error message"""
+        if self._body:
+            try:
+                formatted = self._body.format(**self.variables)
+                return formatted
+            except KeyError, e:
+                self.error_msg = "Missing body variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
     def _permanent_url(self, generic_url, version):

@@ -6,7 +6,7 @@ and healthcare services which are used to describe hospitals and clinics.
 from datetime import datetime
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask import url_for
+from flask import current_app, url_for
 from werkzeug.exceptions import Unauthorized
 
 import address
@@ -480,9 +480,13 @@ class OrgTree(object):
     def __init__(self):
         # Maintain a singleton root object and lookup_table
         if not OrgTree.root:
-            OrgTree.root = OrgNode(id=None)
-            OrgTree.lookup_table = {}
-            self.populate_tree()
+            self.__reset_cache()
+
+    def __reset_cache(self):
+        # Internal method to manage cached org data
+        OrgTree.root = OrgNode(id=None)
+        OrgTree.lookup_table = {}
+        self.populate_tree()
 
     @classmethod
     def invalidate_cache(cls):
@@ -518,8 +522,22 @@ class OrgTree(object):
 
         """
         organization_id = int(organization_id)
+        if organization_id == 0:
+            raise ValueError(
+                "'none of the above' not found as it doesn't belong "
+                "in OrgTree")
+
         if organization_id not in self.lookup_table:
-            raise ValueError("{} not found in OrgTree".format(organization_id))
+            # Strange race condition - if this org id is found, reload
+            # the lookup_table
+            if Organization.query.get(organization_id):
+                current_app.logger.warn(
+                    "existing org not found in OrgTree. "
+                    "lookup_table size {}".format(len(self.lookup_table)))
+                self.__reset_cache()
+            else:
+                raise ValueError(
+                    "{} not found in OrgTree".format(organization_id))
         return self.lookup_table[organization_id]
 
     def all_top_level_ids(self):
@@ -628,9 +646,9 @@ class OrgTree(object):
         now = datetime.utcnow()
         query = db.session.query(User.id).join(
             UserRoles).join(UserConsent).join(UserOrganization).filter(
-                User.deleted_id == None,
+                User.deleted_id.is_(None),
                 UserRoles.role_id == patient_role_id,
-                UserConsent.deleted_id == None,
+                UserConsent.deleted_id.is_(None),
                 UserConsent.expires > now,
                 UserOrganization.organization_id.in_(staff_user_orgs))
 

@@ -15,7 +15,10 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.alter_column('questionnaire_responses', column_name='user_id', new_column_name='subject_id')
+    op.alter_column('questionnaire_responses',
+                    column_name='user_id', new_column_name='subject_id')
+
 
 def downgrade():
-    op.alter_column('questionnaire_responses', column_name='subject_id', new_column_name='user_id')
+    op.alter_column('questionnaire_responses',
+                    column_name='subject_id', new_column_name='user_id')

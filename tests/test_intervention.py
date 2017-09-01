@@ -816,6 +816,101 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
+    def test_truenth_st_conditions(self):
+        # Test the list of conditions expected for SymptomTracker in truenth
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.public_access = False
+        user = self.test_user
+        add_role(user, ROLE.PATIENT)
+        sm_identifier = Identifier(
+            value='self_management', system=DECISION_SUPPORT_GROUP)
+        uw = Organization(
+            name='UW Medicine (University of Washington)')
+        uw.identifiers.append(sm_identifier)
+        with SessionScope(db):
+            db.session.add(uw)
+            db.session.commit()
+        user.organizations.append(uw)
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False
+        with SessionScope(db):
+            db.session.add(user)
+            db.session.commit()
+        user, uw = map(db.session.merge, (user, uw))
+
+        # Full logic from story #150532380
+        description = (
+            "[strategy_1: (user NOT IN sexual_recovery)] "
+            "AND [strategy_2: (user has role PATIENT)] "
+            "AND [strategy_3: (user has BIOPSY)]")
+
+        d = {
+            'function': 'combine_strategies',
+            'kwargs': [
+                # Not in SR (strat 1)
+                {'name': 'strategy_1',
+                 'value': 'allow_if_not_in_intervention'},
+                {'name': 'strategy_1_kwargs',
+                 'value': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                # Does has role PATIENT (strat 2)
+                {'name': 'strategy_2',
+                 'value': 'in_role_list'},
+                {'name': 'strategy_2_kwargs',
+                 'value': [{'name': 'role_list',
+                            'value': [ROLE.PATIENT]}]},
+                # Has Localized PCa (strat 3)
+                {'name': 'strategy_3',
+                 'value': 'observation_check'},
+                {'name': 'strategy_3_kwargs',
+                 'value': [{'name': 'display',
+                            'value': CC.BIOPSY.codings[0].display},
+                           {'name': 'boolean_value', 'value': 'true'}]}
+            ]
+        }
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name='Symptom Tracker Conditions',
+                description=description,
+                intervention_id=INTERVENTION.SELF_MANAGEMENT.id,
+                function_details=json.dumps(d))
+            # print json.dumps(strat.as_json(), indent=2)
+            db.session.add(strat)
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+
+        # only first two strats true so far, therfore, should be False
+        self.assertFalse(sm.display_for_user(user).access)
+
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
+        user = db.session.merge(user)
+        self.login()
+        user.save_constrained_observation(
+            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+        with SessionScope(db):
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+
+        # All conditions now met, should have access
+        self.assertTrue(sm.display_for_user(user).access)
+
+        # Remove all clinics, should still have access
+        user.organizations = []
+        with SessionScope(db):
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertEquals(user.organizations.count(), 0)
+        self.assertTrue(sm.display_for_user(user).access)
+
+        # Finally, remove the PATIENT role and it should disappear
+        user.roles.pop()
+        with SessionScope(db):
+            db.session.add(user)
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertFalse(sm.display_for_user(user).access)
+
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
         self.login()

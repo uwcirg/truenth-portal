@@ -115,7 +115,7 @@
     </a>
     &nbsp;
     <a href="{%-if config.MOVEMER_LINK_URL-%}{{config.MOVEMER_LINK_URL}}{%-endif-%}" class="logo-link" title="{{ _('Movember') }}" target="_blank">
-    {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="{{_('Movember Logo')}}" />{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" />{%-endif-%}</a>
+    {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="{{_('Movember Logo')}}" />{%-else-%}<img src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" alt="Movember Logo"/>{%-endif-%}</a>
     <script>
     $(function() {
       $(".logo-link").each(function() {

@@ -3,6 +3,7 @@ import os
 import re
 import requests
 import sys
+import tempfile
 
 from collections import defaultdict
 from cStringIO import StringIO
@@ -63,6 +64,26 @@ def upsert_to_template_file():
             sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
 
 
+def fix_references(pot_fpath):
+    """Fix reference comments to remove checkout-specific paths"""
+    # Todo: override PoFileParser._process_comment() to perform this as part of `pybabel extract`
+
+    path_regex = re.compile(r"^#: {}(?P<rel_path>.*):(?P<line>\d+)".format(
+        os.path.dirname(current_app.root_path)
+    ))
+    base_url = "%s/tree/develop" % current_app.config.metadata.home_page
+
+    with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
+        prefix='fix_references_',
+        suffix='.pot',
+        delete=False,
+    ) as tmpfile:
+        for line in infile:
+            tmpfile.write(path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line))
+
+    os.rename(tmpfile.name, pot_fpath)
+    current_app.logger.debug("messages.pot file references fixed")
+
 def smartling_authenticate():
     url = 'https://api.smartling.com/auth-api/v2/authenticate'
     headers = {'Content-type': 'application/json'}
@@ -87,13 +108,24 @@ def smartling_upload():
     pot_fpath = os.path.join(translation_fpath, 'messages.pot')
     config_fpath = os.path.join(current_app.root_path, "../instance/babel.cfg")
     # create new .pot file from code
-    check_call(['pybabel', 'extract', '-F', config_fpath, '-o', pot_fpath,
-                current_app.root_path, '--no-wrap'])
+    check_call((
+        'pybabel', 'extract',
+        '--no-wrap',
+        '--mapping-file', config_fpath,
+        '--project', current_app.config.metadata.name,
+        '--version', current_app.config.metadata.version,
+        '--output-file', pot_fpath,
+        current_app.root_path,
+    ))
     current_app.logger.debug("messages.pot file generated")
     # update .pot file with db values
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
-    upload_pot_file(pot_fpath)
+
+    fix_references(pot_fpath)
+
+    if current_app.config.get("SMARTLING_USER_SECRET"):
+        upload_pot_file(pot_fpath)
 
 
 def upload_pot_file(fpath):

@@ -19,27 +19,28 @@ from portal.models.user import User
 
 Session = sessionmaker()
 
+
 def extract_context(comment):
     contexts = [
-        ('login',['login','logout']),
-        ('assessment',['patient report','questionnaireresponse']),
-        ('authentication',['assuming identity', 'service',
-            'inadequate permission','identity challenge',
-            'access token']),
-        ('intervention',['intervention', r'client .* assuming role',
-            r'client .* releasing role',r'updated .* using']),
-        ('account',['register','merging','account','marking deleted',
-            'purging','registration']),
-        ('user',['time of death','deceased','demographics']),
-        ('organization',['organization',r'adding .* to']),
-        ('consent',['consent']),
-        ('observation',['observation',r'set codeableconcept .* on user']),
-        ('group',['group']),
-        ('procedure',['procedure']),
-        ('relationship',['relationship']),
-        ('role',['role']),
-        ('tou',['tou']),
-        ('other',['remote','test'])
+        ('login', ['login', 'logout']),
+        ('assessment', ['patient report', 'questionnaireresponse']),
+        ('authentication', ['assuming identity', 'service',
+                            'inadequate permission', 'identity challenge',
+                            'access token']),
+        ('intervention', ['intervention', r'client .* assuming role',
+                          r'client .* releasing role', r'updated .* using']),
+        ('account', ['register', 'merging', 'account', 'marking deleted',
+                     'purging', 'registration']),
+        ('user', ['time of death', 'deceased', 'demographics']),
+        ('organization', ['organization', r'adding .* to']),
+        ('consent', ['consent']),
+        ('observation', ['observation', r'set codeableconcept .* on user']),
+        ('group', ['group']),
+        ('procedure', ['procedure']),
+        ('relationship', ['relationship']),
+        ('role', ['role']),
+        ('tou', ['tou']),
+        ('other', ['remote', 'test'])
     ]
     for ct in contexts:
         for searchterm in ct[1]:
@@ -47,9 +48,11 @@ def extract_context(comment):
                 return ct[0]
     return 'other'
 
+
 def upgrade():
     op.add_column('audit', sa.Column('subject_id', sa.Integer()))
-    op.create_foreign_key('audit_subject_id_fkey', 'audit', 'users', ['subject_id'], ['id'])
+    op.create_foreign_key('audit_subject_id_fkey', 'audit',
+                          'users', ['subject_id'], ['id'])
 
     op.add_column('audit', sa.Column('context', sa.Text(), nullable=True))
 
@@ -67,11 +70,12 @@ def upgrade():
         if audit.comment:
             # if comment references changed user, use that as subject_id
             audit_comment_list = audit.comment.lower().split()
-            if ("user" in audit_comment_list
-                and len(audit_comment_list) > audit_comment_list.index("user")
-               + 1):
-                subj_id = audit_comment_list[audit_comment_list.index("user") + 1]
-                if subj_id.isdigit() and session.query(User).filter_by(id = subj_id).first():
+            if ("user" in audit_comment_list and
+                len(audit_comment_list) > audit_comment_list.index("user") +
+                    1):
+                subj_id = audit_comment_list[audit_comment_list.index(
+                    "user") + 1]
+                if subj_id.isdigit() and session.query(User).filter_by(id=subj_id).first():
                     audit.subject_id = int(subj_id)
 
             # if possible, use context extracted from comment

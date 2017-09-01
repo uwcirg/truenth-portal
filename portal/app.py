@@ -34,6 +34,7 @@ from .views.patients import patients
 from .views.procedure import procedure_api
 from .views.portal import portal, page_not_found, server_error
 from .views.organization import org_api
+from .views.scheduled_job import scheduled_job_api
 from .views.tou import tou_api
 from .views.truenth import truenth_api
 from .views.user import user_api
@@ -56,6 +57,7 @@ DEFAULT_BLUEPRINTS = (
     patients,
     procedure_api,
     portal,
+    scheduled_job_api,
     truenth_api,
     tou_api,
     user_api,)
@@ -272,7 +274,7 @@ def configure_cache(app):
     requests_cache.install_cache(
         cache_name=app.name,
         backend='redis',
-        expire_after=10,
+        expire_after=1000,
         include_get_headers=True,
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),

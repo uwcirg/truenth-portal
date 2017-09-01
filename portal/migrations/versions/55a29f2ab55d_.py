@@ -15,11 +15,12 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    ### google ids won't fit in bigint - make a string
-    ### have to convert existing
+    # google ids won't fit in bigint - make a string
+    # have to convert existing
     op.execute("ALTER TABLE auth_providers ALTER COLUMN provider_id "
-            "TYPE varchar(40) USING (provider_id)")
+               "TYPE varchar(40) USING (provider_id)")
+
 
 def downgrade():
     op.execute("ALTER TABLE auth_providers ALTER COLUMN provider_id "
-            "TYPE bigint USING CAST(provider_id AS bigint)")
+               "TYPE bigint USING CAST(provider_id AS bigint)")

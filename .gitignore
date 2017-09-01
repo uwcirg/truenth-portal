@@ -8,6 +8,7 @@
 .coverage
 application.cfg
 site.cfg
+celerybeat-schedule
 env
 lib
 local
@@ -16,6 +17,7 @@ man
 pip-selfcheck.json
 log
 portal/test_uploads
+docker/portal.env
 
 .idea
 .settings/

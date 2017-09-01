@@ -1210,7 +1210,7 @@ class User(db.Model, UserMixin):
         """
         uis = UserIntervention.query.filter(and_(
             UserIntervention.user_id == self.id,
-            UserIntervention.staff_html != None))
+            UserIntervention.staff_html.isnot(None)))
         if uis.count() == 0:
             return ""
         if uis.count() == 1:

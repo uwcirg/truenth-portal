@@ -1,10 +1,12 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, jsonify, render_template, request, current_app
+from flask import abort, Blueprint, jsonify, render_template, request
+from flask import current_app, url_for
 from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
+from ..models.app_text import MailResource, UserInviteEmail_ATMA
+from ..models.assessment_status import overall_assessment_status
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
@@ -41,7 +43,7 @@ def patients_root():
     consented_users = []
 
     consent_query = UserConsent.query.filter(and_(
-                         UserConsent.deleted_id == None,
+                         UserConsent.deleted_id.is_(None),
                          UserConsent.expires > now)).with_entities(
                              UserConsent.user_id)
     consented_users = [u.user_id for u in consent_query]
@@ -72,7 +74,7 @@ def patients_root():
         org_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
+                 User.deleted_id.is_(None),
                  User.id.in_(consented_users)
                  )
             ).join(UserOrganization).filter(
@@ -90,15 +92,23 @@ def patients_root():
         ui_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
+                 User.deleted_id.is_(None),
                  User.id.in_(consented_users))
                  ).join(UserIntervention).filter(
                  and_(UserIntervention.user_id==User.id,
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
+    # get assessment status only if it is needed as specified by config
+    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+        patient_list = []
+        for patient in patients:
+            patient.assessment_status = overall_assessment_status(patient.id)
+            patient_list.append(patient)
+        patients = patient_list
+
     return render_template(
-        'patients_by_org.html', patients_list=patients.all(),
+        'patients_by_org.html', patients_list=patients,
         user=user, org_list=org_list,
         wide_container="true")
 
@@ -149,9 +159,29 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
+
+    top_org = patient.first_top_organization()
+    first_org = patient.organizations[0]
+    invite_vars = {
+                   'first_name': patient.first_name,
+                   'last_name': patient.last_name,
+                   'parent_org': top_org.name if top_org else '',
+                   'clinic_name': first_org.name if first_org else '',
+                   'registrationlink': 'url_placeholder',
+                   'verify_account_link': ('<a href=\"url_placeholder\">'
+                                           'url_placeholder</a>'),
+                   'verify_account_button': ('<div class=\"btn\"><a href='
+                                             '\"url_placeholder\">Verify '
+                                             'your account</a></div>')
+                  }
+    if top_org:
+        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+    else:
+        name_key = UserInviteEmail_ATMA.name_key()
+    invite_email = MailResource(app_text(name_key), variables=invite_vars)
     return render_template(
         'profile.html', user=patient,
-        current_user=user,
+        current_user=user, invite_email=invite_email,
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
