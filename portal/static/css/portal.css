@@ -1342,7 +1342,7 @@ h4.detail-title {
   background-color: #576e76;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
-  content: "EDIT";
+  content: attr(data-text);
   position: absolute;
   top: 0.5em;
   left: 0;
@@ -1358,7 +1358,7 @@ h4.detail-title {
   word-break: break-word;
 }
 #mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
-  content: "DONE";
+  content: attr(data-text);
 }
 #mainDiv.profile .profile-item-container .edit-container {
   display: none;

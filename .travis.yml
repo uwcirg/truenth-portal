@@ -102,8 +102,7 @@ after_success:
   - cp docker/portal.env.default docker/portal.env
   - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
   # Build debian package from current repo and branch (else "develop")
-  - REPO_SLUG="$TRAVIS_REPO_SLUG"
-    BRANCH="${TRAVIS_BRANCH:-develop}"
+  - BRANCH="${TRAVIS_BRANCH:-develop}"
     docker-compose run builder
 
   # Build portal docker image from debian package

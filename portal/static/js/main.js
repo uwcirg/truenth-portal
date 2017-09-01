@@ -590,7 +590,7 @@ var fillContent = {
             var headerEnum = {"consentStatus": i18next.t("Consent Status"),
                               "status": i18next.t("Status"),
                               "agreement": i18next.t("Agreement"),
-                              "consentDate": i18next.t("Consent Date"),
+                              "consentDate": i18next.t("Date"),
                               "registrationDate": i18next.t("Registration Date"),
                               "locale": i18next.t("GMT")
                              };
@@ -598,7 +598,6 @@ var fillContent = {
                                 '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
                                 '<span class="agreement">' + headerEnum["agreement"] + '</span>',
                                 '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
-
             headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });

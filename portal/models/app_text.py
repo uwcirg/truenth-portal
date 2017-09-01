@@ -12,10 +12,27 @@ from flask import current_app
 from flask_babel import gettext
 import requests
 from requests.exceptions import MissingSchema, ConnectionError
+import timeit
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
 from ..database import db
+
+
+def time_request(url):
+    """Wrap the requests.get(url) and log the timing"""
+    start = timeit.default_timer()
+    response = requests.get(url)
+    duration = timeit.default_timer() - start
+    message = ('TIME {duration:.4f} seconds to GET {url}'.format(
+        url=url, duration=duration))
+    if duration > 5.0:
+        current_app.logger.error(message)
+    elif duration > 2.0:
+        current_app.logger.warning(message)
+    else:
+        current_app.logger.debug(message)
+    return response
 
 
 class AppText(db.Model):
@@ -205,11 +222,15 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
+        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
 
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+            return "profileSendEmail invite email {}".format(kwargs.get('org'))
         return "profileSendEmail invite email"
+
 
 
 class AboutATMA(AppTextModelAdapter):
@@ -273,7 +294,7 @@ class UnversionedResource(object):
             self._asset = asset
         else:
             try:
-                response = requests.get(url)
+                response = time_request(url)
                 self._asset = response.text
             except MissingSchema:
                 if current_app.config.get('TESTING'):
@@ -327,7 +348,7 @@ class VersionedResource(object):
         self.url = url
         self.variables = variables or {}
         try:
-            response = requests.get(url)
+            response = time_request(url)
             self._asset = response.json().get('asset')
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
@@ -421,7 +442,7 @@ class MailResource(object):
         self.url = url
         self.variables = variables or {}
         try:
-            response = requests.get(url)
+            response = time_request(url)
             self._subject = str(response.json().get('subject'))
             self._body = str(response.json().get('body'))
             self.url = self._permanent_url(

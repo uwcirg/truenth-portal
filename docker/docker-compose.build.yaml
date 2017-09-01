@@ -14,9 +14,13 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.build
     environment:
+      - GIT_REPO=${GIT_REPO:-/mnt/git_repo}
       - BRANCH=${BRANCH:-develop}
-      - REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
     volumes:
       - source: ../debian/artifacts
         target: /tmp/artifacts
         type: bind
+      - source: ..
+        target: "${GIT_REPO:-/mnt/git_repo}"
+        type: bind
+        read_only: true

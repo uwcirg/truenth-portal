@@ -38,41 +38,38 @@
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
-                        <div class="help-block with-errors"></div>
+                        <div class="help-block with-errors get-orgs-error error-message"></div>
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        //userId, noOverride, sync, noPopulate
                         var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+                        aco.getOrgs(function(data) {
+                            if (data) {
+                                if (!data.error) {
+                                    OT.populateOrgsList(data.entry);
+                                    OT.populateUI();
 
-                        $.ajax ({
-                            type: "GET",
-                            url: '/api/organization'
-                        }).done(function(data) {
+                                    if (leafOrgs) {
+                                        OT.filterOrgs(leafOrgs);
+                                    };
 
-                            OT.populateOrgsList(data.entry);
-                            OT.populateUI();
+                                    var userOrgs = $("#userOrgs input[name='organization']");
+                                    userOrgs.each(function() {
+                                        $(this).attr("type", "radio");
+                                    });
 
-                            if (leafOrgs) {
-                                OT.filterOrgs(leafOrgs);
-                            };
+                                    $("#userOrgs input[name='organization']").each(function() {
+                                        $(this).on("click", function() {
+                                            $("#userOrgs").find(".help-block").html("");
+                                        });
+                                    });
 
-                             var userOrgs = $("#userOrgs input[name='organization']");
-                             userOrgs.each(function() {
-                                $(this).attr("type", "radio");
-                             });
-
-                            $("#userOrgs input[name='organization']").each(function() {
-                                $(this).on("click", function() {
-                                    $("#userOrgs").find(".help-block").html("");
-                                });
-                            });
-
-                            var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                            if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
-
-                        }).fail(function() {
-                            console.log("Problem retrieving data from server.");
+                                    var visibleOrgs = $("#userOrgs input[name='organization']:visible");
+                                    if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+                                } else {
+                                    $("#userOrgs .get-orgs-error").html(data.error);
+                                };
+                            } else $("#userOrgs .get-orgs-error").html('{{_("No clinics data available.")}}');
                         });
 
                     });</script>

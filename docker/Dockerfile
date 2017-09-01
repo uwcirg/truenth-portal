@@ -1,7 +1,8 @@
 FROM debian:jessie
 
 ENV \
-    DEBIAN_FRONTEND="noninteractive"
+    DEBIAN_FRONTEND="noninteractive" \
+    WAIT_FOR_IT_VERSION="db049716e42767d39961e95dd9696103dca813f1"
 
 RUN \
     apt-get update && \
@@ -12,6 +13,9 @@ RUN \
     apt-get clean
 
 ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
+ADD \
+    https://raw.githubusercontent.com/vishnubob/wait-for-it/${WAIT_FOR_IT_VERSION}/wait-for-it.sh \
+    /usr/local/bin/
 
 COPY debian/artifacts /tmp/artifacts
 
@@ -36,7 +40,10 @@ ENV \
 
 RUN \
     mkdir --parents "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/"
+    chown "$RUN_USER:$RUN_USER" \
+        "${PROJECT_DIR}/var/portal-instance/" \
+        /usr/local/bin/wait-for-it.sh && \
+    chmod +x /usr/local/bin/wait-for-it.sh
 
 USER "${RUN_USER}"
 
@@ -52,7 +59,15 @@ CMD \
     . "${PROJECT_DIR}/bin/activate" && \
     eval $("${PROJECT_DIR}/bin/remap_envvars.py") && \
     env && \
+
+    wait-for-it.sh \
+        --host="$PGHOST" \
+        --port="$PGPORT" \
+        --strict \
+    && \
+
     flask sync && \
+
     gunicorn \
         --bind "0.0.0.0:${PORT}" \
         `# Workaround to gunicorn sync workers bug` \
