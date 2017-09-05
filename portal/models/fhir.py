@@ -1,5 +1,6 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
+from html.parser import HTMLParser
 import json
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
@@ -541,6 +542,30 @@ def aggregate_responses(instrument_ids, current_user):
 
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
+
+    class HTMLStripper(HTMLParser):
+        """Subclass of HTMLParser for stripping HTML tags"""
+        def __init__(self):
+            self.reset()
+            self.strict = False
+            self.convert_charrefs = True
+            self.fed = []
+
+        def handle_data(self, d):
+            self.fed.append(d)
+
+        def get_data(self):
+            return ' '.join(self.fed)
+
+    def strip_tags(html):
+        """Strip HTML tags from strings. Inserts replacement whitespace if necessary."""
+
+        s = HTMLStripper()
+        s.feed(html)
+        stripped = s.get_data()
+        # Remove extra spaces
+        return ' '.join(filter(None, stripped.split(' ')))
+
     def get_identifier(id_list, **kwargs):
         """Return first identifier object matching kwargs"""
         for identifier in id_list:
@@ -625,7 +650,8 @@ def generate_qnr_csv(qnr_bundle):
         'instrument',
         'question_code',
         'answer_code',
-        'answer',
+        'option_text',
+        'other_text',
     )
 
     yield ','.join('"' + column + '"' for column in columns) + '\n'
@@ -655,7 +681,8 @@ def generate_qnr_csv(qnr_bundle):
             row_data.update({
                 'question_code': question['linkId'],
                 'answer_code': None,
-                'answer': None,
+                'option_text': None,
+                'other_text': None,
             })
 
             answers = consolidate_answer_pairs(question['answer']) or ({},)
@@ -663,16 +690,17 @@ def generate_qnr_csv(qnr_bundle):
             for answer in answers:
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'answer': answer.values()[0]}
+                    answer_data = {'other_text': answer.values()[0]}
 
                     # ...unless nested code (ie valueCode)
                     if answer.keys()[0] == 'valueCoding':
                         answer_data.update({
                             'answer_code': answer['valueCoding']['code'],
 
-                            # Add suplementary text added earlier
-                            # 'answer': answer['valueCoding'].get('text'),
-                            'answer': None,
+                            # Add supplementary text added earlier
+                            # Todo: lookup option text from stored Questionnaire
+                            'option_text': strip_tags(answer['valueCoding'].get('text', None)),
+                            'other_text': None,
                         })
                     row_data.update(answer_data)
 

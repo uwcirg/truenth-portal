@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block main %}
-  <div id="patientList" class="reduce-font-sizes">
+  <div id="patientList">
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
     <div id="patientListOptions">
@@ -11,15 +11,15 @@
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <hr/>
-  <div class="admin-table table-responsive smaller-text">
+  <div class="admin-table table-responsive medium-text">
       <div id="adminTableToolbar" class="admin-toolbar">
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-            <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button id="orglist-dropdown" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
             </button>
             <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
               <div class="form-group smaller-text" id="userOrgs">
-                <div id="fillOrgs" class="smaller-text"></div>
+                <div id="fillOrgs"></div>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
-                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
+                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
                   </tr>
                {% endfor %}
           </tbody>

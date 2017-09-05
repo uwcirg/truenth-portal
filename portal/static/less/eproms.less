@@ -16,20 +16,32 @@
 @baseFontSize:    16px;
 @headlineSize:    1.25em;
 @subheadSize:     1.20em;
-@lgFontSize:      1.6em;
-@lgHeadlineSize:  1.30em;
-@lgsubheadSize:   1.20em;
-@smallText:       0.9em;
+@subSmallHeadSize: 1.1em;
+@lgFontSize:      1.5em;
+@lgHeadlineSize:  1.35em;
+@lgsubheadSize:   1.25em;
+@splashFontSize:  1.05em;
+@smallText:       0.90em;
 @mediumText:      0.95em;
 @smallerText:     0.85em;
 @xsmallText:      0.75em;
 @xxsmallText:     0.70em;
-@btnSize:         0.9em;
-@legendSize:      1em;
-@sessionListSize: 0.95em;
-@orgSize:         0.95em;
-@modalButtonSize: 0.8em;
-@modalLabelSize:  0.8em;
+@btnSize:         1em;
+@smallBtnSize:    0.95em;
+@orgSize:         15px;
+@mobileOrgSize:   12px;
+@modalHeaderSize: 1.3em;
+@modalTitleSize:  1em;
+@modalBodySize:   1.07em;
+@modalButtonSize: 0.91em;
+@modalLabelSize:  1.01em;
+@modalInputSize:  0.90em;
+@footerSize:      0.95em;
+@footerLinkSize:  0.95em;
+@linkSize:        0.9em;
+@mobileSize:      14px;
+@mobileSmallSize:      0.7777em;
+@formSize:        16px;
 
 /**
  * = Colors =
@@ -46,6 +58,7 @@
 @featureBtnHoverBgColor: #909698;
 @featureBtnBorderColor: #333;
 @legendColor:    #595F57;
+@modalBackgroundColor: #606a73;
 @sectionTitleColor: #526960;
 @sectionBorderColor: #E0E6E3;
 @rowBackgroundColor: #8a8e90;
@@ -58,6 +71,12 @@
 @errorMessageColor: #a94442;
 @placeHolderColor: #999;
 @disabledOpacity: 0.6;
+@footerWhiteThemeColor: #F5F5F5;
+@orBackgroundColor: #888a8c;
+@labelColor: #777;
+@inputHeight: 2.5em;
+@wellColor: #F7F7F7;
+
 
 /**
  *  Font-family
@@ -83,8 +102,16 @@ body {
   color: @baseColor;
   font-size: @baseFontSize;
 }
-.capitalize {
-  text-transform: capitalize;
+.tnth-headline {
+  margin: 30px 0 20px;
+  font-size: @headlineSize;
+  letter-spacing: 1px;
+}
+.tnth-subhead {
+  font-size: @subheadSize;
+}
+h3, h4 {
+  font-size: 1.1em;
 }
 .btn {
   cursor: pointer;
@@ -192,7 +219,7 @@ select:not([multiple]) {
 }
 .form-control {
   font-size: @baseFontSize;
-  height: 2.6em;
+  height: @inputHeight;
   border-radius: 0;
 }
 .form-group .help-block {
@@ -201,19 +228,6 @@ select:not([multiple]) {
 .form-group label {
   font-weight: normal;
 }
-.tnth-hide {
-  display: none;
-}
-.tnth-headline {
-  margin: 30px 0 20px;
-  font-size: @headlineSize;
-  letter-spacing: 1px;
-}
-
-.tnth-subhead {
-  font-size: @subheadSize;
-}
-
 .feature-btn {
   transition: all 0.2s ease-in-out 0s;
   -webkit-transition: all 0.2s ease-in-out 0s;
@@ -227,7 +241,6 @@ select:not([multiple]) {
     background-color: @linkHover;
   }
 }
-
 #fullSizeBox {
   a[href*="register"] {
     display: none;
@@ -285,17 +298,34 @@ select:not([multiple]) {
  .detail-title {
     color: #ebefeb;
     letter-spacing: 1px;
+    font-size: @subheadSize;
   }
   #profileHeader * {
     color: #FFF;
     letter-spacing: 1px;
   }
+  div.bootstrap-table,
+  #userSessionsListContainer {
+    TH {
+      background-color: @rowBackgroundColor;
+      color: #FFF;
+      padding: 0.25em 0.5em;
+      font-weight: normal;
+    }
+  }
+  tr.odd {
+    background-color: #F9F9F9;
+  }
+  tr.even {
+    background-color: #FFF;
+  }
   .copyright-container *,
   .logo-container * {
-    color: #F5F5F5;
+    color: @footerWhiteThemeColor;
   }
   .copyright-container {
-    font-size: 0.9em;
+    font-size: @footerSize;
+    color: @footerWhiteThemeColor;
   }
   .logo-container {
     margin: auto;
@@ -321,9 +351,9 @@ select:not([multiple]) {
 }
 
 #mainDiv.profile .copyright-container,
-#mainDiv.portal .copyright-container  {
-  color: #F5F5F5;
-  margin-bottom: 1em;
+#mainDiv.portal .copyright-container,
+#mainDiv.portal .copyright-container * {
+  color: @footerWhiteThemeColor;
 }
 
 @media (max-width: 1199px) {
@@ -336,59 +366,6 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
 }
-
-#stickyMenu {
-  position: fixed;
-  top: 14.5em;
-  left: 0;
-  -webkit-transform: translate(-500px, 0);
-  transform: translate(-500px, 0);
-  transition: transform 0.5s ease;
-  right: 0;
-  padding: 1.5em 0.8em;
-  font-size: 0.9em;
-  min-height: 370px;
-  height: 30%;
-  color: @menuTextColor;
-  width: 200px;
-  border: solid 1px @sectionBorderColor;
-  margin-left: 3.5em;
-  z-index: 11;
-  background-color: @bodyBgColor;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: transform 500ms ease-out;
-  display: block;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-  &.sticky-show {
-    -webkit-transform: translate(0, 0);
-    transform: translate(0, 0);
-  }
-  &::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
-      width: 0px;  /* remove scrollbar space */
-      background: transparent;  /* make scrollbar invisible */
-  }
-  .title {
-    color: @menuTitleColor;
-    font-weight: bold;
-  }
-  ul {
-    padding:0;
-    margin:0;
-    list-style-type:none;
-  }
-  li {
-    margin-bottom: 1.2em;
-    transform-origin: 0 100%;
-    max-width: 130px;
-    cursor:pointer;
-  }
-  li:hover {
-    color: @linkHover;
-    transform: scale(1.05);
-  }
-}
-
 a.open, a.back {
   position: fixed;
   left: 1em;
@@ -405,6 +382,9 @@ a.back:hover {
 }
 a.open .glyphicon, a.back .glyphicon {
   font-size: 1.2em;
+}
+legend {
+  font-size: 0.99em;
 }
 div.left-panel {
   position:fixed;
@@ -424,6 +404,7 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position:relative;
+  max-width: 991px;
   transition:margin ease .5s;
   margin: auto;
 }
@@ -479,6 +460,7 @@ div.right-panel {
 #termsCheckbox {
   width: 1000px;
   max-width: 100%;
+  margin-top: 2.5em;
   .display-view {
     font-weight: normal;
     display: none;
@@ -502,7 +484,7 @@ div.right-panel {
   max-height: 250px;
   overflow: auto;
   padding: 1em;
-  background-color:#F5F5F5;
+  background-color:@wellColor;
 }
 
 #topTerms ~ #aboutForm {
@@ -535,9 +517,8 @@ div.right-panel {
     position: relative;
     text-align: center;
   }
-
   #next {
-    opacity: 1;
+    opacity: 0;
     transition: opacity 200ms ease-in;
     position: absolute;
     left: 0;
@@ -575,7 +556,7 @@ div.right-panel {
     display: none;
   }
   @media (min-width: 500px) {
-    #aboutForm .iq-container {
+    .iq-container {
       margin-top: 11%;
     }
   }
@@ -610,7 +591,7 @@ div.right-panel {
   .iq-container .subtitle {
     color: #595d4e;
     margin: 1em auto;
-    font-size: 1.1em;
+    font-size: @subheadSize;
     position: relative;
   }
   .iq-container #clinics {
@@ -621,18 +602,11 @@ div.right-panel {
   .form-group label,
   label,
   .pat-label {
-    font-size: 1.1em;
-  }
-  .modal label {
-    font-size: 1em;
-  }
-  input[type='text'],
-  select {
-    height: 2.6em;
+    font-size: @subheadSize;
   }
   .prompt {
-    color: #333;
-    font-size: 1.1em;
+    color: @labelColor;
+    font-size: @subheadSize;
   }
   #nameGroup {
     margin-top: 2.5em;
@@ -640,11 +614,6 @@ div.right-panel {
   }
   .bd-optional {
     display: none;
-  }
-  #buttonsContainer {
-    width: 150px;
-    margin: 1em 0;
-    position: relative;
   }
   .iq-container .heading {
     position: absolute;
@@ -660,7 +629,7 @@ div.right-panel {
     border-bottom: 1px solid #FBFBFA;
     border-top: 1px solid rgba(203, 210, 217, 0.2);
     border-left: 1px solid rgba(203, 210, 217, 0.2);
-    font-size: 1.2em;
+    font-size: @subheadSize;
   }
 }
 @media (min-width: 992px) {
@@ -671,7 +640,7 @@ div.right-panel {
     margin-top: 5%;
   }
   #aboutForm .iq-container .tnth-headline:first-of-type {
-    font-size: 1.3em;
+    font-size: @subheadSize;
   }
 }
 @media (min-width: 1200px) {
@@ -679,7 +648,7 @@ div.right-panel {
    border-radius: 100%;
    width: 52px;
    height: 52px;
-   font-size: 1.3em;
+   font-size: @subheadSize;
    line-height: 1;
    content: "\EA03";
    display: inline-block;
@@ -792,7 +761,6 @@ div.right-panel {
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
-    font-size: 0.93em;
   }
   .truenth-id-label {
     display: none;
@@ -801,7 +769,8 @@ div.right-panel {
   div.filterControl input
   {
     font-weight: normal;
-    min-height: 2.5em;
+    min-height: @inputHeight;
+    font-size: 0.99em;
   }
   th.status-field {
     position: relative;
@@ -812,7 +781,7 @@ div.right-panel {
     left: 2%;
     display: none;
     opacity: 0.6;
-    font-size: 0.85em;
+    font-size: @smallerText;
   }
   .filterControl * {
     font-size: 1em;
@@ -839,8 +808,8 @@ div.right-panel {
       display: block;
       margin: -0.4em 0;
       label.org-label {
-        font-size: 1em;
         display: inline-block;
+        font-size: 14px;
       }
     }
     #orglist-footer-container {
@@ -850,7 +819,7 @@ div.right-panel {
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: @mediumText;
+        font-size: 14px;
       }
       input[type="checkbox"] {
         position: relative;
@@ -1003,7 +972,7 @@ div.right-panel {
     max-width: 100%;
     font-family: Arial;
     color: @linkColor;
-    font-size: 0.90em;
+    font-size: @linkSize;
     padding: 0.61em 1em;
     border: solid #ccc 1px;
     text-decoration: none;
@@ -1030,8 +999,9 @@ div.right-panel {
 #patientList {
   div.or {
     display: inline-block;
-    background-color: #888a8c;
+    background-color: @orBackgroundColor;
     margin: 1.5em 1em 1em;
+    font-size: @xxsmallText;
   }
   #_downloadLink {
     visibility: hidden;
@@ -1048,8 +1018,9 @@ div.right-panel {
 #staffList {
   div.or {
     display: inline-block;
-    background-color: #9fa294;
+    background-color: @orBackgroundColor;
     margin: 1.5em 1em 1em 1.2em;
+    font-size: @xxsmallText;
   }
   .firstname-field, .lastname-field {
     max-width: 150px;
@@ -1073,10 +1044,10 @@ div.right-panel {
     margin-left:1.5em
   }
   div.checkbox label{
-    font-size: 0.8em;
+    font-size: @modalInputSize;
   }
   label.radio-inline {
-    font-size: 0.8em;
+    font-size: @modalInputSize;
   }
   input[type="radio"] {
     position: relative;
@@ -1117,10 +1088,7 @@ div.right-panel {
   max-width: 100%;
   display: inline-block;
 }
-#patientsInstrumentList label,
-#patientsDownloadTypeList label {
-  font-size: @modalLabelSize;
-}
+
 #patientsDownloadTypeList {
   margin-top: 0.5em;
 }
@@ -1140,13 +1108,27 @@ div.right-panel {
     font-size: @smallText;
   }
 }
+
+// Used for admin tables or other place where we don't need the large font size
+.medium-text {
+  font-size: @mediumText;
+  .form-control {
+    font-size: @mediumText;
+    height: @mediumText * 2;
+  }
+  .btn {
+    font-size: @mediumText;
+  }
+}
+
+
 .loading {
   opacity: 0.3;
 }
 
 .admin-table {
   .search .form-control {
-    height: 38.5px;
+    height: 2.8em;
   }
 }
 // For table rowlinks
@@ -1299,19 +1281,21 @@ div.right-panel {
 #mainDiv.portal .container {
   max-width: 1100px;
 }
-#mainDiv.portal .copyright-container * {
-  color: #FFF;
+#mainDiv.profile .copyright-container,
+#mainDiv.portal .copyright-container  {
+  color: #F5F5F5;
+  margin-bottom: 1em;
 }
 .portal-item {
  margin: 3em auto 2em auto;
- min-height: 60vh;
+ min-height: 50vh;
 }
 .portal-no-description-container {
   min-height: 400px;
   position: relative;
   margin-top: 10%;
   width: 100% !important;
-  font-size: 1.2em;
+  font-size: @subheadSize;
   max-width: 100%;
   border: 2px solid rgba(121, 121, 121, 1);
 }
@@ -1319,7 +1303,7 @@ div.right-panel {
   color: #FFF;
   width: 85%;
   margin: 1em auto 6em auto;
-  font-size: 1.2em;
+  font-size: @subheadSize;
   max-width: 100%;
   text-align: center;
 }
@@ -1351,16 +1335,16 @@ div.right-panel {
   letter-spacing: 0.5px;
 }
 .portal-header {
-  font-size: 1.2em;
+  font-size: @subheadSize;
   letter-spacing: 1px;
 }
 @media (min-width: 726px) {
   .portal-header {
-    font-size: 1.4em;
+    font-size: @headlineSize;
   }
 }
 .portal-intro-text {
-  font-size: 1.1em;
+  font-size: @subheadSize;
 }
 @media (min-width: 423px) {
   .portal-header {
@@ -1409,7 +1393,7 @@ div.right-panel {
 .portal-description-body {
   margin-top: 1.5em;
   text-align: center;
-  font-size: 1.1em;
+  font-size: @baseFontSize;
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {
@@ -1426,7 +1410,8 @@ div.right-panel {
 .button-container a {
   width: 300px;
   max-width: 100%;
-  font-size: 1em;
+  font-size: @btnSize;
+  height: 2.6em;
 }
 .portal-description-incomplete .button-container {
   top: 50%;
@@ -1441,7 +1426,7 @@ div.right-panel {
   max-width: 100%;
 }
 .portal-full-width-container {
-  font-size: 1.2em;
+  font-size: @subheadSize;
   padding: 2em;
 }
 .loading-message-indicator {
@@ -1526,12 +1511,12 @@ div.right-panel {
   }
 }
 .tnth-form .form-group > label {
-  font-size: 1em;
+  font-size: @formSize;
   color: #777;
 }
 .form-with-floats {
   .form-group > label {
-    font-size:18px;
+    font-size:@formSize;
     color: #aaa;
     opacity: 0;
     &.after-load {
@@ -1567,6 +1552,9 @@ div.right-panel {
 .last-name-container {
   margin-bottom: 0.5em;
 }
+#aboutForm .view-container {
+  display: none;
+}
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
@@ -1600,6 +1588,7 @@ div.right-panel {
   margin-bottom: 2em;
   letter-spacing: 1px;
 }
+<<<<<<< HEAD
 #mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2.5em;
@@ -1643,47 +1632,87 @@ div.right-panel {
 #mainDiv.profile .profile-item-container.edit .edit-container {
   display: inline-block;
 }
+.content-container {
+  position: relative;
+}
 .profile-item-container .view-container {
   display: none;
   max-width: 100%;
   word-break: break-word;
+  padding-bottom: 1em;
 }
-#mainDiv.profile .profile-item-container .view-container {
-  display: block;
-  position: relative;
-}
-#mainDiv.profile .profile-item-container .view-container td:first-of-type {
-  display: inline-block;
-  vertical-align: top;
-}
-#mainDiv.profile .profile-item-container .view-container td {
-  padding: 0.6em 1.5em 0.6em 0;
-}
-#mainDiv.profile .profile-item-container .view-container tr.study-id-view td {
-  padding: 0.6em 1em 0 1em;
-}
-#aboutForm .view-container {
-  display: none;
-}
-#mainDiv.profile .profile-item-container.edit .view-container {
-  display: none;
-}
-#mainDiv.profile .profile-item-loader {
-  position: absolute;
-  top: 1%;
-  left: 1%;
-  width: 98%;
-  height: 98%;
-  padding: 8%;
-  background-color: #FFF;
-  opacity: 0.3;
-  z-index: 21;
-  display: none;
+#mainDiv.profile {
+  .profile-item-edit-btn {
+    position: absolute;
+    top: 2.5em;
+    right: 3em;
+    margin-right: 1em;
+    z-index: 10;
+    height: 2.5em;
+    width: 70px;
+    padding: 0 0.7em;
+    color: #FFF;
+    background: @btnColor;
+    border-color: @btnColor;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: @btnSize;
+  }
+  .profile-item-edit-btn:hover,
+  .profile-item-edit-btn:active,
+  .profile-item-edit-btn:focus {
+    color: #FFF;
+    background-color: @linkHover;
+  }
+  .profile-item-edit-btn::before {
+    content: "EDIT";
+    position: absolute;
+    top: 0.5em;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+  .profile-item-container.edit .profile-item-edit-btn::before {
+    content: "DONE";
+  }
+  .profile-item-container .edit-container {
+    display: none;
+    max-width: 100%;
+  }
+  .profile-item-container.edit .edit-container {
+    display: inline-block;
+  }
+  .profile-item-container .view-container {
+    display: block;
+    position: relative;
+  }
+  .profile-item-container .view-container td:first-of-type {
+    display: inline-block;
+    vertical-align: top;
+  }
+  .profile-item-container .view-container td {
+    padding: 0.6em 1.5em 0.6em 0;
+  }
+  .profile-item-container.edit .view-container {
+    display: none;
+  }
+  .profile-item-loader {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    width: 98%;
+    height: 98%;
+    padding: 8%;
+    background-color: #FFF;
+    opacity: 0.3;
+    z-index: 21;
+    display: none;
+  }
 }
 
 .profile-item-title {
   color: #5b5e61;
-  margin-bottom: 2em;
+  margin-bottom: 1.2em;
   letter-spacing: 1px;
 }
 .profile-name-label, .profile-birthdate-label {
@@ -1701,6 +1730,14 @@ div.right-panel {
   max-width: 100%;
   padding: 1em 0;
 }
+#btnPasswordResetEmail{
+  font-size: @smallBtnSize;
+  height: 2.9em;
+  padding: 0 1em;
+}
+#btnProfileSendEmail {
+  font-size: @smallBtnSize;
+}
 .communication-prompt {
   margin-bottom: 1em;
 }
@@ -1709,9 +1746,13 @@ div.right-panel {
   margin-bottom: -4px;
 }
 
+.deceased-date-container {
+  margin-top: -1.2em;
+}
+
 #createUserLink {
   max-width: 100%;
-  height: 3.2em;
+  height: 3em;
   display: inline-block;
   width: 300px;
   color: #FFF;
@@ -1780,7 +1821,6 @@ div.right-panel {
 }
 
 #fillOrgs legend {
-  font-size:@legendSize;
   color: @legendColor;
   margin: 4px 0 4px 0;
 }
@@ -1828,14 +1868,21 @@ div.noOrg-container {
   .title {
     margin-top: 5%;
   }
-  #userOrgs {
-  margin-top: 2em;
+  .name-section {
+    padding-bottom: 0;
   }
-  #phoneGroup {
-    margin-top: 1.5em;
+  #bdGroup {
+    margin-bottom: 0.1em;
+    padding-bottom: 0;
   }
   #emailGroup {
     margin-top: 0;
+  }
+  #phoneGroup {
+    margin-top: 1.2em;
+  }
+  #altPhoneGroup {
+    margin-top: 1.8em;
   }
   #studyIdContainer {
    margin-top: 1.8em;
@@ -1844,7 +1891,7 @@ div.noOrg-container {
     margin-top: 0.5em;
   }
   #profileStudyIDContainer {
-    margin-top: 2em;
+    margin-top: 2.1em;
     margin-bottom: 1em;
   }
   #profileStudyIDContainer input {
@@ -1854,12 +1901,6 @@ div.noOrg-container {
   #studyId {
     width:350px;
     max-width: 100%;
-  }
-  input[type="text"] {
-    height: 40px !important;
-  }
-  select{
-    height: 40px !important;
   }
   #phone, #email, #altPhone {
     width: 350px;
@@ -1879,8 +1920,20 @@ div.noOrg-container {
   .btn-tnth-back {
     background: none;
   }
+  #updateProfile {
+    font-size: @smallBtnSize;
+  }
 }
-
+.create-account-container {
+  padding: 3.5em 4em;
+  width: 100%;
+  max-width: 100%;
+  border: solid 2px @wellColor;
+  background-color: @wellColor;
+}
+#createProfileForm[data-account='patient'] #bdGroup {
+  min-height: 116px;
+}
 #emailInfoText {
   display: none;
 }
@@ -1892,25 +1945,10 @@ div.noOrg-container {
   width: 400px;
   max-width: 100%;
   label{
-    font-size:0.95em;
+    font-size:@baseFontSize;
   }
 }
 
-.create-account-container {
-  padding: 3.5em 4em;
-  width: 100%;
-  max-width: 100%;
-  border: solid 2px #F1F1F1;
-  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  .name-section {
-    padding-bottom: 0;
-  }
-  #bdGroup {
-    margin-bottom: 0.1em;
-    padding-bottom: 0;
-    min-height: 124px;
-  }
-}
 .left-indent-bottom {
   margin-left: 3.2em;
 }
@@ -1924,7 +1962,7 @@ div.noOrg-container {
 }
 
 #profileEmailMessage {
-  font-size: 0.87em;
+  font-size: @smallText;
   margin-top: 1em;
   margin-left:0.5em;
   width: 250px;
@@ -1967,40 +2005,15 @@ div.noOrg-container {
 #userSessionReportDetailTable caption {
   padding: 0;
 }
-
-#userSessionsList {
-  font-size: @sessionListSize;
-}
-
 #userSessionsList label {
   margin-bottom: 6px;
 }
-
-#userSessionListTable {
-  font-size: 0.98em
-}
-#userSessionListTable TH, table.profile-audit-log TH, .thead {
-  background-color: @rowBackgroundColor;
-  color: #FFF;
-  padding: 0.25em 0.5em;
-  font-size: 1em;
-  font-weight: normal;
-  font-size: 0.98em;
-}
 #userSessionListTable TR:hover {
-  color: #6C7A72;
-  background-color: #ddd;
   cursor: pointer;
-}
-#userSessionListTable .odd {
-  background-color: #F2F2F2;
-}
-#userSessionListTable .even {
-  background-color: #FFF;
 }
 #userAssessementReport table {
   word-break:break-all;
-  font-size: 0.94em;
+  font-size: @baseFontSize;
 }
 .profile-header {
   display: inline-block;
@@ -2017,8 +2030,7 @@ div.noOrg-container {
 }
 
 .profile-audit-log {
-  border-color: #57675B;
-  font-size: 0.87em;
+  font-size: @mediumText;
 }
 
 .error-message, .report-error-message {
@@ -2032,7 +2044,7 @@ div.noOrg-container {
   background-color: #f5f5f5;
   margin-left: 8px;
   display: none;
-  font-size: 1em;
+  font-size: @baseFontSize;
 }
 
 #contactForm .post-contact-response {
@@ -2051,7 +2063,6 @@ div.noOrg-container {
   height: 2em;
   width: 2em;
   overflow: show;
-  font-size: 1em;
   text-align: center;
   z-index: 99999;
   color: #444;
@@ -2076,7 +2087,7 @@ div.noOrg-container {
 }
 
 #loadingIndicator i {
-  font-size: 1em;
+  font-size: @baseFontSize;
 }
 
 /* :not(:required) hides these rules from IE9 and below */
@@ -2172,15 +2183,6 @@ div.noOrg-container {
     transform: rotate(360deg);
   }
 }
-.side {
-  height: 27em
-}
-.side-md {
-  height: 24em
-}
-.side-lg {
-  height: 28em
-}
 .custom-container {
   display: flex;
   margin-bottom: 2em;
@@ -2191,9 +2193,6 @@ div.noOrg-container {
   }
   h4 {
     margin-bottom: 1em;
-  }
-  button, a {
-    padding: 0.5em;
   }
   #btnProfileSendEmail {
     width: 100%;
@@ -2209,11 +2208,9 @@ div.noOrg-container {
   .custom-container-item-right {
     margin-right: 0.12em;
   }
-  .custom-container-content {
-    font-size: 0.95em;
-  }
   .custom-btn {
     margin-bottom: 0.9em;
+    font-size: @smallBtnSize;
   }
   .enter-manual-container {
     flex-grow: 1.5;
@@ -2234,11 +2231,13 @@ div.noOrg-container {
   width: 300px;
   max-width: 100%;
 }
-.pagination {
-  font-size: 0.93em;
+.pagination,
+.pagination button,
+.btn-group>.btn:first-child {
+  font-size: @mediumText !important;
 }
 .pagination-detail {
-  font-size: 0.93em;
+  font-size: @mediumText !important;
 }
 .pagination {
 
@@ -2287,7 +2286,7 @@ div.noOrg-container {
 .radio input[type=radio] {
   position: relative;
   left: 3px;
-  margin-right: 7px;
+  margin-right: 9px;
 }
 .radio-inline input[type=radio] {
   margin-left: -18px;
@@ -2298,42 +2297,44 @@ div.noOrg-container {
 }
 .modal-header,
 .modal-footer {
-  background-color: #606a73;
+  background-color: @modalBackgroundColor;
   color: #FFF;
 }
 .modal-body {
+  font-size: @modalBodySize;
   padding: 2em 2.5em;
 }
 .modal-title {
   font-weight: normal;
-  font-size: 1.1em;
+  font-size: @modalTitleSize;
 }
 .modal-footer {
-  padding: 1em;
+  padding: 0.9em;
 }
 .modal-header {
-  font-size: 1.2em;
+  font-size: @modalHeaderSize;
   min-height: 3em;
+  height: 3.2em;
 }
 .modal-header button,
 .modal-header button * {
   color: #FFF;
-  font-size: 1.3em;
+  font-size: @modalButtonSize;
 }
 .modal label {
-  font-size: 1em;
+  font-size: @modalLabelSize;
 }
 
 .modal button,
 .modal a.btn {
-  font-size: 0.85em;
+  font-size: @modalButtonSize;
 }
 #manualEntryModal input[type='radio'] {
   margin-top: 4px;
   margin-left: -20px;
 }
 #manualEntryModal .modal-title {
-  margin: 0.5em;
+  margin: 0.2em;
 }
 .hide {
   display: none;
@@ -2372,7 +2373,7 @@ color: #777
     border: 1px solid @toolTipColor;
     padding: 0.3em;
     width: 170%;
-    font-size: 0.9em;
+    font-size: @smallerText;
 }
 .tooltip.top .tooltip-arrow {
     border-top-color: @toolTipColor;
@@ -2410,7 +2411,7 @@ div.biopsy-option:last-of-type{
   display: none;
   padding: 1.15em 1.3em;
   color: #57675B;
-  font-size: 0.95em;
+  font-size: @baseFontSize;
   width: 100%;
   max-width: 100%;
   border: 1px solid #ddd;
@@ -2423,7 +2424,7 @@ div.biopsy-option:last-of-type{
   a {
   color:#696f69;
   margin-left: 1.3em;
-  font-size: 0.9em
+  font-size: @linkSize
   }
   a:hover {
   color: @linkHover;
@@ -2444,12 +2445,16 @@ div.biopsy-option:last-of-type{
 }
 
 #consentDateEditContainer {
-  margin-top: 2.5em;
+  margin-top: 2.7em;
+  margin-bottom: 2em;
+  label:first-of-type {
+    margin-bottom: -0.1em;
+  }
 }
 #profileConsentList {
-  font-size: 0.95em;
   max-width: 100%;
   padding: 0.1em;
+  overflow-x: auto;
   a {
     text-decoration:underline;
   }
@@ -2513,7 +2518,7 @@ div.biopsy-option:last-of-type{
 
 .btn-delete-consent, .btn-add-consent {
   color: @rowBackgroundColor;
-  font-size: 0.9em;
+  font-size: @btnSize;
   font-weight: bold;
 }
 
@@ -2548,17 +2553,19 @@ div.input-group.date {
   margin-top: -2px;
 }
 div.org-container {
+  font-size: @smallerText;
   legend {
     color: @legendColor;
   }
   label.org-label{
     margin: 0.2em 0;
     font-weight: normal;
+    font-size: @orgSize;
   }
   .text-muter {
     margin-bottom: 4px;
     margin-top:4px;
-    font-size: 0.97em;
+    font-size: @baseFontSize;
     color: #777474;
   }
   input[type="checkbox"] {
@@ -2587,17 +2594,13 @@ div.org-container {
 .custom-container-item-right {
   margin-right: 0.12em;
 }
-.custom-container-content {
-  font-size: 0.95em;
-}
 .registration-status-container {
   margin:0 0 0.8em 0;
-  font-size: @mediumText;
 }
 .registration-label {
   display:inline-block;
   opacity: 0.7;
-  font-size: 0.99em;
+  font-size: @formSize;
 }
 .timezone-container {
   padding-bottom: 2em;
@@ -2607,6 +2610,12 @@ div.timezone-warning.text-warning {
 }
 .gradient {
   background-image: linear-gradient(to top right, #FFF, #e1e2e1);
+}
+.tnth-hide {
+  display: none;
+}
+.capitalize {
+  text-transform: capitalize;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -2626,14 +2635,6 @@ div.timezone-warning.text-warning {
       margin-bottom: 0;
     }
   }
-  #profileForm {
-    #bdGroup .flex {
-      flex-wrap: nowrap !important;
-    }
-    #month {
-      width: 140px !important;
-    }
-  }
 }
 @media (max-width: 506px) {
   #aboutForm .bd-element,
@@ -2650,8 +2651,9 @@ div.timezone-warning.text-warning {
     float: left !important;
     max-width: 100%;
   }
-  #consentListTable {
-    font-size: 0.7em;
+  #consentListTable,
+  #profileAuditLogTable {
+    font-size: @mobileSmallSize;
     max-width: 100%;
   }
 }
@@ -2660,16 +2662,31 @@ div.timezone-warning.text-warning {
   .form-control,
   input,
   select,
-  h1, h2, h3, h4, h5,
   label,
   legend,
-  .tnth-form .form-group > label {
+  .tnth-form .form-group > label,
+  .fixed-table-container thead th  {
     font-size: 14px;
   }
   .tnth-headline,
-  .tnth-subhead {
-    font-size: 1em;
+  .tnth-subhead,
+  h1, h2 {
+    font-size: @subheadSize;
   }
+  h3, h4, h5 {
+    font-size: @subSmallHeadSize;
+  }
+  small {
+    font-size: 12px;
+  }
+  #createUserLink,
+  .btn,
+  .btn-tnth-primary,
+  a.btn {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
   /************
   div.right-panel {
     margin-left: 0 !important;
@@ -2691,9 +2708,9 @@ div.timezone-warning.text-warning {
       position: relative;
       top: 3px;
     }
-    ***************/
-  }
 
+  }
+   ***************/
   #wellContainer .tnth-well {
     height: 60%;
   }
@@ -2701,45 +2718,30 @@ div.timezone-warning.text-warning {
     padding: 0;
   }
   .profile-item-container {
-    padding: 1em;
     max-width: 100%;
   }
-  #mainDiv.profile .profile-item-container .profile-item-title {
-    max-width: 150px;
+  #mainDiv.profile {
+    .profile-item-container {
+      padding: 2em 1em 2.5em 1em;
+      .profile-item-title {
+        max-width: 150px;
+      }
+      .view-container {
+        padding-bottom: 1em;
+      }
+    }
   }
-
-  #mainDiv.profile .profile-item-container .view-container {
-    padding-bottom: 1em;
-   }
 
   .fixed-table-pagination {
     font-size:@smallText;
   }
-
-  #userSessionsList, #fillOrgs legend {
-    font-size: @smallerText;
-  }
-
-  .side {
-    height: 45em !important;
-  }
-  .one-side {
-    height: 24em !important;
-  }
-
   #createProfileForm {
-    #phone, #email, #studyId {
-      width: 100%;
-      max-width: 100%;
-    }
-    .btn-tnth-back {
-      margin-left: 2.5em
-    }
-  }
-  #profileForm {
     #phone, #email, #profileStudyIDContainer input{
       width: 100%;
       max-width: 100%;
+    }
+    #bdGroup .flex {
+      flex-wrap: wrap;
     }
   }
   .checkbox input[type=checkbox] {
@@ -2753,10 +2755,10 @@ div.timezone-warning.text-warning {
    }
 
   .create-account-container {
-    padding: 1em 2em;
+    padding: 2em;
     width: 100%;
     max-width: 100%;
-    overflow: hidden
+    overflow: hidden;
   }
 
   #identityVerificationContainer {
@@ -2800,38 +2802,51 @@ div.timezone-warning.text-warning {
   }
 
    #adminTableToolbar {
-     div.indent {
-      padding: 0 0.2em;
-    }
-    div.dropdown-menu {
-      width: 200px !important;
-      overflow: auto;
-      div.org-container label.org-label
-      {
-        font-size: 0.8em;
+       div.indent {
+        padding: 0 0.2em;
       }
-    }
-   div.orglist-selector {
-      #orglist-footer-container {
-        padding: 0.5em 1em;
-        label {
-          font-size: 0.8em !important;
-        }
-        input[type="checkbox"] {
-          top: 0;
+      div.dropdown-menu {
+        width: 200px !important;
+        overflow: auto;
+        div.org-container *
+        {
+          font-size: @mobileOrgSize;
         }
       }
+     div.orglist-selector {
+        #orglist-footer-container {
+          padding: 0.5em 1em;
+          input[type="checkbox"] {
+            top: 0;
+          }
+        }
+    }
   }
   .timezone-container {
-      padding-bottom: 0;
+    padding-bottom: 0;
   }
   #consentContainer .radio-inline input {
     position: relative;
     top: 1px;
     left: -1px;
   }
-  .org-container .org-label {
-    font-size: 0.9em;
+  #fillOrgs {
+    label.org-label{
+      margin: 0.2em 0;
+      font-weight: normal;
+      font-size: @mobileOrgSize;
+    }
+  }
+  #adminTableToolbar #fillOrgs {
+    label.org-label {
+      font-size: @mobileOrgSize !important;
+    }
+    legend {
+      font-size: @mobileOrgSize !important;
+    }
+    div.orglist-selector #orglist-footer-container label {
+      font-size: @mobileOrgSize !important;
+    }
   }
 
   #aboutForm .iq-container .tnth-headline:first-of-type{
@@ -2839,11 +2854,11 @@ div.timezone-warning.text-warning {
     margin-right: 0.3em;
   }
 
-}
-@media (max-width: 730px) {
-  #userSessionsList {
-    font-size: @smallerText;
+  .portal-description .button-container a {
+    width: 250px;
+    max-width: 100%;
   }
+
 }
 
 @media (min-width: 768px) {
@@ -2870,20 +2885,20 @@ div.timezone-warning.text-warning {
   .tnth-splash {
     .headline {
       font-weight: bold;
-      font-size: 1.2em;
+      font-size: @splashFontSize;
       margin-bottom: 1em;
     }
     .feature-btn-primary {
       font-weight: bold;
       padding: 0.7em 2.5em;
-      font-size: 1.1em;
+      font-size: @splashFontSize;
     }
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
   }
 }
-@media (min-width: 827px) {
+@media (min-width: 828px) {
   #indexNavBar, #indexContainer {
     display: none;
   }
@@ -2891,11 +2906,6 @@ div.timezone-warning.text-warning {
   div.left-panel, a.back, a.open {
     display: block;
   }***************/
-}
-@media (max-width: 828px) {
-   div.right-panel {
-    margin-left: 0 !important;
-  }
 }
 @media (min-width: 991px) {
   #mainNav {
@@ -2915,7 +2925,7 @@ div.timezone-warning.text-warning {
   }
   #patientList div.or,
   #staffList div.or {
-    margin: 1.3em 1.3em 1.3em 1.6em;
+    margin: 1em 1.3em 1.3em 1.6em;
   }
   #patientListOptions > span:last-of-type,
   #staffListOptions > span:last-of-type {
@@ -2923,21 +2933,6 @@ div.timezone-warning.text-warning {
   }
 }
 @media (max-width: 991px) {
-  .side {
-    height: 28em;
-  }
-  .side-md {
-    height: 30em !important;
-  }
-  .side-lg {
-    height: 34em !important;
-  }
-  .side-xs {
-    height: 22em;
-  }
-  .one-side {
-    height: 24em !important;
-  }
   .load-container {
     min-height: 1.5em;
   }
@@ -2966,17 +2961,17 @@ div.timezone-warning.text-warning {
 
   /** Font sizes changes above 992 **/
   body {
-    font-size: @lgFontSize;
+    font-size: @baseFontSize;
   }
   #wellContainer{
     height:90%;
   }
   .tnth-headline {
-    font-size: @lgHeadlineSize;
+    font-size: @headlineSize;
     letter-spacing: 1px;
   }
   .tnth-subhead {
-    font-size: @lgsubheadSize;
+    font-size: @subheadSize;
   }
   #fullSizeContainer {
     padding: 30px 0;
@@ -2997,7 +2992,7 @@ div.timezone-warning.text-warning {
     }
   }
   .tnth-splash .headline {
-    font-size: @lgHeadlineSize;
+    font-size: @lgFontSize;
   }
   .pos-bottom-md {
     position: absolute;
@@ -3020,7 +3015,7 @@ div.timezone-warning.text-warning {
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   .reduce-font-sizes {
     body & {
-      font-size: 1.1em;
+      font-size: @mediumText;
     }
     .tnth-headline {
       font-size: @headlineSize;
@@ -3062,12 +3057,6 @@ div.timezone-warning.text-warning {
   #profileForm .communications-container .flex-item {
     flex: 0.3 350px;
   }
-  .side-md {
-    height: 26em;
-  }
-  .side-lg {
-    height: 32em;
-  }
 }
 @media (min-width: 1200px) {
   body.open-nav .footer-wrapper {
@@ -3086,7 +3075,7 @@ div.timezone-warning.text-warning {
     padding: 60px;
   }
   .tnth-splash .headline {
-    margin: -1em 0 1.5em;
+    margin: -3.2em 0 1.5em;
   }
   .profile-img {
   display: inline-block;
@@ -3262,7 +3251,7 @@ div.timezone-warning.text-warning {
     margin: 0 auto;
     overflow: hidden;
     height: 62px;
-    font-size: 17px;
+    font-size: @formSize;
     line-height: 1;
     margin: 0 auto;
     letter-spacing: 3px;
@@ -3305,7 +3294,7 @@ div.timezone-warning.text-warning {
   height: 69px;
 }
 .reg-title {
-  font-size: 1.4em;
+  font-size: @headlineSize;
   line-height: 33px;
   color: #494a45;
   position: relative;
@@ -3316,12 +3305,12 @@ div.timezone-warning.text-warning {
 
 div.or {
     display: none;
-    background: #aeb4b9;
+    background: @orBackgroundColor;
     border-radius: 12px;
     color: #fff;
-    font-size: 9px;
+    font-size: @xxsmallText;
     font-weight: bold;
-    height: 25px;
+    height: 26px;
     line-height: 27px;
     text-align: center;
     text-transform: uppercase;
@@ -3356,7 +3345,7 @@ div.or {
   #socialMediaLoginContainer .btn-social,
   #loginForm input[type="submit"]
   {
-    font-size: 0.9em;
+    font-size: @mobileSize;
     height: 52px;
   }
   #socialMediaRegistrationContainer .btn-social,
