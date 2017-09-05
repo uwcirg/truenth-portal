@@ -316,7 +316,7 @@
             var message = '';
             if (this.value != '' && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
-                $('#profileEmailMessage').text(message);
+                $('#profileEmailMessage').html(message);
                 $('#btnProfileSendEmail').removeClass('disabled');
             } else {
                 $('#profileEmailMessage').text('');
@@ -398,10 +398,12 @@
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                         data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
-                       //console.log('data ' + data);
-                        $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
-                    }).fail(function() {
-                        console.log('failed request');
+                        $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                        $('#profileEmailSelect').val("");
+                        $('#btnProfileSendEmail').addClass('disabled');
+                    }).fail(function(xhr) {
+                        var errorMessage = "error sending invite email, " + subject + ", status: " + xhr.status + ", response text: " + xhr.responseText;
+                        tnthAjax.reportError(this.userId, "{{url_for('portal.invite')}}", errorMessage, true);
                         $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                     });
                 };
