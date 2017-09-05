@@ -1107,6 +1107,7 @@ class User(db.Model, UserMixin):
 
         # restore email and record event
         self.email = registered_email
+        self.registered = datetime.utcnow()
         after = self.as_fhir()
         details = StringIO()
         dict_match(newd=after, oldd=before, diff_stream=details)

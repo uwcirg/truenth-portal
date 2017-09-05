@@ -987,9 +987,11 @@ class TestUser(TestCase):
             self.test_user.organizations.append(orgs[1])
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
+            old_regtime = user.registered
             user.promote_to_registered(other)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
+            self.assertNotEqual(user.registered, old_regtime)
             self.assertTrue(other.deleted)
             self.assertEquals(user.first_name, 'newFirst')
             self.assertEquals(user.last_name, 'Better')
