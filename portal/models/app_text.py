@@ -13,6 +13,7 @@ from flask_babel import gettext
 import requests
 from requests.exceptions import MissingSchema, ConnectionError
 import timeit
+from string import Formatter
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -496,6 +497,15 @@ class MailResource(object):
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
         return self.error_msg
+
+    @property
+    def variable_list(self):
+        var_list = set()
+        if self._subject:
+            var_list.update([v[1] for v in Formatter().parse(self._subject)])
+        if self._body:
+            var_list.update([v[1] for v in Formatter().parse(self._body)])
+        return list(var_list)
 
     def _permanent_url(self, generic_url, version):
         """Produce a permanent url from the metadata provided
