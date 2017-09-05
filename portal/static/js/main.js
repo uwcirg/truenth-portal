@@ -581,7 +581,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive table-striped' style='width: 100%; max-width:100%'>";
+            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             /********* Note that column headings are different between TrueNTH and EPROMs.
                  Use css class to hide/show headings accordingly
                  please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
@@ -623,7 +623,7 @@ var fillContent = {
                 };
                 //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
                 //wording is not spec'd out for EPROMs. won't add anything specific until instructed
-                touObj.forEach(function(item) {
+                touObj.forEach(function(item, index) {
                     var org = OT.orgsList[item.organization_id];
                     touContent += "<tr data-tou-type='" + item.type + "'>";
                     touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
@@ -813,6 +813,11 @@ var fillContent = {
                         $("#profileConsentList").html(content);
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
+
+            $("#profileConsentList tr:visible").each(function(index) {
+                if (index % 2 === 0) $(this).addClass("even");
+                else $(this).addClass("odd");
+            });
 
             if (editable) {
                 $("input[class='radio_consent_input']").each(function() {
