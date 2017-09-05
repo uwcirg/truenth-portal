@@ -228,6 +228,10 @@ select:not([multiple]) {
   background: #5f676e;
   z-index: -2;
 }
+#mainDiv.profile a.open,
+#mainDiv.profile a.back {
+  display: none;
+}
 #mainDiv.profile .detail-title {
   color: #ebefeb;
   letter-spacing: 1px;

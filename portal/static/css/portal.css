@@ -1268,6 +1268,10 @@ div.right-panel {
   overflow: hidden;
   background: #5f676e;
 }
+#mainDiv.profile a.open,
+#mainDiv.profile a.back {
+  display: none;
+}
 #mainDiv.profile h4.detail-title {
   display: none;
 }
