@@ -8,16 +8,6 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
       <br/>
-      {% if current_user.has_role(ROLE.STAFF_ADMIN) and request.environ.HTTP_REFERER and (request.environ.HTTP_REFERER.endswith("staff") or request.environ.HTTP_REFERER.endswith("staff-profile-create")) %}
-      {{ back_link('staff', _('Staff List')) }}
-      {% elif providerPerspective == 'true' %}
-      {{ back_link('patients', _('Patients List')) }}
-      {% elif current_user.has_role(ROLE.ADMIN) and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
-      {{ back_link('admin', _('User List')) }}
-      {%- else -%}
-      {{ back_link(PORTAL, _('Home')) }}
-      {%- endif -%}
-      <a class="open" href="#"><span class="glyphicon index-list glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="expand/collapse index list"></span></a>
       <div class="left-panel"></div>
       <div class="right-panel">
           <div class="flex">
