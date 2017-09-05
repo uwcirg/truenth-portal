@@ -131,7 +131,7 @@ var fillViews = {
     },
     "name": function() {
         if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-            var content = i18next.t($("#firstname").val()) + " " + i18next.t($("#lastname").val());
+            var content = $("#firstname").val() + " " + $("#lastname").val();
             if (hasValue($.trim(content))) $("#name_view").text(content);
             else $("#name_view").html("<p class='text-muted'></p>");
         };
@@ -161,7 +161,7 @@ var fillViews = {
     "email": function() {
         if (!$("#emailGroup").hasClass("has-error")) {
             var content = $("#email").val();
-            if (hasValue(content)) $("#email_view").text(i18next.t(content));
+            if (hasValue(content)) $("#email_view").text(content);
             else $("#email_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
     },
