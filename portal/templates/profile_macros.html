@@ -401,7 +401,9 @@
                         $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
                         $('#profileEmailSelect').val("");
                         $('#btnProfileSendEmail').addClass('disabled');
-                    }).fail(function() {
+                    }).fail(function(xhr) {
+                        var errorMessage = "error sending invite email, " + subject + ", status: " + xhr.status + ", response text: " + xhr.responseText;
+                        tnthAjax.reportError(this.userId, "{{url_for('portal.invite')}}", errorMessage, true);
                         $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                     });
                 };
