@@ -155,7 +155,7 @@
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + i18next.t(o.display) + '</label></div>';
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -1301,7 +1301,7 @@
 
                 }).fail(function(xhr) {
                     $(".report-error-message").show();
-                    $(".report-error-message").append("<div>" + i18next.t("Server Error occurred retrieving report data") + "</div>");
+                    $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
 
                 });
 
@@ -2317,14 +2317,15 @@
                 if (self.attempts < self.max_attempts) {
                     setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
                 } else {
+                    var displayError = "{{_('Server error occurred updating data.')}}";
                     errorMessage = '{{_("Error processing request:")}} ' + params.apiUrl;
                     errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
 
-                    $("#error_response_text").html($.trim(xhr.responseText));
+                    $("#error_response_text").html(displayError);
                     var response_text =  $("#error_response_text").text();
                     errorMessage +=";  response text: " + (hasValue(response_text) ? response_text : "no response text returned from server");
                     self.attempts = 0;
-                    if (params.callback) (params.callback).call(self, {"error": errorMessage});
+                    if (params.callback) (params.callback).call(self, {"error": displayError});
                 };
             });
             return errorMessage;
@@ -2452,7 +2453,7 @@
         };
         this.__handleError = function(errorMessage) {
             if (hasValue(errorMessage)) {
-                $('#serviceErrorMsg').html('<small>' + i18next.t("[Processing error] " + errorMessage) + '</small>').fadeIn();
+                $('#serviceErrorMsg').html('<small>' + "{{_('[Processing error]')}} " + errorMessage + '</small>').fadeIn();
                 tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
             };
         };
