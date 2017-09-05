@@ -7,6 +7,7 @@ import sys
 import requests_cache
 from flask import Flask
 import redis
+from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
@@ -73,6 +74,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     app = Flask(app_name, template_folder='templates',
                 instance_relative_config=True)
     configure_app(app, config)
+    configure_profiler(app)
     configure_csrf(app)
     configure_dogpile(app)
     configure_jinja(app)
@@ -95,6 +97,11 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+
+
+def configure_profiler(app):
+    if app.config.get('PROFILE'):
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 
 
 def configure_csrf(app):
