@@ -1628,7 +1628,7 @@ div.right-panel {
     background-color: @linkHover;
   }
   .profile-item-edit-btn::before {
-    content: "EDIT";
+    content: attr(data-text);
     position: absolute;
     top: 0.5em;
     left: 0;
@@ -1636,7 +1636,7 @@ div.right-panel {
     right: 0;
   }
   .profile-item-container.edit .profile-item-edit-btn::before {
-    content: "DONE";
+    content: attr(data-text);
   }
   .profile-item-container .edit-container {
     display: none;
