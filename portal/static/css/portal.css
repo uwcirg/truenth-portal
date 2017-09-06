@@ -611,10 +611,14 @@ div.right-panel {
 #adminTable .eproms-id-label {
   display: none;
 }
+#adminTable div.filterControl {
+  min-height: 2.5em;
+}
 #adminTable div.filterControl select,
 #adminTable div.filterControl input {
   font-weight: normal;
   min-height: 2.3em;
+  height: 2.3em;
 }
 #adminTable th.status-field {
   position: relative;
