@@ -361,7 +361,7 @@ class TestIntervention(TestCase):
 
         # generate questionnaire banks and associate user with
         # metastatic organization
-        mock_questionnairebanks()
+        mock_questionnairebanks('eproms')
         metastatic_org = Organization.query.filter_by(name='metastatic').one()
         self.test_user.organizations.append(metastatic_org)
 
@@ -401,7 +401,7 @@ class TestIntervention(TestCase):
 
         # generate questionnaire banks and associate user with
         # metastatic organization
-        mock_questionnairebanks()
+        mock_questionnairebanks('eproms')
         metastatic_org = Organization.query.filter_by(name='metastatic').one()
         self.test_user.organizations.append(metastatic_org)
 
