@@ -611,7 +611,7 @@ module.exports = OrgTool = (function() {
         }).done(function(data) {
             demoArray = data;
         }).fail(function() {
-            errorMessage = "Error retrieving demographics information for user.";
+            errorMessage = i18next.t("Error retrieving demographics information for user.");
         });
 
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
@@ -634,7 +634,7 @@ module.exports = OrgTool = (function() {
           }).done(function(data) {
               if (callback) callback(errorMessage);
           }).fail(function() {
-              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user organization.";
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + i18next.t("Error occurred updating user organization.");
               if (callback) callback(errorMessage);
           });
         } else {
@@ -753,11 +753,11 @@ module.exports = OrgTool = (function() {
         for (org in orgsList) {
             if (orgsList[org].isTopLevel) {
                 if (orgsList[org].children.length > 0) {
-                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+i18next.t(orgsList[org].name)+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
 
                 } else {
                   $("#fillOrgs").append('<div id="' + orgsList[org].id + '_container" data-parent-id="'+ orgsList[org].name +'"  data-parent-name="' + orgsList[org].name + '" class="org-container"><label id="org-label-' + orgsList[org].id + '" class="org-label"><input class="clinic" type="radio" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
-                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + orgsList[org].name + '</span></label></div>');
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + i18next.t(orgsList[org].name) + '</span></label></div>');
                 };
                 parentOrgsCt++;
             };
@@ -774,14 +774,14 @@ module.exports = OrgTool = (function() {
                         childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        item.name +
+                        i18next.t(item.name) +
                         '</span></label>';
 
                      } else {
                         childClinic += '<label class="org-label">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        item.name +
+                        i18next.t(item.name) +
                         '</span></label>';
                     };
 
@@ -843,7 +843,7 @@ module.exports = OrgTool = (function() {
           };
         };
       } else {
-        $("#modal-org-error").html(errorMessage);
+        $("#modal-org-error").html(i18next.t("Error updating organization"));
       };
     };
   };
@@ -879,7 +879,7 @@ module.exports = OrgTool = (function() {
                   (data.interventions).forEach(function(item) {
                       var d = item.description;
                       var b = item.link_url;
-                      var n = item.name.replace(/\_/g, " ")
+                      var n = item.name.replace(/\_/g, " ");
                       var disabled = item.link_url == "disabled";
                       var dm = /decision\s?support/gi;
                       var sm = /symptom\s?tracker/gi;
@@ -889,7 +889,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                               var ditem = $("#intervention_item_decisionsupport");
                               if (ditem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Decision Support") + '</a></li>');
                               };
 
                               found_decision_support = true;
@@ -912,7 +912,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                             var sitem = $("#intervention_item_symptomtracker");
                             if (sitem.length == 0) { //only draw this when there isn't already one
-                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
+                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Symptom Tracker") + '</a></li>');
                             };
 
                             found_symptom_tracker = true;
@@ -935,7 +935,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                               var eitem = $("#intervention_item_" + ct);
                               if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t(n) + '</a></li>');
                                 ct++;
                               };
                           };
@@ -1041,7 +1041,7 @@ function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
     target.append('<div>' +
-                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' +
+                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">' + i18next.t("Edit in Liferay") + '</a>' +
                 '</div>'
                 );
     if (show) $(".button--LR").addClass("show");
@@ -1054,4 +1054,3 @@ function hasValue(val) {
 function validateUrl(val) {
     return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
 };
-

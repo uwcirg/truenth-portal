@@ -1486,6 +1486,13 @@ div.right-panel {
 .content-container {
   position: relative;
 }
+#mainDiv.profile .profile-item-container .edit-container {
+  display: none;
+  max-width: 100%;
+}
+#mainDiv.profile .profile-item-container.edit .edit-container {
+  display: inline-block;
+}
 .profile-item-container .view-container {
   display: none;
   max-width: 100%;
@@ -1515,7 +1522,7 @@ div.right-panel {
   background-color: #576e76;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
-  content: "EDIT";
+  content: attr(data-text);
   position: absolute;
   top: 0.5em;
   left: 0;
@@ -1523,7 +1530,7 @@ div.right-panel {
   right: 0;
 }
 #mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
-  content: "DONE";
+  content: attr(data-text);
 }
 #mainDiv.profile .profile-item-container .edit-container {
   display: none;

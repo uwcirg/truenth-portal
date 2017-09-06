@@ -9,6 +9,10 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script>window.jQuery || document.write('<script src="../scripts/jquery.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gil.css') }}"><!--[if lte IE 6]>
     <style>#top, #bottom, #left, #right { display: none; }</style>
@@ -42,6 +46,8 @@
             $("#modal-login > div > div > div > form").append('<input id="csrf_token" name="csrf_token" type="hidden" value="'+ result.attr("value") +'">');
         }
     });
+    var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+    __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true), "initImmediate": true});
     </script>
   </head>
   {%- endblock -%}
@@ -303,6 +309,10 @@
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
     <script src="{{url_for('static', filename='js/gil.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     {% if config.PIWIK_SITEID %}
         <script type="text/javascript">
             var _paq = _paq || [];
@@ -341,6 +351,9 @@
                   }
               }
           });
+
+          var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+          __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true), "initImmediate": true});
 
           // Configure and start the session timeout monitor
           {% if user %}
@@ -384,7 +397,7 @@
                     logoutUrl: '{{PORTAL}}/logout',
                     timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
                     modalShown: false,
-                    intervalMonitor: false, 
+                    intervalMonitor: false,
                     onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
@@ -549,6 +562,7 @@
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("__loader(false);", 0);
+
           });
 
       </script>

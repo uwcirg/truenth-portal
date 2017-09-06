@@ -155,7 +155,7 @@
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>{%trans%}' + o.display + '{%endtrans%}</label></div>';
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -377,14 +377,16 @@
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
-                    if (hasValue(return_url)) {
-                        {#- javascript variables are not available at template
-                           rendering time.  insert a placeholder and then
-                           replace once the variable is available. -#}
-                        body = '{{ invite_email.body.encode("string-escape") | safe }}';
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                        subject = '{{ invite_email.subject }}';
-                    };
+                    {% if invite_email %}
+                        if (hasValue(return_url)) {
+                            {#- javascript variables are not available at template
+                               rendering time.  insert a placeholder and then
+                               replace once the variable is available. -#}
+                            body = '{{ invite_email.body.encode("string-escape") | safe}}';
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
+                            subject = '{{ invite_email.subject }}';
+                        };
+                    {% endif %}
                 }
                 else { // reminder
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
@@ -613,6 +615,8 @@
     <div class="put-demo-error error-message"></div>
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        var stateDict={AL:'{{_("Alabama")}}',AK:'{{_("Alaska")}}',AS:'{{_("American Samoa")}}',AZ:'{{_("Arizona")}}',AR:'{{_("Arkansas")}}',CA:'{{_("California")}}',CO:'{{_("Colorado")}}',CT:'{{_("Connecticut")}}',DE:'{{_("Delaware")}}',DC:'{{_("District Of Columbia")}}',FM:'{{_("Federated States Of Micronesia")}}',FL:'{{_("Florida")}}',GA:'{{_("Georgia")}}',GU:'{{_("Guam")}}',HI:'{{_("Hawaii")}}',ID:'{{_("Idaho")}}',IL:'{{_("Illinois")}}',IN:'{{_("Indiana")}}',IA:'{{_("Iowa")}}',KS:'{{_("Kansas")}}',KY:'{{_("Kentucky")}}',LA:'{{_("Louisiana")}}',ME:'{{_("Maine")}}',MH:'{{_("Marshall Islands")}}',MD:'{{_("Maryland")}}',MA:'{{_("Massachusetts")}}',MI:'{{_("Michigan")}}',MN:'{{_("Minnesota")}}',MS:'{{_("Mississippi")}}',MO:'{{_("Missouri")}}',MT:'{{_("Montana")}}',NE:'{{_("Nebraska")}}',NV:'{{_("Nevada")}}',NH:'{{_("New Hampshire")}}',NJ:'{{_("New Jersey")}}',NM:'{{_("New Mexico")}}',NY:'{{_("New York")}}',NC:'{{_("North Carolina")}}',ND:'{{_("North Dakota")}}',MP:'{{_("Northern Mariana Islands")}}',OH:'{{_("Ohio")}}',OK:'{{_("Oklahoma")}}',OR:'{{_("Oregon")}}',PW:'{{_("Palau")}}',PA:'{{_("Pennsylvania")}}',PR:'{{_("Puerto Rico")}}',RI:'{{_("Rhode Island")}}',SC:'{{_("South Carolina")}}',SD:'{{_("South Dakota")}}',TN:'{{_("Tennessee")}}',TX:'{{_("Texas")}}',UT:'{{_("Utah")}}',VT:'{{_("Vermont")}}',VI:'{{_("Virgin Islands")}}',VA:'{{_("Virginia")}}',WA:'{{_("Washington")}}',WV:'{{_("West Virginia")}}',WI:'{{_("Wisconsin")}}',WY:'{{_("Wyoming")}}'};
+
         function handleCheckedItem() {
             var o = $("#userOrgs input[name='organization']:checked");
             if (o.length > 0 && o.val() != 0) {
@@ -1303,8 +1307,7 @@
 
                 }).fail(function(xhr) {
                     $(".report-error-message").show();
-                    $(".report-error-message").append("<br/>" + xhr.responseText);
-
+                    $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
                 });
 
         });
@@ -1646,7 +1649,7 @@
                                 var errorMsg = "";
 
                                 if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                                    if (iy < 1900) errorMsg = "Year must be after 1900";
+                                    if (iy < 1900) errorMsg = "{{_('Year must be after 1900')}}";
                                     // Only allow if birthdate is before today
                                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                                         errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
@@ -2319,14 +2322,15 @@
                 if (self.attempts < self.max_attempts) {
                     setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
                 } else {
+                    var displayError = "{{_('Server error occurred updating data.')}}";
                     errorMessage = '{{_("Error processing request:")}} ' + params.apiUrl;
                     errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
 
-                    $("#error_response_text").html($.trim(xhr.responseText));
+                    $("#error_response_text").html(displayError);
                     var response_text =  $("#error_response_text").text();
                     errorMessage +=";  response text: " + (hasValue(response_text) ? response_text : "no response text returned from server");
                     self.attempts = 0;
-                    if (params.callback) (params.callback).call(self, {"error": errorMessage});
+                    if (params.callback) (params.callback).call(self, {"error": displayError});
                 };
             });
             return errorMessage;
@@ -2454,7 +2458,7 @@
         };
         this.__handleError = function(errorMessage) {
             if (hasValue(errorMessage)) {
-                $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                $('#serviceErrorMsg').html('<small>' + "{{_('[Processing error]')}} " + errorMessage + '</small>').fadeIn();
                 tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
             };
         };
