@@ -111,11 +111,11 @@
     {{copyright_text(user)}}
 {%- endmacro %}
 {% macro logo(white_theme=False) -%}
-    <a href="{%-if config.TRUENTH_LINK_URL-%}{{config.TRUENTH_LINK_URL}}{%-endif-%}" title="{{ _('Movember') }}" class="logo-link" target="_blank">{%-if white_theme -%}<img id="footerLogo" src="{{PORTAL}}{{url_for('static',filename='img/logo_white.png')}}" height="86" width="86" alt="{{_('Movember Logo')}}" />{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/truenth_logo.jpg')}}" alt="{{_('Movember logo')}}" />{%-endif-%}
+    <a href="{%-if config.TRUENTH_LINK_URL-%}{{config.TRUENTH_LINK_URL}}{%-endif-%}" title="{{ _('Movember') }}" class="logo-link" target="_blank">{%-if white_theme -%}<img id="footerLogo" src="{{PORTAL}}{{url_for('static',filename='img/logo_white.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/truenth_logo.jpg')}}" alt="{{_('Movember logo')}}" />{%-endif-%}
     </a>
     &nbsp;
     <a href="{%-if config.MOVEMER_LINK_URL-%}{{config.MOVEMER_LINK_URL}}{%-endif-%}" class="logo-link" title="{{ _('Movember') }}" target="_blank">
-    {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="{{_('Movember Logo')}}" />{%-else-%}<img src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" alt="Movember Logo"/>{%-endif-%}</a>
+    {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" alt="Movember Logo"/>{%-endif-%}</a>
     <script>
     $(function() {
       $(".logo-link").each(function() {
