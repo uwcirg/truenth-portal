@@ -25,8 +25,8 @@ class TestClinical(TestCase):
             observation = Observation()
             coding = Coding(system='SNOMED-CT', code='372278000',
                             display='Gleason score')
-            cc = CodeableConcept(codings=[coding, ])
-            observation.codeable_concept = cc
+            self.gleason_concept = CodeableConcept(codings=[coding, ])
+            observation.codeable_concept = self.gleason_concept
             observation.value_quantity = ValueQuantity(value=2)
             performer = Performer(reference_txt=json.dumps(
                 Reference.patient(TEST_USER_ID).as_fhir()))
@@ -40,6 +40,15 @@ class TestClinical(TestCase):
                                            observation_id=observation.id,
                                            encounter_id=enc.id, audit=audit))
             db.session.commit()
+
+    def test_datetime_for_concept(self):
+        self.prep_db_for_clinical()
+        self.gleason_concept = db.session.merge(self.gleason_concept)
+        self.test_user = db.session.merge(self.test_user)
+        self.assertAlmostEqual(
+            datetime.utcnow().toordinal(),
+            self.test_user.fetch_datetime_for_concept(
+                self.gleason_concept).toordinal())
 
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
