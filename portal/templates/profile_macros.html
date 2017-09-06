@@ -536,17 +536,21 @@
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.phone if person and person.phone }}"  data-htmltags="true" data-error-field="errorphone"/>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone"/>
+        <div class="help-block with-errors"></div>
     </div>
     <div id="errorphone" class="error-message"></div>
+    <script>$(function() { __convertToNumericField($("#phone"))});</script>
 {%- endmacro %}
 
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" class="form-control" id="altPhone" name="altPhone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.alt_phone if person and person.alt_phone }}"  data-htmltags="true" data-error-field="erroraltPhone"/>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone"/>
+        <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
     </div>
+    <script>$(function() { __convertToNumericField($("#altPhone"))});</script>
 {%- endmacro %}
 
 {% macro resetPassword(person) %}
