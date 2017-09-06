@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .intervention import Intervention
 from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .recur import Recur
@@ -164,12 +165,18 @@ class QuestionnaireBank(db.Model):
                 QuestionnaireBank.organization_id.in_(users_top_orgs),
                 QuestionnaireBank.classification == classification).all())
 
-        for intv in (i for i in user.interventions if i.id):
-            qbs = QuestionnaireBank.query.filter(
-                QuestionnaireBank.intervention_id == intv.id,
-                QuestionnaireBank.classification == classification).all()
-            if qbs:
-                results.extend(qbs)
+        # Complicated rules (including strategies and UserIntervention rows)
+        # define a user's access to an intervention.  Rely on the
+        # same check used to display the intervention cards, and only
+        # check for interventions actually associated with QBs.
+        intervention_associated_qbs = QuestionnaireBank.query.filter(
+            QuestionnaireBank.intervention_id.isnot(None),
+            QuestionnaireBank.classification == classification)
+        for qb in intervention_associated_qbs:
+            intervention = Intervention.query.get(qb.intervention_id)
+            display_details = intervention.display_for_user(user)
+            if display_details.access:
+                results.append(qb)
 
         def validate_classification_count(qbs):
             if len(qbs) > 1:
@@ -181,6 +188,34 @@ class QuestionnaireBank(db.Model):
 
         validate_classification_count(results)
         return results
+
+    def trigger_date(self, user):
+        """Return trigger date for user on questionnaire bank
+
+        The trigger date for a questionnaire bank depends on its
+        association.  i.e. for org affiliated QBs, use the respective
+        consent date.
+
+        :return: UTC datetime for the given user / QB, or None if N/A
+
+        """
+        if self.organization_id:
+            # When linked via organization, use the common
+            # top level consent date as `trigger` date.
+            if user.valid_consents and user.valid_consents.count() > 0:
+                    return user.valid_consents[0].audit.timestamp
+            else:
+                return None
+        else:
+            if not self.intervention_id:
+                self.ValueError(
+                    "Can't compute trigger_date on QuestionnaireBank "
+                    "with neither organization nor intervention associated")
+            intervention = Intervention.query.get(self.intervention_id)
+            if intervention.name == 'self_management':
+                # Self management requires positive biopsy (w/o such
+                # an intervention strategy should prevent being here)
+                raise NotImplementedError("unfinished work")
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
