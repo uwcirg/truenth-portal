@@ -196,7 +196,7 @@ $(document).ready(function(){
      ***********************************************************/
 
     $("#profileForm .profile-item-container.editable").each(function() {
-        $(this).prepend('<button class="btn profile-item-edit-btn"></button>');
+        $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}"></button>');
     });
 
     $("#profileForm .profile-item-edit-btn").each(function() {
@@ -204,6 +204,7 @@ $(document).ready(function(){
           e.preventDefault();
           var container = $(this).closest(".profile-item-container");
           container.toggleClass("edit");
+          $(this).attr("data-text", container.hasClass("edit") ? "{{_('DONE')}}": "{{_('EDIT')}}");
           if (!container.hasClass("edit")) {
               var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
               if (sections) {
