@@ -59,6 +59,9 @@
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
+{% block script %}
+<script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}" async></script>
+{% endblock %}
 {% block document_ready %}
 $("#adminTable").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {

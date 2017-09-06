@@ -65,6 +65,9 @@
         </table>
     </div>
 </div>
+{% endblock %}
+{% block table_export_filter_script %}
+{{super()}}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block footer %}

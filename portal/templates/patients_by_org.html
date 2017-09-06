@@ -96,6 +96,9 @@
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
 </div>
+{% endblock %}
+{% block table_export_filter_script %}
+{{super()}}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {%- from "flask_user/_macros.html" import footer -%}
@@ -119,7 +122,7 @@ $(document).ready(function() {
    * client side population of assessment status
    * comment this out for now
    */
-  
+
   /************************************************************************
    * start commented out code
    */
