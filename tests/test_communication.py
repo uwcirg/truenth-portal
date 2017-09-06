@@ -13,6 +13,7 @@ from portal.system_uri import TRUENTH_CR_NAME
 from portal.tasks import update_patient_loop
 from tests import TEST_USER_ID, TEST_USERNAME
 from tests.test_assessment_status import TestQuestionnaireSetup, mock_qr
+from tests.test_assessment_status import symptom_tracker_instruments
 
 
 def mock_communication_request(
@@ -34,7 +35,7 @@ def mock_communication_request(
 
 
 class TestCommunication(TestQuestionnaireSetup):
-    # by inheriting from TestAssessmentStatus, pick up the
+    # by inheriting from TestQuestionnaireSetup, pick up the
     # same mocking done for interacting with QuestionnaireBanks et al
 
     def test_empty(self):
@@ -142,3 +143,53 @@ class TestCommunication(TestQuestionnaireSetup):
         self.assertTrue(comm.message)
         self.assertEquals(comm.message.recipients, TEST_USERNAME)
         self.assertEquals(comm.status, 'completed')
+
+
+class TestCommunicationTnth(TestQuestionnaireSetup):
+    # by inheriting from TestQuestionnaireSetup, pick up the
+    # same mocking done for interacting with QuestionnaireBanks et al
+
+    # set to pull in TrueNTH QBs:
+    eproms_or_tnth = 'tnth'
+
+    def test_st_done(self):
+        # Symptom Tracker QB with completed shouldn't fire
+        mock_communication_request('symptom_tracker', 90)
+
+        self.bless_with_basics(backdate=timedelta(days=91))
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.test_user = db.session.merge(self.test_user)
+
+        # Confirm test user qualifies for ST QB
+        self.assertTrue(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+
+        for instrument in symptom_tracker_instruments:
+            mock_qr(user_id=TEST_USER_ID, instrument_id=instrument)
+
+        # With all q's done, shouldn't generate a message
+        # TODO:
+        # update_patient_loop(update_cache=False, queue_messages=True)
+        # expected = Communication.query.first()
+        # self.assertFalse(expected)
+
+    def test_st_undone(self):
+        # Symptom Tracker QB with incompleted should generate communication
+        mock_communication_request('symptom_tracker', 90)
+
+        self.bless_with_basics(backdate=timedelta(days=91))
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.test_user = db.session.merge(self.test_user)
+
+        # Confirm test user qualifies for ST QB
+        self.assertTrue(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+
+        # With most q's undone, should generate a message
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
+        # TODO:
+        # self.assertEquals(
+        #    'In Progress', overall_assessment_status(TEST_USER_ID))
+        # update_patient_loop(update_cache=False, queue_messages=True)
+        # expected = Communication.query.first()
+        # self.assertTrue(expected)
