@@ -104,9 +104,6 @@ function handleLoginAs(e) {
 //var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter, __indexContainer, __indexIcon, __leftPanel;
 $(document).ready(function(){
 
-
-    $("#profileForm .back").prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-
     /*****************************************
     //$("#profileForm .back").on("click", function(e) {
     //    e.preventDefault();
@@ -125,7 +122,7 @@ $(document).ready(function(){
     /********* Note, this attach loader indicator to element with the class data-loader-container,
               in order for this to work, the element needs to have an id attribute
     ***********/
-    $("[data-loader-container]").each(function() {
+    $("#profileForm [data-loader-container]").each(function() {
         /** see main.js **/
         var attachId = $(this).attr("id");
         if (!hasValue(attachId)) return false;
@@ -155,11 +152,6 @@ $(document).ready(function(){
           });
         };
     });
-
-    if (!(_isTouchDevice())) {
-      $('span[data-toggle="tooltip"]').tooltip();
-    };
-
     /**********************************************************
     /*** sticky menu events, keep them here in case we want them back again
     //$("html").click(function(event){
@@ -203,11 +195,11 @@ $(document).ready(function(){
     //if (__leftPanel.is(":visible")) $("a.open").trigger("click");
      ***********************************************************/
 
-    $(".profile-item-container.editable").each(function() {
+    $("#profileForm .profile-item-container.editable").each(function() {
         $(this).prepend('<button class="btn profile-item-edit-btn"></button>');
     });
 
-    $(".profile-item-edit-btn").each(function() {
+    $("#profileForm .profile-item-edit-btn").each(function() {
         $(this).on("click", function(e) {
           e.preventDefault();
           var container = $(this).closest(".profile-item-container");

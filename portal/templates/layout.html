@@ -9,23 +9,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
     {% set stylesheet = url_for('static', filename=config.PORTAL_STYLESHEET) %}
     <link rel="stylesheet" href="{{ stylesheet }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.css" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}"></script>
-    <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.js"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap-table-filter-control.js') }}"></script>
 </head>
 {# sets container to full-width #}
 {%- set splashView = false -%}
@@ -102,6 +94,14 @@
             {% endif %}
         {%- endwith %}
     {% endblock %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.min.js" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{%block table_export_filter_script %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js" async></script>
+<script src="{{ url_for('static', filename='js/bootstrap-table-filter-control.js') }}"></script>
+{% endblock %}
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = "";
@@ -129,10 +129,6 @@ var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
 {% block document_ready -%}
-$(document).ready(function(){
-   $('[data-toggle="popover"]').popover();
-   $(window).unload(function(){});
-});
 {%- endblock %}
 </script>
 </body>

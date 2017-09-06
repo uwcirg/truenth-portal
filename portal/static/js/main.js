@@ -18,7 +18,6 @@ function equalHeightBoxes(passClass) {
         $('.'+passClass).height(maxHeight);
     }
 }
-
 // Return an XHR without XHR header so  it doesn't need to be explicitly allowed with CORS
 function xhr_function(){
     // Get new xhr object using default factory
@@ -42,18 +41,8 @@ function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
         .html(data);
-        setTimeout(function() {
-            loader();
-            $("#tnthTopLinks li a, #tnthNavbarXs li a").each(function() {
-                $(this).on("click", function(e) {
-                    e.preventDefault();
-                    loader(true);
-                    window.location = $(this).attr("href");
-                });
-            });
-        }, 500)
+        loader();
 }
-
 function showMain() {
     $("#mainHolder").css({
                           "visibility" : "visible",
@@ -65,7 +54,6 @@ function showMain() {
                         });
 
 }
-
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
     //landing page
@@ -80,12 +68,10 @@ var loader = function(show) {
     } else {
         setTimeout("showMain();", 500);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
+            setTimeout('$("#loadingIndicator").fadeOut();', 800);
         };
     };
 };
-
-
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
 var CONSENT_ENUM = {
@@ -110,7 +96,6 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "external_site_id" : "http://us.truenth.org/identity-codes/external-site-id",
     "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
 };
-
 var fillViews = {
     "org": function() {
         var content = "";
@@ -307,18 +292,8 @@ var fillViews = {
         } else $("#procedure_view").html("<p class='text-muted'>No information available.</p>");
     }
 };
-
-
 var fillContent = {
     "clinical": function(data) {
-
-        // sort from newest to oldest
-        // data.entry.sort(function(a,b){
-        //     //date is in this format: 2017-03-21T22:25:03
-        //     var dateA = parseFloat((a.content.meta.lastUpdated).replace(/[\-T\:]/g, ""));
-        //     var dateB = parseFloat((b.content.meta.lastUpdated).replace(/[\-\T\:]/g, ""));
-        //     return dateB - dateA;
-        // });
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
@@ -380,8 +355,6 @@ var fillContent = {
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
-            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
-            //$("#patBiopsy").fadeIn();
         };
         if (data.deceasedDateTime) {
             if(hasValue(data.deceasedDateTime)) {
@@ -1128,7 +1101,6 @@ var fillContent = {
         }, 2000);
     }
 };
-
 var assembleContent = {
     "demo": function(userId,onProfile, targetField, sync) {
 
@@ -3748,7 +3720,6 @@ var tnthDates = {
        return locale ? locale : "en-us";
     }
 };
-
 /***
  * Bootstrap datatables functions
  * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
@@ -3817,8 +3788,6 @@ var tnthTables = {
         return  b_d - a_d;
     }
 };
-
-
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
  * unless dev tools are open, and IE doesn't define console.debug
@@ -3864,8 +3833,6 @@ var tnthTables = {
         }
     }
 })();
-
-
 var FieldLoaderHelper = function () {
     this.delayDuration = 600;
     this.showLoader = function(targetField) {
@@ -3913,10 +3880,8 @@ var FieldLoaderHelper = function () {
     };
 
 };
-
 var flo = new FieldLoaderHelper();
 var LR_INVOKE_KEYCODE = 187; // "=" s=ign
-
 function LRKeyEvent() {
     if ($(".button--LR").length > 0) {
         $("html").on("keydown", function(e) {
@@ -3926,7 +3891,6 @@ function LRKeyEvent() {
         });
     };
 };
-
 function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
@@ -3937,7 +3901,6 @@ function appendLREditContainer(target, url, show) {
     if (show) $(".button--LR").addClass("data-show");
 
 };
-
 function getSaveLoaderDiv(parentID, containerID) {
     var el = $("#" + containerID + "_load");
     if (el.length == 0) {
@@ -3960,7 +3923,6 @@ function getSaveLoaderDiv(parentID, containerID) {
         };
     };
 };
-
 function __getLoaderHTML(message) {
     return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message)?"&nbsp;"+message:"") + '</div>';
 }
@@ -3969,19 +3931,11 @@ function _isTouchDevice(){
 };
 function __convertToNumericField(field) {
     if (field) {
-        if (_isTouchDevice()) field.each(function() {
-            $(this).prop("type", "tel");
-        })
-    }
-}
-function hasValue(val) {
-    return val != null && val != "" && val != "undefined";
+        if (_isTouchDevice()) field.each(function() {$(this).prop("type", "tel");});
+    };
 };
-
-function isString (obj) {
-  return (Object.prototype.toString.call(obj) === '[object String]');
-};
-
+function hasValue(val) {return val != null && val != "" && val != "undefined";};
+function isString (obj) {return (Object.prototype.toString.call(obj) === '[object String]');};
 function disableHeaderFooterLinks() {
     var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
     links.addClass("disabled");
@@ -3991,29 +3945,21 @@ function disableHeaderFooterLinks() {
         return false;
     });
 };
-
-function pad(n) {
-    n = parseInt(n);
-    return (n < 10) ? '0' + n : n;
-};
-
+function pad(n) {n = parseInt(n); return (n < 10) ? '0' + n : n;};
 function escapeHtml(text) {
     'use strict';
-    if (text == null || text.length == 0){
-        return text;
-    }
+    if (text == null || text.length == 0)return text;
     return text.replace(/[\"&'\/<>]/g, function (a) {
         return {
             '"': '&quot;', '&': '&amp;', "'": '&#39;',
             '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
         }[a];
     });
-}
+};
 function containHtmlTags(text) {
     if (!hasValue(text)) return false;
     return /[<>]/.test(text);
 };
-
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};
@@ -4035,4 +3981,53 @@ $.fn.sortOptions = function() {
 var stateDict={AL:"Alabama",AK:"Alaska",AS:"American Samoa",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District Of Columbia",FM:"Federated States Of Micronesia",FL:"Florida",GA:"Georgia",GU:"Guam",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MH:"Marshall Islands",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",MP:"Northern Mariana Islands",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PW:"Palau",PA:"Pennsylvania",PR:"Puerto Rico",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VI:"Virgin Islands",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
 //Promise polyfill - IE doesn't support Promise - so need this
 !function(e){function n(){}function t(e,n){return function(){e.apply(n,arguments)}}function o(e){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(e,this)}function i(e,n){for(;3===e._state;)e=e._value;return 0===e._state?void e._deferreds.push(n):(e._handled=!0,void o._immediateFn(function(){var t=1===e._state?n.onFulfilled:n.onRejected;if(null===t)return void(1===e._state?r:u)(n.promise,e._value);var o;try{o=t(e._value)}catch(i){return void u(n.promise,i)}r(n.promise,o)}))}function r(e,n){try{if(n===e)throw new TypeError("A promise cannot be resolved with itself.");if(n&&("object"==typeof n||"function"==typeof n)){var i=n.then;if(n instanceof o)return e._state=3,e._value=n,void f(e);if("function"==typeof i)return void s(t(i,n),e)}e._state=1,e._value=n,f(e)}catch(r){u(e,r)}}function u(e,n){e._state=2,e._value=n,f(e)}function f(e){2===e._state&&0===e._deferreds.length&&o._immediateFn(function(){e._handled||o._unhandledRejectionFn(e._value)});for(var n=0,t=e._deferreds.length;n<t;n++)i(e,e._deferreds[n]);e._deferreds=null}function c(e,n,t){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof n?n:null,this.promise=t}function s(e,n){var t=!1;try{e(function(e){t||(t=!0,r(n,e))},function(e){t||(t=!0,u(n,e))})}catch(o){if(t)return;t=!0,u(n,o)}}var a=setTimeout;o.prototype["catch"]=function(e){return this.then(null,e)},o.prototype.then=function(e,t){var o=new this.constructor(n);return i(this,new c(e,t,o)),o},o.all=function(e){var n=Array.prototype.slice.call(e);return new o(function(e,t){function o(r,u){try{if(u&&("object"==typeof u||"function"==typeof u)){var f=u.then;if("function"==typeof f)return void f.call(u,function(e){o(r,e)},t)}n[r]=u,0===--i&&e(n)}catch(c){t(c)}}if(0===n.length)return e([]);for(var i=n.length,r=0;r<n.length;r++)o(r,n[r])})},o.resolve=function(e){return e&&"object"==typeof e&&e.constructor===o?e:new o(function(n){n(e)})},o.reject=function(e){return new o(function(n,t){t(e)})},o.race=function(e){return new o(function(n,t){for(var o=0,i=e.length;o<i;o++)e[o].then(n,t)})},o._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},o._unhandledRejectionFn=function(e){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)},o._setImmediateFn=function(e){o._immediateFn=e},o._setUnhandledRejectionFn=function(e){o._unhandledRejectionFn=e},"undefined"!=typeof module&&module.exports?module.exports=o:e.Promise||(e.Promise=o)}(this);
+
+/*!
+ * Validator v0.9.0 for Bootstrap 3, by @1000hz
+ * Copyright 2015 Cina Saffary
+ * Licensed under http://opensource.org/licenses/MIT
+ *
+ * https://github.com/1000hz/bootstrap-validator
+ */
+
++function(a){"use strict";function b(b){return this.each(function(){var d=a(this),e=a.extend({},c.DEFAULTS,d.data(),"object"==typeof b&&b),f=d.data("bs.validator");(f||"destroy"!=b)&&(f||d.data("bs.validator",f=new c(this,e)),"string"==typeof b&&f[b]())})}var c=function(b,d){this.$element=a(b),this.options=d,d.errors=a.extend({},c.DEFAULTS.errors,d.errors);for(var e in d.custom)if(!d.errors[e])throw new Error("Missing default error message for custom validator: "+e);a.extend(c.VALIDATORS,d.custom),this.$element.attr("novalidate",!0),this.toggleSubmit(),this.$element.on("input.bs.validator change.bs.validator focusout.bs.validator",a.proxy(this.validateInput,this)),this.$element.on("submit.bs.validator",a.proxy(this.onSubmit,this)),this.$element.find("[data-match]").each(function(){var b=a(this),c=b.data("match");a(c).on("input.bs.validator",function(){b.val()&&b.trigger("input.bs.validator")})})};c.INPUT_SELECTOR=':input:not([type="submit"], button):enabled:visible',c.DEFAULTS={delay:500,html:!1,disable:!0,custom:{},errors:{match:"Does not match",minlength:"Not long enough"},feedback:{success:"glyphicon-ok",error:"glyphicon-remove"}},c.VALIDATORS={"native":function(a){var b=a[0];return b.checkValidity?b.checkValidity():!0},match:function(b){var c=b.data("match");return!b.val()||b.val()===a(c).val()},minlength:function(a){var b=a.data("minlength");return!a.val()||a.val().length>=b}},c.prototype.validateInput=function(b){var c=a(b.target),d=c.data("bs.validator.errors");if(c.is('[type="radio"]')&&(c=this.$element.find('input[name="'+c.attr("name")+'"]')),this.$element.trigger(b=a.Event("validate.bs.validator",{relatedTarget:c[0]})),!b.isDefaultPrevented()){var e=this;this.runValidators(c).done(function(f){c.data("bs.validator.errors",f),f.length?e.showErrors(c):e.clearErrors(c),d&&f.toString()===d.toString()||(b=f.length?a.Event("invalid.bs.validator",{relatedTarget:c[0],detail:f}):a.Event("valid.bs.validator",{relatedTarget:c[0],detail:d}),e.$element.trigger(b)),e.toggleSubmit(),e.$element.trigger(a.Event("validated.bs.validator",{relatedTarget:c[0]}))})}},c.prototype.runValidators=function(b){function d(a){return b.data(a+"-error")||b.data("error")||"native"==a&&b[0].validationMessage||g.errors[a]}var e=[],f=a.Deferred(),g=this.options;return b.data("bs.validator.deferred")&&b.data("bs.validator.deferred").reject(),b.data("bs.validator.deferred",f),a.each(c.VALIDATORS,a.proxy(function(a,c){if((b.data(a)||"native"==a)&&!c.call(this,b)){var f=d(a);!~e.indexOf(f)&&e.push(f)}},this)),!e.length&&b.val()&&b.data("remote")?this.defer(b,function(){var c={};c[b.attr("name")]=b.val(),a.get(b.data("remote"),c).fail(function(a,b,c){e.push(d("remote")||c)}).always(function(){f.resolve(e)})}):f.resolve(e),f.promise()},c.prototype.validate=function(){var a=this.options.delay;return this.options.delay=0,this.$element.find(c.INPUT_SELECTOR).trigger("input.bs.validator"),this.options.delay=a,this},c.prototype.showErrors=function(b){var c=this.options.html?"html":"text";this.defer(b,function(){var d=b.closest(".form-group"),e=d.find(".help-block.with-errors"),f=d.find(".form-control-feedback"),g=b.data("bs.validator.errors");g.length&&(g=a("<ul/>").addClass("list-unstyled").append(a.map(g,function(b){return a("<li/>")[c](b)})),void 0===e.data("bs.validator.originalContent")&&e.data("bs.validator.originalContent",e.html()),e.empty().append(g),d.addClass("has-error"),f.length&&f.removeClass(this.options.feedback.success)&&f.addClass(this.options.feedback.error)&&d.removeClass("has-success"))})},c.prototype.clearErrors=function(a){var b=a.closest(".form-group"),c=b.find(".help-block.with-errors"),d=b.find(".form-control-feedback");c.html(c.data("bs.validator.originalContent")),b.removeClass("has-error"),d.length&&d.removeClass(this.options.feedback.error)&&d.addClass(this.options.feedback.success)&&b.addClass("has-success")},c.prototype.hasErrors=function(){function b(){return!!(a(this).data("bs.validator.errors")||[]).length}return!!this.$element.find(c.INPUT_SELECTOR).filter(b).length},c.prototype.isIncomplete=function(){function b(){return"checkbox"===this.type?!this.checked:"radio"===this.type?!a('[name="'+this.name+'"]:checked').length:""===a.trim(this.value)}return!!this.$element.find(c.INPUT_SELECTOR).filter("[required]").filter(b).length},c.prototype.onSubmit=function(a){this.validate(),(this.isIncomplete()||this.hasErrors())&&a.preventDefault()},c.prototype.toggleSubmit=function(){if(this.options.disable){var b=a('button[type="submit"], input[type="submit"]').filter('[form="'+this.$element.attr("id")+'"]').add(this.$element.find('input[type="submit"], button[type="submit"]'));b.toggleClass("disabled",this.isIncomplete()||this.hasErrors())}},c.prototype.defer=function(b,c){return c=a.proxy(c,this),this.options.delay?(window.clearTimeout(b.data("bs.validator.timeout")),void b.data("bs.validator.timeout",window.setTimeout(c,this.options.delay))):c()},c.prototype.destroy=function(){return this.$element.removeAttr("novalidate").removeData("bs.validator").off(".bs.validator"),this.$element.find(c.INPUT_SELECTOR).off(".bs.validator").removeData(["bs.validator.errors","bs.validator.deferred"]).each(function(){var b=a(this),c=b.data("bs.validator.timeout");window.clearTimeout(c)&&b.removeData("bs.validator.timeout")}),this.$element.find(".help-block.with-errors").each(function(){var b=a(this),c=b.data("bs.validator.originalContent");b.removeData("bs.validator.originalContent").html(c)}),this.$element.find('input[type="submit"], button[type="submit"]').removeClass("disabled"),this.$element.find(".has-error").removeClass("has-error"),this};var d=a.fn.validator;a.fn.validator=b,a.fn.validator.Constructor=c,a.fn.validator.noConflict=function(){return a.fn.validator=d,this},a(window).on("load",function(){a('form[data-toggle="validator"]').each(function(){var c=a(this);b.call(c,c.data())})})}(jQuery);
+
+/* ============================================================
+ * Bootstrap: rowlink.js v3.1.3
+ * http://jasny.github.io/bootstrap/javascript/#rowlink
+ * ============================================================
+ * Copyright 2012-2014 Arnold Daniels
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ============================================================ */
+
++function($){"use strict";var Rowlink=function(element,options){this.$element=$(element)
+this.options=$.extend({},Rowlink.DEFAULTS,options)
+this.$element.on('click.bs.rowlink','td:not(.rowlink-skip)',$.proxy(this.click,this))}
+Rowlink.DEFAULTS={target:"a"}
+Rowlink.prototype.click=function(e){var target=$(e.currentTarget).closest('tr').find(this.options.target)[0]
+if($(e.target)[0]===target)return
+e.preventDefault();if(target.click){target.click()}else if(document.createEvent){var evt=document.createEvent("MouseEvents");evt.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);target.dispatchEvent(evt);}}
+var old=$.fn.rowlink
+$.fn.rowlink=function(options){return this.each(function(){var $this=$(this)
+var data=$this.data('bs.rowlink')
+if(!data)$this.data('bs.rowlink',(data=new Rowlink(this,options)))})}
+$.fn.rowlink.Constructor=Rowlink
+$.fn.rowlink.noConflict=function(){$.fn.rowlink=old
+return this}
+$(document).on('click.bs.rowlink.data-api','[data-link="row"]',function(e){if($(e.target).closest('.rowlink-skip').length!==0)return
+var $this=$(this)
+if($this.data('bs.rowlink'))return
+$this.rowlink($this.data())
+$(e.target).trigger('click.bs.rowlink')})}(window.jQuery);
 
