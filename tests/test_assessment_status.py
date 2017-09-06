@@ -3,12 +3,15 @@ from datetime import datetime, timedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.intervention import Intervention
 from portal.models.assessment_status import AssessmentStatus
+from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.role import ROLE
 from portal.models.recur import Recur
 from portal.models.fhir import QuestionnaireResponse
 from tests import TestCase, TEST_USER_ID
@@ -39,6 +42,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
+    invalidate_assessment_status_cache(user_id)
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
@@ -47,9 +51,18 @@ metastatic_baseline_instruments = set([
 metastatic_indefinite_instruments = set(['irondemog'])
 metastatic_recurring_instruments = set([
     'eortc', 'hpfs', 'prems', 'epic26'])
+symptom_tracker_instruments = set(['epic26', 'eq5d', 'maxpc', 'pam'])
 
 
-def mock_questionnairebanks():
+def mock_questionnairebanks(eproms_or_tnth):
+    """Create a series of near real world questionnaire banks
+
+    :param eproms_or_tnth: controls which set of questionnairebanks are
+        generated.  As restrictions exist, such as two QBs with the same
+        classification can't have the same instrument, it doesn't work to mix
+        them.
+
+    """
     # Define test Orgs and QuestionnaireBanks for each group
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
@@ -76,7 +89,8 @@ def mock_questionnairebanks():
         for name in (localized_instruments.union(*(
                 metastatic_baseline_instruments,
                 metastatic_indefinite_instruments,
-                metastatic_recurring_instruments))):
+                metastatic_recurring_instruments,
+                symptom_tracker_instruments))):
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
@@ -153,19 +167,42 @@ def mock_questionnairebanks():
             rank=rank, recurs=recurs)
         mr_qb.questionnaires.append(qbq)
 
+    # Symptom Tracker
+    self_management = Intervention.query.filter_by(
+        name='self_management').one()
+    st_qb = QuestionnaireBank(
+        name='symptom_tracker',
+        classification='baseline',
+        intervention_id=self_management.id)
+    for rank, instrument in enumerate(symptom_tracker_instruments):
+        q = Questionnaire.query.filter_by(name=instrument).one()
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire=q, days_till_due=1, days_till_overdue=365,
+            rank=rank)
+        st_qb.questionnaires.append(qbq)
+
     with SessionScope(db):
-        db.session.add(l_qb)
-        db.session.add(mb_qb)
-        db.session.add(mi_qb)
-        db.session.add(mr_qb)
+        if eproms_or_tnth == 'eproms':
+            db.session.add(l_qb)
+            db.session.add(mb_qb)
+            db.session.add(mi_qb)
+            db.session.add(mr_qb)
+        elif eproms_or_tnth == 'tnth':
+            db.session.add(st_qb)
+        else:
+            raise ValueError('unknown value for `eproms_or_tnth`: {}'.format(
+                eproms_or_tnth))
         db.session.commit()
 
 
-class TestAssessmentStatus(TestCase):
+class TestQuestionnaireSetup(TestCase):
+    "Base for test classes needing mock questionnaire setup"
+
+    eproms_or_tnth = 'eproms'  # modify in child class to test `tnth`
 
     def setUp(self):
-        super(self.__class__, self).setUp()
-        mock_questionnairebanks()
+        super(TestQuestionnaireSetup, self).setUp()
+        mock_questionnairebanks(self.eproms_or_tnth)
         self.localized_org_id = Organization.query.filter_by(
             name='localized').one().id
         self.metastatic_org_id = Organization.query.filter_by(
@@ -179,6 +216,8 @@ class TestAssessmentStatus(TestCase):
         self.test_user.organizations.append(Organization.query.get(
             self.metastatic_org_id))
 
+
+class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""
         self.bless_with_basics()
@@ -432,3 +471,17 @@ class TestAssessmentStatus(TestCase):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, 'Partially Completed')
+
+
+class TestTnthAssessmentStatus(TestQuestionnaireSetup):
+    """Tests with Tnth QuestionnaireBanks"""
+
+    eproms_or_tnth = 'tnth'
+
+    def test_no_start_date(self):
+        # W/O a biopsy (i.e. event start date), no questionnaries
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.test_user = db.session.merge(self.test_user)
+        # TODO: finish me!
+        # self.assertFalse(
+        #    QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))

@@ -5,7 +5,7 @@ from flask import current_app
 
 from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
-from .organization import Organization, OrgTree
+from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
 from .user_consent import UserConsent
@@ -41,43 +41,6 @@ def most_recent_survey(user, instrument_id=None):
     return results
 
 
-def qbs_for_user(user, classification):
-    """Return questionnaire banks for the given (user, classification)
-
-    QuestionnaireBanks are associated with a user through the top
-    level organization affiliation, or through interventions
-
-    :return: matching QuestionnaireBanks if found, else empty list
-
-    """
-    results = []
-    for org in (o for o in user.organizations if o.id):
-        top = OrgTree().find(org.id).top_level()
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.organization_id == top,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
-
-    for intv in (i for i in user.interventions if i.id):
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.intervention_id == intv.id,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
-
-    def validate_classification_count(qbs):
-        if len(qbs) > 1:
-            current_app.logger.error(
-                "multiple QuestionnaireBanks for {user} with "
-                "{classification} found.  The UI won't correctly display "
-                "more than one at this time.".format(
-                    user=user, classification=classification))
-
-    validate_classification_count(results)
-    return results
-
-
 class QuestionnaireDetails(object):
     """Encapsulate details needed for a questionnaire
 
@@ -85,19 +48,29 @@ class QuestionnaireDetails(object):
     reports and details needed by clients like AssessmentStatus.
     """
 
-    def __init__(self, user, consent_date):
+    def __init__(self, user):
+        """Initialize QuestionnaireDetails for user """
         self.user = user
-        self.consent_date = consent_date
+        self._qbs = dict()
         self._baseline_qs = OrderedDict()
         self._recurring_qs = OrderedDict()
         self._indefinite_qs = OrderedDict()
         for classification in ('baseline', 'recurring', 'indefinite'):
-            for qb in qbs_for_user(user, classification):
+            for qb in QuestionnaireBank.qbs_for_user(user, classification):
+                self._qbs[classification] = qb
                 for questionnaire in qb.questionnaires:
                     self._append_questionnaire(
                         classification=classification,
                         questionnaire=questionnaire,
                         organization_id=qb.organization_id)
+
+    @property
+    def trigger_date(self):
+        """Shortcut to delegation - baseline QB defines trigger_date"""
+        baseline = self._qbs.get('baseline')
+        if not baseline:
+            return None
+        return baseline.trigger_date(user=self.user)
 
     def lookup(self, questionnaire_name, classification):
         """Return element (if found) with matching criteria"""
@@ -188,7 +161,7 @@ class QuestionnaireDetails(object):
 
             Determine if questionnaire qualifies for inclusion, if not, return
             None.  If it qualifies, return the start date.  Typically this is
-            the consent_date except on recurring questionnaries, where it's
+            the trigger_date except on recurring questionnaries, where it's
             the effective start_date for the active recurrance cycle.
 
             :return: datetime of the questionnaire's start date; None if N/A
@@ -197,11 +170,11 @@ class QuestionnaireDetails(object):
             if len(questionnaire.recurs):
                 for recurrance in questionnaire.recurs:
                     relative_start = recurrance.active_interval_start(
-                        start=self.consent_date)
+                        start=self.trigger_date)
                     if relative_start:
                         return relative_start
                 return None  # no active recurrance
-            return self.consent_date
+            return self.trigger_date
 
         relative_start = questionnaire_start_date(questionnaire)
         if not relative_start:
@@ -240,7 +213,7 @@ class AssessmentStatus(object):
         """
         self.user = user
         self._consent = consent
-        self.questionnaire_data = QuestionnaireDetails(user, self.consent_date)
+        self.questionnaire_data = QuestionnaireDetails(user)
 
     def __str__(self):
         """Present friendly format for logging, etc."""
@@ -251,22 +224,6 @@ class AssessmentStatus(object):
         return results + str(
             ['{}:{}'.format(unicode(q['name']), unicode(q['status']))
              for q in self.questionnaire_data.baseline()])
-
-    @property
-    def consent_date(self):
-        """Return timestamp of signed consent, if available, else None"""
-        if hasattr(self, '_consent_date'):
-            return self._consent_date
-        else:
-            if not self._consent:
-                if self.user.valid_consents and len(list(
-                        self.user.valid_consents)) > 0:
-                    self._consent = self.user.valid_consents[0]
-            if self._consent:
-                self._consent_date = self._consent.audit.timestamp
-            else:
-                self._consent_date = None
-            return self._consent_date
 
     @property
     def completed_date(self):
@@ -400,7 +357,7 @@ class AssessmentStatus(object):
             return self._overall_status
         else:
             first_baseline = next(self.questionnaire_data.baseline(), None)
-            if not self.consent_date or not first_baseline:
+            if not (self.questionnaire_data.trigger_date and first_baseline):
                 self._overall_status = 'Expired'
                 return self._overall_status
             status_strings = [
@@ -428,6 +385,12 @@ class AssessmentStatus(object):
                 else:
                     self._overall_status = 'In Progress'
             return self._overall_status
+
+
+def invalidate_assessment_status_cache(user_id):
+    """Invalidate the assessment status cache values for this user"""
+    dogpile_cache.invalidate(
+        overall_assessment_status, user_id)
 
 
 @dogpile_cache.region('hourly')
