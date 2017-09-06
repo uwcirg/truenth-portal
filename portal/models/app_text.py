@@ -233,7 +233,6 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
         return "profileSendEmail invite email"
 
 
-
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 
