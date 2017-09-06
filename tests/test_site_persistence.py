@@ -10,7 +10,7 @@ from datetime import datetime
 from flask_webtest import SessionScope
 import os
 from tests import TestCase, TEST_USER_ID
-from tests.test_assessment_status import  mock_questionnairebanks
+from tests.test_assessment_status import mock_questionnairebanks
 from tempfile import NamedTemporaryFile
 
 from portal.extensions import db
@@ -173,7 +173,7 @@ class TestSitePersistence(TestCase):
             [r.as_json() for r in (initial_recur, new_recur)])
 
     def test_questionnaire_banks(self):
-        mock_questionnairebanks()
+        mock_questionnairebanks('eproms')
 
         def mock_file(read_only=True):
             '''mock version to create local testfile for site_persistence'''
