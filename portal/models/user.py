@@ -668,6 +668,23 @@ class User(db.Model, UserMixin):
         return [obs.value_quantity for obs in self.observations if\
                 obs.codeable_concept_id == codeable_concept.id]
 
+    def fetch_datetime_for_concept(self, codeable_concept):
+        """Return timestamp from matching observation, if found"""
+        codeable_concept = codeable_concept.add_if_not_found()
+        matching_observations = [
+            obs for obs in self.observations if
+            obs.codeable_concept_id == codeable_concept.id]
+        if not matching_observations:
+            return None
+        u_o = UserObservation.query.filter(
+            UserObservation.user_id == self.id,
+            UserObservation.observation_id == matching_observations[0].id
+        ).first()
+        if u_o:
+            return u_o.audit.timestamp
+        return None
+
+
     def save_constrained_observation(self, codeable_concept, value_quantity,
                                     audit):
         """Add or update the value for given concept as observation
