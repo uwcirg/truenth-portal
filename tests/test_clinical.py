@@ -1,7 +1,6 @@
 """Unit test module for Clinical API"""
 from datetime import datetime, timedelta
 from dateutil import parser
-from flask import current_app
 from flask_webtest import SessionScope
 import json
 import os
@@ -25,8 +24,8 @@ class TestClinical(TestCase):
             audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             observation = Observation()
             coding = Coding(system='SNOMED-CT', code='372278000',
-                    display='Gleason score')
-            cc = CodeableConcept(codings=[coding,])
+                            display='Gleason score')
+            cc = CodeableConcept(codings=[coding, ])
             observation.codeable_concept = cc
             observation.value_quantity = ValueQuantity(value=2)
             performer = Performer(reference_txt=json.dumps(
@@ -48,44 +47,47 @@ class TestClinical(TestCase):
         rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
         clinical_data = json.loads(rv.data)
-        self.assertEquals('Gleason score',
-            clinical_data['entry'][0]['content']['code']['coding'][0]\
-                    ['display'])
-        self.assertEquals('2',
-            clinical_data['entry'][0]['content']['valueQuantity']\
-                    ['value'])
+        self.assertEquals(
+            'Gleason score',
+            clinical_data['entry'][0]['content']['code']['coding'][0]
+            ['display'])
+        self.assertEquals(
+            '2',
+            clinical_data['entry'][0]['content']['valueQuantity']['value'])
         self.assertEquals(
             json.dumps(Reference.patient(TEST_USER_ID).as_fhir()),
             clinical_data['entry'][0]['content']['performer'][0])
         found = parser.parse(
-                clinical_data['entry'][0]['updated'])
+            clinical_data['entry'][0]['updated'])
         found = found.replace(tzinfo=None)
         self.assertAlmostEquals(datetime.utcnow(), found,
-                                delta= timedelta(seconds=5))
+                                delta=timedelta(seconds=5))
 
     def test_clinicalPOST(self):
-        data = {"resourceType": "Observation",
-                "code": {
-                    "coding": [{
-                        "system": "http://loinc.org",
-                        "code": "28540-3",
-                        "display": "Erythrocyte mean corpuscular hemoglobin concentration [Mass/volume]"
-                        }]},
-                "valueQuantity": {
-                    "value": 18.7,
-                    "units": "g/dl",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "g/dl"
-                    },
-                "status": "final",
-                "issued": "2015-08-04T13:27:00+01:00",
-                "performer": Reference.patient(TEST_USER_ID).as_fhir()
-                }
+        data = {
+            "resourceType": "Observation",
+            "code": {
+                "coding": [{
+                    "system": "http://loinc.org",
+                    "code": "28540-3",
+                    "display": ("Erythrocyte mean corpuscular hemoglobin "
+                                "concentration [Mass/volume]")
+                }]},
+            "valueQuantity": {
+                "value": 18.7,
+                "units": "g/dl",
+                "system": "http://unitsofmeasure.org",
+                "code": "g/dl"
+            },
+            "status": "final",
+            "issued": "2015-08-04T13:27:00+01:00",
+            "performer": Reference.patient(TEST_USER_ID).as_fhir()
+        }
 
         self.login()
         rv = self.client.post('/api/patient/%s/clinical' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+                              content_type='application/json',
+                              data=json.dumps(data))
         self.assert200(rv)
         fhir = json.loads(rv.data)
         self.assertIn('28540-3', fhir['message'])
@@ -98,11 +100,11 @@ class TestClinical(TestCase):
         self.login()
         obs = Observation.query.first()
         new_issued = '2016-06-06T06:06:06'
-        data = {'status':'unknown', 'issued':new_issued}
-        data['valueQuantity'] = {'units':'boolean','value':'false'}
+        data = {'status': 'unknown', 'issued': new_issued}
+        data['valueQuantity'] = {'units': 'boolean', 'value': 'false'}
         rv = self.client.put('/api/patient/{}/clinical/{}'.format(
-                TEST_USER_ID,obs.id), content_type='application/json',
-                data=json.dumps(data))
+            TEST_USER_ID, obs.id), content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
         clinical_data = json.loads(rv.data)
         self.assertEquals(clinical_data['status'], 'unknown')
@@ -127,8 +129,8 @@ class TestClinical(TestCase):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
         rv = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
-                           content_type='application/json',
-                           data=json.dumps({'value': True}))
+                              content_type='application/json',
+                              data=json.dumps({'value': True}))
         self.assert200(rv)
         result = json.loads(rv.data)
         self.assertEquals(result['message'], 'ok')
@@ -136,8 +138,8 @@ class TestClinical(TestCase):
         # Can we get it back in FHIR?
         rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
-        coding = data['entry'][0]['content']['code']['coding'][0] 
-        vq = data['entry'][0]['content']['valueQuantity'] 
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
 
         self.assertEquals(coding['code'], '111')
         self.assertEquals(coding['display'], 'biopsy')
@@ -152,8 +154,8 @@ class TestClinical(TestCase):
 
         # Can we alter the value?
         rv = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
-                           content_type='application/json',
-                           data=json.dumps({'value': False}))
+                              content_type='application/json',
+                              data=json.dumps({'value': False}))
         self.assert200(rv)
         result = json.loads(rv.data)
         self.assertEquals(result['message'], 'ok')
@@ -170,9 +172,10 @@ class TestClinical(TestCase):
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
         self.login()
-        rv = self.client.post('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
-                           content_type='application/json',
-                           data=json.dumps({'value': True}))
+        rv = self.client.post(
+            '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps({'value': True}))
         self.assert200(rv)
         result = json.loads(rv.data)
         self.assertEquals(result['message'], 'ok')
@@ -190,7 +193,8 @@ class TestClinical(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct pca_diag value
-        rv = self.client.get('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
+        rv = self.client.get(
+            '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
@@ -229,8 +233,8 @@ class TestClinical(TestCase):
 
         self.login()
         rv = self.client.put('/api/patient/{}/clinical'.format(TEST_USER_ID),
-                         content_type='application/json',
-                         data=json.dumps(data))
+                             content_type='application/json',
+                             data=json.dumps(data))
         self.assert200(rv)
 
         obs = self.test_user.observations.one()  # only expect the one
