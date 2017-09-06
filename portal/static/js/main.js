@@ -648,8 +648,9 @@ var fillContent = {
                     var consentLabels = {
                         "default": i18next.t("Consented"),
                         "consented": i18next.t("Consented / Enrolled"),
-                        "withdrawn": i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data"),
-                        "purged": i18next.t("Purged / Removed")
+                        "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
+                                      "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
+                        "purged": "Purged / Removed"
                     };
 
                     switch(consentStatus) {

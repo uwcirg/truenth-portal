@@ -5,13 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2017-08-28T17:48:43.529Z\n"
-"PO-Revision-Date: 2017-08-28T17:48:43.529Z\n"
-=======
-"POT-Creation-Date: 2017-09-05T17:12:33.609Z\n"
-"PO-Revision-Date: 2017-09-05T17:12:33.610Z\n"
->>>>>>> add versions to i18next source, remove i18next tag from name, re-run extraction
+"POT-Creation-Date: 2017-09-06T20:14:14.888Z\n"
+"PO-Revision-Date: 2017-09-06T20:14:14.888Z\n"
 
 msgid "Select All"
 msgstr ""
@@ -70,7 +65,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-msgid "Registration Date"
+msgid "Regiatration Date"
 msgstr ""
 
 msgid "GMT"
@@ -94,7 +89,7 @@ msgstr ""
 msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
 msgstr ""
 
-msgid "Purged / Removed"
+msgid "Suspend Data Collection and Report Historic Data"
 msgstr ""
 
 msgid "deleted on"
