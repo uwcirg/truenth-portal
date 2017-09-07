@@ -130,7 +130,7 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(results[0]['name'], 'epic26')
         self.assertEquals(results[2]['name'], 'comorb')
 
-    def TODO_lookup_with_intervention(self):
+    def test_lookup_with_intervention(self):
         intv = Intervention(name='TEST', description='Test Intervention')
         epic26 = Questionnaire(name='epic26')
         eproms_add = Questionnaire(name='eproms_add')
@@ -152,6 +152,8 @@ class TestQuestionnaireBank(TestCase):
             bank.questionnaires.append(qbq)
 
         self.test_user.interventions.append(intv)
+        self.login()
+        self.add_required_clinical_data()
         with SessionScope(db):
             db.session.add(bank)
             db.session.commit()

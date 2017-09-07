@@ -5,7 +5,9 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .fhir import CC
 from .intervention import Intervention
+from .intervention_strategies import observation_check
 from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .recur import Recur
@@ -176,7 +178,11 @@ class QuestionnaireBank(db.Model):
             intervention = Intervention.query.get(qb.intervention_id)
             display_details = intervention.display_for_user(user)
             if display_details.access:
-                results.append(qb)
+                # TODO: business rule details like the following should
+                # move to site persistence for QB to user mappings.
+                check_func = observation_check("biopsy", 'true')
+                if check_func(intervention=intervention, user=user):
+                    results.append(qb)
 
         def validate_classification_count(qbs):
             if len(qbs) > 1:
@@ -211,11 +217,11 @@ class QuestionnaireBank(db.Model):
                 self.ValueError(
                     "Can't compute trigger_date on QuestionnaireBank "
                     "with neither organization nor intervention associated")
-            intervention = Intervention.query.get(self.intervention_id)
-            if intervention.name == 'self_management':
-                # Self management requires positive biopsy (w/o such
-                # an intervention strategy should prevent being here)
-                raise NotImplementedError("unfinished work")
+            # TODO: business rule details like the following should
+            # move to site persistence for QB to user mappings.
+            biopsy_date = user.fetch_datetime_for_concept(CC.BIOPSY)
+            # TODO: if procedure filed since, use that date
+            return biopsy_date
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

@@ -65,7 +65,7 @@ class UserEthnicityExtension(CCExtension):
         self.user, self.extension = user, extension
 
     extension_url =\
-       "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
+        "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
 
     @property
     def children(self):
@@ -77,7 +77,7 @@ class UserRaceExtension(CCExtension):
         self.user, self.extension = user, extension
 
     extension_url =\
-       "http://hl7.org/fhir/StructureDefinition/us-core-race"
+        "http://hl7.org/fhir/StructureDefinition/us-core-race"
 
     @property
     def children(self):
@@ -89,7 +89,7 @@ class UserTimezone(CCExtension):
         self.user, self.extension = user, extension
 
     extension_url =\
-       "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        "http://hl7.org/fhir/StructureDefinition/user-timezone"
 
     def as_fhir(self):
         timezone = self.user.timezone
@@ -100,7 +100,7 @@ class UserTimezone(CCExtension):
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
-        if not 'timezone' in self.extension:
+        if 'timezone' not in self.extension:
             abort(400, "Extension missing 'timezone' field")
         timezone = self.extension['timezone']
 
@@ -116,7 +116,11 @@ class UserTimezone(CCExtension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username, user_id=None, acting_user=None, actor=None):
+def permanently_delete_user(
+        username,
+        user_id=None,
+        acting_user=None,
+        actor=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
@@ -128,9 +132,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
     :param acting_user: user taking the action, for record keeping
 
     """
-    from .auth import AuthProvider
     from .tou import ToU
-    from .user_consent import UserConsent
 
     if not acting_user:
         acting_user = User.query.filter_by(username=actor).first()
@@ -144,8 +146,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
     else:
         user = User.query.filter_by(username=username).first()
         if user_id and user.id != user_id:
-                raise ValueError(
-                    "Contridicting username and user_id values given")
+            raise ValueError(
+                "Contridicting username and user_id values given")
 
     def purge_user(user, acting_user):
         if not user:
@@ -158,9 +160,9 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
 
         # purge all the types with user foreign keys, then the user itself
         UserRelationship.query.filter(
-                    or_(UserRelationship.user_id == user.id,
-                        UserRelationship.other_user_id == user.id)).delete()
-        tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+            or_(UserRelationship.user_id == user.id,
+                UserRelationship.other_user_id == user.id)).delete()
+        tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
         for t in tous:
             db.session.delete(t)
 
@@ -175,6 +177,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
         db.session.commit()
 
     purge_user(user, acting_user)
+
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
@@ -222,7 +225,7 @@ def default_email(context=None):
 
 
 class User(db.Model, UserMixin):
-    ## PLEASE maintain merge_with() as user model changes ##
+    # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64))
@@ -232,9 +235,9 @@ class User(db.Model, UserMixin):
         'email', db.String(120), unique=True, nullable=False,
         default=default_email)
     phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
-                                      ondelete='cascade'))
+                                                   ondelete='cascade'))
     alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
-                                      ondelete='cascade'))
+                                                       ondelete='cascade'))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
@@ -268,31 +271,40 @@ class User(db.Model, UserMixin):
     _consents = db.relationship('UserConsent', lazy='dynamic',
                                 cascade='delete')
     indigenous = db.relationship(Coding, lazy='dynamic',
-            secondary="user_indigenous")
+                                 secondary="user_indigenous")
     encounters = db.relationship('Encounter', cascade='delete')
     ethnicities = db.relationship(Coding, lazy='dynamic',
-            secondary="user_ethnicities")
+                                  secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
-            backref=db.backref('users', lazy='dynamic'))
-    interventions = db.relationship('Intervention', lazy='dynamic',
-            secondary="user_interventions", backref=db.backref('users'))
+                             backref=db.backref('users', lazy='dynamic'))
+    interventions = db.relationship(
+        'Intervention',
+        lazy='dynamic',
+        secondary="user_interventions",
+        backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',
                                               lazy='dynamic', cascade='delete')
     races = db.relationship(Coding, lazy='dynamic',
-            secondary="user_races")
-    observations = db.relationship('Observation', lazy='dynamic',
-            secondary="user_observations", backref=db.backref('users'))
-    organizations = db.relationship('Organization', lazy='dynamic',
-            secondary="user_organizations", backref=db.backref('users'))
+                            secondary="user_races")
+    observations = db.relationship(
+        'Observation',
+        lazy='dynamic',
+        secondary="user_observations",
+        backref=db.backref('users'))
+    organizations = db.relationship(
+        'Organization',
+        lazy='dynamic',
+        secondary="user_organizations",
+        backref=db.backref('users'))
     procedures = db.relationship('Procedure', lazy='dynamic',
                                  backref=db.backref('user'), cascade='delete')
     roles = db.relationship('Role', secondary='user_roles',
-            backref=db.backref('users', lazy='dynamic'))
+                            backref=db.backref('users', lazy='dynamic'))
     _locale = db.relationship(CodeableConcept, cascade="save-update")
     deleted = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deleted_id])
     deceased = db.relationship('Audit', cascade="save-update",
-                              foreign_keys=[deceased_id])
+                               foreign_keys=[deceased_id])
     documents = db.relationship('UserDocument', lazy='dynamic',
                                 cascade='save-update, delete')
     _identifiers = db.relationship(
@@ -304,7 +316,7 @@ class User(db.Model, UserMixin):
                                  cascade="save-update, delete")
 
     ###
-    ## PLEASE maintain merge_with() as user model changes ##
+    # PLEASE maintain merge_with() as user model changes #
     ###
 
     assessment_status = 'undetermined'
@@ -348,8 +360,8 @@ class User(db.Model, UserMixin):
         An encounter is typically bound to the logged in user, not
         the subject, if a different user is performing the action.
         """
-        query = Encounter.query.filter(Encounter.user_id==self.id).filter(
-            Encounter.status=='in-progress')
+        query = Encounter.query.filter(Encounter.user_id == self.id).filter(
+            Encounter.status == 'in-progress')
         if query.count() == 0:
             return None
         if query.count() != 1:
@@ -358,13 +370,15 @@ class User(db.Model, UserMixin):
             # first
             msg = "Multiple active encounters found for {}: {}".format(
                 self,
-                [(e.status, str(e.start_time), str(e.end_time)) for e in query])
+                [(e.status, str(e.start_time), str(e.end_time))
+                 for e in query])
             current_app.logger.error(msg)
         return query.first()
 
     @property
     def locale(self):
-        if self._locale and self._locale.codings and (len(self._locale.codings) > 0):
+        if self._locale and self._locale.codings and (
+                len(self._locale.codings) > 0):
             return self._locale.codings[0]
         return None
 
@@ -383,10 +397,10 @@ class User(db.Model, UserMixin):
     @locale.setter
     def locale(self, lang_info):
         # lang_info is a tuple of format (language_code,language_name)
-        # IETF BCP 47 standard uses hyphens, bust we instead store w/ underscores,
-        # to better integrate with babel/LR URLs/etc
+        # IETF BCP 47 standard uses hyphens, but we instead store w/
+        # underscores, to better integrate with babel/LR URLs/etc
         data = {"coding": [{'code': lang_info[0], 'display': lang_info[1],
-                  'system': "urn:ietf:bcp:47"}]}
+                            'system': "urn:ietf:bcp:47"}]}
         self._locale = CodeableConcept.from_fhir(data)
 
     @hybrid_property
@@ -410,7 +424,7 @@ class User(db.Model, UserMixin):
         if email == NO_EMAIL_PREFIX:
             self._email = default_email()
         elif self._email and self._email.startswith(
-            NO_EMAIL_PREFIX) and not email:
+                NO_EMAIL_PREFIX) and not email:
             # already a unique email, for a user w/o email, don't
             # set to an empty string if they didn't give a value.
             pass
@@ -428,7 +442,7 @@ class User(db.Model, UserMixin):
         if self._phone:
             self._phone.value = val
         else:
-            self._phone = ContactPoint(system='phone',use='mobile',value=val)
+            self._phone = ContactPoint(system='phone', use='mobile', value=val)
 
     @property
     def alt_phone(self):
@@ -440,8 +454,8 @@ class User(db.Model, UserMixin):
         if self._alt_phone:
             self._alt_phone.value = val
         else:
-            self._alt_phone = ContactPoint(system='phone',use='home',value=val)
-
+            self._alt_phone = ContactPoint(
+                system='phone', use='home', value=val)
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
@@ -514,10 +528,9 @@ class User(db.Model, UserMixin):
             options['ethnicity'] = any(o.ethnicity_codings for o in orgs)
             options['indigenous'] = any(o.indigenous_codings for o in orgs)
         else:
-            attrs = ('race','ethnicity','indigenous')
-            options = dict.fromkeys(attrs,True)
+            attrs = ('race', 'ethnicity', 'indigenous')
+            options = dict.fromkeys(attrs, True)
         return options
-
 
     @property
     def locale_display_options(self):
@@ -582,21 +595,21 @@ class User(db.Model, UserMixin):
             return None
 
     def add_observation(self, fhir, audit):
-        if not 'coding' in fhir['code']:
+        if 'coding' not in fhir['code']:
             return 400, "requires at least one CodeableConcept"
-        if not 'valueQuantity' in fhir:
+        if 'valueQuantity' not in fhir:
             return 400, "missing required 'valueQuantity'"
 
         cc = CodeableConcept.from_fhir(fhir['code']).add_if_not_found()
 
         v = fhir['valueQuantity']
         vq = ValueQuantity(value=v.get('value'),
-                units=v.get('units'),
-                system=v.get('system'),
-                code=v.get('code')).add_if_not_found(True)
+                           units=v.get('units'),
+                           system=v.get('system'),
+                           code=v.get('code')).add_if_not_found(True)
 
         issued = fhir.get('issued') and\
-                parser.parse(fhir.get('issued')) or None
+            parser.parse(fhir.get('issued')) or None
         observation = Observation(
             status=fhir.get('status'),
             issued=issued,
@@ -616,24 +629,25 @@ class User(db.Model, UserMixin):
     def add_relationship(self, other_user, relationship_name):
         # confirm it's not already defined
         relationship = Relationship.query.filter_by(
-                name=relationship_name).first()
-        existing = UserRelationship.query.filter_by(user_id=self.id,
-                other_user_id=other_user.id,
-                relationship_id=relationship.id).first()
+            name=relationship_name).first()
+        existing = UserRelationship.query.filter_by(
+            user_id=self.id,
+            other_user_id=other_user.id,
+            relationship_id=relationship.id).first()
         if existing:
             raise ValueError("requested relationship already defined")
 
         new_relationship = UserRelationship(user_id=self.id,
-                other_user_id=other_user.id,
-                relationship_id=relationship.id)
+                                            other_user_id=other_user.id,
+                                            relationship_id=relationship.id)
         self.relationships.append(new_relationship)
 
     def has_relationship(self, relationship_name, other_user):
         relationship = Relationship.query.filter_by(
-                name=relationship_name).first()
+            name=relationship_name).first()
         for r in self.relationships:
             if (r.relationship_id == relationship.id and
-                r.other_user_id == other_user.id):
+                    r.other_user_id == other_user.id):
                 return True
         return False
 
@@ -654,7 +668,7 @@ class User(db.Model, UserMixin):
                 return User.query.get(rel.other_user_id)
 
         service_user = User(username=(u'service account sponsored by {}'.
-                              format(self.username)))
+                                      format(self.username)))
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE)
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
@@ -665,7 +679,7 @@ class User(db.Model, UserMixin):
         # User may not have persisted concept - do so now for match
         codeable_concept = codeable_concept.add_if_not_found()
 
-        return [obs.value_quantity for obs in self.observations if\
+        return [obs.value_quantity for obs in self.observations if
                 obs.codeable_concept_id == codeable_concept.id]
 
     def fetch_datetime_for_concept(self, codeable_concept):
@@ -684,9 +698,8 @@ class User(db.Model, UserMixin):
             return u_o.audit.timestamp
         return None
 
-
     def save_constrained_observation(self, codeable_concept, value_quantity,
-                                    audit):
+                                     audit):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -700,7 +713,7 @@ class User(db.Model, UserMixin):
         codeable_concept = codeable_concept.add_if_not_found()
         value_quantity = value_quantity.add_if_not_found()
 
-        existing = [obs for obs in self.observations if\
+        existing = [obs for obs in self.observations if
                     obs.codeable_concept_id == codeable_concept.id]
         assert len(existing) < 2  # it's a constrained concept afterall
 
@@ -725,22 +738,22 @@ class User(db.Model, UserMixin):
         now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Clinical History",
-                "link": [{"rel": "self", "href": requestURL},],
+                "link": [{"rel": "self", "href": requestURL}, ],
                 "updated": as_fhir(now),
                 "entry": []}
 
         for ob in self.observations:
             fhir['entry'].append({"title": "Patient Observation",
-                    "updated": as_fhir(now),
-                    "author": [{"name": "Truenth Portal"},],
-                    "content": ob.as_fhir()})
+                                  "updated": as_fhir(now),
+                                  "author": [{"name": "Truenth Portal"}, ],
+                                  "content": ob.as_fhir()})
         return fhir
 
     def procedure_history(self, requestURL=None):
         now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Procedure History",
-                "link": [{"rel": "self", "href": requestURL},],
+                "link": [{"rel": "self", "href": requestURL}, ],
                 "updated": as_fhir(now),
                 "entry": []}
 
@@ -787,7 +800,7 @@ class User(db.Model, UserMixin):
         if self._locale:
             d['communication'] = [{"language": self._locale.as_fhir()}]
         telecom = Telecom(email=self.email,
-                        contact_points=[self._phone, self._alt_phone])
+                          contact_points=[self._phone, self._alt_phone])
         d['telecom'] = telecom.as_fhir()
         d['photo'] = []
         if self.image_url:
@@ -815,12 +828,15 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
-            audit = Audit(user_id=acting_user.id, subject_id=self.id,
-                          comment="Adding consent agreement",context='consent')
+            audit = Audit(
+                user_id=acting_user.id,
+                subject_id=self.id,
+                comment="Adding consent agreement",
+                context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
                 if existing_consent.organization_id == int(
-                    consent.organization_id):
+                        consent.organization_id):
                     current_app.logger.debug("deleting matching consent {} "
                                              "replacing with {} ".format(
                                                  existing_consent, consent))
@@ -864,8 +880,8 @@ class User(db.Model, UserMixin):
             """
             if (not acting_user.has_role(ROLE.ADMIN)
                 and (acting_user.has_role(ROLE.STAFF)
-                or acting_user.has_role(ROLE.STAFF_ADMIN))
-                and user.id == acting_user.id):
+                     or acting_user.has_role(ROLE.STAFF_ADMIN))
+                    and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
             return True
@@ -908,7 +924,7 @@ class User(db.Model, UserMixin):
                 self.roles.append(role)
                 audit = Audit(
                     comment="added {} to user {}".format(
-                    role, self.id), user_id=acting_user.id,
+                        role, self.id), user_id=acting_user.id,
                     subject_id=self.id, context='role')
                 db.session.add(audit)
 
@@ -916,7 +932,7 @@ class User(db.Model, UserMixin):
             self.roles.remove(stale_role)
             audit = Audit(
                 comment="deleted {} from user {}".format(
-                stale_role, self.id), user_id=acting_user.id,
+                    stale_role, self.id), user_id=acting_user.id,
                 subject_id=self.id, context='role')
             db.session.add(audit)
 
@@ -951,7 +967,7 @@ class User(db.Model, UserMixin):
                     comment="time of death for user {}".format(self.id))
                 self.deceased = audit
             elif 'deceasedBoolean' in fhir:
-                if fhir['deceasedBoolean'] == False:
+                if fhir['deceasedBoolean'] is False:
                     if self.deceased_id:
                         # Remove deceased record from the user, but maintain
                         # the old audit row.
@@ -980,7 +996,7 @@ class User(db.Model, UserMixin):
             are conclusive - deleting unmentioned and adding new.
 
             """
-            if not 'identifier' in fhir:
+            if 'identifier' not in fhir:
                 return
 
             # ignore internal system identifiers
@@ -989,9 +1005,9 @@ class User(db.Model, UserMixin):
             for identifier in fhir['identifier']:
                 try:
                     new_id = Identifier.from_fhir(identifier)
-                except KeyError, e:
+                except KeyError as e:
                     abort(400, "{} field not found for identifier".format(e))
-                except TypeError, e:
+                except TypeError as e:
                     abort(400, "invalid format for identifier {}".format(e))
                 if new_id.system in internal_identifier_systems:
                     continue
@@ -1031,9 +1047,9 @@ class User(db.Model, UserMixin):
                 abort(400, "email address already in use")
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone','mobile')) \
-                or telecom_cps.get(('phone',None))
-            self.alt_phone = telecom_cps.get(('phone','home'))
+            self.phone = telecom_cps.get(('phone', 'mobile')) \
+                or telecom_cps.get(('phone', None))
+            self.alt_phone = telecom_cps.get(('phone', 'home'))
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
@@ -1166,7 +1182,7 @@ class User(db.Model, UserMixin):
 
         orgtree = OrgTree()
         if any(self.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)
-           ) and other.has_role(ROLE.PATIENT):
+               ) and other.has_role(ROLE.PATIENT):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
@@ -1188,7 +1204,7 @@ class User(db.Model, UserMixin):
             for org_id in org_ids:
                 if orgtree.at_or_below_ids(org_id, others_con_org_ids):
                     return True
-            #Still here implies time to check 'furthermore' clause
+            # Still here implies time to check 'furthermore' clause
             others_orgs = [org.id for org in other.organizations]
             for consented_org in others_con_org_ids:
                 if orgtree.at_or_below_ids(consented_org, org_ids):
@@ -1207,7 +1223,9 @@ class User(db.Model, UserMixin):
                 if orgtree.at_or_below_ids(sa_org.id, others_ids):
                     return True
 
-        if self.has_role(ROLE.INTERVENTION_STAFF) and other.has_role(ROLE.PATIENT):
+        if self.has_role(
+                ROLE.INTERVENTION_STAFF) and other.has_role(
+                ROLE.PATIENT):
             # Intervention staff can access patients within that intervention
             for intervention in self.interventions:
                 if intervention in other.interventions:
@@ -1250,10 +1268,9 @@ class User(db.Model, UserMixin):
         # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
         if (birthdate.year < 1900 or
-            dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
+                dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
             return 0
         return sum(scores) / len(scores)
-
 
     def delete_user(self, acting_user):
         """Mark user deleted from the system
@@ -1276,9 +1293,10 @@ class User(db.Model, UserMixin):
         # Don't allow deletion of users with client applications
         clients = Client.query.filter_by(user_id=self.id)
         if clients.count():
-            raise ValueError("Users owning client applications can not "
-                             "be deleted.  Delete client apps first: {}".format(
-                                 [client.id for client in clients]))
+            raise ValueError(
+                "Users owning client applications can not "
+                "be deleted.  Delete client apps first: {}".format(
+                    [client.id for client in clients]))
 
         self.active = False
         self.mask_email(prefix='__deleted_{}__'.format(int(time.time())))
@@ -1294,12 +1312,12 @@ class User(db.Model, UserMixin):
 def add_authomatic_user(authomatic_user, image_url):
     """Given the result from an external IdP, create a new user"""
     user = User(
-            first_name=authomatic_user.first_name,
-            last_name=authomatic_user.last_name,
-            birthdate=authomatic_user.birth_date,
-            gender=authomatic_user.gender,
-            email=authomatic_user.email,
-            image_url=image_url)
+        first_name=authomatic_user.first_name,
+        last_name=authomatic_user.last_name,
+        birthdate=authomatic_user.birth_date,
+        gender=authomatic_user.gender,
+        email=authomatic_user.email,
+        image_url=image_url)
     db.session.add(user)
     return user
 
@@ -1316,7 +1334,7 @@ def add_role(user, role_name):
         raise RoleError("service accounts can't be promoted")
 
     new_role = UserRoles(user_id=user.id,
-            role_id=role.id)
+                         role_id=role.id)
     db.session.add(new_role)
     return user
 
@@ -1352,13 +1370,21 @@ def get_user(uid):
 
 class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'), nullable=False)
-    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id',
-        ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(
+            'users.id',
+            ondelete='CASCADE'),
+        nullable=False)
+    role_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(
+            'roles.id',
+            ondelete='CASCADE'),
+        nullable=False)
 
     __table_args__ = (UniqueConstraint('user_id', 'role_id',
-        name='_user_role'),)
+                                       name='_user_role'),)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -1376,6 +1402,7 @@ def flag_test():  # pragma: no test
         add_role(user, ROLE.TEST)
     db.session.commit()
 
+
 class UserRelationship(db.Model):
     """SQLAlchemy class for `user_relationships` table
 
@@ -1385,25 +1412,41 @@ class UserRelationship(db.Model):
     """
     __tablename__ = 'user_relationships'
     id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'), nullable=False)
-    other_user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'), nullable=False)
-    relationship_id = db.Column(db.Integer(),
-        db.ForeignKey('relationships.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(
+            'users.id',
+            ondelete='CASCADE'),
+        nullable=False)
+    other_user_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(
+            'users.id',
+            ondelete='CASCADE'),
+        nullable=False)
+    relationship_id = db.Column(
+        db.Integer(),
+        db.ForeignKey(
+            'relationships.id',
+            ondelete='CASCADE'),
+        nullable=False)
 
     user = db.relationship("User", backref='relationships',
                            foreign_keys=[user_id])
     other_user = db.relationship("User",
-        foreign_keys=[other_user_id])
+                                 foreign_keys=[other_user_id])
     relationship = db.relationship("Relationship",
-        foreign_keys=[relationship_id])
+                                   foreign_keys=[relationship_id])
 
-    __table_args__ = (UniqueConstraint('user_id', 'other_user_id',
-        'relationship_id', name='_user_relationship'),)
+    __table_args__ = (
+        UniqueConstraint(
+            'user_id',
+            'other_user_id',
+            'relationship_id',
+            name='_user_relationship'),
+    )
 
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "{0.relationship} between {0.user_id} and "\
             "{0.other_user_id}".format(self)
-

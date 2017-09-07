@@ -21,7 +21,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
-from .assessment_status import AssessmentStatus
 from ..database import db
 from .fhir import CC, Coding, CodeableConcept
 from .identifier import Identifier
@@ -206,6 +205,7 @@ def allow_if_not_in_intervention(intervention_name):
 
 def update_card_html_on_completion():
     """Update description and card_html depending on state"""
+    from .assessment_status import AssessmentStatus  # avoid cycle
 
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
@@ -237,7 +237,9 @@ def update_card_html_on_completion():
                   </div>
                   <br/><br/>
                   <div class="button-container portal-header-logout-container">
-                    <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
+                    <a class="btn-lg btn-tnth-primary" href="/logout">
+                      {logout}
+                    </a>
                   </div>
                 </div>""".format(
                     greeting=greeting, confirm=confirm, reminder=reminder,
@@ -413,7 +415,8 @@ def update_card_html_on_completion():
             card_html = """
             <div class="container">
               {intro}
-              <div class="portal-main portal-flex-container portal-completed-container">
+              <div class=
+              "portal-main portal-flex-container portal-completed-container">
                 <div class="portal-description">
                   <h4 class="portal-description-title">{header}</h4>
                   <div class="portal-description-body">
