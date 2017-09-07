@@ -131,12 +131,20 @@ class TestCase(Base):
             db.session.commit()
         return db.session.merge(service_user)
 
-    def add_required_clinical_data(self):
-        " Add clinical data to get beyond the landing page "
+    def add_required_clinical_data(self, backdate=None):
+        """Add clinical data to get beyond the landing page
+
+        :param backdate: timedelta value.  Define to mock Dx
+          happening said period in the past
+
+        """
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        if backdate:
+            audit.timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+                audit=audit)
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                      system=SNOMED):
