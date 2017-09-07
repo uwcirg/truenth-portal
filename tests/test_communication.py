@@ -3,6 +3,7 @@ from datetime import timedelta
 from flask_webtest import SessionScope
 
 from portal.database import db
+from portal.models.assessment_status import overall_assessment_status
 from portal.models.communication import Communication
 from portal.models.communication_request import CommunicationRequest
 from portal.models.identifier import Identifier
@@ -152,12 +153,31 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
     # set to pull in TrueNTH QBs:
     eproms_or_tnth = 'tnth'
 
+    def test_early(self):
+        # Prior to days passing, no message should be generated
+        mock_communication_request('symptom_tracker', 90)
+
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        self.add_required_clinical_data(backdate=timedelta(days=89))
+        self.test_user = db.session.merge(self.test_user)
+
+        # Confirm test user qualifies for ST QB
+        self.assertTrue(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+
+        # Being a day short, shouldn't fire
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query.first()
+        self.assertFalse(expected)
+
     def test_st_done(self):
         # Symptom Tracker QB with completed shouldn't fire
         mock_communication_request('symptom_tracker', 90)
 
-        self.bless_with_basics(backdate=timedelta(days=91))
         self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        self.add_required_clinical_data(backdate=timedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
@@ -168,17 +188,17 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             mock_qr(user_id=TEST_USER_ID, instrument_id=instrument)
 
         # With all q's done, shouldn't generate a message
-        # TODO:
-        # update_patient_loop(update_cache=False, queue_messages=True)
-        # expected = Communication.query.first()
-        # self.assertFalse(expected)
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query.first()
+        self.assertFalse(expected)
 
     def test_st_undone(self):
         # Symptom Tracker QB with incompleted should generate communication
         mock_communication_request('symptom_tracker', 90)
 
-        self.bless_with_basics(backdate=timedelta(days=91))
         self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        self.add_required_clinical_data(backdate=timedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
@@ -187,9 +207,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         # With most q's undone, should generate a message
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        # TODO:
-        # self.assertEquals(
-        #    'In Progress', overall_assessment_status(TEST_USER_ID))
-        # update_patient_loop(update_cache=False, queue_messages=True)
-        # expected = Communication.query.first()
-        # self.assertTrue(expected)
+        self.assertEquals(
+           'In Progress', overall_assessment_status(TEST_USER_ID))
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query.first()
+        self.assertTrue(expected)

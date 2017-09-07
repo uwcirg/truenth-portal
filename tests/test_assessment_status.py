@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.audit import Audit
+from portal.models.fhir import CC
 from portal.models.intervention import Intervention
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.assessment_status import invalidate_assessment_status_cache
@@ -481,7 +483,11 @@ class TestTnthAssessmentStatus(TestQuestionnaireSetup):
     def test_no_start_date(self):
         # W/O a biopsy (i.e. event start date), no questionnaries
         self.promote_user(role_name=ROLE.PATIENT)
+        # toggle default setup - set biopsy false for test user
+        self.login()
         self.test_user = db.session.merge(self.test_user)
-        # TODO: finish me!
-        # self.assertFalse(
-        #    QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.test_user.save_constrained_observation(
+            codeable_concept=CC.BIOPSY, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+        self.assertFalse(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
