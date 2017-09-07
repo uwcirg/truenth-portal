@@ -683,23 +683,19 @@ class User(db.Model, UserMixin):
                 obs.codeable_concept_id == codeable_concept.id]
 
     def fetch_datetime_for_concept(self, codeable_concept):
-        """Return timestamp from matching observation, if found"""
+        """Return newest issued timestamp from matching observation"""
         codeable_concept = codeable_concept.add_if_not_found()
         matching_observations = [
             obs for obs in self.observations if
             obs.codeable_concept_id == codeable_concept.id]
         if not matching_observations:
             return None
-        u_o = UserObservation.query.filter(
-            UserObservation.user_id == self.id,
-            UserObservation.observation_id == matching_observations[0].id
-        ).first()
-        if u_o:
-            return u_o.audit.timestamp
-        return None
+        newest = max(o.issued for o in matching_observations
+                     if o.issued is not None)
+        return newest
 
-    def save_constrained_observation(self, codeable_concept, value_quantity,
-                                     audit):
+    def save_constrained_observation(
+            self, codeable_concept, value_quantity, audit, issued=None):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -727,9 +723,10 @@ class User(db.Model, UserMixin):
                 # with different values.  Delete old and add new
                 self.observations.remove(existing[0])
 
-        observation = Observation(codeable_concept_id=codeable_concept.id,
-                                  value_quantity_id=value_quantity.id
-                                  ).add_if_not_found(True)
+        observation = Observation(
+            codeable_concept_id=codeable_concept.id,
+            issued=issued,
+            value_quantity_id=value_quantity.id).add_if_not_found(True)
         encounter = get_user(audit.user_id).current_encounter
         UserObservation(user_id=self.id, encounter=encounter, audit=audit,
                         observation_id=observation.id).add_if_not_found()
