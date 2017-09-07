@@ -11,28 +11,27 @@ from .user import User
 from .user_consent import UserConsent
 
 
-def most_recent_survey(user, instrument_id=None):
-    """Look up timestamp for recent QuestionnaireResponse for user
+def recent_qnr_status(user, questionnaire_name):
+    """Look up recent status/timestamp for matching QuestionnaireResponse
 
     :param user: Patient to whom completed QuestionnaireResponses belong
-    :param instrument_id: Optional parameter to limit type of
-        QuestionnaireResponse in lookup.
+    :param questionnaire_name: name of associated questionnaire
     :return: dictionary with authored (timestamp) of the most recent
         QuestionnaireResponse keyed by status found
 
     """
     query = QuestionnaireResponse.query.distinct(
         QuestionnaireResponse.status).filter(
-            QuestionnaireResponse.subject_id == user.id)
-    if instrument_id:
-        query = query.filter(
+            QuestionnaireResponse.subject_id == user.id
+        ).filter(
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')
-            ].astext.endswith(instrument_id))
-    query = query.order_by(
-        QuestionnaireResponse.status,
-        QuestionnaireResponse.authored).limit(9).with_entities(
-            QuestionnaireResponse.status, QuestionnaireResponse.authored)
+            ].astext.endswith(questionnaire_name)
+        ).order_by(
+            QuestionnaireResponse.status,
+            QuestionnaireResponse.authored).limit(9).with_entities(
+                QuestionnaireResponse.status, QuestionnaireResponse.authored)
+
     results = {}
     for qr in query:
         if qr[0] not in results:
@@ -186,7 +185,7 @@ class QuestionnaireDetails(object):
             'organization_id': organization_id
         }
         storage[questionnaire.name].update(
-            status_from_recents(recents=most_recent_survey(
+            status_from_recents(recents=recent_qnr_status(
                 self.user, questionnaire.name),
                 days_till_due=questionnaire.days_till_due,
                 days_till_overdue=questionnaire.days_till_overdue,
