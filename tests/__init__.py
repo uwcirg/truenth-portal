@@ -139,12 +139,13 @@ class TestCase(Base):
 
         """
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        timestamp = None
         if backdate:
-            audit.timestamp = datetime.utcnow() - backdate
+            timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=audit)
+                audit=audit, issued=timestamp)
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                      system=SNOMED):
