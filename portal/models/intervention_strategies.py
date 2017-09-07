@@ -21,7 +21,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
-from .assessment_status import AssessmentStatus
 from ..database import db
 from .fhir import CC, Coding, CodeableConcept
 from .identifier import Identifier
@@ -206,6 +205,7 @@ def allow_if_not_in_intervention(intervention_name):
 
 def update_card_html_on_completion():
     """Update description and card_html depending on state"""
+    from .assessment_status import AssessmentStatus  # avoid cycle
 
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
