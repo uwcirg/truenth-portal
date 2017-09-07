@@ -214,32 +214,6 @@ def queue_outstanding_messages(user, questionnaire_bank):
         db.session.add(communication)
         db.session.commit()
 
-    def event_start(user, questionnaire_bank):
-        """Lookup event trigger date - if available
-
-        Depends on QuestionnaireBank context.  If associated
-        by organization, return the consent date.  For
-        intervention association, use the treatment or biopsy date.
-
-        :returns: UTC event datetime - that is the base value for
-        communication calculations, or None if situation doesn't
-        apply.
-
-        """
-        if questionnaire_bank.organization_id:
-            # Questionnaires associated by organization
-            # use consent date as event start
-            if user.valid_consents and len(list(
-                    user.valid_consents)) > 0:
-                _consent = user.valid_consents[0]
-            if _consent:
-                return _consent.audit.timestamp
-            else:
-                return None
-
-        # TODO Pending work to associate QBs by intervion
-        return None
-
     for request in questionnaire_bank.communication_requests:
         if request.status != 'active':
             continue
@@ -254,7 +228,7 @@ def queue_outstanding_messages(user, questionnaire_bank):
         if not unfinished_work(user, questionnaire_bank):
             continue
 
-        basis = event_start(user, questionnaire_bank)
+        basis = questionnaire_bank.trigger_date(user)
         if basis and datetime.utcnow() - basis >= timedelta(
                 days=request.notify_days_after_event):
             queue_communication(user=user, communication_request=request)
