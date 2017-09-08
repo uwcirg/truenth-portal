@@ -9,6 +9,7 @@ from .fhir import CC
 from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .organization import OrgTree
+from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
@@ -219,9 +220,9 @@ class QuestionnaireBank(db.Model):
                     "with neither organization nor intervention associated")
             # TODO: business rule details like the following should
             # move to site persistence for QB to user mappings.
-            biopsy_date = user.fetch_datetime_for_concept(CC.BIOPSY)
-            # TODO: if procedure filed since, use that date
-            return biopsy_date
+            tx_date = latest_treatment_started_date(user)
+            return (tx_date if tx_date else
+                    user.fetch_datetime_for_concept(CC.BIOPSY))
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
