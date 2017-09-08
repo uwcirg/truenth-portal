@@ -119,7 +119,7 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
                  * directories are EN_US, EN_AU, etc.
                  * so check to see if each has a PO file
                  */
-                let poFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
+                let poFilePath = __path + '/' + file + '/LC_MESSAGES/frontend.po';
                 if (fs.existsSync(poFilePath)) {
                     let destDir = translationDestinationDir+file.replace('_', '-');
                     console.log('locale found: ' + file);
