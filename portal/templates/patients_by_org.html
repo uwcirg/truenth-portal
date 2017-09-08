@@ -109,6 +109,9 @@
 
 var AT = new AdminTool({{user.id}});
 
+var d = new Date();
+var filename= 'PatientList_'+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear()+("00" + d.getHours()).slice(-2)+ ("00" + d.getMinutes()).slice(-2)+ ("00" + d.getSeconds()).slice(-2);
+
 $(document).ready(function() {
 
   /*
@@ -181,6 +184,9 @@ $(document).ready(function() {
         var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
         $("#tableCount"+thisId).html(rowInfo);
         return rowInfo;
+    },
+    exportOptions: {
+        fileName: filename,
     }
   });
 
