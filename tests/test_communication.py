@@ -10,7 +10,7 @@ from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
-from portal.system_uri import TRUENTH_CR_NAME
+from portal.system_uri import ICHOM, TRUENTH_CR_NAME
 from portal.tasks import update_patient_loop
 from tests import TEST_USER_ID, TEST_USERNAME
 from tests.test_assessment_status import TestQuestionnaireSetup, mock_qr
@@ -212,3 +212,24 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertTrue(expected)
+
+    def test_procedure_update(self):
+        # Newer procedure should alter trigger date and suspend message
+        mock_communication_request('symptom_tracker', 90)
+
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.test_user = db.session.merge(self.test_user)
+
+        # Confirm test user qualifies for ST QB
+        self.assertTrue(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+
+        # Add fresh procedure
+        self.add_procedure('4', 'External beam radiation therapy', ICHOM)
+
+        # New procedure date should suspend message
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query.first()
+        self.assertFalse(expected)
