@@ -463,7 +463,11 @@ class QuestionnaireResponse(db.Model):
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
         nullable=False)
+    questionnaire_bank_id = db.Column(
+        db.ForeignKey('questionnaire_banks.id'), nullable=True)
+
     encounter = db.relationship("Encounter", cascade='delete')
+    questionnaire_bank = db.relationship("QuestionnaireBank")
 
     # Fields derived from document content
     status = db.Column(
