@@ -100,7 +100,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.min.js" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>>
+<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
 {%block table_export_filter_script %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.min.js"></script>
 <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js" async></script>
@@ -132,8 +132,7 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
-var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
- __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true, "initImmediate": true});
+ __i18next.init({"debug": false, "initImmediate": true});
 
 {% block document_ready -%}
 {%- endblock %}

@@ -46,8 +46,6 @@
             $("#modal-login > div > div > div > form").append('<input id="csrf_token" name="csrf_token" type="hidden" value="'+ result.attr("value") +'">');
         }
     });
-    var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
-    __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true), "initImmediate": true});
     </script>
   </head>
   {%- endblock -%}
@@ -351,9 +349,7 @@
                   }
               }
           });
-
-          var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
-          __i18next.init({"debug": (__ENV.toUpperCase() == "PRODUCTION" ? false: true), "initImmediate": true});
+          __i18next.init({"debug": false, "initImmediate": true});
 
           // Configure and start the session timeout monitor
           {% if user %}

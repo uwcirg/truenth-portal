@@ -1,6 +1,22 @@
 /*** wrapper object to initalize i18next ***/
 var __i18next = (function() {
+
     function init(options, callback) {
+
+            var getQueryString = (function(a) {
+            if (a == "") return {};
+            var b = {};
+            for (var i = 0; i < a.length; ++i)
+            {
+                var p=a[i].split('=', 2);
+                if (p.length == 1)
+                    b[p[0]] = "";
+                else
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+            return b;
+            })(window.location.search.substr(1).split('&'));
+
             if (typeof window.localStorage  != "undefined") {
                 if (window.localStorage.getItem("i18nextLng")) window.localStorage.removeItem("i18nextLng");
             };
@@ -14,7 +30,7 @@ var __i18next = (function() {
                     .use(i18nextBrowserLanguageDetector)
                     .init({
                     fallbackLng: options.fallbackLng ? options.fallbackLng : 'en-US',
-                    debug: options.debug ? options.debug : true,
+                    debug: options.debug ? options.debug : (getQueryString["debugi18next"]? true: false),
                     ns: options.ns ? options.ns : ['translation'],
                     defaultNS: 'translation',
                     initImmediate: options.initImmediate ? options.initImmediate : false,
