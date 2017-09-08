@@ -75,8 +75,6 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-var d = new Date();
-var filename= 'AdminList_'+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear()+("00" + d.getHours()).slice(-2)+ ("00" + d.getMinutes()).slice(-2)+ ("00" + d.getSeconds()).slice(-2);
 
 $("#adminTable").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
@@ -85,7 +83,7 @@ $("#adminTable").bootstrapTable({
         return rowInfo;
     },
     exportOptions: {
-        fileName: filename,
+        fileName: __getExportFileName("AdminList_")
     }
 });
 
