@@ -36,3 +36,10 @@ class TestDemographics(TestCase):
         i_ref = Reference.intervention(i.id)
         self.assertEquals(
             i_ref.as_fhir()['display'], 'self_management')
+        self.assertEquals(
+            i_ref.as_fhir()['reference'], 'api/intervention/self_management')
+
+    def test_intervention_parse(self):
+        ref = {'reference': 'api/intervention/self_management'}
+        i = Reference.parse(ref)
+        self.assertEquals(i.name, 'self_management')

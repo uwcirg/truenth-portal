@@ -181,7 +181,7 @@ class Reference(object):
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
         if hasattr(self, 'intervention_name'):
-            ref = "api/intervention_name/{}".format(
+            ref = "api/intervention/{}".format(
                 self.intervention_name)
             display = self.intervention_name
 
