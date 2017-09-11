@@ -16,6 +16,7 @@ var buffer = require('gulp-buffer');
 var del = require('del');
 var scanner = require('i18next-scanner');
 var concatPo = require('gulp-concat-po');
+var merge_json = require('gulp-merge-json');
 const path = require('path');
 const fs = require('fs');
 const i18nextConv = require('i18next-conv');
@@ -100,8 +101,7 @@ gulp.task('combineAllPotFiles', ['i18nextConvertJSONToPOT'], function() {
  * this task assumes that:
  *    1. text has been extracted from js file into JSON file
  *    2. translated JSON into POT
- *    3. merged new POT into main POT file [need to check about this step]
- *    4. Po files have been returned from translator after uploading POT file from #3
+ *    3. Po files have been returned from translator after uploading POT file from #2
  */
 gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
   console.log('converting po to json ...');
@@ -110,7 +110,7 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
     * translating po file to json for supported languages
     */
   var __path = path.join(__dirname,'./translations');
-  fs.readdir(__path, function(err, files) {
+  return fs.readdir(__path, function(err, files) {
       files.forEach(function(file) {
           let filePath = __path + '/' + file;
           fs.stat(filePath, function(err, stat) {
@@ -120,16 +120,53 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
                  * so check to see if each has a PO file
                  */
                 let poFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
-                if (fs.existsSync(poFilePath)) {
-                    let destDir = translationDestinationDir+file.replace('_', '-');
-                    console.log('locale found: ' + file);
-                    if (!fs.existsSync(destDir)){
-                      fs.mkdirSync(destDir);
-                    };
+                let fpoFilePath = __path + '/' + file + '/LC_MESSAGES/frontend.po';
+                let destDir = translationDestinationDir+file.replace('_', '-');
+                let poExisted = fs.existsSync(poFilePath);
+                let fpoExisted = fs.existsSync(fpoFilePath);
+
+                if (!fs.existsSync(destDir)){
+                    fs.mkdirSync(destDir);
+                };
+
+                if (poExisted && fpoExisted) {
+                    console.log('messages po locale found: ' + file);
                     /*
-                     * write corresponding json file from each po file
+                     * write corresponding json file from each messages po file
                      */
                     i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
+                    .then(save(destDir+'/messages.json'));
+
+                    console.log('frontend po locale found: ' + file);
+                    /*
+                     * write corresponding json file from each frontend po file
+                     */
+                    i18nextConv.gettextToI18next(file, fs.readFileSync(fpoFilePath), false)
+                    .then(save(destDir+'/frontend.json'));
+
+                    console.log("merge json files to translation.json..");
+                    /*
+                     * merge json files into one for frontend to consume
+                     * note this plug-in will remove duplicate entries
+                     */
+                    gulp.src(destDir+'/*.json')
+                    .pipe(merge_json({
+                      fileName: 'translation.json'
+                    }))
+                    .pipe(gulp.dest(destDir));
+                } else if (poExisted) {
+                    console.log('messages po locale found: ' + file + ' in ' + poFilePath);
+                    /*
+                     * write corresponding json file from each messages po file
+                     */
+                    i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
+                    .then(save(destDir+'/translation.json'));
+                } else if (fpoExisted) {
+                    console.log('frontend po locale found: ' + file);
+                    /*
+                     * write corresponding json file from each frontend po file
+                     */
+                    i18nextConv.gettextToI18next(file, fs.readFileSync(fpoFilePath), false)
                     .then(save(destDir+'/translation.json'));
                 };
               };
@@ -142,14 +179,16 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
  * clean all generated source files
  */
 gulp.task('clean-src', function() {
-  del([translationSourceDir + '*']);
+  console.log('delete source files...')
+  return del([translationSourceDir + '']);
 });
 
 /*
  * clean all generated destination json files
  */
 gulp.task('clean-dest', function() {
-  del([translationDestinationDir + '*/translation.json']);
+  console.log('delete json files...')
+  return del([translationDestinationDir + '*/*.json']);
 });
 
 
