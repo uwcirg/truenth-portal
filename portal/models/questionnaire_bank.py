@@ -163,18 +163,27 @@ class QuestionnaireBank(db.Model):
         for org in (o for o in user.organizations if o.id):
             users_top_orgs.add(OrgTree().find(org.id).top_level())
 
-        results = [] if not users_top_orgs else (
-            QuestionnaireBank.query.filter(
+        if not users_top_orgs:
+            results = []
+        elif classification:
+            results = QuestionnaireBank.query.filter(
                 QuestionnaireBank.organization_id.in_(users_top_orgs),
-                QuestionnaireBank.classification == classification).all())
+                QuestionnaireBank.classification == classification).all()
+        else:
+            results = QuestionnaireBank.query.filter(
+                QuestionnaireBank.organization_id.in_(users_top_orgs)).all()
 
         # Complicated rules (including strategies and UserIntervention rows)
         # define a user's access to an intervention.  Rely on the
         # same check used to display the intervention cards, and only
         # check for interventions actually associated with QBs.
-        intervention_associated_qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.intervention_id.isnot(None),
-            QuestionnaireBank.classification == classification)
+        if classification:
+            intervention_associated_qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id.isnot(None),
+                QuestionnaireBank.classification == classification)
+        else:
+            intervention_associated_qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id.isnot(None))
         for qb in intervention_associated_qbs:
             intervention = Intervention.query.get(qb.intervention_id)
             display_details = intervention.display_for_user(user)
