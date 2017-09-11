@@ -127,6 +127,14 @@ def smartling_upload():
     upload_pot_file(messages_pot_fpath, 'messages.pot',
                     'portal/translations/messages.pot')
 
+    frontend_pot_fpath = os.path.join(translation_fpath, "js",
+                                      "src", "frontend.pot")
+
+    fix_references(frontend_pot_fpath)
+
+    upload_pot_file(frontend_pot_fpath, 'frontend.pot',
+                    'portal/translations/js/src/frontend.pot')
+
 
 
 def upload_pot_file(fpath, fname, uri):
@@ -163,22 +171,27 @@ def smartling_download(language=None):
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    if language:
-        response_content = download_po_file(language, headers, project_id,
-                                            'portal/translations/messages.pot')
-        extract_po_file(language, response_content, 'messages')
-        current_app.logger.debug("messages.po file updated, mo file created")
+    find_and_download_po_file(language, 'messages',
+                              'portal/translations/messages.pot')
+    find_and_download_po_file(language, 'frontend',
+                              'portal/translations/js/src/frontend.pot')
 
+
+def find_and_download_po_file(language, fname, uri):
+    if language:
+        response_content = download_po_file(language, headers,
+                                            project_id, uri)
+        extract_po_file(language, response_content, fname)
     else:
-        zfp = download_zip_file(headers, project_id,
-                                'portal/translations/messages.pot')
+        zfp = download_zip_file(headers, project_id, uri)
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
-            extract_po_file(langcode, data, 'messages')
-        current_app.logger.debug("messages.po files updated, mo files created")
+            extract_po_file(langcode, data, fname)
+    current_app.logger.debug(
+            "{}.po files updated, mo files compiled".format(fname))
 
 
 def download_po_file(language, headers, project_id, file_uri):
