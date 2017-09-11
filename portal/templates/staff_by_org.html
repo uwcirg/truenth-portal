@@ -68,6 +68,9 @@ $("#adminTable").bootstrapTable({
         var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
         $("#tableCount").html(rowInfo);
         return rowInfo;
+    },
+    exportOptions: {
+        fileName: __getExportFileName("StaffList_")
     }
 });
 

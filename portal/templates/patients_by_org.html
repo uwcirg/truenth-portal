@@ -108,9 +108,22 @@
 {% block document_ready %}
 
 var AT = new AdminTool({{user.id}});
+/*
+* initializing bootstrapTable
+*/
+$(".tnth-admin-table").bootstrapTable({
+  formatShowingRows: function (pageFrom, pageTo, totalRows) {
+      var thisId = $(this).attr("tableId");
+      var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
+      $("#tableCount"+thisId).html(rowInfo);
+      return rowInfo;
+  },
+  exportOptions: {
+      fileName: __getExportFileName("PatientList_")
+  }
+});
 
 $(document).ready(function() {
-
   /*
    *  scroll to the top of page on each page change
    */
@@ -152,7 +165,6 @@ $(document).ready(function() {
    * end commented out code
    */
 
-
   /*
    * add placeholder text for filter controls
    */
@@ -171,18 +183,6 @@ $(document).ready(function() {
    * fade loading spinner on page load
    */
   AT.fadeLoader();
-
-  /*
-   * initializing bootstrapTable
-   */
-  $(".tnth-admin-table").bootstrapTable({
-    formatShowingRows: function (pageFrom, pageTo, totalRows) {
-        var thisId = $(this).attr("tableId");
-        var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
-        $("#tableCount"+thisId).html(rowInfo);
-        return rowInfo;
-    }
-  });
 
   /*
    *  hide checkbox for hidden id field from side menu

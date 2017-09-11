@@ -3975,6 +3975,10 @@ function containHtmlTags(text) {
     if (!hasValue(text)) return false;
     return /[<>]/.test(text);
 };
+function __getExportFileName(prefix) {
+    var d = new Date();
+    return (prefix?prefix:"ExportList_")+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear()+("00" + d.getHours()).slice(-2)+ ("00" + d.getMinutes()).slice(-2)+ ("00" + d.getSeconds()).slice(-2);
+}
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};
