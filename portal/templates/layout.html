@@ -132,8 +132,7 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
-var __ENV = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
- __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true, "initImmediate": true});
+ __i18next.init({"debug": false, "initImmediate": true});
 
 {% block document_ready -%}
 {%- endblock %}
