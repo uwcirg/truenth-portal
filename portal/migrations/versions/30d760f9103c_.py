@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 from portal.models.fhir import QuestionnaireResponse
 from portal.models.intervention import Intervention
+from portal.models.intervention_strategies import observation_check
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank, OrgTree
 
@@ -38,7 +39,9 @@ def qbs_for_user(user, session):
         intervention = session.query(Intervention).get(qb.intervention_id)
         display_details = intervention.display_for_user(user)
         if display_details.access:
-            results.append(qb)
+            chec_func = observation_check("biopsy", 'true')
+            if chec_func(intervention=intervention, user=user):
+                results.append(qb)
     return results
 
 
