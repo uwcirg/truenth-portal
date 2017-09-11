@@ -105,7 +105,7 @@ def smartling_authenticate():
 def smartling_upload():
     # get relevant filepaths
     translation_fpath = os.path.join(current_app.root_path, "translations")
-    pot_fpath = os.path.join(translation_fpath, 'messages.pot')
+    messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
     config_fpath = os.path.join(current_app.root_path, "../instance/babel.cfg")
     # create new .pot file from code
     check_call((
@@ -114,7 +114,7 @@ def smartling_upload():
         '--mapping-file', config_fpath,
         '--project', current_app.config.metadata.name,
         '--version', current_app.config.metadata.version,
-        '--output-file', pot_fpath,
+        '--output-file', messages_pot_fpath,
         current_app.root_path,
     ))
     current_app.logger.debug("messages.pot file generated")
@@ -122,33 +122,37 @@ def smartling_upload():
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
 
-    fix_references(pot_fpath)
+    fix_references(messages_pot_fpath)
 
-    if current_app.config.get("SMARTLING_USER_SECRET"):
-        upload_pot_file(pot_fpath)
+    upload_pot_file(messages_pot_fpath, 'messages.pot',
+                    'portal/translations/messages.pot')
 
 
-def upload_pot_file(fpath):
-    # authenticate smartling
-    auth = smartling_authenticate()
-    current_app.logger.debug("authenticated in smartling")
-    # upload .pot file to smartling
-    with open(fpath, 'rb') as potfile:
-        headers = {'Authorization': 'Bearer {}'.format(auth)}
-        files = {'file': ('messages.pot', potfile)}
-        data = {
-            'fileUri': 'portal/translations/messages.pot',
-            'fileType': 'gettext'
-        }
-        resp = requests.post('https://api.smartling.com' \
-                '/files-api/v2/projects/{}/' \
-                'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
-                data=data, files=files, headers=headers)
-        resp.raise_for_status()
-    current_app.logger.debug(
-        "messages.pot uploaded to smartling project %s",
-        current_app.config.get("SMARTLING_PROJECT_ID")
-    )
+
+def upload_pot_file(fpath, fname, uri):
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+    if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
+        # authenticate smartling
+        auth = smartling_authenticate()
+        current_app.logger.debug("authenticated in smartling")
+        # upload .pot file to smartling
+        with open(fpath, 'rb') as potfile:
+            headers = {'Authorization': 'Bearer {}'.format(auth)}
+            files = {'file': (fname, potfile)}
+            data = {
+                'fileUri': uri,
+                'fileType': 'gettext'
+            }
+            resp = requests.post('https://api.smartling.com' \
+                    '/files-api/v2/projects/{}/file'.format(project_id),
+                    data=data, files=files, headers=headers)
+            resp.raise_for_status()
+        current_app.logger.debug(
+            "{} uploaded to smartling project {}".format(fname, project_id)
+        )
+    else:
+        current_app.logger.warn("missing smartling configuration - file {} "
+                                "not uploaded".format(fname))
 
 
 def smartling_download(language=None):
@@ -159,20 +163,22 @@ def smartling_download(language=None):
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    file_uri = 'portal/translations/messages.pot'
     if language:
-        response_content = download_po_file(language, headers,
-                                            project_id, file_uri)
-        extract_po_file(language, response_content)
+        response_content = download_po_file(language, headers, project_id,
+                                            'portal/translations/messages.pot')
+        extract_po_file(language, response_content, 'messages')
+        current_app.logger.debug("messages.po file updated, mo file created")
+
     else:
-        zfp = download_zip_file(headers, project_id, file_uri)
+        zfp = download_zip_file(headers, project_id,
+                                'portal/translations/messages.pot')
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
-            extract_po_file(langcode, data)
-    current_app.logger.debug("po files updated, and mo files recompiled")
+            extract_po_file(langcode, data, 'messages')
+        current_app.logger.debug("messages.po files updated, mo files created")
 
 
 def download_po_file(language, headers, project_id, file_uri):
@@ -202,20 +208,20 @@ def download_zip_file(headers, project_id, file_uri):
     return ZipFile(fp, "r")
 
 
-def extract_po_file(language, data):
+def extract_po_file(language, data, fname):
     po_path = os.path.join(current_app.root_path, "translations", language,
-                           'LC_MESSAGES', 'temp_messages.po')
+                           'LC_MESSAGES', 'temp_{}.po'.format(fname))
     with open(po_path, "wb") as fout:
         fout.write(data)
     current_app.logger.debug("{} po file extracted".format(language))
-    merge_po_into_master(po_path, language)
+    merge_po_into_master(po_path, language, fname)
     os.remove(po_path)
 
 
-def merge_po_into_master(po_path, language):
+def merge_po_into_master(po_path, language, fname):
     master_path = os.path.join(current_app.root_path, "translations",
                                language, 'LC_MESSAGES')
-    master_po = pofile(os.path.join(master_path, 'messages.po'))
+    master_po = pofile(os.path.join(master_path, '{}.po'.format(fname)))
     incoming_po = pofile(po_path)
 
     for entry in incoming_po:
@@ -224,8 +230,8 @@ def merge_po_into_master(po_path, language):
         else:
             master_po.append(entry)
 
-    master_po.save(os.path.join(master_path, 'messages.po'))
-    master_po.save_as_mofile(os.path.join(master_path, 'messages.mo'))
+    master_po.save(os.path.join(master_path, '{}.po'.format(fname)))
+    master_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
 
 
 @babel.localeselector
