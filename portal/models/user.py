@@ -610,20 +610,11 @@ class User(db.Model, UserMixin):
 
         issued = fhir.get('issued') and\
             parser.parse(fhir.get('issued')) or None
-        observation = Observation(
-            status=fhir.get('status'),
-            issued=issued,
-            codeable_concept_id=cc.id,
-            value_quantity_id=vq.id).add_if_not_found(True)
+        observation = self.save_observation(cc, vq, audit, issued)
         if 'performer' in fhir:
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
                 observation.performers.append(performer)
-        # The audit defines the acting user, to which the current
-        # encounter is attached.
-        encounter = get_user(audit.user_id).current_encounter
-        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
-                        observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 
     def add_relationship(self, other_user, relationship_name):
@@ -723,13 +714,24 @@ class User(db.Model, UserMixin):
                 # with different values.  Delete old and add new
                 self.observations.remove(existing[0])
 
+        self.save_observation(codeable_concept, value_quantity, audit, issued)
+
+    def save_observation(self, cc, vq, audit, issued):
+        """Helper method for creating new observations"""
+        # avoid cyclical imports
+        from .assessment_status import invalidate_assessment_status_cache
+
         observation = Observation(
-            codeable_concept_id=codeable_concept.id,
+            codeable_concept_id=cc.id,
             issued=issued,
-            value_quantity_id=value_quantity.id).add_if_not_found(True)
+            value_quantity_id=vq.id).add_if_not_found(True)
+        # The audit defines the acting user, to which the current
+        # encounter is attached.
         encounter = get_user(audit.user_id).current_encounter
         UserObservation(user_id=self.id, encounter=encounter, audit=audit,
                         observation_id=observation.id).add_if_not_found()
+        invalidate_assessment_status_cache(self.id)
+        return observation
 
     def clinical_history(self, requestURL=None):
         now = datetime.utcnow()
