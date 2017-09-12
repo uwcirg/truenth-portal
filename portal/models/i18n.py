@@ -136,7 +136,6 @@ def smartling_upload():
                     'portal/translations/js/src/frontend.pot')
 
 
-
 def upload_pot_file(fpath, fname, uri):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
@@ -151,9 +150,10 @@ def upload_pot_file(fpath, fname, uri):
                 'fileUri': uri,
                 'fileType': 'gettext'
             }
-            resp = requests.post('https://api.smartling.com' \
-                    '/files-api/v2/projects/{}/file'.format(project_id),
-                    data=data, files=files, headers=headers)
+            resp = requests.post('https://api.smartling.com'
+                                 '/files-api/v2/projects/{}'
+                                 '/file'.format(project_id),
+                                 data=data, files=files, headers=headers)
             resp.raise_for_status()
         current_app.logger.debug(
             "{} uploaded to smartling project {}".format(fname, project_id)
@@ -171,9 +171,9 @@ def smartling_download(language=None):
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
     download_and_extract_po_file(language, 'messages', headers,
-                              'portal/translations/messages.pot')
+                                 'portal/translations/messages.pot')
     download_and_extract_po_file(language, 'frontend', headers,
-                              'portal/translations/js/src/frontend.pot')
+                                 'portal/translations/js/src/frontend.pot')
 
 
 def download_and_extract_po_file(language, fname, headers, uri):
