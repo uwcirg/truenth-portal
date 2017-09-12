@@ -185,6 +185,12 @@ class QuestionnaireBank(db.Model):
             intervention_associated_qbs = QuestionnaireBank.query.filter(
                 QuestionnaireBank.intervention_id.isnot(None))
         for qb in intervention_associated_qbs:
+            # At this time, doesn't apply to metastatic patients.
+            if any((obs.codeable_concept == CC.PCaLocalized
+                    and obs.value_quantity == CC.FALSE_VALUE)
+                   for obs in user.observations):
+                break
+
             intervention = Intervention.query.get(qb.intervention_id)
             display_details = intervention.display_for_user(user)
             if display_details.access:
@@ -192,6 +198,7 @@ class QuestionnaireBank(db.Model):
                 # move to site persistence for QB to user mappings.
                 check_func = observation_check("biopsy", 'true')
                 if check_func(intervention=intervention, user=user):
+
                     results.append(qb)
 
         def validate_classification_count(qbs):
@@ -211,6 +218,14 @@ class QuestionnaireBank(db.Model):
         The trigger date for a questionnaire bank depends on its
         association.  i.e. for org affiliated QBs, use the respective
         consent date.
+
+        NB `trigger_date` is not the same as the start or valid time frame for
+        all of a user's Questionnaire Banks.  The trigger date defines the
+        initial single period in time for all QBs for a user.  This is an event
+        such as the original date of consent with an organization, or the start
+        date from a procedure.  QBs valid time frame is in reference to this
+        one trigger date.  (Yes, it may be adjusted in time if the user adds a
+        new procedure or the consent date is modified).
 
         :return: UTC datetime for the given user / QB, or None if N/A
 
