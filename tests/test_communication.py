@@ -3,9 +3,11 @@ from datetime import timedelta
 from flask_webtest import SessionScope
 
 from portal.database import db
+from portal.models.audit import Audit
 from portal.models.assessment_status import overall_assessment_status
 from portal.models.communication import Communication
 from portal.models.communication_request import CommunicationRequest
+from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -212,6 +214,28 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertTrue(expected)
+
+    def test_st_metastatic(self):
+        # Symptom Tracker QB on metastatic patient shouldn't qualify
+        mock_communication_request('symptom_tracker', 90)
+
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.test_user = db.session.merge(self.test_user)
+        self.test_user.save_constrained_observation(
+            codeable_concept=CC.PCaLocalized, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+
+        # Confirm test user doesn't qualify for ST QB
+        self.assertFalse(
+            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+
+        # shouldn't generate a message either
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query.first()
+        self.assertFalse(expected)
 
     def test_procedure_update(self):
         # Newer procedure should alter trigger date and suspend message
