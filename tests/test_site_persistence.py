@@ -214,7 +214,6 @@ class TestSitePersistence(TestCase):
         with open(self.tmpfile) as f:
             data = f.read()
         self.assertTrue('recur' in data)
-        print data
 
         # Pull same data back in
         sp.import_(exclude_interventions=True, keep_unmentioned=False)
