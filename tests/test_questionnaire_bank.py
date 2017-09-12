@@ -91,6 +91,46 @@ class TestQuestionnaireBank(TestCase):
         qb = QuestionnaireBank.from_json(data)
         self.assertEquals(2, len(qb.questionnaires))
 
+    def test_import_followup(self):
+        intervention = Intervention(name='testy', description='simple')
+        q1 = Questionnaire(name='q1')
+        q2 = Questionnaire(name='q2')
+        with SessionScope(db):
+            db.session.add(intervention)
+            db.session.add(q1)
+            db.session.add(q2)
+            db.session.commit()
+        intervention, q1, q2 = map(db.session.merge, (intervention, q1, q2))
+
+        data = {
+            'resourceType': 'QuestionnaireBank',
+            'intervention': {'reference': 'api/intervention/{}'.format(
+                intervention.name)},
+            'questionnaires': [
+                {
+                    'days_till_overdue': 104,
+                    'days_till_due': 76,
+                    'rank': 2,
+                    'questionnaire': {
+                        'reference': 'api/questionnaire/{}'.format(
+                            q1.name)}
+                },
+                {
+                    'days_till_overdue': 104,
+                    'days_till_due': 76,
+                    'rank': 1,
+                    'questionnaire': {
+                        'reference': 'api/questionnaire/{}'.format(
+                            q2.name)}
+                }
+            ],
+            'id': 1,
+            'name': u'bank',
+            'classification': 'followup'
+        }
+        qb = QuestionnaireBank.from_json(data)
+        self.assertEquals(2, len(qb.questionnaires))
+
     def test_lookup_for_user(self):
         crv = Organization(name='CRV')
         epic26 = Questionnaire(name='epic26')

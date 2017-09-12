@@ -65,6 +65,16 @@ def mock_questionnairebanks(eproms_or_tnth):
         them.
 
     """
+    if eproms_or_tnth == 'eproms':
+        return mock_eproms_questionnairebanks()
+    elif eproms_or_tnth == 'tnth':
+        return mock_tnth_questionnairebanks()
+    else:
+        raise ValueError('expecting `eproms` or `tntn`, not `{}`'.format(
+            eproms_or_tnth))
+
+
+def mock_eproms_questionnairebanks():
     # Define test Orgs and QuestionnaireBanks for each group
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
@@ -184,16 +194,35 @@ def mock_questionnairebanks(eproms_or_tnth):
         st_qb.questionnaires.append(qbq)
 
     with SessionScope(db):
-        if eproms_or_tnth == 'eproms':
-            db.session.add(l_qb)
-            db.session.add(mb_qb)
-            db.session.add(mi_qb)
-            db.session.add(mr_qb)
-        elif eproms_or_tnth == 'tnth':
-            db.session.add(st_qb)
-        else:
-            raise ValueError('unknown value for `eproms_or_tnth`: {}'.format(
-                eproms_or_tnth))
+        db.session.add(l_qb)
+        db.session.add(mb_qb)
+        db.session.add(mi_qb)
+        db.session.add(mr_qb)
+        db.session.commit()
+
+
+def mock_tnth_questionnairebanks():
+    with SessionScope(db):
+        for name in (symptom_tracker_instruments):
+            db.session.add(Questionnaire(name=name))
+        db.session.commit()
+
+    # Symptom Tracker
+    self_management = Intervention.query.filter_by(
+        name='self_management').one()
+    st_qb = QuestionnaireBank(
+        name='symptom_tracker',
+        classification='baseline',
+        intervention_id=self_management.id)
+    for rank, instrument in enumerate(symptom_tracker_instruments):
+        q = Questionnaire.query.filter_by(name=instrument).one()
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire=q, days_till_due=1, days_till_overdue=365,
+            rank=rank)
+        st_qb.questionnaires.append(qbq)
+
+    with SessionScope(db):
+        db.session.add(st_qb)
         db.session.commit()
 
 
@@ -205,10 +234,11 @@ class TestQuestionnaireSetup(TestCase):
     def setUp(self):
         super(TestQuestionnaireSetup, self).setUp()
         mock_questionnairebanks(self.eproms_or_tnth)
-        self.localized_org_id = Organization.query.filter_by(
-            name='localized').one().id
-        self.metastatic_org_id = Organization.query.filter_by(
-            name='metastatic').one().id
+        if self.eproms_or_tnth == 'eproms':
+            self.localized_org_id = Organization.query.filter_by(
+                name='localized').one().id
+            self.metastatic_org_id = Organization.query.filter_by(
+                name='metastatic').one().id
 
     def mark_localized(self):
         self.test_user.organizations.append(Organization.query.get(

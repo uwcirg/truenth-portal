@@ -172,8 +172,34 @@ class TestSitePersistence(TestCase):
             [r.as_json() for r in updated_copy.questionnaires[0].recurs],
             [r.as_json() for r in (initial_recur, new_recur)])
 
-    def test_questionnaire_banks(self):
+    def test_org_questionnaire_banks(self):
         mock_questionnairebanks('eproms')
+
+        def mock_file(read_only=True):
+            '''mock version to create local testfile for site_persistence'''
+            if not hasattr(self, 'tmpfile'):
+                with NamedTemporaryFile(mode='w', delete=False) as tmpfile:
+                    self.tmpfile = tmpfile.name
+            return self.tmpfile
+
+        sp = SitePersistence()
+        sp.persistence_filename = mock_file
+        sp.export()
+        with open(self.tmpfile) as f:
+            data = f.read()
+        self.assertTrue('recur' in data)
+
+        # Pull same data back in
+        sp.import_(exclude_interventions=True, keep_unmentioned=False)
+
+    def test_intervention_questionnaire_banks(self):
+        sm = INTERVENTION.SELF_MANAGEMENT
+        with SessionScope(db):
+            sm = INTERVENTION.SELF_MANAGEMENT
+            db.session.add(sm)
+            db.session.commit()
+
+        mock_questionnairebanks('tnth')
 
         def mock_file(read_only=True):
             '''mock version to create local testfile for site_persistence'''

@@ -15,7 +15,7 @@ from .recur import Recur
 from .reference import Reference
 
 
-classification_types = ('baseline', 'recurring', 'indefinite')
+classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
 
