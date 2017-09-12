@@ -1,12 +1,12 @@
 """AssessmentStatus module"""
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from datetime import datetime, timedelta
 from flask import current_app
 
 from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
 from .organization import Organization
-from .questionnaire_bank import QuestionnaireBank
+from .questionnaire_bank import classification_types, QuestionnaireBank
 from .user import User
 from .user_consent import UserConsent
 
@@ -50,13 +50,14 @@ class QuestionnaireDetails(object):
     def __init__(self, user):
         """Initialize QuestionnaireDetails for user """
         self.user = user
-        self._qbs = dict()
+        self._qbs = defaultdict(list)
         self._baseline_qs = OrderedDict()
+        self._followup_qs = OrderedDict()
         self._recurring_qs = OrderedDict()
         self._indefinite_qs = OrderedDict()
-        for classification in ('baseline', 'recurring', 'indefinite'):
+        for classification in classification_types:
             for qb in QuestionnaireBank.qbs_for_user(user, classification):
-                self._qbs[classification] = qb
+                self._qbs[classification].append(qb)
                 for questionnaire in qb.questionnaires:
                     self._append_questionnaire(
                         classification=classification,
@@ -66,10 +67,9 @@ class QuestionnaireDetails(object):
     @property
     def trigger_date(self):
         """Shortcut to delegation - baseline QB defines trigger_date"""
-        baseline = self._qbs.get('baseline')
-        if not baseline:
+        if self._qbs.get('baseline') is None:
             return None
-        return baseline.trigger_date(user=self.user)
+        return self._qbs['baseline'][0].trigger_date(user=self.user)
 
     def lookup(self, questionnaire_name, classification):
         """Return element (if found) with matching criteria"""
@@ -86,6 +86,7 @@ class QuestionnaireDetails(object):
         """Generator to return all questionnaires"""
         for q in (
                 self._baseline_qs.values() +
+                self._followup_qs.values() +
                 self._recurring_qs.values() +
                 self._indefinite_qs.values()):
             yield q
@@ -93,6 +94,11 @@ class QuestionnaireDetails(object):
     def baseline(self):
         """Generator to return all baseline questionnaires"""
         for q in self._baseline_qs.values():
+            yield q
+
+    def followup(self):
+        """Generator to return all followup questionnaires"""
+        for q in self._followup_qs.values():
             yield q
 
     def indefinite(self):
