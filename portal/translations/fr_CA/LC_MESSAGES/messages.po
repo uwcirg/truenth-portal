@@ -2482,3 +2482,2924 @@ msgstr ""
 "TrueNTH Decision Support is intended for use by men who have been diagnosed "
 "with localized prostate cancer (the cancer is not in other parts of the "
 "body), but who have not yet started active treatment."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L229
+msgid "Log out"
+msgstr "Log out"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L14
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L18
+msgid "Filter list by site"
+msgstr "Filter list by site"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L47
+msgid "Sites"
+msgstr "Sites"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/client_edit.html#L78
+msgid "Test Callback URL"
+msgstr "Test Callback URL"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/clients_list.html#L44
+msgid "You have not created any client applications."
+msgstr "You have not created any client applications."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L7
+msgid "Use this form to get in touch with TrueNTH"
+msgstr "Use this form to get in touch with TrueNTH"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L45
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L258
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L83
+msgid "Submit"
+msgstr "Submit"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L97
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L140
+msgid "Please confirm all fields are filled."
+msgstr "Please confirm all fields are filled."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L34
+msgid ""
+"The questions we're asking will help us customize what you see and provide "
+"the best information to help you track and manage your prostate cancer "
+"journey."
+msgstr ""
+"The questions we're asking will help us customize what you see and provide "
+"the best information to help you track and manage your prostate cancer "
+"journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L28
+#, python-format
+msgid ""
+"\n"
+"                    <span class=\"custom-tou-text\">I have read the website <a href=\"%(privacy_url)s\" type=\"terms\" class=\"required-link\" data-core-data-subtype=\"privacy_policy\" data-tou-type=\"privacy policy\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
+"                    "
+msgstr ""
+"\n"
+"                    <span class=\"custom-tou-text\">I have read the website <a href=\"%(privacy_url)s\" type=\"terms\" class=\"required-link\" data-core-data-subtype=\"privacy_policy\" data-tou-type=\"privacy policy\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
+"                    "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L89
+msgid ""
+"The patient has read the Website Consent and consent and agree to the "
+"processing of their personal information (including their health "
+"information) on the terms described in this Consent and Terms and Conditions"
+" and a copy of this consent and information provided by the patient has been"
+" securely stored in accordance with my local site procedures."
+msgstr ""
+"The patient has read the Website Consent and consent and agree to the "
+"processing of their personal information (including their health "
+"information) on the terms described in this Consent and Terms and Conditions"
+" and a copy of this consent and information provided by the patient has been"
+" securely stored in accordance with my local site procedures."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L89
+msgid ""
+"The subject has read the Website Consent and IRONMAN Registry Study consent "
+"and agrees to the processing of their personal information (including their "
+"health information) on the terms described in the above consents and Terms "
+"and Conditions and a copy of both consents and information provided by the "
+"subject has been securely stored in accordance with my local site "
+"procedures."
+msgstr ""
+"The subject has read the Website Consent and IRONMAN Registry Study consent "
+"and agrees to the processing of their personal information (including their "
+"health information) on the terms described in the above consents and Terms "
+"and Conditions and a copy of both consents and information provided by the "
+"subject has been securely stored in accordance with my local site "
+"procedures."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L103
+msgid ""
+"We are inviting you to use the TrueNTH website tool because you have agreed "
+"to participate in the [organization] Registry study."
+msgstr ""
+"We are inviting you to use the TrueNTH website tool because you have agreed "
+"to participate in the [organization] Registry study."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L147
+msgid ""
+"I have read the required information to the subject and have completed the "
+"required consent to the use of the TrueNTH website tool and have created an "
+"electronic copy of this declaration and have stored said copy."
+msgstr ""
+"I have read the required information to the subject and have completed the "
+"required consent to the use of the TrueNTH website tool and have created an "
+"electronic copy of this declaration and have stored said copy."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L150
+msgid ""
+"Subject has given consent previously and you had previously signed and "
+"stored an electronic copy of consent declaration.."
+msgstr ""
+"Subject has given consent previously and you had previously signed and "
+"stored an electronic copy of consent declaration.."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L269
+msgid "The biopsy day field is required and must be valid format"
+msgstr "The biopsy day field is required and must be valid format"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L272
+msgid "A biopsy month must be selected"
+msgstr "A biopsy month must be selected"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L289
+msgid "The biopsy year is required and must be in valid format"
+msgstr "The biopsy year is required and must be in valid format"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L28
+msgid "User does not have email address"
+msgstr "User does not have email address"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L72
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_profile_create.html#L68
+msgid "No clinics data available."
+msgstr "No clinics data available."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L63
+msgid "(GMT)"
+msgstr "(GMT)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L162
+msgid "retrieving data ..."
+msgstr "retrieving data ..."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L86
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L95
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L141
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L5
+msgid "Reporting Dashboard"
+msgstr "Reporting Dashboard"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L89
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L98
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L143
+msgid "Research Data"
+msgstr "Research Data"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L33
+#, python-format
+msgid "Profile for %(user_email)s"
+msgstr "Profile for %(user_email)s"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L35
+#, python-format
+msgid "Profile for #%(user_id)s"
+msgstr "Profile for #%(user_id)s"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L199
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L207
+msgid "EDIT"
+msgstr "EDIT"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L207
+msgid "DONE"
+msgstr "DONE"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L108
+msgid "First name is required and must not contain invalid characters."
+msgstr "First name is required and must not contain invalid characters."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L115
+msgid "Last name is required and must not contain invalid characters."
+msgstr "Last name is required and must not contain invalid characters."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L309
+msgid "failed request to get email invite url."
+msgstr "failed request to get email invite url."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L342
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L474
+msgid "your clinic"
+msgstr "your clinic"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L373
+msgid "Hello"
+msgstr "Hello"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L403
+msgid "\" + selectedOption.text() + ' email sent to ' + email + \""
+msgstr "\" + selectedOption.text() + ' email sent to ' + email + \""
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L412
+msgid "You must select a email type."
+msgstr "You must select a email type."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L451
+msgid "failed request to get email invite url"
+msgstr "failed request to get email invite url"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L529
+msgid "invite email sent to "
+msgstr "invite email sent to "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L541
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L551
+msgid "Phone number must be in numbers."
+msgstr "Phone number must be in numbers."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L576
+msgid "Password reset email sent to "
+msgstr "Password reset email sent to "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L582
+msgid "No email address found for user"
+msgstr "No email address found for user"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L608
+msgid "No clinic found in selected state."
+msgstr "No clinic found in selected state."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Alabama"
+msgstr "Alabama"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Alaska"
+msgstr "Alaska"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "American Samoa"
+msgstr "American Samoa"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Arizona"
+msgstr "Arizona"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Arkansas"
+msgstr "Arkansas"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "California"
+msgstr "California"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Colorado"
+msgstr "Colorado"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Connecticut"
+msgstr "Connecticut"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Delaware"
+msgstr "Delaware"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "District Of Columbia"
+msgstr "District Of Columbia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Federated States Of Micronesia"
+msgstr "Federated States Of Micronesia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Florida"
+msgstr "Florida"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Georgia"
+msgstr "Georgia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Guam"
+msgstr "Guam"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Hawaii"
+msgstr "Hawaii"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Idaho"
+msgstr "Idaho"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Illinois"
+msgstr "Illinois"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Indiana"
+msgstr "Indiana"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Iowa"
+msgstr "Iowa"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Kansas"
+msgstr "Kansas"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Kentucky"
+msgstr "Kentucky"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Louisiana"
+msgstr "Louisiana"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Maine"
+msgstr "Maine"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Marshall Islands"
+msgstr "Marshall Islands"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Maryland"
+msgstr "Maryland"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Massachusetts"
+msgstr "Massachusetts"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Michigan"
+msgstr "Michigan"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Minnesota"
+msgstr "Minnesota"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Mississippi"
+msgstr "Mississippi"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Missouri"
+msgstr "Missouri"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Montana"
+msgstr "Montana"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Nebraska"
+msgstr "Nebraska"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Nevada"
+msgstr "Nevada"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Hampshire"
+msgstr "New Hampshire"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Jersey"
+msgstr "New Jersey"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Mexico"
+msgstr "New Mexico"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New York"
+msgstr "New York"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "North Carolina"
+msgstr "North Carolina"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "North Dakota"
+msgstr "North Dakota"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Northern Mariana Islands"
+msgstr "Northern Mariana Islands"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Ohio"
+msgstr "Ohio"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Oklahoma"
+msgstr "Oklahoma"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Oregon"
+msgstr "Oregon"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Palau"
+msgstr "Palau"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Pennsylvania"
+msgstr "Pennsylvania"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Puerto Rico"
+msgstr "Puerto Rico"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Rhode Island"
+msgstr "Rhode Island"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "South Carolina"
+msgstr "South Carolina"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "South Dakota"
+msgstr "South Dakota"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Tennessee"
+msgstr "Tennessee"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Texas"
+msgstr "Texas"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Utah"
+msgstr "Utah"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Vermont"
+msgstr "Vermont"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Virgin Islands"
+msgstr "Virgin Islands"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Virginia"
+msgstr "Virginia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Washington"
+msgstr "Washington"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "West Virginia"
+msgstr "West Virginia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Wisconsin"
+msgstr "Wisconsin"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Wyoming"
+msgstr "Wyoming"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L704
+msgid "\" + item.name + \""
+msgstr "\" + item.name + \""
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L985
+msgid "Problem retrieving reports from server."
+msgstr "Problem retrieving reports from server."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L992
+msgid "No information available."
+msgstr "No information available."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1030
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1033
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1050
+msgid "Date must be valid and in the required format."
+msgstr "Date must be valid and in the required format."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
+msgid "More..."
+msgstr "More..."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
+msgid "Less"
+msgstr "Less"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1094
+msgid "More"
+msgstr "More"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1130
+msgid "Date/Time"
+msgstr "Date/Time"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1130
+msgid "(GMT), Y-M-D"
+msgstr "(GMT), Y-M-D"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1149
+msgid "No audit log item found."
+msgstr "No audit log item found."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1154
+msgid "Problem retrieving audit log from server."
+msgstr "Problem retrieving audit log from server."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1224
+msgid "Click to view report"
+msgstr "Click to view report"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1229
+msgid "' + o + '"
+msgstr "' + o + '"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1239
+msgid "No questionnaire data found."
+msgstr "No questionnaire data found."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1245
+msgid "Problem retrieving session data from server."
+msgstr "Problem retrieving session data from server."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1282
+msgid ""
+"' +\n"
+"                                        entries[0]['questionnaire']['display'] +\n"
+"                                        '"
+msgstr ""
+"' +\n"
+"                                        entries[0]['questionnaire']['display'] +\n"
+"                                        '"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1286
+msgid "(GMT, Y-M-D)"
+msgstr "(GMT, Y-M-D)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1287
+msgid "Question"
+msgstr "Question"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1287
+msgid "Response"
+msgstr "Response"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1301
+msgid "' + (hasValue(q)? q: \"--\") + '"
+msgstr "' + (hasValue(q)? q: \"--\") + '"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1301
+msgid "' + (String(a) !== 'undefined' ? a : '--') + '"
+msgstr "' + (String(a) !== 'undefined' ? a : '--') + '"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1310
+msgid "Server Error occurred retrieving report data"
+msgstr "Server Error occurred retrieving report data"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1517
+msgid "America/Denver"
+msgstr "America/Denver"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1518
+msgid "America/Los Angeles"
+msgstr "America/Los Angeles"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1519
+msgid "America/Indianapolis"
+msgstr "America/Indianapolis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1520
+msgid "America/New York"
+msgstr "America/New York"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1521
+msgid "Australia/Adelaide"
+msgstr "Australia/Adelaide"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1522
+msgid "Australia/Brisbane"
+msgstr "Australia/Brisbane"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1523
+msgid "Australia/Broken_Hill"
+msgstr "Australia/Broken_Hill"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1524
+msgid "Australia/Canberra"
+msgstr "Australia/Canberra"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1525
+msgid "Australia/Currie"
+msgstr "Australia/Currie"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1526
+msgid "Australia/Darwin"
+msgstr "Australia/Darwin"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1527
+msgid "Australia/Eucla"
+msgstr "Australia/Eucla"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1528
+msgid "Australia/Hobart"
+msgstr "Australia/Hobart"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1529
+msgid "Australia/Lindeman"
+msgstr "Australia/Lindeman"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1530
+msgid "Australia/Lord_Howe"
+msgstr "Australia/Lord_Howe"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1531
+msgid "Australia/Melbourne"
+msgstr "Australia/Melbourne"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1532
+msgid "Australia/North"
+msgstr "Australia/North"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1533
+msgid "Australia/Perth"
+msgstr "Australia/Perth"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1534
+msgid "Australia/Queensland"
+msgstr "Australia/Queensland"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1535
+msgid "Australia/South"
+msgstr "Australia/South"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1536
+msgid "Australia/Sydney"
+msgstr "Australia/Sydney"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1537
+msgid "Australia/Tasmania"
+msgstr "Australia/Tasmania"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1538
+msgid "Australia/Victoria"
+msgstr "Australia/Victoria"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1539
+msgid "Australia/West"
+msgstr "Australia/West"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1540
+msgid "Australia/Yancowinna"
+msgstr "Australia/Yancowinna"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1652
+msgid "Year must be after 1900"
+msgstr "Year must be after 1900"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1655
+msgid "The date must not be in the future."
+msgstr "The date must not be in the future."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1657
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Invalid Date. Please enter a valid date."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1685
+msgid "Site ID"
+msgstr "Site ID"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1797
+msgid "The user does not have a valid assessment link."
+msgstr "The user does not have a valid assessment link."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1800
+msgid "You must select a method."
+msgstr "You must select a method."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1816
+msgid "All available questionnaires have been completed."
+msgstr "All available questionnaires have been completed."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1828
+msgid "Interventions"
+msgstr "Interventions"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1830
+msgid "Patient is participating in the following intervention(s): "
+msgstr "Patient is participating in the following intervention(s): "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1834
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1836
+msgid "None"
+msgstr "None"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1906
+msgid "My Reports"
+msgstr "My Reports"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2006
+msgid "Site Id"
+msgstr "Site Id"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2325
+msgid "Server error occurred updating data."
+msgstr "Server error occurred updating data."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2326
+msgid "Error processing request:"
+msgstr "Error processing request:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2461
+msgid "[Processing error]"
+msgstr "[Processing error]"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2512
+msgid "Email is already in use."
+msgstr "Email is already in use."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2521
+msgid "An organization must be selected."
+msgstr "An organization must be selected."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2560
+msgid "no data returned"
+msgstr "no data returned"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2570
+msgid "Error occurred retrieving clinics data."
+msgstr "Error occurred retrieving clinics data."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L7
+msgid "Usage Statistics"
+msgstr "Usage Statistics"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L9
+msgid ""
+"Registrations are collected from the User.registration timestamps of all "
+"Users without the Test Role"
+msgstr ""
+"Registrations are collected from the User.registration timestamps of all "
+"Users without the Test Role"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L10
+msgid ""
+"Logins are collected from the start_time timestamps of Encounters whose "
+"auth_method='password_authenticated'"
+msgstr ""
+"Logins are collected from the start_time timestamps of Encounters whose "
+"auth_method='password_authenticated'"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L11
+msgid ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions"
+msgstr ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L18
+msgid "Today"
+msgstr "Today"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L19
+msgid "This Month"
+msgstr "This Month"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+msgid "This Year"
+msgstr "This Year"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L21
+msgid "All Time"
+msgstr "All Time"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L26
+msgid "Registrations"
+msgstr "Registrations"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L33
+msgid "Logins"
+msgstr "Logins"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L51
+msgid "User Statistics"
+msgstr "User Statistics"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L53
+msgid "User stats are collected from all Users without the Test Role"
+msgstr "User stats are collected from all Users without the Test Role"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L54
+msgid ""
+"Role counts are tallied from User.roles (e.g. a User with both the Patient "
+"and Staff Roles, would add 1 to both Roles' counts)"
+msgstr ""
+"Role counts are tallied from User.roles (e.g. a User with both the Patient "
+"and Staff Roles, would add 1 to both Roles' counts)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L55
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L74
+msgid "No Diagnosis"
+msgstr "No Diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L55
+msgid ""
+"Users whose User.observations does not contain any Observations where the "
+"Observation.codeable_concept=CC.BIOPSY and the "
+"Observation.value_quantity.value=True"
+msgstr ""
+"Users whose User.observations does not contain any Observations where the "
+"Observation.codeable_concept=CC.BIOPSY and the "
+"Observation.value_quantity.value=True"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L56
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L78
+msgid "Diagnosis, No Treatment"
+msgstr "Diagnosis, No Treatment"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L56
+msgid "Users where known_treatment_not_started(User)=True"
+msgstr "Users where known_treatment_not_started(User)=True"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L57
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L82
+msgid "Diagnosis and Treatment"
+msgstr "Diagnosis and Treatment"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L57
+msgid "Users where known_treatment_started(User)=True"
+msgstr "Users where known_treatment_started(User)=True"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L58
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L86
+msgid "Metastasis"
+msgstr "Metastasis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L58
+msgid ""
+"Users whose User.observations contains any Observations where the "
+"Observation.codeable_concept=CC.PCaLocalized and the "
+"Observation.value_quantity.value!=True"
+msgstr ""
+"Users whose User.observations contains any Observations where the "
+"Observation.codeable_concept=CC.PCaLocalized and the "
+"Observation.value_quantity.value!=True"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L64
+msgid "Role"
+msgstr "Role"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L65
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L107
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L137
+msgid "User Count"
+msgstr "User Count"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L90
+msgid "Partners"
+msgstr "Partners"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid "Clinicians"
+msgstr "Clinicians"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L98
+msgid ""
+"Intervention counts only apply to those interventions that control their "
+"subject list manually (eg Sexual Recovery, Care Plan, Community of "
+"Wellness). They are tallied from User.interventions (e.g. a User with both "
+"the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to "
+"both Interventions' counts)"
+msgstr ""
+"Intervention counts only apply to those interventions that control their "
+"subject list manually (eg Sexual Recovery, Care Plan, Community of "
+"Wellness). They are tallied from User.interventions (e.g. a User with both "
+"the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to "
+"both Interventions' counts)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L99
+msgid ""
+"Completed Reports are tallied for each User that has <i>any number</i> of "
+"PatientReports for that Intervention (e.g. whether a User has 1 or 100 "
+"PatientReports for 'Symptom Tracker', that User only adds 1 to that "
+"Intervention's Completed Reports tally)"
+msgstr ""
+"Completed Reports are tallied for each User that has <i>any number</i> of "
+"PatientReports for that Intervention (e.g. whether a User has 1 or 100 "
+"PatientReports for 'Symptom Tracker', that User only adds 1 to that "
+"Intervention's Completed Reports tally)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L100
+msgid ""
+"Completed Reports are only shown for an Intervention if the report count is "
+"above 0"
+msgstr ""
+"Completed Reports are only shown for an Intervention if the report count is "
+"above 0"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L106
+msgid "Intervention"
+msgstr "Intervention"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L118
+msgid "Completed Reports"
+msgstr "Completed Reports"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L126
+msgid "Institution Statistics"
+msgstr "Institution Statistics"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L128
+msgid ""
+"Organization counts are collected from the User.organizations of all Users "
+"without the Test Role"
+msgstr ""
+"Organization counts are collected from the User.organizations of all Users "
+"without the Test Role"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L129
+msgid ""
+"'None of the above' refers to Users who specifically selected the 'None of "
+"the above' organization option"
+msgstr ""
+"'None of the above' refers to Users who specifically selected the 'None of "
+"the above' organization option"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L130
+msgid ""
+"'Unspecified' refers to Users who have not yet been assigned to <i>any</i> "
+"Organization option (including 'None of the above')"
+msgstr ""
+"'Unspecified' refers to Users who have not yet been assigned to <i>any</i> "
+"Organization option (including 'None of the above')"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L136
+msgid "Organization Name"
+msgstr "Organization Name"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L6
+msgid "Scheduled Jobs"
+msgstr "Scheduled Jobs"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L8
+msgid "Current Jobs"
+msgstr "Current Jobs"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L15
+msgid "Task"
+msgstr "Task"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L16
+msgid "Schedule"
+msgstr "Schedule"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L17
+msgid "Active"
+msgstr "Active"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L18
+msgid "Last Runtime"
+msgstr "Last Runtime"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L23
+msgid "No jobs found."
+msgstr "No jobs found."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L26
+msgid "Available Tasks"
+msgstr "Available Tasks"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L34
+msgid "No tasks found."
+msgstr "No tasks found."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L114
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L118
+msgid "Movember Logo"
+msgstr "Movember Logo"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L114
+msgid "Movember logo"
+msgstr "Movember logo"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L37
+msgid "Login With Facebook"
+msgstr "Login With Facebook"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L45
+msgid "Login With Google"
+msgstr "Login With Google"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/404.html#L2
+msgid "TrueNTH Page Not Found"
+msgstr "TrueNTH Page Not Found"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/404.html#L9
+msgid "Page Not found"
+msgstr "Page Not found"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/404.html#L10
+msgid "Sorry, the page you requested was not found. It may have been moved."
+msgstr "Sorry, the page you requested was not found. It may have been moved."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/500.html#L2
+msgid "Error"
+msgstr "Error"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/500.html#L10
+msgid ""
+"Your request was not processed due to server error(s). If you are still "
+"experiencing problem.  Please use the link below."
+msgstr ""
+"Your request was not processed due to server error(s). If you are still "
+"experiencing problem.  Please use the link below."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/500.html#L12
+msgid "Send Message"
+msgstr "Send Message"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L9
+msgid ""
+"\n"
+"          <h1 class=\"page-intro__main\">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>\n"
+"          "
+msgstr ""
+"\n"
+"          <h1 class=\"page-intro__main\">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>\n"
+"          "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L12
+msgid ""
+"Our mission is to improve the prostate cancer journey for men and their "
+"partners and caregivers, by bringing their voices together with doctors, "
+"researchers, and volunteers."
+msgstr ""
+"Our mission is to improve the prostate cancer journey for men and their "
+"partners and caregivers, by bringing their voices together with doctors, "
+"researchers, and volunteers."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L14
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L19
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L11
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L11
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L16
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L11
+msgid "Learn More"
+msgstr "Learn More"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L21
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L18
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L35
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L18
+msgid "Watch"
+msgstr "Watch"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L26
+msgid "Objective N<em>o</em>6: Custom Tools\""
+msgstr "Objective N<em>o</em>6: Custom Tools&quot;"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L27
+msgid "Our Current Projects"
+msgstr "Our Current Projects"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L28
+msgid "We have two tools currently running and more on the way."
+msgstr "We have two tools currently running and more on the way."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L31
+msgid "Tool N<em>o</em>1: Post Diagnosis "
+msgstr "Tool N<em>o</em>1: Post Diagnosis "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L32
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L62
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L78
+msgid "Questionnaire / Education / Report"
+msgstr "Questionnaire / Education / Report"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L36
+msgid "Tool N<em>o</em>2: Monitoring"
+msgstr "Tool N<em>o</em>2: Monitoring"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L37
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L118
+msgid "Questionnaire / Reports / Tips"
+msgstr "Questionnaire / Reports / Tips"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L42
+msgid "Tool N<em>o</em>3: All Stages"
+msgstr "Tool N<em>o</em>3: All Stages"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L43
+msgid "Exercise And Diet"
+msgstr "Exercise And Diet"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L43
+msgid "Personalized Guides"
+msgstr "Personalized Guides"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L50
+msgid "Tool N<em>o</em>4: All Stages"
+msgstr "Tool N<em>o</em>4: All Stages"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L51
+msgid "Shared Stories"
+msgstr "Shared Stories"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L58
+msgid "Tool N<em>o</em>5: All Stages"
+msgstr "Tool N<em>o</em>5: All Stages"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L59
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L101
+msgid "Sexual Health"
+msgstr "Sexual Health"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L59
+msgid "Recovery Plans"
+msgstr "Recovery Plans"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L66
+msgid "Tool N<em>o</em>6: Post Diagnosis"
+msgstr "Tool N<em>o</em>6: Post Diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L67
+msgid "Navigation Resources"
+msgstr "Navigation Resources"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L79
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L104
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L143
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L32
+msgid "Objective N<em>o</em>1: TrueNTH Community"
+msgstr "Objective N<em>o</em>1: TrueNTH Community"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L80
+msgid "Our USA Partners"
+msgstr "Our USA Partners"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L81
+msgid ""
+"We have brought together a Network that is actively working with us on the "
+"best tools for living with and beyond prostate cancer."
+msgstr ""
+"We have brought together a Network that is actively working with us on the "
+"best tools for living with and beyond prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L83
+msgid "University of Colorado Cancer Center"
+msgstr "University of Colorado Cancer Center"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L84
+msgid "Dana Farber Cancer Institute"
+msgstr "Dana Farber Cancer Institute"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L85
+msgid "Duke University"
+msgstr "Duke University"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L86
+msgid "Emory University"
+msgstr "Emory University"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L87
+msgid "Johns Hopkins University"
+msgstr "Johns Hopkins University"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L88
+msgid "Karmanos Cancer Institute"
+msgstr "Karmanos Cancer Institute"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L89
+msgid "Memorial Sloan Kettering Cancer Center"
+msgstr "Memorial Sloan Kettering Cancer Center"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L90
+msgid "University of Michigan"
+msgstr "University of Michigan"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L91
+msgid "Moffitt Cancer Center"
+msgstr "Moffitt Cancer Center"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L93
+msgid "OHSU"
+msgstr "OHSU"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L94
+msgid "UC Davis"
+msgstr "UC Davis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L95
+msgid "UCLA"
+msgstr "UCLA"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L96
+msgid "UCSF"
+msgstr "UCSF"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L97
+msgid "UNC"
+msgstr "UNC"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L98
+msgid "University of Washington"
+msgstr "University of Washington"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L105
+msgid "Global Strategy"
+msgstr "Global Strategy"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L106
+msgid "TrueNTH is currently active in 7 countries around the world:"
+msgstr "TrueNTH is currently active in 7 countries around the world:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L107
+msgid "World Map"
+msgstr "World Map"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L109
+msgid "USA"
+msgstr "USA"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L109
+msgid "US"
+msgstr "US"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L112
+msgid "Canada"
+msgstr "Canada"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L112
+msgid "CA"
+msgstr "CA"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L115
+msgid "Ireland"
+msgstr "Ireland"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L115
+msgid "IE"
+msgstr "IE"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L118
+msgid "UK"
+msgstr "UK"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L121
+msgid "Singapore"
+msgstr "Singapore"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L121
+msgid "SG"
+msgstr "SG"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L124
+msgid "Australia"
+msgstr "Australia"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L124
+msgid "AU"
+msgstr "AU"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L127
+msgid "New Zealand"
+msgstr "New Zealand"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L127
+msgid "NZ"
+msgstr "NZ"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L132
+msgid ""
+"TrueNTH has invested 42 million USD to support the work of more than 350 "
+"global experts in prostate cancer care in these countries."
+msgstr ""
+"TrueNTH has invested 42 million USD to support the work of more than 350 "
+"global experts in prostate cancer care in these countries."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/alonzo_mccann_story.html#L2
+msgid "Lived Experience - Alonzo McCann Story"
+msgstr "Lived Experience - Alonzo McCann Story"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/alonzo_mccann_story.html#L10
+msgid ""
+"Objective N<em>o</em><span class=\"text-uppercase\">2: Lived "
+"Experience</span>"
+msgstr ""
+"Objective N<em>o</em><span class=\"text-uppercase\">2: Lived "
+"Experience</span>"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/alonzo_mccann_story.html#L13
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L28
+msgid "ALONZO McCANN"
+msgstr "ALONZO McCANN"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/alonzo_mccann_story.html#L14
+msgid ""
+"A Detroit football coach, preacher, husband and father, Alonzo McCann has "
+"dedicated his life to helping others. 9 years after his prostate cancer "
+"diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on"
+" his path and his own trials in finding the help he needs."
+msgstr ""
+"A Detroit football coach, preacher, husband and father, Alonzo McCann has "
+"dedicated his life to helping others. 9 years after his prostate cancer "
+"diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on"
+" his path and his own trials in finding the help he needs."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/alonzo_mccann_story.html#L17
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L16
+msgid "WATCH THE FILM"
+msgstr "WATCH THE FILM"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L54
+msgid "Loading"
+msgstr "Loading"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L72
+msgid "Navigation"
+msgstr "Navigation"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L111
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L276
+msgid "Log Out"
+msgstr "Log Out"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L119
+msgid "Click here to join us"
+msgstr "Click here to join us"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L144
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived_experience_base.html#L7
+msgid "Everyone has a part to play in improving the prostate cancer journey."
+msgstr "Everyone has a part to play in improving the prostate cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L145
+msgid ""
+"The more people that join us, the better the tools will become for you and "
+"future generations."
+msgstr ""
+"The more people that join us, the better the tools will become for you and "
+"future generations."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L159
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L161
+msgid "TrueNTH Version"
+msgstr "TrueNTH Version"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L175
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L236
+msgid ""
+"It’s going to take a group effort to improve the prostate cancer experience "
+"for future generations."
+msgstr ""
+"It’s going to take a group effort to improve the prostate cancer experience "
+"for future generations."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L177
+msgid "Do you have an access code?"
+msgstr "Do you have an access code?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L180
+msgid "Enter Access Code"
+msgstr "Enter Access Code"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L188
+msgid "otherwise"
+msgstr "otherwise"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L191
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L236
+msgid "Create Account"
+msgstr "Create Account"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L200
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L229
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L230
+msgid "Login"
+msgstr "Login"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L216
+msgid "Log in with Facebook"
+msgstr "Log in with Facebook"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L219
+msgid "Log in with Google"
+msgstr "Log in with Google"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L270
+msgid "Session Expiration Warning"
+msgstr "Session Expiration Warning"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L271
+#, python-format
+msgid ""
+"\n"
+"            <p class=\"box-modal__copy\">Your session will expire in approximately %(remaining_time)s.</p>\n"
+"            "
+msgstr ""
+"\n"
+"            <p class=\"box-modal__copy\">Your session will expire in approximately %(remaining_time)s.</p>\n"
+"            "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L285
+msgid "Session Timed Out"
+msgstr "Session Timed Out"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L285
+msgid ""
+"You have been logged out due to inactivity.  Please log in again to "
+"continue."
+msgstr ""
+"You have been logged out due to inactivity.  Please log in again to "
+"continue."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L496
+msgid ""
+"Thank you, your access code '\" + $(\"#shortcut_alias\").val() + \"' "
+"indicates you are located at the \" + data.name + \". Proceeding to "
+"registration . . ."
+msgstr ""
+"Thank you, your access code '\" + $(\"#shortcut_alias\").val() + \"' "
+"indicates you are located at the \" + data.name + \". Proceeding to "
+"registration . . ."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L502
+msgid "You have entered an invalid access code.  Please try again"
+msgstr "You have entered an invalid access code.  Please try again"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L508
+msgid "System was unable to process your request."
+msgstr "System was unable to process your request."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L23
+msgid ""
+"Please connect with us, ask questions, share your story, and make "
+"suggestions for how we can do better."
+msgstr ""
+"Please connect with us, ask questions, share your story, and make "
+"suggestions for how we can do better."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L33
+msgid "Contact Form"
+msgstr "Contact Form"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L34
+msgid "Use this form to get in touch with TrueNTH USA."
+msgstr "Use this form to get in touch with TrueNTH USA."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L68
+msgid "About You"
+msgstr "About You"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L71
+msgid "I've been diagnosed with prostate cancer"
+msgstr "I've been diagnosed with prostate cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L72
+msgid "I want to learn more about prostate cancer"
+msgstr "I want to learn more about prostate cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L2
+msgid "Lived Experience - David and Andrew Perez Story"
+msgstr "Lived Experience - David and Andrew Perez Story"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L10
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L10
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L22
+msgid "Objective N<em>o</em>2: LIVED EXPERIENCE"
+msgstr "Objective N<em>o</em>2: LIVED EXPERIENCE"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L13
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L36
+msgid "DAVID AND ANDREW PEREZ"
+msgstr "DAVID AND ANDREW PEREZ"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L14
+msgid ""
+"In 2009, Dave was diagnosed with prostate cancer. He began visiting doctors "
+"with his family and weighing up his treatment options. His son Andrew felt "
+"that this was one situation where there wasn’t much he could do to pitch in "
+"and help. But he accompanied his father in making significant dietary and "
+"lifestyle changes as required in active surveillance, and now they both "
+"strive to help other men in similar situations understand their options and "
+"consider alternatives to treatment."
+msgstr ""
+"In 2009, Dave was diagnosed with prostate cancer. He began visiting doctors "
+"with his family and weighing up his treatment options. His son Andrew felt "
+"that this was one situation where there wasn’t much he could do to pitch in "
+"and help. But he accompanied his father in making significant dietary and "
+"lifestyle changes as required in active surveillance, and now they both "
+"strive to help other men in similar situations understand their options and "
+"consider alternatives to treatment."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L16
+msgid "DAVE PEREZ:"
+msgstr "DAVE PEREZ:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L18
+msgid ""
+"After I was diagnosed with prostate cancer, 5 doctors in a row told me to "
+"get treatment.  I was fortunate to have spent years advocating for my "
+"disabled son’s medical care before it was my turn to advocate for myself. I "
+"kept asking.  Finally I found my way to an Active Surveillance study at "
+"UCSF."
+msgstr ""
+"After I was diagnosed with prostate cancer, 5 doctors in a row told me to "
+"get treatment.  I was fortunate to have spent years advocating for my "
+"disabled son’s medical care before it was my turn to advocate for myself. I "
+"kept asking.  Finally I found my way to an Active Surveillance study at "
+"UCSF."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L20
+msgid ""
+"There they embraced my interest in delaying or possibly avoiding treatment altogether.\n"
+"            And that gave me the time I needed to find the right alternatives, lifestyle and dietary changes necessary to beat the cancer without ever having treatment and the terrible side effects associated with that treatment."
+msgstr ""
+"There they embraced my interest in delaying or possibly avoiding treatment altogether.\n"
+"            And that gave me the time I needed to find the right alternatives, lifestyle and dietary changes necessary to beat the cancer without ever having treatment and the terrible side effects associated with that treatment."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L23
+msgid ""
+"At least once or twice a month I get a call from a woman saying that her "
+"husband/brother/dad/uncle/etc. was diagnosed and asking if I would be "
+"willing to talk to them. I always say yes, absolutely. And the men never "
+"call. A few months later I will learn that they got treatment. That they "
+"never looked at alternatives. That they never made any lifestyle changes."
+msgstr ""
+"At least once or twice a month I get a call from a woman saying that her "
+"husband/brother/dad/uncle/etc. was diagnosed and asking if I would be "
+"willing to talk to them. I always say yes, absolutely. And the men never "
+"call. A few months later I will learn that they got treatment. That they "
+"never looked at alternatives. That they never made any lifestyle changes."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L25
+msgid ""
+"And what is worse, sometimes those men wind up with a recurrence or another "
+"cancer. It breaks my heart to see them blindly accept whatever they are "
+"told."
+msgstr ""
+"And what is worse, sometimes those men wind up with a recurrence or another "
+"cancer. It breaks my heart to see them blindly accept whatever they are "
+"told."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L27
+msgid "ANDREW PEREZ:"
+msgstr "ANDREW PEREZ:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L29
+msgid ""
+"On the day that Michael Jackson and Farrah Fawcett died, I got a phone call "
+"from my dad telling me that he had been diagnosed with prostate cancer. I "
+"don't actually remember the phone call very clearly, but I remember "
+"everything that happened afterward."
+msgstr ""
+"On the day that Michael Jackson and Farrah Fawcett died, I got a phone call "
+"from my dad telling me that he had been diagnosed with prostate cancer. I "
+"don't actually remember the phone call very clearly, but I remember "
+"everything that happened afterward."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L31
+msgid ""
+"My dad doesn't half-ass anything. He also doesn't leap into any decisions "
+"blindly. So when he told me that the doctors had caught the cancer early and"
+" that he still had myriad options to explore before deciding on a course of "
+"action, not a shred of me doubted him."
+msgstr ""
+"My dad doesn't half-ass anything. He also doesn't leap into any decisions "
+"blindly. So when he told me that the doctors had caught the cancer early and"
+" that he still had myriad options to explore before deciding on a course of "
+"action, not a shred of me doubted him."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L33
+msgid ""
+"However, I'm not the type of person to wait and hope for the best. Growing "
+"up the older sibling of a disabled brother, my default setting is to do as "
+"much of the work as I possibly can in any situation. Much to my dismay, I "
+"realized quickly that there wasn't much I could do in this particular "
+"instance. My dad continued to explore options."
+msgstr ""
+"However, I'm not the type of person to wait and hope for the best. Growing "
+"up the older sibling of a disabled brother, my default setting is to do as "
+"much of the work as I possibly can in any situation. Much to my dismay, I "
+"realized quickly that there wasn't much I could do in this particular "
+"instance. My dad continued to explore options."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L35
+msgid ""
+"Eventually he found the UCSF Active Surveillance program and made a series "
+"of lifestyle changes, including diet, exercise and stress reduction. Finally"
+" I had a way of helping my dad, even if it was only in my head. I threw "
+"myself into changing my lifestyle along with him, altering my eating to "
+"better reflect his, keeping up with my exercise, and even beginning yoga and"
+" meditation practices. We read the same books, had the same shopping lists, "
+"and swapped yoga stories often."
+msgstr ""
+"Eventually he found the UCSF Active Surveillance program and made a series "
+"of lifestyle changes, including diet, exercise and stress reduction. Finally"
+" I had a way of helping my dad, even if it was only in my head. I threw "
+"myself into changing my lifestyle along with him, altering my eating to "
+"better reflect his, keeping up with my exercise, and even beginning yoga and"
+" meditation practices. We read the same books, had the same shopping lists, "
+"and swapped yoga stories often."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L37
+msgid ""
+"Too many men in America and across the globe believe that they cannot show "
+"emotion, believe that they cannot show weakness, believe that they cannot "
+"ask for help. And as a result of that mentality, which has been taught for "
+"far too long, generations of men are facing various cancers silently, often "
+"resignedly, when they do not have to. We need to have conversations about "
+"our health. We need to share what works and be open-minded enough to try "
+"something out of the ordinary."
+msgstr ""
+"Too many men in America and across the globe believe that they cannot show "
+"emotion, believe that they cannot show weakness, believe that they cannot "
+"ask for help. And as a result of that mentality, which has been taught for "
+"far too long, generations of men are facing various cancers silently, often "
+"resignedly, when they do not have to. We need to have conversations about "
+"our health. We need to share what works and be open-minded enough to try "
+"something out of the ordinary."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/david_andrew_story.html#L44
+msgid "David and Andrew Perez, Los Angeles, 2016"
+msgstr "David and Andrew Perez, Los Angeles, 2016"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L10
+msgid ""
+"Choosing which treatment path to go down can be confusing and overwhelming. "
+"Being informed of the different options and how each fits into your life is "
+"critical in making the best choice for you."
+msgstr ""
+"Choosing which treatment path to go down can be confusing and overwhelming. "
+"Being informed of the different options and how each fits into your life is "
+"critical in making the best choice for you."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L16
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L33
+msgid "Learn more"
+msgstr "Learn more"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L23
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L50
+msgid "Objective N<em>o</em>6: Custom Tools – Decision Support"
+msgstr "Objective N<em>o</em>6: Custom Tools – Decision Support"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L24
+msgid "Making Your Decision"
+msgstr "Making Your Decision"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L25
+msgid ""
+"As you decide which treatment is best for you, it is important to prepare "
+"for the discussions with your doctor:"
+msgstr ""
+"As you decide which treatment is best for you, it is important to prepare "
+"for the discussions with your doctor:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L27
+msgid "Helpful Tip N<em>o</em>3: Decision Making Checklist"
+msgstr "Helpful Tip N<em>o</em>3: Decision Making Checklist"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L33
+msgid "Make a list of your questions."
+msgstr "Make a list of your questions."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L39
+msgid "Include people who are important to you in your decision making."
+msgstr "Include people who are important to you in your decision making."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L45
+msgid "Take your questions to your appointments."
+msgstr "Take your questions to your appointments."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L54
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L61
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L77
+msgid "Tool N<em>o</em>1: Post Diagnosis"
+msgstr "Tool N<em>o</em>1: Post Diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L55
+msgid "Decision Support Tool"
+msgstr "Decision Support Tool"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L56
+msgid ""
+"Our tool was created to help you determine which option is best for you."
+msgstr ""
+"Our tool was created to help you determine which option is best for you."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L57
+msgid ""
+"After you have answered the questionnaire, you will receive personalized "
+"education and support to discuss the best path forward with your doctor."
+msgstr ""
+"After you have answered the questionnaire, you will receive personalized "
+"education and support to discuss the best path forward with your doctor."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L58
+msgid "You can then download the report and share it with your doctor."
+msgstr "You can then download the report and share it with your doctor."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/exercise-and-diet.html#L10
+msgid "Coming in 2017."
+msgstr "Coming in 2017."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L2
+msgid "Lived Experience - Hirsch Brothers Story"
+msgstr "Lived Experience - Hirsch Brothers Story"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L13
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L44
+msgid "THE HIRSCH BROTHERS"
+msgstr "THE HIRSCH BROTHERS"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L19
+msgid ""
+"Family history plays a role in many cancer diagnoses. Twin brothers Mark and"
+" Jon Hirsch know that first hand. Following their Dad’s diagnosis, the "
+"brothers began monitoring their PSA which lead to early diagnosis and "
+"treatment for their prostate cancer."
+msgstr ""
+"Family history plays a role in many cancer diagnoses. Twin brothers Mark and"
+" Jon Hirsch know that first hand. Following their Dad’s diagnosis, the "
+"brothers began monitoring their PSA which lead to early diagnosis and "
+"treatment for their prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L21
+msgid ""
+"Jon and Mark Hirsch have a lot in common. For starters, they are identical "
+"twins. They are 56 years old. They are outdoorsmen, and both spend a lot of "
+"time staying active with their families. And, in 2014, they were both "
+"diagnosed with prostate cancer."
+msgstr ""
+"Jon and Mark Hirsch have a lot in common. For starters, they are identical "
+"twins. They are 56 years old. They are outdoorsmen, and both spend a lot of "
+"time staying active with their families. And, in 2014, they were both "
+"diagnosed with prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L23
+msgid ""
+"Jon Hirsch discovered his cancer first. Knowing they had a family history of"
+" prostate cancer, Jon was proactive about his health. Their grandfather had "
+"prostate cancer when he passed away at 86 from various health problems. "
+"Their father was diagnosed at 70 years old with an aggressive form of "
+"prostate cancer that spread to his bones. While their father is still alive "
+"today, he has been battling cancer and trying different treatments for the "
+"past six years."
+msgstr ""
+"Jon Hirsch discovered his cancer first. Knowing they had a family history of"
+" prostate cancer, Jon was proactive about his health. Their grandfather had "
+"prostate cancer when he passed away at 86 from various health problems. "
+"Their father was diagnosed at 70 years old with an aggressive form of "
+"prostate cancer that spread to his bones. While their father is still alive "
+"today, he has been battling cancer and trying different treatments for the "
+"past six years."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L25
+msgid ""
+"Jon went in for an annual physical where he requested a PSA test even though"
+" his doctor told him it was unnecessary.  When the results came in his PSA "
+"level was up to 5.5, and Jon asked to see a urologist for a biopsy. "
+"Advocating for himself was the right move. In his words, \"If I wasn’t "
+"persistent, I wouldn’t have known.\""
+msgstr ""
+"Jon went in for an annual physical where he requested a PSA test even though"
+" his doctor told him it was unnecessary.  When the results came in his PSA "
+"level was up to 5.5, and Jon asked to see a urologist for a biopsy. "
+"Advocating for himself was the right move. In his words, \"If I wasn’t "
+"persistent, I wouldn’t have known.\""
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L27
+msgid ""
+"With a new diagnosis of prostate cancer, Jon urged his brother Mark to get "
+"checked as well. Mark went to their father’s urologist and although his "
+"prostate wasn’t enlarged, the Hirsch family history led him to get further "
+"tests. He was eventually diagnosed with prostate cancer, with a Gleason "
+"grade of 4 + 3. His cancer was even more aggressive than Jon’s."
+msgstr ""
+"With a new diagnosis of prostate cancer, Jon urged his brother Mark to get "
+"checked as well. Mark went to their father’s urologist and although his "
+"prostate wasn’t enlarged, the Hirsch family history led him to get further "
+"tests. He was eventually diagnosed with prostate cancer, with a Gleason "
+"grade of 4 + 3. His cancer was even more aggressive than Jon’s."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L29
+msgid ""
+"\"Our dad felt terrible. He was almost apologetic, like he passed on bad "
+"genes. I think he felt guilty. But we weren&apos;t blaming anyone. We were "
+"all shocked and frightened,\" said Jon."
+msgstr ""
+"\"Our dad felt terrible. He was almost apologetic, like he passed on bad "
+"genes. I think he felt guilty. But we weren&apos;t blaming anyone. We were "
+"all shocked and frightened,\" said Jon."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L31
+msgid ""
+"The twins began trying to figure out the best treatment plan to tackle their"
+" disease. Sharing research and going through the experience with each other "
+"made the process a lot less difficult."
+msgstr ""
+"The twins began trying to figure out the best treatment plan to tackle their"
+" disease. Sharing research and going through the experience with each other "
+"made the process a lot less difficult."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L33
+msgid ""
+"We’ve gone through prostate cancer like we’ve gone through everything in our"
+" lives – together. For men, once you’re diagnosed it’s like learning a whole"
+" new language. I only knew a little bit because our dad had it. We became "
+"extremely informed and visited with many different doctors and researched "
+"various therapies."
+msgstr ""
+"We’ve gone through prostate cancer like we’ve gone through everything in our"
+" lives – together. For men, once you’re diagnosed it’s like learning a whole"
+" new language. I only knew a little bit because our dad had it. We became "
+"extremely informed and visited with many different doctors and researched "
+"various therapies."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L35
+msgid ""
+"Ultimately the brothers both decided to have a robotic prostatectomy "
+"(removal of all or part of the prostate gland). At different hospitals, they"
+" had surgery just three days apart from one another."
+msgstr ""
+"Ultimately the brothers both decided to have a robotic prostatectomy "
+"(removal of all or part of the prostate gland). At different hospitals, they"
+" had surgery just three days apart from one another."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L37
+msgid ""
+"\"We both had amazing outcomes with no adverse effects or consequences,\" "
+"said Jon. Both brothers are now functioning almost 100 percent as well as "
+"they were before the surgery."
+msgstr ""
+"\"We both had amazing outcomes with no adverse effects or consequences,\" "
+"said Jon. Both brothers are now functioning almost 100 percent as well as "
+"they were before the surgery."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L39
+msgid ""
+"\"Our dad hasn&apos;t had the positive outcome we&apos;ve had. I count my "
+"blessings every day for the positive outcome of our treatment,\" said Mark."
+msgstr ""
+"\"Our dad hasn&apos;t had the positive outcome we&apos;ve had. I count my "
+"blessings every day for the positive outcome of our treatment,\" said Mark."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L41
+msgid ""
+"Men with a father, brother or son who have a history of prostate cancer are "
+"more than two times as likely to develop the disease, while those with two "
+"or more relatives are nearly four times as likely to be diagnosed. The risk "
+"is highest in men whose family members were diagnosed before age 65."
+msgstr ""
+"Men with a father, brother or son who have a history of prostate cancer are "
+"more than two times as likely to develop the disease, while those with two "
+"or more relatives are nearly four times as likely to be diagnosed. The risk "
+"is highest in men whose family members were diagnosed before age 65."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L43
+msgid ""
+"With three generations of prostate cancer diagnoses, Jon and Mark are now "
+"trying to educate the rest of their family about the health risks they face."
+" Their three brothers have all been checked and are staying vigilant. Mark’s"
+" 19-year-old son is aware that he will need to begin prostate cancer "
+"screening earlier than most men. Jon and Mark’s daughters know that if they "
+"have sons they will have a genetic predisposition to prostate cancer."
+msgstr ""
+"With three generations of prostate cancer diagnoses, Jon and Mark are now "
+"trying to educate the rest of their family about the health risks they face."
+" Their three brothers have all been checked and are staying vigilant. Mark’s"
+" 19-year-old son is aware that he will need to begin prostate cancer "
+"screening earlier than most men. Jon and Mark’s daughters know that if they "
+"have sons they will have a genetic predisposition to prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L45
+msgid ""
+"\"Reflecting on how fortunate I am,\" said Mark, \"I just remember that "
+"tomorrow is not guaranteed. Men need to be aware that they will have a "
+"better propensity for tomorrow if they take care of their health today.\""
+msgstr ""
+"\"Reflecting on how fortunate I am,\" said Mark, \"I just remember that "
+"tomorrow is not guaranteed. Men need to be aware that they will have a "
+"better propensity for tomorrow if they take care of their health today.\""
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/hirsch_brothers_story.html#L52
+msgid "The Hirsch Brothers on their Farm in Wisconsin, 2016"
+msgstr "The Hirsch Brothers on their Farm in Wisconsin, 2016"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L8
+msgid "Truenth Home"
+msgstr "Truenth Home"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L10
+msgid ""
+"TrueNTH is a collective approach to improving your quality of life "
+"throughout your prostate cancer journey."
+msgstr ""
+"TrueNTH is a collective approach to improving your quality of life "
+"throughout your prostate cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L15
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived_experience_base.html#L6
+msgid "Objective N<em>o</em>1: TrueNTH Community "
+msgstr "Objective N<em>o</em>1: TrueNTH Community "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L16
+msgid "We are here to help you navigate your prostate cancer journey."
+msgstr "We are here to help you navigate your prostate cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L17
+msgid "More About TrueNTH"
+msgstr "More About TrueNTH"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L20
+msgid "Jim Williams"
+msgstr "Jim Williams"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L21
+msgid "Jon and Mark Hirsch"
+msgstr "Jon and Mark Hirsch"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L22
+msgid "Dr. Drew Peterson"
+msgstr "Dr. Drew Peterson"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L22
+msgid "UROLOGIST"
+msgstr "UROLOGIST"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L22
+msgid "Drew Peterson"
+msgstr "Drew Peterson"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L23
+msgid "Alonzo McCann"
+msgstr "Alonzo McCann"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L24
+msgid "Dr. Elisabeth Heath"
+msgstr "Dr. Elisabeth Heath"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L24
+msgid "ONCOLOGIST"
+msgstr "ONCOLOGIST"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L24
+msgid "Elisabeth Heath"
+msgstr "Elisabeth Heath"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L25
+msgid "Andrew Maguire"
+msgstr "Andrew Maguire"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L25
+msgid "FILM MAKER"
+msgstr "FILM MAKER"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L26
+msgid "Lois Williams"
+msgstr "Lois Williams"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L27
+msgid "David Perez"
+msgstr "David Perez"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L40
+msgid "Objective N<em>o</em>3: Useful Information"
+msgstr "Objective N<em>o</em>3: Useful Information"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L41
+msgid "What is Prostate Cancer?"
+msgstr "What is Prostate Cancer?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L42
+msgid "Prostate cancer is the second most common cancer in men."
+msgstr "Prostate cancer is the second most common cancer in men."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L43
+msgid "1 in 7 men will be diagnosed with prostate cancer in their lifetime."
+msgstr "1 in 7 men will be diagnosed with prostate cancer in their lifetime."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L44
+msgid ""
+"In 2015, approximately 220,800 men will be diagnosed with prostate cancer in"
+" the USA."
+msgstr ""
+"In 2015, approximately 220,800 men will be diagnosed with prostate cancer in"
+" the USA."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L51
+msgid ""
+"Men have different stages of prostate cancer and have different treatment "
+"options available to them."
+msgstr ""
+"Men have different stages of prostate cancer and have different treatment "
+"options available to them."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L55
+msgid "Preferences"
+msgstr "Preferences"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L56
+msgid "Understanding what is important to you"
+msgstr "Understanding what is important to you"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L61
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L45
+msgid "Education"
+msgstr "Education"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L62
+msgid "Learning about the factors that impact your decision"
+msgstr "Learning about the factors that impact your decision"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L68
+msgid "Results to use during the visit with your doctor"
+msgstr "Results to use during the visit with your doctor"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L73
+msgid ""
+"We have tools to help you determine which treatment option is best for you."
+msgstr ""
+"We have tools to help you determine which treatment option is best for you."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L83
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L123
+msgid "More Info"
+msgstr "More Info"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L90
+msgid "Objective N<em>o</em>6: Custom Tools – Symptom Tracker"
+msgstr "Objective N<em>o</em>6: Custom Tools – Symptom Tracker"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L91
+msgid ""
+"Managing symptoms and side effects is an important part of the prostate "
+"cancer journey."
+msgstr ""
+"Managing symptoms and side effects is an important part of the prostate "
+"cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L95
+msgid "Urinary Incontinence"
+msgstr "Urinary Incontinence"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L96
+msgid "Not being able to control your urine"
+msgstr "Not being able to control your urine"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L102
+msgid "Physical and emotional changes to your sex life and erectile function"
+msgstr "Physical and emotional changes to your sex life and erectile function"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L107
+msgid "Fatigue"
+msgstr "Fatigue"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L108
+msgid "Feeling tired due to treatment for prostate cancer"
+msgstr "Feeling tired due to treatment for prostate cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L113
+msgid ""
+"We’ve created a tool to track your experience and symptoms over time and "
+"provide personal guidance."
+msgstr ""
+"We’ve created a tool to track your experience and symptoms over time and "
+"provide personal guidance."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L117
+msgid " N<em>o</em>2: Monitoring "
+msgstr " N<em>o</em>2: Monitoring "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L29
+msgid "Alonzo McCann Mobile Image"
+msgstr "Alonzo McCann Mobile Image"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L30
+msgid ""
+"Alonzo McCann is a Detroit football coach, preacher, husband and father. "
+"After one of the darkest periods of his life, he now reflects on the route "
+"he took through recovery."
+msgstr ""
+"Alonzo McCann is a Detroit football coach, preacher, husband and father. "
+"After one of the darkest periods of his life, he now reflects on the route "
+"he took through recovery."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L31
+msgid "Watch Alonzo's Film"
+msgstr "Watch Alonzo's Film"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L37
+msgid "David and Andrew Perez Mobile Image"
+msgstr "David and Andrew Perez Mobile Image"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L38
+msgid ""
+"Andrew proved he would be there for his father as he began his Prostate "
+"Cancer journey."
+msgstr ""
+"Andrew proved he would be there for his father as he began his Prostate "
+"Cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L39
+msgid "READ DAVID AND ANDREW'S STORY"
+msgstr "READ DAVID AND ANDREW'S STORY"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L45
+msgid "Hirsch Brothers Mobile Image"
+msgstr "Hirsch Brothers Mobile Image"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L46
+msgid ""
+"Twin brothers Mark and Jon Hirsch learned how family history and early "
+"detection would play a role in their shared Prostate Cancer journey."
+msgstr ""
+"Twin brothers Mark and Jon Hirsch learned how family history and early "
+"detection would play a role in their shared Prostate Cancer journey."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L47
+msgid "Watch Mark and Jon's Film"
+msgstr "Watch Mark and Jon's Film"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived_experience_base.html#L9
+msgid "Share Your Story"
+msgstr "Share Your Story"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived_experience_base.html#L10
+msgid "Read More Stories"
+msgstr "Read More Stories"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L3
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L10
+msgid "Welcome to your TrueNTH Dashboard"
+msgstr "Welcome to your TrueNTH Dashboard"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L13
+msgid "More tools for you will be available as TrueNTH develops."
+msgstr "More tools for you will be available as TrueNTH develops."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L14
+msgid "For now, learn more about TrueNTH:"
+msgstr "For now, learn more about TrueNTH:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L16
+msgid "Below are the TrueNTH tools available to you."
+msgstr "Below are the TrueNTH tools available to you."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L17
+msgid "More will become available as TrueNTH evolves."
+msgstr "More will become available as TrueNTH evolves."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L32
+msgid "About Prostate Cancer"
+msgstr "About Prostate Cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/privacy.html#L2
+msgid "Privacy Statement"
+msgstr "Privacy Statement"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L10
+msgid ""
+"Track your symptoms to see how they are changing over time, and how they "
+"compare to other men with prostate cancer."
+msgstr ""
+"Track your symptoms to see how they are changing over time, and how they "
+"compare to other men with prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L23
+msgid "Objective N<em>o</em>6: Custom Tools – Symptom Tracker "
+msgstr "Objective N<em>o</em>6: Custom Tools – Symptom Tracker "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L24
+msgid "Monitoring and Tracking"
+msgstr "Monitoring and Tracking"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L25
+msgid ""
+"We’ve created a tool that asks you questions about your symptoms and side-"
+"effects throughout your prostate cancer journey from diagnosis through "
+"recovery."
+msgstr ""
+"We’ve created a tool that asks you questions about your symptoms and side-"
+"effects throughout your prostate cancer journey from diagnosis through "
+"recovery."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L26
+msgid ""
+"Every time you complete the tracking questionnaire it adds data to your "
+"graph, shows you how your experience compares with other men, and provides "
+"relevant tips."
+msgstr ""
+"Every time you complete the tracking questionnaire it adds data to your "
+"graph, shows you how your experience compares with other men, and provides "
+"relevant tips."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L26
+msgid "Symptom Tracker Graph"
+msgstr "Symptom Tracker Graph"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L28
+msgid ""
+"We’ve created a tool to track your prostate cancer treatment side effects "
+"over time and provide personal guidance."
+msgstr ""
+"We’ve created a tool to track your prostate cancer treatment side effects "
+"over time and provide personal guidance."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L32
+msgid "Tool N<em>o</em>2: Monitoring "
+msgstr "Tool N<em>o</em>2: Monitoring "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L33
+msgid "Questionnaire / 10 Mins"
+msgstr "Questionnaire / 10 Mins"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/terms.html#L2
+msgid "Terms and Conditions"
+msgstr "Terms and Conditions"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L2
+msgid "Prostate Cancer Information"
+msgstr "Prostate Cancer Information"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L9
+msgid "What is <span class=\"page-intro__main--accent\">Prostate Cancer</span>?"
+msgstr "What is <span class=\"page-intro__main--accent\">Prostate Cancer</span>?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L10
+msgid ""
+"Cancer is a disease in which cells in the body grow out of control. Prostate"
+" Cancer is when cancer starts in the prostate. Many men with prostate cancer"
+" die of other causes without ever having any symptoms from the cancer."
+msgstr ""
+"Cancer is a disease in which cells in the body grow out of control. Prostate"
+" Cancer is when cancer starts in the prostate. Many men with prostate cancer"
+" die of other causes without ever having any symptoms from the cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L18
+msgid "CURRENT U.S. STATISTICS"
+msgstr "CURRENT U.S. STATISTICS"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L22
+msgid ""
+"Prostate cancer is the most common non-skin cancer in the United States, "
+"affecting 1 in 7 men."
+msgstr ""
+"Prostate cancer is the most common non-skin cancer in the United States, "
+"affecting 1 in 7 men."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L27
+msgid ""
+"In 2015, approximately 220,800 men will be diagnosed with prostate cancer, "
+"and more than 27,540 men will die from the disease."
+msgstr ""
+"In 2015, approximately 220,800 men will be diagnosed with prostate cancer, "
+"and more than 27,540 men will die from the disease."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L32
+msgid ""
+"It is estimated that there are nearly 3 million U.S. men currently living "
+"with prostate cancer."
+msgstr ""
+"It is estimated that there are nearly 3 million U.S. men currently living "
+"with prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L37
+msgid ""
+"African American men are 56 percent more likely to develop prostate cancer "
+"compared with Caucasian men and nearly 2.5 times as likely to die from the "
+"disease."
+msgstr ""
+"African American men are 56 percent more likely to develop prostate cancer "
+"compared with Caucasian men and nearly 2.5 times as likely to die from the "
+"disease."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L46
+msgid "What is the <span class=\"module__heading--accent\">Prostate</span>?"
+msgstr "What is the <span class=\"module__heading--accent\">Prostate</span>?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L47
+msgid ""
+"The prostate is a part of the male reproductive system and is located just "
+"below the bladder and in front of the rectum. It produces fluid that makes "
+"up a part of semen."
+msgstr ""
+"The prostate is a part of the male reproductive system and is located just "
+"below the bladder and in front of the rectum. It produces fluid that makes "
+"up a part of semen."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L48
+msgid "Prostate Cancer Graph"
+msgstr "Prostate Cancer Graph"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L53
+msgid ""
+"What are the <span class=\"module__heading--accent\">Risk Factors</span> "
+"for<br/> Prostate Cancer?"
+msgstr ""
+"What are the <span class=\"module__heading--accent\">Risk Factors</span> "
+"for<br/> Prostate Cancer?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L54
+msgid ""
+"There are some risk factors that increase your chances of getting prostate "
+"cancer:"
+msgstr ""
+"There are some risk factors that increase your chances of getting prostate "
+"cancer:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L58
+msgid "Age"
+msgstr "Age"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L59
+msgid "The older a man is, the greater his risk for getting prostate cancer."
+msgstr "The older a man is, the greater his risk for getting prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L63
+msgid ""
+"Prostate cancer is more common in African-American men, tends to start at "
+"younger ages, and grow faster than in other racial or ethnic groups."
+msgstr ""
+"Prostate cancer is more common in African-American men, tends to start at "
+"younger ages, and grow faster than in other racial or ethnic groups."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L68
+msgid "Family History"
+msgstr "Family History"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L69
+msgid ""
+"Certain genes, passed from parent to child, that you inherited from your "
+"parents may affect your prostate cancer risk. A man that has a father, "
+"brother, or son who has had prostate cancer is two to three times more "
+"likely to develop the disease himself."
+msgstr ""
+"Certain genes, passed from parent to child, that you inherited from your "
+"parents may affect your prostate cancer risk. A man that has a father, "
+"brother, or son who has had prostate cancer is two to three times more "
+"likely to develop the disease himself."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L77
+msgid ""
+"What are the <span class=\"module__heading--accent\">Symptoms</span> of "
+"<br/> Prostate Cancer?"
+msgstr ""
+"What are the <span class=\"module__heading--accent\">Symptoms</span> of "
+"<br/> Prostate Cancer?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L78
+msgid ""
+"Most men will not experience any symptoms, especially when the prostate "
+"cancer is caught at early stages. Some men do have symptoms for prostate "
+"cancer which might include:"
+msgstr ""
+"Most men will not experience any symptoms, especially when the prostate "
+"cancer is caught at early stages. Some men do have symptoms for prostate "
+"cancer which might include:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L82
+msgid "POSSIBLE SYMPTOMS"
+msgstr "POSSIBLE SYMPTOMS"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L84
+msgid "Difficulty starting urination"
+msgstr "Difficulty starting urination"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L85
+msgid "Weak or interrupted flow of urine"
+msgstr "Weak or interrupted flow of urine"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L86
+msgid "Frequent urination (especially at night)"
+msgstr "Frequent urination (especially at night)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L87
+msgid "Difficulty emptying bladder completely"
+msgstr "Difficulty emptying bladder completely"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L88
+msgid "Pain in the back, hips or pelvis that doesn’t go away"
+msgstr "Pain in the back, hips or pelvis that doesn’t go away"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L93
+msgid ""
+"If you have any symptoms that worry you, be sure to see your doctor right "
+"away."
+msgstr ""
+"If you have any symptoms that worry you, be sure to see your doctor right "
+"away."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L93
+msgid ""
+"Keep in mind that these symptoms may be caused by conditions other than "
+"prostate cancer."
+msgstr ""
+"Keep in mind that these symptoms may be caused by conditions other than "
+"prostate cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L98
+msgid ""
+"What <span class=\"module__heading--accent\">Screening Tests</span> Are "
+"There for <br/>Prostate Cancer?"
+msgstr ""
+"What <span class=\"module__heading--accent\">Screening Tests</span> Are "
+"There for <br/>Prostate Cancer?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L99
+msgid ""
+"Cancer screening means looking for cancer before it causes symptoms. "
+"However, most prostate cancers grow slowly or not at all.\n"
+msgstr ""
+"Cancer screening means looking for cancer before it causes symptoms. "
+"However, most prostate cancers grow slowly or not at all.\n"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L101
+msgid "Two tests are commonly used to screen for prostate cancer:\n"
+msgstr "Two tests are commonly used to screen for prostate cancer:\n"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L106
+msgid "DIGITAL RECTAL EXAM (DRE)"
+msgstr "DIGITAL RECTAL EXAM (DRE)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L107
+msgid ""
+"A doctor or nurse inserts a gloved, lubricated finger into the rectum to "
+"estimate the size of the prostate and feel for lumps or other abnormalities."
+msgstr ""
+"A doctor or nurse inserts a gloved, lubricated finger into the rectum to "
+"estimate the size of the prostate and feel for lumps or other abnormalities."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L114
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L138
+msgid "PROSTATE SPECIFIC ANTIGEN (PSA) TEST"
+msgstr "PROSTATE SPECIFIC ANTIGEN (PSA) TEST"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L115
+msgid ""
+"Measures the level of PSA in the blood. PSA is a substance made by the "
+"prostate. The levels of PSA in the blood can be higher in men who have "
+"prostate cancer. The PSA level may also be elevated in other conditions that"
+" affect the prostate."
+msgstr ""
+"Measures the level of PSA in the blood. PSA is a substance made by the "
+"prostate. The levels of PSA in the blood can be higher in men who have "
+"prostate cancer. The PSA level may also be elevated in other conditions that"
+" affect the prostate."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L116
+msgid ""
+"Because many factors can affect PSA levels, your doctor is the best person "
+"to interpret your PSA test results. Only a biopsy can diagnose prostate "
+"cancer for sure."
+msgstr ""
+"Because many factors can affect PSA levels, your doctor is the best person "
+"to interpret your PSA test results. Only a biopsy can diagnose prostate "
+"cancer for sure."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L124
+msgid "Diagnosis"
+msgstr "Diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L125
+msgid ""
+"How Is Prostate Cancer <span class=\"module__heading--"
+"accent\">Diagnosed</span>?"
+msgstr ""
+"How Is Prostate Cancer <span class=\"module__heading--"
+"accent\">Diagnosed</span>?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L126
+msgid ""
+"If your prostate specific antigen (PSA) test or digital rectal exam (DRE) is"
+" abnormal, doctors may do more tests to find or diagnose prostate cancer. A "
+"biopsy is the main tool for diagnosing prostate cancer. A biopsy is when a "
+"small piece of tissue is removed from the prostate and looked at under a "
+"microscope to see if there are cancer cells."
+msgstr ""
+"If your prostate specific antigen (PSA) test or digital rectal exam (DRE) is"
+" abnormal, doctors may do more tests to find or diagnose prostate cancer. A "
+"biopsy is the main tool for diagnosing prostate cancer. A biopsy is when a "
+"small piece of tissue is removed from the prostate and looked at under a "
+"microscope to see if there are cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L130
+msgid "Gleason Score"
+msgstr "Gleason Score"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L131
+msgid ""
+"If there is cancer a Gleason score assigned. It indicates how likely it is "
+"to spread. The score ranges from 2 to 10. The lower the score, the less "
+"likely it is that the cancer will spread."
+msgstr ""
+"If there is cancer a Gleason score assigned. It indicates how likely it is "
+"to spread. The score ranges from 2 to 10. The lower the score, the less "
+"likely it is that the cancer will spread."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L139
+msgid ""
+"The staging of prostate cancer is important in choosing treatment options "
+"and predicting a man’s outlook for survival (prognosis). Staging is based "
+"on:"
+msgstr ""
+"The staging of prostate cancer is important in choosing treatment options "
+"and predicting a man’s outlook for survival (prognosis). Staging is based "
+"on:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L141
+msgid "The prostate biopsy results (including the Gleason score)"
+msgstr "The prostate biopsy results (including the Gleason score)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L142
+msgid "The blood PSA level at the time of diagnosis"
+msgstr "The blood PSA level at the time of diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L143
+msgid ""
+"The results of any other exams or tests that were done to find out how far "
+"the cancer has spread"
+msgstr ""
+"The results of any other exams or tests that were done to find out how far "
+"the cancer has spread"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L152
+msgid "Treatment"
+msgstr "Treatment"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L153
+msgid ""
+"How Is Prostate Cancer <span class=\"module__heading--"
+"accent\">Treated</span>?"
+msgstr ""
+"How Is Prostate Cancer <span class=\"module__heading--"
+"accent\">Treated</span>?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L154
+msgid ""
+"Men have different stages of prostate cancer and have different treatment "
+"options available to them:"
+msgstr ""
+"Men have different stages of prostate cancer and have different treatment "
+"options available to them:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L158
+msgid "Active Surveillance"
+msgstr "Active Surveillance"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L159
+msgid ""
+"Closely monitoring prostate cancer to determine if treatment is needed."
+msgstr ""
+"Closely monitoring prostate cancer to determine if treatment is needed."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L164
+msgid "Surgery"
+msgstr "Surgery"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L165
+msgid "Procedure to remove the prostate called prostatectomy."
+msgstr "Procedure to remove the prostate called prostatectomy."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L172
+msgid "RADIATION THERAPY"
+msgstr "RADIATION THERAPY"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L173
+msgid ""
+"Use of high-energy rays to destroy cancer cells. There are two types of "
+"radiation therapy:"
+msgstr ""
+"Use of high-energy rays to destroy cancer cells. There are two types of "
+"radiation therapy:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L174
+msgid "External Radiation Therapy"
+msgstr "External Radiation Therapy"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L175
+msgid "A machine outside the body directs radiation at the cancer cells."
+msgstr "A machine outside the body directs radiation at the cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L176
+msgid "Internal Radiation Therapy (brachytherapy)"
+msgstr "Internal Radiation Therapy (brachytherapy)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L177
+msgid ""
+"Radioactive seeds or pellets are surgically placed into or near the cancer "
+"to destroy the cancer cells."
+msgstr ""
+"Radioactive seeds or pellets are surgically placed into or near the cancer "
+"to destroy the cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L182
+msgid "SYSTEMIC THERAPY"
+msgstr "SYSTEMIC THERAPY"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L183
+msgid "Use of medications to fight cancer cells throughout the body."
+msgstr "Use of medications to fight cancer cells throughout the body."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L184
+msgid "Hormone Therapy"
+msgstr "Hormone Therapy"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L185
+msgid "Lowering levels of hormones to help slow the growth of cancer."
+msgstr "Lowering levels of hormones to help slow the growth of cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L186
+msgid "Chemotherapy"
+msgstr "Chemotherapy"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L187
+msgid "Using special drugs to shrink or kill the cancer."
+msgstr "Using special drugs to shrink or kill the cancer."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L188
+msgid "Immunotherapy"
+msgstr "Immunotherapy"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L189
+msgid ""
+"Medications that use the power of the immune system to target cancer cells."
+msgstr ""
+"Medications that use the power of the immune system to target cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L196
+msgid "CRYOTHERAPY"
+msgstr "CRYOTHERAPY"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L197
+msgid ""
+"Placing a special probe inside or near the prostate cancer to freeze and "
+"kill the cancer cells."
+msgstr ""
+"Placing a special probe inside or near the prostate cancer to freeze and "
+"kill the cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L202
+msgid "BIOLOGICAL THERAPY"
+msgstr "BIOLOGICAL THERAPY"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L203
+msgid ""
+"Works with your body’s immune system to help it fight cancer or to control "
+"side effects from other cancer treatments."
+msgstr ""
+"Works with your body’s immune system to help it fight cancer or to control "
+"side effects from other cancer treatments."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L210
+msgid "High-intensity focused ultrasound (HIFU)"
+msgstr "High-intensity focused ultrasound (HIFU)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L211
+msgid ""
+"This therapy directs high-energy sound waves (ultrasound) at the cancer to "
+"kill cancer cells."
+msgstr ""
+"This therapy directs high-energy sound waves (ultrasound) at the cancer to "
+"kill cancer cells."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L216
+msgid "COMPLIMENTARY AND <br/>ALTERNATIVE MEDICINE"
+msgstr "COMPLIMENTARY AND <br/>ALTERNATIVE MEDICINE"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L217
+msgid ""
+"Medicines and health practices that are not standard cancer treatments."
+msgstr ""
+"Medicines and health practices that are not standard cancer treatments."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L218
+msgid ""
+"Meditation, yoga, and supplements like vitamins and herbs are some examples."
+" Many kinds of complementary and alternative medicine have not been tested "
+"scientifically and may not be safe. Talk to your doctor about the risks and "
+"benefits before you start any kind of complementary or alternative medicine."
+msgstr ""
+"Meditation, yoga, and supplements like vitamins and herbs are some examples."
+" Many kinds of complementary and alternative medicine have not been tested "
+"scientifically and may not be safe. Talk to your doctor about the risks and "
+"benefits before you start any kind of complementary or alternative medicine."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L226
+msgid "ADDITIONAL RESOURCES"
+msgstr "ADDITIONAL RESOURCES"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L228
+msgid "Centers for Disease Control and Prevention"
+msgstr "Centers for Disease Control and Prevention"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L228
+msgid "Information about Prostate Cancer"
+msgstr "Information about Prostate Cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L232
+msgid "Prostate Cancer Foundation"
+msgstr "Prostate Cancer Foundation"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L232
+msgid "Understanding Prostate Cancer"
+msgstr "Understanding Prostate Cancer"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L236
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L240
+msgid "UsTOO"
+msgstr "UsTOO"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L236
+msgid "Education & Support for Prostate Cancer Patients & their Caregivers"
+msgstr "Education & Support for Prostate Cancer Patients & their Caregivers"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L240
+msgid "Online Prostate Cancer Discussion Forum and Community"
+msgstr "Online Prostate Cancer Discussion Forum and Community"
+
+# apptext: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Report your health on TrueNTH. Email from (clinic name)"
+
+# apptext: Cellphone
+msgid "Mobile"
+msgstr "Mobile"
+
+# apptext: Privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41577&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41577&editorUrl=true"
+
+# apptext: consent date label
+# apptext: profileSendEmail invite email
+msgid "Blah."
+msgstr "Blah."
+
+# apptext: profileSendEmail invite email_subject
+msgid "Report your health on TrueNTH ePROMs"
+msgstr "Report your health on TrueNTH ePROMs"
+
+# apptext: layout title
+msgid "Movember ePROMs"
+msgstr "Movember ePROMs"
+
+# apptext: About Movember URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41565&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41565&editorUrl=true"
+
+# interventions: assessment_engine
+msgid "set by access strategy depending on state"
+msgstr "set by access strategy depending on state"
+
+# interventions: decision_support_p3p
+msgid "Decision Support tool"
+msgstr "Decision Support tool"
+
+# apptext: landing title
+msgid "Report your health in order to improve prostate cancer care"
+msgstr "Report your health in order to improve prostate cancer care"
+
+# interventions: self_management
+msgid ""
+"<p>Learn about symptoms that are common in men with prostate cancer, and "
+"about ways to manage and improve these symptoms.</p>"
+msgstr ""
+"<p>Learn about symptoms that are common in men with prostate cancer, and "
+"about ways to manage and improve these symptoms.</p>"
+
+# apptext: Initial Consent Terms URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41603&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41603&editorUrl=true"
+
+# apptext: portal registration
+msgid "TrueNTH EPROMs Registration"
+msgstr "TrueNTH EPROMs Registration"
+
+# apptext: profileSendEmail option reminder
+msgid "ePROMs Reminder"
+msgstr "ePROMs Reminder"
+
+# interventions: self_management
+msgid "Symptom Tracker tool"
+msgstr "Symptom Tracker tool"
+
+# apptext: profileSendEmail reminder email_body
+msgid ""
+"<!DOCTYPE html><html><head><style>div.btn{{width: 300px; background-color: "
+"#79815D; text-align: center;}} .btn{{color: #fff; text-decoration: none; "
+"text-transform: uppercase; letter-spacing: 1px; display: block; font-size: "
+"14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: #2a4531; "
+"text-decoration: underline; cursor: pointer}} .btn a {{color: #fff; text-"
+"decoration: none; display: block; font-size: 14px; width: 300px; text-"
+"transform: uppercase; cursor: "
+"pointer;}}</style></head><body><p>Hello,</p><p>This email was sent to you by"
+" (clinic name). This is where you report on your health along your prostate "
+"cancer journey. The information collected will be used to determine where "
+"improvements in Prostate Cancer Care can be made.</p><p>Login now to "
+"complete your questionnaire.</p><div class=\"btn\"><a href=\"{0}\">Verify "
+"your account and answer questionnaire now</a></div><p>Click the button above"
+" or use the link below to visit TrueNTH:</p><p><a "
+"href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please "
+"contact (clinic name).</p><p><em>&mdash; This email was sent because you "
+"consented to participate in the TrueNTH registry "
+"project</em></p></body></html>"
+msgstr ""
+"&lt;!DOCTYPE html&gt;<html><head><style>div.btn{{width: 300px; background-"
+"color: #79815D; text-align: center;}} .btn{{color: #fff; text-decoration: "
+"none; text-transform: uppercase; letter-spacing: 1px; display: block; font-"
+"size: 14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: "
+"#2a4531; text-decoration: underline; cursor: pointer}} .btn a {{color: #fff;"
+" text-decoration: none; display: block; font-size: 14px; width: 300px; text-"
+"transform: uppercase; cursor: "
+"pointer;}}</style></head><body><p>Hello,</p><p>This email was sent to you by"
+" (clinic name). This is where you report on your health along your prostate "
+"cancer journey. The information collected will be used to determine where "
+"improvements in Prostate Cancer Care can be made.</p><p>Login now to "
+"complete your questionnaire.</p><div class=\"btn\"><a href=\"{0}\">Verify "
+"your account and answer questionnaire now</a></div><p>Click the button above"
+" or use the link below to visit TrueNTH:</p><p><a "
+"href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please "
+"contact (clinic name).</p><p><em>— This email was sent because you consented"
+" to participate in the TrueNTH registry project</em></p></body></html>"
+
+# apptext: CRV organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52651&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52651&editorUrl=true"
+
+# apptext: profileSendEmail invite email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+
+# apptext: registration title
+msgid "Register for TrueNTH ePROMs"
+msgstr "Register for TrueNTH ePROMs"
+
+# apptext: About TrueNTH URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41549&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41549&editorUrl=true"
+
+# apptext: profileSendEmail option invite
+msgid "ePROMs Invite"
+msgstr "ePROMs Invite"
+
+# apptext: IRONMAN organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52668&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52668&editorUrl=true"
+
+# apptext: landing sub-title
+msgid " "
+msgstr " "
+
+# apptext: registration prompt
+msgid "Create a password"
+msgstr "Create a password"
+
+# apptext: profileSendEmail invite email_body
+msgid ""
+"<!DOCTYPE html><html><head><style>div.btn{{width: 300px; background-color: "
+"#79815D; text-align: center;}} .btn{{color: #fff; text-decoration: none; "
+"text-transform: uppercase; letter-spacing: 1px; display: block; font-size: "
+"14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: #2a4531; "
+"text-decoration: underline; cursor: pointer }} .btn a {{color: #fff; text-"
+"decoration: none; display: block; font-size: 14px; width: 300px; text-"
+"transform: uppercase; cursor: "
+"pointer;}}</style></head><body><p>(greeting),</p><p>This email was sent to "
+"you because you are a patient at (clinic name) and consented to participate "
+"in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is"
+" an invitation to use the TrueNTH ePROMs website, where you will report on "
+"your health. Your participation will help us collectively improve the care "
+"that men receive during their prostate cancer journey.</p><p>To complete "
+"your first questionnaire, please first verify your account.</p><div "
+"class=\"btn\"><a href=\"{0}\">Verify your account</a></div><p>You can also "
+"access the TrueNTH ePROMs website with this link:<p/><p><a "
+"href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH"
+" ePROMs any time.</p><p>If you have any queries, please contact your "
+"representative at (clinic name).</p></body></html>"
+msgstr ""
+"&lt;!DOCTYPE html&gt;<html><head><style>div.btn{{width: 300px; background-"
+"color: #79815D; text-align: center;}} .btn{{color: #fff; text-decoration: "
+"none; text-transform: uppercase; letter-spacing: 1px; display: block; font-"
+"size: 14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: "
+"#2a4531; text-decoration: underline; cursor: pointer }} .btn a {{color: "
+"#fff; text-decoration: none; display: block; font-size: 14px; width: 300px; "
+"text-transform: uppercase; cursor: "
+"pointer;}}</style></head><body><p>(greeting),</p><p>This email was sent to "
+"you because you are a patient at (clinic name) and consented to participate "
+"in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is"
+" an invitation to use the TrueNTH ePROMs website, where you will report on "
+"your health. Your participation will help us collectively improve the care "
+"that men receive during their prostate cancer journey.</p><p>To complete "
+"your first questionnaire, please first verify your account.</p><div "
+"class=\"btn\"><a href=\"{0}\">Verify your account</a></div><p>You can also "
+"access the TrueNTH ePROMs website with this link:<p/><p><a "
+"href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH"
+" ePROMs any time.</p><p>If you have any queries, please contact your "
+"representative at (clinic name).</p></body></html>"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: portal 17.8.3.3.dev79+ngff61326\n"
+"Project-Id-Version: portal 17.8.3.2.dev11+ngb4d1572\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-10 14:23-0700\n"
+"POT-Creation-Date: 2017-09-12 10:03-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,55 +33,55 @@ msgstr ""
 msgid "Log out"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L260
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L262
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L280
 msgid "Hi {}"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L261
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L263
 msgid "Please complete your {} registry study questionnaire by {}."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L281
 msgid "Please complete your {} registry study questionnaire at your convenience."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L302
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L331
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L304
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L333
 msgid "Completed Questionnaires"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L303
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L305
 msgid "When you are done, completed questionnaires will be shown here."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L332
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L334
 msgid "View questionnaire completed on {}"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L360
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L388
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L411
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L362
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L390
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L413
 msgid "Open Questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L380
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L382
 msgid "Continue questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L382
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L384
 msgid "Go to questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L409
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L411
 msgid "View previous questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L412
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L414
 msgid "No questionnaire is due."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L449
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L452
 msgid ""
 "The assessment is no longer available.\n"
 "A research staff member will contact you for assistance."
@@ -137,28 +137,27 @@ msgstr ""
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L4
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L48
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L68
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L70
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L74
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/macros.html#L7
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L32
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/privacy.html#L4
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L18
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/terms.html#L4
 msgid "Home"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/about.html#L6
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L77
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L81
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/portal.html#L29
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L82
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L130
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L133
 msgid "About TrueNTH"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L6
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L81
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L85
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L92
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L91
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L134
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L138
 msgid "User Administration"
 msgstr ""
 
@@ -167,67 +166,66 @@ msgid "Select any user to view details or make changes."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L14
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L18
 msgid "Filter list by site"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L40
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L97
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L41
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/settings.html#L28
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L33
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L36
 msgid "ID"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L41
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L98
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L54
 msgid "Username"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L43
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L40
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L41
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L172
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L99
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L107
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L170
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L55
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L37
 msgid "First Name"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L43
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L44
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L44
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L45
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L179
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L100
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L114
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L35
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L177
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L115
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L38
 msgid "Last Name"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L44
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L45
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L21
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L17
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L101
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1808
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1960
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1852
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2004
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L39
 msgid "Email"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L45
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L46
 msgid "Roles"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L47
 msgid "Sites"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L48
 msgid "Delete"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin.html#L48
 msgid "User"
 msgstr ""
 
@@ -241,26 +239,26 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L27
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L14
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L103
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1806
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1958
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1850
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2002
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/settings.html#L29
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/settings.html#L52
 msgid "Name"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L172
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L170
 msgid "First name is required"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L179
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L177
 msgid "Last name is required"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L46
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L217
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L14
 msgid "Birth Date"
 msgstr ""
@@ -271,119 +269,132 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L61
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L63
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L270
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L224
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L273
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L21
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1547
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2183
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1034
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1590
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2227
 msgid "Month"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L64
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L227
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L271
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L225
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L274
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L22
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1548
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2184
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1035
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1591
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2228
 msgid "January"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L65
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L228
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L272
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L275
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L23
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1549
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2185
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1036
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1592
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2229
 msgid "February"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L66
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L229
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L273
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L227
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L276
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L24
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1550
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2186
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1037
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1593
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2230
 msgid "March"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L67
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L230
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L274
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L228
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L277
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L25
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1551
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2187
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1038
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1594
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2231
 msgid "April"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L68
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L231
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L275
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L278
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L26
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1552
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2188
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1039
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1595
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2232
 msgid "May"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L69
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L232
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L276
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L230
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L279
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L27
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1553
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2189
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1040
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1596
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2233
 msgid "June"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L70
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L233
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L277
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L231
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L280
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L28
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1554
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2190
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1041
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1597
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2234
 msgid "July"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L71
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L234
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L232
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L281
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L29
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1555
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2191
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1042
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1598
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2235
 msgid "August"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L72
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L235
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L233
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L282
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L30
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1556
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2192
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1043
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1599
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2236
 msgid "September"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L73
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L236
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L280
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L234
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L283
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L31
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1557
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2193
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1044
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1600
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2237
 msgid "October"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L74
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L237
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L281
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L235
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L284
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L32
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1558
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2194
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1045
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1601
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2238
 msgid "November"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L75
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L238
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L282
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L236
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L285
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L33
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1559
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2195
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1046
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1602
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2239
 msgid "December"
 msgstr ""
 
@@ -398,9 +409,9 @@ msgstr ""
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/client_add.html#L5
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/client_edit.html#L6
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L84
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L79
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L83
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L84
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L131
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L134
 msgid "Client Applications"
 msgstr ""
 
@@ -479,7 +490,7 @@ msgid "Created By"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/clients_list.html#L44
-msgid "You have not created an client applications."
+msgid "You have not created any client applications."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L6
@@ -533,7 +544,7 @@ msgid "What is on your mind?"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact.html#L45
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L251
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L258
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L83
 msgid "Submit"
 msgstr ""
@@ -553,7 +564,7 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L11
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L78
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L128
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L131
 msgid "TrueNTH Home"
 msgstr ""
 
@@ -572,58 +583,58 @@ msgid ""
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L16
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L220
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1833
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1990
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L221
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1877
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2034
 msgid "Ethnicity"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L21
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L224
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L225
 msgid "Hispanic or Latino"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L26
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L230
 msgid "Not Hispanic or Latino"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L35
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/what-is-prostate-cancer.html#L62
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L180
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1834
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1991
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L181
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1878
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2035
 msgid "Race"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L40
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L184
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L185
 msgid "American Indian or Alaska Native"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L45
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L189
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L190
 msgid "Asian"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L50
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L194
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L195
 msgid "Black or African American"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L55
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L199
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L200
 msgid "Native Hawaiian or Other Pacific Islander"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L60
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L204
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L205
 msgid "White"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L65
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L136
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L209
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L137
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L210
 msgid "Other"
 msgstr ""
 
@@ -637,7 +648,6 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L12
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal.html#L15
-# apptext: landing title
 msgid "Welcome to TrueNTH"
 msgstr ""
 
@@ -660,14 +670,14 @@ msgstr ""
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L30
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L27
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L39
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L202
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L225
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L209
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L232
 msgid "or"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L31
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L102
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L127
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L134
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L16
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L16
 msgid "Log In"
@@ -697,7 +707,7 @@ msgstr ""
 msgid "Click continue to start using TrueNTH"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L177
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L184
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L59
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L13
 msgid "Next"
@@ -733,12 +743,12 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    <span class=\"custom-tou-text\">I have read the website <a href=\"%(privacy_url)s\"  class=\"required-link\" data-core-data-subtype=\"privacy_policy\" data-tou-type=\"privacy policy\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
+"                    <span class=\"custom-tou-text\">I have read the website <a href=\"%(privacy_url)s\" type=\"terms\" class=\"required-link\" data-core-data-subtype=\"privacy_policy\" data-tou-type=\"privacy policy\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
 "                    "
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L34
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L150
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L148
 msgid "I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
 msgstr ""
 
@@ -750,10 +760,10 @@ msgstr ""
 msgid "You must agree to the terms and conditions by checking the provided checkbox."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L281
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L288
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L56
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L58
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1699
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L66
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1743
 msgid "OK"
 msgstr ""
 
@@ -762,175 +772,175 @@ msgid "Website Consent Script - Enter Manually - Paper Form"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L80
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L100
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L99
 msgid "For Staff Use Only"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L89
 msgid "The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L89
 msgid "The subject has read the Website Consent and IRONMAN Registry Study consent and agrees to the processing of their personal information (including their health information) on the terms described in the above consents and Terms and Conditions and a copy of both consents and information provided by the subject has been securely stored in accordance with my local site procedures."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L99
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L98
 msgid "Website Consent Script - Enter Manually - Interview Assisted"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L103
 msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L104
 msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L106
 msgid "If yes, continue to read below text and Consent."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L108
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L121
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L120
 msgid "If no, thank them for their time."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L109
 msgid "Read consent [exactly as written]"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L117
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L116
 msgid "Do you have any questions?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L118
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L117
 msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L120
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L119
 msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L128
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L127
 msgid "Please print and fill out the form"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L136
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L135
 msgid "Print"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L137
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L136
 msgid "CLOSE"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L149
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L147
 msgid "I have read the required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L152
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L150
 msgid "Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration.."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L199
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L197
 msgid "I'm a man who is concerned about prostate cancer for myself"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L204
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L202
 msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L217
 msgid "(optional)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L222
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L220
 msgid "The birth day field is required and must be valid format"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L225
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L223
 msgid "A birth month must be selected"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L242
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L240
 msgid "The birth year is required and must be in valid format"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L254
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1331
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L257
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1374
 msgid "Have you had a prostate cancer biopsy?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L258
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L332
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L354
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L802
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1289
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L261
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L335
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L357
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L811
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1332
 msgid "Yes"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L262
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L265
 msgid "Biopsy Date"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L266
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L269
 msgid "The biopsy day field is required and must be valid format"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L269
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L272
 msgid "A biopsy month must be selected"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L286
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L289
 msgid "The biopsy year is required and must be in valid format"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L294
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L359
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L807
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L297
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L362
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L816
 msgid "No"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L299
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L320
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L342
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L302
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L323
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L345
 msgid "I don't know"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L306
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1332
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L309
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1375
 msgid "Have you been diagnosed with prostate cancer?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L310
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L313
 msgid "Yes (my biopsy was positive)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L315
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L318
 msgid "No (my biopsy was negative)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L328
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1285
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1333
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L331
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1328
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1376
 msgid "Is the prostate cancer only within the prostate?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L337
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1294
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L340
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1337
 msgid "No (the cancer is in other parts of my body, too)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L350
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L353
 msgid "Have you begun prostate cancer treatment?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L239
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L424
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L591
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L246
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L428
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L598
 msgid "What is your main clinic for prostate cancer care?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L428
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L432
 msgid "I'm not receiving care at any of the above clinics"
 msgstr ""
 
@@ -956,8 +966,6 @@ msgid "Body"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L17
-# apptext: profileSendEmail invite email_subject
-# apptext: profileSendEmail option invite
 msgid "TrueNTH Invitation"
 msgstr ""
 
@@ -984,7 +992,7 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L8
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/landing.html#L28
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L81
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L73
 msgid "TrueNTH"
 msgstr ""
 
@@ -1003,12 +1011,12 @@ msgid "You have been logged out due to inactivity. Please log in again to contin
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L90
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L262
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L277
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L80
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L92
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L52
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L815
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L269
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L284
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L72
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L84
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L824
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L46
 msgid "Close"
 msgstr ""
 
@@ -1016,12 +1024,12 @@ msgstr ""
 msgid "New Patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L196
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L203
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L51
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L25
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L26
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L239
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L240
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L241
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_profile_create.html#L26
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_profile_create.html#L27
 msgid "Email Address"
@@ -1036,90 +1044,61 @@ msgstr ""
 msgid "Clinics"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L7
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L72
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_profile_create.html#L68
+msgid "No clinics data available."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L8
 msgid "Create a patient record"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L9
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L11
 msgid "Select a patient below to view or update details."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L19
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L61
-msgid "Export questionnaire data"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L23
-msgid "Instrument(s) to export data from:"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L35
-msgid "Data type:"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L39
-msgid "CSV"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L43
-msgid "JSON"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L51
-msgid "Export"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L97
-msgid "TrueNTH ID"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L102
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L537
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1809
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1963
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L58
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L540
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1853
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2007
 msgid "Cell"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L103
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L545
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1810
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1964
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L59
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L550
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1854
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2008
 msgid "Phone (Other)"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L67
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L60
 msgid "Reports"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L61
 msgid "Questionnaire Status"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L106
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1633
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L62
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1677
 msgid "Study ID"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L107
-msgid "Consent Date (GMT)"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L63
+msgid "(GMT)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L108
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L37
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L40
 msgid "Site(s)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L223
-msgid "Please choose at least one instrument."
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L224
-msgid "Please choose one download type."
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L162
+msgid "retrieving data ..."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal.html#L16
-# apptext: landing sub-title
 msgid "Tools for navigating the prostate cancer journey"
 msgstr ""
 
@@ -1146,31 +1125,28 @@ msgid "About"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L32
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L91
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L98
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L2
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L9
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/decision-support.html#L62
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L78
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/macros.html#L9
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L34
-# interventions: decision_support_unavailable
-# interventions: decision_support_p3p
 msgid "Decision Support"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L37
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L95
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L102
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L118
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/macros.html#L10
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L2
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L9
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/symptom-tracker.html#L33
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L35
-# interventions: self_management
 msgid "Symptom Tracker"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L98
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L105
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L45
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/macros.html#L13
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L38
@@ -1191,7 +1167,7 @@ msgid "Privacy"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L99
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L106
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L2
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/macros.html#L18
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L43
@@ -1220,118 +1196,132 @@ msgid "2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L70
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L75
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L79
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L80
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L129
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L31
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L132
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L38
 msgid "My TrueNTH Profile"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L72
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L76
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L87
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L132
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L70
 msgid "Patients"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L89
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L133
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L136
 msgid "Staff List"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L93
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L92
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L139
 msgid "Settings"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L82
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L86
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L95
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L141
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L5
 msgid "Reporting Dashboard"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L97
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L98
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L143
+msgid "Research Data"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L100
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L145
 msgid "Log Out of TrueNTH"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L101
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L116
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L119
 msgid "MENU"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L103
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L106
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L110
 msgid "Welcome"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L106
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L127
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L130
 msgid "Log In to TrueNTH"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L117
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L120
 msgid "Return to TrueNTH home"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L145
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L155
 msgid "Your session is about to expire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L146
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L156
 msgid "Your session will expire in approximately"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L146
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L156
 msgid "seconds due to inactivity."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L269
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L147
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L276
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L157
 msgid "Stay Logged In"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L14
-msgid "Patients List"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L16
-msgid "User List"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L27
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L18
 msgid "Patient Profile"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L29
-msgid "Profile for"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L33
+#, python-format
+msgid "Profile for %(user_email)s"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L34
-msgid "TrueNTH Profile"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L35
+#, python-format
+msgid "Profile for #%(user_id)s"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L42
+msgid "TrueNTH Profile"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L50
 msgid "index list"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L44
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L50
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L52
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L58
 msgid "Log in as this patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L54
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L62
 msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L59
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1700
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1744
 msgid "Cancel"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L75
 msgid "Index List"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L199
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L207
+msgid "EDIT"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L207
+msgid "DONE"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L17
@@ -1340,837 +1330,1220 @@ msgstr ""
 msgid "Birth date must be valid and in the required format."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L80
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1913
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L81
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1957
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2152
 msgid "Language"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L83
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L84
 msgid "American English"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L83
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L84
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L87
 msgid "Default"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L87
 msgid "Australian English"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L108
 msgid "First name is required and must not contain invalid characters."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L114
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L115
 msgid "Last name is required and must not contain invalid characters."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L124
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1832
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1989
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L125
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1876
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2033
 msgid "Gender"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L128
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L129
 msgid "Male"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L132
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L133
 msgid "Female"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L154
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L155
 msgid "Indigenous Status"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L157
-msgid "' + o.display + '"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L277
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L424
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L427
 msgid "Registration status:"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L278
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L425
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L428
 msgid "not yet registered"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L280
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L427
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L281
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L430
 msgid "registered"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L283
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L284
 msgid "Send email to "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L283
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L284
 msgid "patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L283
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L284
 msgid "user"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L285
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L286
 msgid "Select Email..."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L289
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L553
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1654
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L290
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L560
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1698
 msgid "Send email"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L308
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L309
 msgid "failed request to get email invite url."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L341
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L471
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L342
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L474
 msgid "your clinic"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L372
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L373
 msgid "Hello"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L406
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L528
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L572
-msgid "Unable to send email."
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L403
+msgid "\" + selectedOption.text() + ' email sent to ' + email + \""
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L409
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L531
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L579
+msgid "Unable to send email."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L412
 msgid "You must select a email type."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L430
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L433
 msgid "Send registration email"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L448
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L451
 msgid "failed request to get email invite url"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L513
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L516
 msgid "<p>Hello, this is an invitation to complete your registration.</p>"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L514
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L517
 msgid "Verify your account to complete registration"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L517
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L520
 msgid "Registration invite from "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L526
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L529
 msgid "invite email sent to "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L537
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L545
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L744
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L540
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L550
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L753
 msgid "Optional"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L538
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L546
-msgid "XXX-XXX-XXXX"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L541
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L551
+msgid "Phone number must be in numbers."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L569
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L576
 msgid "Password reset email sent to "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L575
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L582
 msgid "No email address found for user"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L588
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L595
 msgid "In what state "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L588
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L595
 msgid "is the patient "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L588
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L595
 msgid "are you "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L588
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L595
 msgid "currently receiving prostate cancer care?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L249
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L598
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L748
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L256
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L605
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L757
 msgid "None of the Above"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L601
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L608
 msgid "No clinic found in selected state."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L695
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Alabama"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Alaska"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "American Samoa"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Arizona"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Arkansas"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "California"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Colorado"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Connecticut"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Delaware"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "District Of Columbia"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Federated States Of Micronesia"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Florida"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Georgia"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Guam"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Hawaii"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Idaho"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Illinois"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Indiana"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Iowa"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Kansas"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Kentucky"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Louisiana"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Maine"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Marshall Islands"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Maryland"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Massachusetts"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Michigan"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Minnesota"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Mississippi"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Missouri"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Montana"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Nebraska"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Nevada"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Hampshire"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Jersey"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New Mexico"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "New York"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "North Carolina"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "North Dakota"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Northern Mariana Islands"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Ohio"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Oklahoma"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Oregon"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Palau"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Pennsylvania"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Puerto Rico"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Rhode Island"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "South Carolina"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "South Dakota"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Tennessee"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Texas"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Utah"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Vermont"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Virgin Islands"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Virginia"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Washington"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "West Virginia"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Wisconsin"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L618
+msgid "Wyoming"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L704
 msgid "\" + item.name + \""
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L743
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L752
 msgid "Main clinic for prostate cancer care"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L744
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L753
 msgid "Clinics "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L789
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L798
 msgid "Consent to share information"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L798
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L807
 msgid "I consent to sharing information with the "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L971
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1461
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L980
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1504
 msgid "No reports available."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L976
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L985
 msgid "Problem retrieving reports from server."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L983
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L992
 msgid "No information available."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1025
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1030
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1033
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1050
+msgid "Date must be valid and in the required format."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
 msgid "More..."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1025
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
 msgid "Less"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1025
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1050
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1069
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1094
 msgid "More"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1086
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1130
 msgid "Date/Time"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1086
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1130
 msgid "(GMT), Y-M-D"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1149
 msgid "No audit log item found."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1154
 msgid "Problem retrieving audit log from server."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1118
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1162
 msgid "for"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1119
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1163
 msgid "Editable by admins only."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1152
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1196
 msgid "Session History"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1152
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1196
 msgid "click each row to review report"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1153
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1197
 msgid "Questionnaire Name"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1153
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1197
 msgid "Status"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1153
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1240
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1197
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1284
 msgid "Last Updated"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1153
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1197
 msgid "GMT, Y-M-D"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1180
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1224
 msgid "Click to view report"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1185
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1229
 msgid "' + o + '"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1195
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1239
 msgid "No questionnaire data found."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1201
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1245
 msgid "Problem retrieving session data from server."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1238
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1282
 msgid ""
 "' +\n"
 "                                        entries[0]['questionnaire']['display'] +\n"
 "                                        '"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1242
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1286
 msgid "(GMT, Y-M-D)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1243
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1287
 msgid "Question"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1243
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1287
 msgid "Response"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1257
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1301
 msgid "' + (hasValue(q)? q: \"--\") + '"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1257
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1301
 msgid "' + (String(a) !== 'undefined' ? a : '--') + '"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1310
+msgid "Server Error occurred retrieving report data"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1322
 msgid "Clinical Question"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1280
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1323
 msgid "Question asked of the patient at account creation"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1326
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1369
 msgid "My Prostate Cancer Profile"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1326
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1369
 msgid "Clinical Questions"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1327
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1370
 msgid "Questions asked of the patient at registration"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1356
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1399
 msgid "no answers provided"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1456
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1499
 msgid "Intervention Reports"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1474
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1517
 msgid "America/Denver"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1475
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1518
 msgid "America/Los Angeles"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1476
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1519
 msgid "America/Indianapolis"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1477
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1520
 msgid "America/New York"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1478
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1521
 msgid "Australia/Adelaide"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1479
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1522
 msgid "Australia/Brisbane"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1480
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1523
 msgid "Australia/Broken_Hill"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1481
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1524
 msgid "Australia/Canberra"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1482
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1525
 msgid "Australia/Currie"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1483
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1526
 msgid "Australia/Darwin"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1484
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1527
 msgid "Australia/Eucla"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1485
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1528
 msgid "Australia/Hobart"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1486
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1529
 msgid "Australia/Lindeman"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1487
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1530
 msgid "Australia/Lord_Howe"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1488
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1531
 msgid "Australia/Melbourne"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1489
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1532
 msgid "Australia/North"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1490
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1533
 msgid "Australia/Perth"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1491
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1534
 msgid "Australia/Queensland"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1492
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1535
 msgid "Australia/South"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1493
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1536
 msgid "Australia/Sydney"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1494
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1537
 msgid "Australia/Tasmania"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1495
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1538
 msgid "Australia/Victoria"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1496
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1539
 msgid "Australia/West"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1497
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1540
 msgid "Australia/Yancowinna"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1521
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1564
 msgid "Deceased Status"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1530
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1573
 msgid "Has the patient passed away?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1535
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1578
 msgid "Deceased Date"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1611
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1652
+msgid "Year must be after 1900"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1655
 msgid "The date must not be in the future."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1613
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1657
 msgid "Invalid Date. Please enter a valid date."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1641
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1685
 msgid "Site ID"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1650
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1694
 msgid "Three ways to complete questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1656
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1700
 msgid "Invite or remind patient over email to complete their questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1661
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1663
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1705
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1707
 msgid "Log in as patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1662
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1706
 msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1666
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1669
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1710
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1713
 msgid "Enter manually"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1667
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1711
 msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1675
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1719
 msgid "Enter questionnaire manually on patient's behalf"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1678
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1722
 msgid "Select the method in which the questionnaire will be completed:"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1683
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1727
 msgid "Interview assisted"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1688
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1732
 msgid "Paper"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1753
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1797
 msgid "The user does not have a valid assessment link."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1756
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1800
 msgid "You must select a method."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1772
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1816
 msgid "All available questionnaires have been completed."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1784
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1828
 msgid "Interventions"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1786
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1830
 msgid "Patient is participating in the following intervention(s): "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1790
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1792
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1834
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1836
 msgid "None"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1803
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1847
 msgid "My Information"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1807
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1959
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1851
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2003
 msgid "Date of Birth"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1829
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1873
 msgid "My Detail"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1835
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1992
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1879
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2036
 msgid "Indigenous"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1853
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2070
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1897
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2114
 msgid "My Questionnaires"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1862
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1906
 msgid "My Reports"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1874
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1883
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1901
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1918
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1927
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1945
 msgid "My Clinic"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1892
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1936
 msgid "My Agreement"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1910
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1954
 msgid "My Locale / Time Zone"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1914
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1958
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2153
 msgid "Time Zone"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1930
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1974
 msgid "My Roles"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1948
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1992
 msgid "Patient Details"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1955
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1999
 msgid "Patient Information"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1955
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1999
 msgid "User Information"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1961
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2005
 msgid "Study Id"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1962
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2006
 msgid "Site Id"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1986
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2030
 msgid "Patient Detail"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1986
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2030
 msgid "User Detail"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2012
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2029
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2056
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2073
 msgid "Communications"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2015
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2059
 msgid "Send reset password email to patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2019
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2063
 msgid "Send registration email to patient"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2032
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2076
 msgid "Send reset password email to staff"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2036
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2080
 msgid "Send registration email to user"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2046
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2090
 msgid "Clinic"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2055
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2099
 msgid "Agreement to Share Clinical Information"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2055
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2099
 msgid "Consent History"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2070
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2114
 msgid "PRO Questionnaires"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2093
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2137
 msgid "Patient Reports"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2149
 msgid "Locale / Time Zone"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2125
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2169
 msgid "User Roles"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2179
 msgid "Audit Log"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2148
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2192
 msgid "My Treatments"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2148
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2192
 msgid "Clinical Data"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2151
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2195
 msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2151
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2195
 msgid ""
 "Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
 "                            date, please make your best guess."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L70
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2155
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2160
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2199
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2204
 msgid "Select"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2155
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2199
 msgid "an option"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2161
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2205
 msgid "Started watchful waiting"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2162
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2206
 msgid "Started active surveillance"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2163
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2207
 msgid "Radical prostatectomy (nerve-sparing)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2164
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2208
 msgid "Radical prostatectomy (non-nerve-sparing)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2165
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2209
 msgid "External beam radiation therapy"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2166
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2210
 msgid "Brachytherapy"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2167
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2211
 msgid "Androgen deprivation therapy"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2168
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2212
 msgid "None of the above"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2176
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2220
 msgid "Date"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2202
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2239
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2246
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2284
 msgid "Save"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2214
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2258
 msgid "My History"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2216
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2260
 msgid "Past"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2216
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2260
 msgid "Management(s)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2236
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2281
 msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2236
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2281
 msgid "Or"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2236
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2281
 msgid "cancel"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2237
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2282
 msgid "There is a problem with your profile. Please correct it before saving."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2237
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2282
 msgid "Make sure all required fields are filled out and all entries are valid."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2240
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2285
 msgid "Profile changes have been saved"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2280
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2325
+msgid "Server error occurred updating data."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2326
 msgid "Error processing request:"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2466
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2461
+msgid "[Processing error]"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2512
 msgid "Email is already in use."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2475
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2521
 msgid "An organization must be selected."
 msgstr ""
 
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2560
+msgid "no data returned"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2570
+msgid "Error occurred retrieving clinics data."
+msgstr ""
+
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L7
+msgid "Usage Statistics"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L9
+msgid "Registrations are collected from the User.registration timestamps of all Users without the Test Role"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L10
+msgid "Logins are collected from the start_time timestamps of Encounters whose auth_method='password_authenticated'"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L11
+msgid "Intervention Logins are filtered based on the login Encounter's User's User.interventions"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L18
+msgid "Today"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L19
+msgid "This Month"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+msgid "This Year"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L21
+msgid "All Time"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L26
+msgid "Registrations"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L33
+msgid "Logins"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L51
 msgid "User Statistics"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L14
-msgid "Role"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L53
+msgid "User stats are collected from all Users without the Test Role"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L15
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L54
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L81
-msgid "User Count"
+msgid "Role counts are tallied from User.roles (e.g. a User with both the Patient and Staff Roles, would add 1 to both Roles' counts)"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L55
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L74
 msgid "No Diagnosis"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L28
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L55
+msgid "Users whose User.observations does not contain any Observations where the Observation.codeable_concept=CC.BIOPSY and the Observation.value_quantity.value=True"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L78
 msgid "Diagnosis, No Treatment"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L56
+msgid "Users where known_treatment_not_started(User)=True"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L82
 msgid "Diagnosis and Treatment"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L57
+msgid "Users where known_treatment_started(User)=True"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L58
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L86
 msgid "Metastasis"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L40
-msgid "Partners"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L58
+msgid "Users whose User.observations contains any Observations where the Observation.codeable_concept=CC.PCaLocalized and the Observation.value_quantity.value!=True"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L44
-msgid "Clinicians"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L53
-msgid "Intervention"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L64
+msgid "Role"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L137
+msgid "User Count"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L90
+msgid "Partners"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid "Clinicians"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L98
+msgid "Intervention counts only apply to those interventions that control their subject list manually (eg Sexual Recovery, Care Plan, Community of Wellness). They are tallied from User.interventions (e.g. a User with both the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to both Interventions' counts)"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L99
+msgid "Completed Reports are tallied for each User that has <i>any number</i> of PatientReports for that Intervention (e.g. whether a User has 1 or 100 PatientReports for 'Symptom Tracker', that User only adds 1 to that Intervention's Completed Reports tally)"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L100
+msgid "Completed Reports are only shown for an Intervention if the report count is above 0"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L106
+msgid "Intervention"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L118
 msgid "Completed Reports"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L73
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L126
 msgid "Institution Statistics"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L80
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L128
+msgid "Organization counts are collected from the User.organizations of all Users without the Test Role"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L129
+msgid "'None of the above' refers to Users who specifically selected the 'None of the above' organization option"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L130
+msgid "'Unspecified' refers to Users who have not yet been assigned to <i>any</i> Organization option (including 'None of the above')"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L136
 msgid "Organization Name"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L51
+msgid "Export questionnaire data"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L17
+msgid "Instrument(s) to export data from:"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L29
+msgid "Data type:"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L33
+msgid "CSV"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L37
+msgid "JSON"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L45
+msgid "Export"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/scheduled_jobs_list.html#L6
@@ -2345,7 +2718,7 @@ msgstr ""
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L22
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L104
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L152
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L200
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L207
 msgid "Having trouble logging in?"
 msgstr ""
 
@@ -2378,7 +2751,7 @@ msgid "Email address is required."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L22
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L197
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L204
 msgid "Password"
 msgstr ""
 
@@ -2566,9 +2939,8 @@ msgid "Tool N<em>o</em>4: All Stages"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L51
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L97
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L104
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L2
-# interventions: lived_experience
 msgid "Lived Experience"
 msgstr ""
 
@@ -2604,7 +2976,7 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L79
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/about.html#L104
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L136
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L143
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L32
 msgid "Objective N<em>o</em>1: TrueNTH Community"
 msgstr ""
@@ -2767,103 +3139,101 @@ msgstr ""
 msgid "WATCH THE FILM"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L50
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L54
 msgid "Loading"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L68
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L72
 msgid "Navigation"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L96
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L103
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/exercise-and-diet.html#L2
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/exercise-and-diet.html#L9
-# interventions: exercise_diet
-# interventions: community_of_wellness
 msgid "Exercise and Diet"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L101
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L127
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L140
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L167
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L228
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L134
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L147
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L174
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L235
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L16
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/index.html#L30
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L16
 msgid "Join Us"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L104
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L269
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L276
 msgid "Log Out"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L112
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L119
 msgid "Click here to join us"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L122
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L129
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/contact.html#L11
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L11
 msgid "Menu"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L137
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L144
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived_experience_base.html#L7
 msgid "Everyone has a part to play in improving the prostate cancer journey."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L138
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L145
 msgid "The more people that join us, the better the tools will become for you and future generations."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L152
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L154
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L159
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L161
 msgid "TrueNTH Version"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L168
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L175
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L236
 msgid "It’s going to take a group effort to improve the prostate cancer experience for future generations."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L170
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L177
 msgid "Do you have an access code?"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L173
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L180
 msgid "Enter Access Code"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L181
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L188
 msgid "otherwise"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L184
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L191
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L236
 msgid "Create Account"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L193
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L222
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L223
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L200
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L230
 msgid "Login"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L209
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L216
 msgid "Log in with Facebook"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L212
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L219
 msgid "Log in with Google"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L263
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L270
 msgid "Session Expiration Warning"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L264
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L271
 #, python-format
 msgid ""
 "\n"
@@ -2871,23 +3241,23 @@ msgid ""
 "            "
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L285
 msgid "Session Timed Out"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L285
 msgid "You have been logged out due to inactivity.  Please log in again to continue."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L484
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L496
 msgid "Thank you, your access code '\" + $(\"#shortcut_alias\").val() + \"' indicates you are located at the \" + data.name + \". Proceeding to registration . . ."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L490
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L502
 msgid "You have entered an invalid access code.  Please try again"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L496
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/base.html#L508
 msgid "System was unable to process your request."
 msgstr ""
 
@@ -3289,7 +3659,6 @@ msgid " N<em>o</em>2: Monitoring "
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/gil/lived-experience.html#L23
-# interventions: lived_experience
 msgid "TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey."
 msgstr ""
 
@@ -3743,80 +4112,113 @@ msgstr ""
 msgid "Online Prostate Cancer Discussion Forum and Community"
 msgstr ""
 
-# interventions: exercise_diet
-msgid "To provide men and the people in their lives with the tools and support they need to optimize their health through exercise and diet."
+# apptext: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
 msgstr ""
 
-# apptext: profileSendEmail reminder email_body
-msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#0088cc\" style=\"background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
-msgstr ""
-
-# apptext: About Movember URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
-msgstr ""
-
-# interventions: assessment_engine
-msgid "Assessment Engine"
+# apptext: Cellphone
+msgid "Mobile"
 msgstr ""
 
 # apptext: Privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41577&editorUrl=true"
+msgstr ""
+
+# apptext: consent date label
+# apptext: profileSendEmail invite email
+msgid "Blah."
 msgstr ""
 
 # interventions: decision_support_wisercare
 msgid "Decision Support WiserCare"
 msgstr ""
 
-# apptext: Terms and Conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true"
+# apptext: profileSendEmail invite email_subject
+msgid "Report your health on TrueNTH ePROMs"
+msgstr ""
+
+# apptext: layout title
+msgid "Movember ePROMs"
 msgstr ""
 
 # interventions: sexual_recovery
 msgid "Sexual Recovery"
 msgstr ""
 
-# apptext: Cellphone
-msgid "Cellphone"
+# apptext: About Movember URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41565&editorUrl=true"
 msgstr ""
 
-# interventions: self_management
-msgid "<p>Compare your symptoms over time with men like you, and manage symptoms that bother you.</p>"
-msgstr ""
-
-# interventions: decision_support_wisercare
-msgid "WiserCare helps patients and providers make smarter, more confident treatment choices"
+# interventions: assessment_engine
+msgid "set by access strategy depending on state"
 msgstr ""
 
 # interventions: decision_support_p3p
 msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
 msgstr ""
 
-# apptext: About TrueNTH URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+# interventions: decision_support_p3p
+msgid "Decision Support tool"
 msgstr ""
 
 # interventions: sexual_recovery
 msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
 msgstr ""
 
-# apptext: registration prompt
-msgid "Create an account"
+# apptext: landing title
+msgid "Report your health in order to improve prostate cancer care"
 msgstr ""
 
-# apptext: profileSendEmail invite email_body
-msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><body><p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#0088cc\" style=\"background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
+# interventions: self_management
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
 msgstr ""
 
-# apptext: layout title
-msgid "TrueNTH USA"
+# apptext: Initial Consent Terms URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41603&editorUrl=true"
+msgstr ""
+
+# apptext: portal registration
+msgid "TrueNTH EPROMs Registration"
+msgstr ""
+
+# apptext: profileSendEmail option reminder
+msgid "ePROMs Reminder"
+msgstr ""
+
+# interventions: self_management
+msgid "Symptom Tracker tool"
+msgstr ""
+
+# apptext: profileSendEmail reminder email_body
+msgid "<!DOCTYPE html><html><head><style>div.btn{{width: 300px; background-color: #79815D; text-align: center;}} .btn{{color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; display: block; font-size: 14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: #2a4531; text-decoration: underline; cursor: pointer}} .btn a {{color: #fff; text-decoration: none; display: block; font-size: 14px; width: 300px; text-transform: uppercase; cursor: pointer;}}</style></head><body><p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div class=\"btn\"><a href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p></body></html>"
+msgstr ""
+
+# apptext: CRV organization consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52651&editorUrl=true"
+msgstr ""
+
+# apptext: profileSendEmail invite email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
 msgstr ""
 
 # interventions: community_of_wellness
 msgid "Community of Wellness"
 msgstr ""
 
-# apptext: Initial Consent Terms URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d57adc33-738c-67bf-187d-a6a9c5af81c5&editorUrl=true"
+# apptext: registration title
+msgid "Register for TrueNTH ePROMs"
+msgstr ""
+
+# apptext: About TrueNTH URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=41549&editorUrl=true"
+msgstr ""
+
+# apptext: profileSendEmail option invite
+msgid "ePROMs Invite"
+msgstr ""
+
+# apptext: IRONMAN organization consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&articleId=52668&editorUrl=true"
 msgstr ""
 
 # interventions: default
@@ -3827,29 +4229,23 @@ msgstr ""
 msgid "Social Support Network"
 msgstr ""
 
-# apptext: registration title
-msgid "Register for TrueNTH"
+# apptext: Terms and Conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true"
 msgstr ""
 
-# apptext: portal registration
-msgid "TrueNTH Registration"
-msgstr ""
-
-# apptext: profileSendEmail reminder email_subject
-# apptext: profileSendEmail option reminder
-msgid "TrueNTH Reminder"
-msgstr ""
-
-# apptext: WiserCare Clinical Institution organization consent URL
-# apptext: P3P Clinical Institution organization consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true"
+# apptext: landing sub-title
+msgid " "
 msgstr ""
 
 # interventions: care_plan
 msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
 msgstr ""
 
-# interventions: decision_support_unavailable
-msgid "TrueNTH Decision Support is intended for use by men who have been diagnosed with localized prostate cancer (the cancer is not in other parts of the body), but who have not yet started active treatment."
+# apptext: registration prompt
+msgid "Create a password"
+msgstr ""
+
+# apptext: profileSendEmail invite email_body
+msgid "<!DOCTYPE html><html><head><style>div.btn{{width: 300px; background-color: #79815D; text-align: center;}} .btn{{color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; display: block; font-size: 14px; width: 300px; padding:1em;}} .btn:hover {{ background-color: #2a4531; text-decoration: underline; cursor: pointer }} .btn a {{color: #fff; text-decoration: none; display: block; font-size: 14px; width: 300px; text-transform: uppercase; cursor: pointer;}}</style></head><body><p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH ePROMs website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div class=\"btn\"><a href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH ePROMs website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH ePROMs any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p></body></html>"
 msgstr ""
 

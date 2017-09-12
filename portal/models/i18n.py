@@ -170,14 +170,14 @@ def smartling_download(language=None):
     current_app.logger.debug("authenticated in smartling")
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    find_and_download_po_file(language, 'messages',
+    download_and_extract_po_file(language, 'messages', headers,
                               'portal/translations/messages.pot')
-    find_and_download_po_file(language, 'frontend',
+    download_and_extract_po_file(language, 'frontend', headers,
                               'portal/translations/js/src/frontend.pot')
 
 
-def find_and_download_po_file(language, fname, uri):
+def download_and_extract_po_file(language, fname, headers, uri):
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if language:
         response_content = download_po_file(language, headers,
                                             project_id, uri)
@@ -194,13 +194,13 @@ def find_and_download_po_file(language, fname, uri):
             "{}.po files updated, mo files compiled".format(fname))
 
 
-def download_po_file(language, headers, project_id, file_uri):
+def download_po_file(language, headers, project_id, uri):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
     language_id = re.sub('_', '-', language)
     url = 'https://api.smartling.com/files-api/v2/projects/' \
           '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
-                                                 file_uri)
+                                                 uri)
     resp = requests.get(url, headers=headers)
     if not resp.content:
         sys.exit('no file returned')
@@ -234,17 +234,22 @@ def extract_po_file(language, data, fname):
 def merge_po_into_master(po_path, language, fname):
     master_path = os.path.join(current_app.root_path, "translations",
                                language, 'LC_MESSAGES')
-    master_po = pofile(os.path.join(master_path, '{}.po'.format(fname)))
+    mpo_path = os.path.join(master_path, '{}.po'.format(fname))
     incoming_po = pofile(po_path)
+    if os.path.isfile(mpo_path):
+        master_po = pofile(mpo_path)
 
-    for entry in incoming_po:
-        if master_po.find(entry.msgid):
-            master_po.find(entry.msgid).msgstr = entry.msgstr
-        else:
-            master_po.append(entry)
+        for entry in incoming_po:
+            if master_po.find(entry.msgid):
+                master_po.find(entry.msgid).msgstr = entry.msgstr
+            else:
+                master_po.append(entry)
 
-    master_po.save(os.path.join(master_path, '{}.po'.format(fname)))
-    master_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
+        master_po.save(mpo_path)
+        master_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
+    else:
+        incoming_po.save(mpo_path)
+        incoming_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
 
 
 @babel.localeselector
