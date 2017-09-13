@@ -8,7 +8,7 @@
     <div>
         <p>{{ _("Registrations are collected from the User.registration timestamps of all Users without the Test Role") }}</p>
         <p>{{ _("Logins are collected from the start_time timestamps of Encounters whose auth_method='password_authenticated'") }}</p>
-        <p>{{ _("Intervention Logins are filtered based on the login Encounter's User's User.interventions") }}</p>
+        <p>{{ _("Intervention Logins are filtered based on the login Encounter's User's User.interventions, and represent the number of users associated with that intervention who have logged in within the given timeframe (whether or not they accessed the intervention during that login session") }}</p>
         <table id="usageStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -36,13 +36,15 @@
                 <td>{{ counts['encounters']['all'] | selectattr("year", "equalto", now.year) | list | length }}</td>
                 <td>{{ counts['encounters']['all'] | length }}</td>
             </tr>
-            {% for k,v in counts['encounters']['interventions'].items() %}
+            {% for k,v in counts['encounters'].items() %}
+            {% if k and k != 'all' %}
                 <td><div class="indent">{{ k }}</div></td>
                 <td>{{ v | selectattr("day", "equalto", now.day) | list | length }}</td>
                 <td>{{ v | selectattr("month", "equalto", now.month) | list | length }}</td>
                 <td>{{ v | selectattr("year", "equalto", now.year) | list | length }}</td>
                 <td>{{ v | length }}</td>
             </tr>
+            {% endif %}
             {% endfor %}
             </tbody>
         </table>
@@ -96,8 +98,6 @@
             </tr>
         </table>
         <p>{{ _("Intervention counts only apply to those interventions that control their subject list manually (eg Sexual Recovery, Care Plan, Community of Wellness). They are tallied from User.interventions (e.g. a User with both the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to both Interventions' counts)") }}</p>
-        <p>{{ _("Completed Reports are tallied for each User that has <i>any number</i> of PatientReports for that Intervention (e.g. whether a User has 1 or 100 PatientReports for 'Symptom Tracker', that User only adds 1 to that Intervention's Completed Reports tally)") }}</p>
-        <p>{{ _("Completed Reports are only shown for an Intervention if the report count is above 0") }}</p>
         <table id="userIntervStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -109,14 +109,51 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for k,v in counts['interventions'].items() %}
+            {% if k %}
             <tr>
                 <td>{{ k }}</td>
                 <td>{{ v }}</td>
             </tr>
-            {% if k in counts['intervention_reports'] %}
+            {% endif %}
+            {% endfor %}
+        </table>
+        <p>{{ _("Completed Reports are tallied for each User that has <i>any number</i> of PatientReports for that Intervention (e.g. whether a User has 1 or 100 PatientReports for 'Symptom Tracker', that User only adds 1 to that Intervention's Completed Reports tally)") }}</p>
+        <p>{{ _("Completed Reports are only shown for an Intervention if the report count is above 0") }}</p>
+        <table id="userIntervStatsTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
             <tr>
-                <td><div class="indent">{{ _("Completed Reports") }}</div></td>
-                <td>{{ counts['intervention_reports'][k] }}</td>
+                <th>{{ _("Intervention (Reports)") }}</th>
+                <th>{{ _("User Count") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for k,v in counts['intervention_reports'].items() %}
+            {% if k %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+        <p>{{ _("Intervention Access counts reflect the number of users who <i>could</i> access said intervention, regardless of whether or not they've actually accessed it.") }}</p>
+        <table id="userIntervStatsTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th>{{ _("Intervention (Access)") }}</th>
+                <th>{{ _("User Count") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for k,v in counts['intervention_access'].items() %}
+            {% if k %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
             </tr>
             {% endif %}
             {% endfor %}
@@ -139,9 +176,11 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for k,v in counts['organizations'].items() %}
+            {% if k %}
                 <td>{{ k }}</td>
                 <td>{{ v }}</td>
             </tr>
+            {% endif %}
             {% endfor %}
             </tbody>
         </table>

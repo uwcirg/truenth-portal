@@ -1069,14 +1069,18 @@ def get_reporting_counts():
     counts['roles'] = defaultdict(int)
     counts['patients'] = defaultdict(int)
     counts['interventions'] = defaultdict(int)
+    counts['intervention_access'] = defaultdict(int)
     counts['intervention_reports'] = defaultdict(int)
     counts['organizations'] = defaultdict(int)
     counts['registrations'] = []
-    counts['encounters'] = {'all': [], 'interventions': defaultdict(list)}
+    counts['encounters'] = defaultdict(list)
+
+    interventions = Intervention.query.all()
 
     for user in User.query.filter_by(active=True):
         if ROLE.TEST in [r.name for r in user.roles]:
             continue
+
         for role in user.roles:
             counts['roles'][role.name] += 1
             if role.name == 'patient':
@@ -1089,26 +1093,38 @@ def get_reporting_counts():
                 elif known_treatment_started(user):
                     counts['patients']['dx-t'] += 1
                 if any((obs.codeable_concept == CC.PCaLocalized
-                        and not obs.value_quantity.value)
+                        and obs.value_quantity == CC.FALSE_VALUE)
                        for obs in user.observations):
                     counts['patients']['meta'] += 1
-        for interv in user.interventions:
-            counts['interventions'][interv.description] += 1
+
+        for interv in interventions:
+            desc = interv.description
+            if desc == 'Decision Support':
+                desc = 'Decision Support P3P'
+            if interv.display_for_user(user).access:
+                counts['intervention_access'][desc] += 1
+            if interv in user.interventions:
+                counts['interventions'][desc] += 1
             if (any(doc.intervention == interv for doc in user.documents)):
-                counts['intervention_reports'][interv.description] += 1
+                counts['intervention_reports'][desc] += 1
+
         if not user.organizations:
             counts['organizations']['Unspecified'] += 1
         else:
             for org in user.organizations:
                 counts['organizations'][org.name] += 1
+
         counts['registrations'].append(user.registered)
 
-    for enc in Encounter.query.filter_by(auth_method='password_authenticated'):
-        st = enc.start_time
-        counts['encounters']['all'].append(st)
-        user = get_user(enc.user_id)
-        for interv in user.interventions:
-            counts['encounters']['interventions'][interv.description].append(st)
+        for enc in user.encounters:
+            if enc.auth_method == 'password_authenticated':
+                st = enc.start_time
+                counts['encounters']['all'].append(st)
+                for interv in user.interventions:
+                    if interv.description == 'Decision Support':
+                        counts['encounters']["Decision Support P3P"].append(st)
+                    else:
+                        counts['encounters'][interv.description].append(st)
 
     return counts
 
