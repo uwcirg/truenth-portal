@@ -1,5 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-from collections import defaultdict
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
@@ -18,7 +17,6 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
-from ..dogpile import dogpile_cache
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
@@ -34,8 +32,7 @@ from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
-from ..models.procedure_codes import known_treatment_started
-from ..models.procedure_codes import known_treatment_not_started
+from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
@@ -1055,78 +1052,7 @@ def reporting_dashboard():
 
     """
     return render_template('reporting_dashboard.html', now=datetime.utcnow(),
-                           counts=get_reporting_counts())
-
-
-@dogpile_cache.region('hourly')
-def get_reporting_counts():
-    """Cachable interface for expensive reporting data queries
-
-    The following code is only run on a cache miss.
-
-    """
-    counts = {}
-    counts['roles'] = defaultdict(int)
-    counts['patients'] = defaultdict(int)
-    counts['interventions'] = defaultdict(int)
-    counts['intervention_access'] = defaultdict(int)
-    counts['intervention_reports'] = defaultdict(int)
-    counts['organizations'] = defaultdict(int)
-    counts['registrations'] = []
-    counts['encounters'] = defaultdict(list)
-
-    interventions = Intervention.query.all()
-
-    for user in User.query.filter_by(active=True):
-        if ROLE.TEST in [r.name for r in user.roles]:
-            continue
-
-        for role in user.roles:
-            counts['roles'][role.name] += 1
-            if role.name == 'patient':
-                if not any((obs.codeable_concept == CC.BIOPSY
-                            and obs.value_quantity.value)
-                           for obs in user.observations):
-                    counts['patients']['pre-dx'] += 1
-                elif known_treatment_not_started(user):
-                    counts['patients']['dx-nt'] += 1
-                elif known_treatment_started(user):
-                    counts['patients']['dx-t'] += 1
-                if any((obs.codeable_concept == CC.PCaLocalized
-                        and obs.value_quantity == CC.FALSE_VALUE)
-                       for obs in user.observations):
-                    counts['patients']['meta'] += 1
-
-        for interv in interventions:
-            desc = interv.description
-            if desc == 'Decision Support':
-                desc = 'Decision Support P3P'
-            if interv.display_for_user(user).access:
-                counts['intervention_access'][desc] += 1
-            if interv in user.interventions:
-                counts['interventions'][desc] += 1
-            if (any(doc.intervention == interv for doc in user.documents)):
-                counts['intervention_reports'][desc] += 1
-
-        if not user.organizations:
-            counts['organizations']['Unspecified'] += 1
-        else:
-            for org in user.organizations:
-                counts['organizations'][org.name] += 1
-
-        counts['registrations'].append(user.registered)
-
-        for enc in user.encounters:
-            if enc.auth_method == 'password_authenticated':
-                st = enc.start_time
-                counts['encounters']['all'].append(st)
-                for interv in user.interventions:
-                    if interv.description == 'Decision Support':
-                        counts['encounters']["Decision Support P3P"].append(st)
-                    else:
-                        counts['encounters'][interv.description].append(st)
-
-    return counts
+                           counts=get_reporting_stats())
 
 
 @portal.route('/spec')

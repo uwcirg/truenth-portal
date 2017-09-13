@@ -20,6 +20,7 @@ from .extensions import celery
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.reporting import get_reporting_stats
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
@@ -100,6 +101,26 @@ def cache_assessment_status(job_id=None):
     message = (
         'Assessment Cache updated and messages queued in {0.seconds}'
         ' seconds'.format(duration))
+    current_app.logger.debug(message)
+    update_runtime(job_id)
+    return message
+
+
+@celery.task
+def cache_reporting_stats(job_id=None):
+    """Populate reporting dashboard stats cache
+
+    Reporting stats can be a VERY expensive lookup - cached for an hour
+    at a time.  This task is responsible for renewing the potenailly
+    stale cache.  Expected to be called as a scheduled job.
+
+    """
+    before = datetime.now()
+    current_app.logger.debug(__name__)
+    dogpile_cache.refresh(get_reporting_stats)
+    duration = datetime.now() - before
+    message = (
+        'Reporting stats updated in {0.seconds} seconds'.format(duration))
     current_app.logger.debug(message)
     update_runtime(job_id)
     return message
