@@ -16,7 +16,7 @@
     text-decoration: none;
   }
   img {
-    margin: 0 1em
+    margin: 0 1em;
     vertical-align: middle;
   }
   * {
@@ -137,9 +137,17 @@
 }
 #tnthLogoXs {
   padding: 0;
+  display: inline-block;
+  margin: auto;
+  max-width: 100%;
   img {
     height: 40px;
     float: right;
+  }
+}
+@media (min-width: 699px) {
+  #tnthLogoXs {
+    width: 250px;
   }
 }
 #tnthTopLinks {
@@ -287,7 +295,7 @@
   display: block;
   margin: 0.2em 0;
 }
-@media screen\0 {
+@media screen {
   /* IE9+ */
   .tnth-dropdown-menu li {
     list-style-image: url(data:0);
@@ -352,9 +360,11 @@
   margin: 0 auto;
 }
 /** Responsive sizes **/
+
 @media (max-width: 498px) {
-  #tnthLogoXs img {
-    margin-right: 2em !important;
+  #tnthLogoXs{
+    display: inline-block;
+    margin: auto;
   }
   .tnth-navbarXs-img-container img {
     width: 25% !important;
@@ -362,8 +372,10 @@
 }
 @media (max-width: 640px) {
    .watermark {
-    width: 30% !important;
+    width: 50% !important;
+    max-width: 100% !important;
     font-size: 0.5em !important;
+    top: 9%;
   }
   .tnth-navbarXs-img-container img {
     margin: 0 !important;
@@ -373,6 +385,11 @@
     display: none;
   }
 }
+@media (max-width: 550px) {
+  .watermark {
+    top: 12%;
+  }
+} 
 @media (max-width: 991px) {
   #tnthUserBtn {
     padding: 6px 0px;
@@ -383,9 +400,6 @@
   }
   #tnthNavXs {
     display: block;
-  }
-  #tnthLogoXs img {
-    margin-right: 45%;
   }
   .watermark {
     width: 270px;
