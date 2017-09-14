@@ -86,27 +86,6 @@ def test(job_id=None):
 
 
 @celery.task
-def cache_assessment_status(job_id=None):
-    """Populate assessment status cache
-
-    Assessment status is an expensive lookup - cached for an hour
-    at a time.  This task is responsible for renewing the potenailly
-    stale cache.  Expected to be called as a scheduled job.
-
-    """
-    before = datetime.now()
-    current_app.logger.debug(__name__)
-    update_patient_loop(update_cache=True, queue_messages=True)
-    duration = datetime.now() - before
-    message = (
-        'Assessment Cache updated and messages queued in {0.seconds}'
-        ' seconds'.format(duration))
-    current_app.logger.debug(message)
-    update_runtime(job_id)
-    return message
-
-
-@celery.task
 def cache_reporting_stats(job_id=None):
     """Populate reporting dashboard stats cache
 
@@ -122,6 +101,27 @@ def cache_reporting_stats(job_id=None):
     duration = datetime.now() - before
     message = (
         'Reporting stats updated in {0.seconds} seconds'.format(duration))
+    current_app.logger.debug(message)
+    update_runtime(job_id)
+    return message
+
+
+@celery.task
+def cache_assessment_status(job_id=None):
+    """Populate assessment status cache
+
+    Assessment status is an expensive lookup - cached for an hour
+    at a time.  This task is responsible for renewing the potenailly
+    stale cache.  Expected to be called as a scheduled job.
+
+    """
+    before = datetime.now()
+    current_app.logger.debug(__name__)
+    update_patient_loop(update_cache=True, queue_messages=True)
+    duration = datetime.now() - before
+    message = (
+        'Assessment Cache updated and messages queued in {0.seconds}'
+        ' seconds'.format(duration))
     current_app.logger.debug(message)
     update_runtime(job_id)
     return message
