@@ -297,7 +297,7 @@
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="consent">
               <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" />
-              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/>
+              <input id="{{org}}_consent" class="consent-checkbox" aria-label="{{_('Consent checkbox')}}" type="checkbox"/>
             </div>
           {% endfor %}
       </div>

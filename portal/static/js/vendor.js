@@ -1961,7 +1961,7 @@ Force Touch events are available in OS X 10.11 and later on devices equipped wit
 */
 
   Modernizr.addTest('forcetouch', function() {
-		// github.com/Modernizr/Modernizr/issues/1613
+    // github.com/Modernizr/Modernizr/issues/1613
     // Test if the browser supports the force touch event progression (see notes link)
     if (!hasEvent(prefixed('mouseforcewillbegin', window, false), window)) {
           return false;
@@ -20707,4 +20707,3 @@ ImagesLoaded.makeJQueryPlugin();
 return ImagesLoaded;
 
 });
-
