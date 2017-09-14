@@ -23,11 +23,6 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             <tr>
-                <td>Date</td>
-                <td>{{ now.day }}</td>
-                <td>{{ now.month }}</td>
-                <td>{{ now.year }}</td>
-            <tr>
                 <td>{{ _("Registrations") }}</td>
                 <td>{{ counts['registrations'] | selectattr("day", "equalto", now.day) | selectattr("month", "equalto", now.month) | selectattr("year", "equalto", now.year) | list | length }}</td>
                 <td>{{ counts['registrations'] | selectattr("month", "equalto", now.month) | selectattr("year", "equalto", now.year) | list | length }}</td>
