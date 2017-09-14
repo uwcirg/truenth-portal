@@ -578,9 +578,6 @@ def set_user_consents(user_id):
         """Invalidate the assessment status cache values for this user"""
         dogpile_cache.invalidate(
             overall_assessment_status, user.id)
-        for consent in user.all_consents:
-            dogpile_cache.invalidate(
-                overall_assessment_status, user.id, consent.id)
 
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
