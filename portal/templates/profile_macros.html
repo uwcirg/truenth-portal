@@ -11,13 +11,13 @@
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}" />
     <div class="form-group profile-section" id="bdGroup">
-        <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
+        <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" required />
+                <input class="form-control bd-element" id="date" aria-label="Birth Date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" required>
+                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="Birth Year" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -105,14 +105,14 @@
     <div class="row profile-section name-section">
         <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname"/>
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorfirstname" class="error-message"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true"/>
+                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorlastname" class="error-message"></div>
             </div>
@@ -282,7 +282,7 @@
             {%- endif -%}
         </div>
         <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
-        <select  id="profileEmailSelect" class="form-control bd-element">
+        <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
             <option value="">{{ _("Select Email...") }}</option>
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
             <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
@@ -1682,8 +1682,8 @@
 {%- endmacro %}
 {% macro profileSiteID(current_user) -%}
     <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Site ID")}}</label>
-        <input type="text" id="profileSiteId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId"/>
+        <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>

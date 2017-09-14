@@ -196,7 +196,7 @@ $(document).ready(function(){
      ***********************************************************/
 
     $("#profileForm .profile-item-container.editable").each(function() {
-        $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}"></button>');
+        $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}" aria-label="{{_('Edit Button')}}"></button>');
     });
 
     $("#profileForm .profile-item-edit-btn").each(function() {

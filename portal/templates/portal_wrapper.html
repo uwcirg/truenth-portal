@@ -64,10 +64,10 @@
         <div id="tnthNavMainContainer">
             <div id="tnthLogo">
                 {% if enable_links %}<a href="{{PORTAL}}">{% endif %}
-                    <img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" />
+                    <img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" alt="TrueNTH logo"/>
                 {% if enable_links %}</a>{% endif %}
                 {% if branded_logos %}
-                    <img src={{ branded_logos[0] }}></img>
+                    <img src="{{ branded_logos[0] }}" alt="brand logo"></img>
                 {% endif %}
             </div>
             <div id="tnthTopLinks">
@@ -116,12 +116,12 @@
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">{{ _("MENU") }} <img src="{{movember_profile}}" width="45" height="45" /></div>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">{{ _("MENU") }} <img src="{{movember_profile}}" width="45" height="45" alt="Movember logo" /></div>
                 {% if enable_links %}<a id="tnthLogoXs" href="{{PORTAL}}" title="{{ _('Return to TrueNTH home') }}">{% endif %}
-                <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" />
+                <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" alt="TrueNTH logo"/>
                 {% if enable_links %}</a>{% endif %}
                 <div class="tnth-navbarXs-img-container">
-                    {% if branded_logos %}<img src={{ branded_logos[1] }}></img>{% endif %}
+                    {% if branded_logos %}<img src="{{ branded_logos[1] }}" alt="brand logo"></img>{% endif %}
                 </div>
             </div>
             {% if enable_links %}
