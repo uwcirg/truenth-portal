@@ -117,6 +117,7 @@ def cache_reporting_stats(job_id=None):
     """
     before = datetime.now()
     current_app.logger.debug(__name__)
+    dogpile_cache.invalidate(get_reporting_stats)
     dogpile_cache.refresh(get_reporting_stats)
     duration = datetime.now() - before
     message = (
