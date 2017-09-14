@@ -1,11 +1,12 @@
 """Module to test assessment_status"""
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
-from portal.models.intervention import Intervention
+from portal.models.intervention import INTERVENTION
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.encounter import Encounter
@@ -49,10 +50,14 @@ def mock_qr(user_id, instrument_id, status='completed'):
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
 metastatic_baseline_instruments = set([
-    'eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
-metastatic_recurring_instruments = set([
-    'eortc', 'hpfs', 'prems', 'epic26'])
+metastatic_3 = set([
+    'eortc', 'eproms_add', 'ironmisc'])
+metastatic_4 = set([
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi'])
+metastatic_6 = set([
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'])
 symptom_tracker_instruments = set(['epic26', 'eq5d', 'maxpc', 'pam'])
 
 
@@ -79,125 +84,132 @@ def mock_eproms_questionnairebanks():
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
 
-    # Recurring assessments every 3 months up to 24 months, then every
-    # 6 months prems alternate with epic26 - start with prems
-    initial_recur = Recur(
-        days_to_start=90, days_in_cycle=90,
-        days_till_termination=720)
-    initial_recur_prems = Recur(
-        days_to_start=90, days_in_cycle=180,
-        days_till_termination=720)
-    initial_recur_epic26 = Recur(
-        days_to_start=180, days_in_cycle=180,
-        days_till_termination=720)
-    every_six_thereafter = Recur(
-        days_to_start=720, days_in_cycle=180)
-    every_six_thereafter_prems = Recur(
-        days_to_start=720, days_in_cycle=360)
-    every_six_thereafter_epic26 = Recur(
-        days_to_start=900, days_in_cycle=360)
+    # from https://docs.google.com/spreadsheets/d/\
+    # 1oJ8HKfMHOdXkSshjRlr8lFXxT4aUHX5ntxnKMgf50wE/edit#gid=1339608238
+    three_q_recur = Recur(
+        start='{"months": 3}', cycle_length='{"months": 6}',
+        termination='{"months": 24}')
+    four_q_recur1 = Recur(
+        start='{"months": 6}', cycle_length='{"years": 1}',
+        termination='{"months": 21}')
+    four_q_recur2 = Recur(
+        start='{"months": 30}', cycle_length='{"years": 1}',
+        termination='{"months": 33}')
+    six_q_recur = Recur(
+        start='{"years": 1}', cycle_length='{"years": 1}',
+        termination='{"years": 3, "months": 3}')
 
     with SessionScope(db):
         for name in (localized_instruments.union(*(
                 metastatic_baseline_instruments,
                 metastatic_indefinite_instruments,
-                metastatic_recurring_instruments,
-                symptom_tracker_instruments))):
+                metastatic_3,
+                metastatic_4,
+                metastatic_6))):
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
-        db.session.add(initial_recur)
-        db.session.add(initial_recur_prems)
-        db.session.add(initial_recur_epic26)
-        db.session.add(every_six_thereafter)
-        db.session.add(every_six_thereafter_prems)
-        db.session.add(every_six_thereafter_epic26)
+        db.session.add(three_q_recur)
+        db.session.add(four_q_recur1)
+        db.session.add(four_q_recur2)
+        db.session.add(six_q_recur)
         db.session.commit()
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
     localized_org_id = localized_org.id
     metastatic_org_id = metastatic_org.id
-    initial_recur = db.session.merge(initial_recur)
-    initial_recur_prems = db.session.merge(initial_recur_prems)
-    initial_recur_epic26 = db.session.merge(initial_recur_epic26)
-    every_six_thereafter = db.session.merge(every_six_thereafter)
-    every_six_thereafter_prems = db.session.merge(every_six_thereafter_prems)
-    every_six_thereafter_epic26 = db.session.merge(every_six_thereafter_epic26)
+    three_q_recur = db.session.merge(three_q_recur)
+    four_q_recur1 = db.session.merge(four_q_recur1)
+    four_q_recur2 = db.session.merge(four_q_recur2)
+    six_q_recur = db.session.merge(six_q_recur)
 
     # Localized baseline
     l_qb = QuestionnaireBank(
         name='localized',
         classification='baseline',
-        organization_id=localized_org_id)
+        organization_id=localized_org_id,
+        start='{"days": 0}',
+        overdue='{"days": 7}',
+        expired='{"months": 3}')
     for rank, instrument in enumerate(localized_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=7, days_till_overdue=90,
-            rank=rank)
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         l_qb.questionnaires.append(qbq)
 
     # Metastatic baseline
     mb_qb = QuestionnaireBank(
         name='metastatic',
         classification='baseline',
-        organization_id=metastatic_org_id)
+        organization_id=metastatic_org_id,
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}')
     for rank, instrument in enumerate(metastatic_baseline_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=30,
-            rank=rank)
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mb_qb.questionnaires.append(qbq)
 
     # Metastatic indefinite
     mi_qb = QuestionnaireBank(
         name='metastatic_indefinite',
         classification='indefinite',
-        organization_id=metastatic_org_id)
+        organization_id=metastatic_org_id,
+        start='{"days": 0}',
+        expired='{"years": 50}')
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=3000,
-            rank=rank)
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mi_qb.questionnaires.append(qbq)
 
-    # Metastatic recurring
-    mr_qb = QuestionnaireBank(
-        name='metastatic_recurring',
+    # Metastatic recurring 3
+    mr3_qb = QuestionnaireBank(
+        name='metastatic_recurring3',
         classification='recurring',
-        organization_id=metastatic_org_id)
-    for rank, instrument in enumerate(metastatic_recurring_instruments):
+        organization_id=metastatic_org_id,
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}',
+        recurs=[three_q_recur])
+    for rank, instrument in enumerate(metastatic_3):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        if instrument == 'prems':
-            recurs = [initial_recur_prems, every_six_thereafter_prems]
-        elif instrument == 'epic26':
-            recurs = [initial_recur_epic26, every_six_thereafter_epic26]
-        else:
-            recurs = [initial_recur, every_six_thereafter]
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
+        mr3_qb.questionnaires.append(qbq)
 
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=30,
-            rank=rank, recurs=recurs)
-        mr_qb.questionnaires.append(qbq)
-
-    # Symptom Tracker
-    self_management = Intervention.query.filter_by(
-        name='self_management').one()
-    st_qb = QuestionnaireBank(
-        name='symptom_tracker',
-        classification='baseline',
-        intervention_id=self_management.id)
-    for rank, instrument in enumerate(symptom_tracker_instruments):
+    # Metastatic recurring 4
+    mr4_qb = QuestionnaireBank(
+        name='metastatic_recurring4',
+        classification='recurring',
+        organization_id=metastatic_org_id,
+        recurs=[four_q_recur1, four_q_recur2],
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}')
+    for rank, instrument in enumerate(metastatic_4):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=365,
-            rank=rank)
-        st_qb.questionnaires.append(qbq)
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
+        mr4_qb.questionnaires.append(qbq)
+
+    # Metastatic recurring 6
+    mr6_qb = QuestionnaireBank(
+        name='metastatic_recurring6',
+        classification='recurring',
+        organization_id=metastatic_org_id,
+        recurs=[six_q_recur],
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}')
+    for rank, instrument in enumerate(metastatic_6):
+        q = Questionnaire.query.filter_by(name=instrument).one()
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
+        mr6_qb.questionnaires.append(qbq)
 
     with SessionScope(db):
         db.session.add(l_qb)
         db.session.add(mb_qb)
         db.session.add(mi_qb)
-        db.session.add(mr_qb)
+        db.session.add(mr3_qb)
+        db.session.add(mr4_qb)
+        db.session.add(mr6_qb)
         db.session.commit()
 
 
@@ -207,22 +219,45 @@ def mock_tnth_questionnairebanks():
             db.session.add(Questionnaire(name=name))
         db.session.commit()
 
-    # Symptom Tracker
-    self_management = Intervention.query.filter_by(
-        name='self_management').one()
+    # Symptom Tracker Baseline
+    self_management = INTERVENTION.SELF_MANAGEMENT
     st_qb = QuestionnaireBank(
         name='symptom_tracker',
         classification='baseline',
-        intervention_id=self_management.id)
+        intervention_id=self_management.id,
+        start='{"days": 0}',
+        expired='{"months": 3}'
+    )
     for rank, instrument in enumerate(symptom_tracker_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=365,
-            rank=rank)
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         st_qb.questionnaires.append(qbq)
+
+    # Symptom Tracker Recurrence
+    st_recur = Recur(
+        start='{"months": 3}', cycle_length='{"months": 3}',
+        termination='{"months": 27}')
 
     with SessionScope(db):
         db.session.add(st_qb)
+        db.session.add(st_recur)
+        db.session.commit()
+
+    self_management = INTERVENTION.SELF_MANAGEMENT
+    st_recur_qb = QuestionnaireBank(
+        name='symptom_tracker_recurring',
+        classification='recurring',
+        intervention_id=self_management.id,
+        start='{"days": 0}',
+        expired='{"months": 3}',
+        recurs=[st_recur]
+    )
+    for rank, instrument in enumerate(symptom_tracker_instruments):
+        q = Questionnaire.query.filter_by(name=instrument).one()
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
+        st_recur_qb.questionnaires.append(qbq)
+    with SessionScope(db):
+        db.session.add(st_recur_qb)
         db.session.commit()
 
 
@@ -278,15 +313,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # confirm appropriate instruments
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(
-            set(a_s.instruments_needing_full_assessment('baseline')),
+            set(a_s.instruments_needing_full_assessment()),
             localized_instruments)
-
-        # check due date access
-        for questionnaire in a_s.questionnaire_data.baseline():
-            self.assertTrue(questionnaire.get('by_date') > datetime.utcnow())
-
-        self.assertFalse(a_s.instruments_in_progress('baseline'))
-        self.assertFalse(a_s.instruments_in_progress('all'))
 
     def test_localized_on_time(self):
         # User finished both on time
@@ -320,10 +348,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertEquals(a_s.overall_status, "In Progress")
 
         # confirm appropriate instruments
-        self.assertFalse(a_s.instruments_needing_full_assessment('all'))
+        self.assertFalse(a_s.instruments_needing_full_assessment())
         self.assertEquals(
-            set(a_s.instruments_in_progress('baseline')),
-            localized_instruments)
+            set(a_s.instruments_in_progress()), localized_instruments)
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
@@ -345,11 +372,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_metastatic_on_time(self):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
+        for i in metastatic_baseline_instruments:
+            mock_qr(user_id=TEST_USER_ID, instrument_id=i)
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
         self.mark_metastatic()
@@ -370,11 +394,10 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertEquals(a_s.overall_status, "Due")
 
         # confirm list of expected intruments needing attention
-        a_s.instruments_needing_full_assessment('baseline')
         self.assertEquals(
             metastatic_baseline_instruments,
-            set(a_s.instruments_needing_full_assessment('baseline')))
-        self.assertFalse(a_s.instruments_in_progress('baseline'))
+            set(a_s.instruments_needing_full_assessment()))
+        self.assertFalse(a_s.instruments_in_progress())
 
         # metastatic indefinite should also be 'due'
         self.assertEquals(
@@ -382,64 +405,56 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             set(a_s.instruments_needing_full_assessment('indefinite')))
         self.assertFalse(a_s.instruments_in_progress('indefinite'))
 
-    def test_metastatic_overdue(self):
+    def test_localized_overdue(self):
         # if the user completed something on time, and nothing else
         # is due, should see the thankyou message.
 
         # backdate so the baseline q's have expired
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
                 status='in-progress')
-        self.bless_with_basics(backdate=timedelta(days=31))
-        self.mark_metastatic()
+        self.bless_with_basics(backdate=relativedelta(months=3))
+        self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Partially Completed")
 
-        # with all q's from baseline expired,
+        # with all q's expired,
         # instruments_needing_full_assessment and insturments_in_progress
         # should be empty
-        self.assertFalse(a_s.instruments_needing_full_assessment('baseline'))
-        self.assertFalse(a_s.instruments_in_progress('baseline'))
-
-        # mock completing the indefinite QB and expect to see 'thank you'
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
-        self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user)
-        self.assertTrue(a_s.enrolled_in_classification('indefinite'))
-        self.assertFalse(a_s.instruments_needing_full_assessment('indefinite'))
-        self.assertFalse(a_s.instruments_in_progress('indefinite'))
+        self.assertFalse(a_s.instruments_needing_full_assessment())
+        self.assertFalse(a_s.instruments_in_progress())
 
     def test_initial_recur_due(self):
 
         # backdate so baseline q's have expired, and we within the first
         # recurrance window
-        self.bless_with_basics(backdate=timedelta(days=90))
+        self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
-        self.assertEquals(a_s.overall_status, "Expired")
+        self.assertEquals(a_s.overall_status, "Due")
 
         # in the initial window w/ no questionnaires submitted
         # should include all from initial recur
         self.assertEquals(
-            set(a_s.instruments_needing_full_assessment('recurring')),
-            set(['eortc', 'hpfs', 'prems']))
+            set(a_s.instruments_needing_full_assessment()),
+            metastatic_3)
 
     def test_secondary_recur_due(self):
 
-        # backdate so baseline q's have expired, and we within the
+        # backdate so baseline q's have expired, and we are within the
         # second recurrance window
-        self.bless_with_basics(backdate=timedelta(days=180))
+        self.bless_with_basics(backdate=relativedelta(months=6))
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
-        self.assertEquals(a_s.overall_status, "Expired")
+        self.assertEquals(a_s.overall_status, "Due")
 
-        # in the initial window w/ no questionnaires submitted
-        # should include all from initial recur
+        # w/ no questionnaires submitted
+        # should include all from second recur
         self.assertEquals(
-            set(a_s.instruments_needing_full_assessment('recurring')),
-            set(['eortc', 'hpfs', 'epic26']))
+            set(a_s.instruments_needing_full_assessment()),
+            metastatic_4)
 
     def test_batch_lookup(self):
         self.login()
@@ -463,18 +478,17 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertEquals(a_s.overall_status, "Due")
 
     def test_boundry_overdue(self):
-        "At days_till_overdue, should still be overdue"
         self.login()
-        self.bless_with_basics(backdate=timedelta(days=89, hours=23))
+        self.bless_with_basics(backdate=relativedelta(months=3, hours=-1))
         self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, 'Overdue')
 
     def test_boundry_expired(self):
-        "At days_till_overdue +1, should be expired"
+        "At expired, should be expired"
         self.login()
-        self.bless_with_basics(backdate=timedelta(days=91))
+        self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
@@ -482,7 +496,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
     def test_boundry_in_progress(self):
         self.login()
-        self.bless_with_basics(backdate=timedelta(days=89, hours=23))
+        self.bless_with_basics(backdate=relativedelta(months=3, hours=-1))
         self.mark_localized()
         for instrument in localized_instruments:
             mock_qr(
@@ -494,7 +508,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
     def test_boundry_in_progress_expired(self):
         self.login()
-        self.bless_with_basics(backdate=timedelta(days=91))
+        self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
         for instrument in localized_instruments:
             mock_qr(

@@ -48,10 +48,11 @@ class TestAssessmentEngine(TestCase):
         qb = QuestionnaireBank(
             name='Test Questionnaire Bank',
             classification='baseline',
-            organization_id=org.id)
-        qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=qn, days_till_due=7, days_till_overdue=90,
-            rank=0)
+            organization_id=org.id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
         qb.questionnaires.append(qbq)
 
         test_user = get_user(TEST_USER_ID)

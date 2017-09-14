@@ -256,8 +256,7 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                due_date = assessment_status.next_available_due_date(
-                    classification='baseline')
+                due_date = assessment_status.next_available_due_date()
                 assert due_date
                 greeting = _("Hi {}").format(user.display_name)
                 reminder = _(
