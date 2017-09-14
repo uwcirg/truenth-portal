@@ -23,14 +23,3 @@ docker/portal.env
 .settings/
 .pydevproject
 .project
-
-portal/node_modules/
-portal/package-lock.json
-portal/less_css_gulpfile.js
-portal/package-lock.json
-.gitignore
-node_modules/
-package-lock.json
-portal/static/js/dist/
-.gitignore
-portal/package.json
