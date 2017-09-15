@@ -2,6 +2,7 @@
 from datetime import datetime
 from flask_webtest import SessionScope
 
+from portal.dogpile import dogpile_cache
 from portal.extensions import db
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
@@ -45,6 +46,8 @@ class TestReporting(TestCase):
                 db.session.add(enc)
             db.session.commit()
 
+        # invalidate cache before testing
+        dogpile_cache.invalidate(get_reporting_stats)
         stats = get_reporting_stats()
 
         self.assertEqual(stats['organizations']['testorg'], 2)
@@ -55,3 +58,18 @@ class TestReporting(TestCase):
         self.assertEqual(stats['roles']['partner'], 1)
 
         self.assertEqual(len(stats['encounters']['all']), 5)
+
+        # test adding a new encounter, to confirm still using cached stats
+        with SessionScope(db):
+            enc = Encounter(
+                status='finished',
+                auth_method='password_authenticated',
+                start_time=datetime.utcnow(),
+                user_id=userid)
+            db.session.add(enc)
+            db.session.commit()
+
+        stats2 = get_reporting_stats()
+
+        # shold not have changed, if still using cached values
+        self.assertEqual(len(stats2['encounters']['all']), 5)
