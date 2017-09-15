@@ -71,7 +71,11 @@ class Recur(db.Model):
         return d
 
     def active_interval_start(self, trigger_date):
-        """Return datetime for active recurrence start or None
+        """Return two tuple (start, iteration_count) or None
+
+        Return UTC datetime for active recurrence start and the
+        iteration_count (possibly non zero in the recurring case)
+        or (None, 0)
 
         :param trigger_date: The UTC datetime defining external context
             launch point of the study or procedure date, etc.
@@ -89,19 +93,23 @@ class Recur(db.Model):
 
         if now < start_date:
             # Has yet to begin
-            return None
+            return (None, 0)
         if termination and now > termination:
             # Recurrence terminated
-            return None
+            return (None, 0)
 
         # Still here implies we're in a valid period - find the current
         # and return its effective start date
+        assert (now + RelativeDelta(self.cycle_length) > now)
+
         effective_start = start_date
+        iteration_count = 0
         while True:
             if effective_start + RelativeDelta(self.cycle_length) < now:
                 effective_start += RelativeDelta(self.cycle_length)
+                iteration_count += 1
             else:
-                return effective_start
+                return (effective_start, iteration_count)
 
 
 class QuestionnaireBankRecur(db.Model):
@@ -114,10 +122,12 @@ class QuestionnaireBankRecur(db.Model):
         nullable=False)
     recur_id = db.Column(db.Integer(), db.ForeignKey(
         'recurs.id', ondelete='CASCADE'), nullable=False)
+    iteration_count = db.Column(
+        db.Integer(), server_default="0", nullable=False)
 
     __table_args__ = (
         UniqueConstraint(
-            questionnaire_bank_id, recur_id,
+            questionnaire_bank_id, recur_id, iteration_count,
             name='_questionnaire_bank_recure'),
     )
 
@@ -125,4 +135,4 @@ class QuestionnaireBankRecur(db.Model):
         """Print friendly format for logging, etc."""
         return ("QuestionnaireBankRecur "
                 "{0.questionnaire_bank_id}:"
-                "{0.recur_id}".format(self))
+                "{0.recur_id} {0.iteration_count}".format(self))

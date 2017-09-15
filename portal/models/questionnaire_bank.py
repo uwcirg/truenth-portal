@@ -287,7 +287,7 @@ class QuestionnaireBank(db.Model):
             if classification == 'indefinite':
                 continue
             for qb in QuestionnaireBank.qbs_for_user(user, classification):
-                relative_start = qb.calculated_start(trigger_date)
+                relative_start, ic = qb.calculated_start(trigger_date)
                 if relative_start is None:
                     # indicates QB hasn't started yet, continue
                     continue
@@ -299,37 +299,39 @@ class QuestionnaireBank(db.Model):
         return last_found
 
     def calculated_start(self, trigger_date):
-        """Return calculated_start date (UTC) for QB or None
+        """Return two item tuple (calculated_start, iteration) for QB or None
 
-        Returns calculated start for the QB.  Generally trigger date plus
-        the QB.start.  For recurring, this may include the math for several
-        iterations to reach the active cycle.
+        Returns calculated start date in UTC for the QB and the iteration
+        count.  Generally trigger date plus the QB.start.  For recurring, the
+        iteration count may be non zero if it takes multiple iterations to
+        reach the active cycle.
 
-        :return: datetime of the questionnaire's start date; None if N/A
+        :return: two item tuple (datetime of the questionnaire's start date,
+            iteration_count); (None, 0) if N/A
 
         """
         # On recurring QB, deligate to recur for date
         if len(self.recurs):
             for recurrence in self.recurs:
-                relative_start = recurrence.active_interval_start(
+                (relative_start, ic) = recurrence.active_interval_start(
                     trigger_date=trigger_date)
                 if relative_start:
-                    return relative_start
-            return None  # no active recurrence
+                    return (relative_start, ic)
+            return (None, 0)  # no active recurrence
 
-        # Otherwise, simply trigger plus start
-        return trigger_date + RelativeDelta(self.start)
+        # Otherwise, simply trigger plus start (and iteration_count of zero)
+        return (trigger_date + RelativeDelta(self.start), 0)
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date)
+        start, ic = self.calculated_start(trigger_date)
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
     def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date)
+        start, ic = self.calculated_start(trigger_date)
         if not (start and self.overdue):
             return None
 

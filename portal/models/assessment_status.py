@@ -86,7 +86,7 @@ def qb_status_dict(user, questionnaire_bank):
     if not questionnaire_bank:
         return d
     trigger_date = questionnaire_bank.trigger_date(user)
-    start = questionnaire_bank.calculated_start(trigger_date)
+    start, _ = questionnaire_bank.calculated_start(trigger_date)
     overdue = questionnaire_bank.calculated_overdue(trigger_date)
     expired = questionnaire_bank.calculated_expiry(trigger_date)
     for q in questionnaire_bank.questionnaires:
