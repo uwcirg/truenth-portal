@@ -134,6 +134,15 @@ var __CRSF_TOKEN_HEADER = {
 };
  __i18next.init({"debug": false, "initImmediate": true});
 
+$("#homeFooter .logo-link").each(function() {
+  if (! hasValue($.trim($(this).attr("href")))) {
+      $(this).removeAttr("target");
+      $(this).on("click", function(e) {
+        e.preventDefault();
+        return false;
+      });
+  };
+});
 {% block document_ready -%}
 {%- endblock %}
 </script>

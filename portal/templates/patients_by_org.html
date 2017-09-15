@@ -130,41 +130,6 @@ $(document).ready(function() {
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
-
-  /*
-   * client side population of assessment status
-   * comment this out for now
-   */
-
-  /************************************************************************
-   * start commented out code
-   */
-  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-  //client side update of assessment status, for performance
-  //  setTimeout(function() { AT.updateData();}, 100);
-  //  $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
-  //      e.stopPropagation();
-  //      AT.abortRequests(function() {
-  //        if (e.target && !$(e.target).hasClass("rowlink-skip")) {
-  //          $(e.target).trigger('click.bs.rowlink');
-  //        };
-  //      }, true);
-  //  });
-  //  $(document).delegate("#createUserLink", "click touchstart", function(e) {
-  //      e.stopPropagation();
-  //      AT.abortRequests(function() {
-  //        window.location = $("#createUserLink").attr("href");
-  //     }, true);
-  //  });
-  //  /*
-  // * appending loading indicator for status column at runtime
-  //   */
-  //  $("#adminTable th.status-field").prepend(__getLoaderHTML('{{_("retrieving data ...")}}'));
-  {% endif %}
-  /************************************************************************
-   * end commented out code
-   */
-
   /*
    * add placeholder text for filter controls
    */
@@ -198,9 +163,7 @@ $(document).ready(function() {
         org_list[{{org}}] = true;
     {% endfor %}
   {% endif %}
-
   AT.initOrgsList(org_list, 'patients');
-
 });
 
 {% endblock %}

@@ -97,16 +97,11 @@ var configObj = (function() {
   var CONFIG_DEFAULT_CORE_DATA = {%if config.REQUIRED_CORE_DATA %}{{config.REQUIRED_CORE_DATA|safe}}{% else%}false{%endif%};
   var CONFIG_REQUIRED_CORE_DATA = null;
   return {
-      initConfig: function() {
-        {%- if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}
-        tnthAjax.getStillNeededCoreData({{user.id}}, true, this.setConfig);
-        {%- else -%}
-        /*
-         * need to make this call to hide/show terms checkboxes as needed
-         */
-        tnthAjax.getStillNeededCoreData({{user.id}}, true);
-        CONFIG_REQUIRED_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
-        {%- endif -%}
+      initConfig: function(callback) {
+	     tnthAjax.getStillNeededCoreData({{user.id}}, true, function(data) {
+		     configObj.setConfig({%-if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}data{%-endif-%});
+		     if (callback) callback(data);
+         });
       },
       inConfig: function(configMatch, dataArray) {
         if (! hasValue(configMatch)) return false;
@@ -136,7 +131,7 @@ var configObj = (function() {
           if (!data.error) {
             CONFIG_REQUIRED_CORE_DATA = data;
           };
-        }
+        } else CONFIG_REQUIRED_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
       }
   };
 
@@ -431,6 +426,7 @@ FieldsChecker.prototype.getNext = function() {
 };
 
 function initIncompleteFields() {
+  fc = new FieldsChecker(mainSections);
   fc.setIncompleteFields();
   incompleteFields = fc.getIncompleteFields();
   incompleteFields.forEach(function(field, index) {
@@ -501,10 +497,14 @@ function initIncompleteFields() {
     };
 
 };
-
-configObj.initConfig();
-
 $(document).ready(function(){
+	/*
+	 * the flow here : 
+	 * get still needed core data
+	 * populate terms if it is agreed
+	 * get incomplete fields thereafter
+	 */
+	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, initIncompleteFields); });
 
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
@@ -829,12 +829,7 @@ $(document).ready(function(){
     $(".button-container").each(function() {
       $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-
-    tnthAjax.getTerms({{user.id}});
-    fc = new FieldsChecker(mainSections);
-
-    setTimeout('$(".footerWrapper").show()', 1000);
-    setTimeout("initIncompleteFields();", 1000);
+    setTimeout('$("#iqFooterWrapper").show()', 1000);;
   });
 {% endblock %}
 
