@@ -1,10 +1,11 @@
 """Questionnaire Bank module"""
+from datetime import datetime
 from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
-from ..date_tools import FHIR_datetime
+from ..date_tools import FHIR_datetime, RelativeDelta
 from .fhir import CC
 from .intervention import Intervention
 from .intervention_strategies import observation_check
@@ -33,12 +34,28 @@ class QuestionnaireBank(db.Model):
     classification = db.Column(
         'classification', classification_types_enum,
         server_default='baseline', nullable=False)
+
+    start = db.Column(
+        db.Text, nullable=False,
+        doc=("'relativedelta' value (i.e. {\"months\": 3, \"days\": -14}) "
+             "from trigger date noting the beginning of the valid time "
+             "period for the questionnaire bank"))
+    overdue = db.Column(
+        db.Text, nullable=True,
+        doc=("optional 'relativedelta' value from start, noting when "
+             "the questionnaire bank is considered 'overdue'"))
+    expired = db.Column(
+        db.Text, nullable=True,
+        doc=("'relativedelta' value from start defining the exclusive end "
+             "of the valid time period for the questionnaire bank"))
     questionnaires = db.relationship(
         'QuestionnaireBankQuestionnaire',
         back_populates='questionnaire_bank',
         order_by="QuestionnaireBankQuestionnaire.rank")
+    recurs = db.relationship(
+        Recur, secondary='questionnaire_bank_recurs')
 
-    # QuestionnaireBank is associated with an Organization OR an Intervention,
+    # QuestionnaireBank is associated with an Organization XOR an Intervention,
     # either of which dictate whether it's given to a User
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=True)
@@ -68,7 +85,25 @@ class QuestionnaireBank(db.Model):
         if 'intervention' in data:
             self.intervention_id = Reference.parse(
                 data['intervention']).id
+        self.start = data['start']
+        self.expired = data['expired']
+        if 'overdue' in data:
+            self.overdue = data['overdue']
+
         self = self.add_if_not_found(commit_immediately=True)
+
+        rs_named = set()
+        for r in data.get('recurs', []):
+            recur = Recur.from_json(r).add_if_not_found()
+            if recur not in self.recurs:
+                self.recurs.append(recur)
+            rs_named.add(recur)
+
+        # remove any stale
+        for unwanted in set(self.recurs) - rs_named:
+            self.recurs.remove(unwanted)
+            db.session.delete(unwanted)
+
         qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_json(
@@ -90,6 +125,10 @@ class QuestionnaireBank(db.Model):
         d = {}
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
+        d['start'] = self.start
+        d['expired'] = self.expired
+        if self.overdue:
+            d['overdue'] = self.overdue
         d['classification'] = self.classification
         if self.organization_id:
             d['organization'] = Reference.organization(
@@ -98,12 +137,13 @@ class QuestionnaireBank(db.Model):
             d['intervention'] = Reference.intervention(
                 self.intervention_id).as_fhir()
         d['questionnaires'] = [q.as_json() for q in self.questionnaires]
+        d['recurs'] = [r.as_json() for r in self.recurs]
         return d
 
     def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
-        Queries for similar, adds new if not found.
+        Queries on name alone, adds new if not found.
 
         @return: the new or matched QuestionnaireBank
 
@@ -202,6 +242,8 @@ class QuestionnaireBank(db.Model):
                     results.append(qb)
 
         def validate_classification_count(qbs):
+            if qbs and qbs[0].classification == 'recurring':
+                return
             if len(qbs) > 1:
                 current_app.logger.error(
                     "multiple QuestionnaireBanks for {user} with "
@@ -212,8 +254,91 @@ class QuestionnaireBank(db.Model):
         validate_classification_count(results)
         return results
 
+    @staticmethod
+    def most_current_qb(user, as_of_date=None):
+        """Return "most current" qb for user, or None
+
+        :param as_of_date: if not provided, use current utc time.
+
+        Ideally, return the one current QuestionnaireBank that applies
+        to the user 'as_of_date'.  If none, return the most recently
+        expired.
+
+        NB the `indefinite` classification is outside the scope of this method,
+        and should be treated independently
+
+        """
+        if as_of_date is None:
+            as_of_date = datetime.utcnow()
+        else:
+            raise NotImplementedError(
+                'needs attention in active_interval_start')
+
+        baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
+        if not baseline:
+            return None
+        trigger_date = baseline[0].trigger_date(user)
+        if not trigger_date:
+            return None
+
+        # Iterate over users QBs looking for current
+        last_found = baseline[0]
+        for classification in classification_types:
+            if classification == 'indefinite':
+                continue
+            for qb in QuestionnaireBank.qbs_for_user(user, classification):
+                relative_start, ic = qb.calculated_start(trigger_date)
+                if relative_start is None:
+                    # indicates QB hasn't started yet, continue
+                    continue
+                expiry = qb.calculated_expiry(trigger_date)
+                last_found = qb
+
+                if relative_start >= as_of_date and as_of_date < expiry:
+                    return qb
+        return last_found
+
+    def calculated_start(self, trigger_date):
+        """Return two item tuple (calculated_start, iteration) for QB or None
+
+        Returns calculated start date in UTC for the QB and the iteration
+        count.  Generally trigger date plus the QB.start.  For recurring, the
+        iteration count may be non zero if it takes multiple iterations to
+        reach the active cycle.
+
+        :return: two item tuple (datetime of the questionnaire's start date,
+            iteration_count); (None, 0) if N/A
+
+        """
+        # On recurring QB, deligate to recur for date
+        if len(self.recurs):
+            for recurrence in self.recurs:
+                (relative_start, ic) = recurrence.active_interval_start(
+                    trigger_date=trigger_date)
+                if relative_start:
+                    return (relative_start, ic)
+            return (None, 0)  # no active recurrence
+
+        # Otherwise, simply trigger plus start (and iteration_count of zero)
+        return (trigger_date + RelativeDelta(self.start), 0)
+
+    def calculated_expiry(self, trigger_date):
+        """Return calculated expired date (UTC) for QB or None"""
+        start, ic = self.calculated_start(trigger_date)
+        if not start:
+            return None
+        return start + RelativeDelta(self.expired)
+
+    def calculated_overdue(self, trigger_date):
+        """Return calculated overdue date (UTC) for QB or None"""
+        start, ic = self.calculated_start(trigger_date)
+        if not (start and self.overdue):
+            return None
+
+        return start + RelativeDelta(self.overdue)
+
     def trigger_date(self, user):
-        """Return trigger date for user on questionnaire bank
+        """Return trigger date for user via QB association
 
         The trigger date for a questionnaire bank depends on its
         association.  i.e. for org affiliated QBs, use the respective
@@ -257,14 +382,10 @@ class QuestionnaireBankQuestionnaire(db.Model):
         'questionnaire_banks.id', ondelete='CASCADE'), nullable=False)
     questionnaire_id = db.Column(db.Integer(), db.ForeignKey(
         'questionnaires.id', ondelete='CASCADE'), nullable=False)
-    days_till_due = db.Column(db.Integer, nullable=False)
-    days_till_overdue = db.Column(db.Integer, nullable=False)
     rank = db.Column(db.Integer, nullable=False)
 
     questionnaire = db.relationship(Questionnaire)
     questionnaire_bank = db.relationship('QuestionnaireBank')
-    recurs = db.relationship(
-        Recur, secondary='questionnaire_bank_questionnaire_recurs')
 
     __table_args__ = (
         UniqueConstraint(
@@ -295,19 +416,13 @@ class QuestionnaireBankQuestionnaire(db.Model):
         """
         instance = cls()
         instance.questionnaire_id = Reference.parse(data['questionnaire']).id
-        instance.days_till_due = data['days_till_due']
-        instance.days_till_overdue = data['days_till_overdue']
         instance.rank = data['rank']
-        for r in data.get('recurs', []):
-            instance.recurs.append(Recur.from_json(r).add_if_not_found())
         return instance
 
     def as_json(self):
         d = {}
         d['questionnaire'] = Reference.questionnaire(self.name).as_fhir()
-        for k in ('rank', 'days_till_due', 'days_till_overdue'):
-            d[k] = getattr(self, k)
-        d['recurs'] = [r.as_json() for r in self.recurs]
+        d['rank'] = getattr(self, 'rank')
         return d
 
     def add_if_not_found(self, commit_immediately=False):

@@ -10,7 +10,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..dogpile import dogpile_cache
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
 from ..models.assessment_status import invalidate_assessment_status_cache
@@ -1579,9 +1578,8 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
+        assessment_status = overall_assessment_status(user.id)
         for consent in user.all_consents:
-            assessment_status = overall_assessment_status(
-                user.id, consent.id)
             details.append(
                 {'consent': consent.as_json(),
                  'assessment_status': assessment_status})

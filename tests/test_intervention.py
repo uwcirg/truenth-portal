@@ -1,9 +1,10 @@
 """Unit test module for Intervention API"""
-from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr, mock_questionnairebanks
+from tests.test_assessment_status import metastatic_baseline_instruments
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -381,32 +382,26 @@ class TestIntervention(TestCase):
             user.display_name in ae.display_for_user(user).card_html)
 
         # Add a fake assessments and see a change
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
+        for i in metastatic_baseline_instruments:
+            mock_qr(user_id=TEST_USER_ID, instrument_id=i)
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
             "Thank you" in ae.display_for_user(user).card_html)
 
-    def test_thankyou_on_expired(self):
-        """If baseline expired and other QB's done, should see thank you"""
+    def test_expired(self):
+        """If baseline expired check message"""
         ae = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
         # backdate so baseline is expired
-        self.bless_with_basics(backdate=timedelta(days=60))
+        self.bless_with_basics(backdate=relativedelta(months=3))
 
         # generate questionnaire banks and associate user with
-        # metastatic organization
+        # localized organization
         mock_questionnairebanks('eproms')
-        metastatic_org = Organization.query.filter_by(name='metastatic').one()
-        self.test_user.organizations.append(metastatic_org)
-
-        # Add a fake assessment only to non-expired one from indefinite
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+        localized_org = Organization.query.filter_by(name='localized').one()
+        self.test_user.organizations.append(localized_org)
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',
@@ -420,7 +415,8 @@ class TestIntervention(TestCase):
         user, ae = map(db.session.merge, (self.test_user, ae))
 
         self.assertTrue(
-            "Thank you" in ae.display_for_user(user).card_html)
+            "The assessment is no longer available" in
+            ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""

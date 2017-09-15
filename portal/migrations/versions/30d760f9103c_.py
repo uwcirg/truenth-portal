@@ -56,15 +56,15 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    for qnr in session.query(QuestionnaireResponse):
-        if ("questionnaire" in qnr.document) and qnr.subject:
-            qn_ref = qnr.document.get("questionnaire").get("reference")
-            qn_name = qn_ref.split("/")[-1] if qn_ref else None
-            qn = session.query(Questionnaire).filter_by(name=qn_name).first()
-            for qb in qbs_for_user(qnr.subject, session):
-                for qbq in qb.questionnaires:
-                    if qbq.questionnaire == qn:
-                        qnr.questionnaire_bank = qb
+    #for qnr in session.query(QuestionnaireResponse):
+    #    if ("questionnaire" in qnr.document) and qnr.subject:
+    #        qn_ref = qnr.document.get("questionnaire").get("reference")
+    #        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+    #        qn = session.query(Questionnaire).filter_by(name=qn_name).first()
+    #        for qb in qbs_for_user(qnr.subject, session):
+    #            for qbq in qb.questionnaires:
+    #                if qbq.questionnaire == qn:
+    #                    qnr.questionnaire_bank = qb
 
     session.commit()
 
