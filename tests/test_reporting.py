@@ -23,7 +23,7 @@ class TestReporting(TestCase):
             db.session.add(org)
             user1.organizations.append(org)
             user2.organizations.append(org)
-            map(db.session.add,(user1, user2, user3))
+            map(db.session.add, (user1, user2, user3))
             db.session.commit()
         user1, user2, user3, org = map(db.session.merge,
                                        (user1, user2, user3, org))
