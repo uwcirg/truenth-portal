@@ -167,9 +167,11 @@ class AssessmentStatus(object):
 
     def __str__(self):
         """Present friendly format for logging, etc."""
-        return (
-            "{0.user} has overall status '{0.overall_status}' for "
-            "QuestionnaireBank {0.qb_data.qb.name}".format(self))
+        if self.qb_data.qb:
+            return (
+                "{0.user} has overall status '{0.overall_status}' for "
+                "QuestionnaireBank {0.qb_data.qb.name}".format(self))
+        return "{0.user} has overall status '{0.overall_status}'".format(self)
 
     @property
     def completed_date(self):

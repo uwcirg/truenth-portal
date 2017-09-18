@@ -1348,10 +1348,11 @@ def current_user():
     from flask import request, session
 
     uid = None
-    if 'id' in session:
+    if session and ('id' in session):
         # Locally logged in
         uid = session['id']
-    elif _call_or_get(flask_login_current_user.is_authenticated):
+    elif (flask_login_current_user and
+          _call_or_get(flask_login_current_user.is_authenticated)):
         uid = flask_login_current_user.id
     elif hasattr(request, 'oauth'):
         # Remote OAuth - 'id' lives in request.oauth.user.id:
