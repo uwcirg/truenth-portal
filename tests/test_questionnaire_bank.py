@@ -159,7 +159,7 @@ class TestQuestionnaireBank(TestCase):
         # User associated with CRV org should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb = QuestionnaireBank.most_current_qb(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(self.test_user)[0]
         results = list(qb.questionnaires)
         self.assertEquals(3, len(results))
         # confirm rank sticks
@@ -198,7 +198,7 @@ class TestQuestionnaireBank(TestCase):
         # User associated with INTV intervention should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb = QuestionnaireBank.most_current_qb(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(self.test_user)[0]
         results = list(qb.questionnaires)
         self.assertEquals(2, len(results))
 
