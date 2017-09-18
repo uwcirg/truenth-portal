@@ -1,5 +1,6 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
+from flask import current_app
 
 from ..dogpile import dogpile_cache
 from .fhir import CC
