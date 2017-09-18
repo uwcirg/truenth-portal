@@ -2,13 +2,10 @@
 {%- from "flask_user/_macros.html" import back_btn, back_link, linksHTML, logo -%}
 {%- from "profile_macros.html" import profile, user_profile, profileSaveBtn, profileImage -%}
 {%- block main -%}
-<script>$("#mainDiv").addClass("profile");</script>
-<div id="stickyMenu"></div>
 <form id="profileForm" class="form tnth-form to-validate" data-toggle="validator">
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
       <br/>
-      <div class="left-panel"></div>
       <div class="right-panel">
           <div class="flex">
             <div id="profileHeader" class="profile-header">
@@ -46,9 +43,6 @@
          </div>
           {%- if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) and (current_user.id != user.id)) -%}
             <nav id="indexNavBar">
-              <!--
-              <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-              -->
               <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Log in as this patient") }}</a></span>
               <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
                   <div class="modal-dialog" role="document">
@@ -71,9 +65,6 @@
               </div>
             </nav>
         {%- endif -%}
-        <!--
-        <div id="indexContainer">{{ _("Index List") }}</div>
-        -->
         <br/>
         {%- if user.id == current_user.id -%}
           {{user_profile(user, current_user, consent_agreements, user_interventions)}}
@@ -85,11 +76,11 @@
     </div>
   </div>
 </form>
+<script>$("#mainDiv").addClass("profile");</script>
 {% endblock %}
 {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
 {% block document_ready %}
 {% if user.has_role(ROLE.PATIENT) and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
-
 function handleLoginAs(e) {
     if (e) {
       e.preventDefault();
@@ -101,121 +92,67 @@ function handleLoginAs(e) {
     } catch(e) {}
     location.replace('/login-as/{{user.id}}');
 };
-//var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter, __indexContainer, __indexIcon, __leftPanel;
 $(document).ready(function(){
-
-    /*****************************************
-    //$("#profileForm .back").on("click", function(e) {
-    //    e.preventDefault();
-    //    $(this).find(".loading-message-indicator").show();
-    //     $(this).find(".glyphicon-home").hide();
-    //     window.location = $(this).attr("href");
-    // });
-    //$("a.open").on("click", function(e) {
-    // stop default browser behavior
-    //  e.preventDefault();
-    //  $("body").toggleClass("open-nav");
-    //  $("#stickyMenu").toggleClass("sticky-show")
-    //});
-    ******************************************/
-
     /********* Note, this attach loader indicator to element with the class data-loader-container,
               in order for this to work, the element needs to have an id attribute
     ***********/
-    $("#profileForm [data-loader-container]").each(function() {
-        /** see main.js **/
-        var attachId = $(this).attr("id");
-        if (!hasValue(attachId)) return false;
-        getSaveLoaderDiv("profileForm", attachId);
-        var targetFields = $(this).find("input, select");
-        if (targetFields.length > 0) {
-          targetFields.each(function() {
-              if ($(this).attr("type") == "hidden") return false;
-              $(this).attr("data-save-container-id", attachId);
-              var triggerEvent = $(this).attr("data-trigger-event");
-              if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
-              $(this).on(triggerEvent, function(e) {
-                e.stopPropagation();
-                var valid = this.validity ? this.validity.valid : true;
-                if (valid) {
-                  var hasError = false;
-                  if ($(this).attr("data-error-field")) {
-                    var customErrorField = $("#" + $(this).attr("data-error-field"));
-                    if (customErrorField.length > 0) {
-                      if (customErrorField.text() != "") hasError = true;
-                      else hasError = false;
-                    } else hasError = false;
+    setTimeout(function() {
+      $("#profileForm [data-loader-container]").each(function() {
+          /** see main.js **/
+          var attachId = $(this).attr("id");
+          if (!hasValue(attachId)) return false;
+          getSaveLoaderDiv("profileForm", attachId);
+          var targetFields = $(this).find("input, select");
+          if (targetFields.length > 0) {
+            targetFields.each(function() {
+                if ($(this).attr("type") == "hidden") return false;
+                $(this).attr("data-save-container-id", attachId);
+                var triggerEvent = $(this).attr("data-trigger-event");
+                if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+                $(this).on(triggerEvent, function(e) {
+                  e.stopPropagation();
+                  var valid = this.validity ? this.validity.valid : true;
+                  if (valid) {
+                    var hasError = false;
+                    if ($(this).attr("data-error-field")) {
+                      var customErrorField = $("#" + $(this).attr("data-error-field"));
+                      if (customErrorField.length > 0) {
+                        if (customErrorField.text() != "") hasError = true;
+                        else hasError = false;
+                      } else hasError = false;
+                    };
+                    if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo({{ user.id }},true, $(this));
                   };
-                  if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo({{ user.id }},true, $(this));
-                };
-              });
-          });
-        };
-    });
-    /**********************************************************
-    /*** sticky menu events, keep them here in case we want them back again
-    //$("html").click(function(event){
-    //    $("#indexContainer").removeClass('open');
-    //});
-    //
-    //$("#indexNavBar span.index-list").click(function(event) {
-    //    event.stopPropagation();
-    //    $('#indexContainer').toggleClass('open');
-    //});
-    //$(window).scroll(function() {
-    //    if (!(__navBar.isOnScreen())) {
-    //        __stickyMenu.css("top", "1em")
-    //    } else {
-    //      __stickyMenu.css("top",__stickyMenu_topPos);
-    //    };
-    //});
-    //$(window).resize(function() {
-    //    if (__stickyMenu.hasClass("sticky-show")) {
-    //      if (__indexIcon.is(":visible") || !(__leftPanel.is(":visible"))) $("a.open").trigger("click");
-    //    }
-    //    else {
-    //      if (__leftPanel.is(":visible")) __indexContainer.removeClass("open");
-    //    }
-    //});
-    //(function() {
-    //  var t = $("#profileForm").find("h4.index-item");
-    //  var indexContent = "<p class='title'><em>Click</em> each to go to section in this page:</p><br/><ul>";
-    //      t.each(function() {
-    //      if ($(this).is(":visible")) {
-    //        indexContent += "<li><a href='#" + $(this).attr("id") + "'>"  + $(this).text() + "</a></li>";
-    //     };
-    //  });
-    //  indexContent += "</ul>";
-    //  $("#indexContainer").html(indexContent);
-    //  $("#stickyMenu").html(indexContent);
-    //  var listHeight = $("#stickyMenu ul").height();
-    //  if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 90);
-    //})();
-    //__stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().//top, __homeFooter = $("#homeFooter"), __indexContainer = $("#indexContainer"), __indexIcon = $("#indexNavBar span.index-list"), __leftPanel = $(".left-panel");
-    //if (__leftPanel.is(":visible")) $("a.open").trigger("click");
-     ***********************************************************/
-
-    $("#profileForm .profile-item-container.editable").each(function() {
-        $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}" aria-label="{{_('Edit Button')}}"></button>');
-    });
-
-    $("#profileForm .profile-item-edit-btn").each(function() {
-        $(this).on("click", function(e) {
-          e.preventDefault();
-          var container = $(this).closest(".profile-item-container");
-          container.toggleClass("edit");
-          $(this).attr("data-text", container.hasClass("edit") ? "{{_('DONE')}}": "{{_('EDIT')}}");
-          if (!container.hasClass("edit")) {
-              var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
-              if (sections) {
-                  sections.forEach(function(sectionId) {
-                      var errorText = container.find(".error-icon").text();
-                      if (!hasValue(errorText) && fillViews[sectionId]) fillViews[sectionId]();
-                  });
-              }
+                });
+            });
           };
-        });
-    });
+      });
+
+      $("#profileForm .profile-item-container.editable").each(function() {
+          $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}" aria-label="{{_('Edit Button')}}"></button>');
+      });
+
+      $("#profileForm .profile-item-edit-btn").each(function() {
+          $(this).on("click", function(e) {
+            e.preventDefault();
+            var container = $(this).closest(".profile-item-container");
+            container.toggleClass("edit");
+            $(this).attr("data-text", container.hasClass("edit") ? "{{_('DONE')}}": "{{_('EDIT')}}");
+            if (!container.hasClass("edit")) {
+                var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
+                if (sections) {
+                    sections.forEach(function(sectionId) {
+                        var errorText = container.find(".error-icon").text();
+                        if (!hasValue(errorText) && fillViews[sectionId]) fillViews[sectionId]();
+                    });
+                }
+            };
+          });
+      });
+    }, 1000);
+    {% if user %}
+      tnthAjax.getDemo({{user.id}});
+    {% endif %}
 
 });
 {% endblock %}

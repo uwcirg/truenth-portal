@@ -66,9 +66,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 500);
+        setTimeout("showMain();", 100);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 800);
+            setTimeout('$("#loadingIndicator").fadeOut();', 200);
         };
     };
 };
@@ -1813,7 +1813,7 @@ OrgTool.prototype.handleEvent = function() {
                     if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                 };
             };
-            setTimeout("tnthAjax.getOptionalCoreData(" + userId + ", false, $(\".profile-item-container[data-sections='detail']\"));", 150);
+            setTimeout(function() { tnthAjax.getOptionalCoreData(userId, false, $(".profile-item-container[data-sections='detail']")); }, 100);
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
@@ -1995,36 +1995,38 @@ var tnthAjax = {
             async: (sync ? false : true)
         }).done(function(data) {
             if (data && data.still_needed) {
-                if (callback) callback(data.still_needed);
                 var __localizedFound = false;
                 if ((data.still_needed).length > 0) $("#termsText").show();
                 (data.still_needed).forEach(function(item) {
-                    $("#termsCheckbox [data-type='terms']").each(function() {
-                        var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
-                        dataTypes.forEach(function(type) {
-                            if ($.trim(type) == $.trim(item)) {
-                                self.show().removeClass("tnth-hide");
-                                self.attr("data-required", "true");
-                            };
+                    if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
+                        $("#termsCheckbox [data-type='terms']").each(function() {
+                            var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
+                            dataTypes.forEach(function(type) {
+                                if ($.trim(type) == $.trim(item)) {
+                                    self.show().removeClass("tnth-hide");
+                                    self.attr("data-required", "true");
+                                };
+                            });
+                            /*
+                             * need to check terms of use types e.g. privacy policy, that is required of user
+                             * in addition to website terms of use
+                             * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
+                             * for the purpose of checking, they need to be broken up into sub items and be checked respectively
+                             */
+                            $(this).find("[data-core-data-subtype]").each(function() {
+                                 if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
+                                    var parentNode = $(this).closest("[data-type='terms']");
+                                    parentNode.show().removeClass("tnth-hide");
+                                    parentNode.attr("data-required", "true");
+                                 };
+                            });
                         });
-                        /*
-                         * need to check terms of use types e.g. privacy policy, that is required of user
-                         * in addition to website terms of use
-                         * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
-                         * for the purpose of checking, they need to be broken up into sub items and be checked respectively
-                         */
-                        $(this).find("[data-core-data-subtype]").each(function() {
-                             if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
-                                var parentNode = $(this).closest("[data-type='terms']");
-                                parentNode.show().removeClass("tnth-hide");
-                                parentNode.attr("data-required", "true");
-                             };
-                        });
-                    });
+                    };
                     if (item == "localized") __localizedFound = true;
                 });
                 if (!__localizedFound) $("#patMeta").remove();
                 else $("#patientQ").show();
+                if (callback) callback(data.still_needed);
             } else {
                 if (callback) {
                     callback({"error": i18next.t("no data returned")});
@@ -2133,14 +2135,15 @@ var tnthAjax = {
             if(!noPopulate) {
                 OT.handlePreSelectedClinic();
                 OT.populateUI();
-                tnthAjax.getDemo(userId, noOverride, sync, callback);
                 OT.handleEvent();
             };
+            if (callback) callback(data);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
            var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
            if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
-           else $(".get-orgs-error").html(errorMessage)
+           else $(".get-orgs-error").html(errorMessage);
+           if (callback) callback({"error": errorMessage});
            loader();
         });
     },
