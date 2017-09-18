@@ -17,6 +17,7 @@ def get_reporting_stats():
     The following code is only run on a cache miss.
 
     """
+    current_app.logger.debug("CACHE MISS: {}".format(__name__))
     stats = {}
     stats['roles'] = defaultdict(int)
     stats['patients'] = defaultdict(int)
@@ -30,7 +31,7 @@ def get_reporting_stats():
     interventions = Intervention.query.all()
 
     for user in User.query.filter_by(active=True):
-        if ROLE.TEST in [r.name for r in user.roles]:
+        if user.has_role(ROLE.TEST):
             continue
 
         for role in user.roles:
@@ -51,7 +52,7 @@ def get_reporting_stats():
 
         for interv in interventions:
             desc = interv.description
-            if desc == 'Decision Support':
+            if interv.name == 'decision_support_p3p':
                 desc = 'Decision Support P3P'
             if interv.display_for_user(user).access:
                 stats['intervention_access'][desc] += 1
@@ -60,7 +61,7 @@ def get_reporting_stats():
             if (any(doc.intervention == interv for doc in user.documents)):
                 stats['intervention_reports'][desc] += 1
 
-        if not user.organizations.all():
+        if not user.organizations.count():
             stats['organizations']['Unspecified'] += 1
         else:
             for org in user.organizations:
@@ -73,7 +74,7 @@ def get_reporting_stats():
                 st = enc.start_time
                 stats['encounters']['all'].append(st)
                 for interv in user.interventions:
-                    if interv.description == 'Decision Support':
+                    if interv.name == 'decision_support_p3p':
                         stats['encounters']["Decision Support P3P"].append(st)
                     else:
                         stats['encounters'][interv.description].append(st)

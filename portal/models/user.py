@@ -1348,7 +1348,7 @@ def current_user():
     from flask import request, session
 
     uid = None
-    if 'id' in session:
+    if session and ('id' in session):
         # Locally logged in
         uid = session['id']
     elif _call_or_get(flask_login_current_user.is_authenticated):
