@@ -267,9 +267,11 @@ def configure_metadata(app):
     metadata = pkginfo.Installed('portal')
 
     # Get git hash from version if present
+    # https://github.com/pypa/setuptools_scm#default-versioning-scheme
     # Todo: extend Distribution base class instead of monkey patching
-    if metadata.version and '+ng' in metadata.version:
-        metadata.git_hash = metadata.version.split('+ng')[-1].split('.')[0]
+    if metadata.version and '+' in metadata.version:
+        # Git short hashes are 8 characters long
+        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][-7:]
 
     app.config.metadata = metadata
 
