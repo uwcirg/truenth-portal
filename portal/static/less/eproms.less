@@ -27,7 +27,7 @@
 @xsmallText:      0.75em;
 @xxsmallText:     0.70em;
 @btnSize:         1em;
-@smallBtnSize:    0.95em;
+@smallBtnSize:    0.9em;
 @orgSize:         15px;
 @mobileOrgSize:   12px;
 @modalHeaderSize: 1.3em;
@@ -388,7 +388,7 @@ a.open .glyphicon, a.back .glyphicon {
   font-size: 1.2em;
 }
 legend {
-  font-size: 0.99em;
+  font-size: 0.95em;
 }
 div.left-panel {
   position:fixed;
@@ -1850,10 +1850,10 @@ div.noOrg-container {
     margin-top: 0;
   }
   #phoneGroup {
-    margin-top: 1.2em;
+    margin-top: 1em;
   }
   #altPhoneGroup {
-    margin-top: 1.8em;
+    margin-top: 1.3em;
   }
   #studyIdContainer {
    margin-top: 1.8em;
@@ -1862,7 +1862,7 @@ div.noOrg-container {
     margin-top: 0.5em;
   }
   #profileStudyIDContainer {
-    margin-top: 2.1em;
+    margin-top: 1.7em;
     margin-bottom: 1em;
   }
   #profileStudyIDContainer input {
@@ -1894,6 +1894,9 @@ div.noOrg-container {
   #updateProfile {
     font-size: @smallBtnSize;
   }
+  label.clinics-section-label {
+    margin-bottom: 0;
+  }
 }
 .create-account-container {
   padding: 3.5em 4em;
@@ -1903,7 +1906,7 @@ div.noOrg-container {
   background-color: @wellColor;
 }
 #createProfileForm[data-account='patient'] #bdGroup {
-  min-height: 116px;
+  min-height: 112px;
 }
 #emailInfoText {
   display: none;
@@ -2416,7 +2419,7 @@ div.biopsy-option:last-of-type{
 }
 
 #consentDateEditContainer {
-  margin-top: 2.7em;
+  margin-top: 2.8em;
   margin-bottom: 2em;
   label:first-of-type {
     margin-bottom: -0.1em;
@@ -3027,6 +3030,11 @@ div.timezone-warning.text-warning {
   }
   #profileForm .communications-container .flex-item {
     flex: 0.3 350px;
+  }
+  #createProfileForm {
+    #emailGroup {
+      margin-top: 1em;
+    }
   }
 }
 @media (min-width: 1200px) {
