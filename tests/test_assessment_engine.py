@@ -3,14 +3,16 @@ import json
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
-from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.user import get_user
+from portal.models.user_consent import UserConsent
+from tests import TestCase, TEST_USER_ID
 
 class TestAssessmentEngine(TestCase):
 
@@ -58,9 +60,16 @@ class TestAssessmentEngine(TestCase):
         test_user = get_user(TEST_USER_ID)
         test_user.organizations.append(org)
 
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org,
+            audit=audit, agreement_url='http://no.com')
+
         with SessionScope(db):
             db.session.add(qb)
             db.session.add(test_user)
+            db.session.add(audit)
+            db.session.add(uc)
             db.session.commit()
         qb = db.session.merge(qb)
 

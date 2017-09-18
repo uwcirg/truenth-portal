@@ -256,7 +256,10 @@ class QuestionnaireBank(db.Model):
 
     @staticmethod
     def most_current_qb(user, as_of_date=None):
-        """Return "most current" qb for user, or None
+        """Return two item tuple (qb, iteration_count) for user
+
+        Return tuple of "most current" qb for user (or None if N/A), and the
+        recurrence iteration number (if current qb is recurring; else None)
 
         :param as_of_date: if not provided, use current utc time.
 
@@ -276,13 +279,14 @@ class QuestionnaireBank(db.Model):
 
         baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
         if not baseline:
-            return None
+            return (None, None)
         trigger_date = baseline[0].trigger_date(user)
         if not trigger_date:
-            return None
+            return (None, None)
 
         # Iterate over users QBs looking for current
         last_found = baseline[0]
+        last_found_ic = None
         for classification in classification_types:
             if classification == 'indefinite':
                 continue
@@ -293,10 +297,11 @@ class QuestionnaireBank(db.Model):
                     continue
                 expiry = qb.calculated_expiry(trigger_date)
                 last_found = qb
+                last_found_ic = ic
 
                 if relative_start >= as_of_date and as_of_date < expiry:
-                    return qb
-        return last_found
+                    return (qb, ic)
+        return (last_found, last_found_ic)
 
     def calculated_start(self, trigger_date):
         """Return two item tuple (calculated_start, iteration) for QB or None

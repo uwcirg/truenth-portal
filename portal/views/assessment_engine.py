@@ -1299,17 +1299,17 @@ def assessment_add(patient_id):
         qn_ref = request.json.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.query.filter_by(name=qn_name).first()
-        for qb in QuestionnaireBank.qbs_for_user(patient, None):
-            for qbq in qb.questionnaires:
-                if qbq.questionnaire == qn:
-                    qnr_qb = qb
+        qb, ic = QuestionnaireBank.most_current_qb(patient)
+        if qb and qn and (qn in [qbq.questionnaire for qbq in qb.questionnaires]):
+            qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         status=request.json["status"],
         document=request.json,
         encounter=encounter,
-        questionnaire_bank=qnr_qb
+        questionnaire_bank=qnr_qb,
+        qb_iteration=ic
     )
 
     db.session.add(questionnaire_response)

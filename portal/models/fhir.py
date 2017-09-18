@@ -465,6 +465,7 @@ class QuestionnaireResponse(db.Model):
         nullable=False)
     questionnaire_bank_id = db.Column(
         db.ForeignKey('questionnaire_banks.id'), nullable=True)
+    qb_iteration = db.Column(db.Integer(), nullable=True)
 
     encounter = db.relationship("Encounter", cascade='delete')
     questionnaire_bank = db.relationship("QuestionnaireBank")
