@@ -1309,7 +1309,7 @@ def assessment_add(patient_id):
         document=request.json,
         encounter=encounter,
         questionnaire_bank=qnr_qb,
-        recur_iteration=ic
+        qb_iteration=ic
     )
 
     db.session.add(questionnaire_response)
