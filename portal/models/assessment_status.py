@@ -105,7 +105,7 @@ class QuestionnaireBankDetails(object):
     """
     def __init__(self, user):
         self.user = user
-        self.qb = QuestionnaireBank.most_current_qb(user)[0]
+        self.qb, _ = QuestionnaireBank.most_current_qb(user)
         self.status_by_q = qb_status_dict(user=user,
                                           questionnaire_bank=self.qb)
 

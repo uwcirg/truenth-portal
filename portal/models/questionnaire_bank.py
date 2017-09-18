@@ -256,8 +256,10 @@ class QuestionnaireBank(db.Model):
 
     @staticmethod
     def most_current_qb(user, as_of_date=None):
-        """Return tuple of "most current" qb for user (or None), and recurrence
-        iteration number (if qb is found and is recurring; else None)
+        """Return two item tuple (qb, iteration_count) for user
+
+        Return tuple of "most current" qb for user (or None if N/A), and the
+        recurrence iteration number (if current qb is recurring; else None)
 
         :param as_of_date: if not provided, use current utc time.
 
