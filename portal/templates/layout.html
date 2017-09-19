@@ -106,6 +106,7 @@
 <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js" async></script>
 <script src="{{ url_for('static', filename='js/bootstrap-table-filter-control.js') }}"></script>
 {% endblock %}
+{%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = "";
