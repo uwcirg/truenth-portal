@@ -1300,8 +1300,8 @@ def assessment_add(patient_id):
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.query.filter_by(name=qn_name).first()
         qb, ic = QuestionnaireBank.most_current_qb(patient)
-        if (qb and qn and
-            (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])):
+        if (qb and qn and (qn.id in [qbq.questionnaire.id
+                           for qbq in qb.questionnaires])):
             qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(

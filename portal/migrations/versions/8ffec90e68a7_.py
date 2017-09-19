@@ -32,7 +32,7 @@ def upgrade():
             qn = Questionnaire.query.filter_by(name=qn_name).first()
 
             qb, ic = QuestionnaireBank.most_current_qb(qnr.subject,
-                                                      as_of_date=qnr.authored)
+                                                       as_of_date=qnr.authored)
             if qb and qn and (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires]):
                 ic = ic or 'NULL'
                 session.execute('UPDATE questionnaire_responses SET questionnaire_bank_id = {}, '
