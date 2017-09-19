@@ -89,7 +89,7 @@ class TestQuestionnaireBank(TestCase):
             'organization': {'reference': 'api/organization/{}'.format(
                 org.id)},
             'start': '{"days": 0}',
-            'overdue': '{"weeks": 1}"',
+            'overdue': '{"weeks": 1}',
             'expired': '{"days": 30}',
             'questionnaires': [
                 {
