@@ -48,10 +48,10 @@ set -o allexport
 
 if [ $BACKUP ]; then
     web_image_id="$(docker-compose images -q web)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.gzip"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.pgdump"
 
     echo "Backing up current database..."
-    docker-compose exec --user postgres db pg_dump --format c postgres > "/tmp/${dump_filename}.pgdump"
+    docker-compose exec --user postgres db pg_dump --format c postgres > "/tmp/${dump_filename}"
 fi
 
 docker-compose pull
