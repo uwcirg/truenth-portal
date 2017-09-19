@@ -50,6 +50,8 @@
 </div>
 <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
 {% endif %}
+{% endblock %}
+{% block additional_scripts %}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {%- from "flask_user/_macros.html" import footer -%}
