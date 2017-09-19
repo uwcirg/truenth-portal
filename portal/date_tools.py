@@ -85,5 +85,16 @@ class RelativeDelta(relativedelta):
             tomorrow = `utcnow() + RelativeDelta('{"days":1}')`
 
         """
-        d = json.loads(paramstring)
+        try:
+            d = json.loads(paramstring)
+        except ValueError:
+            raise ValueError(
+                "Unable to parse RelativeDelta value from `{}`".format(
+                    paramstring))
         super(RelativeDelta, self).__init__(**d)
+
+    @staticmethod
+    def validate(paramstring):
+        """Simply try to bring one to life - or raise ValueError"""
+        RelativeDelta(paramstring)
+        return None

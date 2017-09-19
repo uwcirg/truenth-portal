@@ -271,7 +271,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
     def test_persist(self):
         cr = mock_communication_request(
             questionnaire_bank_name='symptom_tracker_recurring',
-            notify_post_qb_start='{days="30"}',
+            notify_post_qb_start='{"days": 30}',
             communication_request_name='test-communication-request')
 
         serial = cr.as_fhir()
