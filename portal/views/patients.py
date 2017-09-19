@@ -9,6 +9,7 @@ from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
@@ -103,7 +104,11 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            patient.assessment_status = overall_assessment_status(patient.id)
+            a_s, qb, ic = overall_assessment_status(patient.id)
+            patient.assessment_status = a_s
+            patient.current_qb = qb.name
+            if len(qb.recurs):
+                patient.current_qb += " (Iteration: {})".format(ic)
             patient_list.append(patient)
         patients = patient_list
 

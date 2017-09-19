@@ -1579,7 +1579,7 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
-        assessment_status = overall_assessment_status(user.id)
+        assessment_status, _, _ = overall_assessment_status(user.id)
         for consent in user.all_consents:
             details.append(
                 {'consent': consent.as_json(),

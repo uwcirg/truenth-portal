@@ -200,8 +200,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         this time
 
         """
-        return overall_assessment_status(user.id) in (
-            'Due', 'Overdue', 'In Progress')
+        a_s, _, _ = overall_assessment_status(user.id)
+        return a_s in ('Due', 'Overdue', 'In Progress')
 
     def queue_communication(user, communication_request):
         """Create new communication object in preparation state"""

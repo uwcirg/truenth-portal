@@ -312,4 +312,5 @@ def overall_assessment_status(user_id):
     current_app.logger.debug("CACHE MISS: {} {}".format(
         __name__, user_id))
     a_s = AssessmentStatus(user)
-    return a_s.overall_status
+    qb, ic = QuestionnaireBank.most_current_qb(user)
+    return (a_s.overall_status, qb, ic)
