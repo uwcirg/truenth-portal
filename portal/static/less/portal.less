@@ -367,6 +367,12 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
 }
+@media all and (-ms-high-contrast: none),(-ms-high-contrast: active) {
+  /* IE10+ */
+  #mainNav {
+    height: auto;
+  }
+}
 div.right-panel {
   position:relative;
   transition:margin ease .5s;
