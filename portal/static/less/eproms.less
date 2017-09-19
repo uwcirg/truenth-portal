@@ -14,6 +14,7 @@
 }
 
 @baseFontSize:    16px;
+@baseMobileFontSize:  14px;
 @headlineSize:    1.25em;
 @subheadSize:     1.20em;
 @subSmallHeadSize: 1.1em;
@@ -100,23 +101,48 @@ body {
   background-color: @bodyBgColor;
   font-family: @bodyFontFamily;
   color: @baseColor;
-  font-size: @baseFontSize;
+  font-size: @baseMobileFontSize;
 }
-.tnth-headline {
-  margin: 30px 0 20px;
-  font-size: @headlineSize;
-  letter-spacing: 1px;
+
+.form-control,
+input,
+select,
+label,
+legend,
+.form-group > label{
+  font-size: @baseMobileFontSize;
 }
-.tnth-subhead {
+.tnth-headline,
+.tnth-subhead,
+h1, h2 {
   font-size: @subheadSize;
 }
-h3, h4 {
-  font-size: 1.1em;
+h3, h4, h5 {
+  font-size: @subSmallHeadSize;
 }
+small,
+.fixed-table-container thead th,
+.fixed-table-container thead th .both,
+.form-group .help-block {
+  font-size: 12px;
+}
+
+.fixed-table-pagination {
+    font-size:@smallText;
+}
+
+button,
+#createUserLink,
+.btn,
+.btn-tnth-primary,
+a.btn {
+  font-size: @baseMobileFontSize;
+  max-width: 100%;
+}
+
 .btn {
   cursor: pointer;
   border-radius: 0;
-  font-size: @btnSize;
   padding: 0.8em;
   letter-spacing: 2px;
   color: @btnDefaultColor;
@@ -191,6 +217,33 @@ a.btn {
   padding: 0;
   margin: 1em 0.2em;
 }
+#regForm input,
+#loginForm input {
+  background: #f1f0ef;
+  height: 44px;
+  padding: 5px;
+  border: 1px solid #f1f0ef;
+  border-radius: 0;
+  width: 400px;
+  max-width: 100%;
+}
+
+#regForm input[type="submit"],
+#loginForm input[type="submit"] {
+   background-color: @btnColor;
+   text-align: center;
+   padding: 1.2em 2em 1em 2em;
+   height: 52px;
+}
+.reg-title {
+  font-size: @headlineSize;
+  line-height: 33px;
+  color: #494a45;
+  position: relative;
+  padding: 0.6em 0 20px;
+  margin: 1.5em 0 25px;
+  font-weight: bold;
+}
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
 }
@@ -218,12 +271,8 @@ select:not([multiple]) {
   }
 }
 .form-control {
-  font-size: @baseFontSize;
   height: @inputHeight;
   border-radius: 0;
-}
-.form-group .help-block {
-  font-size: @mediumText;
 }
 .form-group label {
   font-weight: normal;
@@ -241,30 +290,6 @@ select:not([multiple]) {
     background-color: @linkHover;
   }
 }
-#fullSizeBox {
-  a[href*="register"] {
-    display: none;
-  }
-  a[href^="/go"] {
-    display: none;
-  }
-  a[href*="google"] {
-    display: none;
-  }
-  a[href*="facebook"] {
-    display: none;
-  }
-  a[href*="explore"]{
-    display: none;
-  }
-  a[href*="about"]{
-    display: none;
-  }
-  span.separator {
-    display: none;
-  }
-}
-
 #socialMediaRegistrationContainer,
 #socialMediaLoginContainer
  {
@@ -290,6 +315,24 @@ select:not([multiple]) {
   transition: visibility 0.6s, opacity 0.7s ease-in;
 }
 
+// Footer styles
+#homeFooter {
+  overflow: auto;
+  font-size: @smallerText;
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+  line-height: 1.2;
+  display: none;
+  text-align: left;
+  &.footer-separate {
+    padding-top: 0;
+    .footer-container {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+  }
+}
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
@@ -360,51 +403,12 @@ select:not([multiple]) {
   color: @footerWhiteThemeColor;
 }
 
-@media (max-width: 1199px) {
-  #mainDiv.profile .footer-container.flex{
+#mainDiv.profile .footer-container.flex{
     justify-content: center;
-  }
 }
-
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
-}
-a.open, a.back {
-  position: fixed;
-  left: 1em;
-  top: 12.3em;
-  z-index: 11;
-  cursor: pointer;
-  display: none;
-}
-a.open {
-  top: 14.5em;
-}
-a.back:hover {
-  color: @linkHover;
-}
-a.open .glyphicon, a.back .glyphicon {
-  font-size: 1.2em;
-}
-legend {
-  font-size: 0.95em;
-}
-div.left-panel {
-  position:fixed;
-  padding: 10px;
-  top: 0;
-  left: 0;
-  height:100%;
-  min-width:50px;
-  background:@leftPanelBgColor;
-  transition: width ease .5s;
-  z-index: 10;
-  display: none;
-}
-
-body.open-nav .left-panel {
-    width:280px;
 }
 div.right-panel {
   position:relative;
@@ -502,6 +506,10 @@ div.right-panel {
   margin: 3em auto;
   min-height: 50vh;
 
+  .view-container {
+    display: none;
+  }
+
   .reg-buttons-msg-wrapper {
     width: 500px;
     max-width: 100%;
@@ -517,6 +525,7 @@ div.right-panel {
   }
   #buttonsContainer {
     width: 350px;
+    max-width: 100%;
     margin: 1em auto;
     position: relative;
     text-align: center;
@@ -559,14 +568,7 @@ div.right-panel {
     margin-top: 20%;
     display: none;
   }
-  @media (min-width: 500px) {
-    .iq-container {
-      margin-top: 11%;
-    }
-  }
-
   .iq-container .tnth-headline:first-of-type {
-    margin-bottom: 1.5em;
     transform: translateY(-100%);
     transition: transform 250ms ease-out .7s;
     font-weight: bold;
@@ -574,7 +576,7 @@ div.right-panel {
     color: rgba(57, 56, 51, 0.8);
     letter-spacing: 0.1px;
     text-align: center;
-    margin-top: 1.2em;
+    margin: 1.2em 0.3em 1.5em 0.3em;
   }
   .iq-container.open .tnth-headline:first-of-type {
     transition: transform 250ms ease-out .1s;
@@ -636,43 +638,6 @@ div.right-panel {
     font-size: @subheadSize;
   }
 }
-@media (min-width: 992px) {
-  #aboutForm {
-    max-width: 65%;
-  }
-  #aboutForm .iq-container {
-    margin-top: 5%;
-  }
-  #aboutForm .iq-container .tnth-headline:first-of-type {
-    font-size: @subheadSize;
-  }
-}
-@media (min-width: 1200px) {
-  #aboutForm div.heading::before {
-   border-radius: 100%;
-   width: 52px;
-   height: 52px;
-   font-size: @subheadSize;
-   line-height: 1;
-   content: "\EA03";
-   display: inline-block;
-   font-family: "symbols";
-   font-style: normal;
-   font-weight: normal;
-   line-height: 1;
-   margin: 0 auto;
-   -webkit-font-smoothing: antialiased;
-   color: #ccc;
-   position: absolute;
-   top: 2.8em;
-   left: 0;
-   right: 0;
-   margin-left: auto;
-   margin-right: auto;
-   margin-bottom: 1em;
-   cursor: pointer;
-   }
-}
 #iqErrorMessage {
   position: relative;
   top: 4em;
@@ -733,17 +698,34 @@ div.right-panel {
     }
   }
 }
-@media (min-width: 992px) {
-    #progressWrapper {
-      width: 80%;
-    }
-    #progressWrapper .progressbar li {
-      font-size: 12px;
-    }
-    #progressWrapper .progressbar {
-      position: relative;
-      left: -3%;
+.orglist-download-container {
+  display: inline-block;
+  div {
+    margin-left: 0.2em;
+    margin-bottom: 0.5em;
   }
+  a {
+    color: @linkColor;
+  }
+}
+
+.admin-table {
+  div.pull-right {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.2em;
+  }
+  div.pull-right.search {
+    width: 50%;
+    float: left !important;
+    max-width: 100%;
+  }
+}
+div.columns {
+  top: 4px;
+}
+div.search {
+  top: 0.3em;
 }
 #adminTable {
   min-height: 280px;
@@ -778,7 +760,6 @@ div.right-panel {
     font-weight: normal;
     min-height: 2.3em;
     height: 2.3em;
-    font-size: 0.99em;
   }
   th.status-field {
     position: relative;
@@ -791,47 +772,64 @@ div.right-panel {
     opacity: 0.6;
     font-size: @smallerText;
   }
-  .filterControl * {
-    font-size: 1em;
-  }
 }
 .truenth-id-label {
    display: none;
  }
+
 #adminTableToolbar {
   div.orglist-selector {
     display: inline-block;
+    .indent {
+      padding: 0 0.2em;
+    }
     div.dropdown-menu {
+      max-width: 100%;
       #userOrgs {
-        width: 350px;
+        width: 100%;
         max-width: 100%;
-        padding: 0 0.5em 0 1em;
-        margin: 0 auto;
+        margin: 0 0.5em;
+        input {
+          cursor: pointer;
+          position: relative;
+          left: -2px;
+        }
       }
-      #fillOrgs .divider {
-        display: none;
+      #fillOrgs {
+        .divider {
+          display: none;
+        }
+        label, legend {
+          font-size: @mobileOrgSize;
+        }
+        label.org-label {
+          padding: 0 0.5em;
+        }
       }
     }
     div.org-container {
       display: block;
-      margin: -0.4em 0;
+      * {
+        font-size: @mobileOrgSize;
+      }
       label.org-label {
         display: inline-block;
-        font-size: 14px;
+        padding: 0 1em !important;
+        line-height: 1.6em;
       }
     }
     #orglist-footer-container {
-      padding: 0 0.5em;
+      padding: 0.5em 1em;
       width: 250px;
       max-width: 100%;
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: 14px;
+        font-size: @mobileOrgSize !important;
       }
       input[type="checkbox"] {
         position: relative;
-        top: -1px;
+        top: 0;
       }
     }
   }
@@ -842,167 +840,6 @@ div.right-panel {
   transition: opacity 0.8s ease-in;
   position: absolute;
   font-size: @smallText;
-}
-
-.access-button {
-    opacity: 1;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
-    border-color: @sectionBorderColor;
-    background-color: @btnColor;
-    background-image: none;
-    color: rgb(255, 255, 255);
-    font-weight: normal;
-    padding: 6px 10px;
-    border-width: 0px;
-    border-radius: 3px;
-    border-style: solid;
-    background-size: auto;
-    background-repeat: repeat;
-    background-position: center center;
-    font-size: @mediumText;
-    font-style: normal;
-    font-family: Arial;
-    text-align: center;
-    width: 140px;
-    height: 32px;
-}
-
-.access-button:hover {
-    color: #fff;
-    background-color: @linkHover;
-    border-color: @linkHover;
-}
-
-#accessCodeWrapper {
-    margin: 0 auto;
-    width: 600px;
-    max-width: 100%;
-    min-height: 500px;
-    overflow: hidden;
-    .main {
-      padding: 4em;
-    }
-    .disabled {
-      background-color: #999;
-      opacity: @disabledOpacity;
-    }
-}
-
-#shortcut_alias {
-    width: 140px;
-    max-width: 100%;
-    height: 34px;
-}
-#registerLink {
-    position: relative;
-    top: -1.1px;
-    width: 140px;
-    display: inline-block;
-}
-#indexContainer {
-  padding: 1.8em 2em;
-  position: absolute;
-  display: none;
-  -webkit-transform: translate(0, -200px);
-  transform: translate(0, -200px);
-  transition: all 0.5s ease;
-  z-index:9;
-  width:45%;
-  min-width:200px;
-  max-width:100%;
-  background-color: @navBarBgColor;
-  color: @bodyBgColor;
-  font-size: @smallerText;
-  -webkit-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
-  -moz-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
-  box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
-  ul {
-    padding: 1em;
-    margin-top: -0.5em;
-  }
-  li {
-    cursor: pointer;
-  }
-  a {
-    color: @bodyBgColor;
-  }
-}
-
-#indexContainer.open {
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
-  display: block;
-}
-
-#indexNavBar {
-  display: none;
-  width: 100%;
-  max-width: 100%;
-  color: #575F5C;
-  border-top: 1px solid #9E9E9E;
-  border-bottom: 1px solid  #9E9E9E;
-  padding: 0.7em 0.2em 0.83em 0.2em;
-  span.index-list {
-    display: block;
-  }
-  span.glyphicon {
-    cursor: pointer;
-    font-size: 1em;
-    padding: 0.5em 0.8em;
-    background: #fff;
-    background-image: -webkit-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -moz-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -ms-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -o-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: linear-gradient(to bottom, #fff, #eee, #d4d4d4);
-    -webkit-box-shadow: 1px 1px 1px 0px #777;
-    -moz-box-shadow: 1px 1px 1px 0px #777;
-    box-shadow: 1px 1px 1px 0px #777;
-    border-left: 1px solid #ddd;
-    border-top: 1px solid #ddd;
-    margin-left: -4px;
-    display: inline-block;
-  }
-
-  span.link {
-    margin-left: 0.3em;
-    background: #fff;
-    background-image: -webkit-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -moz-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -ms-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: -o-linear-gradient(top, #fff, #eee, #d4d4d4);
-    background-image: linear-gradient(to bottom, #fff, #eee, #d4d4d4);
-    -webkit-border-radius: 8;
-    -moz-border-radius: 8;
-    border-radius: 8px;
-    cursor:pointer;
-    font-weight: 500;
-    max-width: 100%;
-    font-family: Arial;
-    color: @linkColor;
-    font-size: @linkSize;
-    padding: 0.61em 1em;
-    border: solid #ccc 1px;
-    text-decoration: none;
-    letter-spacing: 1px;
-    top: 2px;
-  }
-
-  span:hover{
-    color: @linkHover;
-    cursor:pointer;
-  }
-
-  #backLink {
-   position: relative;
-   top: -3.8px;
-   display: inline-block;
-   span {
-    position: relative;
-    top: 1.7px;
-    }
-  }
-
 }
 #patientList {
   div.or {
@@ -1027,8 +864,11 @@ div.right-panel {
   div.or {
     display: inline-block;
     background-color: @orBackgroundColor;
-    margin: 1.5em 1em 1em 1.2em;
+    margin: 1.5em 1em 1em;
     font-size: @xxsmallText;
+  }
+  #_downloadLink {
+    visibility: hidden;
   }
   .firstname-field, .lastname-field {
     max-width: 150px;
@@ -1043,6 +883,10 @@ div.right-panel {
 #staffListOptions {
   display:flex;
   flex-direction: column;
+}
+.download-wrapper,
+.download-break {
+    display: none;
 }
 #dataDownloadModal {
   .modal-dialog {
@@ -1122,21 +966,9 @@ div.right-panel {
   font-size: @mediumText;
   .form-control {
     font-size: @mediumText;
-    height: @mediumText * 2;
   }
   .btn {
     font-size: @mediumText;
-  }
-}
-
-
-.loading {
-  opacity: 0.3;
-}
-
-.admin-table {
-  .search .form-control {
-    height: 2.8em;
   }
 }
 // For table rowlinks
@@ -1159,6 +991,30 @@ div.right-panel {
 
 // fullsize background image box - used on homepage and similar pages
 #fullSizeBox {
+  a[href*="register"] {
+    display: none;
+  }
+  a[href^="/go"] {
+    display: none;
+  }
+  a[href*="google"] {
+    display: none;
+  }
+  a[href*="facebook"] {
+    display: none;
+  }
+  a[href*="explore"]{
+    display: none;
+  }
+  a[href*="about"]{
+    display: none;
+  }
+  span.separator {
+    display: none;
+  }
+}
+
+#fullSizeBox {
   position: relative;
   text-align: left;
   left:0;
@@ -1166,10 +1022,10 @@ div.right-panel {
   margin:0;
   background-image: url('../img/twoMen.jpg');
   background-size: cover;
-  background-position: center top;
+  background-position: 30%;
   overflow: hidden;
   max-width: 100%;
-  height:100%;
+  height:680px;
    -webkit-transition: height 0.8s ease-in;
   -moz-transition: height 0.8s ease-in;
   transition: height 0.8s ease-in;
@@ -1207,7 +1063,7 @@ div.right-panel {
   padding: 18px;
   background-color:rgba(255, 255, 255, 0.7);
   color: #000000;
-  height: 100%;
+  height: 60%;
   text-align: center;
   position: relative;
   .form-group {
@@ -1273,7 +1129,7 @@ div.right-panel {
   }
 }
 .profile-img {
-  display: inline-block;
+  display: none;
   margin-top: 10px;
   margin-left: 6px;
   img {
@@ -1346,18 +1202,8 @@ div.right-panel {
   font-size: @subheadSize;
   letter-spacing: 1px;
 }
-@media (min-width: 726px) {
-  .portal-header {
-    font-size: @headlineSize;
-  }
-}
 .portal-intro-text {
   font-size: @subheadSize;
-}
-@media (min-width: 423px) {
-  .portal-header {
-    line-height: 50px;
-  }
 }
 .portal-header-logout-container {
   width: 100%;
@@ -1415,11 +1261,10 @@ div.right-panel {
   max-width: 100%;
   text-align: center;
 }
-.button-container a {
-  width: 300px;
+
+.portal-description .button-container a {
+  width: 250px;
   max-width: 100%;
-  font-size: @btnSize;
-  height: 2.6em;
 }
 .portal-description-incomplete .button-container {
   top: 50%;
@@ -1451,33 +1296,6 @@ div.right-panel {
     margin-right: -15px;
   }
 }
-.text-on-img {
-  position: absolute;
-  left: 0;
-  padding: 0.5em 1em;
-  &.text-bot {
-    bottom: 0;
-  }
-}
-
-// Footer styles
-#homeFooter {
-  overflow: auto;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  line-height: 1.2;
-  display: none;
-  text-align: left;
-  &.footer-separate {
-    padding-top: 0;
-    .footer-container {
-      margin-top: 30px;
-      border-top: 1px solid #ccc;
-      padding-top: 1em;
-    }
-  }
-}
-
 .separator-horizontal, .separator-vertical {
   position: relative;
   text-transform: uppercase;
@@ -1519,12 +1337,10 @@ div.right-panel {
   }
 }
 .tnth-form .form-group > label {
-  font-size: @formSize;
   color: #777;
 }
 .form-with-floats {
   .form-group > label {
-    font-size:@formSize;
     color: #aaa;
     opacity: 0;
     &.after-load {
@@ -1560,15 +1376,12 @@ div.right-panel {
 .last-name-container {
   margin-bottom: 0.5em;
 }
-#aboutForm .view-container {
-  display: none;
-}
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
   /*background-color: rgba(204, 206, 204, 0.25);*/
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  padding: 2em 3em 2.5em 3em;
+  padding: 2em 1em 2.5em 1em;
   margin: 0.5em auto;
   border: 2px solid #bcc2a6;
   overflow-y: hidden;
@@ -1596,6 +1409,9 @@ div.right-panel {
   margin-bottom: 2em;
   letter-spacing: 1px;
 }
+#mainDiv.profile .profile-item-container .profile-item-title {
+  max-width: 150px;
+}
 .content-container {
   position: relative;
 }
@@ -1612,6 +1428,7 @@ div.right-panel {
   word-break: break-word;
   padding-bottom: 1em;
 }
+
 #mainDiv.profile {
   .profile-item-edit-btn {
     position: absolute;
@@ -1627,7 +1444,6 @@ div.right-panel {
     border-color: @btnColor;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-size: @btnSize;
   }
   .profile-item-edit-btn:hover,
   .profile-item-edit-btn:active,
@@ -1706,13 +1522,13 @@ div.right-panel {
   height: 2.9em;
   padding: 0 1em;
 }
-#btnProfileSendEmail {
-  font-size: @smallBtnSize;
-}
 .communication-prompt {
   margin-bottom: 1em;
 }
 
+#profileForm .communications-container .flex-item {
+    flex: 0.3 350px;
+}
 .profile-name-label, .profile-birthdate-label {
   margin-bottom: -4px;
 }
@@ -1744,16 +1560,9 @@ div.right-panel {
 }
 
 #profileForm {
-  #firstname {
-    width: 300px;
-    max-width: 100%;
-  }
+  #firstname,
   #lastname {
     width: 300px;
-    max-width: 100%;
-  }
- #month {
-    width: 180px;
     max-width: 100%;
   }
   #errorbirthday {
@@ -1787,53 +1596,40 @@ div.right-panel {
   }
 }
 
-#userOrgs {
- font-size:@orgSize;
+#fillOrgs *,
+.noOrg-container * {
+ font-size: @mobileOrgSize;
 }
-
 #fillOrgs legend {
   color: @legendColor;
   margin: 4px 0 4px 0;
 }
+#fillOrgs .divider {
+  display:block;
+  height:0.25em;
+}
 
-#fillOrgs,
 .noOrg-container{
-  font-size: @orgSize;
   margin-top: 0.2em;
+  label {
+    font-weight: normal;
+  }
+  input[type="radio"] {
+    left: 2px;
+    top: 2px;
+  }
+  span {
+    margin-left:5px;
+    position: relative;
+    top: 1px;
+  }
 }
-
-.noOrg-container label {
-  font-weight: normal;
-}
-
 input.clinic {
   margin-top: 6px;
 }
 #fillOrgs label.org-label input[type="radio"] {
   position: relative;
   right: 5px !important;
-  top: -1px !important;
-}
-div.noOrg-container {
-  input[type="radio"] {
-  left: 2px;
-  top: 2px;
-  }
-  span {
-  margin-left:5px;
-  position: relative;
-  top: 1px;
-  }
-}
-.orglist-download-container {
-  display: inline-block;
-  div {
-    margin-left: 0.2em;
-    margin-bottom: 0.5em;
-  }
-  a {
-    color: @linkColor;
-  }
 }
 #createProfileForm  {
   .title {
@@ -1845,36 +1641,34 @@ div.noOrg-container {
   #bdGroup {
     margin-bottom: 0.1em;
     padding-bottom: 0;
+    .flex {
+      flex-wrap: wrap;
+    }
   }
   #emailGroup {
-    margin-top: 0;
+    margin-top: 1em;
   }
   #phoneGroup {
     margin-top: 1em;
   }
   #altPhoneGroup {
-    margin-top: 1.3em;
+    margin-top: 1.2em;
+
   }
   #studyIdContainer {
-   margin-top: 1.8em;
+   margin-top: 1.6em;
   }
   .study-id-label {
     margin-top: 0.5em;
   }
   #profileStudyIDContainer {
-    margin-top: 1.7em;
+    margin-top: 1.6em;
     margin-bottom: 1em;
   }
-  #profileStudyIDContainer input {
-    width: 350px;
-    max-width: 100%;
-  }
-  #studyId {
-    width:350px;
-    max-width: 100%;
-  }
-  #phone, #email, #altPhone {
-    width: 350px;
+
+  #phone, #email, #altPhone, #studyId,
+  #profileStudyIDContainer input  {
+    width: 100%;
     max-width: 100%;
   }
   #userOrgs .smaller-text {
@@ -1899,14 +1693,15 @@ div.noOrg-container {
   }
 }
 .create-account-container {
-  padding: 3.5em 4em;
+  padding: 2em;
   width: 100%;
   max-width: 100%;
   border: solid 2px @wellColor;
   background-color: @wellColor;
+  overflow: hidden;
 }
 #createProfileForm[data-account='patient'] #bdGroup {
-  min-height: 112px;
+  min-height: 114px;
 }
 #emailInfoText {
   display: none;
@@ -1918,9 +1713,6 @@ div.noOrg-container {
   border-radius: 6px;
   width: 400px;
   max-width: 100%;
-  label{
-    font-size:@baseFontSize;
-  }
 }
 
 .left-indent-bottom {
@@ -1931,9 +1723,6 @@ div.noOrg-container {
   margin-left: 2.5em;
 }
 
-#btnProfileSendEmail {
-  margin-top: 5%;
-}
 
 #profileEmailMessage {
   font-size: @smallText;
@@ -1987,7 +1776,6 @@ div.noOrg-container {
 }
 #userAssessementReport table {
   word-break:break-all;
-  font-size: @baseFontSize;
 }
 .profile-header {
   display: inline-block;
@@ -1995,16 +1783,10 @@ div.noOrg-container {
 .profile-section {
   overflow-y: hidden;
   overflow-x: hidden;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding: 0;
 }
-
 .orgLinks {
   margin-top: 4px;
-}
-
-.profile-audit-log {
-  font-size: @mediumText;
 }
 
 .error-message, .report-error-message {
@@ -2013,12 +1795,10 @@ div.noOrg-container {
 }
 
 .report-error-message {
-   padding: 0.5em;
-  color: @errorMessageColor;
+  padding: 0.5em;
   background-color: #f5f5f5;
   margin-left: 8px;
   display: none;
-  font-size: @baseFontSize;
 }
 
 #contactForm .post-contact-response {
@@ -2158,7 +1938,7 @@ div.noOrg-container {
   }
 }
 .custom-container {
-  display: flex;
+  display: block;
   margin-bottom: 2em;
   border-bottom: 1px solid #E0E6E3;
   padding: 0.1em 0 1.5em 0;
@@ -2168,29 +1948,32 @@ div.noOrg-container {
   h4 {
     margin-bottom: 1em;
   }
+  #profileEmailSelect {
+      width: 90%;
+      max-width: 100%;
+  }
+  #btnProfileSendEmail, .custom-btn {
+      width: 280px;
+      max-width: 100%;
+      font-size: @smallBtnSize;
+  }
   #btnProfileSendEmail {
-    width: 100%;
-  }
-  .custom-container-item, .custom-container-item-right {
-    width: 33%;
-    max-width: 100%;
-    display: inline-block;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .custom-container-item-right {
-    margin-right: 0.12em;
+    margin-top: 0.5em;
   }
   .custom-btn {
     margin-bottom: 0.9em;
-    font-size: @smallBtnSize;
+  }
+  .custom-container-item, .custom-container-item-right {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .enter-manual-container {
     flex-grow: 1.5;
   }
 }
-
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -2256,6 +2039,9 @@ div.noOrg-container {
 .radio input[type=radio],
 .radio-inline input[type=radio] {
   margin-top: 5px;
+}
+.checkbox input[type=checkbox] {
+    top: 0;
 }
 .radio input[type=radio] {
   position: relative;
@@ -2385,7 +2171,6 @@ div.biopsy-option:last-of-type{
   display: none;
   padding: 1.15em 1.3em;
   color: #57675B;
-  font-size: @baseFontSize;
   width: 100%;
   max-width: 100%;
   border: 1px solid #ddd;
@@ -2398,7 +2183,6 @@ div.biopsy-option:last-of-type{
   a {
   color:#696f69;
   margin-left: 1.3em;
-  font-size: @linkSize
   }
   a:hover {
   color: @linkHover;
@@ -2419,7 +2203,7 @@ div.biopsy-option:last-of-type{
 }
 
 #consentDateEditContainer {
-  margin-top: 2.8em;
+  margin-top: 2.6em;
   margin-bottom: 2em;
   label:first-of-type {
     margin-bottom: -0.1em;
@@ -2502,7 +2286,8 @@ div.biopsy-option:last-of-type{
 #identityVerificationContainer {
   padding: 2em 1.5em;
   margin: 1em auto;
-  input {
+  input,
+  select {
     width: 100%;
     max-width: 100%;
   }
@@ -2510,15 +2295,10 @@ div.biopsy-option:last-of-type{
     margin-bottom: 1em;
   }
 }
-
 .box-shadow-container {
 -webkit-box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
 -moz-box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
 box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
-}
-
-div.search input, div.columns {
-  font-size:@smallText;
 }
 a.btn-delete {
   padding: 0.2em 0.4em 0.2em 0.3em
@@ -2527,14 +2307,11 @@ div.input-group.date {
   margin-top: -2px;
 }
 div.org-container {
-  font-size: @smallerText;
   legend {
     color: @legendColor;
   }
   label.org-label{
     margin: 0.2em 0;
-    font-weight: normal;
-    font-size: @orgSize;
   }
   .text-muter {
     margin-bottom: 4px;
@@ -2548,25 +2325,8 @@ div.org-container {
     right:4px;
   }
 }
-#fillOrgs .divider {
-  display:block;
-  height:0.25em;
-}
 .indent {
   padding: 0 1em;
-}
-.custom-container {
-  display: flex;
-  margin-bottom: 2em;
-  border-bottom: 1px solid #E0E6E3;
-  padding: 0.1em 0 1.5em 0;
-}
-.custom-container-item, .custom-container-item-right {
-  width: 33%;
-  max-width: 100%;
-}
-.custom-container-item-right {
-  margin-right: 0.12em;
 }
 .registration-status-container {
   margin:0 0 0.8em 0;
@@ -2574,10 +2334,9 @@ div.org-container {
 .registration-label {
   display:inline-block;
   opacity: 0.7;
-  font-size: @formSize;
 }
 .timezone-container {
-  padding-bottom: 2em;
+  padding-bottom: 0;
 }
 div.timezone-warning.text-warning {
   flex: 1 100%;
@@ -2591,255 +2350,239 @@ div.timezone-warning.text-warning {
 .capitalize {
   text-transform: capitalize;
 }
-/** Responsive sizes **/
-@media (max-width: 480px) {
-  #footerLockup {
-    max-height: 80px;
-  }
-  #homeFooter {
-    font-size: @smallerText;
-    padding-top: 0.5em;
-  }
-  .text-on-img {
-    padding: 6px;
-    .tnth-subhead {
-      margin: 0;
-    }
-    p:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-@media (max-width: 506px) {
-  #aboutForm .bd-element,
-  #aboutForm .biopsy-date-element {
-    margin: 0.5em 0;
-  }
-  div.admin-table div.pull-right {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 0.2em;
-  }
-  div.admin-table div.pull-right.search {
-    width: 50%;
-    float: left !important;
-    max-width: 100%;
-  }
-  #consentListTable,
-  #profileAuditLogTable {
+
+#consentListTable,
+#profileAuditLogTable,
+#userSessionListTable {
     font-size: @mobileSmallSize;
     max-width: 100%;
+}
+/** Responsive sizes **/
+@media (min-width: 423px) {
+  .portal-header {
+    line-height: 50px;
   }
 }
-@media (max-width: 640px) {
-  body,
+@media (min-width: 500px) {
+    .iq-container {
+      margin-top: 11%;
+    }
+}
+@media (min-width: 506px) {
+  #consentListTable,
+  #profileAuditLogTable,
+  #userSessionListTable {
+    font-size: @mediumText;
+  }
+}
+@media (min-width: 507px) {
+  .admin-table {
+    div.pull-right {
+      width: auto;
+    }
+    div.pull-right.search {
+      width: auto;
+      float: right !important;
+    }
+  }
+}
+@media (min-width: 580px) {
+  #createProfileForm  {
+    #emailGroup {
+      margin-top: 0;
+    }
+    #phone, #email, #profileStudyIDContainer input, #altPhone{
+        width: 350px;
+    }
+  }
+}
+@media (min-width: 641px) {
+  body {
+    font-size: @baseFontSize;
+  }
   .form-control,
   input,
   select,
   label,
-  legend,
-  .tnth-form .form-group > label,
-  .fixed-table-container thead th  {
-    font-size: 14px;
+  .form-group > label {
+    font-size: @baseFontSize;
   }
-  .tnth-headline,
-  .tnth-subhead,
-  h1, h2 {
-    font-size: @subheadSize;
-  }
-  h3, h4, h5 {
-    font-size: @subSmallHeadSize;
+  .form-group .help-block {
+    font-size: @mediumText;
   }
   small {
-    font-size: 12px;
+    font-size: @baseMobileFontSize;
   }
+  .fixed-table-pagination {
+    font-size:@baseFontSize;
+  }
+  .tnth-headline {
+    margin: 30px 0 20px;
+    font-size: @headlineSize;
+    letter-spacing: 1px;
+  }
+  .tnth-subhead {
+    font-size: @subheadSize;
+  }
+  h1, h2 {
+    font-size: @headlineSize;
+  }
+  h3, h4, h5 {
+    font-size: 1.1em;
+  }
+  legend {
+    font-size: 0.95em;
+  }
+  .fixed-table-container thead th,
+  .fixed-table-container thead th .both {
+    font-size: @baseFontSize*0.95;
+  }
+
+  .fixed-table-toolbar .dropdown-menu {
+    overflow-x: hidden;
+  }
+  .tnth-form .form-group > label {
+    font-size: @formSize;
+  }
+
+  button,
   #createUserLink,
   .btn,
   .btn-tnth-primary,
   a.btn {
-    font-size: 14px;
-    max-width: 100%;
+    font-size: @btnSize;
+    max-width: 350px;
+    work-break: break-all;
   }
 
-  /************
-  div.right-panel {
-    margin-left: 0 !important;
-   }
-   *************/
-   /***************
-  #indexNavBar {
-    display: block;
-    max-width: 100%;
-    padding-top: 1em;
-    span.glyphicon {
-      margin-left: -2px;
-    }
-    #backLink a {
-      top: -0.1px;
-    }
-    span.index-list {
-      display: inline-block;
-      position: relative;
-      top: 3px;
-    }
-
+  #socialMediaRegistrationContainer .btn-social,
+  #regForm input[type="submit"],
+  #socialMediaLoginContainer .btn-social,
+  #loginForm input[type="submit"],
+  #regForm input[type=submit]
+  {
+    font-size: @formSize;
+    height: 62px;
   }
-   ***************/
-  #wellContainer .tnth-well {
-    height: 60%;
+  #loginForm input,
+  #regForm input {
+    font-size: @formSize;
   }
-  .profile-section {
-    padding: 0;
-  }
-  .profile-item-container {
-    max-width: 100%;
-  }
-  #mainDiv.profile {
-    .profile-item-container {
-      padding: 2em 1em 2.5em 1em;
-      .profile-item-title {
-        max-width: 150px;
-      }
-      .view-container {
-        padding-bottom: 1em;
-      }
-    }
+  #socialMediaRegistrationContainer .btn-social,
+  #socialMediaLoginContainer .btn-social
+  {
+    padding-top: 0em;
   }
 
-  .fixed-table-pagination {
-    font-size:@smallText;
-  }
-  #createProfileForm {
-    #phone, #email, #profileStudyIDContainer input{
-      width: 100%;
-      max-width: 100%;
-    }
-    #bdGroup .flex {
-      flex-wrap: wrap;
-    }
-  }
   .checkbox input[type=checkbox] {
     top: -1px;
   }
-  #profile-gender-list {
-    margin-top: 0.2em;
-  }
-  #profile-gender-list input[type=radio] {
-    top: -2px;
-   }
 
-  .create-account-container {
-    padding: 2em;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
+  #homeFooter {
+    font-size: @footerSize;
+    padding-top: 1em;
   }
 
-  #identityVerificationContainer {
-    width: 100%;
-    max-width: 100%;
-    input {
-      width: 100%;
-      max-width: 100%;
-    }
-    select {
-      width: 100%;
-      max-width: 100%;
+  #wellContainer {
+    .tnth-well {
+      height: 100%;
     }
   }
 
-  .download-wrapper, .download-break {
-    display: none;
-  }
-
-  div.search, div.columns {
-    display: none;
-  }
   div.columns {
-    top: 4px;
+    top: 0;
   }
-  .profile-header, #indexNavBar {
-    width: 100%;
-    max-width: 100%;
+  div.search {
+    top: 0;
   }
-
-   #profileForm {
-      #firstname,
-      #lastname {
-        width: 100%;
-        max-width: 100%;
-      }
+  .search .form-control {
+    height: 3em;
   }
 
-  button.btn-delete-consent {
-    padding: 2px;
-  }
-
-   #adminTableToolbar {
-       div.indent {
-        padding: 0 0.2em;
-      }
+  #adminTableToolbar {
+     div.indent {
+      padding: 0;
+    }
+    div.orglist-selector {
       div.dropdown-menu {
-        width: 200px !important;
-        overflow: auto;
-        div.org-container *
-        {
-          font-size: @mobileOrgSize;
+        width: 375px;
+        max-width: 375px;
+        #userOrgs {
+          margin: 0 0.5em;
         }
-      }
-     div.orglist-selector {
-        #orglist-footer-container {
-          padding: 0.5em 1em;
-          input[type="checkbox"] {
-            top: 0;
+        div.org-container
+        {
+          * {
+            font-size: @baseMobileFontSize;
           }
         }
+      }
+      #orglist-footer-container {
+        padding: 0em 0.5em;
+        label {
+          font-size: @baseMobileFontSize;
+        }
+      }
     }
   }
-  .timezone-container {
-    padding-bottom: 0;
+  .download-wrapper,
+  .download-break {
+    display: block;
   }
-  #consentContainer .radio-inline input {
-    position: relative;
-    top: 1px;
-    left: -1px;
-  }
-  #fillOrgs {
-    label.org-label{
-      margin: 0.2em 0;
-      font-weight: normal;
-      font-size: @mobileOrgSize;
-    }
-  }
-  #adminTableToolbar #fillOrgs {
-    label.org-label {
-      font-size: @mobileOrgSize !important;
-    }
-    legend {
-      font-size: @mobileOrgSize !important;
-    }
-    div.orglist-selector #orglist-footer-container label {
-      font-size: @mobileOrgSize !important;
-    }
-  }
-
-  #aboutForm .iq-container .tnth-headline:first-of-type{
-    margin-left: 0.3em;
-    margin-right: 0.3em;
-  }
-
   .portal-description .button-container a {
-    width: 250px;
-    max-width: 100%;
+    width: 300px;
+  }
+   .profile-item-container {
+    padding: 2em 3em 2.5em 3em;
   }
 
+  .profile-section {
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+  }
+
+  #mainDiv.profile {
+    .profile-item-container {
+      .profile-item-title  {
+        max-width: 100%;
+      }
+    }
+  }
+
+  #profileForm {
+    #firstname,
+    #lastname {
+      width: 300px;
+    }
+  }
+
+  .timezone-container {
+    padding-bottom: 2em;
+  }
+
+   #fillOrgs *,
+  .noOrg-container * {
+    font-size:@orgSize;
+  }
+  .create-account-container {
+      padding: 3.5em 4em;
+      overflow: auto;
+  }
+  #createProfileForm {
+    #bdGroup .flex {
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+@media (min-width: 726px) {
+  .portal-header {
+    font-size: @headlineSize;
+  }
 }
 
 @media (min-width: 768px) {
   #fullSizeBox {
-    /*background-image: none;
-    min-height: auto;*/
-    /*height:700px;*/
     > img {
       width: 100%;
     }
@@ -2872,16 +2615,7 @@ div.timezone-warning.text-warning {
     font-size: 24px;
   }
 }
-@media (min-width: 828px) {
-  #indexNavBar, #indexContainer {
-    display: none;
-  }
-  /***************
-  div.left-panel, a.back, a.open {
-    display: block;
-  }***************/
-}
-@media (min-width: 991px) {
+@media (min-width: 992px) {
   #mainNav {
     height: 135px;
   }
@@ -2905,38 +2639,6 @@ div.timezone-warning.text-warning {
   #staffListOptions > span:last-of-type {
     margin-top: 0.7em;
   }
-}
-@media (max-width: 991px) {
-  .load-container {
-    min-height: 1.5em;
-  }
-  .admin-table .search .form-control {
-    height: 35px;
-  }
-  .custom-container {
-    display: block;
-    #profileEmailSelect {
-      width: 90%;
-      max-width: 100%;
-    }
-    #btnProfileSendEmail, .custom-btn {
-      width: 280px;
-      max-width: 100%;
-    }
-  }
-  #profileStudyIDContainer {
-    margin-top: -1.5em;
-  }
-  #aboutForm .bd-element {
-    margin-bottom: 1em;
-  }
-}
-@media (min-width: 992px) {
-
-  /** Font sizes changes above 992 **/
-  body {
-    font-size: @baseFontSize;
-  }
   #wellContainer{
     height:90%;
   }
@@ -2955,6 +2657,9 @@ div.timezone-warning.text-warning {
   }
   #fullSizeLogo {
     height: 90px;
+  }
+  #fullSizeBox {
+    background-position: center top;
   }
   .tnth-well {
     padding: 30px;
@@ -2976,7 +2681,19 @@ div.timezone-warning.text-warning {
       margin: 0 0 15px 15px;
     }
   }
-
+  .custom-container {
+    display: flex;
+    .custom-container-item,
+    .custom-container-item-right {
+        width: 33%;
+    }
+    #profileEmailSelect {
+      width: 100%;
+    }
+    #btnProfileSendEmail, .custom-btn {
+      width: 100%;
+    }
+  }
   .form-group {
     input[type=checkbox] {
       margin-top: 5px;
@@ -2986,6 +2703,16 @@ div.timezone-warning.text-warning {
     }
   }
 
+  #progressWrapper {
+      width: 80%;
+      .progressbar {
+        position: relative;
+        left: -3%;
+        li {
+          font-size: 12px;
+        }
+      }
+  }
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   .reduce-font-sizes {
     body & {
@@ -3001,46 +2728,18 @@ div.timezone-warning.text-warning {
       margin-top: 4px;
     }
   }
-}
-@media (max-width: 1199px) {
-  .profile-img {
-    display: none;
-  }
-  .custom-container .custom-container-item,
-   .custom-container .custom-container-item-right {
-      font-size: @smallText;
-      width: 100%;
-      max-width: 100%;
-  }
-  #profileForm {
-    #date {
-      width: 50px;
-      max-width: 100%;
-    }
-    #year {
-      width: 90px;
-      max-width: 100%;
-    }
-    #bdGroup .flex {
-      flex-wrap: wrap;
-    }
-  }
-  .patient-detail-container .flex {
-    flex-direction: column;
-  }
-  #profileForm .communications-container .flex-item {
-    flex: 0.3 350px;
-  }
-  #createProfileForm {
-    #emailGroup {
-      margin-top: 1em;
+
+  #aboutForm {
+    max-width: 65%;
+    .iq-container {
+      margin-top: 5%;
+      .tnth-headline:first-of-type {
+        font-size: @subheadSize;
+      }
     }
   }
 }
 @media (min-width: 1200px) {
-  body.open-nav .footer-wrapper {
-    margin-left: 25% !important;
-   }
   #fullSizeContainer {
     padding: 60px 0 60px;
   }
@@ -3057,19 +2756,46 @@ div.timezone-warning.text-warning {
     margin: -3.2em 0 1.5em;
   }
   .profile-img {
-  display: inline-block;
-  margin-top: 10px;
-  margin-left: 6px;
-  img {
-    width: 60px;
-    border-radius: 45px;
-  }
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 6px;
+    img {
+      width: 60px;
+      border-radius: 45px;
+    }
   }
   .btn-set {
     margin-bottom: 1em;
     .btn {
       margin-bottom: 0.5em;
     }
+  }
+
+  #aboutForm div.heading::before {
+     border-radius: 100%;
+     width: 52px;
+     height: 52px;
+     font-size: @subheadSize;
+     line-height: 1;
+     content: "\EA03";
+     display: inline-block;
+     font-family: "symbols";
+     font-style: normal;
+     font-weight: normal;
+     line-height: 1;
+     margin: 0 auto;
+     -webkit-font-smoothing: antialiased;
+     color: #ccc;
+     position: absolute;
+     top: 2.8em;
+     left: 0;
+     right: 0;
+     margin: 0 auto 1em auto;
+     cursor: pointer;
+   }
+
+  #mainDiv.profile .footer-container.flex{
+    justify-content: left;
   }
 
   #profileForm {
@@ -3082,19 +2808,9 @@ div.timezone-warning.text-warning {
   }
 }
 
-@media(max-width: 1300px) {
+@media(min-width: 1301px) {
   #fullSizeBox {
-    height: 680px;
-  }
-  #stickyMenu {
-    width: 160px !important;
-    font-size: 0.9em !important;
-  }
-  body.open-nav .left-panel {
-    width: 235px;
-  }
-  body.open-nav .footer-wrapper {
-    margin-left: 215px !important;
+    height: 100%;
   }
 }
 
@@ -3126,66 +2842,6 @@ div.timezone-warning.text-warning {
     .btn {
       margin-bottom: 0.5em;
     }
-  }
-}
-@media (max-width: 1745px) {
-  body.open-nav .right-panel {
-    margin-left: 30px;
-  }
-}
-@media (max-width: 1632px) {
-  body.open-nav .right-panel {
-    margin-left: 50px;
-  }
-}
-@media (max-width: 1560px) {
-  body.open-nav .right-panel {
-    margin-left: 90px;
-  }
-}
-@media (max-width: 1491px) {
-  body.open-nav .right-panel {
-    margin-left:130px;
-  }
-}
-@media (max-width: 1399px) {
-  body.open-nav .right-panel {
-    margin-left:150px;
-  }
-}
-@media (max-width: 1341px) {
-  body.open-nav .right-panel {
-    margin-left:120px;
-  }
-}
-@media (max-width: 1243px) {
-  body.open-nav .right-panel {
-    margin-left:150px;
-  }
-}
-@media (max-width: 1199px) {
-  body.open-nav .right-panel {
-    margin-left:120px;
-  }
-}
-@media (max-width: 1077px) {
-  body.open-nav .right-panel {
-    margin-left:160px;
-  }
-}
-@media (max-width: 940px) {
-  body.open-nav .right-panel {
-    margin-left: 180px;
-  }
-}
-@media (max-width: 991px) {
-  body.open-nav .right-panel {
-    margin-left:160px;
-  }
-}
-@media (max-width: 881px) {
-  body.open-nav .right-panel {
-    margin-left:210px;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/
@@ -3229,8 +2885,9 @@ div.timezone-warning.text-warning {
     max-width: 100%;
     margin: 0 auto;
     overflow: hidden;
-    height: 62px;
-    font-size: @formSize;
+    //height: 62px;
+    height: 52px;
+    font-size: @mobileSize;
     line-height: 1;
     margin: 0 auto;
     letter-spacing: 3px;
@@ -3251,37 +2908,6 @@ div.timezone-warning.text-warning {
  {
   height: 0.5em;
 }
-
-#regForm input,
-#loginForm input {
-  background: #f1f0ef;
-  height: 44px;
-  padding: 5px;
-  border: 1px solid #f1f0ef;
-  border-radius: 0;
-  width: 400px;
-  max-width: 100%;
-}
-
-#regForm input[type="submit"],
-#loginForm input[type="submit"] {
-   background-color: @btnColor;
-   text-align: center;
-   padding: 1.2em 2em 1em 2em;
-}
-#loginForm input[type="submit"] {
-  height: 69px;
-}
-.reg-title {
-  font-size: @headlineSize;
-  line-height: 33px;
-  color: #494a45;
-  position: relative;
-  padding: 0.6em 0 20px;
-  margin: 1.5em 0 25px;
-  font-weight: bold;
-}
-
 div.or {
     display: none;
     background: @orBackgroundColor;
@@ -3316,20 +2942,8 @@ div.or {
 .fail-text {color: #a94442; font-weight: bold;}
 .password-popover li.fail-text::before { content: "\2715"; display: inline-block; margin-right: 4px; }
 
-@media (max-width: 640px) {
-  #regForm input,
-  #socialMediaRegistrationContainer .btn-social,
-  #regForm input[type="submit"],
-  #loginForm input,
-  #socialMediaLoginContainer .btn-social,
-  #loginForm input[type="submit"]
-  {
-    font-size: @mobileSize;
-    height: 52px;
-  }
-  #socialMediaRegistrationContainer .btn-social,
-  #socialMediaLoginContainer .btn-social
-  {
+#socialMediaRegistrationContainer .btn-social,
+#socialMediaLoginContainer .btn-social
+{
     padding-top: 1.7em;
-  }
 }
