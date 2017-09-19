@@ -144,9 +144,10 @@ def update_patient_loop(update_cache=True, queue_messages=True):
         if update_cache:
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
-            for qb in QuestionnaireBank.qbs_for_user(
-                    user=user, classification='baseline'):
-                queue_outstanding_messages(user=user, questionnaire_bank=qb)
+            qb, ic = QuestionnaireBank.most_current_qb(user=user)
+            if qb:
+                queue_outstanding_messages(
+                    user=user, questionnaire_bank=qb, iteration_count=ic)
     db.session.commit()
 
 
