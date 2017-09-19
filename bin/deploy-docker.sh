@@ -43,7 +43,8 @@ export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml
 
 # Hack to set env vars in docker-compose file
 # See portal.env.default
-source "${GIT_WORK_TREE}/docker/portal.env"
+set -o allexport
+. "${GIT_WORK_TREE}/docker/portal.env"
 
 if [ $BACKUP ]; then
     web_image_id="$(docker-compose images -q web)"
