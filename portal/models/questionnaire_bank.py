@@ -271,11 +271,7 @@ class QuestionnaireBank(db.Model):
         and should be treated independently
 
         """
-        if as_of_date is None:
-            as_of_date = datetime.utcnow()
-        else:
-            raise NotImplementedError(
-                'needs attention in active_interval_start')
+        as_of_date = as_of_date or datetime.utcnow()
 
         baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
         if not baseline:
@@ -291,7 +287,8 @@ class QuestionnaireBank(db.Model):
             if classification == 'indefinite':
                 continue
             for qb in QuestionnaireBank.qbs_for_user(user, classification):
-                relative_start, ic = qb.calculated_start(trigger_date)
+                relative_start, ic = qb.calculated_start(trigger_date,
+                                                         as_of_date)
                 if relative_start is None:
                     # indicates QB hasn't started yet, continue
                     continue
@@ -303,7 +300,7 @@ class QuestionnaireBank(db.Model):
                     return (qb, ic)
         return (last_found, last_found_ic)
 
-    def calculated_start(self, trigger_date):
+    def calculated_start(self, trigger_date, as_of_date):
         """Return two item tuple (calculated_start, iteration) for QB or None
 
         Returns calculated start date in UTC for the QB and the iteration
@@ -319,7 +316,7 @@ class QuestionnaireBank(db.Model):
         if len(self.recurs):
             for recurrence in self.recurs:
                 (relative_start, ic) = recurrence.active_interval_start(
-                    trigger_date=trigger_date)
+                    trigger_date=trigger_date, as_of_date=as_of_date)
                 if relative_start:
                     return (relative_start, ic)
             return (None, None)  # no active recurrence
@@ -329,14 +326,14 @@ class QuestionnaireBank(db.Model):
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date)
+        start, ic = self.calculated_start(trigger_date, None)
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
     def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date)
+        start, ic = self.calculated_start(trigger_date, None)
         if not (start and self.overdue):
             return None
 
