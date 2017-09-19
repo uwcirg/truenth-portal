@@ -300,7 +300,7 @@ class QuestionnaireBank(db.Model):
                     return (qb, ic)
         return (last_found, last_found_ic)
 
-    def calculated_start(self, trigger_date, as_of_date):
+    def calculated_start(self, trigger_date, as_of_date=None):
         """Return two item tuple (calculated_start, iteration) for QB or None
 
         Returns calculated start date in UTC for the QB and the iteration
@@ -326,14 +326,14 @@ class QuestionnaireBank(db.Model):
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date, None)
+        start, ic = self.calculated_start(trigger_date)
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
     def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date, None)
+        start, ic = self.calculated_start(trigger_date)
         if not (start and self.overdue):
             return None
 
