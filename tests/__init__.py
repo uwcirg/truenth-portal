@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from portal.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
+from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.auth import Client
 from portal.models.coredata import configure_coredata
@@ -76,7 +77,10 @@ class TestCase(Base):
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
-        return db.session.merge(test_user)
+        test_user = db.session.merge(test_user)
+        # Avoid testing cached/stale data
+        invalidate_assessment_status_cache(test_user.id)
+        return test_user
 
     def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""

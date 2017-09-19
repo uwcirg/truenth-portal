@@ -4,11 +4,11 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.assessment_status import AssessmentStatus
-from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
