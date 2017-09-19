@@ -299,7 +299,7 @@ class QuestionnaireBank(db.Model):
                 last_found = qb
                 last_found_ic = ic
 
-                if relative_start >= as_of_date and as_of_date < expiry:
+                if relative_start <= as_of_date and as_of_date < expiry:
                     return (qb, ic)
         return (last_found, last_found_ic)
 
@@ -312,7 +312,7 @@ class QuestionnaireBank(db.Model):
         reach the active cycle.
 
         :return: two item tuple (datetime of the questionnaire's start date,
-            iteration_count); (None, 0) if N/A
+            iteration_count); (None, None) if N/A
 
         """
         # On recurring QB, deligate to recur for date
@@ -322,10 +322,10 @@ class QuestionnaireBank(db.Model):
                     trigger_date=trigger_date)
                 if relative_start:
                     return (relative_start, ic)
-            return (None, 0)  # no active recurrence
+            return (None, None)  # no active recurrence
 
-        # Otherwise, simply trigger plus start (and iteration_count of zero)
-        return (trigger_date + RelativeDelta(self.start), 0)
+        # Otherwise, simply trigger plus start (and iteration_count of None)
+        return (trigger_date + RelativeDelta(self.start), None)
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
