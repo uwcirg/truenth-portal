@@ -104,11 +104,11 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            a_s, qb, ic = overall_assessment_status(patient.id)
+            a_s, qbd = overall_assessment_status(patient.id)
             patient.assessment_status = a_s
-            patient.current_qb = qb.name
-            if len(qb.recurs):
-                patient.current_qb += " (Iteration: {})".format(ic)
+            patient.current_qb = qbd.questionnaire_bank.name
+            # if len(qb.recurs):
+            #     patient.current_qb += " (Iteration: {})".format(ic)
             patient_list.append(patient)
         patients = patient_list
 

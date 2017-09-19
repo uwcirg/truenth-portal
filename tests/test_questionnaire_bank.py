@@ -28,7 +28,7 @@ class TestQuestionnaireBank(TestCase):
         qb.questionnaires.append(qbq)
 
         trigger_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
-        start, _ = qb.calculated_start(trigger_date)
+        start = qb.calculated_start(trigger_date).relative_start
         self.assertTrue(start > trigger_date)
         self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
 
@@ -183,7 +183,7 @@ class TestQuestionnaireBank(TestCase):
         # User associated with CRV org should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb, _ = QuestionnaireBank.most_current_qb(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(self.test_user).questionnaire_bank
         results = list(qb.questionnaires)
         self.assertEquals(3, len(results))
         # confirm rank sticks
@@ -222,7 +222,7 @@ class TestQuestionnaireBank(TestCase):
         # User associated with INTV intervention should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb, _ = QuestionnaireBank.most_current_qb(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(self.test_user).questionnaire_bank
         results = list(qb.questionnaires)
         self.assertEquals(2, len(results))
 

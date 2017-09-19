@@ -200,7 +200,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         this time
 
         """
-        a_s, _, _ = overall_assessment_status(user.id)
+        a_s, _ = overall_assessment_status(user.id)
         return a_s in ('Due', 'Overdue', 'In Progress')
 
     def queue_communication(user, communication_request):
@@ -215,7 +215,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
     now = datetime.utcnow()
     trigger_date = questionnaire_bank.trigger_date(user)
-    start, ic = questionnaire_bank.calculated_start(trigger_date)
+    qbd = questionnaire_bank.calculated_start(trigger_date)
+    start = qbd.relative_start
     if not start:
         return
 
@@ -234,7 +235,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
             continue
 
         # The iteraction counts must match
-        if ic != request.qb_iteration:
+        if qbd.iteration != request.qb_iteration:
             continue
 
         if (start + RelativeDelta(request.notify_post_qb_start) <

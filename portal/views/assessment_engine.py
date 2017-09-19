@@ -1299,7 +1299,8 @@ def assessment_add(patient_id):
         qn_ref = request.json.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qb, ic = QuestionnaireBank.most_current_qb(patient)
+        qbd = QuestionnaireBank.most_current_qb(patient)
+        qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
@@ -1310,7 +1311,7 @@ def assessment_add(patient_id):
         document=request.json,
         encounter=encounter,
         questionnaire_bank=qnr_qb,
-        qb_iteration=ic
+        qb_iteration=qbd.iteration
     )
 
     db.session.add(questionnaire_response)
@@ -1579,7 +1580,7 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
-        assessment_status, _, _ = overall_assessment_status(user.id)
+        assessment_status, _ = overall_assessment_status(user.id)
         for consent in user.all_consents:
             details.append(
                 {'consent': consent.as_json(),

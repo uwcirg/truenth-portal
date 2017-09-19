@@ -31,8 +31,10 @@ def upgrade():
             qn_name = qn_ref.split("/")[-1] if qn_ref else None
             qn = Questionnaire.query.filter_by(name=qn_name).first()
 
-            qb, ic = QuestionnaireBank.most_current_qb(qnr.subject,
+            qbd = QuestionnaireBank.most_current_qb(qnr.subject,
                                                        as_of_date=qnr.authored)
+            qb = qbd.questionnaire_bank
+            ic = qbd.iteration
             if qb and qn and (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires]):
                 ic = ic or 'NULL'
                 session.execute('UPDATE questionnaire_responses SET questionnaire_bank_id = {}, '
