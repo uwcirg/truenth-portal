@@ -63,7 +63,7 @@ class Communication(db.Model):
                 'st_link': st.link_url}
 
         mailresource = MailResource(
-            url=self.communication_request.lr_url,
+            url=self.communication_request.content_url,
             variables=args)
 
         self.message = EmailMessage(

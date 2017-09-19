@@ -90,6 +90,7 @@ class Reference(object):
         # Due to cyclic import problems, keep these local
         from .organization import Organization, OrganizationIdentifier
         from .questionnaire import Questionnaire
+        from .questionnaire_bank import QuestionnaireBank
         from .user import User
 
         if 'reference' in reference_dict:
@@ -104,6 +105,8 @@ class Reference(object):
         lookup = (
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
             (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),
+            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
+             QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'))
 

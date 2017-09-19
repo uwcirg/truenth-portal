@@ -71,18 +71,18 @@ class Recur(db.Model):
         return d
 
     def active_interval_start(self, trigger_date):
-        """Return two tuple (start, iteration_count) or None
+        """Return two tuple (start, iteration_count)
 
         Return UTC datetime for active recurrence start and the
-        iteration_count (possibly non zero in the recurring case)
-        or (None, 0)
+        iteration_count if it applies, or (None, None) if N/A
 
         :param trigger_date: The UTC datetime defining external context
             launch point of the study or procedure date, etc.
 
-        :return: UTC datetime for active recurrence start or None if
-            the recurrence has either expired (beyond termination) or
-            has yet to begin (prior to start)
+        :return: UTC datetime for active recurrence start and None or the
+            iteration_count if it applies, if the time range is valid.  (None,
+            None) if the recurrence has either expired (beyond termination) or
+            has yet to begin (prior to start).
 
         """
         now = datetime.utcnow()
@@ -93,10 +93,10 @@ class Recur(db.Model):
 
         if now < start_date:
             # Has yet to begin
-            return (None, 0)
+            return (None, None)
         if termination and now > termination:
             # Recurrence terminated
-            return (None, 0)
+            return (None, None)
 
         # Still here implies we're in a valid period - find the current
         # and return its effective start date

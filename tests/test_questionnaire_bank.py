@@ -1,4 +1,5 @@
 """Unit test module for questionnaire_bank"""
+from datetime import datetime
 from flask_webtest import SessionScope
 
 from portal.extensions import db
@@ -11,6 +12,29 @@ from tests import TestCase
 
 
 class TestQuestionnaireBank(TestCase):
+
+    def test_start(self):
+        q = Questionnaire(name='q')
+        org = Organization(name='org')
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.add(org)
+            db.session.commit()
+        q, org = map(db.session.merge, (q, org))
+        qb = QuestionnaireBank(
+            name='qb', organization_id=org.id, classification='baseline',
+            start='{"days": 1}', expired='{"days": 2}')
+        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
+        qb.questionnaires.append(qbq)
+
+        trigger_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
+        start, _ = qb.calculated_start(trigger_date)
+        self.assertTrue(start > trigger_date)
+        self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
+
+        end = qb.calculated_expiry(trigger_date)
+        expected_expiry = datetime.strptime('2000-01-04', '%Y-%m-%d')
+        self.assertEquals(end, expected_expiry)
 
     def test_questionnaire_serialize(self):
         q1 = Questionnaire(name='q1')

@@ -20,13 +20,20 @@ from tests.test_assessment_status import symptom_tracker_instruments
 
 
 def mock_communication_request(
-        questionnaire_bank_name, notify_days,
-        communication_request_name=None):
+        questionnaire_bank_name,
+        notify_post_qb_start,
+        lr_uuid=None,
+        communication_request_name=None,
+        qb_iteration=None):
     qb = QuestionnaireBank.query.filter_by(name=questionnaire_bank_name).one()
+    if lr_uuid is None:
+        lr_uuid = "5424efca-9f24-7ff5-cb41-96c1f6546fab"
     cr = CommunicationRequest(
         status='active',
         questionnaire_bank=qb,
-        notify_days_after_event=notify_days)
+        notify_post_qb_start=notify_post_qb_start,
+        lr_uuid=lr_uuid,
+        qb_iteration=qb_iteration)
     if communication_request_name:
         ident = Identifier(
             system=TRUENTH_CR_NAME, value=communication_request_name)
@@ -53,7 +60,7 @@ class TestCommunication(TestQuestionnaireSetup):
     def test_nearready_message(self):
         # At 13 days with all work in-progress, shouldn't generate message
 
-        mock_communication_request('localized', 14)
+        mock_communication_request('localized', '{"days": 14}')
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
@@ -75,7 +82,8 @@ class TestCommunication(TestQuestionnaireSetup):
         # At 14 days with all work in-progress, should generate message
 
         mock_communication_request(
-            'localized', 14, "Symptom Tracker | 3 Mo Reminder (1)")
+            'localized', '{"days": 14}',
+            communication_request_name="Symptom Tracker | 3 Mo Reminder (1)")
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
@@ -96,7 +104,7 @@ class TestCommunication(TestQuestionnaireSetup):
     def test_noworkdone_message(self):
         # At 14 days with no work started, should generate message
 
-        mock_communication_request('localized', 14)
+        mock_communication_request('localized', '{"days": 14}')
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
@@ -111,7 +119,7 @@ class TestCommunication(TestQuestionnaireSetup):
     def test_done_message(self):
         # At 14 days with all work done, should not generate message
 
-        mock_communication_request('localized', 14)
+        mock_communication_request('localized', '{"days": 14}')
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
@@ -129,7 +137,9 @@ class TestCommunication(TestQuestionnaireSetup):
     def test_create_message(self):
 
         cr = mock_communication_request(
-            'localized', 14, "Symptom Tracker | 3 Mo Reminder (1)")
+            'localized', '{"days": 14}',
+            communication_request_name="Symptom Tracker | 3 Mo Reminder (1)")
+
         comm = Communication(user_id=TEST_USER_ID, communication_request=cr)
 
         # in testing, link_url isn't set:
@@ -157,7 +167,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_early(self):
         # Prior to days passing, no message should be generated
-        mock_communication_request('symptom_tracker', 90)
+        mock_communication_request('symptom_tracker', '{"days": 90}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
@@ -175,7 +185,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_st_done(self):
         # Symptom Tracker QB with completed shouldn't fire
-        mock_communication_request('symptom_tracker', 90)
+        mock_communication_request('symptom_tracker', '{"days": 90}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
@@ -196,7 +206,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_st_undone(self):
         # Symptom Tracker QB with incompleted should generate communication
-        mock_communication_request('symptom_tracker', 90)
+        mock_communication_request('symptom_tracker', '{"days": 90}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
@@ -217,7 +227,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_st_metastatic(self):
         # Symptom Tracker QB on metastatic patient shouldn't qualify
-        mock_communication_request('symptom_tracker', 90)
+        mock_communication_request('symptom_tracker', '{"days": 90}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
@@ -239,7 +249,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_procedure_update(self):
         # Newer procedure should alter trigger date and suspend message
-        mock_communication_request('symptom_tracker', 90)
+        mock_communication_request('symptom_tracker', '{"days": 90}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
@@ -257,3 +267,15 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertFalse(expected)
+
+    def test_persist(self):
+        cr = mock_communication_request(
+            questionnaire_bank_name='symptom_tracker_recurring',
+            notify_post_qb_start='{days="30"}',
+            communication_request_name='test-communication-request')
+
+        serial = cr.as_fhir()
+        self.assertEquals(serial['resourceType'], 'CommunicationRequest')
+        copy = CommunicationRequest.from_fhir(serial)
+        self.assertEquals(cr.questionnaire_bank.name,
+                          copy.questionnaire_bank.name)
