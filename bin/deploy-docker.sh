@@ -46,7 +46,7 @@ export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml
 set -o allexport
 . "${GIT_WORK_TREE}/docker/portal.env"
 
-if [ $BACKUP ]; then
+if [ -n "$BACKUP" -a -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"
     dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.pgdump"
 
