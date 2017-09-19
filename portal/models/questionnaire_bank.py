@@ -86,9 +86,12 @@ class QuestionnaireBank(db.Model):
             self.intervention_id = Reference.parse(
                 data['intervention']).id
         self.start = data['start']
+        RelativeDelta.validate(self.start)
         self.expired = data['expired']
+        RelativeDelta.validate(self.expired)
         if 'overdue' in data:
             self.overdue = data['overdue']
+            RelativeDelta.validate(self.overdue)
 
         self = self.add_if_not_found(commit_immediately=True)
 

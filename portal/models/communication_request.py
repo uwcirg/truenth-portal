@@ -99,6 +99,7 @@ class CommunicationRequest(db.Model):
                     self.identifiers.append(identifier)
         self.status = data['status']
         self.notify_post_qb_start = data['notify_post_qb_start']
+        RelativeDelta.validate(self.notify_post_qb_start)
         self.questionnaire_bank_id = Reference.parse(
             data['questionnaire_bank']).id
         self.qb_iteration = data['qb_iteration']

@@ -60,6 +60,7 @@ class Recur(db.Model):
         for field in (
                 'start', 'cycle_length', 'termination'):
             setattr(instance, field, data.get(field))
+            RelativeDelta.validate(data.get(field))
         return instance.add_if_not_found()
 
     def as_json(self):
