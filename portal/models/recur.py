@@ -70,7 +70,7 @@ class Recur(db.Model):
                 d[field] = getattr(self, field)
         return d
 
-    def active_interval_start(self, trigger_date):
+    def active_interval_start(self, trigger_date, as_of_date=None):
         """Return two tuple (start, iteration_count)
 
         Return UTC datetime for active recurrence start and the
@@ -79,33 +79,36 @@ class Recur(db.Model):
         :param trigger_date: The UTC datetime defining external context
             launch point of the study or procedure date, etc.
 
+        :param as_of_date: The UTC datetime defining the current point in time
+            against which to compare iterations to find the relevant cycle.
+
         :return: UTC datetime for active recurrence start and None or the
             iteration_count if it applies, if the time range is valid.  (None,
             None) if the recurrence has either expired (beyond termination) or
             has yet to begin (prior to start).
 
         """
-        now = datetime.utcnow()
+        as_of_date = as_of_date or datetime.utcnow()
         start_date = trigger_date + RelativeDelta(self.start)
         termination = (
             trigger_date + RelativeDelta(self.termination) if
             self.termination else None)
 
-        if now < start_date:
+        if as_of_date < start_date:
             # Has yet to begin
             return (None, None)
-        if termination and now > termination:
+        if termination and as_of_date > termination:
             # Recurrence terminated
             return (None, None)
 
         # Still here implies we're in a valid period - find the current
         # and return its effective start date
-        assert (now + RelativeDelta(self.cycle_length) > now)
+        assert (as_of_date + RelativeDelta(self.cycle_length) > as_of_date)
 
         effective_start = start_date
         iteration_count = 0
         while True:
-            if effective_start + RelativeDelta(self.cycle_length) < now:
+            if effective_start + RelativeDelta(self.cycle_length) < as_of_date:
                 effective_start += RelativeDelta(self.cycle_length)
                 iteration_count += 1
             else:
