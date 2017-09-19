@@ -217,6 +217,33 @@ a.btn {
   padding: 0;
   margin: 1em 0.2em;
 }
+#regForm input,
+#loginForm input {
+  background: #f1f0ef;
+  height: 44px;
+  padding: 5px;
+  border: 1px solid #f1f0ef;
+  border-radius: 0;
+  width: 400px;
+  max-width: 100%;
+}
+
+#regForm input[type="submit"],
+#loginForm input[type="submit"] {
+   background-color: @btnColor;
+   text-align: center;
+   padding: 1.2em 2em 1em 2em;
+   height: 52px;
+}
+.reg-title {
+  font-size: @headlineSize;
+  line-height: 33px;
+  color: #494a45;
+  position: relative;
+  padding: 0.6em 0 20px;
+  margin: 1.5em 0 25px;
+  font-weight: bold;
+}
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
 }
@@ -2431,7 +2458,8 @@ div.timezone-warning.text-warning {
   #socialMediaRegistrationContainer .btn-social,
   #regForm input[type="submit"],
   #socialMediaLoginContainer .btn-social,
-  #loginForm input[type="submit"]
+  #loginForm input[type="submit"],
+  #regForm input[type=submit]
   {
     font-size: @formSize;
     height: 62px;
@@ -2880,34 +2908,6 @@ div.timezone-warning.text-warning {
  {
   height: 0.5em;
 }
-
-#regForm input,
-#loginForm input {
-  background: #f1f0ef;
-  height: 44px;
-  padding: 5px;
-  border: 1px solid #f1f0ef;
-  border-radius: 0;
-  width: 400px;
-  max-width: 100%;
-}
-
-#regForm input[type="submit"],
-#loginForm input[type="submit"] {
-   background-color: @btnColor;
-   text-align: center;
-   padding: 1.2em 2em 1em 2em;
-}
-.reg-title {
-  font-size: @headlineSize;
-  line-height: 33px;
-  color: #494a45;
-  position: relative;
-  padding: 0.6em 0 20px;
-  margin: 1.5em 0 25px;
-  font-weight: bold;
-}
-
 div.or {
     display: none;
     background: @orBackgroundColor;
