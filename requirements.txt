@@ -15,7 +15,7 @@ beautifulsoup4==4.6.0
 billiard==3.5.0.3
 blinker==1.4
 celery==4.1.0
-cffi==1.10.0
+cffi==1.11.0
 click==6.7
 coverage==4.4.1
 decorator==4.1.2
