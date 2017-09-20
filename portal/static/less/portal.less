@@ -1014,7 +1014,7 @@ div.pull-right {
   }
 }
 
-.download-wrapper, 
+.download-wrapper,
 .download-break {
     display: none;
 }
@@ -1715,9 +1715,6 @@ div.noOrg-container {
     	flex-wrap: wrap;
     }
   }
-  #emailGroup {
-    margin-top: 1em;
-   }
   #erroremail {
     width: 300px;
     max-width: 100%;
@@ -1743,7 +1740,7 @@ div.noOrg-container {
     top:-1px
   }
   #phoneGroup {
-    margin-top: 1em;
+    margin-top: 1.2em;
   }
   #altPhoneGroup {
     margin-top: 1.4em;
@@ -1763,10 +1760,12 @@ div.noOrg-container {
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
 }
 #createProfileForm[data-account='patient'] #bdGroup {
-  min-height: 114px;
+  min-height: 104px;
 }
-#createProfileForm[data-account='staff'] #userOrgs {
-	margin-top: 0;
+#createProfileForm[data-account='staff'] {
+  #userOrgs {
+	 margin-top: 0;
+  }
 }
 
 #profileSendEmailContainer {
@@ -2394,10 +2393,15 @@ div.timezone-warning.text-warning {
 @media (min-width: 580px) {
   #createProfileForm  {
     #emailGroup {
-      margin-top: 0;
+      margin-top: 1.2em;
     }
     #phone, #email, #profileStudyIDContainer input, #altPhone{
         width: 350px;
+    }
+  }
+  #createProfileForm[data-account='staff'] {
+    #bdGroup {
+      height: 80px;
     }
   }
 }
@@ -2574,7 +2578,7 @@ div.timezone-warning.text-warning {
   #fillOrgs * {
   	font-size: @baseFontSize * 0.95;
   }
-  
+
 
   .create-account-container {
       padding: 3.5em 4em;
