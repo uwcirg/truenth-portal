@@ -28,6 +28,8 @@ services:
     image: postgres
     ports:
       - "5432"
+    environment:
+      - POSTGRES_DB=${PGDATABASE:-portaldb}
     volumes:
       - source: postgres-data
         target: /var/lib/postgresql/data
