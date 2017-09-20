@@ -315,8 +315,8 @@ class QuestionnaireBank(db.Model):
         be non zero if it takes multiple iterations to reach the active cycle.
 
         :return: namedtuple QBD (datetime of the questionnaire's start date,
-            iteration_count, recurrence, and not-yet-populated QB field);
-            QBD(None, None, None, None) if N/A
+            iteration_count, recurrence, and self QB field);
+            QBD(None, None, None, self) if N/A
 
         """
         # On recurring QB, deligate to recur for date
@@ -326,13 +326,14 @@ class QuestionnaireBank(db.Model):
                     trigger_date=trigger_date, as_of_date=as_of_date)
                 if relative_start:
                     return QBD(relative_start=relative_start, iteration=ic,
-                               recur=recurrence, questionnaire_bank=None)
+                               recur=recurrence, questionnaire_bank=self)
             # no active recurrence
-            return QBD(None, None, None, None)
+            return QBD(relative_start=None, iteration=None,
+                       recur=None, questionnaire_bank=self)
 
         # Otherwise, simply trigger plus start (and iteration_count of None)
         return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
-                   iteration=None, recur=None, questionnaire_bank=None)
+                   iteration=None, recur=None, questionnaire_bank=self)
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
