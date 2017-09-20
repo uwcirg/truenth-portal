@@ -155,6 +155,12 @@ Run the Celery Worker
 
 Alternatively, install an init script and configure. See `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
 
+Should the need ever arise to purge the queue of jobs, run the following destructive command
+
+.. code:: bash
+
+    $ celery -A portal.celery_worker.celery purge
+
 DATABASE
 --------
 
