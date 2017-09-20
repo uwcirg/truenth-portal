@@ -66,9 +66,12 @@ class CommunicationRequest(db.Model):
     )
 
     def __str__(self):
-        return (
+        description = (
             'CommunicationRequest for {0.questionnaire_bank}'
             ' on {0.notify_post_qb_start}'.format(self))
+        if self.qb_iteration is not None:
+            description += ' iteration {0.qb_iteration}'.format(self)
+        return description
 
     @property
     def name(self):
@@ -102,7 +105,8 @@ class CommunicationRequest(db.Model):
         RelativeDelta.validate(self.notify_post_qb_start)
         self.questionnaire_bank_id = Reference.parse(
             data['questionnaire_bank']).id
-        self.qb_iteration = data['qb_iteration']
+        if 'qb_iteration' in data:
+            self.qb_iteration = data['qb_iteration']
         self.lr_uuid = data['lr_uuid']
         self = self.add_if_not_found(commit_immediately=True)
         return self
@@ -110,7 +114,7 @@ class CommunicationRequest(db.Model):
     def as_fhir(self):
         d = {}
         d['resourceType'] = 'CommunicationRequest'
-        if self.identifiers:
+        if self.identifiers.count():
             d['identifier'] = []
         for id in self.identifiers:
             d['identifier'].append(id.as_fhir())
@@ -118,7 +122,8 @@ class CommunicationRequest(db.Model):
         d['notify_post_qb_start'] = self.notify_post_qb_start
         d['questionnaire_bank'] = Reference.questionnaire_bank(
             self.questionnaire_bank.name).as_fhir()
-        d['qb_iteration'] = self.qb_iteration
+        if self.qb_iteration is not None:
+            d['qb_iteration'] = self.qb_iteration
         d['lr_uuid'] = self.lr_uuid
         return d
 
