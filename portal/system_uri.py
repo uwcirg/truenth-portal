@@ -37,7 +37,8 @@ TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(
     TRUENTH_NAMESPACE)
 
 # Identifiers used in CommunicationRequests
-TRUENTH_CR_NAME = '{}/communicationrequest/name'
+TRUENTH_CR_NAME = '{}/communicationrequest/name'.format(
+    TRUENTH_IDENTITY_SYSTEM)
 
 # Local valuesets, where a decent published FHIR match could not be found
 TRUENTH_VALUESET = '{}/fhir/valueset'.format(TRUENTH_NAMESPACE)
