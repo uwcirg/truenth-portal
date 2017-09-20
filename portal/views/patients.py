@@ -5,6 +5,7 @@ from flask_user import roles_required
 from sqlalchemy import and_
 import re
 
+from ..date_tools import RelativeDelta
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
@@ -109,10 +110,12 @@ def patients_root():
             patient.assessment_status = a_s
             name = re.sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
             if qbd.recur:
-                sm = qbd.recur.start.get("months")
-                sm = sm or (qbd.recur.start.get("years") * 12)
-                clm = qbd.recur.cycle_length.get("months")
-                clm = clm or (qbd.recur.cycle_length.get("years") * 12)
+                srd = RelativeDelta(qbd.recur.start)
+                sm = srd.months or 0
+                sm += (srd.years * 12) if srd.years else 0
+                clrd = RelativeDelta(qbd.recur.cycle_length)
+                clm = clrd.months or 0
+                clm += (clrd.years * 12) if clrd.years else 0
                 total = clm * qbd.iteration + sm
                 append = "Recurring, {} Month".format(total)
             else:
