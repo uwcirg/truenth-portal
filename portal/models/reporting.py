@@ -51,7 +51,7 @@ def get_reporting_stats():
                        for obs in user.observations):
                     stats['patients']['meta'] += 1
 
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER):
             for interv in interventions:
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
