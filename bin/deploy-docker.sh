@@ -51,7 +51,7 @@ if [ -n "$BACKUP" -a -n "$(docker-compose ps -q db)" ]; then
     dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.pgdump"
 
     echo "Backing up current database..."
-    docker-compose exec --user postgres db pg_dump --format c postgres > "/tmp/${dump_filename}"
+    docker-compose exec --user postgres db pg_dump --format c portaldb > "/tmp/${dump_filename}"
 fi
 
 docker-compose pull
