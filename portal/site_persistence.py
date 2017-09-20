@@ -292,6 +292,7 @@ class SitePersistence(object):
             else:
                 self._log("{} not found, importing".format(cr))
                 db.session.add(cr)
+            return db.session.merge(cr)
 
         # Orgs first:
         max_org_id = 0
@@ -397,8 +398,8 @@ class SitePersistence(object):
         # CommunicationRequest depends on QuestionnaireBanks
         crs_seen = []
         for cr in objs_by_type['CommunicationRequest']:
-            update_communication_request(cr)
-            crs_seen.append(cr['id'])
+            updated = update_communication_request(cr)
+            crs_seen.append(updated.id)
 
         if not keep_unmentioned:
             query = CommunicationRequest.query.filter(
