@@ -23,6 +23,7 @@ def upgrade():
     op.execute("UPDATE questionnaire_banks SET name = 'CRV_baseline' "
                "  WHERE name = 'CRV baseline'")
 
+
 def downgrade():
     op.execute("UPDATE questionnaire_banks SET name = 'IRONMAN baseline' "
                "  WHERE name = 'IRONMAN_baseline'")

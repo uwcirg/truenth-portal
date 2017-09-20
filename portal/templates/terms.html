@@ -2,15 +2,16 @@
 {% from "flask_user/_macros.html" import footer, back_btn %}
 {% block main %}
   {{ back_btn(PORTAL, _('Home')) }}
-
     <h1 class="tnth-headline">{{ _("General Terms") }}</h1>
 	<div id = "termsConditionsContainer"><p>{{ content|safe }}</p></div>
-	{% if editorUrl %}
-		<script>appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
-	{% endif %}
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
+{% endblock %}
+{% block additional_scripts %}
+	{% if editorUrl %}
+		<script>appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
+	{% endif %}
 {% endblock %}
 {% block document_ready %}
 	{% if request.args.get("disableLinks", "") %}

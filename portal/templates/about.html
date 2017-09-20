@@ -6,7 +6,6 @@
   <h3 class="tnth-headline">{{ _("About TrueNTH") }}</h3>
 
   <div id="aboutTruenthContainer"><p>{{ about_tnth|safe }}</p></div>
-  {% if about_tnth_editorUrl %}<script>appendLREditContainer($("#aboutTruenthContainer"), "{{about_tnth_editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>{% endif %}
   {% if config.metadata.version %}
   <br />
     {% if config.metadata.git_hash %}
@@ -18,5 +17,8 @@
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
+{% endblock %}
+{% block additional_scripts %}
+{% if about_tnth_editorUrl %}<script>appendLREditContainer($("#aboutTruenthContainer"), "{{about_tnth_editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>{% endif %}
 {% endblock %}
 
