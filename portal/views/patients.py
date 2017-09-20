@@ -3,12 +3,14 @@ from flask import abort, Blueprint, jsonify, render_template, request
 from flask import current_app, url_for
 from flask_user import roles_required
 from sqlalchemy import and_
+import re
 
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
@@ -103,7 +105,19 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            patient.assessment_status = overall_assessment_status(patient.id)
+            a_s, qbd = overall_assessment_status(patient.id)
+            patient.assessment_status = a_s
+            name = re.sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
+            if qbd.recur:
+                sm = qbd.recur.start.get("months")
+                sm = sm or (qbd.recur.start.get("years") * 12)
+                clm = qbd.recur.cycle_length.get("months")
+                clm = clm or (qbd.recur.cycle_length.get("years") * 12)
+                total = clm * qbd.iteration + sm
+                append = "Recurring, {} Month".format(total)
+            else:
+                append = qbd.questionnaire_bank.classification.title()
+            patient.current_qb = "{} {}".format(name, append)
             patient_list.append(patient)
         patients = patient_list
 

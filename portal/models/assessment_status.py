@@ -86,7 +86,7 @@ def qb_status_dict(user, questionnaire_bank):
     if not questionnaire_bank:
         return d
     trigger_date = questionnaire_bank.trigger_date(user)
-    start, _ = questionnaire_bank.calculated_start(trigger_date)
+    start = questionnaire_bank.calculated_start(trigger_date).relative_start
     overdue = questionnaire_bank.calculated_overdue(trigger_date)
     expired = questionnaire_bank.calculated_expiry(trigger_date)
     for q in questionnaire_bank.questionnaires:
@@ -105,7 +105,7 @@ class QuestionnaireBankDetails(object):
     """
     def __init__(self, user):
         self.user = user
-        self.qb, _ = QuestionnaireBank.most_current_qb(user)
+        self.qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
         self.status_by_q = qb_status_dict(user=user,
                                           questionnaire_bank=self.qb)
 
@@ -312,4 +312,5 @@ def overall_assessment_status(user_id):
     current_app.logger.debug("CACHE MISS: {} {}".format(
         __name__, user_id))
     a_s = AssessmentStatus(user)
-    return a_s.overall_status
+    qbd = QuestionnaireBank.most_current_qb(user)
+    return (a_s.overall_status, qbd)

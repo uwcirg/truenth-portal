@@ -219,8 +219,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         # With most q's undone, should generate a message
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        self.assertEquals(
-           'In Progress', overall_assessment_status(TEST_USER_ID))
+        a_s, _ = overall_assessment_status(TEST_USER_ID)
+        self.assertEquals('In Progress', a_s)
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertTrue(expected)

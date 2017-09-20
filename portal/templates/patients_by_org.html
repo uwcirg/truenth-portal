@@ -58,7 +58,10 @@
                   <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field" data-filter-control="input">{{ _("Cell") }}</th>
                   <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field" data-filter-control="input">{{ _("Phone (Other)") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center" data-filter-control="input">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+                  <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
+                  <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
+                  {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.stripLinksTextSorter">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field" data-filter-control="select">{{ _("Site(s)") }}</th>
@@ -79,7 +82,10 @@
                         <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{{patient.assessment_status if patient.assessment_status}}</td>{% endif %}
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+                      <td>{{patient.assessment_status if patient.assessment_status}}</td>
+                      <td>{{patient.current_qb if patient.current_qb}}</td>
+                      {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{%if patient.external_study_id%}<a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.external_study_id }}</a>{%endif%}</a></td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}

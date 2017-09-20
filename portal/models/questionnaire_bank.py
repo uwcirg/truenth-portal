@@ -1,4 +1,5 @@
 """Questionnaire Bank module"""
+from collections import namedtuple
 from datetime import datetime
 from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
@@ -19,6 +20,9 @@ from .reference import Reference
 classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
+
+QBD = namedtuple('QBD', ['relative_start', 'iteration',
+                         'recur', 'questionnaire_bank'])
 
 
 class QuestionnaireBank(db.Model):
@@ -259,10 +263,11 @@ class QuestionnaireBank(db.Model):
 
     @staticmethod
     def most_current_qb(user, as_of_date=None):
-        """Return two item tuple (qb, iteration_count) for user
+        """Return namedtuple (QBD) for user representing their most current QB
 
-        Return tuple of "most current" qb for user (or None if N/A), and the
-        recurrence iteration number (if current qb is recurring; else None)
+        Return namedtuple of QB Details for user, containing the current QB,
+        the QB's calculated start date, the current QB recurrence, and the
+        recurrence iteration number. Values are set as None if N/A.
 
         :param as_of_date: if not provided, use current utc time.
 
@@ -278,41 +283,40 @@ class QuestionnaireBank(db.Model):
 
         baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
         if not baseline:
-            return (None, None)
+            return QBD(None, None, None, None)
         trigger_date = baseline[0].trigger_date(user)
         if not trigger_date:
-            return (None, None)
+            return QBD(None, None, None, None)
 
         # Iterate over users QBs looking for current
-        last_found = baseline[0]
-        last_found_ic = None
+        last_found = QBD(relative_start=None, iteration=None, recur=None,
+                         questionnaire_bank=baseline[0])
         for classification in classification_types:
             if classification == 'indefinite':
                 continue
             for qb in QuestionnaireBank.qbs_for_user(user, classification):
-                relative_start, ic = qb.calculated_start(trigger_date,
-                                                         as_of_date)
-                if relative_start is None:
+                qbd = qb.calculated_start(trigger_date, as_of_date)
+                if qbd.relative_start is None:
                     # indicates QB hasn't started yet, continue
                     continue
                 expiry = qb.calculated_expiry(trigger_date)
-                last_found = qb
-                last_found_ic = ic
+                last_found = qbd._replace(questionnaire_bank=qb)
 
-                if relative_start <= as_of_date and as_of_date < expiry:
-                    return (qb, ic)
-        return (last_found, last_found_ic)
+                if qbd.relative_start <= as_of_date and as_of_date < expiry:
+                    return last_found
+        return last_found
 
     def calculated_start(self, trigger_date, as_of_date=None):
-        """Return two item tuple (calculated_start, iteration) for QB or None
+        """Return namedtuple (QBD) for QB
 
-        Returns calculated start date in UTC for the QB and the iteration
-        count.  Generally trigger date plus the QB.start.  For recurring, the
-        iteration count may be non zero if it takes multiple iterations to
-        reach the active cycle.
+        Returns namdetuple (QBD) containing the calculated start date in UTC
+        for the QB, the QB's recurrence, and the iteration count.  Generally
+        trigger date plus the QB.start.  For recurring, the iteration count may
+        be non zero if it takes multiple iterations to reach the active cycle.
 
-        :return: two item tuple (datetime of the questionnaire's start date,
-            iteration_count); (None, None) if N/A
+        :return: namedtuple QBD (datetime of the questionnaire's start date,
+            iteration_count, recurrence, and self QB field);
+            QBD(None, None, None, self) if N/A
 
         """
         # On recurring QB, deligate to recur for date
@@ -321,22 +325,26 @@ class QuestionnaireBank(db.Model):
                 (relative_start, ic) = recurrence.active_interval_start(
                     trigger_date=trigger_date, as_of_date=as_of_date)
                 if relative_start:
-                    return (relative_start, ic)
-            return (None, None)  # no active recurrence
+                    return QBD(relative_start=relative_start, iteration=ic,
+                               recur=recurrence, questionnaire_bank=self)
+            # no active recurrence
+            return QBD(relative_start=None, iteration=None,
+                       recur=None, questionnaire_bank=self)
 
         # Otherwise, simply trigger plus start (and iteration_count of None)
-        return (trigger_date + RelativeDelta(self.start), None)
+        return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
+                   iteration=None, recur=None, questionnaire_bank=self)
 
     def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date)
+        start = self.calculated_start(trigger_date).relative_start
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
     def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
-        start, ic = self.calculated_start(trigger_date)
+        start = self.calculated_start(trigger_date).relative_start
         if not (start and self.overdue):
             return None
 
