@@ -290,7 +290,7 @@ class QuestionnaireBank(db.Model):
 
         # Iterate over users QBs looking for current
         last_found = QBD(relative_start=None, iteration=None, recur=None,
-                       questionnaire_bank=baseline[0])
+                         questionnaire_bank=baseline[0])
         for classification in classification_types:
             if classification == 'indefinite':
                 continue
