@@ -1229,8 +1229,8 @@
                                                  '</tr>';
                         };
                     });
-                        $("#userSessionListTable").append(sessionListHTML);
-                        $("#userSessionListTable").show();
+                    $("#userSessionListTable").append(sessionListHTML);
+                    $("#userSessionListTable").show();
 
                 } else {
                     $("#userSessionListTable").hide();
@@ -1292,7 +1292,7 @@
                             if (entry['answer']) {
                                 (entry['answer']).forEach(function(item) {
                                     if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
-                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) q += (hasValue(q) ? "<br/>" : "") + item.valueCoding.code;
+                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
                                 });
                             };
                             if (!hasValue(q)) q = entry['linkId'];
