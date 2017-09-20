@@ -15,7 +15,7 @@ services:
       - PGUSER=${PGUSER:-postgres}
       - PGPASSWORD=${PGPASSWORD:-""}
       - PGHOST=${PGHOST:-db}
-      - PGDATABASE=${PGDATABASE:-postgres}
+      - PGDATABASE=${PGDATABASE:-portaldb}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     depends_on:
       - db
@@ -28,6 +28,8 @@ services:
     image: postgres
     ports:
       - "5432"
+    environment:
+      - POSTGRES_DB=${PGDATABASE:-portaldb}
     volumes:
       - source: postgres-data
         target: /var/lib/postgresql/data
