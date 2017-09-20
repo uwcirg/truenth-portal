@@ -51,16 +51,17 @@ def get_reporting_stats():
                        for obs in user.observations):
                     stats['patients']['meta'] += 1
 
-        for interv in interventions:
-            desc = interv.description
-            if interv.name == 'decision_support_p3p':
-                desc = 'Decision Support P3P'
-            if interv.display_for_user(user).access:
-                stats['intervention_access'][desc] += 1
-            if interv in user.interventions:
-                stats['interventions'][desc] += 1
-            if (any(doc.intervention == interv for doc in user.documents)):
-                stats['intervention_reports'][desc] += 1
+        if user.has_role(ROLE.PATIENT):
+            for interv in interventions:
+                desc = interv.description
+                if interv.name == 'decision_support_p3p':
+                    desc = 'Decision Support P3P'
+                if interv.display_for_user(user).access:
+                    stats['intervention_access'][desc] += 1
+                if interv in user.interventions:
+                    stats['interventions'][desc] += 1
+                if (any(doc.intervention == interv for doc in user.documents)):
+                    stats['intervention_reports'][desc] += 1
 
         if not user.organizations.count():
             stats['organizations']['Unspecified'] += 1
