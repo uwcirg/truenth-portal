@@ -3,6 +3,7 @@ from flask import abort, Blueprint, jsonify, render_template, request
 from flask import current_app, url_for
 from flask_user import roles_required
 from sqlalchemy import and_
+import re
 
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
@@ -106,9 +107,17 @@ def patients_root():
         for patient in patients:
             a_s, qbd = overall_assessment_status(patient.id)
             patient.assessment_status = a_s
-            patient.current_qb = qbd.questionnaire_bank.name
-            # if len(qb.recurs):
-            #     patient.current_qb += " (Iteration: {})".format(ic)
+            name = re.sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
+            if qbd.recur:
+                sm = qbd.recur.start.get("months")
+                sm = sm or (qbd.recur.start.get("years") * 12)
+                clm = qbd.recur.cycle_length.get("months")
+                clm = clm or (qbd.recur.cycle_length.get("years") * 12)
+                total = clm * qbd.iteration + sm
+                append = "Recurring, {} Month".format(total)
+            else:
+                append = qbd.questionnaire_bank.classification.title()
+            patient.current_qb = "{} {}".format(name, append)
             patient_list.append(patient)
         patients = patient_list
 
