@@ -5,7 +5,7 @@ from flask_webtest import SessionScope
 from portal.database import db
 from portal.models.audit import Audit
 from portal.models.assessment_status import overall_assessment_status
-from portal.models.communication import Communication
+from portal.models.communication import Communication, DynamicDictLookup
 from portal.models.communication_request import CommunicationRequest
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
@@ -47,6 +47,19 @@ def mock_communication_request(
 class TestCommunication(TestQuestionnaireSetup):
     # by inheriting from TestQuestionnaireSetup, pick up the
     # same mocking done for interacting with QuestionnaireBanks et al
+
+    def test_dd(self):
+        def f():
+            return 'zzz'
+
+        dd = DynamicDictLookup()
+        dd['a'] = f
+        self.assertEquals(dd['a'], 'zzz')
+
+    def test_dd_no_key(self):
+        dd = DynamicDictLookup()
+        with self.assertRaises(KeyError):
+            dd['a']
 
     def test_empty(self):
         # Base test system shouldn't generate any messages

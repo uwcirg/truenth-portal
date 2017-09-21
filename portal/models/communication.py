@@ -1,4 +1,5 @@
 """Communication model"""
+from collections import MutableMapping
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -80,3 +81,29 @@ class Communication(db.Model):
             user_id=user.id)
         self.message.send_message()
         self.status = 'completed'
+
+
+class DynamicDictLookup(MutableMapping):
+    """Dictionary like interface with lazy lookup of values"""
+
+    def __init__(self, *args, **kwargs):
+        self.store = dict()
+        self.update(dict(*args, **kwargs))
+
+    def __getitem__(self, key):
+        if key in self.store:
+            return self.store[key].__call__()
+        else:
+            raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        self.store[key] = value
+
+    def __delitem__(self, key):
+        del self.store[key]
+
+    def __len__(self):
+        return len(self.store)
+
+    def __iter__(self):
+        return iter(self.store)
