@@ -2,6 +2,7 @@
 from collections import namedtuple
 from datetime import datetime
 from flask import current_app, url_for
+from re import sub
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -462,3 +463,19 @@ class QuestionnaireBankQuestionnaire(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
+
+
+def display_visit_name(qbd):
+    name = sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
+    if qbd.recur:
+        srd = RelativeDelta(qbd.recur.start)
+        sm = srd.months or 0
+        sm += (srd.years * 12) if srd.years else 0
+        clrd = RelativeDelta(qbd.recur.cycle_length)
+        clm = clrd.months or 0
+        clm += (clrd.years * 12) if clrd.years else 0
+        total = clm * qbd.iteration + sm
+        append = "Recurring, {} Month".format(total)
+    else:
+        append = qbd.questionnaire_bank.classification.title()
+    return "{} {}".format(name, append)
