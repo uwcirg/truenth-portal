@@ -84,7 +84,7 @@ def test(job_id=None):
     try:
         update_runtime(job_id)
     except Exception as exc:
-        logger.warn("Unexpected exception in `test` on {} : {}".format(
+        logger.error("Unexpected exception in `test` on {} : {}".format(
             job_id, exc))
     return "Test task complete."
 
@@ -101,7 +101,6 @@ def cache_reporting_stats(job_id=None):
     try:
         message = "failed"
         before = datetime.now()
-        current_app.logger.debug('cache_reporting_stats')
         dogpile_cache.invalidate(get_reporting_stats)
         dogpile_cache.refresh(get_reporting_stats)
         duration = datetime.now() - before
@@ -110,8 +109,8 @@ def cache_reporting_stats(job_id=None):
         current_app.logger.debug(message)
         update_runtime(job_id)
     except Exception as exc:
-        logger.warn("Unexpected exception in `cache_reporting_stats` "
-                    "on {} : {}".format(job_id, exc))
+        logger.error("Unexpected exception in `cache_reporting_stats` "
+                     "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -127,7 +126,6 @@ def cache_assessment_status(job_id=None):
     try:
         message = "failed"
         before = datetime.now()
-        current_app.logger.debug('cache_assessment_status')
         update_patient_loop(update_cache=True, queue_messages=False)
         duration = datetime.now() - before
         message = (
@@ -135,8 +133,8 @@ def cache_assessment_status(job_id=None):
         current_app.logger.debug(message)
         update_runtime(job_id)
     except Exception as exc:
-        logger.warn("Unexpected exception in `cache_assessment_status` "
-                    "on {} : {}".format(job_id, exc))
+        logger.error("Unexpected exception in `cache_assessment_status` "
+                     "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -146,7 +144,6 @@ def prepare_communications(job_id=None):
     try:
         message = "failed"
         before = datetime.now()
-        current_app.logger.debug('prepare_communications')
         update_patient_loop(update_cache=False, queue_messages=True)
         duration = datetime.now() - before
         message = (
@@ -154,8 +151,8 @@ def prepare_communications(job_id=None):
         current_app.logger.debug(message)
         update_runtime(job_id)
     except Exception as exc:
-        logger.warn("Unexpected exception in `prepare_communications` "
-                    "on {} : {}".format(job_id, exc))
+        logger.error("Unexpected exception in `prepare_communications` "
+                     "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -177,11 +174,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
             qbd = QuestionnaireBank.most_current_qb(user=user)
-            logger.debug("update_patient_loop user {}".format(user.id))
             if qbd.questionnaire_bank:
-                logger.debug(
-                    "update_patient_loop w/ questionnaire for user {}".format(
-                        user.id))
                 queue_outstanding_messages(
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,

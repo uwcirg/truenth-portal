@@ -188,7 +188,6 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         ).filter(
             Communication.communication_request_id == communication_request_id
         ).first()
-        current_app.logger.debug("found existing for {}".format(user.id))
         return existing
 
     def unfinished_work(user, questionnaire_bank):
@@ -202,7 +201,6 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
         """
         a_s, _ = overall_assessment_status(user.id)
-        current_app.logger.debug("a_s {} for {}".format(a_s, user.id))
         return a_s in ('Due', 'Overdue', 'In Progress')
 
     def queue_communication(user, communication_request):
@@ -212,7 +210,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
             user_id=user.id,
             status='preparation',
             communication_request_id=communication_request.id)
-        current_app.logger.debug("communication added for {}".format(user.id))
+        current_app.logger.debug("communication prepared for {}".format(user.id))
         db.session.add(communication)
         db.session.commit()
 
@@ -221,7 +219,6 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     qbd = questionnaire_bank.calculated_start(trigger_date)
     start = qbd.relative_start
     if not start:
-        current_app.logger.debug("no start for {}".format(user.id))
         return
 
     for request in questionnaire_bank.communication_requests:
@@ -240,13 +237,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
         # The iteraction counts must match
         if qbd.iteration != request.qb_iteration:
-            current_app.logger.debug("qb iteration mismatch for {}".format(
-                user.id))
             continue
 
         if (start + RelativeDelta(request.notify_post_qb_start) <
                 now):
             queue_communication(user=user, communication_request=request)
-        else:
-            current_app.logger.debug("not yet notify time for {}".format(
-                user.id))
