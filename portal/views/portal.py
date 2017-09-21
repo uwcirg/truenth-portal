@@ -1168,6 +1168,14 @@ def celery_result(task_id):
     return repr(retval)
 
 
+@oauth.require_oauth()
+@portal.route("/communicate/<email>")
+def communicate(email):
+    from ..tasks import send_user_messages
+    send_user_messages(email)
+    return jsonify(message='ok')
+
+
 @portal.route("/post-result/<task_id>")
 def post_result(task_id):
     r = post_request.AsyncResult(task_id).get(timeout=1.0)

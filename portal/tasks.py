@@ -194,7 +194,17 @@ def send_messages():
 
     Typically called as a scheduled_job - also directly from tests
     """
-    ready = Communication.query.filter(Communication.status == 'prepared')
+    ready = Communication.query.filter(Communication.status == 'preparation')
+    for communication in ready:
+        current_app.logger.debug("Collate ready communication {}".format(
+            communication))
+        communication.generate_and_send()
+
+
+def send_user_messages(email):
+    """Send queued messages to only given user (if found) """
+    ready = Communication.query.join(User).filter(
+        Communication.status == 'preparation').filter(User.email == email)
     for communication in ready:
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
