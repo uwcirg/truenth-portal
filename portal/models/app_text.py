@@ -503,9 +503,11 @@ class MailResource(object):
     def variable_list(self):
         var_list = set()
         if self._subject:
-            var_list.update([v[1] for v in Formatter().parse(self._subject)])
+            var_list.update(
+                [v[1] for v in Formatter().parse(self._subject) if v[1]])
         if self._body:
-            var_list.update([v[1] for v in Formatter().parse(self._body)])
+            var_list.update(
+                [v[1] for v in Formatter().parse(self._body) if v[1]])
         return list(var_list)
 
     def _permanent_url(self, generic_url, version):
