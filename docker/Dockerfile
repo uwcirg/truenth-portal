@@ -74,4 +74,4 @@ CMD \
         `# https://github.com/benoitc/gunicorn/issues/1194` \
         --timeout 90 \
         --keep-alive 75 \
-    manage:app
+    wsgi:app
