@@ -1,13 +1,15 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
-from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.recur import Recur
 from tests import TestCase
 
 
@@ -265,3 +267,98 @@ class TestQuestionnaireBank(TestCase):
         resp = self.client.get('/api/questionnaire_bank')
         self.assert200(resp)
         self.assertEquals(len(resp.json['entry'][0]['questionnaires']), 3)
+
+    def test_visit_baseline(self):
+        crv = setup_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
+
+        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        self.assertEquals("CRV Baseline", visit_name(qbd))
+
+    def test_visit_3mo(self):
+        crv = setup_qbs()
+        self.bless_with_basics(backdate=relativedelta(months=3))  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
+
+        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        self.assertEquals("CRV Recurring, 3 Month", visit_name(qbd))
+
+        qbd_i2 = qbd._replace(iteration=1)
+        self.assertEquals("CRV Recurring, 9 Month", visit_name(qbd_i2))
+
+    def test_visit_6mo(self):
+        crv = setup_qbs()
+        self.bless_with_basics(backdate=relativedelta(months=6))  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
+
+        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        self.assertEquals("CRV Recurring, 6 Month", visit_name(qbd))
+
+        qbd_i2 = qbd._replace(iteration=1)
+        self.assertEquals("CRV Recurring, 18 Month", visit_name(qbd_i2))
+
+
+def setup_qbs():
+    crv = Organization(name='CRV')
+    epic26 = Questionnaire(name='epic26')
+    recur3 = Recur(
+        start='{"months": 3}', cycle_length='{"months": 6}',
+        termination='{"months": 24}')
+    recur6 = Recur(
+        start='{"months": 6}', cycle_length='{"years": 1}',
+        termination='{"years": 3, "months": 3}')
+
+    with SessionScope(db):
+        db.session.add(crv)
+        db.session.add(epic26)
+        db.session.add(recur3)
+        db.session.add(recur6)
+        db.session.commit()
+    crv, epic26, recur3, recur6 = map(
+        db.session.merge, (crv, epic26, recur3, recur6))
+
+    qb_base = QuestionnaireBank(
+        name='CRV Baseline',
+        classification='baseline',
+        organization_id=crv.id,
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}')
+    qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+    qb_base.questionnaires.append(qbq)
+
+    qb_m3 = QuestionnaireBank(
+        name='CRV_recurring_3mo_period',
+        classification='recurring',
+        organization_id=crv.id,
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}',
+        recurs=[recur3])
+    qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+    qb_m3.questionnaires.append(qbq)
+
+    qb_m6 = QuestionnaireBank(
+        name='CRV_recurring_6mo_period',
+        classification='recurring',
+        organization_id=crv.id,
+        start='{"days": 0}',
+        overdue='{"days": 30}',
+        expired='{"months": 3}',
+        recurs=[recur6])
+    qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+    qb_m6.questionnaires.append(qbq)
+
+    with SessionScope(db):
+        db.session.add(qb_base)
+        db.session.add(qb_m3)
+        db.session.add(qb_m6)
+        db.session.commit()
+    qb_base, qb_m3, qb_m6 = map(
+        db.session.merge, (qb_base, qb_m3, qb_m6))
+
+    return crv

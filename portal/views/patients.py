@@ -3,15 +3,13 @@ from flask import abort, Blueprint, jsonify, render_template, request
 from flask import current_app, url_for
 from flask_user import roles_required
 from sqlalchemy import and_
-import re
 
-from ..date_tools import RelativeDelta
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
-from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.questionnaire_bank import QuestionnaireBank, visit_name
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
@@ -108,19 +106,7 @@ def patients_root():
         for patient in patients:
             a_s, qbd = overall_assessment_status(patient.id)
             patient.assessment_status = a_s
-            name = re.sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
-            if qbd.recur:
-                srd = RelativeDelta(qbd.recur.start)
-                sm = srd.months or 0
-                sm += (srd.years * 12) if srd.years else 0
-                clrd = RelativeDelta(qbd.recur.cycle_length)
-                clm = clrd.months or 0
-                clm += (clrd.years * 12) if clrd.years else 0
-                total = clm * qbd.iteration + sm
-                append = "Recurring, {} Month".format(total)
-            else:
-                append = qbd.questionnaire_bank.classification.title()
-            patient.current_qb = "{} {}".format(name, append)
+            patient.current_qb = visit_name(qbd)
             patient_list.append(patient)
         patients = patient_list
 
