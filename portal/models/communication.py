@@ -66,6 +66,12 @@ class Communication(db.Model):
             url=self.communication_request.content_url,
             variables=args)
 
+        missing = set(mailresource.variable_list) - set(args)
+        if missing:
+            raise ValueError(
+                "{} contains unknown varables: {}".format(
+                    self.communication_request.content_url,
+                    ','.join(missing)))
         self.message = EmailMessage(
             subject=mailresource.subject,
             body=mailresource.body,

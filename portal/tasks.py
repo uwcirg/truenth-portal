@@ -203,9 +203,12 @@ def send_messages():
 
 def send_user_messages(email):
     """Send queued messages to only given user (if found) """
+    count = 0
     ready = Communication.query.join(User).filter(
         Communication.status == 'preparation').filter(User.email == email)
     for communication in ready:
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
         communication.generate_and_send()
+        count += 1
+    return "Sent {} messages to {}".format(count, email)

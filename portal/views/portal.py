@@ -1172,8 +1172,17 @@ def celery_result(task_id):
 @portal.route("/communicate/<email>")
 def communicate(email):
     from ..tasks import send_user_messages
-    send_user_messages(email)
-    return jsonify(message='ok')
+    u = User.query.filter(User.email == email).first()
+    if not u:
+        message = 'no such user'
+    elif u.deleted_id:
+        message = 'delted user - not allowed'
+    else:
+        try:
+            message = send_user_messages(email)
+        except ValueError as ve:
+            message = "ERROR {}".format(ve)
+    return jsonify(message=message)
 
 
 @portal.route("/post-result/<task_id>")
