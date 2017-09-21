@@ -465,7 +465,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
         return self
 
 
-def display_visit_name(qbd):
+def visit_name(qbd):
     name = sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
