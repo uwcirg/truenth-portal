@@ -60,7 +60,8 @@ class Communication(db.Model):
 
         args = {'first_name': user.first_name,
                 'last_name': user.last_name,
-                'st_link': st.link_url}
+                'st_link': '<a href="{URL}">Symptom Tracker</a>'.format(
+                    URL=st.link_url)}
 
         mailresource = MailResource(
             url=self.communication_request.content_url,

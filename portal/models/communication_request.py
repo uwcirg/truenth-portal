@@ -210,7 +210,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
             user_id=user.id,
             status='preparation',
             communication_request_id=communication_request.id)
-        current_app.logger.debug("communication prepared for {}".format(user.id))
+        current_app.logger.debug(
+            "communication prepared for {}".format(user.id))
         db.session.add(communication)
         db.session.commit()
 
