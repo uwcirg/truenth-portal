@@ -101,7 +101,7 @@ def cache_reporting_stats(job_id=None):
     try:
         message = "failed"
         before = datetime.now()
-        current_app.logger.debug(__name__)
+        current_app.logger.debug('cache_reporting_stats')
         dogpile_cache.invalidate(get_reporting_stats)
         dogpile_cache.refresh(get_reporting_stats)
         duration = datetime.now() - before
@@ -111,7 +111,7 @@ def cache_reporting_stats(job_id=None):
         update_runtime(job_id)
     except Exception as exc:
         logger.warn("Unexpected exception in `cache_reporting_stats` "
-                     "on {} : {}".format(job_id, exc))
+                    "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -127,17 +127,35 @@ def cache_assessment_status(job_id=None):
     try:
         message = "failed"
         before = datetime.now()
-        current_app.logger.debug(__name__)
-        update_patient_loop(update_cache=True, queue_messages=True)
+        current_app.logger.debug('cache_assessment_status')
+        update_patient_loop(update_cache=True, queue_messages=False)
         duration = datetime.now() - before
         message = (
-            'Assessment Cache updated and messages queued in {0.seconds}'
-            ' seconds'.format(duration))
+            'Assessment Cache updated in {0.seconds} seconds'.format(duration))
         current_app.logger.debug(message)
         update_runtime(job_id)
     except Exception as exc:
         logger.warn("Unexpected exception in `cache_assessment_status` "
-                     "on {} : {}".format(job_id, exc))
+                    "on {} : {}".format(job_id, exc))
+    return message
+
+
+@celery.task
+def prepare_communications(job_id=None):
+    """Move any ready communications into prepared state """
+    try:
+        message = "failed"
+        before = datetime.now()
+        current_app.logger.debug('prepare_communications')
+        update_patient_loop(update_cache=False, queue_messages=True)
+        duration = datetime.now() - before
+        message = (
+            'Prepared messages queued in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+        update_runtime(job_id)
+    except Exception as exc:
+        logger.warn("Unexpected exception in `prepare_communications` "
+                    "on {} : {}".format(job_id, exc))
     return message
 
 
