@@ -2,7 +2,6 @@
 from collections import namedtuple
 from datetime import datetime
 from flask import current_app, url_for
-from re import sub
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -468,7 +467,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
 def visit_name(qbd):
     if not qbd.questionnaire_bank:
         return None
-    name = sub('_', ' ', qbd.questionnaire_bank.name).split()[0]
+    name = qbd.questionnaire_bank.name.replace('_', ' ').split()[0]
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
         sm = srd.months or 0
