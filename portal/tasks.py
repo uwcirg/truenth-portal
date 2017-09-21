@@ -81,7 +81,11 @@ def post_request(self, url, data, timeout=10, retries=3):
 
 @celery.task
 def test(job_id=None):
-    update_runtime(job_id)
+    try:
+        update_runtime(job_id)
+    except Exception as exc:
+        logger.warn("Unexpected exception in `test` on {} : {}".format(
+            job_id, exc))
     return "Test task complete."
 
 
@@ -94,15 +98,20 @@ def cache_reporting_stats(job_id=None):
     stale cache.  Expected to be called as a scheduled job.
 
     """
-    before = datetime.now()
-    current_app.logger.debug(__name__)
-    dogpile_cache.invalidate(get_reporting_stats)
-    dogpile_cache.refresh(get_reporting_stats)
-    duration = datetime.now() - before
-    message = (
-        'Reporting stats updated in {0.seconds} seconds'.format(duration))
-    current_app.logger.debug(message)
-    update_runtime(job_id)
+    try:
+        message = "failed"
+        before = datetime.now()
+        current_app.logger.debug(__name__)
+        dogpile_cache.invalidate(get_reporting_stats)
+        dogpile_cache.refresh(get_reporting_stats)
+        duration = datetime.now() - before
+        message = (
+            'Reporting stats updated in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+        update_runtime(job_id)
+    except Exception as exc:
+        logger.warn("Unexpected exception in `cache_reporting_stats` "
+                     "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -115,15 +124,20 @@ def cache_assessment_status(job_id=None):
     stale cache.  Expected to be called as a scheduled job.
 
     """
-    before = datetime.now()
-    current_app.logger.debug(__name__)
-    update_patient_loop(update_cache=True, queue_messages=True)
-    duration = datetime.now() - before
-    message = (
-        'Assessment Cache updated and messages queued in {0.seconds}'
-        ' seconds'.format(duration))
-    current_app.logger.debug(message)
-    update_runtime(job_id)
+    try:
+        message = "failed"
+        before = datetime.now()
+        current_app.logger.debug(__name__)
+        update_patient_loop(update_cache=True, queue_messages=True)
+        duration = datetime.now() - before
+        message = (
+            'Assessment Cache updated and messages queued in {0.seconds}'
+            ' seconds'.format(duration))
+        current_app.logger.debug(message)
+        update_runtime(job_id)
+    except Exception as exc:
+        logger.warn("Unexpected exception in `cache_assessment_status` "
+                     "on {} : {}".format(job_id, exc))
     return message
 
 
@@ -145,7 +159,11 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
             qbd = QuestionnaireBank.most_current_qb(user=user)
+            logger.debug("update_patient_loop user {}".format(user.id))
             if qbd.questionnaire_bank:
+                logger.debug(
+                    "update_patient_loop w/ questionnaire for user {}".format(
+                        user.id))
                 queue_outstanding_messages(
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,
