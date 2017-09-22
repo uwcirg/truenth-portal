@@ -6,6 +6,7 @@ from portal.database import db
 from portal.models.audit import Audit
 from portal.models.assessment_status import overall_assessment_status
 from portal.models.communication import Communication, DynamicDictLookup
+from portal.models.communication import load_template_args
 from portal.models.communication_request import CommunicationRequest
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
@@ -54,12 +55,21 @@ class TestCommunication(TestQuestionnaireSetup):
 
         dd = DynamicDictLookup()
         dd['a'] = f
+        dd['b'] = 'bbb'
         self.assertEquals(dd['a'], 'zzz')
+        self.assertEquals(dd['b'], 'bbb')
 
     def test_dd_no_key(self):
         dd = DynamicDictLookup()
         with self.assertRaises(KeyError):
             dd['a']
+
+    def test_template_org(self):
+        self.bless_with_basics()
+        user = db.session.merge(self.test_user)
+        dd = load_template_args(user=user, questionnaire_bank_id=None)
+        self.assertEquals(dd['parent_org'], '101')
+        self.assertEquals(dd['clinic_name'], '1001')
 
     def test_empty(self):
         # Base test system shouldn't generate any messages
@@ -149,6 +159,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
     def test_create_message(self):
 
+        self.bless_with_basics()
         cr = mock_communication_request(
             'localized', '{"days": 14}',
             communication_request_name="Symptom Tracker | 3 Mo Reminder (1)")
