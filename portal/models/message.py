@@ -39,8 +39,8 @@ class EmailMessage(db.Model):
         message.html = fill(self.body, width=280)
         mail.send(message)
 
-        user = User.query.filter_by(email=self.sender).first()
-        user_id = user.id if user else self.user_id
+        user = User.query.filter_by(email='__system__').first()
+        user_id = user.id if user else None
         recipient = self.recipients.split()[0]
         subject = User.query.filter_by(email=recipient).first()
         subject_id = subject.id if subject else self.user_id
