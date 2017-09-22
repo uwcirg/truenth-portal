@@ -8,6 +8,7 @@ RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
     apt-get install --yes --force-yes --no-install-recommends \
+        ca-certificates \
         libpq5 \
         python2.7 && \
     apt-get clean
@@ -74,4 +75,4 @@ CMD \
         `# https://github.com/benoitc/gunicorn/issues/1194` \
         --timeout 90 \
         --keep-alive 75 \
-    manage:app
+    wsgi:app

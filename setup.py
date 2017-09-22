@@ -46,6 +46,7 @@ setup_kwargs = dict(
     packages=find_packages(),
     scripts=[
         "manage.py",
+        "wsgi.py",
         os.path.join('docker', 'remap_envvars.py'),
     ],
     install_requires=[
