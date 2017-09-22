@@ -8,6 +8,7 @@ RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
     apt-get install --yes --force-yes --no-install-recommends \
+        ca-certificates \
         libpq5 \
         python2.7 && \
     apt-get clean
