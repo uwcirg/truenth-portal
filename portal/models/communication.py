@@ -61,7 +61,7 @@ def load_template_args(user, questionnaire_bank_id):
         trigger_date = qb.trigger_date(user)
         due = (qb.calculated_overdue(trigger_date) or
                qb.calculated_expiry(trigger_date))
-        return due
+        return due.strftime('%-d %b %Y') if due else ''
 
     def st_link():
         return '<a href="{0.link_url}">Symptom Tracker</a>'.format(
