@@ -199,6 +199,7 @@ def send_messages():
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
         communication.generate_and_send()
+        db.session.commit()
 
 
 def send_user_messages(email):
@@ -210,5 +211,6 @@ def send_user_messages(email):
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
         communication.generate_and_send()
+        db.session.commit()
         count += 1
     return "Sent {} messages to {}".format(count, email)
