@@ -262,9 +262,28 @@ a.btn {
     margin: 0 auto;
     letter-spacing: 3px;
     border-radius: 0px;
-    padding: 1.4em 2em 1em 4em;
+    padding: 1.45em 2em 1em 4em;
     text-transform: uppercase;
     text-align: left;
+}
+
+#regForm input,
+#loginForm input
+{
+  background: #f1f0ef;
+  height: 44px;
+  padding: 5px;
+  border: 1px solid #f1f0ef;
+  border-radius: 0;
+  width: 400px;
+  max-width: 100%;
+}
+
+#regForm input[type="submit"],
+#loginForm input[type="submit"] {
+   background-color: @featureBtnBgColor;
+   text-align: center;
+   padding: 1.35em 2em;
 }
 
 .button--LR.data-show,
@@ -2474,6 +2493,12 @@ div.timezone-warning.text-warning {
     font-size: @baseFontSize;
     height: 62px;
   }
+
+  #loginForm input[type=submit], 
+  #regForm input[type=submit] {
+    padding: 1.4em 1.95em;
+  }
+
   #loginForm input,
   #regForm input {
     font-size: @formSize;
@@ -2901,25 +2926,6 @@ div.timezone-warning.text-warning {
 #socialMediaLoginContainer .divider
 {
   height: 0.5em;
-}
-
-#regForm input,
-#loginForm input
-{
-  background: #f1f0ef;
-  height: 44px;
-  padding: 5px;
-  border: 1px solid #f1f0ef;
-  border-radius: 0;
-  width: 400px;
-  max-width: 100%;
-}
-
-#regForm input[type="submit"],
-#loginForm input[type="submit"] {
-   background-color: @featureBtnBgColor;
-   text-align: center;
-   padding: 1.2em 2em 1em 2em;
 }
 .reg-title {
   font-size: @headlineSize;
