@@ -21,6 +21,22 @@ services:
     depends_on:
       - db
       - redis
+      - celery
+  celery:
+    image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
+    command: bash -c '
+      . "${PROJECT_DIR:-/opt/venvs/portal}/bin/activate" &&
+      eval $$("${PROJECT_DIR:-/opt/venvs/portal}/bin/remap_envvars.py") &&
+      env &&
+      celery worker --app portal.celery_worker.celery --loglevel=info'
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+    volumes:
+      - source: ../instance
+        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
+        type: bind
+    depends_on:
+      - redis
   redis:
     image: redis
     ports:
