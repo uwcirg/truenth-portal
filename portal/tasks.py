@@ -208,7 +208,7 @@ def send_user_messages(email, force_update=False):
 
     @param email: to process
     @param force_update: set True to force reprocessing of cached
-        data and queue any messages previously overlooked.
+    data and queue any messages previously overlooked.
 
     Triggers a send for any messages found in a prepared state ready
     for transmission.
