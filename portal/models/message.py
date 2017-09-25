@@ -5,8 +5,10 @@ from flask import current_app
 from flask_mail import Message
 from flask_mail import email_dispatched
 
+from ..audit import auditable_event
 from ..database import db
 from ..extensions import mail
+from .user import User
 
 
 def log_message(message, app):
@@ -36,6 +38,18 @@ class EmailMessage(db.Model):
                 recipients=self.recipients.split())
         message.html = fill(self.body, width=280)
         mail.send(message)
+
+        user = User.query.filter_by(email='__system__').first()
+        user_id = user.id if user else None
+        recipient = self.recipients.split()[0]
+        subject = User.query.filter_by(email=recipient).first()
+        subject_id = subject.id if subject else self.user_id
+
+        if user_id and subject_id:
+            audit_msg = ("EmailMessage '{0.subject}' sent to "
+                         "{0.recipients} from {0.sender}".format(self))
+            auditable_event(message=audit_msg, user_id=user_id,
+                            subject_id=subject_id, context="user")
 
     def __str__(self):
         return "EmailMessage subj:{} sent_at:{}".format(self.subject,
