@@ -226,7 +226,6 @@ $(document).ready(function() {
             // If there's no events left, add status msg back in
             if ($('#eventListtnthproc tr').length == 0) {
                 $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
-                $("#pastTreatmentsContainer").css("opacity", 0);
             };
         });
         // Post delete to server
