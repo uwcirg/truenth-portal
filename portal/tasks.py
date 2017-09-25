@@ -17,6 +17,7 @@ from celery.utils.log import get_task_logger
 from .database import db
 from .dogpile import dogpile_cache
 from .extensions import celery
+from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
@@ -202,8 +203,26 @@ def send_messages():
         db.session.commit()
 
 
-def send_user_messages(email):
-    """Send queued messages to only given user (if found) """
+def send_user_messages(email, force_update=False):
+    """Send queued messages to only given user (if found)
+
+    @param email: to process
+    @param force_update: set True to force reprocessing of cached
+        data and queue any messages previously overlooked.
+
+    Triggers a send for any messages found in a prepared state ready
+    for transmission.
+
+    """
+    if force_update:
+        user = User.query.filter(User.email == email).one()
+        invalidate_assessment_status_cache(user)
+        qbd = QuestionnaireBank.most_current_qb(user=user)
+        if qbd.questionnaire_bank:
+            queue_outstanding_messages(
+                user=user,
+                questionnaire_bank=qbd.questionnaire_bank,
+                iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
         Communication.status == 'preparation').filter(User.email == email)
@@ -213,4 +232,7 @@ def send_user_messages(email):
         communication.generate_and_send()
         db.session.commit()
         count += 1
-    return "Sent {} messages to {}".format(count, email)
+    message = "Sent {} messages to {}".format(count, email)
+    if force_update:
+        message += " after forced update"
+    return message
