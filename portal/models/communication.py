@@ -6,7 +6,9 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from .assessment_status import AssessmentStatus  # avoid cycle
 from .app_text import MailResource
+from ..audit import auditable_event
 from ..database import db
+from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
 from .questionnaire_bank import QuestionnaireBank
@@ -21,7 +23,13 @@ event_status_types = ENUM(
 
 
 def load_template_args(user, questionnaire_bank_id):
-    """Capture known variable lookup functions and values"""
+    """Capture known variable lookup functions and values
+
+    To add additional template variable lookup functions, name the
+    local function with the `_lookup_` prefix to match, i.e::
+        `_lookup_first_name` -> `first_name`
+
+    """
 
     def ae_link():
         assessment_status = AssessmentStatus(user=user)
@@ -34,48 +42,85 @@ def load_template_args(user, questionnaire_bank_id):
             _external=True)
         return link_url
 
-    def assessment_button():
-        return (
-            '<div class="btn"><a href="{ae_link}">'
-            'Assessment Button</a></div>'.format(ae_link=ae_link()))
+    def make_button(text):
+        return '<div class="btn">{}</div>'.format(text)
 
-    def assessment_link():
+    def _lookup_assessment_button():
+        return make_button(_lookup_assessment_link)
+
+    def _lookup_assessment_link():
         return (
-            '<a href="{ae_link}">Assessment Link</a>'.format(
+            '<a href="{ae_link}">Assessment Engine</a>'.format(
                 ae_link=ae_link()))
 
-    def clinic_name():
+    def _lookup_clinic_name():
         org = user.organizations.first()
         if org:
             return org.name
         return ""
 
-    def parent_org():
+    def _lookup_first_name():
+        name = ''
+        if user:
+            name = getattr(user, 'first_name', '')
+        return name
+
+    def _lookup_last_name():
+        name = ''
+        if user:
+            name = getattr(user, 'last_name', '')
+        return name
+
+    def _lookup_parent_org():
         org = user.first_top_organization()
         if org:
             return org.name
         return ""
 
-    def questionnaire_due_date():
+    def _lookup_password_reset_button():
+        return make_button(_lookup_password_reset_link())
+
+    def _lookup_password_reset_link():
+        return (
+            '<a href="{url}">Password Reset</a>'.format(
+                url=url_for('user.forgot_password', _external=True)))
+
+    def _lookup_questionnaire_due_date():
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
         due = (qb.calculated_overdue(trigger_date) or
                qb.calculated_expiry(trigger_date))
         return due.strftime('%-d %b %Y') if due else ''
 
-    def st_link():
+    def _lookup_st_button():
+        return make_button(_lookup_st_link())
+
+    def _lookup_st_link():
         return '<a href="{0.link_url}">Symptom Tracker</a>'.format(
             INTERVENTION.SELF_MANAGEMENT)
 
+    def _lookup_verify_account_button():
+        return make_button(_lookup_verify_account_link())
+
+    def _lookup_verify_account_link():
+        token = user_manager.token_manager.generate_token(user.id)
+        url = url_for(
+            'portal.access_via_token', token=token, _external=True)
+        system_user = User.query.filter_by(email='__system__').one()
+        auditable_event(
+            "generated access token for user {} to embed in email".format(
+                user.id),
+            user_id=system_user.id, subject_id=user.id,
+            context='authentication')
+        return '<a href="{url}">Verify Account</a>'.format(url=url)
+
+    # Load all functions from the local space with the `_lookup_` prefix
+    # into the args instance
     args = DynamicDictLookup()
-    args['assessment_button'] = assessment_button
-    args['assessment_link'] = assessment_link
-    args['clinic_name'] = clinic_name
-    args['first_name'] = user.first_name
-    args['last_name'] = user.last_name
-    args['parent_org'] = parent_org
-    args['questionnaire_due_date'] = questionnaire_due_date
-    args['st_link'] = st_link
+    for fname, function in locals().items():
+        if fname.startswith('_lookup_'):
+            # chop the prefix and assign to the function
+            args[fname[len('_lookup_'):]] = function
     return args
 
 
