@@ -1171,6 +1171,15 @@ def celery_result(task_id):
 @oauth.require_oauth()
 @portal.route("/communicate/<email>")
 def communicate(email):
+    """Direct call to trigger communications to given user.
+
+    Typically handled by scheduled jobs, this API enables testing of
+    communications without the wait.
+
+    Include a `force=True` query string parameter to first invalidate the cache
+    and look for fresh messages before triggering the send.
+
+    """
     from ..tasks import send_user_messages
     u = User.query.filter(User.email == email).first()
     if not u:
@@ -1178,8 +1187,11 @@ def communicate(email):
     elif u.deleted_id:
         message = 'delted user - not allowed'
     else:
+        force = request.args.get('force', False)
+        if force in ('', '0', 'false', 'False'):
+            force = False
         try:
-            message = send_user_messages(email)
+            message = send_user_messages(email, force)
         except ValueError as ve:
             message = "ERROR {}".format(ve)
     return jsonify(message=message)
