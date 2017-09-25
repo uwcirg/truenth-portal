@@ -71,6 +71,14 @@ class TestCommunication(TestQuestionnaireSetup):
         self.assertEquals(dd['parent_org'], '101')
         self.assertEquals(dd['clinic_name'], '1001')
 
+    def test_pw_button(self):
+        dd = load_template_args(user=None, questionnaire_bank_id=None)
+        self.assertTrue('forgot-password' in dd['password_reset_button'])
+
+    def test_st_button(self):
+        dd = load_template_args(user=None, questionnaire_bank_id=None)
+        self.assertTrue('Symptom Tracker' in dd['st_button'])
+
     def test_empty(self):
         # Base test system shouldn't generate any messages
         count_b4 = Communication.query.count()
@@ -158,7 +166,7 @@ class TestCommunication(TestQuestionnaireSetup):
         self.assertFalse(expected)
 
     def test_create_message(self):
-
+        self.add_user('__system__')
         self.bless_with_basics()
         cr = mock_communication_request(
             'localized', '{"days": 14}',
