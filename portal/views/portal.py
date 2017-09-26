@@ -1204,6 +1204,7 @@ def communicate(email):
 
 @portal.route("/post-result/<task_id>")
 def post_result(task_id):
+    celery = create_celery(current_app)
     r = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
 
