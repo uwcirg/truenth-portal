@@ -1,6 +1,7 @@
 """Communication model"""
 from collections import MutableMapping
 from flask import current_app, url_for
+import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -43,8 +44,27 @@ def load_template_args(user, questionnaire_bank_id):
         return link_url
 
     def make_button(text):
-        improved = text.replace('<a href', '<a class="btn" href')
-        return '<div>{}</div>'.format(improved)
+        inline = False
+        if inline:
+            match = regex.search(r'href=([^>]+)>([^<]*)', text)
+            if not match:
+                raise ValueError("Can't make button w/o matching href pattern")
+
+            return (
+                '<a href={link} '
+                'style="font-size: 0.9em; '
+                'font-family: Helvetica, Arial, sans-serif; '
+                'display: inline-block; color: #FFF; '
+                'background-color: #7C959E; border-color: #7C959E; '
+                'border-radius: 0;'
+                'letter-spacing: 2px; cursor: pointer; '
+                'text-transform: uppercase; text-align: center; '
+                'line-height: 1.42857143;'
+                'font-weight: 400; padding: 0.6em; text-decoration: none;">'
+                '{label}</a>'.format(
+                    link=match.groups()[0], label=match.groups()[1]))
+        else:
+            return text.replace('<a href', '<a class="btn" href')
 
     def _lookup_assessment_button():
         return make_button(_lookup_assessment_link())
