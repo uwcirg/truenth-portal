@@ -55,7 +55,6 @@ setup_kwargs = dict(
         "enum34",
         "Flask",
         "Flask-Babel",
-        "Flask-Celery-Helper",
         "Flask-Dogpile-Cache",
         "Flask-Migrate",
         "Flask-OAuthlib",
