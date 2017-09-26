@@ -437,7 +437,7 @@ class MailResource(object):
             otherwise the original url.
 
         """
-        self._subject, self._body = None, None
+        self._subject, self._body, self._footer = None, None, None
         self.error_msg, self.editor_url = None, None
         self.url = url
         self.variables = variables or {}
@@ -445,13 +445,15 @@ class MailResource(object):
             response = time_request(url)
             self._subject = str(response.json().get('subject'))
             self._body = str(response.json().get('body'))
+            self._footer = str(response.json().get('footer'))
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
         except MissingSchema:
             if current_app.config.get('TESTING'):
-                self._subject = 'TESTING'
-                self._body = '[TESTING - fake response]'
+                self._subject = 'TESTING SUBJECT'
+                self._body = 'TESTING BODY'
+                self._footer = 'TESTING FOOTER'
             else:
                 self.error_msg = (
                     "Could not retrieve remote content - Invalid URL")
@@ -491,6 +493,9 @@ class MailResource(object):
         if self._body:
             try:
                 formatted = self._body.format(**self.variables)
+                if self._footer:
+                    formatted += "\n"
+                    formatted += self.footer
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing body variable {}".format(e)
@@ -498,6 +503,19 @@ class MailResource(object):
                                          ": {}".format(self.url))
                 raise
         raise ValueError(self.error_msg)
+
+    @property
+    def footer(self):
+        """Return optional footer if available"""
+        if self._footer:
+            try:
+                formatted = self._footer.format(**self.variables)
+                return formatted
+            except KeyError, e:
+                self.error_msg = "Missing footer variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
+                raise
 
     @property
     def variable_list(self):
@@ -508,6 +526,9 @@ class MailResource(object):
         if self._body:
             var_list.update(
                 [v[1] for v in Formatter().parse(self._body) if v[1]])
+        if self._footer:
+            var_list.update(
+                [v[1] for v in Formatter().parse(self._footer) if v[1]])
         return list(var_list)
 
     def _permanent_url(self, generic_url, version):

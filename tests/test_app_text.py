@@ -110,12 +110,18 @@ class TestAppText(TestCase):
         self.assertEquals(error_key, "'variable'")
 
     def test_mail_resource(self):
-        testvars = {"subjkey": "test", "bodykey1": "123", "bodykey2": "456"}
+        testvars = {"subjkey": "test",
+                    "bodykey1": "123",
+                    "bodykey2": "456",
+                    "footerkey": "foot"}
         tmr = MailResource(None, variables=testvars)
-        self.assertEquals(tmr.subject, "TESTING")
-        self.assertEquals(tmr.body, "[TESTING - fake response]")
+        self.assertEquals(tmr.subject, "TESTING SUBJECT")
+        self.assertEquals(tmr.body.splitlines()[0], "TESTING BODY")
+        self.assertEquals(tmr.body.splitlines()[1], "TESTING FOOTER")
         tmr._subject = "Replace this: {subjkey}"
         tmr._body = "Replace these: {bodykey1} and {bodykey2}"
+        tmr._footer = "Replace this: {footerkey}"
         self.assertEquals(tmr.subject.split()[-1], "test")
-        self.assertEquals(tmr.body.split()[-1], "456")
+        self.assertEquals(tmr.body.splitlines()[0].split()[-1], "456")
+        self.assertEquals(tmr.body.splitlines()[1].split()[-1], "foot")
         self.assertEquals(set(tmr.variable_list), set(testvars.keys()))
