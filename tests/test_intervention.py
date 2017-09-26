@@ -407,7 +407,7 @@ class TestIntervention(TestCase):
         self.assertTrue(
             "Thank you" in ae.display_for_user(user).card_html)
 
-        self.assertTrue(ae.quick_access_check(user, silent=True))
+        self.assertTrue(ae.quick_access_check(user))
 
     def test_expired(self):
         """If baseline expired check message"""

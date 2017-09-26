@@ -11,7 +11,7 @@ from .role import ROLE
 from .user import User
 
 
-@dogpile_cache.region('hourly')
+# @dogpile_cache.region('hourly')
 def get_reporting_stats():
     """Cachable interface for expensive reporting data queries
 
@@ -56,7 +56,7 @@ def get_reporting_stats():
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
                     desc = 'Decision Support P3P'
-                if interv.quick_access_check(user, silent=True):
+                if interv.quick_access_check(user):
                     stats['intervention_access'][desc] += 1
                 if interv in user.interventions:
                     stats['interventions'][desc] += 1

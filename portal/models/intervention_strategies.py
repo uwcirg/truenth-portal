@@ -35,9 +35,15 @@ from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
 # # functions implementing the 'access_strategy' API
 # ##
 
+__log_strats = None
+
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
-    if not kwargs.get('silent'):
+    # get config value if haven't yet
+    global __log_strats
+    if __log_strats is None:
+        __log_strats = current_app.config.get("LOG_DEBUG_STRATS", False)
+    if __log_strats:
         msg = kwargs.get('message', '')  # optional
         current_app.logger.debug(
             "{func_name} returning {result} for {user} on intervention "
@@ -80,18 +86,18 @@ def limit_by_clinic_w_id(
     if combinator not in ('any', 'all'):
         raise ValueError("unknown value {} for combinator, must be any or all")
 
-    def user_registered_with_all_clinics(intervention, user, silent=False):
+    def user_registered_with_all_clinics(intervention, user):
         has = set((o.id for o in user.organizations))
         if required.intersection(has) == required:
             _log(result=True, func_name='limit_by_clinic_list', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
-    def user_registered_with_any_clinics(intervention, user, silent=False):
+    def user_registered_with_any_clinics(intervention, user):
         has = set((o.id for o in user.organizations))
         if not required.isdisjoint(has):
             _log(result=True, func_name='limit_by_clinic_list', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
     return user_registered_with_all_clinics if combinator == 'all' else\
@@ -130,11 +136,11 @@ def not_in_clinic_w_id(
     else:
         dont_want = set((o.id for o in orgs))
 
-    def user_not_registered_with_clinics(intervention, user, silent=False):
+    def user_not_registered_with_clinics(intervention, user):
         has = set((o.id for o in user.organizations))
         if has.isdisjoint(dont_want):
             _log(result=True, func_name='not_in_clinic_list', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
     return user_not_registered_with_clinics
@@ -155,11 +161,11 @@ def in_role_list(role_list):
                              "found".format(role))
     required = set(roles)
 
-    def user_has_given_role(intervention, user, silent=False):
+    def user_has_given_role(intervention, user):
         has = set(user.roles)
         if has.intersection(required):
             _log(result=True, func_name='in_role_list', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
     return user_has_given_role
@@ -180,11 +186,11 @@ def not_in_role_list(role_list):
                              "found".format(role))
     dont_want = set(roles)
 
-    def user_not_given_role(intervention, user, silent=False):
+    def user_not_given_role(intervention, user):
         has = set(user.roles)
         if has.isdisjoint(dont_want):
             _log(result=True, func_name='not_in_role_list', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
     return user_not_given_role
@@ -195,10 +201,10 @@ def allow_if_not_in_intervention(intervention_name):
 
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
-    def user_not_in_intervention(intervention, user, silent=False):
-        if not exclusive_intervention.quick_access_check(user, silent=silent):
+    def user_not_in_intervention(intervention, user):
+        if not exclusive_intervention.quick_access_check(user):
             _log(result=True, func_name='user_not_in_intervention', user=user,
-                 intervention=intervention.name, silent=silent)
+                 intervention=intervention.name)
             return True
 
     return user_not_in_intervention
@@ -208,11 +214,9 @@ def update_card_html_on_completion():
     """Update description and card_html depending on state"""
     from .assessment_status import AssessmentStatus  # avoid cycle
 
-    def update_user_card_html(intervention, user, silent=False):
+    def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
-        if silent:
-            return True
         assessment_status = AssessmentStatus(user=user)
         current_app.logger.debug("{}".format(assessment_status))
         indefinite_questionnaires = (
@@ -503,7 +507,7 @@ def tx_begun(boolean_value):
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 
-    def user_has_desired_tx(intervention, user, silent=False):
+    def user_has_desired_tx(intervention, user):
         return check_func(user)
     return user_has_desired_tx
 
@@ -534,11 +538,11 @@ def observation_check(display, boolean_value):
     else:
         raise ValueError("boolean_value must be 'true' or 'false'")
 
-    def user_has_matching_observation(intervention, user, silent=False):
+    def user_has_matching_observation(intervention, user):
         obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
         if obs and obs[0].value_quantity == vq:
             _log(result=True, func_name='observation_check', user=user,
-                 intervention=intervention.name, silent=silent,
+                 intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
             return True
 
@@ -581,32 +585,32 @@ def combine_strategies(**kwargs):
         func = getattr(sys.modules[__name__], func_name)
         strats.append(func(**func_kwargs))
 
-    def call_all_combined(intervention, user, silent=False):
+    def call_all_combined(intervention, user):
         "Returns True if ALL of the combined strategies return True"
         for strategy in strats:
-            if not strategy(intervention, user, silent):
+            if not strategy(intervention, user):
                 _log(
                     result=False, func_name='combine_strategies', user=user,
-                    intervention=intervention.name, silent=silent)
+                    intervention=intervention.name)
                 return
         # still here?  effective AND passed as all returned true
         _log(
             result=True, func_name='combine_strategies', user=user,
-            intervention=intervention.name, silent=silent)
+            intervention=intervention.name)
         return True
 
-    def call_any_combined(intervention, user, silent=False):
+    def call_any_combined(intervention, user):
         "Returns True if ANY of the combined strategies return True"
         for strategy in strats:
-            if strategy(intervention, user, silent):
+            if strategy(intervention, user):
                 _log(
                     result=True, func_name='combine_strategies', user=user,
-                    intervention=intervention.name, silent=silent)
+                    intervention=intervention.name)
                 return True
         # still here?  effective ANY failed as none returned true
         _log(
             result=False, func_name='combine_strategies', user=user,
-            intervention=intervention.name, silent=silent)
+            intervention=intervention.name)
         return
 
     combinator = kwargs.get('combinator', 'all')
