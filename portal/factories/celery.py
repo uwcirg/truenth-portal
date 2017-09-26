@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from celery import Celery
 
+
 def create_celery(app):
     celery = Celery(
         app.import_name,
