@@ -165,22 +165,17 @@ class Intervention(db.Model):
         should have access to an intervention.  The first 'true' found
         is returned (as to make the check as quick as possible).
 
-        1. call each strategy_function in intervention.access_strategies.
-           Note, on rare occasions, a strategy may alter the UserIntervention
-           attributes given the circumstances.
+        1. check if the intervention has `public_access` set
         2. check for a UserIntervention row defining access for the given
            user on this intervention.
-        3. check if the intervention has `public_access` set
+        3. call each strategy_function in intervention.access_strategies.
 
         @return boolean representing 'access'.
 
         """
-        # 1. check strategies for access
-        for func in self.fetch_strategies():
-            if func.__name__ == 'update_user_card_html':
-                return True
-            if func(intervention=self, user=user):
-                return True
+        # 1. check intervention scope for access
+        if self.public_access:
+            return True
 
         # 2. check user_intervention for access
         ui = UserIntervention.query.filter_by(
@@ -188,11 +183,12 @@ class Intervention(db.Model):
         if ui and ui.access == 'granted':
             return True
 
-        # 3. check intervention scope for access
-        # (NB - tempting to shortcut by testing this first, but we
-        # need to allow all the strategies to run in case they alter settings)
-        if self.public_access:
-            return True
+        # 3. check strategies for access
+        for func in self.fetch_strategies():
+            if func.__name__ == 'update_user_card_html':
+                return True
+            if func(intervention=self, user=user):
+                return True
 
         return False
 
