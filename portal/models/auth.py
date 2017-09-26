@@ -13,7 +13,6 @@ from ..database import db
 from ..extensions import oauth
 from .relationship import RELATIONSHIP
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
-from ..tasks import post_request
 from .user import current_user
 
 providers_list = ENUM(
@@ -152,7 +151,8 @@ class Client(db.Model):
 
         # Use celery asynchronous task 'post_request'
         kwargs = {'url': self.callback_url, 'data': formdata}
-        res = post_request.apply_async(kwargs=kwargs)
+
+        res = celery.send_task('tasks.post_request', kwargs=kwargs)
 
         context = {
             "id": res.task_id,

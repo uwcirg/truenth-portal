@@ -1,4 +1,5 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from celery.result import AsyncResult
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
@@ -17,6 +18,8 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
+from ..factories.celery import create_celery
+
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
@@ -36,7 +39,6 @@ from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
-from ..tasks import add, info, post_request
 from jinja2 import TemplateNotFound
 
 
@@ -1141,7 +1143,8 @@ def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""
     x = int(request.args.get("x", x))
     y = int(request.args.get("y", y))
-    res = add.apply_async((x, y))
+    celery = create_celery(current_app)
+    res = celery.send_task('tasks.add', args=(x, y))
     context = {"id": res.task_id, "x": x, "y": y}
     result = "add((x){}, (y){})".format(context['x'], context['y'])
     task_id = "{}".format(context['id'])
@@ -1153,7 +1156,8 @@ def celery_test(x=16, y=16):
 
 @portal.route("/celery-info")
 def celery_info():
-    res = info.apply_async(())
+    celery = create_celery(current_app)
+    res = celery.send_task('tasks.info')
     context = {"id": res.task_id}
     task_id = "{}".format(context['id'])
     result_url = url_for('.celery_result', task_id=task_id)
@@ -1164,7 +1168,8 @@ def celery_info():
 
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
-    retval = add.AsyncResult(task_id).get(timeout=1.0)
+    celery = create_celery(current_app)
+    retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return repr(retval)
 
 
@@ -1199,7 +1204,7 @@ def communicate(email):
 
 @portal.route("/post-result/<task_id>")
 def post_result(task_id):
-    r = post_request.AsyncResult(task_id).get(timeout=1.0)
+    r = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
 
 @portal.route("/legal/stock-org-consent/<org_name>")
