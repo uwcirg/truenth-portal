@@ -11,5 +11,5 @@ execfile(activate_this, dict(__file__=activate_this))
 if PROJECT_DIR not in sys.path:
     sys.path.append(PROJECT_DIR)
 
-from portal.app.factories import create_app
+from portal.factories.app import create_app
 application = create_app()
