@@ -9,7 +9,7 @@ import click
 import alembic.config
 from flask_migrate import Migrate
 
-from portal.app import create_app
+from portal.factories.app import create_app
 from portal.extensions import db
 from portal.models.i18n import smartling_upload, smartling_download
 from portal.models.fhir import add_static_concepts
