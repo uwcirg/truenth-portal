@@ -47,7 +47,7 @@ EMAIL_HEADER = (
     " background-color: #576e76;"
     "}"
     "</style></head><body>")
-EMAIL_FOOTER = "</body>"
+EMAIL_FOOTER = "</body></html>"
 
 
 class EmailMessage(db.Model):
