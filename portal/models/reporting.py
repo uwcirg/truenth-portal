@@ -56,7 +56,7 @@ def get_reporting_stats():
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
                     desc = 'Decision Support P3P'
-                if interv.display_for_user(user).access:
+                if interv.quick_access_check(user):
                     stats['intervention_access'][desc] += 1
                 if interv in user.interventions:
                     stats['interventions'][desc] += 1

@@ -138,6 +138,7 @@ class TestIntervention(TestCase):
 
         # Prior to associating user with any orgs, shouldn't have access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
         # Add association and test again
         user.organizations.append(org3)
@@ -145,6 +146,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
     def test_diag_stategy(self):
         """Test strategy for diagnosis"""
@@ -169,6 +171,7 @@ class TestIntervention(TestCase):
 
         # Prior to PCa dx, user shouldn't have access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
         # Bless the test user with PCa diagnosis
         self.login()
@@ -180,6 +183,7 @@ class TestIntervention(TestCase):
         user, cp = map(db.session.merge, (user, cp))
 
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
     def test_no_tx(self):
         """Test strategy for not starting treatment"""
@@ -202,6 +206,7 @@ class TestIntervention(TestCase):
 
         # Prior to declaring TX, user should have access
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -211,6 +216,7 @@ class TestIntervention(TestCase):
 
         # Declaring they started a non TX proc, should still have access
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
         self.add_procedure(
             code='26294005',
@@ -222,6 +228,7 @@ class TestIntervention(TestCase):
 
         # Declaring they started a TX proc, should lose access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -247,7 +254,9 @@ class TestIntervention(TestCase):
         # Prior to associating user w/ decision support, the strategy
         # should give access to p3p
         self.assertTrue(ds_p3p.display_for_user(user).access)
+        self.assertTrue(ds_p3p.quick_access_check(user))
         self.assertFalse(ds_wc.display_for_user(user).access)
+        self.assertFalse(ds_wc.quick_access_check(user))
 
         # Add user to wisercare, confirm it's the only w/ access
 
@@ -259,7 +268,9 @@ class TestIntervention(TestCase):
         user, ds_p3p, ds_wc = map(db.session.merge, (user, ds_p3p, ds_wc))
 
         self.assertFalse(ds_p3p.display_for_user(user).access)
+        self.assertFalse(ds_p3p.quick_access_check(user))
         self.assertTrue(ds_wc.display_for_user(user).access)
+        self.assertTrue(ds_wc.quick_access_check(user))
 
     def test_not_in_role_or_sr(self):
         user = self.test_user
@@ -297,6 +308,7 @@ class TestIntervention(TestCase):
         # Prior to granting user WRITE_ONLY role, the strategy
         # should give access to p3p
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
         # Add WRITE_ONLY to user's roles
         add_role(user, ROLE.WRITE_ONLY)
@@ -304,6 +316,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
         # Revert role change for next condition
         user.roles = []
@@ -311,6 +324,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
         # Grant user sr access, they should lose sm visibility
         ui = UserIntervention(
@@ -322,6 +336,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
     def test_in_role(self):
         user = self.test_user
@@ -346,6 +361,7 @@ class TestIntervention(TestCase):
         # Prior to granting user PATIENT role, the strategy
         # should not give access to SM
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
         # Add PATIENT to user's roles
         add_role(user, ROLE.PATIENT)
@@ -353,6 +369,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
@@ -389,6 +406,8 @@ class TestIntervention(TestCase):
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
             "Thank you" in ae.display_for_user(user).card_html)
+
+        self.assertTrue(ae.quick_access_check(user))
 
     def test_expired(self):
         """If baseline expired check message"""

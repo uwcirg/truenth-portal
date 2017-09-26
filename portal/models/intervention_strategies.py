@@ -35,12 +35,19 @@ from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
 # # functions implementing the 'access_strategy' API
 # ##
 
+__log_strats = None
+
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
-    msg = kwargs.get('message', '')  # optional
-    current_app.logger.debug(
-        "{func_name} returning {result} for {user} on intervention "
-        "{intervention}".format(**kwargs) + msg)
+    # get config value if haven't yet
+    global __log_strats
+    if __log_strats is None:
+        __log_strats = current_app.config.get("LOG_DEBUG_STRATS", False)
+    if __log_strats:
+        msg = kwargs.get('message', '')  # optional
+        current_app.logger.debug(
+            "{func_name} returning {result} for {user} on intervention "
+            "{intervention}".format(**kwargs) + msg)
 
 
 def limit_by_clinic_w_id(
@@ -195,7 +202,7 @@ def allow_if_not_in_intervention(intervention_name):
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
     def user_not_in_intervention(intervention, user):
-        if not exclusive_intervention.display_for_user(user).access:
+        if not exclusive_intervention.quick_access_check(user):
             _log(result=True, func_name='user_not_in_intervention', user=user,
                  intervention=intervention.name)
             return True
