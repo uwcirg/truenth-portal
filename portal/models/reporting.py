@@ -11,7 +11,7 @@ from .role import ROLE
 from .user import User
 
 
-# @dogpile_cache.region('hourly')
+@dogpile_cache.region('hourly')
 def get_reporting_stats():
     """Cachable interface for expensive reporting data queries
 
