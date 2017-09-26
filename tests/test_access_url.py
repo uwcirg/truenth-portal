@@ -38,3 +38,10 @@ class TestAccessUrl(TestCase):
 
         rv = self.client.get(access_url)
         self.assert_redirects(rv, url_for('portal.challenge_identity'))
+
+    def test_bad_token(self):
+        token = 'TBKSYw7iHndUT3DfaED9tw.DHZMrQ.Wwr8SPM7ylABWf0mQHhGHHwttYk'
+        access_url = url_for('portal.access_via_token', token=token)
+
+        rv = self.client.get(access_url)
+        self.assert_redirects(rv, url_for('portal.landing'))
