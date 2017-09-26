@@ -38,6 +38,7 @@ logger = get_task_logger(__name__)
 
 celery = create_celery(current_app)
 
+
 @celery.task(name="tasks.add")
 def add(x, y):
     return x + y

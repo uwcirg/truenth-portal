@@ -9,7 +9,7 @@ from sqlalchemy import exc
 from StringIO import StringIO
 import tempfile
 
-from app import SITE_CFG
+from factories.app import SITE_CFG
 from database import db
 from models.app_text import AppText
 from models.communication_request import CommunicationRequest

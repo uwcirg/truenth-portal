@@ -4,7 +4,6 @@ from datetime import datetime
 import re
 
 from ..database import db
-from ..extensions import celery
 
 
 class ScheduledJob(db.Model):
