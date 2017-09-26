@@ -239,8 +239,7 @@ class QuestionnaireBank(db.Model):
                 break
 
             intervention = Intervention.query.get(qb.intervention_id)
-            display_details = intervention.display_for_user(user)
-            if display_details.access:
+            if intervention.quick_access_check(user):
                 # TODO: business rule details like the following should
                 # move to site persistence for QB to user mappings.
                 check_func = observation_check("biopsy", 'true')
