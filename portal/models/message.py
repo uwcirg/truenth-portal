@@ -22,11 +22,11 @@ email_dispatched.connect(log_message)
 
 EMAIL_HEADER = (
     "<!DOCTYPE html>"
-    "<html><head><style>"
+    "<html><head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
     "}"
-    ".btn {"
+    " .btn {"
     " font-size: 0.9em;"
     " font-family: Helvetica, Arial, sans-serif;"
     " display: inline-block;"
@@ -43,7 +43,7 @@ EMAIL_HEADER = (
     " padding: 0.6em;"
     " text-decoration: none;"
     "}"
-    ".btn:hover {"
+    " .btn:hover {"
     " background-color: #576e76;"
     "}"
     "</style></head><body>")
