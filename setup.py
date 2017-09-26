@@ -77,6 +77,7 @@ setup_kwargs = dict(
         "python-Levenshtein",
         "redis",
         "requests-cache",
+        "regex",
         "sphinx",
         "sphinx_rtd_theme",
         "validators",
