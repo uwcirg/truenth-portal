@@ -43,10 +43,11 @@ def load_template_args(user, questionnaire_bank_id):
         return link_url
 
     def make_button(text):
-        return '<div class="btn">{}</div>'.format(text)
+        improved = text.replace('<a href', '<a class="btn" href')
+        return '<div>{}</div>'.format(improved)
 
     def _lookup_assessment_button():
-        return make_button(_lookup_assessment_link)
+        return make_button(_lookup_assessment_link())
 
     def _lookup_assessment_link():
         return (
