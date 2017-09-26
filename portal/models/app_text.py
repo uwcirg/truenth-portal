@@ -493,6 +493,9 @@ class MailResource(object):
         if self._body:
             try:
                 formatted = self._body.format(**self.variables)
+                if self._footer:
+                    formatted += "\n"
+                    formatted += self.footer
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing body variable {}".format(e)

@@ -116,12 +116,12 @@ class TestAppText(TestCase):
                     "footerkey": "foot"}
         tmr = MailResource(None, variables=testvars)
         self.assertEquals(tmr.subject, "TESTING SUBJECT")
-        self.assertEquals(tmr.body, "TESTING BODY")
-        self.assertEquals(tmr.footer, "TESTING FOOTER")
+        self.assertEquals(tmr.body.splitlines()[0], "TESTING BODY")
+        self.assertEquals(tmr.body.splitlines()[1], "TESTING FOOTER")
         tmr._subject = "Replace this: {subjkey}"
         tmr._body = "Replace these: {bodykey1} and {bodykey2}"
         tmr._footer = "Replace this: {footerkey}"
         self.assertEquals(tmr.subject.split()[-1], "test")
-        self.assertEquals(tmr.body.split()[-1], "456")
-        self.assertEquals(tmr.footer.split()[-1], "foot")
+        self.assertEquals(tmr.body.splitlines()[0].split()[-1], "456")
+        self.assertEquals(tmr.body.splitlines()[1].split()[-1], "foot")
         self.assertEquals(set(tmr.variable_list), set(testvars.keys()))
