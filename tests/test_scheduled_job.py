@@ -1,13 +1,11 @@
 """Unit test module for scheduled jobs logic"""
 import json
-
-from portal.extensions import db, celery
+from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob
 from portal.tasks import test
 from tests import TestCase
 
-assert celery
 
 
 class TestScheduledJob(TestCase):

@@ -12,7 +12,7 @@ from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
 
-from portal.app import create_app
+from portal.factories.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
