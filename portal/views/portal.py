@@ -340,19 +340,15 @@ def access_via_token(token):
         is_valid, has_expired, user_id =\
                 user_manager.token_manager.verify_token(token, valid_seconds)
         if has_expired:
-            flash('Your access token has expired.', 'error')
-            return (None, redirect(url_for('portal.landing')))
+            abort(404, "Access token has expired")
         if not is_valid:
-            flash('Your access token is invalid.', 'error')
-            return (None, redirect(url_for('portal.landing')))
-        return (user_id, None)
+            abort(404, "Access token is invalid")
+        return user_id
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
-    user_id, redir = verify_token(valid_seconds)
-    if redir:
-        return redir
+    user_id = verify_token(valid_seconds)
 
     # Valid token - confirm user id looks legit
     user = get_user(user_id)
@@ -366,9 +362,7 @@ def access_via_token(token):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
             # only give such tokens 5 minutes - recheck validity
-            _, redir = verify_token(valid_seconds=5*60)
-            if redir:
-                return redir
+            verify_token(valid_seconds=5*60)
             auditable_event("promoting user without challenge via token, "
                             "pending registration", user_id=user.id,
                             subject_id=user.id, context='account')

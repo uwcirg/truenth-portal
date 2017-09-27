@@ -44,4 +44,4 @@ class TestAccessUrl(TestCase):
         access_url = url_for('portal.access_via_token', token=token)
 
         rv = self.client.get(access_url)
-        self.assert_redirects(rv, url_for('portal.landing'))
+        self.assert404(rv)
