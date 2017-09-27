@@ -17,6 +17,7 @@ from celery.utils.log import get_task_logger
 from .database import db
 from .dogpile import dogpile_cache
 from factories.celery import create_celery
+from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
@@ -36,7 +37,7 @@ from .models.scheduled_job import update_runtime
 
 logger = get_task_logger(__name__)
 
-celery = create_celery(current_app)
+celery = create_celery(create_app())
 
 
 @celery.task(name="tasks.add")
