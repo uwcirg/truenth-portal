@@ -706,12 +706,12 @@
                                 var contentHTML = "";
                                 /*
                                  * if organization is top level org and has child orgs,
-                                 * we render legend for it, and not allows it to be selectable
+                                 * we render legend for it, and not allows it to be selectable (rendering it as hidden input field)
                                  */
                                 if (oo && oo.isTopLevel && oo.children.length > 0) {
                                     contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
                                 } else {
-                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>"
+                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + i18next.t(item.name) + "</label></div>"
                                 };
                                 $("#" + parentState + "_container").append(contentHTML);
                             };
