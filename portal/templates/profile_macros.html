@@ -705,8 +705,9 @@
                                 var oo = orgsList[item.id];
                                 var contentHTML = "";
                                 /*
-                                 * if organization is top level org and has child orgs,
-                                 * we render legend for it, and not allows it to be selectable (rendering it as hidden input field)
+                                 * If an organization is a top level org and has child orgs,
+                                 * we render legend for it.  This will prevent the organization from being selected by the user.
+                                 * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
                                  */
                                 if (oo && oo.isTopLevel && oo.children.length > 0) {
                                     contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
