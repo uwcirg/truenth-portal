@@ -217,6 +217,27 @@ a.btn {
   padding: 0;
   margin: 1em 0.2em;
 }
+#socialMediaRegistrationContainer .btn-social,
+#regForm input[type="submit"],
+#socialMediaLoginContainer .btn-social,
+#socialMediaLoginContainer input[type="submit"]
+{
+    margin: 0.2em auto;
+    display: inline-block;
+    width: 400px;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    height: 52px;
+    font-size: @mobileSize;
+    line-height: 1;
+    margin: 0 auto;
+    letter-spacing: 3px;
+    border-radius: 0px;
+    padding: 1.2em 2em 1em 4em;
+    text-transform: uppercase;
+    text-align: left;
+}
 #regForm input,
 #loginForm input {
   background: #f1f0ef;
@@ -232,7 +253,7 @@ a.btn {
 #loginForm input[type="submit"] {
    background-color: @btnColor;
    text-align: center;
-   padding: 1.2em 2em 1em 2em;
+   padding: 1.1em 2em 1em 2em;
    height: 52px;
 }
 .reg-title {
@@ -2881,29 +2902,6 @@ div.timezone-warning.text-warning {
   max-width: 100%;
   margin: 0 auto;
 }
-#socialMediaRegistrationContainer .btn-social,
-#regForm input[type="submit"],
-#socialMediaLoginContainer .btn-social,
-#socialMediaLoginContainer input[type="submit"]
-{
-    margin: 0.2em auto;
-    display: inline-block;
-    width: 400px;
-    max-width: 100%;
-    margin: 0 auto;
-    overflow: hidden;
-    //height: 62px;
-    height: 52px;
-    font-size: @mobileSize;
-    line-height: 1;
-    margin: 0 auto;
-    letter-spacing: 3px;
-    border-radius: 0px;
-    padding: 1.2em 2em 1em 4em;
-    text-transform: uppercase;
-    text-align: left;
-}
-
 #socialMediaRegistrationContainer .btn-social > :first-child,
 #socialMediaLoginContainer .btn-social > :first-child {
   width: 40px;
