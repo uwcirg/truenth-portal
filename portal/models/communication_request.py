@@ -213,7 +213,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         current_app.logger.debug(
             "communication prepared for {}".format(user.id))
         db.session.add(communication)
-        db.session.commit()
+        return communication
 
     now = datetime.utcnow()
     trigger_date = questionnaire_bank.trigger_date(user)
@@ -222,6 +222,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     if not start:
         return
 
+    newly_crafted = []  # holds tuples (notify_date, communication)
     for request in questionnaire_bank.communication_requests:
         if request.status != 'active':
             continue
@@ -240,6 +241,25 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         if qbd.iteration != request.qb_iteration:
             continue
 
-        if (start + RelativeDelta(request.notify_post_qb_start) <
-                now):
-            queue_communication(user=user, communication_request=request)
+        notify_date = start + RelativeDelta(request.notify_post_qb_start)
+        if (notify_date < now):
+            newly_crafted.append((
+                notify_date,
+                queue_communication(user=user, communication_request=request)))
+
+    # For first pass on users that happen to have a backdated trigger, it's
+    # possible for multiple requests to now be valid.  We don't want to flood
+    # the user with multiple communications, so mark all but the latest as
+    # 'suspended'.
+    if len(newly_crafted) > 1:
+        # look for newest, defined by largest notify_date
+        newest = newly_crafted[0]
+        for d, c in newly_crafted[1:]:
+            if d > newest[0]:
+                newest = (d, c)
+        for _, c in newly_crafted:
+            if c != newest[1]:
+                c.status = 'suspended'
+
+    if newly_crafted:
+        db.session.commit()

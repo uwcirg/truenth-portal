@@ -147,6 +147,27 @@ class TestCommunication(TestQuestionnaireSetup):
         expected = Communication.query.first()
         self.assertEquals(expected.user_id, TEST_USER_ID)
 
+    def test_single_message(self):
+        # With multiple time spaced CRs, only latest should send
+
+        mock_communication_request('localized', '{"days": 7}')
+        mock_communication_request('localized', '{"days": 14}')
+        mock_communication_request('localized', '{"days": 21}')
+
+        # Fake a user associated with localized org
+        # and mark all baseline questionnaires as in-progress
+        self.bless_with_basics(backdate=timedelta(days=22))
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.mark_localized()
+
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query
+        self.assertEquals(expected.count(), 3)
+        self.assertEquals(
+            len([e for e in expected if e.status == 'preparation']), 1)
+        self.assertEquals(
+            len([e for e in expected if e.status == 'suspended']), 2)
+
     def test_done_message(self):
         # At 14 days with all work done, should not generate message
 
