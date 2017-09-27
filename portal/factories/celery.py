@@ -4,6 +4,7 @@ from celery import Celery
 
 __celery = None
 
+
 def create_celery(app):
     global __celery
     if __celery:
