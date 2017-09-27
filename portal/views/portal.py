@@ -27,6 +27,7 @@ from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
+from ..models.communication_request import CommunicationRequest
 from ..models.coredata import Coredata
 from ..models.encounter import Encounter
 from ..models.fhir import CC
