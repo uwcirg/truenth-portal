@@ -654,6 +654,11 @@
             }).done(function(data) {
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
+                  /*
+                   * populate orgs list object
+                   */
+                  OT.populateOrgsList(entry);
+                  var orgsList = OT.getOrgsList();
 
                   /**** draw state select element first to gather all states
                         assign orgs to each state in array
@@ -695,8 +700,20 @@
                                 };
                                 return s;
                             })(parentId);
+
                             if ($("#" + parentState + "_container").length > 0) {
-                                $("#" + parentState + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>");
+                                var oo = orgsList[item.id];
+                                var contentHTML = "";
+                                /*
+                                 * if organization is top level org and has child orgs,
+                                 * we render legend for it, and not allows it to be selectable (rendering it as hidden input field)
+                                 */
+                                if (oo && oo.isTopLevel && oo.children.length > 0) {
+                                    contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
+                                } else {
+                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + i18next.t(item.name) + "</label></div>"
+                                };
+                                $("#" + parentState + "_container").append(contentHTML);
                             };
                         };
                     };
@@ -712,8 +729,6 @@
                       setTimeout(function() { OT.handlePreSelectedClinic();}, 200);
                       //case of pre-selected clinic, need to check if any clinic has prechecked
                       setTimeout(function() { handleCheckedItem();}, 500);
-
-                      OT.populateOrgsList(entry);
                       $("#userOrgs input[name='organization']").each(function() {
                         if ($(this).val() != 0) OT.getDefaultModal(this);
                       });
