@@ -25,7 +25,7 @@ def jobs_list():
     TODO: Add new jobs, modify & inactivate existing jobs
 
     """
-    create_celery = create_celery(current_app)
+    celery = create_celery(current_app)
     jobs = ScheduledJob.query.filter(
         ScheduledJob.name != "__test_celery__").all()
     tasks = []
