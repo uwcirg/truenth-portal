@@ -173,7 +173,7 @@ def patient_profile(patient_id):
                    'registrationlink': 'url_placeholder',
                    'verify_account_link': ('<a href=\"url_placeholder\">'
                                            'url_placeholder</a>'),
-                   'verify_account_button': ('<div class=\"btn\"><a href='
+                   'verify_account_button': ('<div><a class=\"btn\" href='
                                              '\"url_placeholder\">Verify '
                                              'your account</a></div>')
                   }
