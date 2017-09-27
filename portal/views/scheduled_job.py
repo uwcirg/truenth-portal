@@ -6,7 +6,7 @@ from flask_user import roles_required
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
-from ..factories.celery import create_celery
+from ..factories.celery import init_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
@@ -25,7 +25,7 @@ def jobs_list():
     TODO: Add new jobs, modify & inactivate existing jobs
 
     """
-    celery = create_celery(current_app)
+    celery = init_celery(current_app)
     jobs = ScheduledJob.query.filter(
         ScheduledJob.name != "__test_celery__").all()
     tasks = []

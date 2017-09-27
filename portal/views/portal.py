@@ -18,7 +18,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
-from ..factories.celery import create_celery
+from ..factories.celery import init_celery
 
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
@@ -1143,7 +1143,7 @@ def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""
     x = int(request.args.get("x", x))
     y = int(request.args.get("y", y))
-    celery = create_celery(current_app)
+    celery = init_celery(current_app)
     res = celery.send_task('tasks.add', args=(x, y))
     context = {"id": res.task_id, "x": x, "y": y}
     result = "add((x){}, (y){})".format(context['x'], context['y'])
@@ -1156,7 +1156,7 @@ def celery_test(x=16, y=16):
 
 @portal.route("/celery-info")
 def celery_info():
-    celery = create_celery(current_app)
+    celery = init_celery(current_app)
     res = celery.send_task('tasks.info')
     context = {"id": res.task_id}
     task_id = "{}".format(context['id'])
@@ -1168,7 +1168,7 @@ def celery_info():
 
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
-    celery = create_celery(current_app)
+    celery = init_celery(current_app)
     retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return repr(retval)
 
@@ -1204,7 +1204,7 @@ def communicate(email):
 
 @portal.route("/post-result/<task_id>")
 def post_result(task_id):
-    celery = create_celery(current_app)
+    celery = init_celery(current_app)
     r = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
 
