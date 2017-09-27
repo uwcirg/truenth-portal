@@ -16,7 +16,8 @@ from celery.utils.log import get_task_logger
 
 from .database import db
 from .dogpile import dogpile_cache
-from .extensions import celery
+from factories.celery import create_celery
+from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
@@ -36,20 +37,22 @@ from .models.scheduled_job import update_runtime
 
 logger = get_task_logger(__name__)
 
+celery = create_celery(create_app())
 
-@celery.task
+
+@celery.task(name="tasks.add")
 def add(x, y):
     return x + y
 
 
-@celery.task
+@celery.task(name="tasks.info")
 def info():
     return "CELERY_BROKER_URL: {} <br/> SERVER_NAME: {}".format(
         current_app.config.get('CELERY_BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
 
 
-@celery.task(bind=True)
+@celery.task(name="tasks.post_request", bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
     """Wrap requests.post for asyncronous posts - includes timeout & retry"""
     logger.debug("task: %s retries:%s", self.request.id, self.request.retries)

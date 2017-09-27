@@ -24,7 +24,6 @@ docutils==0.14
 dogpile.cache==0.6.4
 Flask==0.12.2
 Flask-Babel==0.11.2
-Flask-Celery-Helper==1.1.0
 Flask-Dogpile-Cache==0.2
 Flask-Login==0.4.0
 Flask-Mail==0.9.1

@@ -1,11 +1,12 @@
 """Views for Scheduled Jobs"""
 from flask import abort, jsonify, Blueprint, request
-from flask import render_template
+from flask import render_template, current_app
 from flask_user import roles_required
 
 from ..audit import auditable_event
 from ..database import db
-from ..extensions import celery, oauth
+from ..extensions import oauth
+from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
@@ -24,6 +25,7 @@ def jobs_list():
     TODO: Add new jobs, modify & inactivate existing jobs
 
     """
+    celery = create_celery(current_app)
     jobs = ScheduledJob.query.filter(
         ScheduledJob.name != "__test_celery__").all()
     tasks = []
