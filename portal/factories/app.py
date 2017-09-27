@@ -171,9 +171,6 @@ def configure_extensions(app):
     # flask-session - Server side sessions
     session.init_app(app)
 
-    # celery - task queue for asynchronous tasks
-    # celery.init_app(app)
-
     # babel - i18n
     babel.init_app(app)
 
