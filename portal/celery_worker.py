@@ -14,14 +14,12 @@ from .database import db
 from factories.celery import create_celery
 from factories.app import create_app
 from .models.scheduled_job import ScheduledJob
+import tasks
 
 
 app = create_app()
 celery = create_celery(app)
 app.app_context().push()
-
-# Todo: fix 'RuntimeError: Working outside of application context.'
-import tasks
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
