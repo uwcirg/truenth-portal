@@ -340,11 +340,11 @@ def access_via_token(token):
         is_valid, has_expired, user_id =\
                 user_manager.token_manager.verify_token(token, valid_seconds)
         if has_expired:
-            flash('Your access token has expired.', 'error')
-            return redirect(url_for('portal.landing'))
+            current_app.logger.info("token access failed: "
+                                    "expired token {}".format(token))
+            abort(404, "Access token has expired")
         if not is_valid:
-            flash('Your access token is invalid.', 'error')
-            return redirect(url_for('portal.landing'))
+            abort(404, "Access token is invalid")
         return user_id
 
     # Confirm the token is valid, and not expired.
