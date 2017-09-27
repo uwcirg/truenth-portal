@@ -239,7 +239,7 @@ def configure_logging(app):  # pragma: no cover
         log.setLevel(level)
         log.addHandler(info_file_handler)
 
-    from .tasks import logger as task_logger
+    from ..tasks import logger as task_logger
     task_logger.setLevel(level)
     task_logger.addHandler(info_file_handler)
 
