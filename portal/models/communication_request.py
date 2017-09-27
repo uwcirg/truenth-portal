@@ -206,6 +206,10 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     def queue_communication(user, communication_request):
         """Create new communication object in preparation state"""
 
+        if not user.email or '@' not in user.email:
+            raise ValueError(
+                "can't send communication to user w/o valid email address")
+
         communication = Communication(
             user_id=user.id,
             status='preparation',

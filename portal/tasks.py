@@ -177,6 +177,9 @@ def update_patient_loop(update_cache=True, queue_messages=True):
         if update_cache:
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
+            if not user.email or '@' not in user.email:
+                # can't send to users w/o legit email
+                continue
             qbd = QuestionnaireBank.most_current_qb(user=user)
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(
