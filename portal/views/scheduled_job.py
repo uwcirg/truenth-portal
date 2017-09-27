@@ -6,11 +6,11 @@ from flask_user import roles_required
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
+from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
 
-from ..factories.celery import create_celery
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 
