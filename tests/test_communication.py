@@ -15,6 +15,7 @@ from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.system_uri import ICHOM, TRUENTH_CR_NAME
 from portal.tasks import update_patient_loop
+from portal.models.user import NO_EMAIL_PREFIX
 from tests import TEST_USER_ID, TEST_USERNAME
 from tests.test_assessment_status import TestQuestionnaireSetup, mock_qr
 from tests.test_assessment_status import symptom_tracker_instruments
@@ -167,6 +168,24 @@ class TestCommunication(TestQuestionnaireSetup):
             len([e for e in expected if e.status == 'preparation']), 1)
         self.assertEquals(
             len([e for e in expected if e.status == 'suspended']), 2)
+
+    def test_no_email(self):
+        # User w/o email shouldn't trigger communication
+
+        mock_communication_request('localized', '{"days": 14}')
+
+        # Fake a user associated with localized org
+        # and mark all baseline questionnaires as in-progress
+        self.bless_with_basics(backdate=timedelta(days=22))
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.mark_localized()
+        self.test_user.email = NO_EMAIL_PREFIX
+        with SessionScope(db):
+            db.session.commit()
+
+        update_patient_loop(update_cache=False, queue_messages=True)
+        expected = Communication.query
+        self.assertEquals(expected.count(), 0)
 
     def test_done_message(self):
         # At 14 days with all work done, should not generate message

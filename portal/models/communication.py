@@ -184,6 +184,10 @@ class Communication(db.Model):
     def generate_and_send(self):
         "Collate message details and send"
         user = User.query.get(self.user_id)
+        if not user.email or '@' not in user.email:
+            raise ValueError(
+                "can't send communication to user w/o valid email address")
+
         args = load_template_args(
             user=user,
             questionnaire_bank_id=self.communication_request.
