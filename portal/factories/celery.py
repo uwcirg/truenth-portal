@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from celery import Celery
 
+from ..extensions import db
+
 
 __celery = None
 
@@ -21,7 +23,12 @@ def create_celery(app):
 
         def __call__(self, *args, **kwargs):
             with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
+                db.session = db.create_scoped_session()
+                try:
+                    response = TaskBase.__call__(self, *args, **kwargs)
+                finally:
+                    db.session.remove()
+                return response
     celery.Task = ContextTask
 
     __celery = celery
