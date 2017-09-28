@@ -82,7 +82,8 @@ def delete_job(job_id):
     return jsonify(message=msg)
 
 
-@scheduled_job_api.route('/api/scheduled_job/<int:job_id>/trigger')
+@scheduled_job_api.route(
+    '/api/scheduled_job/<int:job_id>/trigger', methods=('POST',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def trigger_job(job_id):

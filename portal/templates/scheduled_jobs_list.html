@@ -10,6 +10,7 @@
     <ul>
         {% for job in jobs %}
             <li>
+                <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
                 <b>{{ job.name }}</b>
                 <br />{{ _("Task") }}: {{ job.task }}
                 {% if job.args %}
@@ -22,6 +23,7 @@
                 <br />{{ _("Active") }}: {{ job.active }}
                 <br />{{ _("Last Runtime") }}: {{ job.last_runtime }}
                 <br />{{ _("Last Status") }}: {{ job.last_status }}
+                <div id="triggerMessage_{{job.id}}" class="text-info"></div>
             </li>
         {% endfor %}
     </ul>
@@ -40,5 +42,28 @@
     <p>{{ _("No tasks found.") }}</p>
     {% endif %}
 
+
+{% endblock %}
+{% block document_ready %}
+
+function triggerJob(event, jobId) {
+    if (event) event.stopPropagation();
+    if (jobId) {
+         $.ajax ({
+              type: "POST",
+              url: "/api/scheduled_job/" + jobId + "/trigger",
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json'
+          }).done(function(data) {
+                if (data) {
+                    $("#triggerMessage_" + jobId).text(data["message"]);
+                }
+          }).fail(function(xhr) {
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+                $("#triggerMessage_" + jobId).text(xhr.status + ": " + xhr.responseText);
+          });
+    };
+};
 
 {% endblock %}
