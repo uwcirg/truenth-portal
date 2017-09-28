@@ -82,6 +82,15 @@ class ScheduledJob(db.Model):
                        day_of_week=svals[4]
                       )
 
+    def trigger(self):
+        from .. import tasks
+        func = getattr(tasks, self.task, None)
+        if func:
+            args_in = self.args.split(',') if self.args else []
+            kwargs_in = self.kwargs or {}
+            return func(*args_in, job_id=self.id, **kwargs_in)
+        return 'task {} not found'.format(self.task)
+
 
 def update_job(job_id, runtime=None, status=None):
     if job_id:

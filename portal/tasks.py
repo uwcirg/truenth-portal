@@ -85,12 +85,7 @@ def post_request(self, url, data, timeout=10, retries=3):
 
 @celery.task
 def test(job_id=None):
-    try:
-        update_job(job_id, status="success")
-    except Exception as exc:
-        msg = "Unexpected exception in `test` on {} : {}".format(job_id, exc)
-        logger.error(msg)
-        update_job(job_id, status=msg)
+    update_current_job(job_id, 'test', status="success")
     return "Test task complete."
 
 
@@ -116,7 +111,7 @@ def cache_reporting_stats(job_id=None):
         message = ("Unexpected exception in `cache_reporting_stats` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
-    update_job(job_id, status=message)
+    update_current_job(job_id, 'cache_reporting_stats', status=message)
     return message
 
 
@@ -141,7 +136,7 @@ def cache_assessment_status(job_id=None):
         message = ("Unexpected exception in `cache_assessment_status` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
-    update_job(job_id, status=message)
+    update_current_job(job_id, 'cache_assessment_status', status=message)
     return message
 
 
@@ -160,7 +155,7 @@ def prepare_communications(job_id=None):
         message = ("Unexpected exception in `prepare_communications` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
-    update_job(job_id, status=message)
+    update_current_job(job_id, 'prepare_communications', status=message)
     return message
 
 
@@ -197,7 +192,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 def send_queued_communications(job_id=None):
     "Look for communication objects ready to send"
     send_messages()
-    update_job(job_id, status='success')
+    update_current_job(job_id, 'send_queued_communications', status='success')
 
 
 def send_messages():
@@ -246,3 +241,11 @@ def send_user_messages(email, force_update=False):
     if force_update:
         message += " after forced update"
     return message
+
+
+def update_current_job(job_id, func_name, runtime=None, status=None):
+    try:
+        update_job(job_id, runtime=runtime, status=status)
+    except Exception as exc:
+        logger.error("Failed to update job {} for task `{}`:"
+                     " {}".format(job_id, func_name, exc))

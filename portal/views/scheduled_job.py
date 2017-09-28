@@ -80,3 +80,14 @@ def delete_job(job_id):
     auditable_event(msg, user_id=user_id, subject_id=user_id,
                     context='other')
     return jsonify(message=msg)
+
+
+@scheduled_job_api.route('/api/scheduled_job/<int:job_id>/trigger')
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def trigger_job(job_id):
+    job = ScheduledJob.query.get(job_id)
+    if not job:
+        abort(404, 'job ID not found')
+    msg = job.trigger()
+    return jsonify(message=msg)
