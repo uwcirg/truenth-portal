@@ -88,7 +88,12 @@ class ScheduledJob(db.Model):
         if func:
             args_in = self.args.split(',') if self.args else []
             kwargs_in = self.kwargs or {}
-            return func(*args_in, job_id=self.id, **kwargs_in)
+            try:
+                msg = func(*args_in, job_id=self.id, **kwargs_in)
+            except Exception as exc:
+                msg = ("Unexpected exception in `{}` on {}:"
+                       " {}".format(self.job_id, self.task, exc))
+            return msg
         return 'task {} not found'.format(self.task)
 
 
