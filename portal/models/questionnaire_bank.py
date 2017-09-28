@@ -15,6 +15,7 @@ from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
+from ..trace import trace
 
 
 classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
@@ -282,6 +283,7 @@ class QuestionnaireBank(db.Model):
 
         baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
         if not baseline:
+            trace("no baseline questionnaire_bank, can't continue")
             return QBD(None, None, None, None)
         trigger_date = baseline[0].trigger_date(user)
         if not trigger_date:
@@ -367,23 +369,49 @@ class QuestionnaireBank(db.Model):
         :return: UTC datetime for the given user / QB, or None if N/A
 
         """
+        if hasattr(self, '__trigger_date'):
+            return self.__trigger_date
         if self.organization_id:
             # When linked via organization, use the common
             # top level consent date as `trigger` date.
             if user.valid_consents and user.valid_consents.count() > 0:
-                    return user.valid_consents[0].audit.timestamp
+                self.__trigger_date = user.valid_consents[0].audit.timestamp
+                trace(
+                    'found valid_consent with trigger_date {}'.format(
+                        self.__trigger_date))
+                return self.__trigger_date
             else:
-                return None
+                trace(
+                    "questionnaire_bank affiliated with org {}, user has "
+                    "no valid consents, so no trigger_date".format(
+                        self.organization_id))
+                self.__trigger_date = None
+                return self.__trigger_date
         else:
             if not self.intervention_id:
-                self.ValueError(
+                raise ValueError(
                     "Can't compute trigger_date on QuestionnaireBank "
                     "with neither organization nor intervention associated")
             # TODO: business rule details like the following should
             # move to site persistence for QB to user mappings.
             tx_date = latest_treatment_started_date(user)
-            return (tx_date if tx_date else
-                    user.fetch_datetime_for_concept(CC.BIOPSY))
+            if tx_date:
+                trace(
+                    "found latest treatment date {} for trigger_date".format(
+                        tx_date))
+                self.__trigger_date = tx_date
+                return self.__trigger_date
+            else:
+                self.__trigger_date = user.fetch_datetime_for_concept(
+                    CC.BIOPSY)
+                if self.__trigger_date:
+                    trace(
+                        "found biopsy {} for trigger_date".format(
+                            self.__trigger_date))
+                    return self.__trigger_date
+                else:
+                    trace("no treatment or biopsy date, no trigger_date")
+                    return self.__trigger_date
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

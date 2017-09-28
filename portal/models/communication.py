@@ -13,6 +13,7 @@ from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
 from .questionnaire_bank import QuestionnaireBank
+from ..trace import trace
 from .user import User
 
 
@@ -177,9 +178,13 @@ class Communication(db.Model):
     )
 
     def __str__(self):
+        if not self.communication_request:
+            from .communication_request import CommunicationRequest
+            self.communication_request = CommunicationRequest.query.get(
+                self.communication_request_id)
         return (
-            'Communication for {0.user_id}'
-            ' of {0.communication_request_id}'.format(self))
+            'Communication for user {0.user_id}'
+            ' of {0.communication_request.name}'.format(self))
 
     def generate_and_send(self):
         "Collate message details and send"
@@ -188,6 +193,8 @@ class Communication(db.Model):
             raise ValueError(
                 "can't send communication to user w/o valid email address")
 
+        trace("load variables for UUID {}".format(
+            self.communication_request.lr_uuid))
         args = load_template_args(
             user=user,
             questionnaire_bank_id=self.communication_request.

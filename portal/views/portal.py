@@ -8,6 +8,7 @@ from flask_user import roles_required
 from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
+from jinja2 import TemplateNotFound
 from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
@@ -19,7 +20,6 @@ from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
 from ..factories.celery import create_celery
-
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
@@ -27,6 +27,7 @@ from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
+from ..models.communication import Communication
 from ..models.communication_request import CommunicationRequest
 from ..models.coredata import Coredata
 from ..models.encounter import Encounter
@@ -40,7 +41,7 @@ from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
-from jinja2 import TemplateNotFound
+from ..trace import establish_trace, dump_trace
 
 
 portal = Blueprint('portal', __name__)
@@ -1185,6 +1186,12 @@ def communicate(email):
     Include a `force=True` query string parameter to first invalidate the cache
     and look for fresh messages before triggering the send.
 
+    Include a `purge=True` query string parameter to throw out existing
+    communications for the user first, thus forcing a resend  (implies a force)
+
+    Include a `trace=True` query string parameter to get details found during
+    processing - like a debug trace.
+
     """
     from ..tasks import send_user_messages
     u = User.query.filter(User.email == email).first()
@@ -1193,13 +1200,23 @@ def communicate(email):
     elif u.deleted_id:
         message = 'delted user - not allowed'
     else:
-        force = request.args.get('force', False)
+        purge = request.args.get('purge', False)
+        if purge in ('', '0', 'false', 'False'):
+            purge = False
+        force = request.args.get('force', purge)
         if force in ('', '0', 'false', 'False'):
             force = False
+        trace = request.args.get('trace', False)
+        if trace:
+            establish_trace("BEGIN trace for communicate on {}".format(u))
+        if purge:
+            Communication.query.filter_by(user_id=u.id).delete()
         try:
             message = send_user_messages(email, force)
         except ValueError as ve:
             message = "ERROR {}".format(ve)
+        if trace:
+            message = dump_trace(message)
     return jsonify(message=message)
 
 
