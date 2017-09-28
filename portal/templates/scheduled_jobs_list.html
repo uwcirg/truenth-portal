@@ -11,11 +11,17 @@
         {% for job in jobs %}
             <li>
                 <b>{{ job.name }}</b>
-
                 <br />{{ _("Task") }}: {{ job.task }}
+                {% if job.args %}
+                <br />{{ _("Args") }}: {{ job.args }}
+                {% endif %}
+                {% if job.kwargs %}
+                <br />{{ _("Kwargs") }}: {{ job.kwargs }}
+                {% endif %}
                 <br />{{ _("Schedule") }}: {{ job.schedule }}
                 <br />{{ _("Active") }}: {{ job.active }}
                 <br />{{ _("Last Runtime") }}: {{ job.last_runtime }}
+                <br />{{ _("Last Status") }}: {{ job.last_status }}
             </li>
         {% endfor %}
     </ul>
