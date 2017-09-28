@@ -24,7 +24,7 @@ event_status_types = ENUM(
     create_type=False)
 
 
-def load_template_args(user, questionnaire_bank_id):
+def load_template_args(user, questionnaire_bank_id=None):
     """Capture known variable lookup functions and values
 
     To add additional template variable lookup functions, name the
@@ -121,11 +121,16 @@ def load_template_args(user, questionnaire_bank_id):
                 url=url_for('user.forgot_password', _external=True)))
 
     def _lookup_questionnaire_due_date():
+        if not questionnaire_bank_id:
+            return ''
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
         due = (qb.calculated_overdue(trigger_date) or
                qb.calculated_expiry(trigger_date))
         return due.strftime('%-d %b %Y') if due else ''
+
+    def _lookup_registrationlink():
+        return 'url_placeholder'
 
     def _lookup_st_button():
         return make_button(_lookup_st_link())
