@@ -34,6 +34,10 @@ class BaseConfig(object):
         'CELERY_BROKER_URL',
         REDIS_URL
     )
+    CELERY_RESULT_BACKEND = os.environ.get(
+        'CELERY_RESULT_BACKEND',
+        REDIS_URL
+    )
     REQUEST_CACHE_URL = os.environ.get(
         'REQUEST_CACHE_URL',
         REDIS_URL
