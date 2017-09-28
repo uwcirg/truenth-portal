@@ -30,8 +30,8 @@ class BaseConfig(object):
     )
 
     ANONYMOUS_USER_ACCOUNT = True
-    CELERY_BROKER_URL = os.environ.get(
-        'CELERY_BROKER_URL',
+    BROKER_URL = os.environ.get(
+        'BROKER_URL',
         REDIS_URL
     )
     CELERY_RESULT_BACKEND = os.environ.get(

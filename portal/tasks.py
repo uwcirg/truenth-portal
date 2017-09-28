@@ -47,8 +47,8 @@ def add(x, y):
 
 @celery.task(name="tasks.info")
 def info():
-    return "CELERY_BROKER_URL: {} <br/> SERVER_NAME: {}".format(
-        current_app.config.get('CELERY_BROKER_URL'),
+    return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
+        current_app.config.get('BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
 
 
