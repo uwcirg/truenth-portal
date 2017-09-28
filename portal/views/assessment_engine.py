@@ -1336,6 +1336,7 @@ def invalidate(user_id):
 
 
 @assessment_engine_api.route('/present-assessment')
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine
