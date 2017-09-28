@@ -443,11 +443,11 @@ class MailResource(object):
         self.variables = variables or {}
         try:
             response = time_request(url)
-            self._subject = str(response.json().get('subject'))
-            self._body = str(response.json().get('body'))
+            self._subject = response.json().get('subject')
+            self._body = response.json().get('body')
             if current_app.config.get("DEBUG_EMAIL", False):
                 self._body += '{debug_slot}'
-            self._footer = str(response.json().get('footer'))
+            self._footer = response.json().get('footer')
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
@@ -480,7 +480,7 @@ class MailResource(object):
         """Return subject if available else error message"""
         if self._subject:
             try:
-                formatted = self._subject.format(**self.variables)
+                formatted = str(self._subject).format(**self.variables)
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing subject variable {}".format(e)
@@ -494,7 +494,7 @@ class MailResource(object):
         """Return body if available else error message"""
         if self._body:
             try:
-                formatted = self._body.format(**self.variables)
+                formatted = str(self._body).format(**self.variables)
                 if self._footer:
                     formatted += "\n"
                     formatted += self.footer
@@ -511,7 +511,7 @@ class MailResource(object):
         """Return optional footer if available"""
         if self._footer:
             try:
-                formatted = self._footer.format(**self.variables)
+                formatted = str(self._footer).format(**self.variables)
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing footer variable {}".format(e)
