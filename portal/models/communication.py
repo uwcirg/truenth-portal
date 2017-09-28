@@ -86,9 +86,12 @@ def load_template_args(user, questionnaire_bank_id):
         open_div = '<div style="background-color: #D3D3D3">'
         close_div = '</div>'
 
+        trace_data = dump_trace()
+        if not trace_data:
+            trace_data = ['no trace data found']
         result = '{open_div} {trace} {close_div}'.format(
             open_div=open_div, close_div=close_div,
-            trace='<br/>'.join(dump_trace()))
+            trace='<br/>'.join(trace_data))
         return result
 
     def _lookup_first_name():
