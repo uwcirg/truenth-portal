@@ -7,13 +7,15 @@ specific details around tricky tasks.
 from flask import g
 
 
-def establish_trace(opening_line):
+def establish_trace(opening_line, reset_trace=None):
     """Establish the begin of a trace - w/o this trace won't function
 
     Open up the trace for the request, capturing opening_line
 
     """
     if not hasattr(g, 'trace'):
+        g.trace = []
+    elif reset_trace:
         g.trace = []
     g.trace.append(opening_line)
 
