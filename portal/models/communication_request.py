@@ -11,6 +11,7 @@ from ..date_tools import RelativeDelta
 from .identifier import Identifier
 from .reference import Reference
 from ..system_uri import TRUENTH_CR_NAME
+from ..trace import trace
 
 
 # https://www.hl7.org/fhir/valueset-request-status.html
@@ -180,6 +181,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     'preparation' status.
 
     """
+    trace("process {}; iteration {}".format(
+        questionnaire_bank, iteration_count))
 
     def existing_communication(user_id, communication_request_id):
         "Return a matching communication, if found"
@@ -188,6 +191,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         ).filter(
             Communication.communication_request_id == communication_request_id
         ).first()
+        if existing:
+            trace('found existing communication for this request')
         return existing
 
     def unfinished_work(user, questionnaire_bank):
@@ -201,7 +206,10 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
         """
         a_s, _ = overall_assessment_status(user.id)
-        return a_s in ('Due', 'Overdue', 'In Progress')
+        unfinished_work = a_s in ('Due', 'Overdue', 'In Progress')
+        trace('{} unfinished work'.format(
+            'found' if unfinished_work else "didn't find"))
+        return unfinished_work
 
     def queue_communication(user, communication_request):
         """Create new communication object in preparation state"""
@@ -217,18 +225,31 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         current_app.logger.debug(
             "communication prepared for {}".format(user.id))
         db.session.add(communication)
+        trace('added {}'.format(communication))
         return communication
 
     now = datetime.utcnow()
     trigger_date = questionnaire_bank.trigger_date(user)
+    trace('trigger_date = {}'.format(trigger_date))
     qbd = questionnaire_bank.calculated_start(trigger_date)
     start = qbd.relative_start
     if not start:
+        trace("no relative start found, can't continue")
         return
 
     newly_crafted = []  # holds tuples (notify_date, communication)
+    if not len(questionnaire_bank.communication_requests):
+        trace("zero communication requests in questionnaire_bank")
+
     for request in questionnaire_bank.communication_requests:
+        trace("process eligable {}".format(request))
         if request.status != 'active':
+            trace("found inactive request, skipping")
+            continue
+
+        # The iteraction counts must match
+        if qbd.iteration != request.qb_iteration:
+            trace("iteration mismatch, request doesn't apply")
             continue
 
         # Continue if matching message was already generated
@@ -241,15 +262,15 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         if not unfinished_work(user, questionnaire_bank):
             continue
 
-        # The iteraction counts must match
-        if qbd.iteration != request.qb_iteration:
-            continue
-
         notify_date = start + RelativeDelta(request.notify_post_qb_start)
         if (notify_date < now):
             newly_crafted.append((
                 notify_date,
                 queue_communication(user=user, communication_request=request)))
+        else:
+            trace(
+                "notify_date {} hasn't yet come to pass, doesn't apply".format(
+                    notify_date))
 
     # For first pass on users that happen to have a backdated trigger, it's
     # possible for multiple requests to now be valid.  We don't want to flood
@@ -257,6 +278,9 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     # 'suspended'.
     if len(newly_crafted) > 1:
         # look for newest, defined by largest notify_date
+        trace(
+            "multiple ({}) communications generated for single qb - mark "
+            "all but one 'suspended'".format(len(newly_crafted)))
         newest = newly_crafted[0]
         for d, c in newly_crafted[1:]:
             if d > newest[0]:
