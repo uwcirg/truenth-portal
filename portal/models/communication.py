@@ -13,7 +13,7 @@ from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
 from .questionnaire_bank import QuestionnaireBank
-from ..trace import trace
+from ..trace import dump_trace, establish_trace, trace
 from .user import User
 
 
@@ -80,6 +80,16 @@ def load_template_args(user, questionnaire_bank_id):
         if org:
             return org.name
         return ""
+
+    def _lookup_debug_slot():
+        """Special slot added when configuration DEBUG_EMAIL is set"""
+        open_div = '<div style="background-color: #D3D3D3">'
+        close_div = '</div>'
+
+        result = '{open_div} {trace} {close_div}'.format(
+            open_div=open_div, close_div=close_div,
+            trace='<br/>'.join(dump_trace()))
+        return result
 
     def _lookup_first_name():
         name = ''
@@ -188,13 +198,19 @@ class Communication(db.Model):
 
     def generate_and_send(self):
         "Collate message details and send"
+
+        if current_app.config.get('DEBUG_EMAIL', False):
+            establish_trace("BEGIN trace as per DEBUG_EMAIL configuration")
+
         user = User.query.get(self.user_id)
         if not user.email or '@' not in user.email:
             raise ValueError(
                 "can't send communication to user w/o valid email address")
 
-        trace("load variables for UUID {}".format(
-            self.communication_request.lr_uuid))
+        trace("load variables for {user} & UUID {uuid} on {request}".format(
+            user=user,
+            uuid=self.communication_request.lr_uuid,
+            request=self.communication_request.name))
         args = load_template_args(
             user=user,
             questionnaire_bank_id=self.communication_request.

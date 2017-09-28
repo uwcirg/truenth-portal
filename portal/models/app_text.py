@@ -445,6 +445,8 @@ class MailResource(object):
             response = time_request(url)
             self._subject = str(response.json().get('subject'))
             self._body = str(response.json().get('body'))
+            if current_app.config.get("DEBUG_EMAIL", False):
+                self._body += '{debug_slot}'
             self._footer = str(response.json().get('footer'))
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))

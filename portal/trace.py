@@ -24,7 +24,7 @@ def trace(line):
         g.trace.append(line)
 
 
-def dump_trace(last_line):
+def dump_trace(last_line=None):
     """Return the active trace, a list of strings"""
     if hasattr(g, 'trace'):
         if last_line:
