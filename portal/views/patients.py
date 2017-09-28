@@ -165,7 +165,7 @@ def patient_profile(patient_id):
                 url=display.link_url, id=patient.id)
 
     top_org = patient.first_top_organization()
-    args = load_template_args(user)
+    args = load_template_args(patient)
     if top_org:
         name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
     else:
