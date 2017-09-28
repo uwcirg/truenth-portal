@@ -43,7 +43,6 @@ class BaseConfig(object):
         REDIS_URL
     )
     CELERY_IMPORTS = ('portal.tasks', )
-    CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
