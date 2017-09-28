@@ -208,7 +208,12 @@ class Communication(db.Model):
         "Collate message details and send"
 
         if current_app.config.get('DEBUG_EMAIL', False):
-            establish_trace("BEGIN trace as per DEBUG_EMAIL configuration")
+            # hack to restart trace when in loop from celery task
+            # don't want to reset if in the middle of a request
+            from celery import current_task
+            establish_trace(
+                "BEGIN trace as per DEBUG_EMAIL configuration",
+                reset_trace=current_task is None)
 
         user = User.query.get(self.user_id)
         if not user.email or '@' not in user.email:
