@@ -236,6 +236,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     if not start:
         trace("no relative start found, can't continue")
         return
+    trace("computed start {} for this questionnaire_bank".format(
+        start))
 
     newly_crafted = []  # holds tuples (notify_date, communication)
     if not len(questionnaire_bank.communication_requests):
@@ -264,6 +266,9 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
         notify_date = start + RelativeDelta(request.notify_post_qb_start)
         if (notify_date < now):
+            trace(
+                "notifiy_date {} has passed - add communication".format(
+                    notify_date))
             newly_crafted.append((
                 notify_date,
                 queue_communication(user=user, communication_request=request)))
