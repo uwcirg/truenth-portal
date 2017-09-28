@@ -11,13 +11,15 @@ def create_celery(app):
     global __celery
     if __celery:
         return __celery
+
     celery = Celery(
         app.import_name,
-        broker=app.config['CELERY_BROKER_URL']
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL'],
     )
     celery.conf.update(app.config)
-    TaskBase = celery.Task
 
+    TaskBase = celery.Task
     class ContextTask(TaskBase):
         abstract = True
 
