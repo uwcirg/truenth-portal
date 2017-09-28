@@ -27,7 +27,7 @@ from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
-from ..models.communication import Communication
+from ..models.communication import load_template_args, Communication
 from ..models.communication_request import CommunicationRequest
 from ..models.coredata import Coredata
 from ..models.encounter import Encounter
@@ -787,24 +787,12 @@ def profile(user_id):
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     top_org = user.first_top_organization()
-    first_org = user.organizations[0] if len(list(user.organizations)) > 0 else None
-    invite_vars = {
-                   'first_name': user.first_name,
-                   'last_name': user.last_name,
-                   'parent_org': top_org.name if top_org else '',
-                   'clinic_name': first_org.name if first_org else '',
-                   'registrationlink': 'url_placeholder',
-                   'verify_account_link': ('<a href=\"url_placeholder\">'
-                                           'url_placeholder</a>'),
-                   'verify_account_button': ('<div class=\"btn\"><a href='
-                                             '\"url_placeholder\">Verify '
-                                             'your account</a></div>')
-                  }
     if top_org:
         name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
     else:
         name_key = UserInviteEmail_ATMA.name_key()
-    invite_email = MailResource(app_text(name_key), variables=invite_vars)
+    args = load_template_args(user=user)
+    invite_email = MailResource(app_text(name_key), variables=args)
     return render_template('profile.html', user=user,
                            invite_email=invite_email, terms=terms,
                            consent_agreements=consent_agreements)
