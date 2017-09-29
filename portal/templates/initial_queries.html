@@ -506,6 +506,8 @@ $(document).ready(function(){
 	 */
 	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, initIncompleteFields); });
 
+  tnthAjax.getDemo({{user.id}});
+
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
        else {

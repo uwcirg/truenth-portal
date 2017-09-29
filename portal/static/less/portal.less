@@ -2594,12 +2594,13 @@ div.timezone-warning.text-warning {
     padding-bottom: 2em;
   }
 
-  .noOrg-container * {
-    font-size:@baseFontSize;
+  #fillOrgs *,
+  .noOrg-container *  {
+  	font-size: @baseFontSize * 0.95;
   }
 
-  #fillOrgs * {
-  	font-size: @baseFontSize * 0.95;
+  .iq-container .noOrg-container *  {
+    font-size: @baseFontSize;
   }
 
 
