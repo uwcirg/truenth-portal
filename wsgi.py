@@ -5,7 +5,8 @@
 from portal.factories.app import create_app
 from werkzeug.contrib.fixers import ProxyFix
 
-app = create_app()
+# WSGI apps are called "application" by default
+application = create_app()
 
-if app.config.get('PREFERRED_URL_SCHEME', '').lower() == 'https':
-    app.wsgi_app = ProxyFix(app.wsgi_app)
+if application.config.get('PREFERRED_URL_SCHEME', '').lower() == 'https':
+    application.wsgi_app = ProxyFix(application.wsgi_app)

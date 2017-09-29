@@ -42,7 +42,7 @@ You can create a new .pot file with all extracted translations from the code by 
    
 You should then update the .pot file with all translation strings from the apptext/interventions tables using the following:
 
-   $ python manage.py translations
+   $ FLASK_APP=manage.py flask translations
 
 You can then use pybabel to update existing .po translation files (this command will only add new translations, it won't remove or modify any existing ones). For example, to update the en_AU translation file::
 
