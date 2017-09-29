@@ -994,7 +994,7 @@ var fillContent = {
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
                     creator = i18next.t("you");
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.95em; padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.85em; padding: 0.5em 0.8em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
                 }
                 else if (creator == subjectId) {
                     creator = i18next.t("this patient");
