@@ -81,3 +81,16 @@ class TestScheduledJob(TestCase):
 
         resp = self.client.delete('/api/scheduled_job/999')
         self.assert404(resp)
+
+    def test_trigger_job(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        job = ScheduledJob(name="testjob", task="test", schedule="0 0 * * *")
+        db.session.add(job)
+        db.session.commit()
+        job = db.session.merge(job)
+
+        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
+        self.assert200(resp)
+        self.assertEquals(resp.json['message'], 'Test task complete.')
