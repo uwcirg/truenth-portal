@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:stretch
 
 ENV \
     DEBIAN_FRONTEND="noninteractive" \
@@ -7,7 +7,7 @@ ENV \
 RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
-    apt-get install --yes --force-yes --no-install-recommends \
+    apt-get install --yes --no-install-recommends \
         ca-certificates \
         libpq5 \
         python2.7 && \
@@ -31,7 +31,7 @@ RUN \
 RUN \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61 && \
     apt-get update && \
-    apt-get install --yes --force-yes portal && \
+    apt-get install --yes --allow-unauthenticated portal && \
     apt-get clean && \
     rm --force --recursive --verbose /tmp/artifacts
 
