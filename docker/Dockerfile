@@ -1,8 +1,7 @@
 FROM debian:stretch
 
 ENV \
-    DEBIAN_FRONTEND="noninteractive" \
-    WAIT_FOR_IT_VERSION="db049716e42767d39961e95dd9696103dca813f1"
+    DEBIAN_FRONTEND="noninteractive"
 
 RUN \
     apt-get update && \
@@ -10,13 +9,11 @@ RUN \
     apt-get install --yes --no-install-recommends \
         ca-certificates \
         libpq5 \
-        python2.7 && \
+        python2.7 \
+        wait-for-it && \
     apt-get clean
 
 ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
-ADD \
-    https://raw.githubusercontent.com/vishnubob/wait-for-it/${WAIT_FOR_IT_VERSION}/wait-for-it.sh \
-    /usr/local/bin/
 
 COPY debian/artifacts /tmp/artifacts
 
@@ -40,10 +37,7 @@ ENV \
 
 RUN \
     mkdir --parents "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" \
-        "${PROJECT_DIR}/var/portal-instance/" \
-        /usr/local/bin/wait-for-it.sh && \
-    chmod +x /usr/local/bin/wait-for-it.sh
+    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/"
 
 USER "${RUN_USER}"
 
@@ -60,7 +54,7 @@ CMD \
     eval $("${PROJECT_DIR}/bin/remap_envvars.py") && \
     env && \
 
-    wait-for-it.sh \
+    wait-for-it \
         --host="$PGHOST" \
         --port="$PGPORT" \
         --strict \
