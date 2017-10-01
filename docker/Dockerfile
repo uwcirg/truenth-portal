@@ -29,7 +29,6 @@ RUN \
     fi
 
 RUN \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61 && \
     apt-get update && \
     apt-get install --yes --allow-unauthenticated portal && \
     apt-get clean && \
