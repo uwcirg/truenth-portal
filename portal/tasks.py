@@ -13,6 +13,7 @@ from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
+import json
 
 from .database import db
 from .dogpile import dogpile_cache
@@ -26,7 +27,7 @@ from .models.reporting import get_reporting_stats
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
-from .models.scheduled_job import update_runtime
+from .models.scheduled_job import update_job
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug
@@ -85,12 +86,17 @@ def post_request(self, url, data, timeout=10, retries=3):
 
 @celery.task
 def test(job_id=None):
-    try:
-        update_runtime(job_id)
-    except Exception as exc:
-        logger.error("Unexpected exception in `test` on {} : {}".format(
-            job_id, exc))
+    update_current_job(job_id, 'test', status="success")
     return "Test task complete."
+
+
+@celery.task
+def test_args(job_id=None, *args, **kwargs):
+    alist = ",".join(args)
+    klist = json.dumps(kwargs)
+    msg = "Test task complete. - {} - {}".format(alist, klist)
+    update_current_job(job_id, 'test_args', status=msg)
+    return msg
 
 
 @celery.task
@@ -111,10 +117,11 @@ def cache_reporting_stats(job_id=None):
         message = (
             'Reporting stats updated in {0.seconds} seconds'.format(duration))
         current_app.logger.debug(message)
-        update_runtime(job_id)
     except Exception as exc:
-        logger.error("Unexpected exception in `cache_reporting_stats` "
+        message = ("Unexpected exception in `cache_reporting_stats` "
                      "on {} : {}".format(job_id, exc))
+        logger.error(message)
+    update_current_job(job_id, 'cache_reporting_stats', status=message)
     return message
 
 
@@ -135,10 +142,11 @@ def cache_assessment_status(job_id=None):
         message = (
             'Assessment Cache updated in {0.seconds} seconds'.format(duration))
         current_app.logger.debug(message)
-        update_runtime(job_id)
     except Exception as exc:
-        logger.error("Unexpected exception in `cache_assessment_status` "
+        message = ("Unexpected exception in `cache_assessment_status` "
                      "on {} : {}".format(job_id, exc))
+        logger.error(message)
+    update_current_job(job_id, 'cache_assessment_status', status=message)
     return message
 
 
@@ -153,10 +161,11 @@ def prepare_communications(job_id=None):
         message = (
             'Prepared messages queued in {0.seconds} seconds'.format(duration))
         current_app.logger.debug(message)
-        update_runtime(job_id)
     except Exception as exc:
-        logger.error("Unexpected exception in `prepare_communications` "
+        message = ("Unexpected exception in `prepare_communications` "
                      "on {} : {}".format(job_id, exc))
+        logger.error(message)
+    update_current_job(job_id, 'prepare_communications', status=message)
     return message
 
 
@@ -193,7 +202,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 def send_queued_communications(job_id=None):
     "Look for communication objects ready to send"
     send_messages()
-    update_runtime(job_id)
+    update_current_job(job_id, 'send_queued_communications', status='success')
 
 
 def send_messages():
@@ -242,3 +251,11 @@ def send_user_messages(email, force_update=False):
     if force_update:
         message += " after forced update"
     return message
+
+
+def update_current_job(job_id, func_name, runtime=None, status=None):
+    try:
+        update_job(job_id, runtime=runtime, status=status)
+    except Exception as exc:
+        logger.error("Failed to update job {} for task `{}`:"
+                     " {}".format(job_id, func_name, exc))
