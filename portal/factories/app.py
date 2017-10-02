@@ -268,7 +268,7 @@ def configure_metadata(app):
     # Todo: extend Distribution base class instead of monkey patching
     if metadata.version and '+' in metadata.version:
         # Git short hashes are 8 characters long
-        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][-7:]
+        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][-8:]
 
     app.config.metadata = metadata
 
