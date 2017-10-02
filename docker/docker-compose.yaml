@@ -31,7 +31,7 @@ services:
   celery:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     command: bash -c '
-      eval $$("${PROJECT_DIR:-/opt/venvs/portal}/bin/remap_envvars.py") &&
+      eval $$(remap_envvars.py) &&
       env &&
       celery worker --app portal.celery_worker.celery --loglevel=info'
     environment:
@@ -45,7 +45,7 @@ services:
   celerybeat:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     command: bash -c '
-      eval $$("${PROJECT_DIR:-/opt/venvs/portal}/bin/remap_envvars.py") &&
+      eval $$(remap_envvars.py) &&
       env &&
       celery worker --app portal.celery_worker.celery --beat --schedule=/tmp/celerybeat-schedule --loglevel=info'
     environment:
