@@ -92,6 +92,7 @@ class TestScheduledJob(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
+        # test standard task
         job = ScheduledJob(name="test_trig", task="test", schedule="0 0 * * *")
         with SessionScope(db):
             db.session.add(job)
@@ -102,3 +103,21 @@ class TestScheduledJob(TestCase):
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job_id))
         self.assert200(resp)
         self.assertEquals(resp.json['message'], 'Test task complete.')
+
+        # test task w/ args + kwargs
+        alist = ["arg1", "arg2", "arg3"]
+        kdict = {"kwarg1":12345, "kwarg2":"abcde"}
+        job = ScheduledJob(name="test_trig_2", task="test_args", kwargs=kdict,
+                           args=",".join(alist), schedule="0 0 * * *")
+        with SessionScope(db):
+            db.session.add(job)
+            db.session.commit()
+            job = db.session.merge(job)
+            job_id = job.id
+
+        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job_id))
+        self.assert200(resp)
+        msg = resp.json['message'].split(" - ")
+        self.assertEquals(msg[0], 'Test task complete.')
+        self.assertEquals(msg[1].split(","), alist)
+        self.assertEquals(json.loads(msg[2]), kdict)

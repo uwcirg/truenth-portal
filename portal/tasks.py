@@ -13,6 +13,7 @@ from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
+import json
 
 from .database import db
 from .dogpile import dogpile_cache
@@ -91,7 +92,9 @@ def test(job_id=None):
 
 @celery.task
 def test_args(job_id=None, *args, **kwargs):
-    msg = "Test complete; args: {} | kwargs: {}".format(args, kwargs)
+    alist = ",".join(args)
+    klist = json.dumps(kwargs)
+    msg = "Test task complete. - {} - {}".format(alist, klist)
     update_current_job(job_id, 'test_args', status=msg)
     return msg
 
