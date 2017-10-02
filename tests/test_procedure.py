@@ -12,8 +12,10 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import FHIR_datetime
 from portal.models.procedure import Procedure
-from portal.models.procedure_codes import known_treatment_started
+from portal.models.procedure_codes import latest_treatment_started_date
 from portal.models.procedure_codes import known_treatment_not_started
+from portal.models.procedure_codes import known_treatment_started
+from portal.models.procedure_codes import TxStartedConstants
 from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 
@@ -141,20 +143,28 @@ class TestProcedure(TestCase):
 
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
-        started_codes = (
+        started_codes = set([
             ('3', 'Radical prostatectomy (nerve-sparing)', ICHOM),
             ('3-nns', 'Radical prostatectomy (non-nerve-sparing)', ICHOM),
             ('4', 'External beam radiation therapy', ICHOM),
             ('5', 'Brachytherapy', ICHOM),
-            ('6', 'ADT', ICHOM),
+            ('6', 'Androgen deprivation therapy', ICHOM),
             ('7', 'Focal therapy', ICHOM),
             ('26294005', 'Radical prostatectomy (nerve-sparing)', SNOMED),
             ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)',
              SNOMED),
             ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
-            ('707266006', 'Androgen deprivation therapy', SNOMED)
-        )
+            ('707266006', 'Androgen deprivation therapy', SNOMED),
+            ('888', u'Other (free text)', ICHOM),
+            ('118877007', 'Procedure on prostate', SNOMED)
+        ])
+        # confirm we have the whole list:
+        found = set()
+        for codeableconcept in TxStartedConstants():
+            [found.add((cc.code, cc.display, cc.system)) for cc in
+             codeableconcept.codings]
+        self.assertEquals(started_codes, found)
 
         # prior to setting any procedures, should return false
         self.assertFalse(known_treatment_started(self.test_user))
@@ -165,6 +175,14 @@ class TestProcedure(TestCase):
             self.assertTrue(known_treatment_started(self.test_user),
                             "treatment {} didn't show as started".format(
                 (system, code)))
+
+            # The "others" count as treatement started, but should NOT
+            # return a date from latest_treatment - only specific treatments
+            if code in ('888', '118877007'):
+                self.assertFalse(latest_treatment_started_date(self.test_user))
+            else:
+                self.assertTrue(latest_treatment_started_date(self.test_user))
+
             self.test_user.procedures.delete()  # reset for next iteration
 
     def test_treatment_not_started(self):
