@@ -90,6 +90,13 @@ def test(job_id=None):
 
 
 @celery.task
+def test_args(job_id=None, *args, **kwargs):
+    msg = "Test complete; args: {} | kwargs: {}".format(args, kwargs)
+    update_current_job(job_id, 'test_args', status=msg)
+    return msg
+
+
+@celery.task
 def cache_reporting_stats(job_id=None):
     """Populate reporting dashboard stats cache
 

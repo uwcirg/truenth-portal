@@ -39,6 +39,5 @@ def setup_periodic_tasks(sender, **kwargs):
             args_in = job.args.split(',') if job.args else []
             kwargs_in = job.kwargs or {}
             sender.add_periodic_task(job.crontab_schedule(),
-                                     task.s(*args_in,
-                                            job_id=job.id,
+                                     task.s(job.id, *args_in,
                                             **kwargs_in))

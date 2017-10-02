@@ -89,7 +89,7 @@ class ScheduledJob(db.Model):
             args_in = self.args.split(',') if self.args else []
             kwargs_in = self.kwargs or {}
             try:
-                msg = func(*args_in, job_id=self.id, **kwargs_in)
+                msg = func(self.id, *args_in, **kwargs_in)
             except Exception as exc:
                 msg = ("Unexpected exception in `{}` on {}:"
                        " {}".format(self.job_id, self.task, exc))
