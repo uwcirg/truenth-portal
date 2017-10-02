@@ -52,7 +52,7 @@ ENV \
 EXPOSE "${PORT}"
 
 CMD \
-    eval $("${PROJECT_DIR}/bin/remap_envvars.py") && \
+    eval $(remap_envvars.py) && \
     env && \
 
     wait-for-it \
