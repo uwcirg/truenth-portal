@@ -42,6 +42,7 @@ class TestScheduledJob(TestCase):
             content_type='application/json',
             data=json.dumps(data))
         self.assert200(resp)
+        orig_id = resp.json['id']
         self.assertEquals(resp.json['schedule'], '* * * * *')
 
         data['schedule'] = "0 0 0 0 0"
@@ -50,6 +51,7 @@ class TestScheduledJob(TestCase):
             content_type='application/json',
             data=json.dumps(data))
         self.assert200(resp)
+        self.assertEquals(resp.json['id'], orig_id)
         self.assertEquals(resp.json['schedule'], '0 0 0 0 0')
 
     def test_job_get(self):
@@ -94,6 +96,7 @@ class TestScheduledJob(TestCase):
 
         # test standard task
         job = ScheduledJob(name="test_trig", task="test", schedule="0 0 * * *")
+
         with SessionScope(db):
             db.session.add(job)
             db.session.commit()
@@ -109,13 +112,15 @@ class TestScheduledJob(TestCase):
         kdict = {"kwarg1": 12345, "kwarg2": "abcde"}
         job = ScheduledJob(name="test_trig_2", task="test_args", kwargs=kdict,
                            args=",".join(alist), schedule="0 0 * * *")
+
         with SessionScope(db):
             db.session.add(job)
             db.session.commit()
             job = db.session.merge(job)
             job_id = job.id
+            resp = self.client.post('/api/scheduled_job/{}'
+                                    '/trigger'.format(job_id))
 
-        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job_id))
         self.assert200(resp)
         msg = resp.json['message'].split(" - ")
         self.assertEquals(msg[0], 'Test task complete.')
