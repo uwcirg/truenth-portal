@@ -864,9 +864,9 @@ def about():
         user=current_user())
 
 
+@portal.route('/staff-registration-email/<int:user_id>')
 @roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
-@portal.route('/staff-registration-email/<int:user_id>')
 def staff_registration_email(user_id):
     """Staff Registration Email Content"""
     if user_id:
@@ -1163,8 +1163,9 @@ def celery_result(task_id):
     return repr(retval)
 
 
-@oauth.require_oauth()
 @portal.route("/communicate/<email>")
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
 def communicate(email):
     """Direct call to trigger communications to given user.
 
