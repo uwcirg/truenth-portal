@@ -32,9 +32,11 @@ class TestProcedure(TestCase):
         rv = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
         data = json.loads(rv.data)
-        self.assertEquals('367336001',
+        self.assertEquals(
+            '367336001',
             data['entry'][0]['resource']['code']['coding'][0]['code'])
-        self.assertEquals('Chemotherapy',
+        self.assertEquals(
+            'Chemotherapy',
             data['entry'][0]['resource']['code']['coding'][0]['display'])
         self.assertEquals(
             Reference.patient(TEST_USER_ID).as_fhir()['reference'],
@@ -57,7 +59,9 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         proc = Procedure.from_fhir(data, Audit(user_id=TEST_USER_ID))
-        self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
+        self.assertEquals(
+            proc.code.codings[0].system,
+            'http://snomed.info/sct')
         self.assertEquals(proc.code.codings[0].code, '80146002')
         self.assertEquals(proc.start_time, dateutil.parser.parse("2013-04-05"))
 
@@ -91,7 +95,9 @@ class TestProcedure(TestCase):
         results = json.loads(rv.data)
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
-        self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
+        self.assertEquals(
+            proc.code.codings[0].system,
+            'http://snomed.info/sct')
         self.assertEquals(proc.user_id, 1)
         self.assertEquals(proc.end_time, datetime(2011, 6, 27))
         self.assertEquals(proc.encounter.user_id, TEST_USER_ID)
@@ -103,7 +109,7 @@ class TestProcedure(TestCase):
 
         # confirm we correctly convert a timezone aware datetime
         # to unaware but converted to UTC time
-        start_time ="2013-01-28T13:31:00+01:00"
+        start_time = "2013-01-28T13:31:00+01:00"
         end_time = "2013-01-28T14:27:00+01:00"
         data['performedPeriod']['start'] = start_time
         data['performedPeriod']['end'] = end_time
@@ -157,8 +163,8 @@ class TestProcedure(TestCase):
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_started(self.test_user),
-                           "treatment {} didn't show as started".format(
-                           (system, code)))
+                            "treatment {} didn't show as started".format(
+                (system, code)))
             self.test_user.procedures.delete()  # reset for next iteration
 
     def test_treatment_not_started(self):
