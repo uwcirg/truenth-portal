@@ -1007,6 +1007,9 @@ var fillContent = {
                     highestId = procID;
                 } 
             } else {
+                /*
+                 *  for entries marked as other procedure.  These are rendered as hidden fields and can be referenced when these entries are deleted.
+                 */
                 otherHtml += "<input type='hidden' data-id='" + procID + "'  data-code='" + code + "' name='otherProcedures' >";
             };
         });
