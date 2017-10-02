@@ -3,6 +3,11 @@ version: "3.2"
 services:
   web:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     env_file:
