@@ -1,39 +1,36 @@
-FROM debian:jessie
+FROM debian:stretch
 
 ENV \
-    DEBIAN_FRONTEND="noninteractive" \
-    WAIT_FOR_IT_VERSION="db049716e42767d39961e95dd9696103dca813f1"
+    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}" \
+    DEBIAN_FRONTEND="noninteractive"
 
 RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
-    apt-get install --yes --force-yes --no-install-recommends \
+    apt-get install --yes --no-install-recommends \
         ca-certificates \
         libpq5 \
-        python2.7 && \
+        python2.7 \
+        wait-for-it && \
     apt-get clean
 
 ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
-ADD \
-    https://raw.githubusercontent.com/vishnubob/wait-for-it/${WAIT_FOR_IT_VERSION}/wait-for-it.sh \
-    /usr/local/bin/
 
-COPY debian/artifacts /tmp/artifacts
+COPY debian/artifacts "${ARTIFACT_DIR}"
 
 # Only add local repository if packages available in artifacts/
 RUN \
-    if [ -n "$(ls /tmp/artifacts)" ]; then \
-        echo deb file:/tmp/artifacts ./ > /etc/apt/sources.list.d/truenth.local.list; \
+    if [ -n "$(ls ${ARTIFACT_DIR})" ]; then \
+        echo "deb file:${ARTIFACT_DIR}" ./ > /etc/apt/sources.list.d/truenth.local.list; \
     else \
         echo deb "${debian_repo}" stable main > /etc/apt/sources.list.d/truenth.list; \
     fi
 
 RUN \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61 && \
     apt-get update && \
-    apt-get install --yes --force-yes portal && \
+    apt-get install --yes --allow-unauthenticated portal && \
     apt-get clean && \
-    rm --force --recursive --verbose /tmp/artifacts
+    rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
     RUN_USER="${RUN_USER:-www-data}" \
@@ -41,10 +38,7 @@ ENV \
 
 RUN \
     mkdir --parents "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" \
-        "${PROJECT_DIR}/var/portal-instance/" \
-        /usr/local/bin/wait-for-it.sh && \
-    chmod +x /usr/local/bin/wait-for-it.sh
+    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/"
 
 USER "${RUN_USER}"
 
@@ -58,10 +52,10 @@ ENV \
 EXPOSE "${PORT}"
 
 CMD \
-    eval $("${PROJECT_DIR}/bin/remap_envvars.py") && \
+    eval $(remap_envvars.py) && \
     env && \
 
-    wait-for-it.sh \
+    wait-for-it \
         --host="$PGHOST" \
         --port="$PGPORT" \
         --strict \
