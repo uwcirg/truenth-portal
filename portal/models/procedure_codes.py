@@ -27,10 +27,14 @@ def latest_treatment_started_date(user):
     performed date if any from the TxStartedConstants are found,
     else None
 
+    NB - only specific treatments count - the generic (placeholders) such as
+    "other" are not considered when looking up treatment start date.
+
     """
     cc_ids = set(cc.id for cc in TxStartedConstants())
+    other_id = TxStartedConstants().OtherProcedure.id
     matching = [proc.start_time for proc in user.procedures
-                if proc.code_id in cc_ids]
+                if proc.code_id in cc_ids and proc.code_id != other_id]
     return max(matching) if matching else None
 
 
