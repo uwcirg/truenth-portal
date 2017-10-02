@@ -54,6 +54,7 @@ services:
         --app portal.celery_worker.celery
         --schedule=/tmp/celerybeat-schedule.db
         --loglevel debug
+        --pidfile=/tmp/celerybeat.pid
       '
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
