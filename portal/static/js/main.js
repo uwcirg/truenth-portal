@@ -976,13 +976,13 @@ var fillContent = {
             return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
         });
 
-        var contentHTML = "", proceduresHtml = "";
+        var contentHTML = "", proceduresHtml = "", otherHtml = "";
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
         $.each(data.entry,function(i,val){
             var code = val.resource.code.coding[0].code;
+            var procID = val.resource.id;
             if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
-                var procID = val.resource.id;
                 var displayText = val.resource.code.coding[0].display;
                 var performedDateTime = val.resource.performedDateTime;
                 var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
@@ -1005,7 +1005,12 @@ var fillContent = {
                 contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(" + i18next.t("data entered by ") + creator + i18next.t(" on ") + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
-                };
+                } 
+            } else {
+                /*
+                 *  for entries marked as other procedure.  These are rendered as hidden fields and can be referenced when these entries are deleted.
+                 */
+                otherHtml += "<input type='hidden' data-id='" + procID + "'  data-code='" + code + "' name='otherProcedures' >";
             };
         });
 
@@ -1019,6 +1024,8 @@ var fillContent = {
         } else {
             $("#pastTreatmentsContainer").fadeOut();
         }
+
+        if (hasValue(otherHtml)) $("#userProcedures").append(otherHtml);
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
