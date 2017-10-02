@@ -106,7 +106,7 @@ class TestScheduledJob(TestCase):
 
         # test task w/ args + kwargs
         alist = ["arg1", "arg2", "arg3"]
-        kdict = {"kwarg1":12345, "kwarg2":"abcde"}
+        kdict = {"kwarg1": 12345, "kwarg2": "abcde"}
         job = ScheduledJob(name="test_trig_2", task="test_args", kwargs=kdict,
                            args=",".join(alist), schedule="0 0 * * *")
         with SessionScope(db):
