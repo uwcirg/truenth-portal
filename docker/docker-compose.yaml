@@ -33,7 +33,10 @@ services:
     command: bash -c '
       eval $$(remap_envvars.py) &&
       env &&
-      celery worker --app portal.celery_worker.celery --loglevel=info'
+      celery worker
+        --app portal.celery_worker.celery
+        --loglevel debug
+      '
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
@@ -47,7 +50,11 @@ services:
     command: bash -c '
       eval $$(remap_envvars.py) &&
       env &&
-      celery worker --app portal.celery_worker.celery --beat --schedule=/tmp/celerybeat-schedule --loglevel=info'
+      celery beat
+        --app portal.celery_worker.celery
+        --schedule=/tmp/celerybeat-schedule.db
+        --loglevel debug
+      '
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
