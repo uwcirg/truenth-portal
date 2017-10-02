@@ -91,8 +91,8 @@ class ScheduledJob(db.Model):
             try:
                 msg = func(self.id, *args_in, **kwargs_in)
             except Exception as exc:
-                msg = ("Unexpected exception in `{}` on {}:"
-                       " {}".format(self.job_id, self.task, exc))
+                msg = ("Unexpected exception in task `{}` (job_id={}):"
+                       " {}".format(self.task, self.id, exc))
             return msg
         return 'task {} not found'.format(self.task)
 
