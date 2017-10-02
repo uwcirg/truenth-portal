@@ -954,6 +954,7 @@ div.pull-right {
   }
 
   span.link {
+    font-size: @mediumText;
     margin-left: 0.3em;
     background: @featureBtnBgColor;
     border: solid @featureBtnBgColor 1px;
@@ -2594,12 +2595,13 @@ div.timezone-warning.text-warning {
     padding-bottom: 2em;
   }
 
-  .noOrg-container * {
-    font-size:@baseFontSize;
+  #fillOrgs *,
+  .noOrg-container *  {
+  	font-size: @baseFontSize * 0.95;
   }
 
-  #fillOrgs * {
-  	font-size: @baseFontSize * 0.95;
+  .iq-container .noOrg-container *  {
+    font-size: @baseFontSize;
   }
 
 
