@@ -267,8 +267,7 @@ def configure_metadata(app):
     # https://github.com/pypa/setuptools_scm#default-versioning-scheme
     # Todo: extend Distribution base class instead of monkey patching
     if metadata.version and '+' in metadata.version:
-        # Git short hashes are 8 characters long
-        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][-8:]
+        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][1:]
 
     app.config.metadata = metadata
 
