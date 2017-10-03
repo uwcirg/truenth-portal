@@ -45,7 +45,6 @@ from ..system_uri import SHORTCUT_ALIAS
 from ..trace import establish_trace, dump_trace
 
 
-
 portal = Blueprint('portal', __name__)
 
 

@@ -406,6 +406,7 @@ FieldsChecker.prototype.getNext = function() {
     if (!found && !self.sectionCompleted(section)) {
        if (section == "orgsContainer") {
           if (hasValue(preselectClinic)) {
+              OT.handlePreSelectedClinic()
               var __modal = OT.getConsentModal();
               if (__modal) {
                 __modal.modal("show");
@@ -504,10 +505,11 @@ $(document).ready(function(){
 	 * get still needed core data
 	 * populate terms if it is agreed
 	 * get incomplete fields thereafter 
-   * note: need to delay gathering incomplete fields to allow fields to be render (e.g. broken in firefox if no delay)
+   * note: need to delay gathering incomplete fields to allow fields to be render 
+   * (e.g. broken in firefox if no delay)
 	 */
 	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, function() {
-    setTimeout(initIncompleteFields, 500);
+    setTimeout(initIncompleteFields, 1000);
     })
   });
 
@@ -836,7 +838,7 @@ $(document).ready(function(){
     $(".button-container").each(function() {
       $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-    setTimeout('$("#iqFooterWrapper").show()', 1000);;
+    setTimeout('$("#iqFooterWrapper").show()', 2000);;
   });
 {% endblock %}
 
