@@ -4,6 +4,7 @@ from flask import current_app, url_for
 import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+from string import Formatter
 
 from .assessment_status import AssessmentStatus  # avoid cycle
 from .app_text import MailResource
@@ -276,3 +277,15 @@ class DynamicDictLookup(MutableMapping):
 
     def __iter__(self):
         return iter(self.store)
+
+    def minimal_subdict(self, target):
+        """Return subdict including only keys referenced in target string
+
+        Passing a dictionary to `format` forces evaluation of every (key,
+        value) in the dict.  To avoid unnecessary lookups, this returns a
+        dict like object with only the keys referenced in the given string.
+
+        """
+        needed = [v[1] for v in Formatter().parse(target) if v[1]]
+        result = {k: self.store[k] for k in self.store if k in needed}
+        return result

@@ -111,7 +111,7 @@ class TestAppText(TestCase):
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",
-                    "bodykey1": "123",
+                    "bodykey1": u'\u2713',
                     "bodykey2": "456",
                     "footerkey": "foot"}
         tmr = MailResource(None, variables=testvars)
@@ -128,6 +128,7 @@ class TestAppText(TestCase):
         self.assertEquals(tmr.body.splitlines()[0].split()[-1], "456")
         self.assertEquals(tmr.body.splitlines()[1].split()[-1], "foot")
         self.assertEquals(set(tmr.variable_list), set(testvars.keys()))
+        self.assertTrue(testvars['bodykey1'] in tmr.body)
 
         # test footer optionality
         tmr._footer = None
