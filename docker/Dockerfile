@@ -34,13 +34,17 @@ RUN \
 
 ENV \
     RUN_USER="${RUN_USER:-www-data}" \
-    PROJECT_DIR="/opt/venvs/portal"
+    PROJECT_DIR="/opt/venvs/portal" \
+    BASH_ENV="/etc/profile.d/remap_envvars.sh"
 
 RUN \
     mkdir --parents "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/"
+    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/" && \
+    echo 'eval $("${PROJECT_DIR}/bin/remap_envvars.py")' > /etc/profile.d/remap_envvars.sh
+
 
 USER "${RUN_USER}"
+SHELL ["/bin/bash", "-c"]
 
 ENV \
     SERVER_NAME="${SERVER_NAME:-localhost}" \
@@ -52,7 +56,6 @@ ENV \
 EXPOSE "${PORT}"
 
 CMD \
-    eval $(remap_envvars.py) && \
     env && \
 
     wait-for-it \
