@@ -506,14 +506,14 @@ def initial_queries():
         current_app.logger.debug("POST initial_queries -> next_after_login")
         return next_after_login()
     elif len(Coredata().still_needed(user)) == 0:
-    	"""
-         also handle the situations that resulted from: 1. user refreshing the browser or
-         2. exiting browser and resuming session thereafter
-         In both cases, the request method is GET, hence a redirect back to initial-queries page
-         won't ever reach the above check for next_after_login based on the request method of POST
-    	"""
-        # NB: user needs to have provided consent before we can make for check for next_after_login
-        # case in point: user has pre-selected clinic via access code BUT has not provided consent yet
+        #also handle the situations that resulted from: 1. user refreshing the browser or
+        #2. exiting browser and resuming session thereafter
+        #In both cases, the request method is GET, 
+        #hence a redirect back to initial-queries page won't ever reach the above check 
+        #specifically for next_after_login based on the request method of POST
+        #NB: user needs to have provided consent before we can check for next_after_login
+        #case in point:
+        #user has pre-selected clinic via access code BUT has not provided consent yet
     	consented_user = UserConsent.query.filter(and_(UserConsent.deleted_id.is_(None),
                                                   UserConsent.expires > datetime.utcnow(),
                                                   UserConsent.user_id == user.id)).one_or_none()
