@@ -201,8 +201,20 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 @celery.task
 def send_queued_communications(job_id=None):
     "Look for communication objects ready to send"
-    send_messages()
-    update_current_job(job_id, 'send_queued_communications', status='success')
+    try:
+        before = datetime.now()
+        send_messages()
+        duration = datetime.now() - before
+        message = (
+            'Sent queued messages in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+    except Exception as exc:
+        message = ("Unexpected exception in `send_queued_communications` "
+                     "on {} : {}".format(job_id, exc))
+        logger.error(message)
+
+    update_current_job(job_id, 'send_queued_communications', status=message)
+    return message
 
 
 def send_messages():
