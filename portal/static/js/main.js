@@ -2215,7 +2215,12 @@ var tnthAjax = {
         var stockConsentUrl = $("#stock_consent_url").val();
         var agreementUrl = "";
         if (hasValue(stockConsentUrl)) {
-            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent($("#" + orgId + "_org").attr("data-parent-name")));
+            var orgName = $("#" + orgId + "_org").attr("data-parent-name");
+            if (!hasValue(orgName)) {
+                var ol = OT.getOrgsList();
+                if (ol[orgId]) orgName = ol[orgId].name;
+            }
+            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent(orgName));
         };
         if (hasValue(agreementUrl)) {
             var params = CONSENT_ENUM["consented"];
