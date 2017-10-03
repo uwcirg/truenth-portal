@@ -7,13 +7,14 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-from sqlalchemy import and_
+from celery.utils.log import get_task_logger
 from datetime import datetime
 from flask import current_app
+import json
 from requests import Request, Session
 from requests.exceptions import RequestException
-from celery.utils.log import get_task_logger
-import json
+from sqlalchemy import and_
+from traceback import format_exc
 
 from .database import db
 from .dogpile import dogpile_cache
