@@ -1739,7 +1739,7 @@ OrgTool.prototype.handlePreSelectedClinic = function() {
             var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
             var userId = this.getUserId();
             if (!tnthAjax.hasConsent(userId, parentOrg)) {
-                var __modal = OT.getConsentModal();
+                var __modal = OT.getConsentModal(parentOrg);
                 if (__modal) {
                     ob.attr("data-require-validate", "true");
                      __modal.on("hidden.bs.modal", function() {
@@ -1775,7 +1775,7 @@ OrgTool.prototype.getConsentModal = function(parentOrg) {
         var __modal = $("#" + parentOrg + "_consentModal");
         if (__modal.length > 0) return __modal;
         else {
-            var __defaultModal = this.getDefaultModal(this.getSelectedOrg());
+            var __defaultModal = this.getDefaultModal(this.getSelectedOrg() || $("#userOrgs input[name='organization'][value='"+parentOrg+"']"));
             if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
             else return false;
         };

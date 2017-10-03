@@ -727,7 +727,7 @@
                       .prepend("<option value='' selected>Select</option>")
                       .val("");
                       $(".state-container, .clinic-prompt").hide();
-                      setTimeout(function() { OT.handlePreSelectedClinic();}, 200);
+                      setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
                       //case of pre-selected clinic, need to check if any clinic has prechecked
                       setTimeout(function() { handleCheckedItem();}, 500);
                       $("#userOrgs input[name='organization']").each(function() {
