@@ -406,7 +406,7 @@ FieldsChecker.prototype.getNext = function() {
     if (!found && !self.sectionCompleted(section)) {
        if (section == "orgsContainer") {
           if (hasValue(preselectClinic)) {
-              var __modal = OT.getConsentModal(preselectClinic);
+              var __modal = OT.getConsentModal();
               if (__modal) {
                 __modal.modal("show");
               };

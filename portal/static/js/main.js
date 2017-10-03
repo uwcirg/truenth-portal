@@ -1739,7 +1739,7 @@ OrgTool.prototype.handlePreSelectedClinic = function() {
             var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
             var userId = this.getUserId();
             if (!tnthAjax.hasConsent(userId, parentOrg)) {
-                var __modal = OT.getConsentModal(parentOrg);
+                var __modal = OT.getConsentModal();
                 if (__modal) {
                     ob.attr("data-require-validate", "true");
                      __modal.on("hidden.bs.modal", function() {
