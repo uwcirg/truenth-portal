@@ -122,6 +122,7 @@ def cache_reporting_stats(job_id=None):
         message = ("Unexpected exception in `cache_reporting_stats` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'cache_reporting_stats', status=message)
     return message
 
@@ -147,6 +148,7 @@ def cache_assessment_status(job_id=None):
         message = ("Unexpected exception in `cache_assessment_status` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'cache_assessment_status', status=message)
     return message
 
@@ -166,6 +168,7 @@ def prepare_communications(job_id=None):
         message = ("Unexpected exception in `prepare_communications` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'prepare_communications', status=message)
     return message
 
@@ -213,7 +216,7 @@ def send_queued_communications(job_id=None):
         message = ("Unexpected exception in `send_queued_communications` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
-
+        logger.error(format_exc())
     update_current_job(job_id, 'send_queued_communications', status=message)
     return message
 
