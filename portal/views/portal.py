@@ -492,14 +492,12 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 def initial_queries():
     """Initial consent terms, initial queries view function"""
     user = current_user()
-   
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
         return redirect(url_for('portal.landing'))
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-     
     if request.method == 'POST':
         """
          data submission all handled via ajax calls from initial_queries
@@ -509,8 +507,7 @@ def initial_queries():
         return next_after_login()
     elif len(Coredata().still_needed(user)) == 0:
     	"""
-		 also handle the situations that resulted from :
-         1. user refreshing the browser or 
+		 also handle the situations that resulted from: 1. user refreshing the browser or 
          2. exiting browser and resuming session thereafter
          In both cases, the request method is GET, hence a redirect back to initial-queries page
          won't ever reach the above check for next_after_login based on the request method of POST
@@ -518,9 +515,9 @@ def initial_queries():
         # NB: user needs to have provided consent before we can make for check for next_after_login
         # case in point: user has pre-selected clinic via access code BUT has not provided consent yet
     	consented_user = UserConsent.query.filter(and_(
-                          UserConsent.deleted_id.is_(None),
-                          UserConsent.expires > datetime.utcnow(),
-                          UserConsent.user_id == user.id)).one_or_none()
+                        UserConsent.deleted_id.is_(None),
+                        UserConsent.expires > datetime.utcnow(),
+                        UserConsent.user_id == user.id)).one_or_none()
     	if consented_user:
     	 	current_app.logger.debug("GET initial_queries -> next_after_login")
         	return next_after_login()
