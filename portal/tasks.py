@@ -214,7 +214,7 @@ def send_queued_communications(job_id=None):
         current_app.logger.debug(message)
     except Exception as exc:
         message = ("Unexpected exception in `send_queued_communications` "
-                     "on {} : {}".format(job_id, exc))
+                   "on {} : {}".format(job_id, exc))
         logger.error(message)
         logger.error(format_exc())
     update_current_job(job_id, 'send_queued_communications', status=message)
