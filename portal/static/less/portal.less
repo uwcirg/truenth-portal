@@ -14,12 +14,12 @@
 }
 @baseFontSize:    16px;
 @baseMobileFontSize:  14px;
-@headlineSize:    1.25em;
-@subheadSize:     1.20em;
-@subSmallHeadSize: 1.08em;
+@headlineSize:    1.30em;
+@subheadSize:     1.25em;
+@subSmallHeadSize: 1.10em;
 @lgFontSize:      1.6em;
 @lgHeadlineSize:  1.35em;
-@lgsubheadSize:   1.25em;
+@lgsubheadSize:   1.30em;
 @smallText:       0.90em;
 @mediumText:      0.95em;
 @smallerText:     0.85em;
@@ -707,6 +707,7 @@ div.pull-right {
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
+    vertical-align: middle;
   }
   td.reports-field {
     width: 150px;
@@ -2458,7 +2459,7 @@ div.timezone-warning.text-warning {
     font-size: @headlineSize;
   }
   h3, h4, h5 {
-    font-size: 1.1em;
+    font-size: 1.15em;
   }
   legend {
     font-size: 0.95em;
@@ -2495,7 +2496,7 @@ div.timezone-warning.text-warning {
     height: 62px;
   }
 
-  #loginForm input[type=submit], 
+  #loginForm input[type=submit],
   #regForm input[type=submit] {
     padding: 1.4em 1.95em;
   }
@@ -2537,6 +2538,14 @@ div.timezone-warning.text-warning {
   }
   .search .form-control {
     height: 3em;
+  }
+
+  #adminTable {
+    TH.id-field {
+      div.th-inner {
+        padding-top: 4px;
+      }
+    }
   }
 
   #adminTableToolbar {
