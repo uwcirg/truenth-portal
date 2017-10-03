@@ -98,3 +98,11 @@ class RelativeDelta(relativedelta):
         """Simply try to bring one to life - or raise ValueError"""
         RelativeDelta(paramstring)
         return None
+
+
+def localize_datetime(dt, user):
+    if dt and user and user.timezone:
+        local = pytz.utc.localize(dt)
+        tz = pytz.timezone(user.timezone)
+        return local.astimezone(tz)
+    return dt
