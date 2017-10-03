@@ -3,6 +3,11 @@ version: "3.2"
 services:
   web:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     env_file:
@@ -26,9 +31,12 @@ services:
   celery:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     command: bash -c '
-      eval $$("${PROJECT_DIR:-/opt/venvs/portal}/bin/remap_envvars.py") &&
+      eval $$(remap_envvars.py) &&
       env &&
-      celery worker --app portal.celery_worker.celery --loglevel=info'
+      celery worker
+        --app portal.celery_worker.celery
+        --loglevel debug
+      '
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
@@ -40,9 +48,14 @@ services:
   celerybeat:
     image: "${REPO:-uwcirg-portal-docker.jfrog.io/}${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     command: bash -c '
-      eval $$("${PROJECT_DIR:-/opt/venvs/portal}/bin/remap_envvars.py") &&
+      eval $$(remap_envvars.py) &&
       env &&
-      celery worker --app portal.celery_worker.celery --beat --schedule=/tmp/celerybeat-schedule --loglevel=info'
+      celery beat
+        --app portal.celery_worker.celery
+        --schedule=/tmp/celerybeat-schedule.db
+        --loglevel debug
+        --pidfile=/tmp/celerybeat.pid
+      '
     environment:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
