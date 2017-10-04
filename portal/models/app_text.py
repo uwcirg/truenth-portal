@@ -480,7 +480,11 @@ class MailResource(object):
         """Return subject if available else error message"""
         if self._subject:
             try:
-                formatted = str(self._subject).format(**self.variables)
+                if hasattr(self.variables, 'minimal_subdict'):
+                    formatted = unicode(self._subject).format(
+                        **self.variables.minimal_subdict(self._subject))
+                else:
+                    formatted = unicode(self._subject).format(**self.variables)
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing subject variable {}".format(e)
@@ -494,7 +498,11 @@ class MailResource(object):
         """Return body if available else error message"""
         if self._body:
             try:
-                formatted = str(self._body).format(**self.variables)
+                if hasattr(self.variables, 'minimal_subdict'):
+                    formatted = unicode(self._body).format(
+                        **self.variables.minimal_subdict(self._body))
+                else:
+                    formatted = unicode(self._body).format(**self.variables)
                 if self._footer:
                     formatted += "\n"
                     formatted += self.footer
@@ -511,7 +519,11 @@ class MailResource(object):
         """Return optional footer if available"""
         if self._footer:
             try:
-                formatted = str(self._footer).format(**self.variables)
+                if hasattr(self.variables, 'minimal_subdict'):
+                    formatted = unicode(self._footer).format(
+                        **self.variables.minimal_subdict(self._footer))
+                else:
+                    formatted = unicode(self._footer).format(**self.variables)
                 return formatted
             except KeyError, e:
                 self.error_msg = "Missing footer variable {}".format(e)

@@ -377,7 +377,7 @@
                             {#- javascript variables are not available at template
                                rendering time.  insert a placeholder and then
                                replace once the variable is available. -#}
-                            body = '{{ invite_email.body.encode("string-escape") | safe}}';
+                            body = '{{ invite_email.body.encode("unicode-escape") | safe}}';
                             body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
                             subject = '{{ invite_email.subject }}';
                         };

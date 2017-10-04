@@ -59,11 +59,40 @@ class TestCommunication(TestQuestionnaireSetup):
         dd['b'] = 'bbb'
         self.assertEquals(dd['a'], 'zzz')
         self.assertEquals(dd['b'], 'bbb')
+        target = 'a {a} and b {b}'.format(**dd)
+        self.assertTrue(dd['a'] in target)
+        self.assertTrue(dd['b'] in target)
 
     def test_dd_no_key(self):
         dd = DynamicDictLookup()
         with self.assertRaises(KeyError):
             dd['a']
+
+    def test_unicode(self):
+        dd = DynamicDictLookup()
+        dd['u'] = u'\u2713'
+        target = u'works {u}'
+        result = target.format(**dd)
+        self.assertTrue(u'\u2713' in result)
+
+    def test_dd_no_extra_calls(self):
+        def bad():
+            raise ValueError("shouldn't call me")
+
+        def good():
+            return 'good results'
+
+        dd = DynamicDictLookup()
+        dd['bad'] = bad
+        dd['good'] = good
+
+        ok = "string with just the {good} reference"
+        # format forces __get_item__ on all key/values by default
+        with self.assertRaises(ValueError):
+            ok.format(**dd)
+
+        # using minimal_subdict, should fly
+        self.assertTrue('good results' in ok.format(**dd.minimal_subdict(ok)))
 
     def test_template_org(self):
         self.bless_with_basics()
