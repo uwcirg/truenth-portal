@@ -20,8 +20,8 @@ from portal.models.fhir import QuestionnaireResponse
 from tests import TestCase, TEST_USER_ID
 
 
-def mock_qr(user_id, instrument_id, status='completed'):
-    today = datetime.utcnow()
+def mock_qr(user_id, instrument_id, status='completed', timestamp=None):
+    timestamp = timestamp or datetime.utcnow()
     qr_document = {
         "questionnaire": {
             "display": "Additional questions",
@@ -31,7 +31,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
         }
     }
     enc = Encounter(status='planned', auth_method='url_authenticated',
-                    user_id=TEST_USER_ID, start_time=datetime.utcnow())
+                    user_id=TEST_USER_ID, start_time=timestamp)
     with SessionScope(db):
         db.session.add(enc)
         db.session.commit()
@@ -39,7 +39,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
     qr = QuestionnaireResponse(
         subject_id=TEST_USER_ID,
         status=status,
-        authored=today,
+        authored=timestamp,
         document=qr_document,
         encounter_id=enc.id)
     with SessionScope(db):

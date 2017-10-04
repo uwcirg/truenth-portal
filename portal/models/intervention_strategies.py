@@ -22,6 +22,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..database import db
+from ..date_tools import localize_datetime
 from .fhir import CC, Coding, CodeableConcept
 from .identifier import Identifier
 from .intervention import Intervention, INTERVENTION, UserIntervention
@@ -263,7 +264,8 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                due_date = assessment_status.next_available_due_date()
+                utc_due_date = assessment_status.next_available_due_date()
+                due_date = localize_datetime(utc_due_date, user)
                 assert due_date
                 greeting = _("Hi {}").format(user.display_name)
                 reminder = _(
@@ -337,10 +339,11 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status == "Completed":
                 header = _("Completed Questionnaires")
+                utc_comp_date = assessment_status.completed_date
+                comp_date = localize_datetime(utc_comp_date, user)
                 message = _(
                     "View questionnaire completed on {}").format(
-                        assessment_status.completed_date.strftime(
-                            '%-d %b %Y'))
+                        comp_date.strftime('%-d %b %Y'))
                 return completed_html.format(
                     header=header, message=message,
                     recent_survey_link=url_for(
