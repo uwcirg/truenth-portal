@@ -7,13 +7,14 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-from sqlalchemy import and_
+from celery.utils.log import get_task_logger
 from datetime import datetime
 from flask import current_app
+import json
 from requests import Request, Session
 from requests.exceptions import RequestException
-from celery.utils.log import get_task_logger
-import json
+from sqlalchemy import and_
+from traceback import format_exc
 
 from .database import db
 from .dogpile import dogpile_cache
@@ -121,6 +122,7 @@ def cache_reporting_stats(job_id=None):
         message = ("Unexpected exception in `cache_reporting_stats` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'cache_reporting_stats', status=message)
     return message
 
@@ -146,6 +148,7 @@ def cache_assessment_status(job_id=None):
         message = ("Unexpected exception in `cache_assessment_status` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'cache_assessment_status', status=message)
     return message
 
@@ -165,6 +168,7 @@ def prepare_communications(job_id=None):
         message = ("Unexpected exception in `prepare_communications` "
                      "on {} : {}".format(job_id, exc))
         logger.error(message)
+        logger.error(format_exc())
     update_current_job(job_id, 'prepare_communications', status=message)
     return message
 
@@ -201,8 +205,20 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 @celery.task
 def send_queued_communications(job_id=None):
     "Look for communication objects ready to send"
-    send_messages()
-    update_current_job(job_id, 'send_queued_communications', status='success')
+    try:
+        before = datetime.now()
+        send_messages()
+        duration = datetime.now() - before
+        message = (
+            'Sent queued messages in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+    except Exception as exc:
+        message = ("Unexpected exception in `send_queued_communications` "
+                   "on {} : {}".format(job_id, exc))
+        logger.error(message)
+        logger.error(format_exc())
+    update_current_job(job_id, 'send_queued_communications', status=message)
+    return message
 
 
 def send_messages():
