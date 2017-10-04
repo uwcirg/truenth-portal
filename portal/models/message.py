@@ -70,7 +70,7 @@ class EmailMessage(db.Model):
         for element in restricted:
             if element in lower_body:
                 raise ValueError(
-                    "Unexpected element '{}' found in email body".format(
+                    u"Unexpected element '{}' found in email body".format(
                         element))
         return u'{header}{body}{footer}'.format(
             header=EMAIL_HEADER, body=body, footer=EMAIL_FOOTER)
@@ -91,11 +91,11 @@ class EmailMessage(db.Model):
         subject_id = subject.id if subject else self.user_id
 
         if user_id and subject_id:
-            audit_msg = ("EmailMessage '{0.subject}' sent to "
+            audit_msg = (u"EmailMessage '{0.subject}' sent to "
                          "{0.recipients} from {0.sender}".format(self))
             auditable_event(message=audit_msg, user_id=user_id,
                             subject_id=subject_id, context="user")
 
     def __str__(self):
-        return "EmailMessage subj:{} sent_at:{}".format(self.subject,
-                                                        self.sent_at)
+        return "EmailMessage subj:{} sent_at:{}".format(
+            self.subject, self.sent_at)
