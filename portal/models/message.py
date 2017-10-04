@@ -21,7 +21,7 @@ email_dispatched.connect(log_message)
 
 
 EMAIL_HEADER = (
-    "<!DOCTYPE html>"
+    u"<!DOCTYPE html>"
     "<html><head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
@@ -47,7 +47,7 @@ EMAIL_HEADER = (
     " background-color: #576e76;"
     "}"
     "</style></head><body>")
-EMAIL_FOOTER = "</body></html>"
+EMAIL_FOOTER = u"</body></html>"
 
 
 class EmailMessage(db.Model):
@@ -65,14 +65,14 @@ class EmailMessage(db.Model):
     def style_message(self, body):
         """Implicitly called on send, to wrap body with style tags"""
         # Catch duplicate styling attempts
-        restricted = ('doctype', 'html', 'head', 'body')
+        restricted = (u'doctype', u'html', u'head', u'body')
         lower_body = body.lower()
         for element in restricted:
             if element in lower_body:
                 raise ValueError(
                     "Unexpected element '{}' found in email body".format(
                         element))
-        return '{header}{body}{footer}'.format(
+        return u'{header}{body}{footer}'.format(
             header=EMAIL_HEADER, body=body, footer=EMAIL_FOOTER)
 
     def send_message(self):

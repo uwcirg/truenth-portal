@@ -155,10 +155,15 @@ class TestPortal(TestCase):
                 "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
-                body='Welcome to testing', sent_at=sent_at,
+                body=u'Welcome to testing \u2713', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
+
+        # confirm styling unicode functions
+        body = message.style_message(message.body)
+        self.assertTrue(u'DOCTYPE' in body)
+        self.assertTrue(isinstance(body, unicode))
 
         self.login()
         rv = self.client.get('/invite/{0}'.format(message.id))
