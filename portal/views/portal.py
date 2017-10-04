@@ -510,15 +510,8 @@ def initial_queries():
         # In both cases, the request method is GET, 
         # hence a redirect back to initial-queries page won't ever reach the above check 
         # specifically for next_after_login based on the request method of POST
-        # NB: user needs to have provided consent before we can check for next_after_login
-        # case in point:
-        # user has pre-selected clinic via access code BUT has not provided consent yet
-    	consented_user = UserConsent.query.filter(and_(UserConsent.deleted_id.is_(None),
-                                                    UserConsent.expires > datetime.utcnow(),
-                                                    UserConsent.user_id == user.id)).one_or_none()
-    	if consented_user:
-            current_app.logger.debug("GET initial_queries -> next_after_login")
-            return next_after_login()
+        current_app.logger.debug("GET initial_queries -> next_after_login")
+        return next_after_login()
 
     terms, consent_agreements = None, {}
     org = user.first_top_organization()

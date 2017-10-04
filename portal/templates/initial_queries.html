@@ -509,7 +509,8 @@ $(document).ready(function(){
    * (e.g. broken in firefox if no delay)
 	 */
 	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, function() {
-    setTimeout(initIncompleteFields, 1000);
+    var to = (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) ? 1000: 500;  
+    setTimeout(initIncompleteFields, to);
     })
   });
 

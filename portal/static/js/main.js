@@ -1141,30 +1141,38 @@ var assembleContent = {
 
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        if ($("#userOrgs input[name='organization']").length > 0) {
-            var orgIDs;
-            orgIDs = $("#userOrgs input[name='organization']").map(function(){
-                if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
-            }).get();
+        if (typeof preselectClinic != "undefined" && hasValue(preselectClinic)) {
+            var ol = OT.getOrgsList();
+            if (ol[preselectClinic] && hasValue(ol[preselectClinic].parentOrgId)) parentOrg = ol[preselectClinic].parentOrgId;
+            else parentOrg = preselectClinic;
+            if (tnthAjax.hasConsent(userId, parentOrg))  demoArray["careProvider"] = [{ reference: "api/organization/"+preselectClinic }];
+        } else {
 
-            if (orgIDs) {
-                if (orgIDs.length > 0) {
-                    demoArray["careProvider"] = orgIDs;
+            if ($("#userOrgs input[name='organization']").length > 0) {
+                var orgIDs;
+                orgIDs = $("#userOrgs input[name='organization']").map(function(){
+                    if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
+                }).get();
+
+                if (orgIDs) {
+                    if (orgIDs.length > 0) {
+                        demoArray["careProvider"] = orgIDs;
+                    };
                 };
+
             };
 
-        };
-
-        /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
-        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
-        if (topLevelOrgs.length > 0)  {
-            topLevelOrgs.each(function() {
-                var tOrg = $(this).attr("orgid");
-                if (hasValue(tOrg)) {
-                    if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
-                    demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
-                };
-            });
+            /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+            var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+            if (topLevelOrgs.length > 0)  {
+                topLevelOrgs.each(function() {
+                    var tOrg = $(this).attr("orgid");
+                    if (hasValue(tOrg)) {
+                        if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
+                        demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
+                    };
+                });
+            };
         };
 
 
