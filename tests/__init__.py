@@ -184,11 +184,14 @@ class TestCase(Base):
             db.session.add(consent)
             db.session.commit()
 
-    def bless_with_basics(self, backdate=None):
+    def bless_with_basics(self, backdate=None, setdate=None):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
           happening said period in the past
+
+        :param setdate: datetime value.  Define to mock consents
+          happening at exact time in the past
 
         """
         self.test_user = db.session.merge(self.test_user)
@@ -203,7 +206,9 @@ class TestCase(Base):
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        if backdate:
+        if setdate:
+            audit.timestamp = setdate
+        elif backdate:
             audit.timestamp = datetime.utcnow() - backdate
         tou = ToU(audit=audit, agreement_url='http://not.really.org',
                   type='website terms of use')

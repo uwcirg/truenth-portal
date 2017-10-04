@@ -9,6 +9,7 @@ from .assessment_status import AssessmentStatus  # avoid cycle
 from .app_text import MailResource
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import localize_datetime
 from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
@@ -127,7 +128,8 @@ def load_template_args(user, questionnaire_bank_id=None):
         trigger_date = qb.trigger_date(user)
         due = (qb.calculated_overdue(trigger_date) or
                qb.calculated_expiry(trigger_date))
-        return due.strftime('%-d %b %Y') if due else ''
+        due_date = localize_datetime(due, user)
+        return due_date.strftime('%-d %b %Y') if due_date else ''
 
     def _lookup_registrationlink():
         return 'url_placeholder'
