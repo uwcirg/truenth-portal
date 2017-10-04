@@ -69,10 +69,3 @@ flask sync
 
 echo "Updating package metadata"
 python setup.py egg_info --quiet
-
-# Restart apache if application is served by apache
-if [ "${GIT_WORK_TREE}" == "/srv/www/"* ]; then
-    echo "Restarting services"
-    sudo service apache2 restart
-    sudo service celeryd restart
-fi
