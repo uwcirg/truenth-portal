@@ -12,6 +12,8 @@ Docker is an open-source project that automates the deployment of applications i
 
 Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
 
+Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
+
 Getting Started
 ===============
 Install `docker-compose` as per environment.  For example, from a debian system::
@@ -30,31 +32,37 @@ Download and run the generated images::
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
-Containers
-==========
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
 
-Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a Debian package from the portal codebase and how to install and configure the package into a working Shared Services instance.
+    IMAGE_TAG='stable'
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
+
+
+Docker Images
+=============
+
+Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build docker images capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
 
 Building a Debian Package
 -------------------------
 
-To build a Debian package from your current ``develop``::
+To build a Debian package from your local ``develop`` branch::
 
     # Build debian package from local develop branch
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
-
 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
 If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
 
-    # Override defaults with environmental variables
-    BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
-    # Override default docker repo to differentiate locally-built images
-    REPO='local'
+    # Override defaults with environmental variables
+    BRANCH='feature/feature-branch-name'
+    GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
 
     # Run the container (override defaults)
     docker-compose run builder
@@ -62,34 +70,19 @@ If you would like to create a package from a topic branch or fork you can overri
 .. note::
     The branch specified must exist on Github
 
-Orchestration
--------------
-Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
+Building a Shared Services Docker Image
+---------------------------------------
 
-Docker-compose offers a higher-level interface to build and run containers together but may be supplanted by Docker stacks in the future.
-
-To download and start the set of containers that comprise Shared Services issue the following command::
-
-    # Download and start web container and dependencies
-    COMPOSE_FILE='docker/docker-compose.yaml'
-    docker-compose up web
-
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
-
-    IMAGE_TAG='stable'
-    COMPOSE_FILE='docker/docker-compose.yaml'
-    docker-compose up web
 
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
-    # Override default docker repo to differentiate locally-built images
+    # Override default (Artifactory) docker repo to differentiate locally-built images
     REPO='local'
 
     # Build the "web" service locally
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose build web
 
-    # Disable remote repo so locally-built image is used
     docker-compose up web
 
 PostgreSQL Access
