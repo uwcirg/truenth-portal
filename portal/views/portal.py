@@ -507,8 +507,8 @@ def initial_queries():
     elif len(Coredata().still_needed(user)) == 0:
         # also handle the situations that resulted from: 1. user refreshing the browser or
         # 2. exiting browser and resuming session thereafter
-        # In both cases, the request method is GET, 
-        # hence a redirect back to initial-queries page won't ever reach the above check 
+        # In both cases, the request method is GET,
+        # hence a redirect back to initial-queries page won't ever reach the above check
         # specifically for next_after_login based on the request method of POST
         current_app.logger.debug("GET initial_queries -> next_after_login")
         return next_after_login()
