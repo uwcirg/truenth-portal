@@ -291,7 +291,7 @@ class UnversionedResource(object):
         self.url = url
         self.variables = variables or {}
         if asset:
-            self._asset = asset
+            self._asset = unicode(asset)
         else:
             try:
                 response = time_request(url)
