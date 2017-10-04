@@ -13,7 +13,7 @@ import sys
 import logging
 from flask import current_app
 
-from .database  import db
+from .database import db
 from .models.audit import Audit
 
 # special log level for auditable events
@@ -31,7 +31,8 @@ def auditable_event(message, user_id, subject_id, context="other"):
     subject_id: The user id upon which the action was performed
 
     """
-    text = "performed by {0} on {1}: {2}: {3}".format(user_id, subject_id, context, message)
+    text = u"performed by {0} on {1}: {2}: {3}".format(
+        user_id, subject_id, context, message)
     current_app.logger.log(AUDIT, text)
 
     with db.session.no_autoflush:
