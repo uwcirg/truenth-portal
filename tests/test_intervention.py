@@ -1,4 +1,5 @@
 """Unit test module for Intervention API"""
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
@@ -398,16 +399,27 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
+        dt = datetime(2017, 06, 10, 20, 00, 00, 000000)
         # Add a fake assessments and see a change
         for i in metastatic_baseline_instruments:
-            mock_qr(user_id=TEST_USER_ID, instrument_id=i)
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+            mock_qr(user_id=TEST_USER_ID, instrument_id=i, timestamp=dt)
+        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog', timestamp=dt)
 
         user, ae = map(db.session.merge, (self.test_user, ae))
-        self.assertTrue(
-            "Thank you" in ae.display_for_user(user).card_html)
 
+        card_html = ae.display_for_user(user).card_html
+        self.assertTrue("Thank you" in card_html)
         self.assertTrue(ae.quick_access_check(user))
+
+        # test datetime display based on user timezone
+        self.assertTrue("10 Jun 2017" in card_html)
+        user.timezone = "Asia/Tokyo"
+        with SessionScope(db):
+            db.session.add(user)
+            db.session.commit()
+        user, ae = map(db.session.merge, (self.test_user, ae))
+        card_html = ae.display_for_user(user).card_html
+        self.assertTrue("11 Jun 2017" in card_html)
 
     def test_expired(self):
         """If baseline expired check message"""
