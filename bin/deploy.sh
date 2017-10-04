@@ -15,12 +15,11 @@ USAGE
 
 update_repo(){
     echo "Updating repository"
-    branch_name=$(git symbolic-ref -q HEAD)
 
     git fetch origin
     git fetch --tags
 
-    if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
+    if [[ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]]; then
         git checkout "$BRANCH"
     fi
 
