@@ -13,3 +13,8 @@ class TestDateTools(TestCase):
         # feb + 3 = may; 15 - 14 = 1
         expected = datetime.strptime('May 1 2016', '%b %d %Y')
         self.assertEquals(feb_15_leap_year + rd, expected)
+
+        # singular param raises error
+        d = {'month': 5}
+        with self.assertRaises(ValueError):
+            rd = RelativeDelta(json.dumps(d))
