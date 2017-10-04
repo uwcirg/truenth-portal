@@ -606,6 +606,7 @@ $(document).ready(function(){
                   //var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
+                if (fc.sectionCompleted("clinicalContainer")) return false;
             };
 
             thisItem.parents(".pat-q").next().fadeIn();

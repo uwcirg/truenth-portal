@@ -702,7 +702,7 @@ var fillContent = {
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">' + i18next.t("Close", {"": "Close"}) + '</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close", {"": "Close"}) + '</button>'
                             + '</div>'
                             + '</div></div></div>';
 

@@ -12,6 +12,7 @@
     font-weight: normal;
     font-style: normal;
 }
+
 @baseFontSize:    16px;
 @baseMobileFontSize:  14px;
 @headlineSize:    1.30em;
@@ -104,6 +105,7 @@ body {
   font-family: @bodyFontFamily;
   color: @baseColor;
   font-size: @baseMobileFontSize;
+  text-rendering: optimizeLegibility;
 }
 .form-control,
 input,
@@ -2086,17 +2088,17 @@ div.noOrg-container {
 }
 .modal-body {
   padding: 2em 2.5em;
-  font-size: @baseFontSize;
+  font-size: @baseMobileFontSize;
 }
 .modal-title {
   font-weight: normal;
-  font-size: @modalTitleSize;
+  font-size: @baseFontSize;
 }
 .modal-footer {
   padding: 0.75em;
 }
 .modal-header {
-  font-size: @modalHeaderSize;
+  font-size: @baseMobileFontSize;
   min-height: 3em;
 }
 .modal-header button,
@@ -2104,11 +2106,11 @@ div.noOrg-container {
   color: #FFF;
 }
 .modal label {
-  font-size: @modalLabelSize;
+  font-size: @baseMobileFontSize;
 }
 .modal button,
 .modal a.btn {
-  font-size: @modalButtonSize;
+  font-size: @baseMobileFontSize;
 }
 .hide {
   display: none;
@@ -2506,6 +2508,22 @@ div.timezone-warning.text-warning {
     font-size: @formSize;
   }
 
+  .modal-body {
+  font-size: @baseFontSize;
+  }
+  .modal-title {
+    font-size: @modalTitleSize;
+  }
+  .modal-header {
+    font-size: @modalHeaderSize;
+  }
+  .modal label {
+    font-size: @modalLabelSize;
+  }
+  .modal button,
+  .modal a.btn {
+    font-size: @modalButtonSize;
+  }
   .checkbox input[type=checkbox] {
     top: -1px;
   }

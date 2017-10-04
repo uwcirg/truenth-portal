@@ -102,6 +102,7 @@ body {
   font-family: @bodyFontFamily;
   color: @baseColor;
   font-size: @baseMobileFontSize;
+  text-rendering: optimizeLegibility;
 }
 
 .form-control,
@@ -2093,28 +2094,28 @@ input.clinic {
   color: #FFF;
 }
 .modal-body {
-  font-size: @modalBodySize;
+  font-size: @baseMobileFontSize;
   padding: 2em 2.5em;
 }
 .modal-title {
   font-weight: normal;
-  font-size: @modalTitleSize;
+  font-size: @baseFontSize;
 }
 .modal-footer {
   padding: 0.9em;
 }
 .modal-header {
-  font-size: @modalHeaderSize;
+  font-size: @baseMobileFontSize;
   min-height: 3em;
   height: 3.2em;
 }
 .modal-header button,
 .modal-header button * {
   color: #FFF;
-  font-size: @modalButtonSize;
+  font-size: @baseMobileFontSize;
 }
 .modal label {
-  font-size: @modalLabelSize;
+  font-size: @baseMobileFontSize;
 }
 
 .modal button,
@@ -2482,6 +2483,23 @@ div.timezone-warning.text-warning {
   .btn-tnth-primary,
   a.btn {
     font-size: @btnSize;
+  }
+
+  .modal-body {
+  font-size: @baseFontSize;
+  }
+  .modal-title {
+    font-size: @modalTitleSize;
+  }
+  .modal-header {
+    font-size: @modalHeaderSize;
+  }
+  .modal label {
+    font-size: @modalLabelSize;
+  }
+  .modal button,
+  .modal a.btn {
+    font-size: @modalButtonSize;
   }
 
   #socialMediaRegistrationContainer .btn-social,
