@@ -40,7 +40,7 @@ repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 while getopts ":b:p:" option; do
     case "${option}" in
         b)
-            BRANCH=${OPTARG}
+            branch=${OPTARG}
             ;;
         p)
             repo_path=${OPTARG}
@@ -61,14 +61,8 @@ export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
-if [[ -z "$BRANCH" ]]; then
-    BRANCH="develop"
-
-    # Use master branch on production
-    if [[ "${GIT_WORK_TREE}" == "/srv/www/us.truenth.org"* ]]; then
-        BRANCH="master"
-    fi
-fi
+# Assign branch in the following precedence: $BRANCH, $branch, "develop"
+BRANCH=${BRANCH:-${branch:-develop}}
 
 update_repo
 activate_once
