@@ -702,7 +702,7 @@ var fillContent = {
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">' + i18next.t("Close", {"": "Close"}) + '</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close", {"": "Close"}) + '</button>'
                             + '</div>'
                             + '</div></div></div>';
 
@@ -1840,13 +1840,17 @@ OrgTool.prototype.handleEvent = function() {
                     if (__modal.length > 0) __modal.modal("show");
                     else {
                         tnthAjax.setDefaultConsent(userId, parentOrg);
-                        assembleContent.demo(userId,true, $(this), true);
+                        setTimeout(function() {
+                            assembleContent.demo(userId,true, $(this), true);
+                        },500);
                     };
                 };
             }
             else {
-                assembleContent.demo(userId,true, $(this), true);
                 tnthAjax.handleConsent($(this));
+                setTimeout(function() {
+                    assembleContent.demo(userId,true, $(this), true);
+                }, 500);
                 if (typeof reloadConsentList != "undefined") reloadConsentList();
             };
             if ($("#locale").length > 0) {
@@ -2340,14 +2344,13 @@ var tnthAjax = {
                     d = d.sort(function(a,b){
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
-                    item = d[0];
+                    var item = d[0];
                     expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     if (item.deleted) found = true;
                     if (expired > 0) found = true;
                     if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
                     if (!found) {
                         if (orgId == item.organization_id) {
-                            //console.log("consented orgid: " + orgId)
                             switch(filterStatus) {
                                 case "suspended":
                                     if (suspended) found = true;
@@ -2373,7 +2376,6 @@ var tnthAjax = {
         }).fail(function() {
             return false;
          });
-        //console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     },
     removeObsoleteConsent: function() {
