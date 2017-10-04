@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 cmdname=$(basename $0)
 
@@ -19,20 +19,11 @@ update_repo(){
     git fetch origin
     git fetch --tags
 
-    if [[ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]]; then
+    if [ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
         git checkout "$BRANCH"
     fi
 
-
     git pull origin "$BRANCH"
-}
-
-# Prevent reading virtualenv environmental variables multiple times
-activate_once(){
-    if [[ $(which python) != "${GIT_WORK_TREE}"* ]]; then
-        echo "Activating virtualenv"
-        source "${GIT_WORK_TREE}/env/bin/activate"
-    fi
 }
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
@@ -65,7 +56,9 @@ export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 BRANCH=${BRANCH:-${branch:-develop}}
 
 update_repo
-activate_once
+
+echo "Activating virtualenv"
+. "${GIT_WORK_TREE}/env/bin/activate"
 
 echo "Updating python dependancies"
 cd "${GIT_WORK_TREE}"
@@ -78,7 +71,7 @@ echo "Updating package metadata"
 python setup.py egg_info --quiet
 
 # Restart apache if application is served by apache
-if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
+if [ "${GIT_WORK_TREE}" == "/srv/www/"* ]; then
     echo "Restarting services"
     sudo service apache2 restart
     sudo service celeryd restart
