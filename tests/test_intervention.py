@@ -399,7 +399,7 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
-        dt = datetime(2017, 06, 10, 20, 00, 00, 000000)
+        dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         # Add a fake assessments and see a change
         for i in metastatic_baseline_instruments:
             mock_qr(user_id=TEST_USER_ID, instrument_id=i, timestamp=dt)

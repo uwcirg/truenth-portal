@@ -114,7 +114,7 @@ class TestCommunication(TestQuestionnaireSetup):
         qb_id = qb.id
 
         # with no timezone
-        dt = datetime(2017, 06, 10, 20, 00, 00, 000000)
+        dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         self.bless_with_basics(setdate=dt)
         self.promote_user(role_name=ROLE.PATIENT)
         user = db.session.merge(self.test_user)
