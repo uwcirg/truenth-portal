@@ -1005,7 +1005,7 @@ var fillContent = {
                 contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(" + i18next.t("data entered by ") + creator + i18next.t(" on ") + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
-                } 
+                }
             } else {
                 /*
                  *  for entries marked as other procedure.  These are rendered as hidden fields and can be referenced when these entries are deleted.
@@ -1846,8 +1846,8 @@ OrgTool.prototype.handleEvent = function() {
             }
             else {
                 assembleContent.demo(userId,true, $(this), true);
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
                 tnthAjax.handleConsent($(this));
+                if (typeof reloadConsentList != "undefined") reloadConsentList();
             };
             if ($("#locale").length > 0) {
                 tnthAjax.getLocale(userId);
@@ -2303,7 +2303,9 @@ var tnthAjax = {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
                         expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
-                            if (orgId == "all") consentedOrgIds.push(item.organization_id);
+                            if (orgId == "all") {
+                                consentedOrgIds.push(item.organization_id);
+                            }
                             else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
                     });
@@ -2404,8 +2406,11 @@ var tnthAjax = {
                             var params = CONSENT_ENUM["consented"];
                             params.org = cto ? parentOrg : orgId;
                             params.agreementUrl = agreementUrl;
-                            setTimeout("tnthAjax.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
-                            setTimeout("tnthAjax.removeObsoleteConsent();", 200);
+                            setTimeout(function() {
+                                tnthAjax.setConsent($('#fillOrgs').attr('userId'),params, 'all', true, function() {
+                                    tnthAjax.removeObsoleteConsent();
+                                });
+                            }, 350);
                         } else {
                             if (cto) {
                                 tnthAjax.setDefaultConsent(userId, parentOrg);
@@ -2414,33 +2419,50 @@ var tnthAjax = {
                     };
 
                 } else {
-                    var pOrg, prevOrg, currentOrg;
                     if (cto) {
                         var topLevelOrgs = OT.getTopLevelOrgs();
                         topLevelOrgs.forEach(function(i) {
-                            if (i != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": i}) + ");", 0);
+                            (function(orgId) {
+                                setTimeout(function() {
+                                    tnthAjax.deleteConsent($('#fillOrgs').attr('userId'), {"org": orgId});
+                                }, 350);
+                            })(i);
                         });
 
                     } else {
                         //delete all orgs
                         $("#userOrgs").find("input[name='organization']").each(function() {
-                            setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": $(this).val()}) + ");", 0);
+                            (function(orgId) {
+                                setTimeout(function() {
+                                    tnthAjax.deleteConsent($('#fillOrgs').attr('userId'),{"org": orgId});
+                                }, 350);
+                            })($(this).val());
                         });
                     };
                 };
             } else {
                 //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
                 if (cto) {
-                    var childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
+                    var childOrgs = [];
+                    if ($("#fillOrgs").attr("patient_view")) childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
+                    else childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
                     var allUnchecked = true;
                     childOrgs.each(function() {
                         if ($(this).prop("checked")) allUnchecked = false;
                     });
                     if (allUnchecked && childOrgs.length > 0) {
-                        if (parentOrg != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": parentOrg}) + ");", 0);
+                        (function(orgId) {
+                            setTimeout(function() {
+                                tnthAjax.deleteConsent($('#fillOrgs').attr('userId'),{"org": orgId});
+                            }, 350);
+                        })(parentOrg);
                     };
                 } else {
-                    setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": orgId}) + ");", 0);
+                    (function(orgId) {
+                        setTimeout(function() {
+                            tnthAjax.deleteConsent($('#fillOrgs').attr('userId'),{"org": orgId});
+                        }, 350);
+                    })(orgId);
                 };
             };
         });
