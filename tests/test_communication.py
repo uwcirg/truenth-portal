@@ -80,7 +80,7 @@ class TestCommunication(TestQuestionnaireSetup):
             raise ValueError("shouldn't call me")
 
         def good():
-            return 'good'
+            return 'good results'
 
         dd = DynamicDictLookup()
         dd['bad'] = bad
@@ -92,7 +92,7 @@ class TestCommunication(TestQuestionnaireSetup):
             ok.format(**dd)
 
         # using minimal_subdict, should fly
-        ok.format(**dd.minimal_subdict(ok))
+        self.assertTrue('good results' in ok.format(**dd.minimal_subdict(ok)))
 
     def test_template_org(self):
         self.bless_with_basics()

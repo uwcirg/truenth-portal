@@ -287,5 +287,8 @@ class DynamicDictLookup(MutableMapping):
 
         """
         needed = [v[1] for v in Formatter().parse(target) if v[1]]
-        result = {k: self.store[k] for k in self.store if k in needed}
+        result = DynamicDictLookup()
+        for key in self.store:
+            if key in needed:
+                result[key] = self.store[key]
         return result
