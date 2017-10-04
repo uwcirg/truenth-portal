@@ -499,8 +499,8 @@ def initial_queries():
         abort(400, "deleted user - operation not permitted")
     if request.method == 'POST':
         """
-         data submission all handled via ajax calls from initial_queries
-         template.  assume POST can only be sent when valid.
+        data submission all handled via ajax calls from initial_queries
+        template.  assume POST can only be sent when valid.
         """
         current_app.logger.debug("POST initial_queries -> next_after_login")
         return next_after_login()
