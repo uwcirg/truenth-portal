@@ -21,11 +21,11 @@ update_repo(){
     git fetch --tags
 
     if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
-        git checkout $BRANCH
+        git checkout "$BRANCH"
     fi
 
 
-    git pull origin $BRANCH
+    git pull origin "$BRANCH"
 }
 
 # Prevent reading virtualenv environmental variables multiple times
@@ -62,7 +62,7 @@ export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
-if [[ -z $BRANCH ]]; then
+if [[ -z "$BRANCH" ]]; then
     BRANCH="develop"
 
     # Use master branch on production
