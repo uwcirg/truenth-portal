@@ -1141,30 +1141,38 @@ var assembleContent = {
 
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        if ($("#userOrgs input[name='organization']").length > 0) {
-            var orgIDs;
-            orgIDs = $("#userOrgs input[name='organization']").map(function(){
-                if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
-            }).get();
+        if (typeof preselectClinic != "undefined" && hasValue(preselectClinic)) {
+            var ol = OT.getOrgsList();
+            if (ol[preselectClinic] && hasValue(ol[preselectClinic].parentOrgId)) parentOrg = ol[preselectClinic].parentOrgId;
+            else parentOrg = preselectClinic;
+            if (tnthAjax.hasConsent(userId, parentOrg))  demoArray["careProvider"] = [{ reference: "api/organization/"+preselectClinic }];
+        } else {
 
-            if (orgIDs) {
-                if (orgIDs.length > 0) {
-                    demoArray["careProvider"] = orgIDs;
+            if ($("#userOrgs input[name='organization']").length > 0) {
+                var orgIDs;
+                orgIDs = $("#userOrgs input[name='organization']").map(function(){
+                    if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
+                }).get();
+
+                if (orgIDs) {
+                    if (orgIDs.length > 0) {
+                        demoArray["careProvider"] = orgIDs;
+                    };
                 };
+
             };
 
-        };
-
-        /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
-        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
-        if (topLevelOrgs.length > 0)  {
-            topLevelOrgs.each(function() {
-                var tOrg = $(this).attr("orgid");
-                if (hasValue(tOrg)) {
-                    if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
-                    demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
-                };
-            });
+            /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+            var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+            if (topLevelOrgs.length > 0)  {
+                topLevelOrgs.each(function() {
+                    var tOrg = $(this).attr("orgid");
+                    if (hasValue(tOrg)) {
+                        if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
+                        demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
+                    };
+                });
+            };
         };
 
 
@@ -1775,7 +1783,7 @@ OrgTool.prototype.getConsentModal = function(parentOrg) {
         var __modal = $("#" + parentOrg + "_consentModal");
         if (__modal.length > 0) return __modal;
         else {
-            var __defaultModal = this.getDefaultModal(this.getSelectedOrg());
+            var __defaultModal = this.getDefaultModal(this.getSelectedOrg() || $("#userOrgs input[name='organization'][value='"+parentOrg+"']"));
             if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
             else return false;
         };
@@ -2215,7 +2223,12 @@ var tnthAjax = {
         var stockConsentUrl = $("#stock_consent_url").val();
         var agreementUrl = "";
         if (hasValue(stockConsentUrl)) {
-            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent($("#" + orgId + "_org").attr("data-parent-name")));
+            var orgName = $("#" + orgId + "_org").attr("data-parent-name");
+            if (!hasValue(orgName)) {
+                var ol = OT.getOrgsList();
+                if (ol[orgId]) orgName = ol[orgId].name;
+            }
+            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent(orgName));
         };
         if (hasValue(agreementUrl)) {
             var params = CONSENT_ENUM["consented"];

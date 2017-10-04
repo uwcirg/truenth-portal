@@ -406,6 +406,7 @@ FieldsChecker.prototype.getNext = function() {
     if (!found && !self.sectionCompleted(section)) {
        if (section == "orgsContainer") {
           if (hasValue(preselectClinic)) {
+              OT.handlePreSelectedClinic()
               var __modal = OT.getConsentModal();
               if (__modal) {
                 __modal.modal("show");
@@ -497,14 +498,21 @@ function initIncompleteFields() {
     };
 
 };
+
 $(document).ready(function(){
 	/*
 	 * the flow here : 
 	 * get still needed core data
 	 * populate terms if it is agreed
-	 * get incomplete fields thereafter
+	 * get incomplete fields thereafter 
+   * note: need to delay gathering incomplete fields to allow fields to be render 
+   * (e.g. broken in firefox if no delay)
 	 */
-	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, initIncompleteFields); });
+	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, function() {
+    var to = (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) ? 1000: 500;  
+    setTimeout(initIncompleteFields, to);
+    })
+  });
 
   tnthAjax.getDemo({{user.id}});
 
@@ -831,7 +839,7 @@ $(document).ready(function(){
     $(".button-container").each(function() {
       $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-    setTimeout('$("#iqFooterWrapper").show()', 1000);;
+    setTimeout('$("#iqFooterWrapper").show()', 2000);;
   });
 {% endblock %}
 

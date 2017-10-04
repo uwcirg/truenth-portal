@@ -40,6 +40,7 @@ from ..models.organization import Organization, OrganizationIdentifier, OrgTree,
 from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
+from ..models.user_consent import UserConsent
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import establish_trace, dump_trace
 
@@ -489,12 +490,6 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 @portal.route('/initial-queries', methods=['GET','POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
-    if request.method == 'POST':
-        # data submission all handled via ajax calls from initial_queries
-        # template.  assume POST can only be sent when valid.
-        current_app.logger.debug("POST initial_queries -> next_after_login")
-        return next_after_login()
-
     user = current_user()
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
@@ -502,8 +497,22 @@ def initial_queries():
         return redirect(url_for('portal.landing'))
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
+    if request.method == 'POST':
+        """
+        data submission all handled via ajax calls from initial_queries
+        template.  assume POST can only be sent when valid.
+        """
+        current_app.logger.debug("POST initial_queries -> next_after_login")
+        return next_after_login()
+    elif len(Coredata().still_needed(user)) == 0:
+        # also handle the situations that resulted from: 1. user refreshing the browser or
+        # 2. exiting browser and resuming session thereafter
+        # In both cases, the request method is GET,
+        # hence a redirect back to initial-queries page won't ever reach the above check
+        # specifically for next_after_login based on the request method of POST
+        current_app.logger.debug("GET initial_queries -> next_after_login")
+        return next_after_login()
 
-    still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     org = user.first_top_organization()
     role = None
@@ -516,9 +525,10 @@ def initial_queries():
     terms = get_terms(org, role)
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
+
     return render_template(
         'initial_queries.html', user=user, terms=terms,
-        consent_agreements=consent_agreements, still_needed=still_needed)
+        consent_agreements=consent_agreements)
 
 
 @portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
