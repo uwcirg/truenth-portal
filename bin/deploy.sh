@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 cmdname=$(basename $0)
 
@@ -15,25 +15,15 @@ USAGE
 
 update_repo(){
     echo "Updating repository"
-    branch_name=$(git symbolic-ref -q HEAD)
 
     git fetch origin
     git fetch --tags
 
-    if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
-        git checkout $BRANCH
+    if [ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
+        git checkout "$BRANCH"
     fi
 
-
-    git pull origin $BRANCH
-}
-
-# Prevent reading virtualenv environmental variables multiple times
-activate_once(){
-    if [[ $(which python) != "${GIT_WORK_TREE}"* ]]; then
-        echo "Activating virtualenv"
-        source "${GIT_WORK_TREE}/env/bin/activate"
-    fi
+    git pull origin "$BRANCH"
 }
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
@@ -41,7 +31,7 @@ repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 while getopts ":b:p:" option; do
     case "${option}" in
         b)
-            BRANCH=${OPTARG}
+            branch=${OPTARG}
             ;;
         p)
             repo_path=${OPTARG}
@@ -62,17 +52,14 @@ export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
-if [[ -z $BRANCH ]]; then
-    BRANCH="develop"
-
-    # Use master branch on production
-    if [[ "${GIT_WORK_TREE}" == "/srv/www/us.truenth.org"* ]]; then
-        BRANCH="master"
-    fi
-fi
+# Assign branch in the following precedence:
+# BRANCH envvar, branch specified by option (-b), "develop"
+BRANCH=${BRANCH:-${branch:-develop}}
 
 update_repo
-activate_once
+
+echo "Activating virtualenv"
+. "${GIT_WORK_TREE}/env/bin/activate"
 
 echo "Updating python dependancies"
 cd "${GIT_WORK_TREE}"
@@ -83,10 +70,3 @@ flask sync
 
 echo "Updating package metadata"
 python setup.py egg_info --quiet
-
-# Restart apache if application is served by apache
-if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
-    echo "Restarting services"
-    sudo service apache2 restart
-    sudo service celeryd restart
-fi
