@@ -4,7 +4,7 @@
 {%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, accountCreationScript, profileConsentDate -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
-<form id="createProfileForm" data-account="patient" class="form tnth-form to-validate">
+<form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row">
         <div class="col-md-11">
@@ -93,7 +93,7 @@
     {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
     {%- endif -%}
 </form>
-<a id="redirectLink" href="" name="redirectLink" arial-label="{{_('Redirect link')}}" class="tnth-hide">&nbsp;</a>
+<a id="redirectLink" href="" name="redirectLink" class="tnth-hide">&nbsp;</a>
 {{accountCreationScript()}}
 {% endblock %}
 {% block footer %}
