@@ -469,49 +469,28 @@
                 var cn = parentName ? parentName: "{%trans%}your clinic{%endtrans%}";
                 return cn;
             })();
-            return_url = getAccessUrl();
-            if (hasValue(return_url)) {
-                $.ajax ({
-                    type: "GET",
-                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
-                    cache: false,
-                    async: false
-                }).done(function(data) {
-                    if (hasValue(data)) {
-                        body = data;
-                        var fname = "";
-                        var lname = "";
-                        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-                            fname = $("#firstname").val();
-                            lname = $("#lastname").val();
-                        } else {
-                            $.ajax ({
-                                type: "GET",
-                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
-                                async: false,
-                                cache: false
-                            }).done(function(data) {
-                                if (data && data.name) {
-                                    fname = data.name.given;
-                                    lname = data.name.family;
-                                };
-                            }).fail(function() {
-                            });
-                        };
-                        body = body.replace(/\(firstname\)/i, fname)
-                                   .replace(/\(lastname\)/i, lname)
-                                   .replace(/\(registrationlink\)/gi, return_url)
-
-                    };
-                }).fail(function(xhr) {
-                });
-
-                //provide default body content if no body content was returned from ajax call
-                if (!hasValue(body)) {
-                    body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+            $.ajax ({
+                type: "GET",
+                url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                cache: false,
+                async: false
+            }).done(function(data) {
+                if (hasValue(data)) {
+                    subject = data["subject"];
+                    body = data["body"]
                 };
+            }).fail(function(xhr) {
+            });
 
+            //provide default body content if no body content was returned from ajax call
+            if (!hasValue(body)) {
+                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                return_url = getAccessUrl()
+                if (hasValue(return_url)) {
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                }
+            };
+            if (!hasValue(subject)) {
                 subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
 
