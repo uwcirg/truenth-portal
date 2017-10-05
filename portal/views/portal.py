@@ -886,14 +886,16 @@ def staff_registration_email(user_id):
 
     org = user.first_top_organization()
 
+    args = load_template_args(user=user)
+
     try:
-        item = VersionedResource(app_text(StaffRegistrationEmail_ATMA.
-                                          name_key(organization=org)))
+        name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
+        item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return ('', 204)
 
-    return make_response(item.asset)
+    return jsonify(subject=item.subject, body=item.body)
 
 @portal.route('/explore')
 def explore():
