@@ -379,7 +379,7 @@
               e.stopPropagation();
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
-                $("#biopsy_day").focus();
+                if ($(this).attr("id") == "biopsy_yes") $("#biopsy_day").focus();
           		} else {
           			$("#biopsyDate").val("");
                 $("#biopsy_day").val("");
