@@ -127,9 +127,11 @@ def load_template_args(user, questionnaire_bank_id=None):
             return ''
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
-        due = (qb.calculated_overdue(trigger_date) or
-               qb.calculated_expiry(trigger_date))
+        due = qb.calculated_start(trigger_date).relative_start
+        trace("UTC due date: {}".format(due))
         due_date = localize_datetime(due, user)
+        tz = user.timezone or 'UTC'
+        trace("Localized due date (timezone = {}): {}".format(tz, due_date))
         return due_date.strftime('%-d %b %Y') if due_date else ''
 
     def _lookup_registrationlink():

@@ -120,7 +120,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(self.test_user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEquals(dd['questionnaire_due_date'], '17 Jun 2017')
+        self.assertEquals(dd['questionnaire_due_date'], '10 Jun 2017')
 
         # with timezone where (day = UTCday + 1)
         user.timezone = "Asia/Tokyo"
@@ -130,7 +130,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEquals(dd['questionnaire_due_date'], '18 Jun 2017')
+        self.assertEquals(dd['questionnaire_due_date'], '11 Jun 2017')
 
 
     def test_empty(self):
