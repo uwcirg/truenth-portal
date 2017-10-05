@@ -41,10 +41,9 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 # Set default docker-compose file if COMPOSE_FILE environmental variable not set
 export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}
 
-# Hack to set env vars in docker-compose file
-# See portal.env.default
-set -o allexport
-. "${GIT_WORK_TREE}/docker/portal.env"
+# Set env vars in docker-compose file; see env.default
+set -o allexport # export all new env vars by default
+. "${GIT_WORK_TREE}/docker/.env"
 
 if [ -n "$BACKUP" -a -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"

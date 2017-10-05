@@ -91,6 +91,14 @@ To interact with the database image started via the ``docker-compose`` instructi
 
     docker-compose exec db psql --username postgres
 
+Advanced Configuration
+======================
+
+Environmental variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, it is possible to use environmental variables directly in docker-compose-level files for the configuration of docker-compose.
+
+An additional configuration file, ``.env``, in current working directory can define environmental variables available through the entire docker-compose file (including containers). These docker-compose-level environmental variables can also be set in the shell invoking docker-compose.
+
+
 Continuous Delivery
 ===================
 
@@ -118,6 +126,9 @@ Most if not all values needed to build and deploy Shared Services are available 
         * A Docker image
         * Execution environment
         * A standard set of instructions
+
+    environment file
+        A file for defining environment variables. One per line, no shell syntax (export etc).
 
     build
         A group of TravisCI jobs tied to a single commit; initiated by a pull request or push
