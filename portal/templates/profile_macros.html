@@ -2337,12 +2337,11 @@
                     setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
                 } else {
                     var displayError = "{{_('Server error occurred updating data.')}}";
-                    errorMessage = '{{_("Error processing request:")}} ' + params.apiUrl;
-                    errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
-
                     $("#error_response_text").html(displayError);
-                    var response_text =  $("#error_response_text").text();
-                    errorMessage +=";  response text: " + (hasValue(response_text) ? response_text : "no response text returned from server");
+                    errorMessage = "Error processing request: " + params.apiUrl;
+                    errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
+                    errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
+                    tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                     self.attempts = 0;
                     if (params.callback) (params.callback).call(self, {"error": displayError});
                 };
@@ -2473,7 +2472,6 @@
         this.__handleError = function(errorMessage) {
             if (hasValue(errorMessage)) {
                 $('#serviceErrorMsg').html('<small>' + "{{_('[Processing error]')}} " + errorMessage + '</small>').fadeIn();
-                tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
             };
         };
         this.__redirect = function() {
@@ -2709,7 +2707,7 @@
               });
             });
         };
-        $('#createProfileForm').validator().on('submit', function (e) {
+        $('#createProfileForm').on('submit', function (e) {
             if (e.isDefaultPrevented()) {
                 // handle the invalid form...
                 aco.__checkFields();
