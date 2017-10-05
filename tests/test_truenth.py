@@ -7,8 +7,9 @@ class TestTrueNTH(TestCase):
         self.login()
         rv = self.client.get('/api/portal-wrapper-html/')
 
-        self.assertTrue(FIRST_NAME in rv.data)
-        self.assertTrue(LAST_NAME in rv.data)
+        results = unicode(rv.data, 'utf-8')
+        self.assertTrue(FIRST_NAME in results)
+        self.assertTrue(LAST_NAME in results)
 
     def test_portal_wrapper_wo_name(self):
         "w/o a users first, last name, username should appear"
