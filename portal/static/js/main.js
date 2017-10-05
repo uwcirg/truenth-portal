@@ -235,7 +235,8 @@ var fillViews = {
     "clinical": function() {
         var content = "";
         if (!$("#biopsyDateContainer").hasClass("has-error")) {
-            var a = $("#patBiopsy input[name='biopsy']:checked").val();
+            var f = $("#patBiopsy input[name='biopsy']:checked");
+            var a = f.val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
                 var displayDate = "";
@@ -245,7 +246,10 @@ var fillViews = {
                 if (!hasValue(displayDate)) displayDate = __NOT_PROVIDED_TEXT;
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
-            } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+            } else {
+                f.prop("checked", false);
+                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+            };
             if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
