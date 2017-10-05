@@ -52,7 +52,8 @@ export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
-# Assign branch in the following precedence: $BRANCH, $branch, "develop"
+# Assign branch in the following precedence:
+# BRANCH envvar, branch specified by option (-b), "develop"
 BRANCH=${BRANCH:-${branch:-develop}}
 
 update_repo
