@@ -1,7 +1,7 @@
 """Test module for audit functionality"""
 from dateutil import parser
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase, TEST_USER_ID, FIRST_NAME, LAST_NAME
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -64,7 +64,7 @@ class TestAudit(TestCase):
             Reference.patient(TEST_USER_ID).as_fhir()['reference'])
         self.assertEquals(
             rv.json['audits'][0]['by']['display'],
-            'First Last')
+            ' '.join((FIRST_NAME, LAST_NAME)))
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['context'], 'other')

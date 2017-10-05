@@ -107,7 +107,7 @@ class TestAppText(TestCase):
                                        asset=invalid_asset,
                                        variables=test_vars)
         error_key = resource.asset.split()[-1]
-        self.assertEquals(error_key, "'variable'")
+        self.assertEquals(error_key, "u'variable'")
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",

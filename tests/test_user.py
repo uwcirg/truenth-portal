@@ -938,7 +938,7 @@ class TestUser(TestCase):
                                  birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
         self.assertEquals(score, 0)  # incorrect birthdate returns 0
 
-        score = user.fuzzy_match(first_name=user.first_name + 's',
+        score = user.fuzzy_match(first_name=user.first_name,
                                  last_name='O' + user.last_name,
                                  birthdate=user.birthdate)
         self.assertTrue(score > 88)  # should be close

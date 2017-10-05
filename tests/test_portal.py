@@ -87,11 +87,12 @@ class TestPortal(TestCase):
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
         self.app.config['PATIENT_LIST_ADDL_FIELDS'] = [
-            'reports',]
+            'reports']
         rv = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.staff_html, rv.data)
+        results = unicode(rv.data, 'utf-8')
+        self.assertIn(ui.staff_html, results)
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
