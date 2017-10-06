@@ -315,7 +315,6 @@ select:not([multiple]) {
   border: 1px solid #bdb9b9;
   overflow: hidden;
   background-image: none;
-  width: 300px;
   max-width: 100%;
 }
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -783,6 +782,8 @@ div.pull-right {
         }
         label.org-label {
           padding: 0 0.5em;
+          display:block;
+          line-height: 30px;
         }
       }
     }
@@ -2557,7 +2558,8 @@ div.timezone-warning.text-warning {
   }
 
   #adminTable {
-    TH.id-field {
+    TH.id-field,
+    TH[data-field='userid'] {
       div.th-inner {
         padding-top: 4px;
       }
@@ -2751,7 +2753,7 @@ div.timezone-warning.text-warning {
   }
   #patientList div.or,
   #staffList div.or {
-    margin: 1.2em 1em 1em 1.2em;
+    margin: 0.9em 1em 1em 1.2em;
   }
 
   #patientListOptions > span:last-of-type,

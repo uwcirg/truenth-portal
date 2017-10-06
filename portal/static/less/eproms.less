@@ -15,7 +15,7 @@
 
 @baseFontSize:    16px;
 @baseMobileFontSize:  14px;
-@headlineSize:    1.25em;
+@headlineSize:    1.30em;
 @subheadSize:     1.20em;
 @subSmallHeadSize: 1.1em;
 @lgFontSize:      1.5em;
@@ -816,6 +816,7 @@ div.search {
     }
     div.dropdown-menu {
       max-width: 100%;
+      min-width: 200px;
       #userOrgs {
         width: 100%;
         max-width: 100%;
@@ -823,15 +824,13 @@ div.search {
         input {
           cursor: pointer;
           position: relative;
-          left: -2px;
+          left: -6px;
+          top: 0.5px;
         }
       }
       #fillOrgs {
         .divider {
           display: none;
-        }
-        label, legend {
-          font-size: @mobileOrgSize;
         }
         label.org-label {
           padding: 0 0.5em;
@@ -861,6 +860,7 @@ div.search {
       input[type="checkbox"] {
         position: relative;
         top: 0;
+        left: -2px;
       }
     }
   }
@@ -2624,7 +2624,7 @@ div.timezone-warning.text-warning {
 
 @media (min-width: 726px) {
   .portal-header {
-    font-size: @headlineSize;
+    font-size: @subheadSize;
   }
 }
 
