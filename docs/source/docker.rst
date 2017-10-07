@@ -10,7 +10,7 @@ Background
 
 Docker is an open-source project that automates the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
 
-Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
+Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environment variables (ENV) that may be overridden.
 
 Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
 
@@ -32,7 +32,7 @@ Download and run the generated images::
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environment variable::
 
     IMAGE_TAG='stable'
     COMPOSE_FILE='docker/docker-compose.yaml'
@@ -60,7 +60,7 @@ If you would like to create a package from a topic branch or fork you can overri
 
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
-    # Override defaults with environmental variables
+    # Override defaults with environment variables
     BRANCH='feature/feature-branch-name'
     GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
 
@@ -94,9 +94,9 @@ To interact with the database image started via the ``docker-compose`` instructi
 Advanced Configuration
 ======================
 
-Environmental variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, it is possible to use environmental variables directly in docker-compose-level files for the configuration of docker-compose.
+environment variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, it is possible to use environment variables directly in docker-compose-level files for the configuration of docker-compose.
 
-An additional configuration file, ``.env``, in current working directory can define environmental variables available through the entire docker-compose file (including containers). These docker-compose-level environmental variables can also be set in the shell invoking docker-compose.
+An additional configuration file, ``.env``, in current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
 
 
 Continuous Delivery
@@ -113,7 +113,7 @@ Currently, our TravisCI setup uses packages locally-built on TravisCI instead of
 Configuration
 -------------
 
-Most if not all values needed to build and deploy Shared Services are available as environmental variables with sane, CIRG-specific defaults. Please see the `global section of .travis.yml <https://docs.travis-ci.com/user/environment-variables#global-variables>`_.
+Most if not all values needed to build and deploy Shared Services are available as environment variables with sane, CIRG-specific defaults. Please see the `global section of .travis.yml <https://docs.travis-ci.com/user/environment-variables#global-variables>`_.
 
 .. glossary::
 

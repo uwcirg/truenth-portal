@@ -251,7 +251,7 @@ To run a specific tox environment, "docs" or the docgen environment in this case
 
     $ tox -e docs
 
-Tox will also run the environment specified by the ``TOXENV`` environmental variable, as configured in the TravisCI integration.
+Tox will also run the environment specified by the ``TOXENV`` environment variable, as configured in the TravisCI integration.
 
 Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analgous the above nosetests invocation):
 
