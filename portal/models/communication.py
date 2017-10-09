@@ -252,6 +252,35 @@ class Communication(db.Model):
         self.message.send_message()
         self.status = 'completed'
 
+    def preview(self):
+        "Collate message details and return preview (DOES NOT SEND)"
+
+        user = User.query.get(self.user_id)
+
+        args = load_template_args(
+            user=user,
+            questionnaire_bank_id=self.communication_request.
+            questionnaire_bank_id)
+        mailresource = MailResource(
+            url=self.communication_request.content_url,
+            variables=args)
+        missing = set(mailresource.variable_list) - set(args)
+        if missing:
+            raise ValueError(
+                "{} contains unknown varables: {}".format(
+                    self.communication_request.content_url,
+                    ','.join(missing)))
+
+        msg = EmailMessage(
+            subject=mailresource.subject,
+            body=mailresource.body,
+            recipients=user.email,
+            sender=current_app.config['DEFAULT_MAIL_SENDER'],
+            user_id=user.id)
+        msg.body = msg.style_message(msg.body)
+
+        return preview
+
 
 class DynamicDictLookup(MutableMapping):
     """Dictionary like interface with lazy lookup of values"""

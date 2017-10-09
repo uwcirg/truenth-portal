@@ -15,7 +15,7 @@
                 <th data-field="id" data-sortable="true">ID</th>
                 <th data-field="status" data-sortable="true">Status</th>
                 <th data-field="user" data-sortable="true">User</th>
-                <th data-field="msg" data-sortable="true">Message</th>
+                <th data-field="msg" data-sortable="true">Sent</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
@@ -23,7 +23,7 @@
                 <td>{{ comm.id }}</td>
                 <td>{{ comm.status }}</td>
                 <td>{{ comm.user_email }}
-                <td>{{ comm.message_id }}</td>
+                <td>{{ comm.sent_at }}</td>
             </tr>
             {% endfor %}
             </tbody>
