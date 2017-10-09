@@ -7,6 +7,7 @@ import sys
 import requests_cache
 from flask import Flask
 import redis
+from urlparse import urlparse
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from ..audit import configure_audit_log
@@ -98,6 +99,12 @@ def configure_app(app, config):
     if config:
         app.config.from_object(config)
 
+    # Set email "from" addresss if not set yet
+    if 'MAIL_DEFAULT_SENDER' not in app.config:
+        app.config['MAIL_DEFAULT_SENDER'] = (
+            'TrueNTH' if app.config.get('TRUENTH_LINK_URL') else 'ePROMs'
+            'noreply@{uri.netloc}'.format(uri=urlparse(app.config['SERVER_NAME']))
+        )
 
 def configure_profiler(app):
     if app.config.get('PROFILE'):
