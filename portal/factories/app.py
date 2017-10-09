@@ -7,7 +7,6 @@ import sys
 import requests_cache
 from flask import Flask
 import redis
-from urlparse import urlparse
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from ..audit import configure_audit_log
