@@ -494,7 +494,6 @@ class QuestionnaireBankQuestionnaire(db.Model):
 def visit_name(qbd):
     if not qbd.questionnaire_bank:
         return None
-    name = qbd.questionnaire_bank.name.replace('_', ' ').split()[0]
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
         sm = srd.months or 0
@@ -503,7 +502,5 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
-        append = "Recurring, {} Month".format(total)
-    else:
-        append = qbd.questionnaire_bank.classification.title()
-    return "{} {}".format(name, append)
+        return "Month {}".format(total)
+    return qbd.questionnaire_bank.classification.title()
