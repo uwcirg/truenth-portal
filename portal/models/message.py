@@ -78,7 +78,6 @@ class EmailMessage(db.Model):
     def send_message(self):
         message = Message(
             subject=self.subject,
-            sender=current_app.config['DEFAULT_MAIL_SENDER'],
             recipients=self.recipients.split())
         body = self.style_message(self.body)
         message.html = fill(body, width=280)
