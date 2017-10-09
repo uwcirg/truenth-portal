@@ -1175,6 +1175,22 @@ def celery_result(task_id):
     return repr(retval)
 
 
+@portal.route('/communicate')
+@roles_required([ROLE.ADMIN])
+@oauth.require_oauth()
+def communications_dashboard():
+    """Communications Dashboard
+
+    Displays a list of communication requests from the system;
+    includes a preview mode for specific requests.
+
+    """
+    comms = Communication.query.all()
+    for comm in comms:
+        comm.user_email = User.query.get(comm.user_id).email
+    return render_template('communications.html', communications=comms)
+
+
 @portal.route("/communicate/<email>")
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block main %}
+    <h1>Communications</h1>
+    {% if communications %}
+    <div>
+        <table id="comms"
+               class="table table-striped table-hover table-condensed"
+               data-toggle="table"
+               data-sort-name="id"
+               data-sort-order="desc"
+               data-search="true"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th data-field="id" data-sortable="true">ID</th>
+                <th data-field="status" data-sortable="true">Status</th>
+                <th data-field="user" data-sortable="true">User</th>
+                <th data-field="msg" data-sortable="true">Message</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for comm in communications %}
+                <td>{{ comm.id }}</td>
+                <td>{{ comm.status }}</td>
+                <td>{{ comm.user_email }}
+                <td>{{ comm.message_id }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No communications found.</p>
+    {% endif %}
+{% endblock %}
