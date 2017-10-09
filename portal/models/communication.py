@@ -248,7 +248,6 @@ class Communication(db.Model):
             subject=mailresource.subject,
             body=mailresource.body,
             recipients=user.email,
-            sender=current_app.config['DEFAULT_MAIL_SENDER'],
             user_id=user.id)
         self.message.send_message()
         self.status = 'completed'

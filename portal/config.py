@@ -44,7 +44,6 @@ class BaseConfig(object):
     )
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
-    DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
@@ -52,11 +51,6 @@ class BaseConfig(object):
     LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
     LOG_LEVEL = 'DEBUG'
 
-    MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
-    MAIL_DEFAULT_SENDER = (
-        '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu>')
-    CONTACT_SENDTO_EMAIL = MAIL_USERNAME
-    ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
     SS_TIMEOUT = 60 * 60  # seconds for session cookie, reset on ping
     PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
