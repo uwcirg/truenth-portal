@@ -34,7 +34,10 @@ def upgrade():
     session = Session(bind=bind)
 
     qb = session.query(QuestionnaireBank).filter(
-        QuestionnaireBank.name == 'CRV_baseline').one()
+        QuestionnaireBank.name == 'CRV_baseline').first()
+    if not qb:
+        # probably running on TrueNTH rather than ePROMs - done.
+        return
 
     found_order = []
     for q in qb.questionnaires:
