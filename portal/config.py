@@ -44,7 +44,7 @@ class BaseConfig(object):
     )
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
-    DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
+    MAIL_DEFAULT_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
