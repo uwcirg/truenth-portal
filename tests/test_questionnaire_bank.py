@@ -275,7 +275,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         qbd = QuestionnaireBank.most_current_qb(self.test_user)
-        self.assertEquals("CRV Baseline", visit_name(qbd))
+        self.assertEquals("Baseline", visit_name(qbd))
 
     def test_visit_3mo(self):
         crv = setup_qbs()
@@ -284,10 +284,10 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         qbd = QuestionnaireBank.most_current_qb(self.test_user)
-        self.assertEquals("CRV Recurring, 3 Month", visit_name(qbd))
+        self.assertEquals("Month 3", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
-        self.assertEquals("CRV Recurring, 9 Month", visit_name(qbd_i2))
+        self.assertEquals("Month 9", visit_name(qbd_i2))
 
     def test_visit_6mo(self):
         crv = setup_qbs()
@@ -296,10 +296,10 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         qbd = QuestionnaireBank.most_current_qb(self.test_user)
-        self.assertEquals("CRV Recurring, 6 Month", visit_name(qbd))
+        self.assertEquals("Month 6", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
-        self.assertEquals("CRV Recurring, 18 Month", visit_name(qbd_i2))
+        self.assertEquals("Month 18", visit_name(qbd_i2))
 
 
 def setup_qbs():
