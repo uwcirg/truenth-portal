@@ -289,19 +289,13 @@
     <script>$(function () {
         function getAccessUrl() {
             var url = '';
-            $.ajax ({
-                type: 'GET',
-                url: '/api/user/' + $("#_userId").val() + '/access_url',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                cache: false,
-                async: false
-            }).done(function(data) {
-                url = data['access_url'];
-                $("#profileEmailErrorMessage").text("");
-                console.log(url);
-            }).fail(function() {
-                $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url.{%endtrans%}");
+            tnthAjax.accessUrl( $("#_userId").val(), true, function(data) {
+                if (!data.error) {
+                    url = data.url;
+                    $("#profileEmailErrorMessage").text("");
+                } else {
+                    $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
+                }
             });
             return url;
         };
@@ -329,46 +323,12 @@
                 var subject = '';
                 var body = '';
                 var return_url = '';
-                var parentName = "";
-                var selectedOrg = $("#userOrgs input[name='organization']:checked");
                 var clinicName = (function() {
                     var cn = "";
+                    var selectedOrg = $("#userOrgs input[name='organization']:checked");
                     if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
                     if (!hasValue(cn)) cn = "{%trans%}your clinic{%endtrans%}";
                     return cn;
-                })();
-                var parentName = (function() {
-                    var pName = "";
-                    if (selectedOrg.length > 0) {
-                        pName = $(selectedOrg).attr("data-parent-name");
-                        if (!hasValue(pName)) pName = $(selectedOrg).closest(".org-container[data-parent-id]").attr("data-parent-name");
-                    };
-                    return pName;
-                })();
-                var greeting = (function() {
-                    var fname = "";
-                    var lname = "";
-                    if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-                        fname = $("#firstname").val();
-                        lname = $("#lastname").val();
-                    } else {
-                        $.ajax ({
-                            type: "GET",
-                            url: '/api/demographics/{{person.id}}',
-                            async: false,
-                            cache: false
-                        }).done(function(data) {
-                            if (data && data.name) {
-                                fname = data.name.given;
-                                lname = data.name.family;
-                            };
-                        }).fail(function() {
-                        });
-                    };
-                    var txt = "{%trans%}Hello{%endtrans%}";
-                    if (hasValue(fname)) txt += " " + fname;
-                    if (hasValue(lname)) txt += " " + lname;
-                    return txt;
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
@@ -388,20 +348,15 @@
                     subject = '{{ app_text('profileSendEmail reminder email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                 }
                 if (body != '') {
-                    $.ajax ({
-                        type: 'POST',
-                        url: '/invite',
-                        cache: false,
-                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        data: {'subject': subject, 'recipients': email, 'body': body}
-                    }).done(function(data) {
-                        $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
-                        $('#profileEmailSelect').val("");
-                        $('#btnProfileSendEmail').addClass('disabled');
-                    }).fail(function(xhr) {
-                        var errorMessage = "error sending invite email, " + subject + ", status: " + xhr.status + ", response text: " + xhr.responseText;
-                        tnthAjax.reportError(this.userId, "{{url_for('portal.invite')}}", errorMessage, true);
-                        $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                    tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
+                        if (!data.error) {
+                            $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                            $('#profileEmailSelect').val("");
+                            $('#btnProfileSendEmail').addClass('disabled');
+
+                        } else {
+                            $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                        };
                     });
                 };
             } else $('#profileEmailMessage').text('{%trans%}You must select a email type.{%endtrans%}');
@@ -432,18 +387,13 @@
     <script>$(function () {
         function getAccessUrl() {
             var url = '';
-            $.ajax ({
-                type: 'GET',
-                url: '/api/user/' + $("#_userId").val() + '/access_url',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                async: false
-            }).done(function(data) {
-                url = data['access_url'];
-                $("#profileEmailErrorMessage").text("");
-                console.log(url);
-            }).fail(function() {
-                $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
+            tnthAjax.accessUrl( $("#_userId").val(), true, function(data) {
+                if (!data.error) {
+                    url = data.url;
+                    $("#profileEmailErrorMessage").text("");
+                } else {
+                    $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
+                }
             });
             return url;
         };
@@ -477,9 +427,10 @@
             }).done(function(data) {
                 if (hasValue(data)) {
                     subject = data["subject"];
-                    body = data["body"]
+                    body = data["body"];
                 };
             }).fail(function(xhr) {
+               
             });
 
             //provide default body content if no body content was returned from ajax call
@@ -494,15 +445,13 @@
                 subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
 
-            $.ajax ({
-                type: 'POST',
-                url: "{{url_for('portal.invite')}}",
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                data: {'subject': subject, 'recipients': email, 'body': body}
-            }).done(function(data) {
-                $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
-            }).fail(function() {
-                $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+            tnthAjax.invite({{person.id}},{'subject': subject, 'recipients': email, 'body': body}, function(data) {
+                if (!data.error) {
+                    $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
+                    $('#btnProfileSendEmail').attr("disabled", true);
+                } else {
+                    if (data.error) $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                };
             });
         });
      });</script>
@@ -542,15 +491,12 @@
             event.preventDefault();
             email = $('#email').val()
             if (email) {
-                $.ajax ({
-                    type: 'POST',
-                    url: '/api/user/' + {{person.id}} + '/password_reset',
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
-                }).done(function(data) {
-                    $('#passwordResetMessage').text('{%trans%}Password reset email sent to {%endtrans%}' + email);
-                }).fail(function() {
-                    console.log('failed request');
-                    $('#passwordResetMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                tnthAjax.passwordReset({{person.id}}, function(data) {
+                    if (!data.error) {
+                        $('#passwordResetMessage').text('{%trans%}Password reset email sent to {%endtrans%}' + email);
+                    } else {
+                        $('#passwordResetMessage').text('{%trans%}Unable to send email.{%endtrans%}')
+                    };
                 });
             } else {
                 $('#passwordResetMessage').text('{%trans%}No email address found for user{%endtrans%}');
@@ -727,8 +673,8 @@
                   if ($("#mainDiv.profile").length > 0) setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
                 };
 
-            }).fail(function() {
-
+            }).fail(function(xhr) {
+                tnthAjax.sendError(xhr, '/api/organization', {{person.id if person}})
             });
         });
     </script>
@@ -903,80 +849,76 @@
     $(function () {
          var ww = $(window).width();
          var prUserId = $("#pr_user_id").val();
+         tnthAjax.patientReport($("#pr_user_id").val(), function(data) {
+            if (!data.error) {
+                if (data["user_documents"] && data["user_documents"].length > 0 ) {
+                    var fData = [];
+                    data["user_documents"].forEach(function(item) {
+                        item["filename"] = escapeHtml(item["filename"]);
+                        item["document_type"] = escapeHtml(item["document_type"]);
+                        item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
+                        item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
+                        fData.push(item);
+                    });
 
-        $.ajax ({
-            type: "GET",
-            url: '/api/user/' + $("#pr_user_id").val() + '/user_documents?document_type=PatientReport',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json'
-        }).done(function(data) {
-            if (data["user_documents"] && data["user_documents"].length > 0 ) {
-                var fData = [];
-                data["user_documents"].forEach(function(item) {
-                    item["filename"] = escapeHtml(item["filename"]);
-                    item["document_type"] = escapeHtml(item["document_type"]);
-                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
-                    item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
-                    fData.push(item);
-                });
+                    $('#profilePatientReportTable').bootstrapTable( {
+                        data: fData,
+                        pagination: true,
+                        pageSize: 5,
+                        pageList: [5, 10, 25, 50, 100],
+                        classes: 'table table-responsive profile-patient-reports',
+                        sortName: 'uploaded_at',
+                        search: true,
+                        smartDisplay: true,
+                        showToggle: true,
+                        showColumns: true,
+                        toolbar: "#prTableToolBar",
+                        rowStyle: function rowStyle(row, index) {
+                              return {
+                                css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                              };
+                        },
+                        undefinedText: '--',
+                        columns: [
+                            {
+                                field: 'filename',
+                                title: 'Filename',
+                                searchable: true,
+                                sortable: true
+                            }, {
+                                field: 'uploaded_at',
+                                title: 'Uploaded At (GMT)',
+                                sortable: true,
+                                searchable: true,
+                                width: '20%'
+                            }, {
+                                field: 'document_type',
+                                title: 'Document Type',
+                                sortable: true,
+                                visible: false
+                            }, {
+                                field: 'contributor',
+                                title: 'Contributor',
+                                sortable: true,
+                                searchable: true
+                            }, {
+                                field: 'actions',
+                                title: 'Actions',
+                                sortable: false,
+                                searchable: false,
+                                visible: true
+                            }
+                        ]
+                    } );
+                } else {
+                    $("#patientReportErrorMessage").text("{%trans%}No reports available.{%endtrans%}").removeClass("error-message");
+                }
 
-                $('#profilePatientReportTable').bootstrapTable( {
-                    data: fData,
-                    pagination: true,
-                    pageSize: 5,
-                    pageList: [5, 10, 25, 50, 100],
-                    classes: 'table table-responsive profile-patient-reports',
-                    sortName: 'uploaded_at',
-                    search: true,
-                    smartDisplay: true,
-                    showToggle: true,
-                    showColumns: true,
-                    toolbar: "#prTableToolBar",
-                    rowStyle: function rowStyle(row, index) {
-                          return {
-                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
-                          };
-                    },
-                    undefinedText: '--',
-                    columns: [
-                        {
-                            field: 'filename',
-                            title: 'Filename',
-                            searchable: true,
-                            sortable: true
-                        }, {
-                            field: 'uploaded_at',
-                            title: 'Uploaded At (GMT)',
-                            sortable: true,
-                            searchable: true,
-                            width: '20%'
-                        }, {
-                            field: 'document_type',
-                            title: 'Document Type',
-                            sortable: true,
-                            visible: false
-                        }, {
-                            field: 'contributor',
-                            title: 'Contributor',
-                            sortable: true,
-                            searchable: true
-                        }, {
-                            field: 'actions',
-                            title: 'Actions',
-                            sortable: false,
-                            searchable: false,
-                            visible: true
-                        }
-                    ]
-                } );
             } else {
-                $("#patientReportErrorMessage").text("{%trans%}No reports available.{%endtrans%}").removeClass("error-message");
-            }
-
-        }).fail(function() {
-            $("#profilePatientReportTable").closest("div.profile-item-container").hide();
-            $("#patientReportErrorMessage").text("{%trans%}Problem retrieving reports from server.{%endtrans%}").addClass("error-message");
-        });
+                $("#profilePatientReportTable").closest("div.profile-item-container").hide();
+                $("#patientReportErrorMessage").text("{%trans%}Problem retrieving reports from server.{%endtrans%}").addClass("error-message");
+            };
+         });
      });</script>
 {%- endmacro %}
 
@@ -1065,87 +1007,85 @@
         $(function () {
              var ww = $(window).width();
              var auditUserId = $("#audit_user_id").val();
-            $.ajax ({
-                type: "GET",
-                url: '/api/user/' + $("#audit_user_id").val() + '/audit',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json'
-            }).done(function(data) {
-                if (data["audits"] && data["audits"].length > 0 ) {
-                    var fData = [];
-                    data["audits"].forEach(function(item) {
-                        item["by"] = item["by"]["reference"];
-                        var r = /\d+/g;
-                        var m = r.exec(String(item["by"]));
-                        if (m) item["by"] = m[0]
-                        else item["by"] = "-";
-                        item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
-                        item["comment"] = escapeHtml(item["comment"]);
-                        var c = String(item["comment"]);
-                        var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
+             
+                tnthAjax.auditLog(auditUserId, function(data) {
+                    if (!data.error) {
+                        if (data["audits"] && data["audits"].length > 0 ) {
+                            var fData = [];
+                            data["audits"].forEach(function(item) {
+                                item["by"] = item["by"]["reference"];
+                                var r = /\d+/g;
+                                var m = r.exec(String(item["by"]));
+                                if (m) item["by"] = m[0]
+                                else item["by"] = "-";
+                                item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
+                                item["comment"] = escapeHtml(item["comment"]);
+                                var c = String(item["comment"]);
+                                var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
-                        item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>{%trans%}More{%endtrans%}}...</sub>") : item["comment"];
-                        fData.push(item);
-                    });
+                                item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>{%trans%}More{%endtrans%}}...</sub>") : item["comment"];
+                                fData.push(item);
+                            });
 
-                    $('#profileAuditLogTable').bootstrapTable( {
-                        data: fData,
-                        pagination: true,
-                        pageSize: 5,
-                        pageList: [5, 10, 25, 50, 100],
-                        classes: 'table table-responsive profile-audit-log',
-                        sortName: 'lastUpdated',
-                        search: true,
-                        smartDisplay: true,
-                        showToggle: true,
-                        showColumns: true,
-                        toolbar: "#auditTableToolBar",
-                        rowStyle: function rowStyle(row, index) {
-                              return {
-                                css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
-                              };
-                        },
-                        undefinedText: '--',
-                        columns: [
-                            {
-                                field: 'by',
-                                title: 'User',
-                                width: '5%',
-                                sortable: true,
-                                searchable: true
-                            }, {
-                                field: 'comment',
-                                title: 'Comment',
-                                searchable: true,
-                                sortable: true
-                            }, {
-                                field: 'lastUpdated',
-                                title: "{%trans%}Date/Time{%endtrans %} <span class='gmt'> {%trans%}(GMT), Y-M-D{%endtrans%}</span>",
-                                sortable: true,
-                                searchable: true,
-                                /******
-                                sorter: function(a, b) {
-                                    return new Date(b).getTime() - new Date(a).getTime();
+                            $('#profileAuditLogTable').bootstrapTable( {
+                                data: fData,
+                                pagination: true,
+                                pageSize: 5,
+                                pageList: [5, 10, 25, 50, 100],
+                                classes: 'table table-responsive profile-audit-log',
+                                sortName: 'lastUpdated',
+                                search: true,
+                                smartDisplay: true,
+                                showToggle: true,
+                                showColumns: true,
+                                toolbar: "#auditTableToolBar",
+                                rowStyle: function rowStyle(row, index) {
+                                      return {
+                                        css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                                      };
                                 },
-                                ****/
-                                width: '20%'
-                            },
-                            {
-                                field: 'version',
-                                title: 'Version',
-                                sortable: true,
-                                visible: false
-                            }
-                        ]
-                    } );
-                } else {
-                    $("#profileAuditLogErrorMessage").text("{%trans%}No audit log item found.{%endtrans%}");
-                }
+                                undefinedText: '--',
+                                columns: [
+                                    {
+                                        field: 'by',
+                                        title: 'User',
+                                        width: '5%',
+                                        sortable: true,
+                                        searchable: true
+                                    }, {
+                                        field: 'comment',
+                                        title: 'Comment',
+                                        searchable: true,
+                                        sortable: true
+                                    }, {
+                                        field: 'lastUpdated',
+                                        title: "{%trans%}Date/Time{%endtrans %} <span class='gmt'> {%trans%}(GMT), Y-M-D{%endtrans%}</span>",
+                                        sortable: true,
+                                        searchable: true,
+                                        /******
+                                        sorter: function(a, b) {
+                                            return new Date(b).getTime() - new Date(a).getTime();
+                                        },
+                                        ****/
+                                        width: '20%'
+                                    },
+                                    {
+                                        field: 'version',
+                                        title: 'Version',
+                                        sortable: true,
+                                        visible: false
+                                    }
+                                ]
+                            } );
+                        } else {
+                            $("#profileAuditLogErrorMessage").text("{%trans%}No audit log item found.{%endtrans%}");
+                        }
 
-
-            }).fail(function() {
-                $("#profileAuditLogErrorMessage").text("{%trans%}Problem retrieving audit log from server.{%endtrans%}");
-            });
+                    } else {
+                        $("#profileAuditLogErrorMessage").text("{%trans%}Problem retrieving audit log from server.{%endtrans%}");
+                    };
+                });
+            
          });</script>
      {% endif %}
 {%- endmacro %}
@@ -1196,13 +1136,8 @@
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
 
-        $.ajax ({
-                type: "GET",
-                url: '/api/patient/' + sessionUserId + '/assessment',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                cache: false
-            }).done(function(data) {
+        tnthAjax.assessmentList(sessionUserId, function(data) {
+            if (!data.error) {
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
                     entries.forEach(function(entry, index) {
@@ -1232,12 +1167,11 @@
                     $("#userSessionsListContainer").prepend("<span class='text-muted'>{%trans%}No questionnaire data found.{%endtrans%}</span>");
                 };
 
-            }).fail(function() {
-                console.log("Problem retrieving session data from server.");
+            } else {
                 $("#userSessionListTable").hide();
                 $("#profileSessionListError").html("{%trans%}Problem retrieving session data from server.{%endtrans%}");
-            });
-
+            };
+        });
     });
     </script>
 {%- endmacro %}
@@ -1255,13 +1189,8 @@
             var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
 
-            $.ajax ({
-                    type: "GET",
-                    url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json'
-                }).done(function(data) {
-                    //console.log(data)
+            tnthAjax.assessmentReport(sessionUserId, '{{instrument_id}}', function(data) {
+                if (!data.error) {
                     $(".report-error-message").hide();
                     $("#userSessionReportDetailTable").html('');
                     if (data.entry && data.entry.length > 0) {
@@ -1294,21 +1223,18 @@
                             reportHTML += '<tr><td>{%trans%}' + (hasValue(q)? q: "--") + '{%endtrans%}</td><td>{%trans%}' + (String(a) !== 'undefined' ? a : '--') + '{%endtrans%}</td></tr>';
                         });
                         $("#userSessionReportDetailTable").append(reportHTML);
-
-                    }
-                    //console.log(data);
-
-                }).fail(function(xhr) {
+                    };
+                } else {
                     $(".report-error-message").show();
                     $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
-                });
-
+                };
+            });
         });
         </script>
 
 {%- endmacro %}
-
 {% macro profileClinicalPCALocalized(person, current_user) -%}
+<!-- not currently being used -->
  <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
@@ -1799,20 +1725,17 @@
           });
 
         {%- if person -%}
-            $.ajax ({
-                type: "GET",
-                url: '/api/patient/{{person.id}}/assessment-status',
-                cache: false
-            }).done(function(data) {
-                if (data && (data.assessment_status).toUpperCase() == "COMPLETED") {
-                    $("#assessmentLink").attr("disabled", true);
-                    $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+            tnthAjax.assessmentStatus({{person.id}}, function(data) {
+                if (!data.error) {
+                    if ((data.assessment_status).toUpperCase() == "COMPLETED") {
+                        $("#assessmentLink").attr("disabled", true);
+                        $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+                    };
                 };
-            }).fail(function() {
-               // console.log("Problem retrieving data from server.");
             });
         {%- endif -%}
-    });</script>
+        });
+        </script>
 {%- endmacro %}
 {% macro profileInterventions(user_interventions) -%}
   <div class="row">
@@ -2551,7 +2474,7 @@
                         callback({"error": "{{_('no data returned')}}"});
                     };
                 };
-            }).fail(function() {
+            }).fail(function(xhr) {
                 /*
                  * retry here
                  */
@@ -2562,6 +2485,7 @@
                     if (callback) callback({"error": errorMessage});
                     self.attempts = 0;
                 };
+                tnthAjax.sendError(xhr, '', '/api/organization')
             });
         };
         function getParentOrgId(obj) {
