@@ -1203,7 +1203,7 @@ def preview_communication(comm_id):
         abort(404, "no communication found for id `{}`".format(comm_id))
     preview = comm.preview()
     return jsonify(subject=preview.subject, body=preview.body,
-                   recipients=preview.recipients, sender=preview.sender)
+                   recipients=preview.recipients)
 
 
 @portal.route("/communicate/<email>")

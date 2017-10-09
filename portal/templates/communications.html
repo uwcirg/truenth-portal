@@ -9,13 +9,21 @@
                data-sort-name="id"
                data-sort-order="desc"
                data-search="true"
+               data-pagination="true"
+               data-page-size="50"
+               data-page-list="[25,50,100,ALL]"
+               data-toolbar="#commsTableToolbar"
+               data-show-toggle="true"
+               data-show-export="true"
+               data-export-data-type="all"
+               data-filter-control="true"
                data-show-columns="true">
             <thead>
             <tr>
                 <th data-field="id" data-sortable="true">ID</th>
-                <th data-field="status" data-sortable="true">Status</th>
-                <th data-field="user" data-sortable="true">User</th>
-                <th data-field="msg" data-sortable="true">Sent</th>
+                <th data-field="status" data-sortable="true" data-filter-control="select">Status</th>
+                <th data-field="user" data-sortable="true" data-filter-control="input">User</th>
+                <th data-field="msg" data-sortable="true" data-filter-control="input">Sent</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
@@ -23,7 +31,7 @@
                 <td>{{ comm.id }}</td>
                 <td>{{ comm.status }}</td>
                 <td>{{ comm.user_email }}
-                <td>{{ comm.sent_at }}</td>
+                <td><button title="Preview" onclick="previewComm(event, {{ comm.id }})"><i class="fa fa-eye"></i></button> {{ comm.sent_at }}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -32,4 +40,32 @@
     {% else %}
     <p>No communications found.</p>
     {% endif %}
+{% endblock %}
+{% block document_ready %}
+
+function previewComm(event, commId) {
+    if (event) event.stopPropagation();
+    var myWindow;
+    if (commId) {
+         $.ajax ({
+              type: "GET",
+              url: "/communicate/preview/" + commId,
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json'
+          }).done(function(data) {
+                if (data) {
+                    myWindow = window.open("", "MsgWindow", "width=400,height=800");
+                    myWindow.document.write("<p><b>Recipients:</b>\n" + data["recipients"] + "</p>");
+                    myWindow.document.write("<p><b>Subject:</b>\n" + data["subject"] + "</p>");
+                    myWindow.document.write("<p><b>Body:</b>\n" + data["body"] + "</p>");
+                }
+          }).fail(function(xhr) {
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+                myWindow = window.open("", "MsgWindow", "width=400,height=800");
+                myWindow.document.write(xhr.status + ": " + shr.responseText);
+          });
+    };
+};
+
 {% endblock %}

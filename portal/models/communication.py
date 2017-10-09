@@ -279,7 +279,7 @@ class Communication(db.Model):
             user_id=user.id)
         msg.body = msg.style_message(msg.body)
 
-        return preview
+        return msg
 
 
 class DynamicDictLookup(MutableMapping):
