@@ -5,6 +5,7 @@ FLASK_APP=manage.py flask --help
 """
 import os
 import click
+import redis
 
 import alembic.config
 from flask_migrate import Migrate
@@ -65,6 +66,12 @@ def upgrade_db():
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
 
 
+def flush_cache():
+    """Flush redis of all values. Cached values may not longer correspond with new DB entries"""
+    r = redis.from_url(app.config['REDIS_URL'])
+    r.flushdb()
+
+
 @app.cli.command()
 def sync():
     """Synchronize database with latest schema and persistence data.
@@ -78,6 +85,7 @@ def sync():
     if not db.engine.dialect.has_table(db.engine.connect(), 'alembic_version'):
         db.create_all()
     stamp_db()
+    flush_cache()
     upgrade_db()
     seed()
 
