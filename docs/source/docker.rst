@@ -94,10 +94,11 @@ To interact with the database image started via the ``docker-compose`` instructi
 Advanced Configuration
 ======================
 
-environment variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, it is possible to use environment variables directly in docker-compose-level files for the configuration of docker-compose.
+Environment variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, some environment variables are used for configuration specific to docker-compose.
 
-An additional configuration file, ``.env``, in current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
+An additional environment file, specifically named ``.env``, in current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
 
+One use for these more "global" environmental variables is overriding the default ``COMPOSE_PROJECT_NAME`` which is used to namespace applications running under docker-compose. In production deployments ``COMPOSE_PROJECT_NAME`` is set to correspond to the domain being served.
 
 Continuous Delivery
 ===================
