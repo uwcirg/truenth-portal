@@ -209,6 +209,37 @@ class Communication(db.Model):
             'Communication for user {0.user_id}'
             ' of {0.communication_request.name}'.format(self))
 
+    def generate_message(self):
+        "Collate message details into EmailMessage"
+
+        user = User.query.get(self.user_id)
+
+        args = load_template_args(
+            user=user,
+            questionnaire_bank_id=self.communication_request.
+            questionnaire_bank_id)
+
+        mailresource = MailResource(
+            url=self.communication_request.content_url,
+            variables=args)
+
+        missing = set(mailresource.variable_list) - set(args)
+        if missing:
+            raise ValueError(
+                "{} contains unknown varables: {}".format(
+                    self.communication_request.content_url,
+                    ','.join(missing)))
+
+        msg = EmailMessage(
+            subject=mailresource.subject,
+            body=mailresource.body,
+            recipients=user.email,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            user_id=user.id)
+
+        return msg
+
+
     def generate_and_send(self):
         "Collate message details and send"
 
@@ -229,55 +260,16 @@ class Communication(db.Model):
             user=user,
             uuid=self.communication_request.lr_uuid,
             request=self.communication_request.name))
-        args = load_template_args(
-            user=user,
-            questionnaire_bank_id=self.communication_request.
-            questionnaire_bank_id)
 
-        mailresource = MailResource(
-            url=self.communication_request.content_url,
-            variables=args)
-
-        missing = set(mailresource.variable_list) - set(args)
-        if missing:
-            raise ValueError(
-                "{} contains unknown varables: {}".format(
-                    self.communication_request.content_url,
-                    ','.join(missing)))
-        self.message = EmailMessage(
-            subject=mailresource.subject,
-            body=mailresource.body,
-            recipients=user.email,
-            user_id=user.id)
+        self.message = self.generate_message()
         self.message.send_message()
         self.status = 'completed'
 
     def preview(self):
         "Collate message details and return preview (DOES NOT SEND)"
 
-        user = User.query.get(self.user_id)
-
-        args = load_template_args(
-            user=user,
-            questionnaire_bank_id=self.communication_request.
-            questionnaire_bank_id)
-        mailresource = MailResource(
-            url=self.communication_request.content_url,
-            variables=args)
-        missing = set(mailresource.variable_list) - set(args)
-        if missing:
-            raise ValueError(
-                "{} contains unknown varables: {}".format(
-                    self.communication_request.content_url,
-                    ','.join(missing)))
-
-        msg = EmailMessage(
-            subject=mailresource.subject,
-            body=mailresource.body,
-            recipients=user.email,
-            user_id=user.id)
+        msg = self.generate_message()
         msg.body = msg.style_message(msg.body)
-
         return msg
 
 
