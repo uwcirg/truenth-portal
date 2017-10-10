@@ -20,28 +20,59 @@
                data-show-columns="true">
             <thead>
             <tr>
-                <th data-field="id" data-sortable="true">ID</th>
-                <th data-field="status" data-sortable="true" data-filter-control="select">Status</th>
-                <th data-field="user" data-sortable="true" data-filter-control="input">User</th>
-                <th data-field="msg" data-sortable="true" data-filter-control="input">Sent</th>
+                <th data-field="id" data-sortable="true">{{_("ID")}}</th>
+                <th data-field="status" data-sortable="true" data-filter-control="select">{{_("Status")}}</th>
+                <th data-field="user" data-sortable="true" data-filter-control="input">{{_("User")}}</th>
+                <th data-field="msg" data-sortable="true" data-filter-control="input">{{_("Sent")}}</th>
             </tr>
             </thead>
-            <tbody data-link="row" class="rowlink">
+            <tbody>
             {% for comm in communications %}
                 <td>{{ comm.id }}</td>
                 <td>{{ comm.status }}</td>
                 <td>{{ comm.user_email }}
-                <td><button title="Preview" onclick="previewComm(event, {{ comm.id }})"><i class="fa fa-eye"></i></button> {{ comm.sent_at }}</td>
+                <td><button title="{{_('Preview')}}" onclick="previewComm(event, {{ comm.id }})" class="communication-detail-button"><i class="fa fa-eye"></i></button> {% if comm.sent_at %}{{ comm.sent_at}}{%else%}<span class="text-muted">---</span>{%endif%}</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
+    <div class="modal fade" id="commModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              {{ _("Communication Detail") }}
+            </div>
+            <div class="modal-body">
+                <table id="commDetailTable" cellspacing="8" cellpadding="8">
+                  <tr><td valign="top" class="text-muted label-cell">{{_("Recipients:")}}</td><td><div id="commRecipients" class="content"></div></td></tr>
+                  <tr><td valign="top" class="text-muted label-cell">{{_("Subject:")}}</td><td><div id="commSubject" class="content"></div></td></tr>
+                  <tr><td valign="top" class="text-muted label-cell">{{_("Body:")}}</td><td><div id="commBody" class="content"></div></td></tr>
+                </tr>
+                </table>
+                <div id="commMessage" class="error-message"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+            </div>
+          </div>
+        </div>
+    </div>
     {% else %}
-    <p>No communications found.</p>
+    <p>{{_("No communications found.")}}</p>
     {% endif %}
 {% endblock %}
 {% block document_ready %}
+
+/*
+ * initialize communication modal
+ */
+$(document).ready(function() {
+   $('#commModal').modal({
+      show: false
+    });
+});
 
 function previewComm(event, commId) {
     if (event) event.stopPropagation();
@@ -51,19 +82,28 @@ function previewComm(event, commId) {
               type: "GET",
               url: "/communicate/preview/" + commId,
               contentType: 'application/json; charset=utf-8',
-              dataType: 'json'
+              dataType: 'json',
+              async: false
           }).done(function(data) {
                 if (data) {
-                    myWindow = window.open("", "MsgWindow", "width=400,height=800");
-                    myWindow.document.write("<p><b>Recipients:</b>\n" + data["recipients"] + "</p>");
-                    myWindow.document.write("<p><b>Subject:</b>\n" + data["subject"] + "</p>");
-                    myWindow.document.write("<p><b>Body:</b>\n" + data["body"] + "</p>");
-                }
+                    $("#commRecipients").html(data["recipients"]||"{{_('Not available')}}");
+                    $("#commSubject").html(data["subject"]||"{{_('Not available')}}");
+                    $("#commBody").html(data.body||"{{_('Not available')}}");
+                    /*
+                     * prevent links and buttons in email body from being clickable
+                     */
+                    $("#commBody a").each(function() {
+                      $(this).on("click", function(e) {
+                          e.preventDefault();
+                          return false;
+                      });
+                    });
+                    $("#commModal").modal("show");
+                };
           }).fail(function(xhr) {
                 console.log("response Text: " + xhr.responseText);
                 console.log("response status: " +  xhr.status);
-                myWindow = window.open("", "MsgWindow", "width=400,height=800");
-                myWindow.document.write(xhr.status + ": " + shr.responseText);
+                $("#commMessage").html("{{_('Unable to receive content')}}");
           });
     };
 };
