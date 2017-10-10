@@ -7,6 +7,7 @@ from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank
+from ..trace import trace
 from .user import User
 
 
@@ -93,6 +94,9 @@ def qb_status_dict(user, questionnaire_bank):
         recents = recent_qnr_status(user, q.name)
         d[q.name] = status_from_recents(
             recents, start, overdue, expired)
+    trace("QuestionnaireBank status for {}:".format(questionnaire_bank.name))
+    for k, v in d.items():
+        trace("  {}:{}".format(k, v))
     return d
 
 
@@ -297,6 +301,11 @@ class AssessmentStatus(object):
 
 def invalidate_assessment_status_cache(user_id):
     """Invalidate the assessment status cache values for this user"""
+    try:
+        int(user_id)
+    except:
+        raise ValueError(
+            "overall_assessment_status cached on user_id; int cast failed")
     dogpile_cache.invalidate(
         overall_assessment_status, user_id)
 

@@ -247,7 +247,7 @@ def send_user_messages(email, force_update=False):
     """
     if force_update:
         user = User.query.filter(User.email == email).one()
-        invalidate_assessment_status_cache(user)
+        invalidate_assessment_status_cache(user_id=user.id)
         qbd = QuestionnaireBank.most_current_qb(user=user)
         if qbd.questionnaire_bank:
             queue_outstanding_messages(
