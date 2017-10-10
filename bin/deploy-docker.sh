@@ -1,7 +1,7 @@
 #!/bin/sh -e
 # docker-compose deployment script
 # Build or update a set of containers as defined by a docker-compose.yaml file
-# Environmental variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
+# Environment variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
 
 cmdname=$(basename $0)
 
@@ -33,18 +33,17 @@ shift $((OPTIND-1))
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-# git-specific environmental variables
+# git-specific environment variables
 # allow git commands outside repo path
 export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 
-# Set default docker-compose file if COMPOSE_FILE environmental variable not set
+# Set default docker-compose file if COMPOSE_FILE environment variable not set
 export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}
 
-# Hack to set env vars in docker-compose file
-# See portal.env.default
-set -o allexport
-. "${GIT_WORK_TREE}/docker/portal.env"
+# Set env vars in docker-compose file; see env.default
+set -o allexport # export all new env vars by default
+. "${GIT_WORK_TREE}/docker/.env"
 
 if [ -n "$BACKUP" -a -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"

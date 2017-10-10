@@ -10,7 +10,9 @@ Background
 
 Docker is an open-source project that automates the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
 
-Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
+Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environment variables (ENV) that may be overridden.
+
+Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
 
 Getting Started
 ===============
@@ -30,31 +32,37 @@ Download and run the generated images::
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
-Containers
-==========
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environment variable::
 
-Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a Debian package from the portal codebase and how to install and configure the package into a working Shared Services instance.
+    IMAGE_TAG='stable'
+    COMPOSE_FILE='docker/docker-compose.yaml'
+    docker-compose up web
+
+
+Docker Images
+=============
+
+Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build docker images capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
 
 Building a Debian Package
 -------------------------
 
-To build a Debian package from your current ``develop``::
+To build a Debian package from your local ``develop`` branch::
 
     # Build debian package from local develop branch
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
-
 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
 If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
 
-    # Override defaults with environmental variables
-    BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
-    # Override default docker repo to differentiate locally-built images
-    REPO='local'
+    # Override defaults with environment variables
+    BRANCH='feature/feature-branch-name'
+    GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
 
     # Run the container (override defaults)
     docker-compose run builder
@@ -62,34 +70,19 @@ If you would like to create a package from a topic branch or fork you can overri
 .. note::
     The branch specified must exist on Github
 
-Orchestration
--------------
-Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
+Building a Shared Services Docker Image
+---------------------------------------
 
-Docker-compose offers a higher-level interface to build and run containers together but may be supplanted by Docker stacks in the future.
-
-To download and start the set of containers that comprise Shared Services issue the following command::
-
-    # Download and start web container and dependencies
-    COMPOSE_FILE='docker/docker-compose.yaml'
-    docker-compose up web
-
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
-
-    IMAGE_TAG='stable'
-    COMPOSE_FILE='docker/docker-compose.yaml'
-    docker-compose up web
 
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
-    # Override default docker repo to differentiate locally-built images
+    # Override default (Artifactory) docker repo to differentiate locally-built images
     REPO='local'
 
     # Build the "web" service locally
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose build web
 
-    # Disable remote repo so locally-built image is used
     docker-compose up web
 
 PostgreSQL Access
@@ -97,6 +90,16 @@ PostgreSQL Access
 To interact with the database image started via the ``docker-compose`` instructions above, use ``docker exec`` such as::
 
     docker-compose exec db psql --username postgres
+
+Advanced Configuration
+======================
+
+Environment variables defined in the ``portal.env`` environment file are only passed to the underlying "web" container. However, some environment variables are used for configuration specific to docker-compose.
+
+An
+`additional environment file <https://docs.docker.com/compose/environment-variables/#the-env-file>`__, specifically named ``.env``, in current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
+
+One use for these more "global" environmental variables is overriding the default ``COMPOSE_PROJECT_NAME`` which is used to namespace applications running under docker-compose. In production deployments ``COMPOSE_PROJECT_NAME`` is set to correspond to the domain being served.
 
 Continuous Delivery
 ===================
@@ -112,7 +115,7 @@ Currently, our TravisCI setup uses packages locally-built on TravisCI instead of
 Configuration
 -------------
 
-Most if not all values needed to build and deploy Shared Services are available as environmental variables with sane, CIRG-specific defaults. Please see the `global section of .travis.yml <https://docs.travis-ci.com/user/environment-variables#global-variables>`_.
+Most if not all values needed to build and deploy Shared Services are available as environment variables with sane, CIRG-specific defaults. Please see the `global section of .travis.yml <https://docs.travis-ci.com/user/environment-variables#global-variables>`_.
 
 .. glossary::
 
@@ -125,6 +128,9 @@ Most if not all values needed to build and deploy Shared Services are available 
         * A Docker image
         * Execution environment
         * A standard set of instructions
+
+    environment file
+        A file for defining environment variables. One per line, no shell syntax (export etc).
 
     build
         A group of TravisCI jobs tied to a single commit; initiated by a pull request or push

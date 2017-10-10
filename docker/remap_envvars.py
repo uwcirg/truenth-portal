@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Parses and remaps DB URLs into standard psql environmental variables
+# Parses and remaps DB URLs into standard psql environment variables
 # https://www.postgresql.org/docs/9.6/static/libpq-envars.html
 
 from urlparse import urlparse
@@ -51,7 +51,7 @@ def main():
     if pgdatabase:
         final_envvars['PGDATABASE'] = pgdatabase.split('/')[1]
 
-    # Environmental variables do not persist unless evaluated by parent shell
+    # Environment variables do not persist unless evaluated by parent shell
     for name, value in final_envvars.items():
         print("export {}='{}'".format(name, value))
 

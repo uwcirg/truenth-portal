@@ -62,7 +62,7 @@ before_install:
       export DEPLOY=true;
     fi
 
-  # Set TOXENV default (if not already set by matrix environmental variables)
+  # Set TOXENV default (if not already set by matrix environment variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
   # Fetch all remote branches instead of just the currently checked out one

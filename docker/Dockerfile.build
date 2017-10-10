@@ -19,7 +19,7 @@ RUN \
         python-pip && \
     apt-get clean
 
-# Allow repo and branch to be overridden with environmental variable
+# Allow repo and branch to be overridden with environment variable
 ENV \
     GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
     BRANCH="${BRANCH:-develop}" \
