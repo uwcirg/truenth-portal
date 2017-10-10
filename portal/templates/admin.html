@@ -3,6 +3,14 @@
 
 <div class="reduce-font-sizes">
 
+    <h3 class="tnth-headline">{{ _("Admin Tools") }}</h3>
+    <div id="adminToolLinks">
+      <a href="{{ url_for('portal.communications_dashboard') }}" id="communicationsLink" class="btn btn-default">{{ _("Communications") }}</a>
+      <br/>
+      <a href="{{ url_for('scheduled_job_api.jobs_list') }}" id="scheduledJobsLink" class="btn btn-default">{{ _("Scheduled Jobs") }}</a>
+    </div>
+    <br/>
+
     <h3 class="tnth-headline">{{ _("User Administration") }}</h3>
 
     <p id="profileIntro">{{ _("Select any user to view details or make changes.") }}</p>
