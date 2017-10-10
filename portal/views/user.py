@@ -7,11 +7,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
-from ..csrf import csrf
 from ..database import db
-from ..dogpile import dogpile_cache
 from ..extensions import oauth, user_manager
-from ..models.assessment_status import overall_assessment_status
+from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
 from ..models.auth import Client, Token
 from ..models.group import Group
@@ -573,12 +571,6 @@ def set_user_consents(user_id):
         description: if user_id doesn't exist
 
     """
-    # TODO: refactor common code to better home
-    def invalidate_assessment_status_cache(user):
-        """Invalidate the assessment status cache values for this user"""
-        dogpile_cache.invalidate(
-            overall_assessment_status, user.id)
-
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
     user = current_user()
@@ -598,7 +590,7 @@ def set_user_consents(user_id):
             consent_list=consent_list, acting_user=current_user())
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
-        invalidate_assessment_status_cache(user)
+        invalidate_assessment_status_cache(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
