@@ -87,11 +87,12 @@ class TestPortal(TestCase):
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
         self.app.config['PATIENT_LIST_ADDL_FIELDS'] = [
-            'reports',]
+            'reports']
         rv = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.staff_html, rv.data)
+        results = unicode(rv.data, 'utf-8')
+        self.assertIn(ui.staff_html, results)
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
@@ -155,10 +156,15 @@ class TestPortal(TestCase):
                 "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
-                body='Welcome to testing', sent_at=sent_at,
+                body=u'Welcome to testing \u2713', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
+
+        # confirm styling unicode functions
+        body = message.style_message(message.body)
+        self.assertTrue(u'DOCTYPE' in body)
+        self.assertTrue(isinstance(body, unicode))
 
         self.login()
         rv = self.client.get('/invite/{0}'.format(message.id))

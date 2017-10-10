@@ -1,6 +1,6 @@
 Portal
 ======
-.. automodule:: portal.app
+.. automodule:: portal.factories.app
     :members:
 
 .. automodule:: portal.audit

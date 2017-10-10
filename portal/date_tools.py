@@ -1,7 +1,9 @@
 """Module for additional datetime tools/utilities"""
 from datetime import date, datetime
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from flask import abort, current_app
+import json
 import pytz
 
 
@@ -67,3 +69,45 @@ class FHIR_datetime(object):
     def now():
         """Generates a FHIR compliant datetime string for current moment"""
         return datetime.utcnow().isoformat()+'Z'
+
+
+class RelativeDelta(relativedelta):
+    """utility class to simplify storing relative deltas in SQL strings"""
+
+    def __init__(self, paramstring):
+        """Expects a JSON string of parameters
+
+        :param paramstring: like '{\"months\": 3, \"days\": -14}' is parsed
+            using JSON and passed to dateutl.relativedelta.  All parameters
+            supported by relativedelta should work.
+
+        :returns instance for use in date math such as:
+            tomorrow = `utcnow() + RelativeDelta('{"days":1}')`
+
+        """
+        try:
+            d = json.loads(paramstring)
+        except ValueError:
+            raise ValueError(
+                "Unable to parse RelativeDelta value from `{}`".format(
+                    paramstring))
+        # for now, only using class for relative info, not absolute info
+        if any(key[-1] != 's' for key, val in d.items()):
+            raise ValueError(
+                "Singular key found in RelativeDelta params: {}".format(
+                    paramstring))
+        super(RelativeDelta, self).__init__(**d)
+
+    @staticmethod
+    def validate(paramstring):
+        """Simply try to bring one to life - or raise ValueError"""
+        RelativeDelta(paramstring)
+        return None
+
+
+def localize_datetime(dt, user):
+    if dt and user and user.timezone:
+        local = pytz.utc.localize(dt)
+        tz = pytz.timezone(user.timezone)
+        return local.astimezone(tz)
+    return dt

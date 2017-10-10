@@ -1,5 +1,5 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-from collections import defaultdict
+from celery.result import AsyncResult
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
@@ -8,6 +8,7 @@ from flask_user import roles_required
 from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
+from jinja2 import TemplateNotFound
 from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
@@ -18,7 +19,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
-from ..dogpile import dogpile_cache
+from ..factories.celery import create_celery
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
@@ -26,6 +27,8 @@ from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.auth import validate_origin
+from ..models.communication import load_template_args, Communication
+from ..models.communication_request import CommunicationRequest
 from ..models.coredata import Coredata
 from ..models.encounter import Encounter
 from ..models.fhir import CC
@@ -34,13 +37,12 @@ from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
-from ..models.procedure_codes import known_treatment_started
-from ..models.procedure_codes import known_treatment_not_started
+from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
+from ..models.user_consent import UserConsent
 from ..system_uri import SHORTCUT_ALIAS
-from ..tasks import add, info, post_request
-from jinja2 import TemplateNotFound
+from ..trace import establish_trace, dump_trace
 
 
 portal = Blueprint('portal', __name__)
@@ -343,11 +345,11 @@ def access_via_token(token):
         is_valid, has_expired, user_id =\
                 user_manager.token_manager.verify_token(token, valid_seconds)
         if has_expired:
-            flash('Your access token has expired.', 'error')
-            return redirect(url_for('portal.landing'))
+            current_app.logger.info("token access failed: "
+                                    "expired token {}".format(token))
+            abort(404, "Access token has expired")
         if not is_valid:
-            flash('Your access token is invalid.', 'error')
-            return redirect(url_for('portal.landing'))
+            abort(404, "Access token is invalid")
         return user_id
 
     # Confirm the token is valid, and not expired.
@@ -488,12 +490,6 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 @portal.route('/initial-queries', methods=['GET','POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
-    if request.method == 'POST':
-        # data submission all handled via ajax calls from initial_queries
-        # template.  assume POST can only be sent when valid.
-        current_app.logger.debug("POST initial_queries -> next_after_login")
-        return next_after_login()
-
     user = current_user()
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
@@ -501,8 +497,22 @@ def initial_queries():
         return redirect(url_for('portal.landing'))
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
+    if request.method == 'POST':
+        """
+        data submission all handled via ajax calls from initial_queries
+        template.  assume POST can only be sent when valid.
+        """
+        current_app.logger.debug("POST initial_queries -> next_after_login")
+        return next_after_login()
+    elif len(Coredata().still_needed(user)) == 0:
+        # also handle the situations that resulted from: 1. user refreshing the browser or
+        # 2. exiting browser and resuming session thereafter
+        # In both cases, the request method is GET,
+        # hence a redirect back to initial-queries page won't ever reach the above check
+        # specifically for next_after_login based on the request method of POST
+        current_app.logger.debug("GET initial_queries -> next_after_login")
+        return next_after_login()
 
-    still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     org = user.first_top_organization()
     role = None
@@ -515,9 +525,10 @@ def initial_queries():
     terms = get_terms(org, role)
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
+
     return render_template(
         'initial_queries.html', user=user, terms=terms,
-        consent_agreements=consent_agreements, still_needed=still_needed)
+        consent_agreements=consent_agreements)
 
 
 @portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
@@ -786,24 +797,12 @@ def profile(user_id):
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     top_org = user.first_top_organization()
-    first_org = user.organizations[0] if len(list(user.organizations)) > 0 else None
-    invite_vars = {
-                   'first_name': user.first_name,
-                   'last_name': user.last_name,
-                   'parent_org': top_org.name if top_org else '',
-                   'clinic_name': first_org.name if first_org else '',
-                   'registrationlink': 'url_placeholder',
-                   'verify_account_link': ('<a href=\"url_placeholder\">'
-                                           'url_placeholder</a>'),
-                   'verify_account_button': ('<div class=\"btn\"><a href='
-                                             '\"url_placeholder\">Verify '
-                                             'your account</a></div>')
-                  }
     if top_org:
         name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
     else:
         name_key = UserInviteEmail_ATMA.name_key()
-    invite_email = MailResource(app_text(name_key), variables=invite_vars)
+    args = load_template_args(user=user)
+    invite_email = MailResource(app_text(name_key), variables=args)
     return render_template('profile.html', user=user,
                            invite_email=invite_email, terms=terms,
                            consent_agreements=consent_agreements)
@@ -875,9 +874,9 @@ def about():
         user=current_user())
 
 
+@portal.route('/staff-registration-email/<int:user_id>')
 @roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
-@portal.route('/staff-registration-email/<int:user_id>')
 def staff_registration_email(user_id):
     """Staff Registration Email Content"""
     if user_id:
@@ -887,14 +886,16 @@ def staff_registration_email(user_id):
 
     org = user.first_top_organization()
 
+    args = load_template_args(user=user)
+
     try:
-        item = VersionedResource(app_text(StaffRegistrationEmail_ATMA.
-                                          name_key(organization=org)))
+        name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
+        item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return ('', 204)
 
-    return make_response(item.asset)
+    return jsonify(subject=item.subject, body=item.body)
 
 @portal.route('/explore')
 def explore():
@@ -1055,62 +1056,7 @@ def reporting_dashboard():
 
     """
     return render_template('reporting_dashboard.html', now=datetime.utcnow(),
-                           counts=get_reporting_counts())
-
-
-@dogpile_cache.region('hourly')
-def get_reporting_counts():
-    """Cachable interface for expensive reporting data queries
-
-    The following code is only run on a cache miss.
-
-    """
-    counts = {}
-    counts['roles'] = defaultdict(int)
-    counts['patients'] = defaultdict(int)
-    counts['interventions'] = defaultdict(int)
-    counts['intervention_reports'] = defaultdict(int)
-    counts['organizations'] = defaultdict(int)
-    counts['registrations'] = []
-    counts['encounters'] = {'all': [], 'interventions': defaultdict(list)}
-
-    for user in User.query.filter_by(active=True):
-        if ROLE.TEST in [r.name for r in user.roles]:
-            continue
-        for role in user.roles:
-            counts['roles'][role.name] += 1
-            if role.name == 'patient':
-                if not any((obs.codeable_concept == CC.BIOPSY
-                            and obs.value_quantity.value)
-                           for obs in user.observations):
-                    counts['patients']['pre-dx'] += 1
-                elif known_treatment_not_started(user):
-                    counts['patients']['dx-nt'] += 1
-                elif known_treatment_started(user):
-                    counts['patients']['dx-t'] += 1
-                if any((obs.codeable_concept == CC.PCaLocalized
-                        and not obs.value_quantity.value)
-                       for obs in user.observations):
-                    counts['patients']['meta'] += 1
-        for interv in user.interventions:
-            counts['interventions'][interv.description] += 1
-            if (any(doc.intervention == interv for doc in user.documents)):
-                counts['intervention_reports'][interv.description] += 1
-        if not user.organizations:
-            counts['organizations']['Unspecified'] += 1
-        else:
-            for org in user.organizations:
-                counts['organizations'][org.name] += 1
-        counts['registrations'].append(user.registered)
-
-    for enc in Encounter.query.filter_by(auth_method='password_authenticated'):
-        st = enc.start_time
-        counts['encounters']['all'].append(st)
-        user = get_user(enc.user_id)
-        for interv in user.interventions:
-            counts['encounters']['interventions'][interv.description].append(st)
-
-    return counts
+                           counts=get_reporting_stats())
 
 
 @portal.route('/spec')
@@ -1194,13 +1140,13 @@ def spec():
     return jsonify(swag)
 
 
-
 @portal.route("/celery-test")
 def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""
     x = int(request.args.get("x", x))
     y = int(request.args.get("y", y))
-    res = add.apply_async((x, y))
+    celery = create_celery(current_app)
+    res = celery.send_task('tasks.add', args=(x, y))
     context = {"id": res.task_id, "x": x, "y": y}
     result = "add((x){}, (y){})".format(context['x'], context['y'])
     task_id = "{}".format(context['id'])
@@ -1212,7 +1158,8 @@ def celery_test(x=16, y=16):
 
 @portal.route("/celery-info")
 def celery_info():
-    res = info.apply_async(())
+    celery = create_celery(current_app)
+    res = celery.send_task('tasks.info')
     context = {"id": res.task_id}
     task_id = "{}".format(context['id'])
     result_url = url_for('.celery_result', task_id=task_id)
@@ -1223,13 +1170,61 @@ def celery_info():
 
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
-    retval = add.AsyncResult(task_id).get(timeout=1.0)
+    celery = create_celery(current_app)
+    retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return repr(retval)
+
+
+@portal.route("/communicate/<email>")
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def communicate(email):
+    """Direct call to trigger communications to given user.
+
+    Typically handled by scheduled jobs, this API enables testing of
+    communications without the wait.
+
+    Include a `force=True` query string parameter to first invalidate the cache
+    and look for fresh messages before triggering the send.
+
+    Include a `purge=True` query string parameter to throw out existing
+    communications for the user first, thus forcing a resend  (implies a force)
+
+    Include a `trace=True` query string parameter to get details found during
+    processing - like a debug trace.
+
+    """
+    from ..tasks import send_user_messages
+    u = User.query.filter(User.email == email).first()
+    if not u:
+        message = 'no such user'
+    elif u.deleted_id:
+        message = 'delted user - not allowed'
+    else:
+        purge = request.args.get('purge', False)
+        if purge in ('', '0', 'false', 'False'):
+            purge = False
+        force = request.args.get('force', purge)
+        if force in ('', '0', 'false', 'False'):
+            force = False
+        trace = request.args.get('trace', False)
+        if trace:
+            establish_trace("BEGIN trace for communicate on {}".format(u))
+        if purge:
+            Communication.query.filter_by(user_id=u.id).delete()
+        try:
+            message = send_user_messages(email, force)
+        except ValueError as ve:
+            message = "ERROR {}".format(ve)
+        if trace:
+            message = dump_trace(message)
+    return jsonify(message=message)
 
 
 @portal.route("/post-result/<task_id>")
 def post_result(task_id):
-    r = post_request.AsyncResult(task_id).get(timeout=1.0)
+    celery = create_celery(current_app)
+    r = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
 
 @portal.route("/legal/stock-org-consent/<org_name>")

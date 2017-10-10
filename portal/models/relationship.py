@@ -1,7 +1,7 @@
 """Relationship module
 
 Relationship data lives in the `relationships` table, populated via:
-    `python manage.py seed`
+    `FLASK_APP=manage.py flask seed`
 
 To extend the list of roles, add name: description pairs to the
 STATIC_RELATIONSHIPS dict within, and rerun the seed command above.

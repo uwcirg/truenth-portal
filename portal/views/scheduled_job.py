@@ -1,11 +1,12 @@
 """Views for Scheduled Jobs"""
 from flask import abort, jsonify, Blueprint, request
-from flask import render_template
+from flask import render_template, current_app
 from flask_user import roles_required
 
 from ..audit import auditable_event
 from ..database import db
-from ..extensions import celery, oauth
+from ..extensions import oauth
+from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
@@ -24,6 +25,7 @@ def jobs_list():
     TODO: Add new jobs, modify & inactivate existing jobs
 
     """
+    celery = create_celery(current_app)
     jobs = ScheduledJob.query.filter(
         ScheduledJob.name != "__test_celery__").all()
     tasks = []
@@ -77,4 +79,16 @@ def delete_job(job_id):
     user_id = current_user().id
     auditable_event(msg, user_id=user_id, subject_id=user_id,
                     context='other')
+    return jsonify(message=msg)
+
+
+@scheduled_job_api.route(
+    '/api/scheduled_job/<int:job_id>/trigger', methods=('POST',))
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def trigger_job(job_id):
+    job = ScheduledJob.query.get(job_id)
+    if not job:
+        abort(404, 'job ID not found')
+    msg = job.trigger()
     return jsonify(message=msg)

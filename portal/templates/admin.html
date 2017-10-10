@@ -65,6 +65,9 @@
         </table>
     </div>
 </div>
+{% endblock %}
+{% block table_export_filter_script %}
+{{super()}}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block footer %}
@@ -72,11 +75,15 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
+
 $("#adminTable").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
         $("#tableCount").html(rowInfo);
         return rowInfo;
+    },
+    exportOptions: {
+        fileName: __getExportFileName("AdminList_")
     }
 });
 

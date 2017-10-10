@@ -46,6 +46,7 @@ setup_kwargs = dict(
     packages=find_packages(),
     scripts=[
         "manage.py",
+        "wsgi.py",
         os.path.join('docker', 'remap_envvars.py'),
     ],
     install_requires=[
@@ -54,7 +55,6 @@ setup_kwargs = dict(
         "enum34",
         "Flask",
         "Flask-Babel",
-        "Flask-Celery-Helper",
         "Flask-Dogpile-Cache",
         "Flask-Migrate",
         "Flask-OAuthlib",
@@ -76,6 +76,7 @@ setup_kwargs = dict(
         "python-Levenshtein",
         "redis",
         "requests-cache",
+        "regex",
         "sphinx",
         "sphinx_rtd_theme",
         "validators",

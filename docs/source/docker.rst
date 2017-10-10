@@ -38,9 +38,9 @@ Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a Debian p
 Building a Debian Package
 -------------------------
 
-To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)::
+To build a Debian package from your current ``develop``::
 
-    # Build debian package from develop branch on Github
+    # Build debian package from local develop branch
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
 
@@ -48,11 +48,13 @@ To build a Debian package from the latest latest code on Github (develop branch 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
-If you would like to create a package from a topic branch or fork you can override the Github repo and branch as below::
+If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
 
     # Override defaults with environmental variables
-    REPO_SLUG='USERNAME/true_nth_usa_portal'
     BRANCH='feature/feature-branch-name' COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+
+    # Override default docker repo to differentiate locally-built images
+    REPO='local'
 
     # Run the container (override defaults)
     docker-compose run builder
@@ -80,16 +82,21 @@ By default, the ``portal_web`` image with the ``latest`` tag is downloaded and u
 
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
-    # Build the "web" service locally instead of downloading from a docker registry
-    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
+    # Override default docker repo to differentiate locally-built images
+    REPO='local'
+
+    # Build the "web" service locally
+    COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose build web
+
+    # Disable remote repo so locally-built image is used
     docker-compose up web
 
 PostgreSQL Access
 -----------------
 To interact with the database image started via the ``docker-compose`` instructions above, use ``docker exec`` such as::
 
-    docker exec -it docker_db_1 /usr/lib/postgresql/9.6/bin/psql -U postgres
+    docker-compose exec db psql --username postgres
 
 Continuous Delivery
 ===================

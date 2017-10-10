@@ -4,7 +4,6 @@ from datetime import datetime
 import re
 
 from ..database import db
-from ..extensions import celery
 
 
 class ScheduledJob(db.Model):
@@ -23,6 +22,7 @@ class ScheduledJob(db.Model):
     _schedule = db.Column('schedule', db.Text, nullable=False)
     active = db.Column(db.Boolean(), nullable=False, server_default='1')
     last_runtime = db.Column(db.DateTime, nullable=True)
+    last_status = db.Column(db.Text)
 
     def __str__(self):
         return "scheduled_job {0.name} ({0.task}: {0._schedule})".format(self)
@@ -69,6 +69,7 @@ class ScheduledJob(db.Model):
         d['schedule'] = self.schedule
         d['active'] = self.active
         d['last_runtime'] = self.last_runtime
+        d['last_status'] = self.last_status
         return d
 
     def crontab_schedule(self):
@@ -81,13 +82,28 @@ class ScheduledJob(db.Model):
                        day_of_week=svals[4]
                       )
 
+    def trigger(self):
+        from .. import tasks
+        func = getattr(tasks, self.task, None)
+        if func:
+            args_in = self.args.split(',') if self.args else []
+            kwargs_in = self.kwargs or {}
+            try:
+                msg = func(self.id, *args_in, **kwargs_in)
+            except Exception as exc:
+                msg = ("Unexpected exception in task `{}` (job_id={}):"
+                       " {}".format(self.task, self.id, exc))
+            return msg
+        return 'task {} not found'.format(self.task)
 
-def update_runtime(job_id, runtime=None):
+
+def update_job(job_id, runtime=None, status=None):
     if job_id:
         runtime = runtime or datetime.now()
         sj = ScheduledJob.query.get(job_id)
         if sj:
             sj.last_runtime = runtime
+            sj.last_status = status
             db.session.add(sj)
             db.session.commit()
             return db.session.merge(sj)

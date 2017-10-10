@@ -12,9 +12,10 @@ from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
 
-from portal.app import create_app
+from portal.factories.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
+from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.auth import Client
 from portal.models.coredata import configure_coredata
@@ -36,7 +37,7 @@ from portal.system_uri import SNOMED
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
-FIRST_NAME = 'First'
+FIRST_NAME = u'\u2713'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
@@ -76,7 +77,10 @@ class TestCase(Base):
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
-        return db.session.merge(test_user)
+        test_user = db.session.merge(test_user)
+        # Avoid testing cached/stale data
+        invalidate_assessment_status_cache(test_user.id)
+        return test_user
 
     def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""
@@ -131,12 +135,21 @@ class TestCase(Base):
             db.session.commit()
         return db.session.merge(service_user)
 
-    def add_required_clinical_data(self):
-        " Add clinical data to get beyond the landing page "
+    def add_required_clinical_data(self, backdate=None):
+        """Add clinical data to get beyond the landing page
+
+        :param backdate: timedelta value.  Define to mock Dx
+          happening said period in the past
+
+        """
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        timestamp = None
+        if backdate:
+            timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+                audit=audit, issued=timestamp)
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                      system=SNOMED):
@@ -161,11 +174,24 @@ class TestCase(Base):
             db.session.add(procedure)
             db.session.commit()
 
-    def bless_with_basics(self, backdate=None):
+    def consent_with_org(self, org_id, user_id=TEST_USER_ID):
+        """Bless given user with a valid consent with org"""
+        audit = Audit(user_id=user_id, subject_id=user_id)
+        consent = UserConsent(
+            user_id=user_id, organization_id=org_id,
+            audit=audit, agreement_url='http://fake.org')
+        with SessionScope(db):
+            db.session.add(consent)
+            db.session.commit()
+
+    def bless_with_basics(self, backdate=None, setdate=None):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
           happening said period in the past
+
+        :param setdate: datetime value.  Define to mock consents
+          happening at exact time in the past
 
         """
         self.test_user = db.session.merge(self.test_user)
@@ -180,7 +206,9 @@ class TestCase(Base):
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        if backdate:
+        if setdate:
+            audit.timestamp = setdate
+        elif backdate:
             audit.timestamp = datetime.utcnow() - backdate
         tou = ToU(audit=audit, agreement_url='http://not.really.org',
                   type='website terms of use')

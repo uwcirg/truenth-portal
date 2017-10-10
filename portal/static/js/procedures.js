@@ -11,8 +11,9 @@ $.fn.extend({
             var selectDate = $(this).attr('data-date');
             // Only continue if both values are filled in
             if (selectVal !== undefined && selectDate !== undefined) {
-                 //remove any procedure on prostate or none treatment
-                $("#userProcedures tr[data-id]").each(function() {
+                //remove any procedure on prostate or none treatment
+                //see main.js proceduresContent function that renders these as hidden fields
+                $("#userProcedures input[name='otherProcedures']").each(function() {
                     var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
                     if (code == CANCER_TREATMENT_CODE) {
                         tnthAjax.deleteProc(procId);
@@ -226,7 +227,6 @@ $(document).ready(function() {
             // If there's no events left, add status msg back in
             if ($('#eventListtnthproc tr').length == 0) {
                 $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
-                $("#pastTreatmentsContainer").css("opacity", 0);
             };
         });
         // Post delete to server

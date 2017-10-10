@@ -21,8 +21,8 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
-from .assessment_status import AssessmentStatus
 from ..database import db
+from ..date_tools import localize_datetime
 from .fhir import CC, Coding, CodeableConcept
 from .identifier import Identifier
 from .intervention import Intervention, INTERVENTION, UserIntervention
@@ -36,12 +36,20 @@ from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
 # # functions implementing the 'access_strategy' API
 # ##
 
+__log_strats = None
+
+
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
-    msg = kwargs.get('message', '')  # optional
-    current_app.logger.debug(
-        "{func_name} returning {result} for {user} on intervention "
-        "{intervention}".format(**kwargs) + msg)
+    # get config value if haven't yet
+    global __log_strats
+    if __log_strats is None:
+        __log_strats = current_app.config.get("LOG_DEBUG_STRATS", False)
+    if __log_strats:
+        msg = kwargs.get('message', '')  # optional
+        current_app.logger.debug(
+            "{func_name} returning {result} for {user} on intervention "
+            "{intervention}".format(**kwargs) + msg)
 
 
 def limit_by_clinic_w_id(
@@ -196,7 +204,7 @@ def allow_if_not_in_intervention(intervention_name):
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
     def user_not_in_intervention(intervention, user):
-        if not exclusive_intervention.display_for_user(user).access:
+        if not exclusive_intervention.quick_access_check(user):
             _log(result=True, func_name='user_not_in_intervention', user=user,
                  intervention=intervention.name)
             return True
@@ -206,6 +214,7 @@ def allow_if_not_in_intervention(intervention_name):
 
 def update_card_html_on_completion():
     """Update description and card_html depending on state"""
+    from .assessment_status import AssessmentStatus  # avoid cycle
 
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
@@ -219,15 +228,15 @@ def update_card_html_on_completion():
                 classification='indefinite'))
 
         def thank_you_block(name, registry):
-            greeting = _("Thank you, {}.").format(name)
+            greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                "You've completed the {} Registry Study questionnaire"
+                u"You've completed the {} Registry Study questionnaire"
                 ".").format(registry)
             reminder = _(
-                "You will be notified when the next "
+                u"You will be notified when the next "
                 "questionnaire is ready to complete.")
-            logout = _("Log out")
-            return """
+            logout = _(u"Log out")
+            return u"""
                 <div class="portal-header-container">
                   <h2 class="portal-header">{greeting}</h2>
                   <p>{confirm}</p>
@@ -237,7 +246,9 @@ def update_card_html_on_completion():
                   </div>
                   <br/><br/>
                   <div class="button-container portal-header-logout-container">
-                    <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
+                    <a class="btn-lg btn-tnth-primary" href="/logout">
+                      {logout}
+                    </a>
                   </div>
                 </div>""".format(
                     greeting=greeting, confirm=confirm, reminder=reminder,
@@ -254,16 +265,16 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                due_date = assessment_status.next_available_due_date(
-                    classification='baseline')
+                utc_due_date = assessment_status.next_available_due_date()
+                due_date = localize_datetime(utc_due_date, user)
                 assert due_date
-                greeting = _("Hi {}").format(user.display_name)
+                greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    "Please complete your {} registry study "
+                    u"Please complete your {} registry study "
                     "questionnaire by {}.").format(
                         assessment_status.organization.name,
                         due_date.strftime('%-d %b %Y'))
-                return """
+                return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
                       <h4 class="portal-intro-text">
@@ -275,12 +286,12 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
-                greeting = _("Hi {}").format(user.display_name)
+                greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    "Please complete your {} registry study "
+                    u"Please complete your {} registry study "
                     "questionnaire at your convenience.").format(
                         assessment_status.organization.name)
-                return """
+                return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
                       <h4 class="portal-intro-text">
@@ -299,11 +310,11 @@ def update_card_html_on_completion():
 
         def completed_card_html(assessment_status):
             """Generates the appropriate HTML for the 'completed card'"""
-            header = _("Completed Questionnaires")
+            header = _(u"Completed Questionnaires")
             message = _(
-                "When you are done, completed questionnaires will be "
+                u"When you are done, completed questionnaires will be "
                 "shown here.")
-            completed_placeholder = """
+            completed_placeholder = u"""
                 <div class="portal-description disabled">
                   <h4 class="portal-description-title">
                     {header}
@@ -313,7 +324,7 @@ def update_card_html_on_completion():
                   </div>
                 </div>""".format(header=header, message=message)
 
-            completed_html = """
+            completed_html = u"""
                 <div class="portal-description">
                   <h4 class="portal-description-title">
                     {header}
@@ -328,11 +339,12 @@ def update_card_html_on_completion():
                  </div>"""
 
             if assessment_status.overall_status == "Completed":
-                header = _("Completed Questionnaires")
+                header = _(u"Completed Questionnaires")
+                utc_comp_date = assessment_status.completed_date
+                comp_date = localize_datetime(utc_comp_date, user)
                 message = _(
-                    "View questionnaire completed on {}").format(
-                        assessment_status.completed_date.strftime(
-                            '%-d %b %Y'))
+                    u"View questionnaire completed on {}").format(
+                        comp_date.strftime('%-d %b %Y'))
                 return completed_html.format(
                     header=header, message=message,
                     recent_survey_link=url_for(
@@ -357,8 +369,8 @@ def update_card_html_on_completion():
                 resume_instrument_id=assessment_status.
                 instruments_in_progress(classification='all'))
 
-            header = _("Open Questionnaire")
-            card_html = """
+            header = _(u"Open Questionnaire")
+            card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
@@ -377,16 +389,16 @@ def update_card_html_on_completion():
 
         elif any(indefinite_questionnaires):
             # User completed baseline, but has outstanding indefinite work
-            link_label = _('Continue questionnaire') if (
+            link_label = _(u'Continue questionnaire') if (
                 indefinite_questionnaires[1]) else (
-                    _('Go to questionnaire'))
+                    _(u'Go to questionnaire'))
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
                 instrument_id=indefinite_questionnaires[0],
                 resume_instrument_id=indefinite_questionnaires[1])
 
-            header = _("Open Questionnaire")
-            card_html = """
+            header = _(u"Open Questionnaire")
+            card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
@@ -406,14 +418,15 @@ def update_card_html_on_completion():
 
         elif assessment_status.overall_status == "Completed":
             # User completed both baseline and indefinite
-            link_label = _('View previous questionnaire')
+            link_label = _(u'View previous questionnaire')
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
-            header = _("Open Questionnaire")
-            message = _("No questionnaire is due.")
-            card_html = """
+            header = _(u"Open Questionnaire")
+            message = _(u"No questionnaire is due.")
+            card_html = u"""
             <div class="container">
               {intro}
-              <div class="portal-main portal-flex-container portal-completed-container">
+              <div class=
+              "portal-main portal-flex-container portal-completed-container">
                 <div class="portal-description">
                   <h4 class="portal-description-title">{header}</h4>
                   <div class="portal-description-body">
@@ -436,7 +449,7 @@ def update_card_html_on_completion():
                     "Unexpected state {} for {}".format(
                         assessment_status.overall_status, user))
 
-            link_label = "N/A"
+            link_label = u"N/A"
             link_url = None
 
             # If the user was enrolled in indefinite work and lands
@@ -447,10 +460,10 @@ def update_card_html_on_completion():
                     registry=assessment_status.organization.name)
             else:
                 message = _(
-                    "The assessment is no longer available.\n"
+                    u"The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
-                card_html = """
-                    "<div class='portal-description
+                card_html = u"""
+                    <div class='portal-description
                         portal-no-description-container'>
                       {message}
                     </div>""".format(message=message)

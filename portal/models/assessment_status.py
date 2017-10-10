@@ -1,38 +1,36 @@
 """AssessmentStatus module"""
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import current_app
 
 from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
-from .organization import Organization, OrgTree
+from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
-from .user_consent import UserConsent
 
 
-def most_recent_survey(user, instrument_id=None):
-    """Look up timestamp for recent QuestionnaireResponse for user
+def recent_qnr_status(user, questionnaire_name):
+    """Look up recent status/timestamp for matching QuestionnaireResponse
 
     :param user: Patient to whom completed QuestionnaireResponses belong
-    :param instrument_id: Optional parameter to limit type of
-        QuestionnaireResponse in lookup.
+    :param questionnaire_name: name of associated questionnaire
     :return: dictionary with authored (timestamp) of the most recent
         QuestionnaireResponse keyed by status found
 
     """
     query = QuestionnaireResponse.query.distinct(
         QuestionnaireResponse.status).filter(
-            QuestionnaireResponse.subject_id == user.id)
-    if instrument_id:
-        query = query.filter(
+            QuestionnaireResponse.subject_id == user.id
+        ).filter(
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')
-            ].astext.endswith(instrument_id))
-    query = query.order_by(
-        QuestionnaireResponse.status,
-        QuestionnaireResponse.authored).limit(9).with_entities(
-            QuestionnaireResponse.status, QuestionnaireResponse.authored)
+            ].astext.endswith(questionnaire_name)
+        ).order_by(
+            QuestionnaireResponse.status,
+            QuestionnaireResponse.authored).limit(9).with_entities(
+                QuestionnaireResponse.status, QuestionnaireResponse.authored)
+
     results = {}
     for qr in query:
         if qr[0] not in results:
@@ -41,183 +39,113 @@ def most_recent_survey(user, instrument_id=None):
     return results
 
 
-def qbs_for_user(user, classification):
-    """Return questionnaire banks for the given (user, classification)
+def status_from_recents(recents, start, overdue, expired):
+    """Returns dict defining available values from recents
 
-    QuestionnaireBanks are associated with a user through the top
-    level organization affiliation, or through interventions
-
-    :return: matching QuestionnaireBanks if found, else empty list
+    Return dict will only define values which make sense.  i.e.
+    'completed' is only present if status is 'Completed', and
+    'by_date' is only present if it's not completed or expired.
 
     """
-    results = []
-    for org in (o for o in user.organizations if o.id):
-        top = OrgTree().find(org.id).top_level()
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.organization_id == top,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
+    results = {}
+    if 'completed' in recents:
+        return {
+            'status': 'Completed',
+            'completed': recents['completed']
+        }
+    if 'in-progress' in recents:
+        results['status'] = 'In Progress'
+        results['in-progress'] = recents['in-progress']
+    now = datetime.utcnow()
+    if now < start:
+        raise ValueError(
+            "unexpected call for status on unstarted Questionnaire")
 
-    for intv in (i for i in user.interventions if i.id):
-        qbs = QuestionnaireBank.query.filter(
-            QuestionnaireBank.intervention_id == intv.id,
-            QuestionnaireBank.classification == classification).all()
-        if qbs:
-            results.extend(qbs)
+    if (overdue and now < overdue) or (not overdue and now < expired):
+        tmp = {
+            'status': 'Due',
+            'by_date': overdue if overdue else expired
+           }
+        tmp.update(results)
+        return tmp
+    if overdue and now < expired:
+        tmp = {
+            'status': 'Overdue',
+            'by_date': expired
+           }
+        tmp.update(results)
+        return tmp
+    tmp = {'status': 'Expired'}
+    tmp.update(results)
+    return tmp
 
-    def validate_classification_count(qbs):
-        if len(qbs) > 1:
-            current_app.logger.error(
-                "multiple QuestionnaireBanks for {user} with "
-                "{classification} found.  The UI won't correctly display "
-                "more than one at this time.".format(
-                    user=user, classification=classification))
 
-    validate_classification_count(results)
-    return results
+def qb_status_dict(user, questionnaire_bank):
+    """Gather status details for a user on a given QB"""
+    d = OrderedDict()
+    if not questionnaire_bank:
+        return d
+    trigger_date = questionnaire_bank.trigger_date(user)
+    start = questionnaire_bank.calculated_start(trigger_date).relative_start
+    overdue = questionnaire_bank.calculated_overdue(trigger_date)
+    expired = questionnaire_bank.calculated_expiry(trigger_date)
+    for q in questionnaire_bank.questionnaires:
+        recents = recent_qnr_status(user, q.name)
+        d[q.name] = status_from_recents(
+            recents, start, overdue, expired)
+    return d
 
 
-class QuestionnaireDetails(object):
-    """Encapsulate details needed for a questionnaire
+class QuestionnaireBankDetails(object):
+    """Gather details on users most current QuestionnaireBank
 
     Houses details including questionnaire's classification, recent
     reports and details needed by clients like AssessmentStatus.
+
     """
-
-    def __init__(self, user, consent_date):
+    def __init__(self, user):
         self.user = user
-        self.consent_date = consent_date
-        self._baseline_qs = OrderedDict()
-        self._recurring_qs = OrderedDict()
-        self._indefinite_qs = OrderedDict()
-        for classification in ('baseline', 'recurring', 'indefinite'):
-            for qb in qbs_for_user(user, classification):
-                for questionnaire in qb.questionnaires:
-                    self._append_questionnaire(
-                        classification=classification,
-                        questionnaire=questionnaire,
-                        organization_id=qb.organization_id)
+        self.qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
+        self.status_by_q = qb_status_dict(user=user,
+                                          questionnaire_bank=self.qb)
 
-    def lookup(self, questionnaire_name, classification):
-        """Return element (if found) with matching criteria"""
-        if classification == 'all':
-            raise NotImplementedError(
-                "`lookup' not yet supporting `all` classifications")
-        storage = getattr(self, '_{}_qs'.format(classification))
-        if not storage:
-            raise ValueError("unknown classification: {}".format(
-                classification))
-        return storage.get(questionnaire_name)
+    def completed_date(self):
+        """Returns timestamp from most recent completed assessment"""
+        dates = [
+            self.status_by_q[q]['completed'] for q in self.status_by_q
+            if 'completed' in self.status_by_q[q]]
+        dates.sort(reverse=True)
+        if dates:
+            return dates[0]
+        else:
+            return None
 
-    def all(self):
-        """Generator to return all questionnaires"""
-        for q in (
-                self._baseline_qs.values() +
-                self._recurring_qs.values() +
-                self._indefinite_qs.values()):
-            yield q
+    def overall_status(self):
+        """Returns the `overall_status` for the users most_current_qb"""
+        if not (self.qb and self.qb.trigger_date):
+            return 'Expired'
+        status_strings = [v['status'] for v in self.status_by_q.values()]
+        if all((status_strings[0] == status for status in status_strings)):
+            if not status_strings[0] in (
+                    'Completed', 'Due', 'In Progress', 'Overdue',
+                    'Expired'):
+                raise ValueError('Unexpected common status {}'.format(
+                    status_strings[0]))
 
-    def baseline(self):
-        """Generator to return all baseline questionnaires"""
-        for q in self._baseline_qs.values():
-            yield q
+            result = status_strings[0]
 
-    def indefinite(self):
-        """Generator to return all indefinite questionnaires"""
-        for q in self._indefinite_qs.values():
-            yield q
-
-    def recurring(self):
-        """Generator to return all recurring questionnaires"""
-        for q in self._recurring_qs.values():
-            yield q
-
-    def _append_questionnaire(self, classification, questionnaire,
-                              organization_id):
-        """Build up internal ordered dict from given values"""
-        storage = getattr(self, '_{}_qs'.format(classification))
-        if questionnaire.name in storage:
-            raise ValueError(
-                "questionnaires expected to be unique by classification, "
-                "{} already defined for {}".format(
-                    questionnaire.name, classification))
-
-        def status_from_recents(
-                recents, days_till_due, days_till_overdue, start):
-            """Returns dict defining available values from recents
-
-            Return dict will only define values which make sense.  i.e.
-            'completed' is only present if status is 'Completed', and
-            'by_date' is only present if it's not completed or expired.
-
-            """
-            results = {}
-            if 'completed' in recents:
-                return {
-                    'status': 'Completed',
-                    'completed': recents['completed']
-                }
-            if 'in-progress' in recents:
-                results['status'] = 'In Progress'
-                results['in-progress'] = recents['in-progress']
-            today = datetime.utcnow()
-            delta = today - start
-            if delta < timedelta(days=days_till_due):
-                tmp = {
-                    'status': 'Due',
-                    'by_date': (
-                        start + timedelta(days=days_till_due))
-                   }
-                tmp.update(results)
-                return tmp
-            if delta < timedelta(days=days_till_overdue):
-                tmp = {
-                    'status': 'Overdue',
-                    'by_date': start + timedelta(
-                        days=days_till_overdue)
-                   }
-                tmp.update(results)
-                return tmp
-            tmp = {'status': 'Expired'}
-            tmp.update(results)
-            return tmp
-
-        def questionnaire_start_date(questionnaire):
-            """Return relative start date for questionnare or None
-
-            Determine if questionnaire qualifies for inclusion, if not, return
-            None.  If it qualifies, return the start date.  Typically this is
-            the consent_date except on recurring questionnaries, where it's
-            the effective start_date for the active recurrance cycle.
-
-            :return: datetime of the questionnaire's start date; None if N/A
-
-            """
-            if len(questionnaire.recurs):
-                for recurrance in questionnaire.recurs:
-                    relative_start = recurrance.active_interval_start(
-                        start=self.consent_date)
-                    if relative_start:
-                        return relative_start
-                return None  # no active recurrance
-            return self.consent_date
-
-        relative_start = questionnaire_start_date(questionnaire)
-        if not relative_start:
-            return
-
-        storage[questionnaire.name] = {
-            'name': questionnaire.name,
-            'classification': classification,
-            'organization_id': organization_id
-        }
-        storage[questionnaire.name].update(
-            status_from_recents(recents=most_recent_survey(
-                self.user, questionnaire.name),
-                days_till_due=questionnaire.days_till_due,
-                days_till_overdue=questionnaire.days_till_overdue,
-                start=relative_start))
+            # Edge case where all are in progress, but no time remains
+            if status_strings[0] == 'In Progress':
+                due_by = [
+                    d.get('by_date') for d in self.status_by_q.values()]
+                if not any(due_by):
+                    result = 'Partially Completed'
+        else:
+            if any(('Expired' == status for status in status_strings)):
+                result = 'Partially Completed'
+            else:
+                result = 'In Progress'
+        return result
 
 
 class AssessmentStatus(object):
@@ -228,57 +156,27 @@ class AssessmentStatus(object):
 
     """
 
-    def __init__(self, user, consent=None):
+    def __init__(self, user):
         """Initialize assessment status object for given user/consent
 
         :param user: The user in question - patient on whom to check status
-        :param consent: Consent agreement defining dates and which organization
-            to consider in the status check.  If not provided, use the first
-            valid consent found for the user.  Users w/o consents have
-            overall_status of `Expired`
 
         """
         self.user = user
-        self._consent = consent
-        self.questionnaire_data = QuestionnaireDetails(user, self.consent_date)
+        self.qb_data = QuestionnaireBankDetails(user)
 
     def __str__(self):
         """Present friendly format for logging, etc."""
-        results = (
-            "{0.user} has overall status '{0.overall_status}' for "
-            "baseline questionnaires:".format(self))
-
-        return results + str(
-            ['{}:{}'.format(unicode(q['name']), unicode(q['status']))
-             for q in self.questionnaire_data.baseline()])
-
-    @property
-    def consent_date(self):
-        """Return timestamp of signed consent, if available, else None"""
-        if hasattr(self, '_consent_date'):
-            return self._consent_date
-        else:
-            if not self._consent:
-                if self.user.valid_consents and len(list(
-                        self.user.valid_consents)) > 0:
-                    self._consent = self.user.valid_consents[0]
-            if self._consent:
-                self._consent_date = self._consent.audit.timestamp
-            else:
-                self._consent_date = None
-            return self._consent_date
+        if self.qb_data.qb:
+            return (
+                "{0.user} has overall status '{0.overall_status}' for "
+                "QuestionnaireBank {0.qb_data.qb.name}".format(self))
+        return "{0.user} has overall status '{0.overall_status}'".format(self)
 
     @property
     def completed_date(self):
         """Returns timestamp from most recent completed assessment"""
-        dates = [
-            q['completed'] for q in self.questionnaire_data.all()
-            if 'completed' in q]
-        dates.sort(reverse=True)
-        if dates:
-            return dates[0]
-        else:
-            return None
+        return self.qb_data.completed_date()
 
     @property
     def localized(self):
@@ -291,87 +189,85 @@ class AssessmentStatus(object):
 
     @property
     def organization(self):
-        """Returns the organization associated with users's baseline"""
-        first_baseline = next(self.questionnaire_data.baseline(), None)
-        if first_baseline:
-            return Organization.query.get(first_baseline['organization_id'])
-        else:
-            return
+        """Returns the organization associated with users's QB or None"""
+        org_id = self.qb_data.qb.organization_id
+        if org_id:
+            return Organization.query.get(org_id)
+        return None
 
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
-        filter = getattr(self.questionnaire_data, classification)
-        for one in filter():
-            return True
-        return False
+        return len(
+            QuestionnaireBank.qbs_for_user(self.user, classification)) > 0
 
-    def instruments_needing_full_assessment(self, classification):
-        """Return list of questionnaire names needed for classification
+    def _status_by_classification(self, classification):
+        """Returns appropriate status dict for requested QB type(s)"""
+        results = OrderedDict()
+        if classification is None or classification == 'all':
+            # Assumes current by default
+            results = self.qb_data.status_by_q
+        if classification in ('all', 'indefinite'):
+            qb = QuestionnaireBank.qbs_for_user(self.user, 'indefinite')
+            if qb:
+                assert len(qb) == 1
+                results.update(qb_status_dict(self.user, qb[0]))
+        return results
+
+    def instruments_needing_full_assessment(self, classification=None):
+        """Return list of questionnaire names needed
 
         NB - if the questionnaire is outside the valid date range, such as in
         an expired state or prior to the next recurring cycle, it will not be
         included in the list regardless of its needing assessment status.
 
-        :param classification: set to restrict lookup to a single
-            QuestionnaireBank.classification or 'all' to consider all.
+        :param classification: set to 'indefinite' to consider that
+            classification, or 'all', otherwise uses current QB.
         :returns: list of questionnaire names (IDs)
 
         """
-        filter = getattr(self.questionnaire_data, classification)
         results = []
-        for data in filter():
+        input = self._status_by_classification(classification)
+        for name, data in input.items():
             if ('completed' in data or 'in-progress' in data or
                     data.get('status') == 'Expired'):
                 continue
-            results.append(data['name'])
-
+            results.append(name)
         return results
 
-    def instruments_in_progress(self, classification):
+    def instruments_in_progress(self, classification=None):
         """Return list of questionnaire names in-progress for classification
 
         NB - if the questionnaire is outside the valid date range, such as in
         an expired state, it will not be included in the list regardless of
         its in-progress status.
 
-        :param classification: set to restrict lookup to a single
-            QuestionnaireBank.classification or 'all' to consider all.
+        :param classification: set to 'indefinite' to consider that
+            classification, or 'all', otherwise uses current QB.
         :returns: list of questionnaire names (IDs)
 
         """
-        filter = getattr(self.questionnaire_data, classification)
         results = []
-        for data in filter():
+        input = self._status_by_classification(classification)
+        for name, data in input.items():
             if 'in-progress' in data:
                 # Only counts if there's a `by_date`, otherwise, although this
                 # questionnaire is partially done, it can't be resumed
                 if 'by_date' in data:
-                    results.append(data['name'])
-
+                    results.append(name)
         return results
 
-    def next_available_due_date(self, classification):
-        """Lookup due_date from next available assessment for classification
+    def next_available_due_date(self):
+        """Lookup due_date from next available assessment
 
-        Considering the classification, prefer due_date for first
-        questionnaire needing full assessment, also consider those in
-        process in case others don't qualify.
+        Prefer due_date for first questionnaire needing full assessment, also
+        consider those in process in case others don't qualify.
 
-        :param classification: set to restrict lookup to a single
-            QuestionnaireBank.classification or 'all' to consider all.
         :returns: due date of next available assessment, or None
 
         """
-        instruments = (
-            self.instruments_needing_full_assessment(classification)
-            or self.instruments_in_progress(classification))
-        for i in instruments:
-            due_date = self.questionnaire_data.lookup(
-                questionnaire_name=i, classification=classification).get(
-                    'by_date')
-            if due_date:
-                return due_date
-
+        for name, data in self.qb_data.status_by_q.items():
+            if data.get('by_date'):
+                return data.get('by_date')
         return None
 
     @property
@@ -396,50 +292,25 @@ class AssessmentStatus(object):
                 expired.
 
         """
-        if hasattr(self, '_overall_status'):
-            return self._overall_status
-        else:
-            first_baseline = next(self.questionnaire_data.baseline(), None)
-            if not self.consent_date or not first_baseline:
-                self._overall_status = 'Expired'
-                return self._overall_status
-            status_strings = [
-                details['status'] for details in
-                self.questionnaire_data.baseline()]
-            if all((status_strings[0] == status for status in status_strings)):
-                if not status_strings[0] in (
-                        'Completed', 'Due', 'In Progress', 'Overdue',
-                        'Expired'):
-                    raise ValueError('Unexpected common status {}'.format(
-                        status_strings[0]))
+        return self.qb_data.overall_status()
 
-                self._overall_status = status_strings[0]
 
-                # Edge case where all are in progress, but no time remains
-                if status_strings[0] == 'In Progress':
-                    due_by = [
-                        d.get('by_date') for d in
-                        self.questionnaire_data.baseline()]
-                    if not any(due_by):
-                        self._overall_status = 'Partially Completed'
-            else:
-                if any(('Expired' == status for status in status_strings)):
-                    self._overall_status = 'Partially Completed'
-                else:
-                    self._overall_status = 'In Progress'
-            return self._overall_status
+def invalidate_assessment_status_cache(user_id):
+    """Invalidate the assessment status cache values for this user"""
+    dogpile_cache.invalidate(
+        overall_assessment_status, user_id)
 
 
 @dogpile_cache.region('hourly')
-def overall_assessment_status(user_id, consent_id=None):
+def overall_assessment_status(user_id):
     """Cachable interface for expensive assessment status lookup
 
     The following code is only run on a cache miss.
 
     """
     user = User.query.get(user_id)
-    consent = UserConsent.query.get(consent_id) if consent_id else None
-    current_app.logger.debug("CACHE MISS: {} {} {}".format(
-        __name__, user_id, consent_id))
-    a_s = AssessmentStatus(user, consent)
-    return a_s.overall_status
+    current_app.logger.debug("CACHE MISS: {} {}".format(
+        __name__, user_id))
+    a_s = AssessmentStatus(user)
+    qbd = QuestionnaireBank.most_current_qb(user)
+    return (a_s.overall_status, qbd)

@@ -1,29 +1,12 @@
-FROM debian:jessie
+FROM debian:stretch
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Use newest version of dh-virtualenv from testing release
-# Todo: try specifying version in `apt-get install` invocation
-RUN echo '\n\
-Package: dh-virtualenv\n\
-Pin: release a=testing\n\
-Pin-Priority: 750\n\
-\n'\
-> /etc/apt/preferences.d/dh-virtualenv.pref
-
-RUN echo '\n\
-Package: *\n\
-Pin: release a=testing\n\
-Pin-Priority: 75\n\
-\n'\
-> /etc/apt/preferences.d/testing.pref
-
-RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
-
 RUN \
     apt-get update && \
-    apt-get dist-upgrade -y && \
-    apt-get install -y --force-yes --no-install-recommends \
+    apt-get install --yes --no-install-recommends apt-utils && \
+    apt-get dist-upgrade --yes && \
+    apt-get install --yes --no-install-recommends \
         build-essential \
         debhelper \
         dh-virtualenv\
@@ -36,24 +19,28 @@ RUN \
         python-pip && \
     apt-get clean
 
-RUN pip install --upgrade pip setuptools
-RUN pip install make-deb
+# Allow repo and branch to be overridden with environmental variable
+ENV \
+    GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
+    BRANCH="${BRANCH:-develop}" \
+    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
 
-RUN mkdir -p /tmp/artifacts
+RUN \
+    pip install --upgrade pip setuptools && \
+    pip install wheel && \
+    pip install make-deb && \
+    mkdir --parents "${ARTIFACT_DIR}"
 
-# Allow branch to be overridden with environmental variable
-ENV BRANCH="${BRANCH:-develop}"
-
-# Allow repo to be overridden with environmental variable
-ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+WORKDIR /root/portal
 
 CMD \
-    git clone --branch "${BRANCH}" "https://github.com/${REPO_SLUG}.git" /root/portal && \
-    cd /root/portal && \
+    git clone --verbose --branch "${BRANCH}" "${GIT_REPO}" . && \
     yes | make-deb && \
     git checkout debian/rules && \
-    dpkg-buildpackage -us -uc && \
-    mv /root/portal_* /tmp/artifacts && \
-    cd /tmp/artifacts && \
-    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz && \
-    chown --verbose nobody:nogroup /tmp/artifacts/*
+
+    dpkg-buildpackage --unsigned-source --unsigned-changes && \
+    mv /root/portal_* "${ARTIFACT_DIR}" && \
+
+    cd "${ARTIFACT_DIR}" && \
+    dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz" && \
+    chown --verbose nobody:nogroup "${ARTIFACT_DIR}/"*

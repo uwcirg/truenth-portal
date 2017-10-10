@@ -10,17 +10,16 @@ Launch in the same virtual environment via
   $ celery worker -A portal.celery_worker.celery --loglevel=info
 
 """
-from .app import create_app
 from .database import db
-from .extensions import celery
+from factories.celery import create_celery
+from factories.app import create_app
 from .models.scheduled_job import ScheduledJob
 import tasks
 
-assert celery  # silence pyflake warning
 
 app = create_app()
+celery = create_celery(app)
 app.app_context().push()
-
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -40,6 +39,5 @@ def setup_periodic_tasks(sender, **kwargs):
             args_in = job.args.split(',') if job.args else []
             kwargs_in = job.kwargs or {}
             sender.add_periodic_task(job.crontab_schedule(),
-                                     task.s(*args_in,
-                                            job_id=job.id,
+                                     task.s(job.id, *args_in,
                                             **kwargs_in))

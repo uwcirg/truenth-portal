@@ -10,9 +10,10 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..dogpile import dogpile_cache
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus, overall_assessment_status
+from ..models.assessment_status import AssessmentStatus
+from ..models.assessment_status import invalidate_assessment_status_cache
+from ..models.assessment_status import overall_assessment_status
 from ..models.auth import validate_origin
 from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
@@ -1293,11 +1294,24 @@ def assessment_add(patient_id):
         encounter_type = getattr(EC, session['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
+    qnr_qb = None
+    if "questionnaire" in request.json:
+        qn_ref = request.json.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.query.filter_by(name=qn_name).first()
+        qbd = QuestionnaireBank.most_current_qb(patient)
+        qb = qbd.questionnaire_bank
+        if (qb and qn and (qn.id in [qbq.questionnaire.id
+                           for qbq in qb.questionnaires])):
+            qnr_qb = qb
+
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         status=request.json["status"],
         document=request.json,
         encounter=encounter,
+        questionnaire_bank=qnr_qb,
+        qb_iteration=qbd.iteration
     )
 
     db.session.add(questionnaire_response)
@@ -1307,37 +1321,22 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    def invalidate_assessment_status_cache(user):
-        """Invalidate the assessment status cache values for this user"""
-        dogpile_cache.invalidate(
-            overall_assessment_status, user.id)
-        for consent in user.all_consents:
-            dogpile_cache.invalidate(
-                overall_assessment_status, user.id, consent.id)
-
-    invalidate_assessment_status_cache(patient)
+    invalidate_assessment_status_cache(patient.id)
     return jsonify(response)
 
 
 @assessment_engine_api.route('/invalidate/<int:user_id>')
 @oauth.require_oauth()
 def invalidate(user_id):
-    def invalidate_assessment_status_cache(user):
-        """Invalidate the assessment status cache values for this user"""
-        dogpile_cache.invalidate(
-            overall_assessment_status, user.id)
-        for consent in user.all_consents:
-            dogpile_cache.invalidate(
-                overall_assessment_status, user.id, consent.id)
-
     user = get_user(user_id)
     if not user:
         abort(404)
-    invalidate_assessment_status_cache(user)
+    invalidate_assessment_status_cache(user_id)
     return jsonify(invalidated=user.as_fhir())
 
 
 @assessment_engine_api.route('/present-assessment')
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine
@@ -1582,9 +1581,8 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
+        assessment_status, _ = overall_assessment_status(user.id)
         for consent in user.all_consents:
-            assessment_status = overall_assessment_status(
-                user.id, consent.id)
             details.append(
                 {'consent': consent.as_json(),
                  'assessment_status': assessment_status})

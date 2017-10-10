@@ -5,6 +5,7 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
+from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.user import current_user, get_user
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxStartedConstants, TxNotStartedConstants
@@ -145,6 +146,7 @@ def post_procedure():
     db.session.commit()
     auditable_event("added {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
+    invalidate_assessment_status_cache(patient_id)
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
@@ -195,6 +197,7 @@ def procedure_delete(procedure_id):
     db.session.commit()
     auditable_event("deleted {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
+    invalidate_assessment_status_cache(patient_id)
     return jsonify(message='deleted procedure')
 
 

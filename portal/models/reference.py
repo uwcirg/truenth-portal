@@ -4,6 +4,7 @@ from sqlalchemy import and_
 
 from ..database import db
 from .identifier import Identifier
+from .intervention import Intervention
 
 
 class MissingReference(Exception):
@@ -55,6 +56,18 @@ class Reference(object):
         return instance
 
     @classmethod
+    def intervention(cls, intervention_id):
+        """Create a reference object from given intervention
+
+        Intervention references maintained by name - lookup from given id.
+
+        """
+        instance = cls()
+        obj = Intervention.query.get(intervention_id)
+        instance.intervention_name = obj.name
+        return instance
+
+    @classmethod
     def parse(cls, reference_dict):
         """Parse an organization from a FHIR Reference resource
 
@@ -77,6 +90,7 @@ class Reference(object):
         # Due to cyclic import problems, keep these local
         from .organization import Organization, OrganizationIdentifier
         from .questionnaire import Questionnaire
+        from .questionnaire_bank import QuestionnaireBank
         from .user import User
 
         if 'reference' in reference_dict:
@@ -91,6 +105,9 @@ class Reference(object):
         lookup = (
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
             (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),
+            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
+             QuestionnaireBank, 'name'),
+            (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'))
 
         for pattern, obj, attribute in lookup:
@@ -166,5 +183,9 @@ class Reference(object):
             ref = "api/questionnaire_bank/{}".format(
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
+        if hasattr(self, 'intervention_name'):
+            ref = "api/intervention/{}".format(
+                self.intervention_name)
+            display = self.intervention_name
 
         return {"reference": ref, "display": display}

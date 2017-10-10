@@ -7,37 +7,38 @@ import sys
 import requests_cache
 from flask import Flask
 import redis
+from werkzeug.contrib.profiler import ProfilerMiddleware
 
-from .audit import configure_audit_log
-from .config import DefaultConfig
-from .csrf import csrf, csrf_blueprint
-from .database import db
-from .dogpile import dogpile_cache
-from .extensions import authomatic, recaptcha
-from .extensions import babel, celery, mail, oauth, session, user_manager
-from .models.app_text import app_text
-from .models.coredata import configure_coredata
-from .models.role import ROLE
-from .views.assessment_engine import assessment_engine_api
-from .views.audit import audit_api
-from .views.auth import auth, capture_next_view_function
-from .views.coredata import coredata_api
-from .views.clinical import clinical_api
-from .views.demographics import demographics_api
-from .views.extend_flask_user import reset_password_view_function
-from .views.fhir import fhir_api
-from .views.filters import filters_blueprint
-from .views.group import group_api
-from .views.intervention import intervention_api
-from .views.patient import patient_api
-from .views.patients import patients
-from .views.procedure import procedure_api
-from .views.portal import portal, page_not_found, server_error
-from .views.organization import org_api
-from .views.scheduled_job import scheduled_job_api
-from .views.tou import tou_api
-from .views.truenth import truenth_api
-from .views.user import user_api
+from ..audit import configure_audit_log
+from ..config import DefaultConfig
+from ..csrf import csrf, csrf_blueprint
+from ..database import db
+from ..dogpile import dogpile_cache
+from ..extensions import authomatic, recaptcha
+from ..extensions import babel, mail, oauth, session, user_manager
+from ..models.app_text import app_text
+from ..models.coredata import configure_coredata
+from ..models.role import ROLE
+from ..views.assessment_engine import assessment_engine_api
+from ..views.audit import audit_api
+from ..views.auth import auth, capture_next_view_function
+from ..views.coredata import coredata_api
+from ..views.clinical import clinical_api
+from ..views.demographics import demographics_api
+from ..views.extend_flask_user import reset_password_view_function
+from ..views.fhir import fhir_api
+from ..views.filters import filters_blueprint
+from ..views.group import group_api
+from ..views.intervention import intervention_api
+from ..views.patient import patient_api
+from ..views.patients import patients
+from ..views.procedure import procedure_api
+from ..views.portal import portal, page_not_found, server_error
+from ..views.organization import org_api
+from ..views.scheduled_job import scheduled_job_api
+from ..views.tou import tou_api
+from ..views.truenth import truenth_api
+from ..views.user import user_api
 
 SITE_CFG = 'site.cfg'
 DEFAULT_BLUEPRINTS = (
@@ -73,6 +74,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     app = Flask(app_name, template_folder='templates',
                 instance_relative_config=True)
     configure_app(app, config)
+    configure_profiler(app)
     configure_csrf(app)
     configure_dogpile(app)
     configure_jinja(app)
@@ -95,6 +97,11 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+
+
+def configure_profiler(app):
+    if app.config.get('PROFILE'):
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 
 
 def configure_csrf(app):
@@ -164,9 +171,6 @@ def configure_extensions(app):
     # flask-session - Server side sessions
     session.init_app(app)
 
-    # celery - task queue for asynchronous tasks
-    celery.init_app(app)
-
     # babel - i18n
     babel.init_app(app)
 
@@ -235,7 +239,7 @@ def configure_logging(app):  # pragma: no cover
         log.setLevel(level)
         log.addHandler(info_file_handler)
 
-    from .tasks import logger as task_logger
+    from ..tasks import logger as task_logger
     task_logger.setLevel(level)
     task_logger.addHandler(info_file_handler)
 
@@ -257,12 +261,13 @@ def configure_logging(app):  # pragma: no cover
 
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
-    metadata = pkginfo.Develop(os.path.join(app.root_path, ".."))
+    metadata = pkginfo.Installed('portal')
 
     # Get git hash from version if present
-    # Todo: extend Develop instead of monkey patching
-    if metadata.version and '+ng' in metadata.version:
-        metadata.git_hash = metadata.version.split('+ng')[-1].split('.')[0]
+    # https://github.com/pypa/setuptools_scm#default-versioning-scheme
+    # Todo: extend Distribution base class instead of monkey patching
+    if metadata.version and '+' in metadata.version:
+        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][1:]
 
     app.config.metadata = metadata
 
@@ -274,7 +279,7 @@ def configure_cache(app):
     requests_cache.install_cache(
         cache_name=app.name,
         backend='redis',
-        expire_after=1000,
+        expire_after=app.config.get('REQUEST_CACHE_EXPIRE', 10),
         include_get_headers=True,
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),

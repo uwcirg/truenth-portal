@@ -7,8 +7,10 @@ from sqlalchemy import and_
 from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
+from ..models.communication import load_template_args
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.questionnaire_bank import QuestionnaireBank, visit_name
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
@@ -103,7 +105,9 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            patient.assessment_status = overall_assessment_status(patient.id)
+            a_s, qbd = overall_assessment_status(patient.id)
+            patient.assessment_status = a_s
+            patient.current_qb = visit_name(qbd)
             patient_list.append(patient)
         patients = patient_list
 
@@ -161,24 +165,12 @@ def patient_profile(patient_id):
                 url=display.link_url, id=patient.id)
 
     top_org = patient.first_top_organization()
-    first_org = patient.organizations[0]
-    invite_vars = {
-                   'first_name': patient.first_name,
-                   'last_name': patient.last_name,
-                   'parent_org': top_org.name if top_org else '',
-                   'clinic_name': first_org.name if first_org else '',
-                   'registrationlink': 'url_placeholder',
-                   'verify_account_link': ('<a href=\"url_placeholder\">'
-                                           'url_placeholder</a>'),
-                   'verify_account_button': ('<div class=\"btn\"><a href='
-                                             '\"url_placeholder\">Verify '
-                                             'your account</a></div>')
-                  }
+    args = load_template_args(patient)
     if top_org:
         name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
     else:
         name_key = UserInviteEmail_ATMA.name_key()
-    invite_email = MailResource(app_text(name_key), variables=invite_vars)
+    invite_email = MailResource(app_text(name_key), variables=args)
     return render_template(
         'profile.html', user=patient,
         current_user=user, invite_email=invite_email,

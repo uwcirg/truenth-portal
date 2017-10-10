@@ -1,9 +1,18 @@
 """Unit test module for Assessment Engine API"""
 import json
 from flask_swagger import swagger
+from flask_webtest import SessionScope
 
-from tests import TestCase, TEST_USER_ID
+from portal.extensions import db
+from portal.models.audit import Audit
+from portal.models.organization import Organization
 from portal.models.role import ROLE
+from portal.models.questionnaire import Questionnaire
+from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.user import get_user
+from portal.models.user_consent import UserConsent
+from tests import TestCase, TEST_USER_ID
 
 class TestAssessmentEngine(TestCase):
 
@@ -25,6 +34,57 @@ class TestAssessmentEngine(TestCase):
         self.assertEquals(
             self.test_user.questionnaire_responses[0].encounter.auth_method,
             'password_authenticated')
+
+    def test_submit_assessment_for_qb(self):
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        qn = Questionnaire(name='epic26')
+        org = Organization(name="testorg")
+        with SessionScope(db):
+            db.session.add(qn)
+            db.session.add(org)
+            db.session.commit()
+
+        qn, org = map(db.session.merge, (qn, org))
+        qb = QuestionnaireBank(
+            name='Test Questionnaire Bank',
+            classification='baseline',
+            organization_id=org.id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+
+        test_user = get_user(TEST_USER_ID)
+        test_user.organizations.append(org)
+
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org,
+            audit=audit, agreement_url='http://no.com')
+
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.add(test_user)
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+        qb = db.session.merge(qb)
+
+        self.login()
+        rv = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data),
+        )
+        self.assert200(rv)
+        test_user = get_user(TEST_USER_ID)
+        self.assertEquals(test_user.questionnaire_responses.count(), 1)
+        self.assertEquals(
+            test_user.questionnaire_responses[0].questionnaire_bank_id,
+            qb.id)
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)

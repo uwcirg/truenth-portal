@@ -30,8 +30,12 @@ class BaseConfig(object):
     )
 
     ANONYMOUS_USER_ACCOUNT = True
-    CELERY_BROKER_URL = os.environ.get(
-        'CELERY_BROKER_URL',
+    BROKER_URL = os.environ.get(
+        'BROKER_URL',
+        REDIS_URL
+    )
+    CELERY_RESULT_BACKEND = os.environ.get(
+        'CELERY_RESULT_BACKEND',
         REDIS_URL
     )
     REQUEST_CACHE_URL = os.environ.get(
@@ -39,7 +43,6 @@ class BaseConfig(object):
         REDIS_URL
     )
     CELERY_IMPORTS = ('portal.tasks', )
-    CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'

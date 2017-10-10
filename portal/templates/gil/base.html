@@ -9,6 +9,10 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script>window.jQuery || document.write('<script src="../scripts/jquery.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gil.css') }}"><!--[if lte IE 6]>
     <style>#top, #bottom, #left, #right { display: none; }</style>
@@ -264,9 +268,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
             <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4>
-            {% trans remaining_time='<span id="remaining-time"></span>' %}
-            <p class="box-modal__copy">Your session will expire in approximately {{remaining_time}}.</p>
-            {% endtrans %}
+            <span class="box-modal__copy">{{_("Your session will expire in approximately ")}}</span><span class="box-modal__copy text-warning" id='remaining-time'></span>
           </div>
            <div class="box-modal__footer">
             <button id="log-out" class="button button--teal" data-dismiss="modal">{{_("Log Out")}}</button>&nbsp;<button id="stay-logged-in" class="button button--teal" data-dismiss="modal">{{_("Stay Logged In")}}</button>
@@ -293,7 +295,7 @@
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="consent">
               <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" />
-              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/>
+              <input id="{{org}}_consent" class="consent-checkbox" aria-label="{{_('Consent checkbox')}}" type="checkbox"/>
             </div>
           {% endfor %}
       </div>
@@ -303,6 +305,10 @@
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
     <script src="{{url_for('static', filename='js/gil.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     {% if config.PIWIK_SITEID %}
         <script type="text/javascript">
             var _paq = _paq || [];
@@ -341,6 +347,7 @@
                   }
               }
           });
+          __i18next.init({"debug": false, "initImmediate": true});
 
           // Configure and start the session timeout monitor
           {% if user %}
@@ -384,7 +391,7 @@
                     logoutUrl: '{{PORTAL}}/logout',
                     timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
                     modalShown: false,
-                    intervalMonitor: false, 
+                    intervalMonitor: false,
                     onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
@@ -549,6 +556,7 @@
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("__loader(false);", 0);
+
           });
 
       </script>

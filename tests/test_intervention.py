@@ -1,9 +1,11 @@
 """Unit test module for Intervention API"""
-from datetime import timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr, mock_questionnairebanks
+from tests.test_assessment_status import metastatic_baseline_instruments
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -137,6 +139,7 @@ class TestIntervention(TestCase):
 
         # Prior to associating user with any orgs, shouldn't have access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
         # Add association and test again
         user.organizations.append(org3)
@@ -144,6 +147,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
     def test_diag_stategy(self):
         """Test strategy for diagnosis"""
@@ -168,6 +172,7 @@ class TestIntervention(TestCase):
 
         # Prior to PCa dx, user shouldn't have access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
         # Bless the test user with PCa diagnosis
         self.login()
@@ -179,6 +184,7 @@ class TestIntervention(TestCase):
         user, cp = map(db.session.merge, (user, cp))
 
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
     def test_no_tx(self):
         """Test strategy for not starting treatment"""
@@ -201,6 +207,7 @@ class TestIntervention(TestCase):
 
         # Prior to declaring TX, user should have access
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -210,6 +217,7 @@ class TestIntervention(TestCase):
 
         # Declaring they started a non TX proc, should still have access
         self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
 
         self.add_procedure(
             code='26294005',
@@ -221,6 +229,7 @@ class TestIntervention(TestCase):
 
         # Declaring they started a TX proc, should lose access
         self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -246,7 +255,9 @@ class TestIntervention(TestCase):
         # Prior to associating user w/ decision support, the strategy
         # should give access to p3p
         self.assertTrue(ds_p3p.display_for_user(user).access)
+        self.assertTrue(ds_p3p.quick_access_check(user))
         self.assertFalse(ds_wc.display_for_user(user).access)
+        self.assertFalse(ds_wc.quick_access_check(user))
 
         # Add user to wisercare, confirm it's the only w/ access
 
@@ -258,7 +269,9 @@ class TestIntervention(TestCase):
         user, ds_p3p, ds_wc = map(db.session.merge, (user, ds_p3p, ds_wc))
 
         self.assertFalse(ds_p3p.display_for_user(user).access)
+        self.assertFalse(ds_p3p.quick_access_check(user))
         self.assertTrue(ds_wc.display_for_user(user).access)
+        self.assertTrue(ds_wc.quick_access_check(user))
 
     def test_not_in_role_or_sr(self):
         user = self.test_user
@@ -296,6 +309,7 @@ class TestIntervention(TestCase):
         # Prior to granting user WRITE_ONLY role, the strategy
         # should give access to p3p
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
         # Add WRITE_ONLY to user's roles
         add_role(user, ROLE.WRITE_ONLY)
@@ -303,6 +317,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
         # Revert role change for next condition
         user.roles = []
@@ -310,6 +325,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
         # Grant user sr access, they should lose sm visibility
         ui = UserIntervention(
@@ -321,6 +337,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
     def test_in_role(self):
         user = self.test_user
@@ -345,6 +362,7 @@ class TestIntervention(TestCase):
         # Prior to granting user PATIENT role, the strategy
         # should not give access to SM
         self.assertFalse(sm.display_for_user(user).access)
+        self.assertFalse(sm.quick_access_check(user))
 
         # Add PATIENT to user's roles
         add_role(user, ROLE.PATIENT)
@@ -352,6 +370,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
         self.assertTrue(sm.display_for_user(user).access)
+        self.assertTrue(sm.quick_access_check(user))
 
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
@@ -361,7 +380,7 @@ class TestIntervention(TestCase):
 
         # generate questionnaire banks and associate user with
         # metastatic organization
-        mock_questionnairebanks()
+        mock_questionnairebanks('eproms')
         metastatic_org = Organization.query.filter_by(name='metastatic').one()
         self.test_user.organizations.append(metastatic_org)
 
@@ -380,33 +399,40 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
+        dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         # Add a fake assessments and see a change
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+        for i in metastatic_baseline_instruments:
+            mock_qr(user_id=TEST_USER_ID, instrument_id=i, timestamp=dt)
+        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog', timestamp=dt)
 
         user, ae = map(db.session.merge, (self.test_user, ae))
-        self.assertTrue(
-            "Thank you" in ae.display_for_user(user).card_html)
 
-    def test_thankyou_on_expired(self):
-        """If baseline expired and other QB's done, should see thank you"""
+        card_html = ae.display_for_user(user).card_html
+        self.assertTrue("Thank you" in card_html)
+        self.assertTrue(ae.quick_access_check(user))
+
+        # test datetime display based on user timezone
+        self.assertTrue("10 Jun 2017" in card_html)
+        user.timezone = "Asia/Tokyo"
+        with SessionScope(db):
+            db.session.add(user)
+            db.session.commit()
+        user, ae = map(db.session.merge, (self.test_user, ae))
+        card_html = ae.display_for_user(user).card_html
+        self.assertTrue("11 Jun 2017" in card_html)
+
+    def test_expired(self):
+        """If baseline expired check message"""
         ae = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
         # backdate so baseline is expired
-        self.bless_with_basics(backdate=timedelta(days=60))
+        self.bless_with_basics(backdate=relativedelta(months=3))
 
         # generate questionnaire banks and associate user with
-        # metastatic organization
-        mock_questionnairebanks()
-        metastatic_org = Organization.query.filter_by(name='metastatic').one()
-        self.test_user.organizations.append(metastatic_org)
-
-        # Add a fake assessment only to non-expired one from indefinite
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+        # localized organization
+        mock_questionnairebanks('eproms')
+        localized_org = Organization.query.filter_by(name='localized').one()
+        self.test_user.organizations.append(localized_org)
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',
@@ -420,7 +446,8 @@ class TestIntervention(TestCase):
         user, ae = map(db.session.merge, (self.test_user, ae))
 
         self.assertTrue(
-            "Thank you" in ae.display_for_user(user).card_html)
+            "The assessment is no longer available" in
+            ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""

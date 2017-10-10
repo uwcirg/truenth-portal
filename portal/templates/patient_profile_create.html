@@ -4,7 +4,7 @@
 {%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, accountCreationScript, profileConsentDate -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
-<form id="createProfileForm" class="form tnth-form to-validate">
+<form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row">
         <div class="col-md-11">
@@ -25,7 +25,7 @@
                         <label for="email">{{ _("Email Address") }}</label>
                         <input type="text" class="form-control" id="email" name="email" autocomplete="off" placeholder="{{ _('Email Address') }}" value="" data-customemail="true" required />
                         <div id="noEmailContainer">
-                            <input type="checkbox" id="noEmail" class="text-muted">&nbsp;&nbsp;<span class="text-muted">{{_("User does not have email address")}}</span>
+                            <input type="checkbox" id="noEmail" aria-label="{{_('No email')}}" class="text-muted">&nbsp;&nbsp;<span class="text-muted">{{_("User does not have email address")}}</span>
                         </div>
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
@@ -93,7 +93,7 @@
     {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
     {%- endif -%}
 </form>
-<a id="redirectLink" href="">&nbsp;</a>
+<a id="redirectLink" href="" name="redirectLink" class="tnth-hide">&nbsp;</a>
 {{accountCreationScript()}}
 {% endblock %}
 {% block footer %}

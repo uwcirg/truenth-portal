@@ -20,6 +20,24 @@ def known_treatment_started(user):
     return not cc_ids.isdisjoint(has_procs)
 
 
+def latest_treatment_started_date(user):
+    """Returns most recent performed date for Tx proc, or None
+
+    Look up procedures for given user, returning the most recent
+    performed date if any from the TxStartedConstants are found,
+    else None
+
+    NB - only specific treatments count - the generic (placeholders) such as
+    "other" are not considered when looking up treatment start date.
+
+    """
+    cc_ids = set(cc.id for cc in TxStartedConstants())
+    other_id = TxStartedConstants().OtherProcedure.id
+    matching = [proc.start_time for proc in user.procedures
+                if proc.code_id in cc_ids and proc.code_id != other_id]
+    return max(matching) if matching else None
+
+
 def known_treatment_not_started(user):
     """Returns True if the user has a procedure suggesting no Tx started
 
@@ -126,8 +144,7 @@ class TxStartedConstants(object):
             system=ICHOM, code='7', display='Focal therapy'
         ).add_if_not_found(True)
         return CodeableConcept(
-            codings=[ichom,], text='Focal therapy'
-        ).add_if_not_found(True)
+            codings=[ichom], text='Focal therapy').add_if_not_found(True)
 
     @lazyprop
     def OtherProcedure(self):
@@ -164,8 +181,9 @@ class TxNotStartedConstants(object):
         ichom = Coding(
             system=ICHOM, code='1', display='Watchful waiting'
         ).add_if_not_found(True)
-        return CodeableConcept(codings=[sno, ichom], text='Watchful waiting'
-                              ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno, ichom],
+            text='Watchful waiting').add_if_not_found(True)
 
     @lazyprop
     def StartedActiveSurveillance(self):
@@ -175,12 +193,14 @@ class TxNotStartedConstants(object):
         ichom = Coding(
             system=ICHOM, code='2', display='Active surveillance'
         ).add_if_not_found(True)
-        return CodeableConcept(codings=[sno, ichom], text='Active surveillance'
-                             ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno, ichom],
+            text='Active surveillance').add_if_not_found(True)
 
     @lazyprop
     def NoneOfTheAbove(self):
-        tnth = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='999',
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='999',
             display='None').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
                                text='None').add_if_not_found(True)

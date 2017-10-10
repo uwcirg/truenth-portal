@@ -157,6 +157,42 @@ class Intervention(db.Model):
         return DisplayDetails(access=access, intervention=self,
                 user_intervention=ui)
 
+    def quick_access_check(self, user):
+        """Return boolean representing given user's access to intervention
+
+        Somewhat complicated method, depending on intervention configuration.
+        The following ordered steps are used to determine if a user
+        should have access to an intervention.  The first 'true' found
+        is returned (as to make the check as quick as possible).
+
+        1. check if the intervention has `public_access` set
+        2. check for a UserIntervention row defining access for the given
+           user on this intervention.
+        3. call each strategy_function in intervention.access_strategies.
+
+        @return boolean representing 'access'.
+
+        """
+        # 1. check intervention scope for access
+        if self.public_access:
+            return True
+
+        # 2. check user_intervention for access
+        ui = UserIntervention.query.filter_by(
+            user_id=user.id, intervention_id=self.id).first()
+        if ui and ui.access == 'granted':
+            return True
+
+        # 3. check strategies for access
+        for func in self.fetch_strategies():
+            if func.__name__ == 'update_user_card_html':
+                return True
+            if func(intervention=self, user=user):
+                return True
+
+        return False
+
+
     def __str__(self):
         """print details needed in audit logs"""
         if self.name == INTERVENTION.DEFAULT.name:

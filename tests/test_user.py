@@ -938,7 +938,7 @@ class TestUser(TestCase):
                                  birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
         self.assertEquals(score, 0)  # incorrect birthdate returns 0
 
-        score = user.fuzzy_match(first_name=user.first_name + 's',
+        score = user.fuzzy_match(first_name=user.first_name,
                                  last_name='O' + user.last_name,
                                  birthdate=user.birthdate)
         self.assertTrue(score > 88)  # should be close
@@ -987,9 +987,11 @@ class TestUser(TestCase):
             self.test_user.organizations.append(orgs[1])
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
+            old_regtime = user.registered
             user.promote_to_registered(other)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
+            self.assertNotEqual(user.registered, old_regtime)
             self.assertTrue(other.deleted)
             self.assertEquals(user.first_name, 'newFirst')
             self.assertEquals(user.last_name, 'Better')

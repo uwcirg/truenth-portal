@@ -578,9 +578,6 @@ def set_user_consents(user_id):
         """Invalidate the assessment status cache values for this user"""
         dogpile_cache.invalidate(
             overall_assessment_status, user.id)
-        for consent in user.all_consents:
-            dogpile_cache.invalidate(
-                overall_assessment_status, user.id, consent.id)
 
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
@@ -1655,7 +1652,7 @@ def upload_user_document(user_id):
 
 
 @user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
-@oauth.require_oauth()
+@oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 def trigger_password_reset_email(user_id):
     """Trigger a password reset email for the specified user

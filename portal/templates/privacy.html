@@ -5,9 +5,6 @@
     <h1 class="tnth-headline">{{ _("Privacy") }}</h1>
     <br/>
 	<div id="privacyContentContainer"><p>{{ content|safe }}</p></div>
-	{% if editorUrl %}
-	<script>appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
-	{% endif %}
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
@@ -17,5 +14,10 @@
 	$("document").ready(function() {
 		setTimeout("disableHeaderFooterLinks();", 1000);
 	});
+	{% endif %}
+{% endblock %}
+{% block additional_scripts %}
+	{% if editorUrl %}
+	<script>appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
 	{% endif %}
 {% endblock %}

@@ -12,8 +12,10 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import FHIR_datetime
 from portal.models.procedure import Procedure
-from portal.models.procedure_codes import known_treatment_started
+from portal.models.procedure_codes import latest_treatment_started_date
 from portal.models.procedure_codes import known_treatment_not_started
+from portal.models.procedure_codes import known_treatment_started
+from portal.models.procedure_codes import TxStartedConstants
 from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 
@@ -32,9 +34,11 @@ class TestProcedure(TestCase):
         rv = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
         data = json.loads(rv.data)
-        self.assertEquals('367336001',
+        self.assertEquals(
+            '367336001',
             data['entry'][0]['resource']['code']['coding'][0]['code'])
-        self.assertEquals('Chemotherapy',
+        self.assertEquals(
+            'Chemotherapy',
             data['entry'][0]['resource']['code']['coding'][0]['display'])
         self.assertEquals(
             Reference.patient(TEST_USER_ID).as_fhir()['reference'],
@@ -57,7 +61,9 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         proc = Procedure.from_fhir(data, Audit(user_id=TEST_USER_ID))
-        self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
+        self.assertEquals(
+            proc.code.codings[0].system,
+            'http://snomed.info/sct')
         self.assertEquals(proc.code.codings[0].code, '80146002')
         self.assertEquals(proc.start_time, dateutil.parser.parse("2013-04-05"))
 
@@ -91,7 +97,9 @@ class TestProcedure(TestCase):
         results = json.loads(rv.data)
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
-        self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
+        self.assertEquals(
+            proc.code.codings[0].system,
+            'http://snomed.info/sct')
         self.assertEquals(proc.user_id, 1)
         self.assertEquals(proc.end_time, datetime(2011, 6, 27))
         self.assertEquals(proc.encounter.user_id, TEST_USER_ID)
@@ -103,7 +111,7 @@ class TestProcedure(TestCase):
 
         # confirm we correctly convert a timezone aware datetime
         # to unaware but converted to UTC time
-        start_time ="2013-01-28T13:31:00+01:00"
+        start_time = "2013-01-28T13:31:00+01:00"
         end_time = "2013-01-28T14:27:00+01:00"
         data['performedPeriod']['start'] = start_time
         data['performedPeriod']['end'] = end_time
@@ -135,20 +143,28 @@ class TestProcedure(TestCase):
 
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
-        started_codes = (
+        started_codes = set([
             ('3', 'Radical prostatectomy (nerve-sparing)', ICHOM),
             ('3-nns', 'Radical prostatectomy (non-nerve-sparing)', ICHOM),
             ('4', 'External beam radiation therapy', ICHOM),
             ('5', 'Brachytherapy', ICHOM),
-            ('6', 'ADT', ICHOM),
+            ('6', 'Androgen deprivation therapy', ICHOM),
             ('7', 'Focal therapy', ICHOM),
             ('26294005', 'Radical prostatectomy (nerve-sparing)', SNOMED),
             ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)',
              SNOMED),
             ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
-            ('707266006', 'Androgen deprivation therapy', SNOMED)
-        )
+            ('707266006', 'Androgen deprivation therapy', SNOMED),
+            ('888', u'Other (free text)', ICHOM),
+            ('118877007', 'Procedure on prostate', SNOMED)
+        ])
+        # confirm we have the whole list:
+        found = set()
+        for codeableconcept in TxStartedConstants():
+            [found.add((cc.code, cc.display, cc.system)) for cc in
+             codeableconcept.codings]
+        self.assertEquals(started_codes, found)
 
         # prior to setting any procedures, should return false
         self.assertFalse(known_treatment_started(self.test_user))
@@ -157,8 +173,16 @@ class TestProcedure(TestCase):
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_started(self.test_user),
-                           "treatment {} didn't show as started".format(
-                           (system, code)))
+                            "treatment {} didn't show as started".format(
+                (system, code)))
+
+            # The "others" count as treatement started, but should NOT
+            # return a date from latest_treatment - only specific treatments
+            if code in ('888', '118877007'):
+                self.assertFalse(latest_treatment_started_date(self.test_user))
+            else:
+                self.assertTrue(latest_treatment_started_date(self.test_user))
+
             self.test_user.procedures.delete()  # reset for next iteration
 
     def test_treatment_not_started(self):

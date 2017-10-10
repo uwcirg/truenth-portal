@@ -41,12 +41,17 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 # Set default docker-compose file if COMPOSE_FILE environmental variable not set
 export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}
 
-if [ $BACKUP ]; then
+# Hack to set env vars in docker-compose file
+# See portal.env.default
+set -o allexport
+. "${GIT_WORK_TREE}/docker/portal.env"
+
+if [ -n "$BACKUP" -a -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.gzip"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.pgdump"
 
     echo "Backing up current database..."
-    docker-compose exec --user postgres db pg_dump --format c postgres > "/tmp/${dump_filename}.pgdump"
+    docker-compose exec --user postgres db pg_dump --format c portaldb > "/tmp/${dump_filename}"
 fi
 
 docker-compose pull

@@ -1,18 +1,29 @@
 """Questionnaire Bank module"""
-from flask import url_for
+from collections import namedtuple
+from datetime import datetime
+from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
-from ..date_tools import FHIR_datetime
+from ..date_tools import FHIR_datetime, RelativeDelta
+from .fhir import CC
+from .intervention import Intervention
+from .intervention_strategies import observation_check
+from .organization import OrgTree
+from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
+from ..trace import trace
 
 
-classification_types = ('baseline', 'recurring', 'indefinite')
+classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
+
+QBD = namedtuple('QBD', ['relative_start', 'iteration',
+                         'recur', 'questionnaire_bank'])
 
 
 class QuestionnaireBank(db.Model):
@@ -28,17 +39,36 @@ class QuestionnaireBank(db.Model):
     classification = db.Column(
         'classification', classification_types_enum,
         server_default='baseline', nullable=False)
+
+    start = db.Column(
+        db.Text, nullable=False,
+        doc=("'relativedelta' value (i.e. {\"months\": 3, \"days\": -14}) "
+             "from trigger date noting the beginning of the valid time "
+             "period for the questionnaire bank"))
+    overdue = db.Column(
+        db.Text, nullable=True,
+        doc=("optional 'relativedelta' value from start, noting when "
+             "the questionnaire bank is considered 'overdue'"))
+    expired = db.Column(
+        db.Text, nullable=True,
+        doc=("'relativedelta' value from start defining the exclusive end "
+             "of the valid time period for the questionnaire bank"))
     questionnaires = db.relationship(
         'QuestionnaireBankQuestionnaire',
         back_populates='questionnaire_bank',
         order_by="QuestionnaireBankQuestionnaire.rank")
+    recurs = db.relationship(
+        Recur, secondary='questionnaire_bank_recurs')
 
-    # QuestionnaireBank is associated with an Organization OR an Intervention,
+    # QuestionnaireBank is associated with an Organization XOR an Intervention,
     # either of which dictate whether it's given to a User
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=True)
     intervention_id = db.Column(
         db.ForeignKey('interventions.id'), nullable=True)
+
+    communication_requests = db.relationship(
+        'CommunicationRequest')
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -54,9 +84,34 @@ class QuestionnaireBank(db.Model):
         self.name = data['name']
         if 'classification' in data:
             self.classification = data['classification']
-        self.organization_id = Reference.parse(
-            data['organization']).id
+        if 'organization' in data:
+            self.organization_id = Reference.parse(
+                data['organization']).id
+        if 'intervention' in data:
+            self.intervention_id = Reference.parse(
+                data['intervention']).id
+        self.start = data['start']
+        RelativeDelta.validate(self.start)
+        self.expired = data['expired']
+        RelativeDelta.validate(self.expired)
+        if 'overdue' in data:
+            self.overdue = data['overdue']
+            RelativeDelta.validate(self.overdue)
+
         self = self.add_if_not_found(commit_immediately=True)
+
+        rs_named = set()
+        for r in data.get('recurs', []):
+            recur = Recur.from_json(r).add_if_not_found()
+            if recur not in self.recurs:
+                self.recurs.append(recur)
+            rs_named.add(recur)
+
+        # remove any stale
+        for unwanted in set(self.recurs) - rs_named:
+            self.recurs.remove(unwanted)
+            db.session.delete(unwanted)
+
         qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_json(
@@ -78,16 +133,25 @@ class QuestionnaireBank(db.Model):
         d = {}
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
+        d['start'] = self.start
+        d['expired'] = self.expired
+        if self.overdue:
+            d['overdue'] = self.overdue
         d['classification'] = self.classification
-        d['organization'] = Reference.organization(
-            self.organization_id).as_fhir()
+        if self.organization_id:
+            d['organization'] = Reference.organization(
+                self.organization_id).as_fhir()
+        if self.intervention_id:
+            d['intervention'] = Reference.intervention(
+                self.intervention_id).as_fhir()
         d['questionnaires'] = [q.as_json() for q in self.questionnaires]
+        d['recurs'] = [r.as_json() for r in self.recurs]
         return d
 
     def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
-        Queries for similar, adds new if not found.
+        Queries on name alone, adds new if not found.
 
         @return: the new or matched QuestionnaireBank
 
@@ -133,6 +197,222 @@ class QuestionnaireBank(db.Model):
         }
         return bundle
 
+    @staticmethod
+    def qbs_for_user(user, classification):
+        """Return questionnaire banks applicable to (user, classification)
+
+        QuestionnaireBanks are associated with a user through the top
+        level organization affiliation, or through interventions
+
+        :return: matching QuestionnaireBanks if found, else empty list
+
+        """
+        users_top_orgs = set()
+        for org in (o for o in user.organizations if o.id):
+            users_top_orgs.add(OrgTree().find(org.id).top_level())
+
+        if not users_top_orgs:
+            results = []
+        elif classification:
+            results = QuestionnaireBank.query.filter(
+                QuestionnaireBank.organization_id.in_(users_top_orgs),
+                QuestionnaireBank.classification == classification).all()
+        else:
+            results = QuestionnaireBank.query.filter(
+                QuestionnaireBank.organization_id.in_(users_top_orgs)).all()
+
+        # Complicated rules (including strategies and UserIntervention rows)
+        # define a user's access to an intervention.  Rely on the
+        # same check used to display the intervention cards, and only
+        # check for interventions actually associated with QBs.
+        if classification:
+            intervention_associated_qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id.isnot(None),
+                QuestionnaireBank.classification == classification)
+        else:
+            intervention_associated_qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id.isnot(None))
+        for qb in intervention_associated_qbs:
+            # At this time, doesn't apply to metastatic patients.
+            if any((obs.codeable_concept == CC.PCaLocalized
+                    and obs.value_quantity == CC.FALSE_VALUE)
+                   for obs in user.observations):
+                break
+
+            intervention = Intervention.query.get(qb.intervention_id)
+            if intervention.quick_access_check(user):
+                # TODO: business rule details like the following should
+                # move to site persistence for QB to user mappings.
+                check_func = observation_check("biopsy", 'true')
+                if check_func(intervention=intervention, user=user):
+
+                    results.append(qb)
+
+        def validate_classification_count(qbs):
+            if qbs and qbs[0].classification == 'recurring':
+                return
+            if len(qbs) > 1:
+                current_app.logger.error(
+                    "multiple QuestionnaireBanks for {user} with "
+                    "{classification} found.  The UI won't correctly display "
+                    "more than one at this time.".format(
+                        user=user, classification=classification))
+
+        validate_classification_count(results)
+        return results
+
+    @staticmethod
+    def most_current_qb(user, as_of_date=None):
+        """Return namedtuple (QBD) for user representing their most current QB
+
+        Return namedtuple of QB Details for user, containing the current QB,
+        the QB's calculated start date, the current QB recurrence, and the
+        recurrence iteration number. Values are set as None if N/A.
+
+        :param as_of_date: if not provided, use current utc time.
+
+        Ideally, return the one current QuestionnaireBank that applies
+        to the user 'as_of_date'.  If none, return the most recently
+        expired.
+
+        NB the `indefinite` classification is outside the scope of this method,
+        and should be treated independently
+
+        """
+        as_of_date = as_of_date or datetime.utcnow()
+
+        baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
+        if not baseline:
+            trace("no baseline questionnaire_bank, can't continue")
+            return QBD(None, None, None, None)
+        trigger_date = baseline[0].trigger_date(user)
+        if not trigger_date:
+            return QBD(None, None, None, None)
+
+        # Iterate over users QBs looking for current
+        last_found = QBD(relative_start=None, iteration=None, recur=None,
+                         questionnaire_bank=baseline[0])
+        for classification in classification_types:
+            if classification == 'indefinite':
+                continue
+            for qb in QuestionnaireBank.qbs_for_user(user, classification):
+                qbd = qb.calculated_start(trigger_date, as_of_date)
+                if qbd.relative_start is None:
+                    # indicates QB hasn't started yet, continue
+                    continue
+                expiry = qb.calculated_expiry(trigger_date)
+                last_found = qbd._replace(questionnaire_bank=qb)
+
+                if qbd.relative_start <= as_of_date and as_of_date < expiry:
+                    return last_found
+        return last_found
+
+    def calculated_start(self, trigger_date, as_of_date=None):
+        """Return namedtuple (QBD) for QB
+
+        Returns namdetuple (QBD) containing the calculated start date in UTC
+        for the QB, the QB's recurrence, and the iteration count.  Generally
+        trigger date plus the QB.start.  For recurring, the iteration count may
+        be non zero if it takes multiple iterations to reach the active cycle.
+
+        :return: namedtuple QBD (datetime of the questionnaire's start date,
+            iteration_count, recurrence, and self QB field);
+            QBD(None, None, None, self) if N/A
+
+        """
+        # On recurring QB, deligate to recur for date
+        if len(self.recurs):
+            for recurrence in self.recurs:
+                (relative_start, ic) = recurrence.active_interval_start(
+                    trigger_date=trigger_date, as_of_date=as_of_date)
+                if relative_start:
+                    return QBD(relative_start=relative_start, iteration=ic,
+                               recur=recurrence, questionnaire_bank=self)
+            # no active recurrence
+            return QBD(relative_start=None, iteration=None,
+                       recur=None, questionnaire_bank=self)
+
+        # Otherwise, simply trigger plus start (and iteration_count of None)
+        return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
+                   iteration=None, recur=None, questionnaire_bank=self)
+
+    def calculated_expiry(self, trigger_date):
+        """Return calculated expired date (UTC) for QB or None"""
+        start = self.calculated_start(trigger_date).relative_start
+        if not start:
+            return None
+        return start + RelativeDelta(self.expired)
+
+    def calculated_overdue(self, trigger_date):
+        """Return calculated overdue date (UTC) for QB or None"""
+        start = self.calculated_start(trigger_date).relative_start
+        if not (start and self.overdue):
+            return None
+
+        return start + RelativeDelta(self.overdue)
+
+    def trigger_date(self, user):
+        """Return trigger date for user via QB association
+
+        The trigger date for a questionnaire bank depends on its
+        association.  i.e. for org affiliated QBs, use the respective
+        consent date.
+
+        NB `trigger_date` is not the same as the start or valid time frame for
+        all of a user's Questionnaire Banks.  The trigger date defines the
+        initial single period in time for all QBs for a user.  This is an event
+        such as the original date of consent with an organization, or the start
+        date from a procedure.  QBs valid time frame is in reference to this
+        one trigger date.  (Yes, it may be adjusted in time if the user adds a
+        new procedure or the consent date is modified).
+
+        :return: UTC datetime for the given user / QB, or None if N/A
+
+        """
+        if hasattr(self, '__trigger_date'):
+            return self.__trigger_date
+        if self.organization_id:
+            # When linked via organization, use the common
+            # top level consent date as `trigger` date.
+            if user.valid_consents and user.valid_consents.count() > 0:
+                self.__trigger_date = user.valid_consents[0].audit.timestamp
+                trace(
+                    'found valid_consent with trigger_date {}'.format(
+                        self.__trigger_date))
+                return self.__trigger_date
+            else:
+                trace(
+                    "questionnaire_bank affiliated with org {}, user has "
+                    "no valid consents, so no trigger_date".format(
+                        self.organization_id))
+                self.__trigger_date = None
+                return self.__trigger_date
+        else:
+            if not self.intervention_id:
+                raise ValueError(
+                    "Can't compute trigger_date on QuestionnaireBank "
+                    "with neither organization nor intervention associated")
+            # TODO: business rule details like the following should
+            # move to site persistence for QB to user mappings.
+            tx_date = latest_treatment_started_date(user)
+            if tx_date:
+                trace(
+                    "found latest treatment date {} for trigger_date".format(
+                        tx_date))
+                self.__trigger_date = tx_date
+                return self.__trigger_date
+            else:
+                self.__trigger_date = user.fetch_datetime_for_concept(
+                    CC.BIOPSY)
+                if self.__trigger_date:
+                    trace(
+                        "found biopsy {} for trigger_date".format(
+                            self.__trigger_date))
+                    return self.__trigger_date
+                else:
+                    trace("no treatment or biopsy date, no trigger_date")
+                    return self.__trigger_date
+
 
 class QuestionnaireBankQuestionnaire(db.Model):
     """link table for n:n association between Questionnaires and Banks"""
@@ -142,14 +422,10 @@ class QuestionnaireBankQuestionnaire(db.Model):
         'questionnaire_banks.id', ondelete='CASCADE'), nullable=False)
     questionnaire_id = db.Column(db.Integer(), db.ForeignKey(
         'questionnaires.id', ondelete='CASCADE'), nullable=False)
-    days_till_due = db.Column(db.Integer, nullable=False)
-    days_till_overdue = db.Column(db.Integer, nullable=False)
     rank = db.Column(db.Integer, nullable=False)
 
     questionnaire = db.relationship(Questionnaire)
     questionnaire_bank = db.relationship('QuestionnaireBank')
-    recurs = db.relationship(
-        Recur, secondary='questionnaire_bank_questionnaire_recurs')
 
     __table_args__ = (
         UniqueConstraint(
@@ -180,19 +456,13 @@ class QuestionnaireBankQuestionnaire(db.Model):
         """
         instance = cls()
         instance.questionnaire_id = Reference.parse(data['questionnaire']).id
-        instance.days_till_due = data['days_till_due']
-        instance.days_till_overdue = data['days_till_overdue']
         instance.rank = data['rank']
-        for r in data.get('recurs', []):
-            instance.recurs.append(Recur.from_json(r).add_if_not_found())
         return instance
 
     def as_json(self):
         d = {}
         d['questionnaire'] = Reference.questionnaire(self.name).as_fhir()
-        for k in ('rank', 'days_till_due', 'days_till_overdue'):
-            d[k] = getattr(self, k)
-        d['recurs'] = [r.as_json() for r in self.recurs]
+        d['rank'] = getattr(self, 'rank')
         return d
 
     def add_if_not_found(self, commit_immediately=False):
@@ -219,3 +489,18 @@ class QuestionnaireBankQuestionnaire(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
+
+
+def visit_name(qbd):
+    if not qbd.questionnaire_bank:
+        return None
+    if qbd.recur:
+        srd = RelativeDelta(qbd.recur.start)
+        sm = srd.months or 0
+        sm += (srd.years * 12) if srd.years else 0
+        clrd = RelativeDelta(qbd.recur.cycle_length)
+        clm = clrd.months or 0
+        clm += (clrd.years * 12) if clrd.years else 0
+        total = clm * qbd.iteration + sm
+        return "Month {}".format(total)
+    return qbd.questionnaire_bank.classification.title()

@@ -144,16 +144,22 @@ Run the Central Services Server
 
 .. code:: bash
 
-    $ python manage.py runserver
+    $ FLASK_APP=manage.py flask runserver
 
 Run the Celery Worker
 ---------------------
 
 .. code:: bash
 
-    $ celery worker -A portal.celery_worker.celery --loglevel=info
+    $ celery worker --app portal.celery_worker.celery --loglevel=info
 
 Alternatively, install an init script and configure. See `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
+
+Should the need ever arise to purge the queue of jobs, run the following destructive command
+
+.. code:: bash
+
+    $ celery -A portal.celery_worker.celery purge
 
 DATABASE
 --------
@@ -173,7 +179,7 @@ managed and run.
 
 .. code:: bash
 
-    python manage.py db stamp head
+    FLASK_APP=manage.py flask db stamp head
 
 Upgrade
 ^^^^^^^
@@ -187,7 +193,7 @@ that already received the upgrade.
 
 .. code:: bash
 
-    python manage.py db upgrade
+    FLASK_APP=manage.py flask db upgrade
 
 Schema Changes
 ^^^^^^^^^^^^^^
@@ -198,13 +204,13 @@ the code changes and generate the necessary migration steps:
 
 .. code:: bash
 
-    python manage.py db migrate
+    FLASK_APP=manage.py flask db migrate
 
 Then execute the upgrade as previously mentioned:
 
 .. code:: bash
 
-    python manage.py db upgrade
+    FLASK_APP=manage.py flask db upgrade
 
 Testing
 -------

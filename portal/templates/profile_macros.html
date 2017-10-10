@@ -1,23 +1,18 @@
 {% from "initial_queries_macros.html" import patientQGroup, consent_fields %}
 
 {% macro profileImage(person) -%}
-    {% if person and person.image_url %}
-        <div class="profile-img hidden-xs">
-            <img src="{{ person and person.image_url }}" />
-        </div>
-    {% endif %}
+    {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
 {%- endmacro %}
 
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}" />
     <div class="form-group profile-section" id="bdGroup">
-        <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
+        <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" required />
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" required>
+                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -34,7 +29,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -103,16 +98,16 @@
 {% macro profileName(person, isFocus=False) -%}
     <div class="form-group profile-name-label"><label>{{ _("Name") }}</label></div>
     <div class="row profile-section name-section">
-        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
+        <div id="firstNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname"/>
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorfirstname" class="error-message"></div>
             </div>
         </div>
-        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
+        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true"/>
+                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorlastname" class="error-message"></div>
             </div>
@@ -155,7 +150,7 @@
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>{%trans%}' + o.display + '{%endtrans%}</label></div>';
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -282,7 +277,7 @@
             {%- endif -%}
         </div>
         <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
-        <select  id="profileEmailSelect" class="form-control bd-element">
+        <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
             <option value="">{{ _("Select Email...") }}</option>
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
             <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
@@ -316,7 +311,7 @@
             var message = '';
             if (this.value != '' && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
-                $('#profileEmailMessage').text(message);
+                $('#profileEmailMessage').html(message);
                 $('#btnProfileSendEmail').removeClass('disabled');
             } else {
                 $('#profileEmailMessage').text('');
@@ -377,14 +372,16 @@
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
-                    if (hasValue(return_url)) {
-                        {#- javascript variables are not available at template
-                           rendering time.  insert a placeholder and then
-                           replace once the variable is available. -#}
-                        body = '{{ invite_email.body.encode("string-escape") | safe }}';
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                        subject = '{{ invite_email.subject }}';
-                    };
+                    {% if invite_email %}
+                        if (hasValue(return_url)) {
+                            {#- javascript variables are not available at template
+                               rendering time.  insert a placeholder and then
+                               replace once the variable is available. -#}
+                            body = '{{ invite_email.body.encode("unicode-escape") | safe}}';
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
+                            subject = '{{ invite_email.subject }}';
+                        };
+                    {% endif %}
                 }
                 else { // reminder
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
@@ -398,10 +395,12 @@
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                         data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
-                       //console.log('data ' + data);
-                        $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
-                    }).fail(function() {
-                        console.log('failed request');
+                        $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                        $('#profileEmailSelect').val("");
+                        $('#btnProfileSendEmail').addClass('disabled');
+                    }).fail(function(xhr) {
+                        var errorMessage = "error sending invite email, " + subject + ", status: " + xhr.status + ", response text: " + xhr.responseText;
+                        tnthAjax.reportError(this.userId, "{{url_for('portal.invite')}}", errorMessage, true);
                         $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                     });
                 };
@@ -470,49 +469,28 @@
                 var cn = parentName ? parentName: "{%trans%}your clinic{%endtrans%}";
                 return cn;
             })();
-            return_url = getAccessUrl();
-            if (hasValue(return_url)) {
-                $.ajax ({
-                    type: "GET",
-                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
-                    cache: false,
-                    async: false
-                }).done(function(data) {
-                    if (hasValue(data)) {
-                        body = data;
-                        var fname = "";
-                        var lname = "";
-                        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
-                            fname = $("#firstname").val();
-                            lname = $("#lastname").val();
-                        } else {
-                            $.ajax ({
-                                type: "GET",
-                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
-                                async: false,
-                                cache: false
-                            }).done(function(data) {
-                                if (data && data.name) {
-                                    fname = data.name.given;
-                                    lname = data.name.family;
-                                };
-                            }).fail(function() {
-                            });
-                        };
-                        body = body.replace(/\(firstname\)/i, fname)
-                                   .replace(/\(lastname\)/i, lname)
-                                   .replace(/\(registrationlink\)/gi, return_url)
-
-                    };
-                }).fail(function(xhr) {
-                });
-
-                //provide default body content if no body content was returned from ajax call
-                if (!hasValue(body)) {
-                    body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+            $.ajax ({
+                type: "GET",
+                url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                cache: false,
+                async: false
+            }).done(function(data) {
+                if (hasValue(data)) {
+                    subject = data["subject"];
+                    body = data["body"]
                 };
+            }).fail(function(xhr) {
+            });
 
+            //provide default body content if no body content was returned from ajax call
+            if (!hasValue(body)) {
+                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                return_url = getAccessUrl()
+                if (hasValue(return_url)) {
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                }
+            };
+            if (!hasValue(subject)) {
                 subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
 
@@ -534,17 +512,21 @@
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.phone if person and person.phone }}"  data-htmltags="true" data-error-field="errorphone"/>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone"/>
+        <div class="help-block with-errors"></div>
     </div>
     <div id="errorphone" class="error-message"></div>
+    <script>$(function() { __convertToNumericField($("#phone"))});</script>
 {%- endmacro %}
 
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" class="form-control" id="altPhone" name="altPhone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.alt_phone if person and person.alt_phone }}"  data-htmltags="true" data-error-field="erroraltPhone"/>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone"/>
+        <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
     </div>
+    <script>$(function() { __convertToNumericField($("#altPhone"))});</script>
 {%- endmacro %}
 
 {% macro resetPassword(person) %}
@@ -607,6 +589,8 @@
     <div class="put-demo-error error-message"></div>
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        var stateDict={AL:'{{_("Alabama")}}',AK:'{{_("Alaska")}}',AS:'{{_("American Samoa")}}',AZ:'{{_("Arizona")}}',AR:'{{_("Arkansas")}}',CA:'{{_("California")}}',CO:'{{_("Colorado")}}',CT:'{{_("Connecticut")}}',DE:'{{_("Delaware")}}',DC:'{{_("District Of Columbia")}}',FM:'{{_("Federated States Of Micronesia")}}',FL:'{{_("Florida")}}',GA:'{{_("Georgia")}}',GU:'{{_("Guam")}}',HI:'{{_("Hawaii")}}',ID:'{{_("Idaho")}}',IL:'{{_("Illinois")}}',IN:'{{_("Indiana")}}',IA:'{{_("Iowa")}}',KS:'{{_("Kansas")}}',KY:'{{_("Kentucky")}}',LA:'{{_("Louisiana")}}',ME:'{{_("Maine")}}',MH:'{{_("Marshall Islands")}}',MD:'{{_("Maryland")}}',MA:'{{_("Massachusetts")}}',MI:'{{_("Michigan")}}',MN:'{{_("Minnesota")}}',MS:'{{_("Mississippi")}}',MO:'{{_("Missouri")}}',MT:'{{_("Montana")}}',NE:'{{_("Nebraska")}}',NV:'{{_("Nevada")}}',NH:'{{_("New Hampshire")}}',NJ:'{{_("New Jersey")}}',NM:'{{_("New Mexico")}}',NY:'{{_("New York")}}',NC:'{{_("North Carolina")}}',ND:'{{_("North Dakota")}}',MP:'{{_("Northern Mariana Islands")}}',OH:'{{_("Ohio")}}',OK:'{{_("Oklahoma")}}',OR:'{{_("Oregon")}}',PW:'{{_("Palau")}}',PA:'{{_("Pennsylvania")}}',PR:'{{_("Puerto Rico")}}',RI:'{{_("Rhode Island")}}',SC:'{{_("South Carolina")}}',SD:'{{_("South Dakota")}}',TN:'{{_("Tennessee")}}',TX:'{{_("Texas")}}',UT:'{{_("Utah")}}',VT:'{{_("Vermont")}}',VI:'{{_("Virgin Islands")}}',VA:'{{_("Virginia")}}',WA:'{{_("Washington")}}',WV:'{{_("West Virginia")}}',WI:'{{_("Wisconsin")}}',WY:'{{_("Wyoming")}}'};
+
         function handleCheckedItem() {
             var o = $("#userOrgs input[name='organization']:checked");
             if (o.length > 0 && o.val() != 0) {
@@ -649,6 +633,11 @@
             }).done(function(data) {
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
+                  /*
+                   * populate orgs list object
+                   */
+                  OT.populateOrgsList(entry);
+                  var orgsList = OT.getOrgsList();
 
                   /**** draw state select element first to gather all states
                         assign orgs to each state in array
@@ -690,8 +679,21 @@
                                 };
                                 return s;
                             })(parentId);
+
                             if ($("#" + parentState + "_container").length > 0) {
-                                $("#" + parentState + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>");
+                                var oo = orgsList[item.id];
+                                var contentHTML = "";
+                                /*
+                                 * If an organization is a top level org and has child orgs,
+                                 * we render legend for it.  This will prevent the organization from being selected by the user.
+                                 * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
+                                 */
+                                if (oo && oo.isTopLevel && oo.children.length > 0) {
+                                    contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
+                                } else {
+                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + i18next.t(item.name) + "</label></div>"
+                                };
+                                $("#" + parentState + "_container").append(contentHTML);
                             };
                         };
                     };
@@ -704,11 +706,9 @@
                       .prepend("<option value='' selected>Select</option>")
                       .val("");
                       $(".state-container, .clinic-prompt").hide();
-                      setTimeout(function() { OT.handlePreSelectedClinic();}, 200);
+                      setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
                       //case of pre-selected clinic, need to check if any clinic has prechecked
                       setTimeout(function() { handleCheckedItem();}, 500);
-
-                      OT.populateOrgsList(entry);
                       $("#userOrgs input[name='organization']").each(function() {
                         if ($(this).val() != 0) OT.getDefaultModal(this);
                       });
@@ -739,7 +739,7 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div class="form-group profile-section standard" id="userOrgs">
-            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
+            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{ _("Main clinic for prostate cancer care") }}</p>{%else%}
             <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
             <div class="indent">
             <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
@@ -761,7 +761,10 @@
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
-            setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);}, 500);
+            setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false,
+                function() {
+                    tnthAjax.getDemo({{ person.id if person }}, false, false, _handleOrgs);
+                });}, 500);
         });
 
         function _handleOrgs() {
@@ -931,7 +934,7 @@
                     toolbar: "#prTableToolBar",
                     rowStyle: function rowStyle(row, index) {
                           return {
-                            css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                           };
                     },
                     undefinedText: '--',
@@ -1099,7 +1102,7 @@
                         toolbar: "#auditTableToolBar",
                         rowStyle: function rowStyle(row, index) {
                               return {
-                                css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                                css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                               };
                         },
                         undefinedText: '--',
@@ -1221,8 +1224,8 @@
                                                  '</tr>';
                         };
                     });
-                        $("#userSessionListTable").append(sessionListHTML);
-                        $("#userSessionListTable").show();
+                    $("#userSessionListTable").append(sessionListHTML);
+                    $("#userSessionListTable").show();
 
                 } else {
                     $("#userSessionListTable").hide();
@@ -1284,7 +1287,7 @@
                             if (entry['answer']) {
                                 (entry['answer']).forEach(function(item) {
                                     if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
-                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) q += (hasValue(q) ? "<br/>" : "") + item.valueCoding.code;
+                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
                                 });
                             };
                             if (!hasValue(q)) q = entry['linkId'];
@@ -1297,8 +1300,7 @@
 
                 }).fail(function(xhr) {
                     $(".report-error-message").show();
-                    $(".report-error-message").append("<br/>" + xhr.responseText);
-
+                    $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
                 });
 
         });
@@ -1640,7 +1642,7 @@
                                 var errorMsg = "";
 
                                 if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                                    if (iy < 1900) errorMsg = "Year must be after 1900";
+                                    if (iy < 1900) errorMsg = "{{_('Year must be after 1900')}}";
                                     // Only allow if birthdate is before today
                                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                                         errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
@@ -1673,8 +1675,8 @@
 {%- endmacro %}
 {% macro profileSiteID(current_user) -%}
     <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Site ID")}}</label>
-        <input type="text" id="profileSiteId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId"/>
+        <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
@@ -2313,14 +2315,14 @@
                 if (self.attempts < self.max_attempts) {
                     setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
                 } else {
-                    errorMessage = '{{_("Error processing request:")}} ' + params.apiUrl;
+                    var displayError = "{{_('Server error occurred updating data.')}}";
+                    $("#error_response_text").html(displayError);
+                    errorMessage = "Error processing request: " + params.apiUrl;
                     errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
-
-                    $("#error_response_text").html($.trim(xhr.responseText));
-                    var response_text =  $("#error_response_text").text();
-                    errorMessage +=";  response text: " + (hasValue(response_text) ? response_text : "no response text returned from server");
+                    errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
+                    tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                     self.attempts = 0;
-                    if (params.callback) (params.callback).call(self, {"error": errorMessage});
+                    if (params.callback) (params.callback).call(self, {"error": displayError});
                 };
             });
             return errorMessage;
@@ -2448,8 +2450,7 @@
         };
         this.__handleError = function(errorMessage) {
             if (hasValue(errorMessage)) {
-                $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
-                tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
+                $('#serviceErrorMsg').html('<small>' + "{{_('[Processing error]')}} " + errorMessage + '</small>').fadeIn();
             };
         };
         this.__redirect = function() {
@@ -2623,12 +2624,12 @@
         });
         $("#noEmail").on("click, change", function() {
             if ($(this).is(":checked")) {
-                $("#erroremail").hide();
+                $("#erroremail").css("visibility", "hidden");
                 $("#email").val("").attr("disabled", true).removeAttr("required").removeAttr("data-customemail");
                 setTimeout('$("#erroremail").text(""); $("#email").closest("form-group").removeClass("has-error"); $("#email").css("border-color", "#ccc");', 600);
             }
             else {
-                $("#erroremail").show();
+                $("#erroremail").css("visibility", "visible");
                 $("#email").attr("disabled", false).attr("required", "required").attr("data-customemail", "true");
             };
         });
@@ -2685,7 +2686,7 @@
               });
             });
         };
-        $('#createProfileForm').validator().on('submit', function (e) {
+        $('#createProfileForm').on('submit', function (e) {
             if (e.isDefaultPrevented()) {
                 // handle the invalid form...
                 aco.__checkFields();
