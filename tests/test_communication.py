@@ -282,6 +282,25 @@ class TestCommunication(TestQuestionnaireSetup):
         self.assertEquals(comm.message.recipients, TEST_USERNAME)
         self.assertEquals(comm.status, 'completed')
 
+    def test_preview(self):
+        self.bless_with_basics()
+        cr = mock_communication_request(
+            'localized', '{"days": 14}',
+            communication_request_name="Symptom Tracker | 3 Mo Reminder (1)")
+
+        comm = Communication(user_id=TEST_USER_ID, communication_request=cr)
+
+        # in testing, link_url isn't set:
+        st = Intervention.query.filter_by(name='self_management').one()
+        if not st.link_url:
+            st.link_url = 'https://stg-sm.cirg.washington.edu'
+
+        preview = comm.preview()
+
+        self.assertTrue('<style>' in preview.body)
+        self.assertTrue(preview.subject)
+        self.assertEquals(preview.recipients, TEST_USERNAME)
+
 
 class TestCommunicationTnth(TestQuestionnaireSetup):
     # by inheriting from TestQuestionnaireSetup, pick up the
