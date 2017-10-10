@@ -98,6 +98,11 @@ function previewComm(event, commId) {
                           return false;
                       });
                     });
+                    /*
+                     * remove inline style in email body
+                     * style here is already applied via css
+                     */
+                    $("#commBody style").remove();
                     $("#commModal").modal("show");
                 };
           }).fail(function(xhr) {
