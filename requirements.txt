@@ -32,7 +32,7 @@ Flask-OAuthlib==0.9.4
 Flask-ReCaptcha==0.4.2
 Flask-Script==2.0.6
 Flask-Session==0.3.1
-Flask-SQLAlchemy==2.3.1
+Flask-SQLAlchemy==2.3.2
 flask-swagger==0.2.13
 Flask-Testing==0.6.2
 Flask-User==0.6.19
