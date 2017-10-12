@@ -188,6 +188,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 
     for user in valid_patients:
         if update_cache:
+            dogpile_cache.invalidate(overall_assessment_status, user.id)
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
             if not user.email or '@' not in user.email:
