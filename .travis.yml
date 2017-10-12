@@ -32,22 +32,16 @@ matrix:
     - env: TOXENV=docs
       services: []
       addons: {}
+    - env: TOXENV=build
+      services:
+        - docker
     - env: TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
-    - env: TOXENV=build
-      services:
-        - docker
   # Build artifacts only (no testing)
   allow_failures:
-    - env: TOXENV=build
-      services:
-        - docker
     - env: TOXENV=ui
-      addons:
-        postgresql: "9.4"
-        sauce_connect: true
 
 before_install:
   # Set Github env vars
