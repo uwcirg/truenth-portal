@@ -41,9 +41,6 @@ matrix:
         - docker
   # Build artifacts only (no testing)
   allow_failures:
-    - env: TOXENV=build
-      services:
-        - docker
     - env: TOXENV=ui
       addons:
         postgresql: "9.4"
