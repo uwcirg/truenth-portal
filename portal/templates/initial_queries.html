@@ -376,7 +376,7 @@ FieldsChecker.prototype.continueToFinish = function() {
   }, 2000);
   $("#next").fadeOut();
   $("#iqErrorMessage").text("");
-  $("#updateProfile").removeAttr("disabled").addClass("open");
+  $("#updateProfile").removeAttr("disabled").fadeIn();
 };
 
 FieldsChecker.prototype.stopContinue = function(sectionId) {
