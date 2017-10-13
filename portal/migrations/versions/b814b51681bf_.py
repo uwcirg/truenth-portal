@@ -22,6 +22,7 @@ down_revision = '50c447197b26'
 
 Session = sessionmaker()
 
+
 def update_org_id(old_id, new_id, new_parent_id=None, new_name=None):
     bind = op.get_bind()
     session = Session(bind=bind)
