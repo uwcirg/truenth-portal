@@ -42,6 +42,8 @@ class BaseConfig(object):
         'REQUEST_CACHE_URL',
         REDIS_URL
     )
+    REQUEST_CACHE_EXPIRE = 10
+
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
