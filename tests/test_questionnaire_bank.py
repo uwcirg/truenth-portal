@@ -38,6 +38,29 @@ class TestQuestionnaireBank(TestCase):
         expected_expiry = datetime.strptime('2000-01-04', '%Y-%m-%d')
         self.assertEquals(end, expected_expiry)
 
+    def test_due(self):
+        q = Questionnaire(name='q')
+        org = Organization(name='org')
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.add(org)
+            db.session.commit()
+        q, org = map(db.session.merge, (q, org))
+        qb = QuestionnaireBank(
+            name='qb', organization_id=org.id, classification='baseline',
+            start='{"days": 1}', due='{"days": 2}')
+        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
+        qb.questionnaires.append(qbq)
+
+        trigger_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
+        start = qb.calculated_start(trigger_date).relative_start
+        self.assertTrue(start > trigger_date)
+        self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
+
+        due = qb.calculated_due(trigger_date)
+        expected_due = datetime.strptime('2000-01-04', '%Y-%m-%d')
+        self.assertEquals(due, expected_due)
+
     def test_questionnaire_serialize(self):
         q1 = Questionnaire(name='q1')
         with SessionScope(db):

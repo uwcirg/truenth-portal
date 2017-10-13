@@ -132,6 +132,15 @@ class TestCommunication(TestQuestionnaireSetup):
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
         self.assertEquals(dd['questionnaire_due_date'], '11 Jun 2017')
 
+        # with calculated_due
+        qb.due = "{\"days\": 7}"
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.commit()
+        user = db.session.merge(user)
+
+        dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
+        self.assertEquals(dd['questionnaire_due_date'], '18 Jun 2017')
 
     def test_empty(self):
         # Base test system shouldn't generate any messages
