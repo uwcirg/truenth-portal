@@ -45,6 +45,10 @@ class QuestionnaireBank(db.Model):
         doc=("'relativedelta' value (i.e. {\"months\": 3, \"days\": -14}) "
              "from trigger date noting the beginning of the valid time "
              "period for the questionnaire bank"))
+    due = db.Column(
+        db.Text, nullable=True,
+        doc=("optional 'relativedelta' value from start, noting when "
+             "the questionnaire bank is considered 'due'"))
     overdue = db.Column(
         db.Text, nullable=True,
         doc=("optional 'relativedelta' value from start, noting when "
@@ -94,6 +98,9 @@ class QuestionnaireBank(db.Model):
         RelativeDelta.validate(self.start)
         self.expired = data['expired']
         RelativeDelta.validate(self.expired)
+        if 'due' in data:
+            self.due = data['due']
+            RelativeDelta.validate(self.due)
         if 'overdue' in data:
             self.overdue = data['overdue']
             RelativeDelta.validate(self.overdue)
@@ -135,6 +142,8 @@ class QuestionnaireBank(db.Model):
         d['name'] = self.name
         d['start'] = self.start
         d['expired'] = self.expired
+        if self.due:
+            d['due'] = self.due
         if self.overdue:
             d['overdue'] = self.overdue
         d['classification'] = self.classification
@@ -342,6 +351,14 @@ class QuestionnaireBank(db.Model):
         if not start:
             return None
         return start + RelativeDelta(self.expired)
+
+    def calculated_due(self, trigger_date):
+        """Return calculated due date (UTC) for QB or None"""
+        start = self.calculated_start(trigger_date).relative_start
+        if not (start and self.due):
+            return None
+
+        return start + RelativeDelta(self.due)
 
     def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
