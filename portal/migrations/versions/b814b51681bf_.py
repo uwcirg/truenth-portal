@@ -28,7 +28,7 @@ def update_org_id(old_id, new_id, new_parent_id=None, new_name=None):
 
     org = session.query(Organization).get(old_id)
     if not org:
-        raise ValueError('organization with id {} not found'.format(old_id))
+        return
     OT = OrgTree()
     if len(OT.here_and_below_id(old_id)) > 1:
         raise ValueError('organization `{}` cannot be moved '
