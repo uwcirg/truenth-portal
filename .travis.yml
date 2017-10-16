@@ -14,10 +14,13 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
+
     - PGUSER=postgres
     - PGPASSWORD=""
     - PGHOST=localhost
     - PGDATABASE=portal_unit_tests
+    - SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
+
     - PACKAGE_NAME="${PACKAGE_NAME:-true_nth_usa_portal}"
     - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
@@ -47,9 +50,6 @@ matrix:
     - env: TOXENV=ui
 
 before_install:
-  # Reuse PG* env vars - each TravisCI job gets its own DB
-  - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
-
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
       export DEPLOY=true;
