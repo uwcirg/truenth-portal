@@ -21,14 +21,16 @@ env:
     - PGDATABASE=portal_unit_tests
     - SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
 
+    - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
+    - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
+    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
+    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
+
     - PACKAGE_NAME="${PACKAGE_NAME:-true_nth_usa_portal}"
     - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
-    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
     - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
-    - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
-    - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
 
 matrix:
   include:
@@ -102,7 +104,6 @@ after_success:
   - docker-compose build web
 
 before_deploy:
-  - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
   - if [[ -v ARTIFACTORY_TOKEN ]]; then
       docker login
         --username "$ARTIFACTORY_USERNAME"
