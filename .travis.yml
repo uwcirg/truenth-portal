@@ -14,16 +14,16 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
-    - PGUSER='postgres'
-    - PGPASSWORD=''
-    - PGHOST='localhost'
-    - PGDATABASE='portal_unit_tests'
-    - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
-    - IMAGE_NAME=${IMAGE_NAME:-portal_web}
-    - DEB_REPO=${DEB_REPO:-portal-deb}
-    - DOCKER_REPO=${DOCKER_REPO:-portal-docker}
-    - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
-    - SHORT_HASH=${TRAVIS_COMMIT:0:7}
+    - PGUSER=postgres
+    - PGPASSWORD=""
+    - PGHOST=localhost
+    - PGDATABASE=portal_unit_tests
+    - PACKAGE_NAME="${PACKAGE_NAME:-true_nth_usa_portal}"
+    - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
+    - DEB_REPO="${DEB_REPO:-portal-deb}"
+    - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
+    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
+    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
     - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
     - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
 
