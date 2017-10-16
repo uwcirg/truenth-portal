@@ -14,15 +14,23 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
-    - PGUSER='postgres'
-    - PGPASSWORD=''
-    - PGHOST='localhost'
-    - PGDATABASE='portal_unit_tests'
-    - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
-    - IMAGE_NAME=${IMAGE_NAME:-portal_web}
-    - DEB_REPO=${DEB_REPO:-portal-deb}
-    - DOCKER_REPO=${DOCKER_REPO:-portal-docker}
-    - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
+
+    - PGUSER=postgres
+    - PGPASSWORD=""
+    - PGHOST=localhost
+    - PGDATABASE=portal_unit_tests
+    - SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
+
+    - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
+    - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
+    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
+    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
+
+    - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
+    - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
+    - DEB_REPO="${DEB_REPO:-portal-deb}"
+    - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
+    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
 
 matrix:
   include:
@@ -44,13 +52,6 @@ matrix:
     - env: TOXENV=ui
 
 before_install:
-  # Set Github env vars
-  - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
-  - export GH_USERNAME GH_REPO
-  - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
-  # Reuse PG* env vars - each TravisCI job gets its own DB
-  - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
-
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
       export DEPLOY=true;
@@ -63,6 +64,7 @@ before_install:
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
+  - export PORTAL_VERSION="$(python setup.py --version)"
 
   - createdb
       --owner "$PGUSER"
@@ -70,7 +72,6 @@ before_install:
     "$PGDATABASE"
 
   - pip install --upgrade pip setuptools
-  - export PORTAL_VERSION="$(python setup.py --version)"
 
 install:
   - pip install tox
@@ -103,7 +104,6 @@ after_success:
   - docker-compose build web
 
 before_deploy:
-  - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
   - if [[ -v ARTIFACTORY_TOKEN ]]; then
       docker login
         --username "$ARTIFACTORY_USERNAME"
