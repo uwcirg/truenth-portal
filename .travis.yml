@@ -26,7 +26,7 @@ env:
     - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
     - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
 
-    - PACKAGE_NAME="${PACKAGE_NAME:-true_nth_usa_portal}"
+    - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
