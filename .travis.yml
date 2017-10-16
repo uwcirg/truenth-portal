@@ -23,6 +23,9 @@ env:
     - DEB_REPO=${DEB_REPO:-portal-deb}
     - DOCKER_REPO=${DOCKER_REPO:-portal-docker}
     - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
+    - SHORT_HASH=${TRAVIS_COMMIT:0:7}
+    - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
+    - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
 
 matrix:
   include:
@@ -44,10 +47,6 @@ matrix:
     - env: TOXENV=ui
 
 before_install:
-  # Set Github env vars
-  - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
-  - export GH_USERNAME GH_REPO
-  - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
   # Reuse PG* env vars - each TravisCI job gets its own DB
   - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
 
@@ -63,6 +62,7 @@ before_install:
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
+  - export PORTAL_VERSION="$(python setup.py --version)"
 
   - createdb
       --owner "$PGUSER"
@@ -70,7 +70,6 @@ before_install:
     "$PGDATABASE"
 
   - pip install --upgrade pip setuptools
-  - export PORTAL_VERSION="$(python setup.py --version)"
 
 install:
   - pip install tox
