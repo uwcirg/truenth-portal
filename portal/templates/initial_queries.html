@@ -501,16 +501,16 @@ function initIncompleteFields() {
 
 $(document).ready(function(){
   	/*
-  	 * the flow here : 
+  	 * the flow here :
   	 * get still needed core data
   	 * populate terms if it is agreed
-  	 * get incomplete fields thereafter 
-     * note: need to delay gathering incomplete fields to allow fields to be render 
+  	 * get incomplete fields thereafter
+     * note: need to delay gathering incomplete fields to allow fields to be render
      * (e.g. broken in firefox if no delay)
   	 */
   	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, function() {
       var isFF = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-      var to = (isFF) ? 1000: 500;  
+      var to = (isFF) ? 1000: 500;
       if (isFF) {
         DELAY_LOADING = true;
         setTimeout(function() { $("#loadingIndicator").fadeOut(); DELAY_LOADING = false;}, 1500);
@@ -606,7 +606,6 @@ $(document).ready(function(){
                   //var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
-                if (fc.sectionCompleted("clinicalContainer")) return false;
             };
 
             thisItem.parents(".pat-q").next().fadeIn();
