@@ -265,8 +265,11 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                utc_due_date = assessment_status.next_available_due_date()
-                due_date = localize_datetime(utc_due_date, user)
+                qb = assessment_status.qb_data.qb
+                trigger_date = qb.trigger_date(user)
+                utc_due = qb.calculated_start(trigger_date).relative_start
+                utc_due = qb.calculated_due(trigger_date) or utc_due
+                due_date = localize_datetime(utc_due, user)
                 assert due_date
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
