@@ -252,7 +252,7 @@ class Communication(db.Model):
                 reset_trace=current_task is None)
 
         user = User.query.get(self.user_id)
-        if not user.email or '@' not in user.email:
+        if not user.email or u'@' not in user.email:
             raise ValueError(
                 "can't send communication to user w/o valid email address")
 
