@@ -254,7 +254,7 @@ a.btn {
 #loginForm input[type="submit"] {
    background-color: @btnColor;
    text-align: center;
-   padding: 1.1em 2em 1em 2em;
+   padding: 1.2em 2em 1em 2em;
    height: 52px;
 }
 .reg-title {
@@ -559,7 +559,6 @@ div.right-panel {
     text-align: center;
   }
   #next {
-    opacity: 0;
     transition: opacity 200ms ease-in;
     position: absolute;
     left: 0;
@@ -573,17 +572,14 @@ div.right-panel {
     display: none;
   }
   #updateProfile {
-    opacity: 0;
     transition: opacity 200ms ease-in;
     letter-spacing: 4px;
     text-transform: uppercase;
     padding: 1em;
+    display: none;
   }
   #next:disabled {
     opacity: @disabledOpacity;
-  }
-  #next.open, #updateProfile.open {
-    opacity: 1;
   }
   #next span {
     margin-left: 0.3em;
@@ -855,7 +851,6 @@ div.search {
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: @mobileOrgSize !important;
       }
       input[type="checkbox"] {
         position: relative;
