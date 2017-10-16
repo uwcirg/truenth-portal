@@ -1175,6 +1175,37 @@ def celery_result(task_id):
     return repr(retval)
 
 
+@portal.route('/communicate')
+@roles_required([ROLE.ADMIN])
+@oauth.require_oauth()
+def communications_dashboard():
+    """Communications Dashboard
+
+    Displays a list of communication requests from the system;
+    includes a preview mode for specific requests.
+
+    """
+    comms = Communication.query.all()
+    for comm in comms:
+        comm.user_email = User.query.get(comm.user_id).email
+        comm.sent_at = comm.message.sent_at if comm.message else None
+    return render_template('communications.html', communications=comms)
+
+
+@portal.route('/communicate/preview/<int:comm_id>')
+@roles_required([ROLE.ADMIN])
+@oauth.require_oauth()
+def preview_communication(comm_id):
+    """Communication message preview"""
+
+    comm = Communication.query.get(comm_id)
+    if not comm:
+        abort(404, "no communication found for id `{}`".format(comm_id))
+    preview = comm.preview()
+    return jsonify(subject=preview.subject, body=preview.body,
+                   recipients=preview.recipients)
+
+
 @portal.route("/communicate/<email>")
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
