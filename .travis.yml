@@ -23,16 +23,17 @@ env:
 
     - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
     - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
-    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
-    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
+    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
 
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
-    - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
-    - DOCKER_REPOSITORY="${DOCKER_REPOSITORY:-$IMAGE_NAME}"
+    - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
+    - DOCKER_REPOSITORY="$IMAGE_NAME"
     - IMAGE_TAG=travis
-    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
+
+    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
+    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
 
 matrix:
   include:
