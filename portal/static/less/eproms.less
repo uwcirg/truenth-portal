@@ -34,7 +34,7 @@
 @modalHeaderSize: 1.3em;
 @modalTitleSize:  1em;
 @modalBodySize:   1.07em;
-@modalButtonSize: 0.91em;
+@modalButtonSize: 0.85em;
 @modalLabelSize:  1.01em;
 @modalInputSize:  0.90em;
 @footerSize:      0.95em;
@@ -136,7 +136,8 @@ button,
 #createUserLink,
 .btn,
 .btn-tnth-primary,
-a.btn {
+a.btn,
+.sm-btn {
   font-size: @baseMobileFontSize;
   max-width: 100%;
 }
@@ -1550,7 +1551,8 @@ div.search {
   padding: 1em 0;
 }
 #btnPasswordResetEmail,
-#registrationEmailContainer #btnProfileSendEmail {
+#registrationEmailContainer #btnProfileSendEmail,
+.sm-btn {
   font-size: @smallBtnSize;
   height: 2.9em;
   padding: 0 1em;
@@ -2128,13 +2130,13 @@ input.clinic {
   font-weight: normal;
   font-size: @baseFontSize;
 }
+.modal-header,
 .modal-footer {
-  padding: 0.9em;
-}
-.modal-header {
   font-size: @baseMobileFontSize;
-  min-height: 3em;
-  height: 3.2em;
+}
+.modal-footer {
+  min-height: 4em;
+  padding: 0.7em;
 }
 .modal-header button,
 .modal-header button * {
@@ -2269,7 +2271,8 @@ div.biopsy-option:last-of-type{
     margin-bottom: -0.1em;
   }
 }
-#profileConsentList {
+#profileConsentList,
+#profileConsentHistory {
   max-width: 100%;
   padding: 0.1em;
   overflow-x: auto;
@@ -2288,6 +2291,7 @@ div.biopsy-option:last-of-type{
   }
   .consentlist-cell{
     background-color: #fbf9f9;
+    vertical-align: top;
   }
 }
 
@@ -2314,15 +2318,21 @@ div.biopsy-option:last-of-type{
     margin: 0 0.5em;
     display: inline-block !important;
   }
+  tr[data-tou-type='website terms of use'] {
+    display: none;
+  }
+}
+#profileConsentList,
+#profileConsentHistory {
   .truenth-consent-status-header,
   .truenth-consent-date-header,
   .truenth-tou-table-text {
     display: none;
   }
-
-  tr[data-tou-type='website terms of use'] {
-    display: none;
-  }
+}
+#consentHistoryWrapper {
+  max-height: 500px;
+  overflow-y: auto;
 }
 #consentListLoad {
   margin-top: 1em;
@@ -2412,7 +2422,8 @@ div.timezone-warning.text-warning {
 
 #consentListTable,
 #profileAuditLogTable,
-#userSessionListTable {
+#userSessionListTable,
+#consentHistoryTable {
     font-size: @mobileSmallSize;
     max-width: 100%;
 }
@@ -2430,7 +2441,8 @@ div.timezone-warning.text-warning {
 @media (min-width: 506px) {
   #consentListTable,
   #profileAuditLogTable,
-  #userSessionListTable {
+  #userSessionListTable,
+  #consentHistoryTable {
     font-size: @mediumText;
   }
 }
@@ -2511,8 +2523,11 @@ div.timezone-warning.text-warning {
   a.btn {
     font-size: @btnSize;
   }
-
-  .modal-body {
+  .sm-btn {
+    font-size: 0.9em;
+  }
+  .modal-body,
+  .modal-footer {
   font-size: @baseFontSize;
   }
   .modal-title {
