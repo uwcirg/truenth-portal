@@ -380,7 +380,7 @@
             <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send registration email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn disabled">{{ _("Send registration email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
     </div>
@@ -430,7 +430,7 @@
                     body = data["body"];
                 };
             }).fail(function(xhr) {
-               
+
             });
 
             //provide default body content if no body content was returned from ajax call
@@ -480,7 +480,7 @@
 
 {% macro resetPassword(person) %}
     <div id="resetPasswordGroup" class="form-group profile-section flex-item">
-        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary">{{ _("Send email") }}</button>
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{ _("Send email") }}</button>
         <div id="passwordResetMessage" class="text-info"></div>
     </div>
     <script>
@@ -925,6 +925,22 @@
 {% macro profileConsent(person, current_user) -%}
     {% if person %}
     <div id="profileConsentList">{{_("No information available.")}}</div>
+    <div id="profileConsentHistory">
+        <div class="modal fade" id="consentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="consentHistoryModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{{ _("Consent History") }}</h4>
+                    </div>
+                    <div class="modal-body"></div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="get-consent-error error-message"></div>
     <div class="set-consent-error error-message"></div>
     <div class="delete-consent-error error-message"></div>
@@ -947,6 +963,7 @@
 
             });
         };
+        $("#consentHistoryModal").modal({"show": false});
         /*******  NOTE, this call is already made when getting the organizations
         $(function () {
             setTimeout("tnthAjax.getConsent({{person.id}}, false);", 1000);
@@ -1007,7 +1024,7 @@
         $(function () {
              var ww = $(window).width();
              var auditUserId = $("#audit_user_id").val();
-             
+
                 tnthAjax.auditLog(auditUserId, function(data) {
                     if (!data.error) {
                         if (data["audits"] && data["audits"].length > 0 ) {
@@ -1085,7 +1102,7 @@
                         $("#profileAuditLogErrorMessage").text("{%trans%}Problem retrieving audit log from server.{%endtrans%}");
                     };
                 });
-            
+
          });</script>
      {% endif %}
 {%- endmacro %}

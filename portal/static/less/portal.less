@@ -1505,6 +1505,7 @@ div.pull-right {
     color: #FFF;
     padding: 0.25em 0.5em;
     font-weight: normal;
+    vertical-align: top;
   }
   tr:hover {
     background-color: @rowHoverBgColor;
@@ -2232,6 +2233,19 @@ color: @labelColor
   display: inline;
 }
 
+#viewConsentHistoryButton,
+#profileConsentHistory {
+  display: none;
+}
+
+#profileConsentList,
+#profileConsentHistory {
+  .eproms-consent-status-header,
+  .eproms-consent-date-header,
+  .eproms-tou-table-text {
+      display: none;
+  }
+}
 #profileConsentList {
   max-width: 100%;
   padding: 0.1em;
@@ -2248,11 +2262,6 @@ color: @labelColor
     font-weight: normal;
     padding-left: 0.6em;
     padding-right: 0.6em;
-  }
-  .eproms-consent-status-header,
-  .eproms-consent-date-header,
-  .eproms-tou-table-text {
-      display: none;
   }
 }
 #identityVerificationContainer {

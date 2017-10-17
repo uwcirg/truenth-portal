@@ -102,6 +102,517 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "language": "http://hl7.org/fhir/valueset/languages"
 };
 var __NOT_PROVIDED_TEXT = "not provided";
+/*
+ * helper class for drawing consent list table
+ */
+var ConsentUIHelper = function(consentItems, userId) {
+    /*
+     * display text for header
+     */
+    var headerEnum = {"consentStatus": i18next.t("Consent Status"),
+                      "status": i18next.t("Status"),
+                      "agreement": i18next.t("Agreement"),
+                      "consentDate": i18next.t("Date"),
+                      "registrationDate": i18next.t("Regiatration Date"),
+                      "locale": i18next.t("GMT")
+                      };
+    /*
+     * html for header cell in array
+     */
+    var headerArray = ['Organization',
+                    '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
+                    '<span class="agreement">' + headerEnum["agreement"] + '</span>',
+                    '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
+
+    var consentLabels = {
+                        "default": i18next.t("Consented"),
+                        "consented": i18next.t("Consented / Enrolled"),
+                        "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
+                                      "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
+                        "purged": "Purged / Removed"
+                    };
+
+    this.items = consentItems;
+    this.userId = userId;
+
+    /*
+     * relevant variables currently defined in profile_macro.html, but can be defined by consumer
+     *
+     */
+    this.ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
+    this.isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
+    this.editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
+    this.consentDateEditable = this.editable && (typeof isTestPatient != "undefined" && isTestPatient);
+    this.touObj = [];
+    this.showInitialConsentTerms = false;
+    this.hasConsent = false;
+    this.hasHistory = false;
+
+
+    this.getHeaderRow = function() {
+        var content = "";
+        headerArray.forEach(function (title, index) {
+            if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
+        });
+        return content;
+    };
+
+    this.getConsentRow = function(item, index) {
+        var self = this;
+        var consentStatus = self.getConsentStatus(item);
+        var sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
+        var LROrgId = item ? item.organization_id: "";
+        if (hasValue(LROrgId)) {
+            var topOrgID = OT.getTopLevelParentOrg(LROrgId);
+            if (hasValue(topOrgID) && (topOrgID != LROrgId)) LROrgId = topOrgID;
+        };
+        var editorUrlEl = $("#" + LROrgId + "_editor_url");
+        var content = "<tr>";
+        [
+            {
+                content: self.getConsentOrgDisplayName(item)
+            },
+            {
+                content: sDisplay + (self.editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentModalHTML(item, index): ""),
+                "_class": "indent"
+            },
+            {
+                content: (function(item) {
+                    var s = "";
+                    if (self.isDefaultConsent(item)) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                    else {
+                        s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                        ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "")
+                    };
+                    return s;
+                })(item)
+            },
+            {
+                content: tnthDates.formatDateString(item.signed) + (self.consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentDateModalHTML(item, index) : "")
+
+            }
+        ].forEach(function(cell) {
+            if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
+        });
+        content += "</tr>";
+        return content;
+    };
+    this.getConsentOrgDisplayName = function(item) {
+        if (!item) return "";
+        if (!OT.initialized) tnthAjax.getOrgs(this.userId, false, true);
+        var orgId = item.organization_id;
+        var currentOrg = OT.orgsList[orgId];
+        var orgName = "";
+        if (!this.ctop) {
+            var topOrgID = OT.getTopLevelParentOrg(orgId);
+            var topOrg = OT.orgsList[topOrgID];
+            if (topOrg) {
+                try {
+                    orgName = topOrg.name;
+
+                } catch(e) {
+                    orgName = currentOrg ? currentOrg.name: "";
+                }
+            };
+        } else orgName = currentOrg ? currentOrg.name: "";
+        return orgName || item.organization_id;
+    };
+    this.getConsentStatus = function(item) {
+        if (!item) return "";
+        var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
+        return item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
+    };
+    this.getDeletedDisplayDate = function(item) {
+        if (!item) return "";
+        var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
+        return deleteDate.replace("T", " ") + " GMT";
+    };
+    this.isDefaultConsent = function(item) {
+        return item && /stock\-org\-consent/.test(item.agreement_url);
+    };
+    this.getConsentStatusHTMLObj = function(item) {
+        console.log(item)
+        var consentStatus = this.getConsentStatus(item);
+        var sDisplay = "", cflag = "";
+        var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports;
+        var oDisplayText = {
+            "default": "<span class='text-success small-text'>" + consentLabels["default"] + "</span>",
+            "consented": "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>",
+            "withdrawn": "<span class='text-warning small-text withdrawn-label'>" + consentLabels["withdrawn"] + "</span>",
+            "purged": "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>",
+            "expired": "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>",
+        };
+
+        switch(consentStatus) {
+            case "deleted":
+                if (se && sr && ir) {
+                    sDisplay = oDisplayText["consented"];
+                } else if (se && ir && !sr) {
+                    sDisplay = oDisplayText["withdrawn"];
+                } else if (!se && !ir && !sr) {
+                    sDisplay = oDisplayText["purged"];
+                } else {
+                    sDisplay = oDisplayText["consented"];
+                };
+                sDisplay += "<br/><span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(" + i18next.t("modified on") + " " + this.getDeletedDisplayDate(item) + ")</span>";
+                break;
+            case "expired":
+                sDisplay = oDisplayText["expired"];
+                break;
+            case "active":
+                if (se && sr && ir) {
+                    if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
+                    else sDisplay = oDisplayText["consented"];
+                    cflag = "consented";
+                } else if (se && ir && !sr) {
+                    sDisplay = oDisplayText["withdrawn"];
+                    cflag = "suspended";
+                } else if (!se && !ir && !sr) {
+                    sDisplay = oDisplayText["purged"];
+                    cflag = "purged";
+                } else {
+                    sDisplay = oDisplayText["consented"];
+                    cflag = "consented";
+                };
+                break;
+        };
+
+        return {"statusText": cflag||consentStatus, "statusHTML": sDisplay };
+    };
+    this.getConsentModalHTML = function(item, index) {
+        if (!item) item = "";
+        if (!index) index = "0";
+         /****** modal content for modifying consent status *******/
+        /*
+         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
+         * different verbiage is hidden/shown via css - see .withdrawn-label class in respective css files
+         */
+         var userId = this.userId, cflag = this.getConsentStatusHTMLObj(item).statusText;
+         return '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
+            + '<div class="modal-dialog" role="document">'
+            + '<div class="modal-content">'
+            + '<div class="modal-header">'
+            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") +'"><span aria-hidden="true">&times;</span></button>'
+            + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
+            + '</div>'
+            + '<div class="modal-body" style="padding: 0 2em">'
+            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
+            + '<div>'
+            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
+            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
+            + (this.isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
+            + '</div><br/><br/>'
+            + '</div>'
+            + '<div class="modal-footer">'
+            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
+            + '</div>'
+            + '</div></div></div>';
+    };
+    this.getConsentDateModalHTML = function(item, index) {
+        if (!item) return "";
+        if (!index) index = "0";
+        /**** modal content for editing consent date for test patient ****/
+        var userId = this.userId, cflag = this.getConsentStatusHTMLObj(item).statusText;
+        return '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
+            + '<div class="modal-dialog" role="document">'
+            + '<div class="modal-content">'
+            + '<div class="modal-header">'
+            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '"><span aria-hidden="true">&times;</span></button>'
+            + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
+            + '</div>'
+            + '<div class="modal-body" style="padding: 0 2em">'
+            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+            + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
+            + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
+            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
+            + '<div class="row">'
+            + '<div class="col-md-3 col-sm-3">'
+            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-3">'
+            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-3">'
+            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-3">'
+            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div></div>'
+            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
+            + '</div>'
+            + '<div class="modal-footer">'
+            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">' + i18next.t("Submit") + '</button>'
+            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
+            + '</div>'
+            + '</div></div></div>';
+    };
+    this.getTermsTableHTML = function(includeHeader) {
+        var touContent = "";
+        if (includeHeader) {
+            headerArray.forEach(function(title) {
+                touContent += "<th class='consentlist-header'>" + title + "</th>";
+            });
+        };
+        //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
+        //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+        this.touObj.forEach(function(item, index) {
+            var org = OT.orgsList[item.organization_id];
+            touContent += "<tr data-tou-type='" + item.type + "'>";
+            touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td>" + item.accepted + "</td></tr>";
+        });
+        return touContent;
+    };
+    this.getTerms = function() {
+        var self = this;
+        //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
+        //and also website terms of use
+        // WILL NEED TO CLARIFY
+        tnthAjax.getTerms(this.userId, false, true, function(data) {
+            if (data && data.tous) {
+                (data.tous).forEach(function(item) {
+                    var fType = $.trim(item.type).toLowerCase();
+                    if (fType == "subject website consent" || fType == "website terms of use") {
+                        item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                        item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
+                        self.touObj.push(item);
+                    };
+                });
+            };
+        });
+        //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
+        self.showInitialConsentTerms = (self.touObj.length > 0);
+    },
+    this.initConsentItemEvent = function() {
+        $("#profileConsentList input[class='radio_consent_input']").each(function() {
+            $(this).on("click", function() {
+                var o = CONSENT_ENUM[$(this).val()];
+                if (o) {
+                    o.org = $(this).attr("data-orgId");
+                    o.agreementUrl = $(this).attr("data-agreementUrl");
+                };
+                if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
+                $("#" + $(this).attr("modalId")).modal('hide');
+                if (typeof reloadConsentList != "undefined") reloadConsentList();
+            });
+        });
+    },
+    this.initConsentDateEvents = function() {
+        var today = new Date();
+        $("#profileConsentList .consent-date-modal").each(function() {
+            $(this).on("shown.bs.modal", function() {
+                $(this).find(".consent-date").focus();
+                $(this).addClass("active");
+                $(this).find("input").each(function() {
+                    if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
+                    else $(this).val("");
+                });
+                $(this).find(".set-consent-error").html("");
+            });
+            $(this).on("hidden.bs.modal", function() {
+                $(this).removeClass("active");
+            });
+        });
+        $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+        $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+            __convertToNumericField($(this));
+        });
+        $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+            $(this).on("change", function() {
+                var dataIndex = $.trim($(this).attr("data-index"));
+                var d = $("#consentDate_" + dataIndex);
+                var h = $("#consentHour_" + dataIndex).val();
+                var m = $("#consentMinute_" + dataIndex).val();
+                var s = $("#consentSecond_" + dataIndex).val();
+                var errorMessage = "";
+
+                if (hasValue(d.val())) {
+                    var isValid = tnthDates.isValidDefaultDateFormat(d.val());
+                    if (!isValid) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Date must in the valid format.");
+                        d.datepicker("hide");
+                    };
+                };
+
+                /**** validate hour [0]0 ****/
+                if (hasValue(h)) {
+                    if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Hour must be in valid format, range 0 to 23.");
+                    };
+                };
+
+                /***** validate minute [0]0 *****/
+                if (hasValue(m)) {
+                    if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Minute must be in valid format, range 0 to 59.");
+                    };
+                };
+                /***** validate second [0]0 *****/
+                if (hasValue(s)) {
+                    if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Second must be in valid format, range 0 to 59.");
+                    };
+                };
+
+                if (hasValue(errorMessage)) {
+                    $("#consentDateError_" + dataIndex).html(errorMessage);
+                } else $("#consentDateError_" + dataIndex).html("");
+
+            });
+        });
+
+        $("#profileConsentList .btn-submit").each(function() {
+            $(this).on("click", function() {
+                var dataIndex = $.trim($(this).attr("data-index"));
+                var ct = $("#consentDate_" + dataIndex);
+                var h = $("#consentHour_" + dataIndex).val();
+                var m = $("#consentMinute_" + dataIndex).val();
+                var s = $("#consentSecond_" + dataIndex).val();
+                var isValid = hasValue(ct.val());
+                if (isValid) {
+                    var dt = new Date(ct.val());
+                    //2017-07-06T22:04:50 format
+                    var cDate = dt.getFullYear()
+                                + "-"
+                                + (dt.getMonth()+1)
+                                + "-"
+                                + dt.getDate()
+                                + "T"
+                                + (hasValue(h) ? pad(h) : "00")
+                                + ":"
+                                + (hasValue(m) ? pad(m) : "00")
+                                + ":"
+                                + (hasValue(s) ? pad(s) : "00");
+
+                    var o = CONSENT_ENUM[ct.attr("data-status")];
+
+                    if (o) {
+                        o.org = ct.attr("data-orgId");
+                        o.agreementUrl = ct.attr("data-agreementUrl");
+                        o.acceptance_date = cDate;
+                        o.testPatient = true;
+                        setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
+                        setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
+
+                        /**** disable close buttons while processing request ***/
+                        $("#consentListTable button[data-dismiss]").attr("disabled", true);
+
+                        setTimeout(tnthAjax.setConsent(ct.attr("data-userId"),o, ct.attr("data-status"), true, function(data) {
+                            if (data) {
+                                if (data && data.error) {
+                                    $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text(i18next.t("Error processing data.  Make sure the date is in the correct format."));
+                                    setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); }, 200);
+                                    setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); }, 450);
+                                    $("#consentListTable button[data-dismiss]").attr("disabled", false);
+                                } else {
+                                    $("#consentListTable .modal").modal("hide");
+                                    if (typeof reloadConsentList != "undefined") reloadConsentList();
+                                    else setTimeout("location.reload();", 2000);
+                                };
+                            };
+                        }), 100);
+                    };
+                } else  $("#consentDateError_" + dataIndex).text(i18next.t("You must enter a valid date/time"));
+
+            });
+        });
+    },
+    this.getConsentHistory = function(options) {
+        if (!options) options = {};
+        var self = this;
+        var content = "";
+        content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+        content += this.getHeaderRow();
+        this.items.forEach(function(item, index) {
+            if (!(/null/.test(item.agreement_url))) {
+                if ((options.includeCurrent && !item.deleted) || item.deleted) {
+                    content += self.getConsentRow(item, index);
+                };
+            };
+        });
+        content += "</table></div>";
+        $("#consentHistoryModal .modal-body").html(content);
+        if (!self.ctop) $("#profileConsentHistory .agreement").each(function() {
+            $(this).parent().hide();
+        });
+        $("#consentHistoryModal").modal("show");
+    },
+    this.getConsentList = function() {
+        this.getTerms(); //get terms of use if any
+        var self = this;
+        if (this.items.length > 0) {
+            var existingOrgs = {};
+            var content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+            content += this.getHeaderRow();
+            this.items.forEach(function(item, index) {
+                if (item.deleted) {
+                    self.hasHistory = true;
+                    return true;
+                };
+                if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    self.hasContent = true;
+                    if (self.showInitialConsentTerms) content += self.getTermsTableHTML();
+                    content += self.getConsentRow(item, index);
+                    existingOrgs[item.organization_id] = true;
+                };
+
+            });
+            content += "</table>";
+
+            if (self.hasContent) {
+                $("#profileConsentList").html(content);
+                if (!self.ctop) $("#profileConsentList .agreement").each(function() {
+                    $(this).parent().hide();
+                });
+                $("#profileConsentList .button--LR").each(function() {
+                    if ($(this).attr("show") == "true") $(this).addClass("show");
+                });
+                $("#profileConsentList tr:visible").each(function(index) {
+                    if (index % 2 === 0) $(this).addClass("even");
+                    else $(this).addClass("odd");
+                });
+            } else {
+                if (self.showInitialConsentTerms) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += self.getTermsTableHTML(true);
+                    content += "</table>"
+                    $("#profileConsentList").html(content);
+                } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
+            };
+
+            if (self.editable && self.hasHistory) {
+                $("#profileConsentList").append("<br/><button id='viewConsentHistoryButton' class='btn btn-tnth-primary sm-btn'>" + i18next.t("History") + "</button>");
+                (function(self) {
+                    $("#viewConsentHistoryButton").on("click", function(e) {
+                        e.preventDefault();
+                        self.getConsentHistory();
+                    });
+                })(self);
+            };
+
+            if (self.editable) {
+                self.initConsentItemEvent();
+            };
+            if (self.consentDateEditable) {
+                self.initConsentDateEvents();
+            };
+
+        } else {
+            if (self.showInitialConsentTerms) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += self.getTermsTableHTML(true);
+                    content += "</table>";
+                    $("#profileConsentList").html(content);
+            } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
+        };
+
+        $("#profileConsentList").animate({opacity: 1});
+    };
+
+};
 
 var fillViews = {
     "org": function() {
@@ -555,422 +1066,22 @@ var fillContent = {
         fillViews.siteId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
-        /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
-        var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-        var content = "";
-        if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
-            var dataArray = data["consent_agreements"].sort(function(a,b){
-                 return new Date(b.signed) - new Date(a.signed);
-            });
-            var existingOrgs = {};
-            var hasConsent = false;
-            var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-            var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            /********* Note that column headings are different between TrueNTH and EPROMs.
-                 Use css class to hide/show headings accordingly
-                 please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
-             ********/
-            var headerEnum = {"consentStatus": i18next.t("Consent Status"),
-                              "status": i18next.t("Status"),
-                              "agreement": i18next.t("Agreement"),
-                              "consentDate": i18next.t("Date"),
-                              "registrationDate": i18next.t("Regiatration Date"),
-                              "locale": i18next.t("GMT")
-                             };
-            var headerArray = ['Organization',
-                                '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
-                                '<span class="agreement">' + headerEnum["agreement"] + '</span>',
-                                '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
-            headerArray.forEach(function (title, index) {
-                if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
-            });
-
-            var hasContent = false;
-            var touObj = [];
-
-            //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
-            //and also website terms of use
-            // WILL NEED TO CLARIFY
-            tnthAjax.getTerms(userId, false, true, function(data) {
-                if (data && data.tous) {
-                    (data.tous).forEach(function(item) {
-                        var fType = $.trim(item.type).toLowerCase();
-                        if (fType == "subject website consent" || fType == "website terms of use") {
-                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
-                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
-                            touObj.push(item);
-                        };
-                    });
-                };
-            });
-
-            //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
-            var showInitialConsentTerms = (touObj.length > 0);
-            var getTOUTableHTML = function(includeHeader) {
-                var touContent = "";
-                if (includeHeader) {
-                    headerArray.forEach(function(title) {
-                        touContent += "<th class='consentlist-header'>" + title + "</th>";
-                    });
-                };
-                //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
-                //wording is not spec'd out for EPROMs. won't add anything specific until instructed
-                touObj.forEach(function(item, index) {
-                    var org = OT.orgsList[item.organization_id];
-                    touContent += "<tr data-tou-type='" + item.type + "'>";
-                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
-                    touContent += "<td>" + item.accepted + "</td></tr>";
-                });
-                return touContent;
-            };
-
-            dataArray.forEach(function(item, index) {
-                if (item.deleted) return true;
-                if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
-                    hasContent = true;
-                    var orgName = "";
-                    var orgId = item.organization_id;
-                    /*****
-                        consent with top level org config value is only set in Truenth, we need to get the top level org name(s) for each consent
-                        for displaying purpose in EPROMs
-                            ******/
-
-                    if (!OT.initialized) tnthAjax.getOrgs(userId, false, true);
-
-                    var currentOrg = OT.orgsList[orgId];
-                    if (!ctop) {
-                    	var topOrgID = OT.getTopLevelParentOrg(orgId);
-                    	var topOrg = OT.orgsList[topOrgID];
-                    	if (topOrg) {
-	                        try {
-	                            orgName = topOrg.name;
-
-	                        } catch(e) {
-	                            orgName = currentOrg ? currentOrg.name: "";
-	                        }
-	                    };
-                    } else orgName = currentOrg ? currentOrg.name: "";
-	             
-
-                    var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                    var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
-                    var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
-                    var sDisplay = "", cflag = "";
-                    var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
-                    var signedDate = tnthDates.formatDateString(item.signed);
-                    var editorUrlEl = $("#" + orgId + "_editor_url");
-                    var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    var consentLabels = {
-                        "default": i18next.t("Consented"),
-                        "consented": i18next.t("Consented / Enrolled"),
-                        "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
-                                      "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
-                        "purged": "Purged / Removed"
-                    };
-
-                    switch(consentStatus) {
-                        case "deleted":
-                            sDisplay = "<span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(" + i18next.t("deleted on") + " " + deleteDate.replace("T", " ") + " GMT)</span>";
-                            break;
-                        case "expired":
-                            sDisplay = "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>";
-                            break;
-                        case "active":
-                            if (se && sr && ir) {
-                                    if (isDefault) sDisplay = "<span class='text-success small-text'>" + consentLabels["default"] + "</span>";
-                                    else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
-                                    cflag = "consented";
-                            } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text withdrawn-label'>" + consentLabels["withdrawn"] + "</span>";
-                                    cflag = "suspended";
-                            } else if (!se && !ir && !sr) {
-                                    sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
-                                    cflag = "purged";
-                            } else {
-                                //backward compatible?
-                                sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
-                                cflag = "consented";
-                            };
-                            break;
-                    };
-                    var modalContent = "", consentDateModalContent = "";
-
-                    if (editable && consentStatus == "active") {
-                        /****** modal content for modifying consent status *******/
-                        /*
-                         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
-                         * different verbiage is hidden/shown via css - see .withdrawn-label class in respective css files
-                         */
-                        modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
-                            + '<div class="modal-dialog" role="document">'
-                            + '<div class="modal-content">'
-                            + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") +'"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
-                            + '</div>'
-                            + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
-                            + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
-                            + '</div><br/><br/>'
-                            + '</div>'
-                            + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close", {"": "Close"}) + '</button>'
-                            + '</div>'
-                            + '</div></div></div>';
-
-                        /**** modal content for editing consent date for test patient ****/
-                        consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
-                            + '<div class="modal-dialog" role="document">'
-                            + '<div class="modal-content">'
-                            + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
-                            + '</div>'
-                            + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
-                            + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
-                            + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
-                            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
-                            + '<div class="row">'
-                            + '<div class="col-md-3 col-sm-3">'
-                            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div></div>'
-                            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
-                            + '</div>'
-                            + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">' + i18next.t("Submit") + '</button>'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
-                            + '</div>'
-                            + '</div></div></div>';
-
-                    };
-
-                    if (showInitialConsentTerms) content += getTOUTableHTML();
-
-                    content += "<tr>";
-
-                    [
-                        {
-                            content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
-                        },
-                        {
-                            content: sDisplay + (editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
-                            "_class": "indent"
-                        },
-                        {
-                            content: function(item) {
-                                var s = "";
-                                if (isDefault) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
-                                else {
-                                    s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "")
-                                };
-                                return s;
-                            } (item)
-                        },
-                        {
-                            content: signedDate + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
-
-                        }
-                    ].forEach(function(cell) {
-                        if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
-                    });
-                    content += "</tr>";
-                    existingOrgs[item.organization_id] = true;
-                };
-
-            });
-            content += "</table>";
-
-            if (hasContent) {
-                $("#profileConsentList").html(content);
-                if (!ctop) $("#profileConsentList .agreement").each(function() {
-                    $(this).parent().hide();
-                });
-                 $("#profileConsentList .button--LR").each(function() {
-                     if ($(this).attr("show") == "true") $(this).addClass("show");
-                 });
-            } else {
-                if (showInitialConsentTerms) {
-                        content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                        content += getTOUTableHTML(true);
-                        content += "</table>"
-                        $("#profileConsentList").html(content);
-                } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
-            };
-
-            $("#profileConsentList tr:visible").each(function(index) {
-                if (index % 2 === 0) $(this).addClass("even");
-                else $(this).addClass("odd");
-            });
-
-            if (editable) {
-                $("input[class='radio_consent_input']").each(function() {
-                    $(this).on("click", function() {
-                        var o = CONSENT_ENUM[$(this).val()];
-                        if (o) {
-                            o.org = $(this).attr("data-orgId");
-                            o.agreementUrl = $(this).attr("data-agreementUrl");
-                        };
-                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
-                        else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                        $("#" + $(this).attr("modalId")).modal('hide');
-                        if (typeof reloadConsentList != "undefined") reloadConsentList();
-                    });
-                });
-            };
-            if (consentDateEditable) {
-                var today = new Date();
-                $(".consent-date-modal").each(function() {
-                    $(this).on("shown.bs.modal", function() {
-                        $(this).find(".consent-date").focus();
-                        $(this).addClass("active");
-                        $(this).find("input").each(function() {
-                            if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
-                            else $(this).val("");
-                        });
-                        $(this).find(".set-consent-error").html("");
-                    });
-                    $(this).on("hidden.bs.modal", function() {
-                        $(this).removeClass("active");
-                    });
-                });
-                $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-                $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
-                    __convertToNumericField($(this));
-                });
-                $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
-                    $(this).on("change", function() {
-                        var dataIndex = $.trim($(this).attr("data-index"));
-                        var d = $("#consentDate_" + dataIndex);
-                        var h = $("#consentHour_" + dataIndex).val();
-                        var m = $("#consentMinute_" + dataIndex).val();
-                        var s = $("#consentSecond_" + dataIndex).val();
-                        var errorMessage = "";
-
-                        if (hasValue(d.val())) {
-                            var isValid = tnthDates.isValidDefaultDateFormat(d.val());
-                            if (!isValid) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Date must in the valid format.");
-                                d.datepicker("hide");
-                            };
-                        };
-
-                        /**** validate hour [0]0 ****/
-                        if (hasValue(h)) {
-                            if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Hour must be in valid format, range 0 to 23.");
-                            };
-                        };
-
-                        /***** validate minute [0]0 *****/
-                        if (hasValue(m)) {
-                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Minute must be in valid format, range 0 to 59.");
-                            };
-                        };
-                        /***** validate second [0]0 *****/
-                        if (hasValue(s)) {
-                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Second must be in valid format, range 0 to 59.");
-                            };
-                        };
-
-                        if (hasValue(errorMessage)) {
-                            $("#consentDateError_" + dataIndex).html(errorMessage);
-                        } else $("#consentDateError_" + dataIndex).html("");
-
-                    });
-                });
-
-                $("#profileConsentList .btn-submit").each(function() {
-                    $(this).on("click", function() {
-                        var dataIndex = $.trim($(this).attr("data-index"));
-                        var ct = $("#consentDate_" + dataIndex);
-                        var h = $("#consentHour_" + dataIndex).val();
-                        var m = $("#consentMinute_" + dataIndex).val();
-                        var s = $("#consentSecond_" + dataIndex).val();
-                        var isValid = hasValue(ct.val());
-                        if (isValid) {
-                            var dt = new Date(ct.val());
-                            //2017-07-06T22:04:50 format
-                            var cDate = dt.getFullYear()
-                                        + "-"
-                                        + (dt.getMonth()+1)
-                                        + "-"
-                                        + dt.getDate()
-                                        + "T"
-                                        + (hasValue(h) ? pad(h) : "00")
-                                        + ":"
-                                        + (hasValue(m) ? pad(m) : "00")
-                                        + ":"
-                                        + (hasValue(s) ? pad(s) : "00");
-
-                            var o = CONSENT_ENUM[ct.attr("data-status")];
-
-                            if (o) {
-                                o.org = ct.attr("data-orgId");
-                                o.agreementUrl = ct.attr("data-agreementUrl");
-                                o.acceptance_date = cDate;
-                                o.testPatient = true;
-                                setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
-                                setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
-                                /**** disable close buttons while processing request ***/
-                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
-
-                                //serId, params, status, sync, callback)
-                                var serverErrorMessage = i18next.t("Error processing data.  Make sure the date is in the correct format.");
-                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {"
-                                            + " if (data && data.error) { "
-                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("' + serverErrorMessage + '"); '
-                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
-                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); })(), 450);'
-                                            + '  $("#consentListTable button[data-dismiss]").attr("disabled", false);'
-                                            + '  } else { '
-                                            + '  $("#consentListTable .modal").modal("hide");'
-                                            + '  if (typeof reloadConsentList != "undefined") reloadConsentList(); '
-                                            + '  else setTimeout("location.reload();", 2000); '
-                                            + '  }; '
-                                            + ' }})', 100);
-                            };
-                        } else  $("#consentDateError_" + dataIndex).text(i18next.t("You must enter a valid date/time"));
-
-                    });
-                });
-            };
-
+        if (hasValue(errorMessage)) {
+            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : ("<p class='text-muted'>" + i18next.t("No consent found for this user.") + "</p>"));
+        } else if (parseInt(errorCode) == 401) {
+            var msg = i18next.t("You do not have permission to edit this patient record.");
+            $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
         } else {
-            if (hasValue(errorMessage)) {
-                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : ("<p class='text-muted'>" + i18next.t("No consent found for this user.") + "</p>"));
-            } else if (parseInt(errorCode) == 401) {
-                var msg = i18next.t("You do not have permission to edit this patient record.");
-                $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
-            } else {
-                if (showInitialConsentTerms) {
-                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                    content += getTOUTableHTML(true);
-                    content += "</table>";
-                    $("#profileConsentList").html(content);
-                } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
+            var content = "";
+            var dataArray = [];
+            if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+                dataArray = data["consent_agreements"].sort(function(a,b){
+                     return new Date(b.signed) - new Date(a.signed);
+                });
             };
+            var co = new ConsentUIHelper(dataArray, userId);
+            co.getConsentList();
         };
-        $("#profileConsentList").animate({opacity: 1});
     },
     "treatment": function(data) {
         var treatmentCode = tnthAjax.hasTreatment(data);
@@ -2432,7 +2543,7 @@ var tnthAjax = {
                                 tnthAjax.setConsent($('#fillOrgs').attr('userId'),params, 'all', true, function() {
                                     tnthAjax.removeObsoleteConsent();
                                 });
-                            }, 350);                     	
+                            }, 350);
                         } else {
                             if (cto) {
                                 tnthAjax.setDefaultConsent(userId, parentOrg);
@@ -2965,7 +3076,7 @@ var tnthAjax = {
     "postTerms": function(toSend) {
     	this.sendRequest('/api/tou/accepted', 'POST', null, {data: JSON.stringify(toSend)}, function(data) {
     		if (data) {
-    			if (!data.error) {	
+    			if (!data.error) {
     				$(".post-tou-error").html("");
     			} else {
     				//alert("There was a problem saving your answers. Please try again.");
@@ -3168,7 +3279,7 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     tnthAjax.beforeSend();
-    
+
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
     //setTimeout('LRKeyEvent();', 1500);
