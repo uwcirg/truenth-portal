@@ -49,7 +49,7 @@
             });
             ["year", "month", "date"].forEach(function(fn) {
                 var field = $("#" + fn);
-                var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
+                var triggerEvent = hasValue(field.attr("data-trigger-event")) ? field.attr("data-trigger-event") : (field.attr("type") == "text" ? "blur" : "change");
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
                     if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {

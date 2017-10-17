@@ -128,6 +128,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
         due = qb.calculated_start(trigger_date).relative_start
+        due = qb.calculated_due(trigger_date) or due
         trace("UTC due date: {}".format(due))
         due_date = localize_datetime(due, user)
         tz = user.timezone or 'UTC'

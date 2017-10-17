@@ -764,9 +764,9 @@ var fillViews = {
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else {
-                f.prop("checked", false);
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
             };
+            if ($("#patBiopsy input[name='biopsy']").is(":checked")) $("#biopsyDateContainer").show();
             if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
