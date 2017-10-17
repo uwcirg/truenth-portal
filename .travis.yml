@@ -23,14 +23,17 @@ env:
 
     - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
     - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
-    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
-    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
+    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
 
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
-    - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
-    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
+    - DOCKER_REPOSITORY=""
+    - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
+    - DOCKER_IMAGE_TAG=travis
+
+    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
+    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
 
 matrix:
   include:
@@ -166,13 +169,13 @@ after_deploy:
   - if [[ -v ARTIFACTORY_TOKEN ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
-          "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
+          "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+          "uwcirg-$DOCKER_REPO.jfrog.io/$DOCKER_IMAGE_NAME:$tag";
       done
     fi
   - if [[ -v ARTIFACTORY_TOKEN ]]; then
       for tag in $DOCKER_TAGS; do
-        docker push "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
+        docker push "uwcirg-$DOCKER_REPO.jfrog.io/$DOCKER_IMAGE_NAME:$tag";
       done &
     fi
 
@@ -180,13 +183,13 @@ after_deploy:
   - if [[ -v BINTRAY_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
-          "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+          "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+          "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$DOCKER_IMAGE_NAME:$tag";
       done
     fi
   - if [[ -v BINTRAY_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
-        docker push "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+        docker push "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$DOCKER_IMAGE_NAME:$tag";
       done &
     fi
 
@@ -194,19 +197,19 @@ after_deploy:
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
-          "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
+          "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+          "$DOCKER_CLOUD_USERNAME/$DOCKER_IMAGE_NAME:$tag";
       done
     fi
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
-        docker push "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
+        docker push "$DOCKER_CLOUD_USERNAME/$DOCKER_IMAGE_NAME:$tag";
       done &
     fi
 
   # Deploy to Heroku, if configured
   - if [[ -v HEROKU_API_KEY ]]; then
-      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
+      docker tag "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" "registry.heroku.com/$HEROKU_APP/web";
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
   - docker images --digests --all

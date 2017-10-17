@@ -32,9 +32,9 @@ Download and run the generated images::
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environment variable::
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
 
-    IMAGE_TAG='stable'
+    DOCKER_IMAGE_TAG='stable'
     COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
@@ -77,7 +77,7 @@ Building a Shared Services Docker Image
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Override default (Artifactory) docker repo to differentiate locally-built images
-    REPO='local'
+    DOCKER_REPOSITORY=''
 
     # Build the "web" service locally
     COMPOSE_FILE='docker/docker-compose.yaml'
