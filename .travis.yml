@@ -30,6 +30,8 @@ env:
     - IMAGE_NAME="${IMAGE_NAME:-portal_web}"
     - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
+    - DOCKER_REPOSITORY="${DOCKER_REPOSITORY:-$IMAGE_NAME}"
+    - IMAGE_TAG=travis
     - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
 
 matrix:
@@ -166,7 +168,7 @@ after_deploy:
   - if [[ -v ARTIFACTORY_TOKEN ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
+          "$DOCKER_REPOSITORY:$IMAGE_TAG"
           "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
       done
     fi
@@ -180,7 +182,7 @@ after_deploy:
   - if [[ -v BINTRAY_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
+          "$DOCKER_REPOSITORY:$IMAGE_TAG"
           "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
       done
     fi
@@ -194,7 +196,7 @@ after_deploy:
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
         docker tag
-          "$IMAGE_NAME:$TAG"
+          "$DOCKER_REPOSITORY:$IMAGE_TAG"
           "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
       done
     fi
@@ -206,7 +208,7 @@ after_deploy:
 
   # Deploy to Heroku, if configured
   - if [[ -v HEROKU_API_KEY ]]; then
-      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
+      docker tag "$DOCKER_REPOSITORY:$IMAGE_TAG" "registry.heroku.com/$HEROKU_APP/web";
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
   - docker images --digests --all
