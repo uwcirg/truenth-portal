@@ -925,7 +925,7 @@ def contact():
         email = user.email if user else ''
         gil = current_app.config.get('GIL')
         recipient_types = []
-        for org in Organization.query.filter(Organization.email != None):
+        for org in Organization.query.filter(Organization.email.isnot(None)):
             if u'@' in org.email:
                 recipient_types.append((org.name, org.email))
         return render_template('contact.html' if not gil else 'gil/contact.html',
@@ -959,8 +959,8 @@ def contact():
         abort(400, "No recipient found")
 
     user_id = user.id if user else None
-    email = EmailMessage(subject=subject, body=body,
-            recipients=recipient, sender=sender, user_id=user_id)
+    email = EmailMessage(subject=subject, body=body, recipients=recipient,
+                         sender=sender, user_id=user_id)
     email.send_message()
     db.session.add(email)
     db.session.commit()
