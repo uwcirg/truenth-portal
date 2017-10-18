@@ -28,7 +28,7 @@ class TablePreference(db.Model):
 
     __table_args__ = (
         UniqueConstraint(user_id, table_name,
-                         name='_user_table_uc'))
+                         name='_user_table_uc'),)
 
     user = db.relationship('User')
 
