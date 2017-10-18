@@ -1,0 +1,59 @@
+"""Unit test module for table preferences logic"""
+from flask_webtest import SessionScope
+import json
+
+from portal.extensions import db
+from portal.models.role import ROLE
+from portal.models.table_preference import TablePreference
+from tests import TestCase, TEST_USER_ID
+
+
+class TestTablePreference(TestCase):
+    """Table Preference tests"""
+
+    def test_preference_upsert(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        filter_json = {"field1":"filter1", "field2":"filter2"}
+        data = {
+                "sort_field": "testSort",
+                "sort_order": "asc",
+                "filters": json.dumps(filter_json),
+               }
+        resp = self.client.post(
+            '/api/user/{}/table_preferences/testTable'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert200(resp)
+        self.assertEquals(resp.json['user_id'], TEST_USER_ID)
+        
+
+        pref = TablePreference.query.filter_by(user_id=TEST_USER_ID,
+                                               table_name='testTable').first()
+
+        self.assertTrue(pref.updated_at)
+        self.assertEquals(pref.filters, filter_json)
+
+    def test_preference_get(self):
+        filter_json = {"field1":"filter1", "field2":"filter2"}
+        pref = TablePreference(user_id=TEST_USER_ID,
+                                   table_name="testTable",
+                                   sort_field="testSort",
+                                   sort_order="desc",
+                                   filters=filter_json)
+        with SessionScope(db):
+            db.session.add(pref)
+            db.session.commit()
+            pref = db.session.merge(pref)
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        resp = self.client.get('/api/user/{}/table_preferences/'
+                               'testTable'.format(TEST_USER_ID))
+
+        self.assert200(resp)
+        self.assertEquals(resp.json['user_id'], TEST_USER_ID)
+        self.assertEquals(json.loads(resp.json['filters']), filter_json)
