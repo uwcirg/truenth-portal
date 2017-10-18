@@ -36,19 +36,6 @@
     <meta name="msapplication-square150x150logo" content="{{url_for('static', filename='img/mediumtile.png') }}">
     <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
     <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
-    <script>
-      {% if not request.args.get("disableLinks", "") %}
-        var url = "{{url_for('user.login')}}";
-        $.ajax({
-            url: url,
-            cache: false,
-            success: function(response) {
-                result = $(response).find("#csrf_token");
-                $("#modal-login > div > div > div > form").append('<input id="csrf_token" name="csrf_token" type="hidden" value="'+ result.attr("value") +'">');
-            }
-        });
-      {% endif %}
-    </script>
   </head>
   {%- endblock -%}
   <body>
@@ -201,7 +188,7 @@
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
              <form action="{{url_for('user.login')}}" method="POST" class="form">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>
               <input id="btnLogin" class="button button-large button--login" type="submit" value="Log In">

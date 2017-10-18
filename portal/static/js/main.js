@@ -356,11 +356,12 @@ var ConsentUIHelper = function(consentItems, userId) {
         };
         //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
         //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+
         this.touObj.forEach(function(item, index) {
             var org = OT.orgsList[item.organization_id];
             touContent += "<tr data-tou-type='" + item.type + "'>";
             touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-            touContent += "<td><span class='text-success small-text eproms-tou-table-text'>" + i18next.t("Agreed to ") + "<a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + item.display_type) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
             touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
