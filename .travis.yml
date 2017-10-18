@@ -106,32 +106,7 @@ after_success:
   # Build portal docker image from debian package
   - docker-compose build web
 
-before_deploy:
-  - if [[ -v ARTIFACTORY_TOKEN ]]; then
-      docker login
-        --username "$ARTIFACTORY_USERNAME"
-        --password "$ARTIFACTORY_TOKEN"
-      "uwcirg-$DOCKER_REPO.jfrog.io" ;
-    fi
-  - if [[ -v BINTRAY_API_KEY ]]; then
-      docker login
-        --username "$BINTRAY_USERNAME"
-        --password "$BINTRAY_API_KEY"
-      "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io" ;
-    fi
-  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      docker login
-        --username "$DOCKER_CLOUD_USERNAME"
-        --password "$DOCKER_CLOUD_API_KEY"
-      https://index.docker.io/v1/ ;
-    fi
-
-  - if [[ -v HEROKU_API_KEY ]]; then
-      docker login
-        --username "$HEROKU_USERNAME"
-        --password "$HEROKU_API_KEY"
-      https://registry.heroku.com/ ;
-    fi
+before_deploy: ./bin/docker-login.sh
 
 # Only deploy from default virtual env TravisCI job
 deploy:

@@ -4,7 +4,7 @@
 get_configured_registries() {
     # Read docker registry configuration from set of 3 environment variables and print to stdout
 
-    printenv | grep '_REPO' | cut --delimiter = --fields 1 | while read envvar_name; do
+    printenv | cut --delimiter = --fields 1 | grep '_REPO$' | while read envvar_name; do
         delivery_target_name="$(echo $envvar_name | awk -F '_REPO' '{print $1; print $3}')"
 
         # "${REGISTRY}_REPO" - registry domain or URL

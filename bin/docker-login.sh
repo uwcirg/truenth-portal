@@ -35,6 +35,7 @@ get_configured_registries | while read config ; do
     username="$(echo "$config" | awk '{print $2}')"
     api_key="$(echo "$config" | awk '{print $3}')"
 
+    echo "Logging into $repo..."
     docker login \
         --username "$username" \
         --password "$api_key" \
