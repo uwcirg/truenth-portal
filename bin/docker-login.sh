@@ -26,17 +26,34 @@ if [ "$1" = "-h" -o "$1" = "--help" ]; then
     exit 0
 fi
 
-printenv | grep '_API_KEY' | cut --delimiter = --fields 1 | while read envvar_name; do
-    delivery_target_name="$(echo $envvar_name | awk -F '_API_KEY' '{print $1; print $3}')"
+get_configured_registries() {
+    # Read docker registry configuration from set of 3 environment variables and print to stdout
 
-    api_key="$(printenv "${delivery_target_name}_API_KEY" || true)"
-    username="$(printenv "${delivery_target_name}_USERNAME" || true)"
-    repo="$(printenv "${delivery_target_name}_REPO" || true)"
+    printenv | grep '_REPO' | cut --delimiter = --fields 1 | while read envvar_name; do
+        delivery_target_name="$(echo $envvar_name | awk -F '_REPO' '{print $1; print $3}')"
 
-    if [ -n "$api_key" -a -n "$username" -a -n "$repo" ]; then
-        echo docker login \
-            --username "$username" \
-            --password "$api_key" \
-        "$repo"
-    fi
+        # "${REGISTRY}_API_KEY" - API key or password needed to authenticate with registry
+        local api_key="$(printenv "${delivery_target_name}_API_KEY" || true)"
+
+        # "${REGISTRY}_USERNAME" - username used to log into docker registry
+        local username="$(printenv "${delivery_target_name}_USERNAME" || true)"
+
+        # "${REGISTRY}_REPO" - registry domain or URL
+        local repo="$(printenv "${delivery_target_name}_REPO" || true)"
+
+        if [ -n "$api_key" -a -n "$username" -a -n "$repo" ]; then
+            # Print docker registry configuration, one line per configuration, space separated
+            echo "$repo" "$username" "$api_key"
+        fi
+    done
+}
+
+get_configured_registries | while read config ; do
+   read repo username api_key <<< "$config"
+
+    echo docker login \
+        --username "$username" \
+        --password "$api_key" \
+    "$repo"
+
 done
