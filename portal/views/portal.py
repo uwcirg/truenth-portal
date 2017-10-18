@@ -953,8 +953,10 @@ def contact():
         abort(400, "No contact request body provided")
     body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
         sendername=sendername, sender=sender, body=formbody)
-    recipient = request.form.get('type')
-    recipient = recipient or current_app.config['CONTACT_SENDTO_EMAIL']
+    recipient = current_app.config.get('CONTACT_SENDTO_EMAIL')
+    formtype = request.form.get('type')
+    if formtype and Organization.query.filter_by(email=formtype).count():
+        recipient = formtype
     if not recipient:
         abort(400, "No recipient found")
 
