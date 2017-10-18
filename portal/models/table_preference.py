@@ -1,5 +1,6 @@
 """Table Preference module"""
 from datetime import datetime
+import json
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -42,7 +43,8 @@ class TablePreference(db.Model):
         d['table_name'] = self.table_name
         d['sort_field'] = self.sort_field
         d['sort_order'] = self.sort_order
-        d['filters'] = self.filters
+        if self.filters:
+            d['filters'] = json.dumps(self.filters)
         d['updated_at'] = FHIR_datetime.as_fhir(self.updated_at)
         return d
 
@@ -58,9 +60,11 @@ class TablePreference(db.Model):
             pref = cls()
             pref.user_id = data['user_id']
             pref.table_name = data['table_name']
-        for attr in ('sort_field', 'sort_order', 'filters'):
+        for attr in ('sort_field', 'sort_order'):
             if data.get(attr, None) is not None:
                 setattr(pref, attr, data[attr])
+        if 'filters' in data:
+            pref.filters = json.loads(data['filters'])
         pref.updated_at = datetime.now()
         return pref
 
