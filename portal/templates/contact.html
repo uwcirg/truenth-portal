@@ -25,6 +25,17 @@
           required>
         <div class="help-block with-errors"></div>
       </div>
+      {% if types|length > 0 %}
+      <div class="form-group">
+        <label for="type">{{ _("Enquiry Type") }}</label>
+        <select class="form-control" maxlength="200" name="type" id="type">
+          {% for type in types %}
+          <option value="{{ type[1] }}">{{ type[0] }}</option>
+          {% endfor %}
+          <option value="{{ config.CONTACT_SENDTO_EMAIL }}" selected>{{_("Other")}}</option>
+        </select>
+      </div>
+      {% endif %}
       <div class="form-group">
         <label for="subject">{{ _("Subject") }}</label>
         <input type="text" class="form-control" maxlength="200" name="subject" id="subject" placeholder="{{ _('What is this about?') }}">
