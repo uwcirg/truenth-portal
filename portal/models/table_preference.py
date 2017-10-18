@@ -34,7 +34,8 @@ class TablePreference(db.Model):
     user = db.relationship('User')
 
     def __str__(self):
-        return self.filename
+        return ("TablePreference for user {0.user_id} "
+                "on table {0.table_name}".format(self))
 
     def as_json(self):
         d = {}
@@ -61,7 +62,7 @@ class TablePreference(db.Model):
             pref.user_id = data['user_id']
             pref.table_name = data['table_name']
         for attr in ('sort_field', 'sort_order'):
-            if data.get(attr, None) is not None:
+            if attr in data::
                 setattr(pref, attr, data[attr])
         if 'filters' in data:
             pref.filters = json.loads(data['filters'])
