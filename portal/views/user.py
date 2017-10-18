@@ -1736,7 +1736,7 @@ def get_table_preferences(user_id, table_name):
         description:
           Returns JSON of the user's table view preferences.
         schema:
-          id: table_references
+          id: table_preferences
           properties:
             user_id:
               type: integer
@@ -1782,5 +1782,114 @@ def get_table_preferences(user_id, table_name):
                                            user_id=user_id).first()
     if not pref:
         abort(404, "no table preferences found for given user & table")
+
+    return jsonify(pref.as_json())
+
+
+@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>',
+                methods=('PUT','POST',))
+@oauth.require_oauth()
+def set_table_preferences(user_id, table_name):
+    """Add a consent agreement for the user with named organization
+
+    Used to add a consent agreements between a user and an organization.
+    Assumed to have just been agreed to.  Include 'expires' if
+    necessary, defaults to now and five years from now (both in UTC).
+
+    NB only one valid consent should be in place between a user and an
+    organization.  Therefore, if this POST would create a second consent on the
+    given user / organization, the existing consent will be marked deleted.
+
+    ---
+    tags:
+      - User
+    operationId: set_table_preferences
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: table_name
+        in: path
+        description: Portal UI Table Name
+        required: true
+        type: string
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: set_preferences
+          properties:
+            sort_field:
+              type: string
+              description: Field on which to sort the table
+            sort_order:
+              type: string
+              description: Method to use for sorting (asc or desc)
+            filters:
+              type: application/json
+              description:
+                JSON describing field filter values (expected
+                format - {<table_field>: <filter_value>} )
+    responses:
+      200:
+        description:
+          Returns JSON of the user's table view preferences.
+        schema:
+          id: table_preferences
+          properties:
+            user_id:
+              type: integer
+              format: int64
+              description: TrueNTH user ID
+            table_name:
+              type: string
+              description: Name of table in portal UI
+            sort_field:
+              type: string
+              description: Field on which to sort the table
+            sort_order:
+              type: string
+              description: Method to use for sorting (asc or desc)
+            filters:
+              type: application/json
+              description:
+                JSON describing field filter values (expected
+                format - {<table_field>: <filter_value>} )
+            updated_at:
+              type: string
+              format: date-time
+              description: Last updated datetime
+      400:
+        description: if the request includes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+
+    """
+    if not user_id or not table_name:
+        abort(400, "missing user or table parameters")
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    if not request.json:
+        abort(400, "no table preference data provided")
+
+    req = request.json
+    req['user_id'] = user_id
+    req['table_name'] = table_name
+
+    pref = TablePreference.from_json(req)
+    db.session.add(pref)
+    db.session.commit()
 
     return jsonify(pref.as_json())
