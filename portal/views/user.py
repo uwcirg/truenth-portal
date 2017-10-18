@@ -1753,9 +1753,7 @@ def get_table_preferences(user_id, table_name):
               description: Method to use for sorting (asc or desc)
             filters:
               type: application/json
-              description:
-                JSON describing field filter values (expected
-                format - {<table_field>: <filter_value>} )
+              description: JSON describing filter fields and values
             updated_at:
               type: string
               format: date-time
@@ -1832,9 +1830,7 @@ def set_table_preferences(user_id, table_name):
               description: Method to use for sorting (asc or desc)
             filters:
               type: application/json
-              description:
-                JSON describing field filter values (expected
-                format - {<table_field>: <filter_value>} )
+              description: JSON describing filter fields and values
     responses:
       200:
         description:
@@ -1857,9 +1853,7 @@ def set_table_preferences(user_id, table_name):
               description: Method to use for sorting (asc or desc)
             filters:
               type: application/json
-              description:
-                JSON describing field filter values (expected
-                format - {<table_field>: <filter_value>} )
+              description: JSON describing filter fields and values
             updated_at:
               type: string
               format: date-time
