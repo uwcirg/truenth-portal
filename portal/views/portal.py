@@ -924,8 +924,13 @@ def contact():
         sendername = user.display_name if user else ''
         email = user.email if user else ''
         gil = current_app.config.get('GIL')
-        return render_template('contact.html' if not gil else 'gil/contact.html', sendername=sendername,
-                               email=email, user=user)
+        recipient_types = []
+        for org in Organization.query.filter(Organization.email.isnot(None)):
+            if u'@' in org.email:
+                recipient_types.append((org.name, org.email))
+        return render_template('contact.html' if not gil else 'gil/contact.html',
+                               sendername=sendername, email=email, user=user,
+                               types=recipient_types)
 
     if (not user and
             current_app.config.get('RECAPTCHA_SITE_KEY', None) and
@@ -948,11 +953,14 @@ def contact():
         abort(400, "No contact request body provided")
     body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
         sendername=sendername, sender=sender, body=formbody)
-    recipients = current_app.config['CONTACT_SENDTO_EMAIL']
+    recipient = request.form.get('type')
+    recipient = recipient or current_app.config['CONTACT_SENDTO_EMAIL']
+    if not recipient:
+        abort(400, "No recipient found")
 
     user_id = user.id if user else None
-    email = EmailMessage(subject=subject, body=body,
-            recipients=recipients, sender=sender, user_id=user_id)
+    email = EmailMessage(subject=subject, body=body, recipients=recipient,
+                         sender=sender, user_id=user_id)
     email.send_message()
     db.session.add(email)
     db.session.commit()

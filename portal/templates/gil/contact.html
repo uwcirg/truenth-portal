@@ -51,6 +51,19 @@
                   <input class="field__input input-email" type="email" placeholder="{{_('Email Address')}}" id="email" name="email"/>
                 </div>
               </div>
+              {% if types|length > 0 %}
+                <div class="field-group">
+                  <div class="field field__select">
+                    <label>{{_("Enquiry Type")}}</label>
+                    <select id="type" name="type" class="field__select">
+                      {% for type in types %}
+                      <option value="{{ type[1] }}">{{ type[0] }}</option>
+                      {% endfor %}
+                      <option value="{{ config.CONTACT_SENDTO_EMAIL }}" selected>{{_("Other")}}</option>
+                    </select>
+                  </div>
+                </div>
+              {% endif %}
               <div class="field-group">
                 <div class="field field__text">
                   <label>{{_("Subject")}}</label>
@@ -102,7 +115,7 @@
         $("#submitButton").on("click", function(e) {
             e.preventDefault();
             var formData = {};
-            $("#contactForm").find("input, select, textarea").each(function() {
+            $("#contactForm").find("input, select, textarea, type").each(function() {
                 formData[$(this).attr("name")] = $(this).val() || $(this).text();
             });
 
