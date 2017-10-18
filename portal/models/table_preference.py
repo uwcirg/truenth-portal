@@ -62,7 +62,7 @@ class TablePreference(db.Model):
             pref.user_id = data['user_id']
             pref.table_name = data['table_name']
         for attr in ('sort_field', 'sort_order'):
-            if attr in data::
+            if attr in data:
                 setattr(pref, attr, data[attr])
         if 'filters' in data:
             pref.filters = json.loads(data['filters'])
