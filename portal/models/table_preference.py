@@ -1,8 +1,14 @@
 """Table Preference module"""
 from datetime import datetime
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+
+sort_order_types = ('asc', 'desc')
+sort_order_types_enum = ENUM(
+    *sort_order_types, name='sort_order_enum', create_type=False)
 
 class TablePreference(db.Model):
     """Captures user preferences for UI table display
@@ -16,9 +22,13 @@ class TablePreference(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     table_name = db.Column(db.Text, nullable=False)
     sort_field = db.Column(db.Text)
-    sort_order = db.Column(db.Text)
+    sort_order = db.Column('sort_order', sort_order_types_enum)
     filters = db.Column(db.JSON)
     updated_at = db.Column(db.DateTime)
+
+    __table_args__ = (
+        UniqueConstraint(user_id, table_name,
+                         name='_user_table_uc'))
 
     user = db.relationship('User')
 
@@ -34,7 +44,6 @@ class TablePreference(db.Model):
         d['sort_order'] = self.sort_order
         d['filters'] = self.filters
         d['updated_at'] = FHIR_datetime.as_fhir(self.updated_at)
-
         return d
 
     @classmethod
