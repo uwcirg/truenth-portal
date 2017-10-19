@@ -2152,7 +2152,8 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? i18next.t(message) : i18next.t("Not provided");
+        //don't think we want to translate message sent back to the server here
+        params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
 
         $.ajax ({
             type: "GET",
@@ -2285,7 +2286,7 @@ var tnthAjax = {
             if (callback) callback("<div class='error-message'>" + i18next.t("User Id is required") + "</div>");
             return false;
         };
-        this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true}, function(data) {
+        this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true, 'dataType': 'html'}, function(data) {
         	if (data) {
         		if (!data.error) {
         			if (hasValue(containerId)) $("#" + containerId).html(data);
