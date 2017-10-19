@@ -3178,6 +3178,34 @@ var tnthAjax = {
     		};
     	});
     },
+    "setTablePreference": function(userId, tableName, params, callback) {
+        if (!hasValue(userId) || !hasValue(tableName)) return false;
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/table_preferences/'+tableName, 'PUT', userId, {"data":params.data, "sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred setting table preference.")});
+                };
+            };
+        });
+    },
+    "getTablePreference": function(userId, tableName, params, callback) {
+        if (!hasValue(userId) || !hasValue(tableName)) return false;
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/table_preferences/'+tableName, 'GET', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred setting table preference.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    }, 
     "auditLog": function(userId, callback) {
     	if (!hasValue(userId)) return false;
     	this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {

@@ -30,8 +30,6 @@
              class="tnth-admin-table"
              data-classes="table table-hover table-condensed table-striped table-responsive"
              data-toggle="table"
-             data-sort-name="id"
-             data-sort-order="desc"
              data-search="true"
              data-pagination="true"
              data-page-size="10"
@@ -114,6 +112,8 @@
 {% block document_ready %}
 
 var AT = new AdminTool({{user.id}});
+
+var sortObj = AT.getColumnSortOrder({{user.id}}, "patientList");
 /*
 * initializing bootstrapTable
 */
@@ -124,6 +124,8 @@ $(".tnth-admin-table").bootstrapTable({
       $("#tableCount"+thisId).html(rowInfo);
       return rowInfo;
   },
+  sortName: sortObj?sortObj.sort_field:"email",
+  sortOrder: sortObj?sortObj.sort_order:"desc",
   exportOptions: {
       fileName: __getExportFileName("PatientList_")
   }
@@ -136,6 +138,11 @@ $(document).ready(function() {
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
+
+  $("#adminTable").on("sort.bs.table", function(e, name, order) {
+      AT.setColumnSortOrder({{user.id}}, "patientList", name, order);
+  });
+
   /*
    * add placeholder text for filter controls
    */

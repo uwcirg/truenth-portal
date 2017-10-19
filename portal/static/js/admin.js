@@ -421,7 +421,31 @@ AdminTool.prototype.handleDownloadModal = function() {
     $("input[name='instrument'], input[name='downloadType']").on("click", function() {
         if ($(this).is(":checked")) $("#_downloadMessage").text("");
     });
-}
+};
+
+
+AdminTool.prototype.getColumnSortOrder = function(userId, tableName) {
+    var prefData = null;
+    tnthAjax.getTablePreference(userId||this.userId, "patientList", {"sync": true}, function(data) {
+      if (data && !data.error) {
+        prefData = data;
+      };
+    });
+    return prefData ? 
+           prefData : 
+           {
+            sort_field: "id",
+            sort_order: "desc"
+           };
+};
+
+AdminTool.prototype.setColumnSortOrder = function(userId, tableName, sortField, sortOrder) {
+  //TODO preserve filters?
+  if (hasValue(tableName) && hasValue(sortField)  && hasValue(sortOrder)) {
+      var data = {"sort_field":sortField, "sort_order":sortOrder};
+      tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
+  };
+};
 
 
 
