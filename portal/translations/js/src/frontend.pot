@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-09-11T21:36:07.502Z\n"
-"PO-Revision-Date: 2017-09-11T21:36:07.502Z\n"
+"POT-Creation-Date: 2017-10-18T21:58:05.108Z\n"
+"PO-Revision-Date: 2017-10-18T21:58:05.108Z\n"
 
 msgid "Select All"
 msgstr ""
@@ -44,13 +44,7 @@ msgstr ""
 msgid "Edit in Liferay"
 msgstr ""
 
-msgid "No affiliated clinic"
-msgstr ""
-
-msgid "No clinic selected"
-msgstr ""
-
-msgid "Patient is deceased"
+msgid "Organization"
 msgstr ""
 
 msgid "Consent Status"
@@ -71,15 +65,6 @@ msgstr ""
 msgid "GMT"
 msgstr ""
 
-msgid "Agreed to terms"
-msgstr ""
-
-msgid "TrueNTH USA Terms of Use"
-msgstr ""
-
-msgid "View"
-msgstr ""
-
 msgid "Consented"
 msgstr ""
 
@@ -92,10 +77,16 @@ msgstr ""
 msgid "Suspend Data Collection and Report Historic Data"
 msgstr ""
 
-msgid "deleted on"
+msgid "Sharing information with clinics "
+msgstr ""
+
+msgid "View"
 msgstr ""
 
 msgid "expired"
+msgstr ""
+
+msgid "modified on"
 msgstr ""
 
 msgid "Consent Status Editor"
@@ -119,10 +110,13 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-msgid "Sharing information with clinics "
+msgid "Agreed to "
 msgstr ""
 
-msgid "No Consent Record Found"
+msgid "Agreed to terms"
+msgstr ""
+
+msgid "TrueNTH USA Terms of Use"
 msgstr ""
 
 msgid "Date must in the valid format."
@@ -141,6 +135,21 @@ msgid "Error processing data.  Make sure the date is in the correct format."
 msgstr ""
 
 msgid "You must enter a valid date/time"
+msgstr ""
+
+msgid "No Consent Record Found"
+msgstr ""
+
+msgid "History"
+msgstr ""
+
+msgid "No affiliated clinic"
+msgstr ""
+
+msgid "No clinic selected"
+msgstr ""
+
+msgid "Patient is deceased"
 msgstr ""
 
 msgid "No consent found for this user."
@@ -182,11 +191,6 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-msgid ""
-"You must agree to the terms and conditions by checking the provided "
-"checkboxes."
-msgstr ""
-
 msgid "Consent to share information"
 msgstr ""
 
@@ -199,10 +203,10 @@ msgstr ""
 msgid "Not provided"
 msgstr ""
 
-msgid "no data returned"
+msgid "unable to get needed core data"
 msgstr ""
 
-msgid "unable to get needed core data"
+msgid "no data returned"
 msgstr ""
 
 msgid "unable to get required core data"
@@ -217,22 +221,16 @@ msgstr ""
 msgid "User Id is required"
 msgstr ""
 
-msgid "No data found"
+msgid "Unable to retrieve portal footer html"
 msgstr ""
 
-msgid "Unable to retrieve portal footer html"
+msgid "No data found"
 msgstr ""
 
 msgid "Server error occurred retrieving organization/clinic information."
 msgstr ""
 
 msgid "Problem retrieving data from server."
-msgstr ""
-
-msgid "Error Status Code: "
-msgstr ""
-
-msgid "Permission denied to access patient record"
 msgstr ""
 
 msgid "Server error occurred retrieving consent information."
@@ -299,6 +297,27 @@ msgid "Server error occurred retrieving tou data."
 msgstr ""
 
 msgid "Server error occurred saving terms of use information."
+msgstr ""
+
+msgid "Error occurred retrieving access url."
+msgstr ""
+
+msgid "Error occurred sending password reset request."
+msgstr ""
+
+msgid "Error occurred retrieving assessment status."
+msgstr ""
+
+msgid "Error occurred retrieving assessment list."
+msgstr ""
+
+msgid "Error occurred retrieving assessment report."
+msgstr ""
+
+msgid "Error occurred retrieving patient report."
+msgstr ""
+
+msgid "Error occurred retrieving audit log."
 msgstr ""
 
 msgid "not provided"

@@ -133,7 +133,11 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
- __i18next.init({"debug": false, "initImmediate": true});
+ __i18next.init({
+  "debug": false, 
+  "initImmediate": false,
+  "ns": ["translation", "custom"]
+  });
 
 $("#homeFooter .logo-link").each(function() {
   if (! hasValue($.trim($(this).attr("href")))) {

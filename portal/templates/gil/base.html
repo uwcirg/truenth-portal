@@ -36,17 +36,6 @@
     <meta name="msapplication-square150x150logo" content="{{url_for('static', filename='img/mediumtile.png') }}">
     <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
     <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
-    <script>
-    var url = "{{url_for('user.login')}}";
-    $.ajax({
-        url: url,
-        cache: false,
-        success: function(response) {
-            result = $(response).find("#csrf_token");
-            $("#modal-login > div > div > div > form").append('<input id="csrf_token" name="csrf_token" type="hidden" value="'+ result.attr("value") +'">');
-        }
-    });
-    </script>
   </head>
   {%- endblock -%}
   <body>
@@ -108,7 +97,7 @@
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></li>
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a></li>
           {% else %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{url_for('auth.logout')}}">{{_("Log Out")}}</a></li>
+            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--logout"><a href="{{url_for('auth.logout')}}">{{_("Log Out")}}</a></li>
           {% endif %}
         </ul>
       </div>
@@ -199,7 +188,7 @@
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
              <form action="{{url_for('user.login')}}" method="POST" class="form">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>
               <input id="btnLogin" class="button button-large button--login" type="submit" value="Log In">
@@ -550,6 +539,23 @@
                   };
                 });
             };
+
+            {% if request.args.get("disableLinks", "") %}
+               $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
+                  if (!$(this).hasClass("side-nav-items__item--home") && 
+                      !$(this).hasClass("side-nav-items__item--logout") &&
+                      !$(this).hasClass("nav-list__item--home")) {
+                    $(this).children("a").each(function() {
+                        $(this).addClass("disabled");
+                        $(this).prop('onclick',null).off('click');
+                        $(this).on("click", function(e) {
+                            e.preventDefault();
+                            return false;
+                        });
+                    });
+                  };
+               });
+            {% endif %}
 
             //uncomment if want to allow LR edit link to display on hot key
             //setTimeout("LRKeyEvent();", 500);

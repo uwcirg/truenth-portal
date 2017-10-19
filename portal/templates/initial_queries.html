@@ -6,7 +6,7 @@
 {% from "profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
-  {{tou(terms)}}
+  {{tou(terms, user)}}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -40,14 +40,14 @@
           <div class="content">
             <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
             <div class="content-body">
-             {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                 <div id="clinics">
+              <div id="clinics">
+               {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
                     {{profileOrgsSelector(user, user, consent_agreements)}}
-                 </div>
-             {% else %}
-                  {{clinic(consent_agreements)}}
-             {% endif %}
+               {% else %}
+                    {{clinic(consent_agreements)}}
+               {% endif %}
               </div>
+            </div>
           </div>
         </div>
         <div class="reg-buttons-msg-wrapper">
@@ -99,7 +99,7 @@ var configObj = (function() {
   return {
       initConfig: function(callback) {
 	     tnthAjax.getStillNeededCoreData({{user.id}}, true, function(data) {
-		     configObj.setConfig({%-if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}data{%-endif-%});
+		     configObj.setConfig({%-if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)-%}data{%-endif-%});
 		     if (callback) callback(data);
          });
       },
@@ -149,7 +149,6 @@ var FieldsChecker = function(mainSections) {
         if (mainSections[section].required) {
           this.mainSections[section] = mainSections[section];
         }
-
         else if (configObj.inConfig(mainSections[section].config)) {
           this.mainSections[section] = mainSections[section];
         };
@@ -256,48 +255,6 @@ FieldsChecker.prototype.reset = function() {
     self.incompleteFields = [];
 };
 
-FieldsChecker.prototype.getNextField = function(currentIndex, field) {
-    currentIndex = parseInt(currentIndex);
-    var self = this;
-    if (!isNaN(currentIndex) && currentIndex >= 0) {
-      if ((currentIndex + 1) <= (this.incompleteFields.length - 1)) {
-          this.incompleteFields[currentIndex + 1].section.show();
-          //console.log("next Index? " + currentIndex + 1);
-          //console.log(this.incompleteFields[currentIndex + 1].section)
-           var el = this.incompleteFields[currentIndex + 1].element;
-           el.fadeIn();
-           $('html, body').animate({
-              scrollTop: el.offset().top
-           }, 500);
-      };
-    } else {
-      if (field) {
-          var parentContainer = field.closest("[data-parent-section='true']");
-          var found = false;
-          if (parentContainer.length > 0) {
-              var nexts = parentContainer.nextAll("[data-parent-section='true']");
-              nexts.each(function() {
-                var parentId = $(this).attr("id");
-                //console.log('parentId: ' + parentId)
-                if (!found) {
-                  if (!self.sectionCompleted(parentId)) {
-                      var section = $(this);
-                      section.fadeIn();
-                      $('html, body').animate({
-                          scrollTop: section.offset().top
-                      }, 500);
-                      found = true;
-                  };
-                  if (!found) {
-                      if (self.sectionCompleted(parentId)) $(this).fadeIn();
-                  };
-                };
-              });
-          };
-      };
-    };
-};
-
 FieldsChecker.prototype.sectionCompleted = function(sectionId) {
   var isComplete = true;
   if (this.mainSections && this.mainSections[sectionId]) {
@@ -308,7 +265,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
       if (fields) {
           fields.forEach(function(field) {
             if (field.length > 0 && (field.attr("skipped") != "true")) {
-                var type = field.attr('type') || field.attr('data-type');
+                var type = field.attr('data-type') || field.attr('type');
                 switch(String(type).toLowerCase()) {
                 case 'checkbox':
                 case 'radio':
@@ -374,7 +331,7 @@ FieldsChecker.prototype.continueToFinish = function() {
   $('html, body').animate({
     scrollTop: $('div.reg-complete-container').offset().top
   }, 2000);
-  $("#next").fadeOut();
+  $("#next").attr("disabled", true).removeClass("open");
   $("#iqErrorMessage").text("");
   $("#updateProfile").removeAttr("disabled").addClass("open");
 };
@@ -382,14 +339,14 @@ FieldsChecker.prototype.continueToFinish = function() {
 FieldsChecker.prototype.stopContinue = function(sectionId) {
   $("#updateProfile").attr("disabled", true).removeClass("open");
   $("div.reg-complete-container").fadeOut();
-  $("#next").show().attr("disabled", true);
+  $("#next").attr("disabled", true).addClass("open");
   this.setProgressBar(sectionId);
 }
 
 FieldsChecker.prototype.continueToNext = function(sectionId) {
   this.setProgressBar(sectionId);
   $("div.reg-complete-container").fadeOut();
-  $("#next").show().removeAttr("disabled");
+  $("#next").removeAttr("disabled").addClass("open");
   if (!$("#next").isOnScreen()) {
     setTimeout(function() {
         $('html, body').animate({
@@ -399,6 +356,7 @@ FieldsChecker.prototype.continueToNext = function(sectionId) {
   };
   $("#updateProfile").attr("disabled", true).removeClass("open");
 };
+
 
 FieldsChecker.prototype.getNext = function() {
   var found = false, self = this;
@@ -412,13 +370,16 @@ FieldsChecker.prototype.getNext = function() {
                 __modal.modal("show");
               };
               $("#" + section).fadeIn(500).addClass("open");
+              self.stopContinue(section);
               found = true;
           } else {
             $("#" + section).fadeIn(500).addClass("open");
+            self.stopContinue(section);
             found = true;
           };
        } else {
           $("#" + section).fadeIn(500).addClass("open");
+          self.stopContinue(section);
           found = true;
        };
     };
@@ -426,8 +387,19 @@ FieldsChecker.prototype.getNext = function() {
   if (!found) self.continueToFinish();
 };
 
+FieldsChecker.prototype.sectionsLoaded = function() {
+  var self = this, isLoaded = true;
+  for (var section in self.mainSections) {
+    if (isLoaded) {
+      for (var subsectionId in self.mainSections[section].subsections) {
+          if (!$("#" + subsectionId).attr("loaded")) isLoaded = false;
+      };
+    };
+  };
+  return isLoaded;
+}
+
 function initIncompleteFields() {
-  fc = new FieldsChecker(mainSections);
   fc.setIncompleteFields();
   incompleteFields = fc.getIncompleteFields();
   incompleteFields.forEach(function(field, index) {
@@ -471,231 +443,7 @@ function initIncompleteFields() {
 
     fc.constructProgressBar();
 
-    //if term of use form not present - need to show the form
-    if ($("#topTerms").length == 0)  {
-        $("#aboutForm").fadeIn();
-        fc.getNext();
-        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
-          fc.continueToFinish();
-        };
-    } else {
-      if (!fc.sectionCompleted("topTerms")) {
-        $("#topTerms").removeClass("hide-terms").show();
-        if (window.performance) {
-          if (performance.navigation.type == 1) {
-            //page has been reloaded;
-            $("#termsReminderModal").modal("show");
-          };
-        };
-        setTimeout("disableHeaderFooterLinks();", 1000);
-      } else {
-        fc.getNext();
-        $("#aboutForm").fadeIn();
-        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
-          fc.continueToFinish();
-        };
-      };
-    };
-
-};
-
-$(document).ready(function(){
-  	/*
-  	 * the flow here :
-  	 * get still needed core data
-  	 * populate terms if it is agreed
-  	 * get incomplete fields thereafter
-     * note: need to delay gathering incomplete fields to allow fields to be render
-     * (e.g. broken in firefox if no delay)
-  	 */
-  	configObj.initConfig(function() { tnthAjax.getTerms({{user.id}}, false, false, function() {
-      var isFF = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-      var to = (isFF) ? 1000: 500;
-      if (isFF) {
-        DELAY_LOADING = true;
-        setTimeout(function() { $("#loadingIndicator").fadeOut(); DELAY_LOADING = false;}, 1500);
-      }
-      setTimeout(initIncompleteFields, to);
-      })
-    });
-
-    tnthAjax.getDemo({{user.id}});
-
-    var namesChangeEvent = function() {
-       if (fc.allFieldsCompleted()) fc.continueToFinish();
-       else {
-          if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
-          else fc.stopContinue("demographicsContainer");
-       };
-    };
-
-    var bdChangeEvent = function() {
-       var d = $("#date");
-       var m = $("#month");
-       var y = $("#year");
-       if (d.val() != "" && m.val() != "" && y.val() != "") {
-          if (this.validity.valid) {
-              var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-              if (isValid) {
-                  $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
-                  $("#errorbirthday").text("").hide();
-                  assembleContent.demo($("#iq_userId").val());
-                  if (fc.allFieldsCompleted()) {
-                     fc.continueToFinish();
-                  } else {
-                    if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
-                  };
-              } else {
-                  fc.stopContinue("demographicsContainer");
-              };
-          } else fc.stopContinue("demographicsContainer");
-      } else fc.stopContinue("demographicsContainer");
-    };
-
-    var rolesGroupClickEvent = function(){
-        var roles = [];
-        var theVal = $(this).val();
-        roles.push({name: theVal});
-        var toSend = {"roles": roles};
-        tnthAjax.putRoles({{user.id}},toSend);
-
-        if (theVal == "patient") {
-            $("#clinicalContainer").attr("skipped", "false");
-            $("#orgsContainer").attr("skipped", "false");
-            $("#date").attr("required", "required").attr("skipped", "false");
-            $("#month").attr("required", "required").attr("skipped", "false");
-            $("#year").attr("required", "required").attr("skipped", "false");
-            $(".bd-optional").hide();
-        } else {
-          // If partner, skip all questions
-          if (theVal == "partner") {
-            $("#clinicalContainer").attr("skipped", "true");
-            $("#orgsContainer").attr("skipped", "true");
-            $("#date").removeAttr("required").attr("skipped", "true");
-            $("#month").removeAttr("required").attr("skipped", "true");
-            $("#year").removeAttr("required").attr("skipped", "true");
-            $(".bd-optional").show();
-          };
-        };
-
-        if (fc.allFieldsCompleted()) {
-          fc.continueToFinish();
-        } else {
-          if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
-          else fc.stopContinue("demographicsContainer");
-        };
-    };
-
-    var patientQClickEvent = function(){
-          var thisItem = $(this);
-          var toCall = thisItem.attr("name") || thisItem.attr("data-name");
-
-          // Get value from div - either true or false
-          var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
-          //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
-          if (toCall != "tx" && toCall != "biopsy") {
-              tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("data-status"), false);
-          };
-          if (toSend == "true" || toCall ==  "pca_localized") {
-
-           if (toCall == "biopsy") {
-                $("#biopsyDate").attr("skipped", "false");
-                if ($("#biopsyDate").val() == "") return true;
-                else {
-                  //$("#biopsyDate").datepicker("hide");
-                  //var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
-                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
-                };
-            };
-
-            thisItem.parents(".pat-q").next().fadeIn();
-
-            var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
-            var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
-            if (nextItem.length > 0) {
-                var checkedRadio = nextItem.find("input[type='radio']:checked");
-                if (!(checkedRadio.length > 0)) {
-                  $('html, body').animate({
-                    scrollTop: nextItem.offset().top
-                  }, 1000);
-                };
-                nextItem.find("input[type='radio']").each(function() {
-                  $(this).attr("skipped", "false");
-                });
-                //console.log( thisItem.closest(".pat-q").nextAll())
-                //console.log(thisItem)
-                thisItem.closest(".pat-q").nextAll().each(function() {
-                    var dataTopic = $(this).attr("data-topic");
-                    $(this).find("input[name='" + dataTopic + "']").each(function() {
-                        $(this).attr("skipped", "false");
-                    });
-                });
-
-            };
-
-          } else {
-            if (toCall == "biopsy") {
-              tnthAjax.postClinical({{user.id}}, toCall, "false", $(this).attr("data-status"));
-              $("#biopsyDate").attr("skipped", "true");
-
-              ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
-                  $("input[name='" + fieldName + "']").each(function() {
-                      $(this).prop("checked", false);
-                      $(this).attr("skipped", "true");
-                  });
-              });
-              if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
-              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
-
-              if ($("input[name='tx']").length > 0) {
-                tnthAjax.deleteTreatment({{user.id}});
-              };
-            } else if (toCall == "pca_diag") {
-              ["pca_localized", "tx"].forEach(function(fieldName) {
-                  $("input[name='" + fieldName + "']").each(function() {
-                      $(this).prop("checked", false);
-                      $(this).attr("skipped", "true");
-                  });
-              });
-              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
-
-              //tnthAjax.putClinical({{user.id}},"tx","false");
-              if ($("input[name='tx']").length > 0) {
-                tnthAjax.deleteTreatment({{user.id}});
-              };
-            }
-            thisItem.parents(".pat-q").nextAll().fadeOut();
-          };
-
-          if (fc.allFieldsCompleted()) {
-            fc.continueToFinish();
-          } else {
-            if (fc.sectionCompleted("clinicalContainer")) fc.continueToNext("clinicalContainer");
-            else fc.stopContinue("clinicalContainer");
-          }
-      };
-
-    var userOrgChangeEvent = function() {
-      if ($(this).prop("checked")) {
-        var parentOrg = $(this).attr("data-parent-id");
-        var m = $("#" + parentOrg + "_consentModal");
-        var dm = $("#" + parentOrg + "_defaultConsentModal");
-        if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
-          //do nothing
-        } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0 ) {
-          //do nothing
-        }
-        else {
-          if (fc.allFieldsCompleted()) {
-            fc.continueToFinish();
-          } else {
-            if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
-            else fc.stopContinue("orgsContainer");
-          };
-        };
-      };
-    };
-
+    /*** event for consent popups **/
     $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($(this).find("input[name='toConsent']:checked").length > 0) {
@@ -712,25 +460,242 @@ $(document).ready(function(){
         });
     });
 
-    var termsEvent = function(){
-        if ($(this).attr("data-agree") == "false") {
-          var types = $(this).attr("data-tou-type");
-          var additional = $(this).find("[data-core-data-subtype]");
-          if (additional.length > 0) types += (hasValue(types)?",":"") + additional.attr("data-tou-type");
-          if (hasValue(types)) {
-              var arrTypes = types.split(",");
-              var self = $(this);
-              arrTypes.forEach(function(type) {
-                  var theTerms = {};
-                  theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
-                  theTerms["type"] = type;
-                  var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
-                  /*** if UI for orgs is not present, need to get the user org from backend ***/
-                  if (org.length == 0) {
-	                  	$.ajax ({
-			            type: "GET",
-			            url: '/api/demographics/{{user.id}}',
-			            async: false
+    /*** event for element that is tagged with data-required attribute in terms section ***/
+    $("#topTerms label.terms-label").on("click", function() {
+        $(this).find("[data-required]").each(function() {
+          termsEvent.apply(this);
+        });
+    });
+
+    //if term of use form not present - need to show the form
+    if ($("#topTerms").length == 0)  {
+        $("#aboutForm").fadeIn();
+        fc.getNext();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
+    } else {
+      if (!fc.sectionCompleted("topTerms")) {
+        $("#topTerms").removeClass("hide-terms").show();
+        if (window.performance) {
+          if (performance.navigation.type == 1) {
+            //page has been reloaded;
+            var agreedCheckboxes = $("#topTerms .terms-label:visible i");
+            if (agreedCheckboxes.length > 1) {
+                $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
+            };
+            if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
+            $("#termsReminderModal").modal("show");
+          };
+        };
+        setTimeout("disableHeaderFooterLinks();", 1000);
+      } else {
+        fc.getNext();
+        $("#aboutForm").fadeIn();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
+      };
+    };
+
+};
+
+var namesChangeEvent = function() {
+   if (fc.allFieldsCompleted()) fc.continueToFinish();
+   else {
+      if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
+      else fc.stopContinue("demographicsContainer");
+   };
+};
+
+var bdChangeEvent = function() {
+   var d = $("#date");
+   var m = $("#month");
+   var y = $("#year");
+   if (d.val() != "" && m.val() != "" && y.val() != "") {
+      if (this.validity.valid) {
+          var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+          if (isValid) {
+              $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
+              $("#errorbirthday").text("").hide();
+              assembleContent.demo($("#iq_userId").val());
+              if (fc.allFieldsCompleted()) {
+                 fc.continueToFinish();
+              } else {
+                if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
+              };
+          } else {
+              fc.stopContinue("demographicsContainer");
+          };
+      } else fc.stopContinue("demographicsContainer");
+  } else fc.stopContinue("demographicsContainer");
+};
+
+var rolesGroupClickEvent = function(){
+    var roles = [];
+    var theVal = $(this).val();
+    roles.push({name: theVal});
+    var toSend = {"roles": roles};
+    tnthAjax.putRoles({{user.id}},toSend);
+
+    if (theVal == "patient") {
+        $("#clinicalContainer").attr("skipped", "false");
+        $("#orgsContainer").attr("skipped", "false");
+        $("#date").attr("required", "required").attr("skipped", "false");
+        $("#month").attr("required", "required").attr("skipped", "false");
+        $("#year").attr("required", "required").attr("skipped", "false");
+        $(".bd-optional").hide();
+    } else {
+      // If partner, skip all questions
+      if (theVal == "partner") {
+        $("#clinicalContainer").attr("skipped", "true");
+        $("#orgsContainer").attr("skipped", "true");
+        $("#date").removeAttr("required").attr("skipped", "true");
+        $("#month").removeAttr("required").attr("skipped", "true");
+        $("#year").removeAttr("required").attr("skipped", "true");
+        $(".bd-optional").show();
+      };
+    };
+
+    if (fc.allFieldsCompleted()) {
+      fc.continueToFinish();
+    } else {
+      if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
+      else fc.stopContinue("demographicsContainer");
+    };
+};
+
+var patientQClickEvent = function(){
+      var thisItem = $(this);
+      var toCall = thisItem.attr("name") || thisItem.attr("data-name");
+      // Get value from div - either true or false
+      var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
+      //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
+      if (toCall != "tx" && toCall != "biopsy") {
+          tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("data-status"), false);
+      };
+      if (toSend == "true" || toCall ==  "pca_localized") {
+       if (toCall == "biopsy") {
+            $("#biopsyDate").attr("skipped", "false");
+            if (toSend == "true") {
+              ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+                  $("input[name='" + fieldName + "']").each(function() {
+                      $(this).attr("skipped", "false");
+                  });
+              });
+            };
+            if ($("#biopsyDate").val() == "") return true;
+            else {
+              tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
+            };
+            if (fc.sectionCompleted("clinicalContainer")) return false;
+        };
+
+        thisItem.parents(".pat-q").next().fadeIn();
+
+        var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
+        var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
+        if (nextItem.length > 0) {
+            var checkedRadio = nextItem.find("input[type='radio']:checked");
+            if (!(checkedRadio.length > 0)) {
+              $('html, body').animate({
+                scrollTop: nextItem.offset().top
+              }, 1000);
+            };
+            nextItem.find("input[type='radio']").each(function() {
+              $(this).attr("skipped", "false");
+            });
+            //console.log( thisItem.closest(".pat-q").nextAll())
+            //console.log(thisItem)
+            thisItem.closest(".pat-q").nextAll().each(function() {
+                var dataTopic = $(this).attr("data-topic");
+                $(this).find("input[name='" + dataTopic + "']").each(function() {
+                    $(this).attr("skipped", "false");
+                });
+            });
+
+        };
+
+      } else {
+        if (toCall == "biopsy") {
+          tnthAjax.postClinical({{user.id}}, toCall, "false", $(this).attr("data-status"));
+          $("#biopsyDate").attr("skipped", "true");
+
+          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+              $("input[name='" + fieldName + "']").each(function() {
+                  $(this).prop("checked", false);
+                  $(this).attr("skipped", "true");
+              });
+          });
+          if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
+          if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
+          if ($("input[name='tx']").length > 0) {
+            tnthAjax.deleteTreatment({{user.id}});
+          };
+        } else if (toCall == "pca_diag") {
+          ["pca_localized", "tx"].forEach(function(fieldName) {
+              $("input[name='" + fieldName + "']").each(function() {
+                  $(this).prop("checked", false);
+                  $(this).attr("skipped", "true");
+              });
+          });
+          if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
+          //tnthAjax.putClinical({{user.id}},"tx","false");
+          if ($("input[name='tx']").length > 0) {
+            tnthAjax.deleteTreatment({{user.id}});
+          };
+        }
+        thisItem.parents(".pat-q").nextAll().fadeOut();
+      };
+
+      if (fc.allFieldsCompleted()) {
+        fc.continueToFinish();
+      } else {
+        if (fc.sectionCompleted("clinicalContainer")) fc.continueToNext("clinicalContainer");
+        else fc.stopContinue("clinicalContainer");
+      }
+  };
+
+var userOrgChangeEvent = function() {
+  if ($(this).prop("checked")) {
+    var parentOrg = $(this).attr("data-parent-id");
+    var m = $("#" + parentOrg + "_consentModal");
+    var dm = $("#" + parentOrg + "_defaultConsentModal");
+    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
+      //do nothing
+    } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0 ) {
+      //do nothing
+    }
+    else {
+      if (fc.allFieldsCompleted()) {
+        fc.continueToFinish();
+      } else {
+        if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
+        else fc.stopContinue("orgsContainer");
+      };
+    };
+  };
+};
+
+var termsEvent = function(){
+    if ($(this).attr("data-agree") == "false") {
+      var types = $(this).attr("data-tou-type");
+      if (hasValue(types)) {
+          var arrTypes = types.split(",");
+          var self = $(this);
+          arrTypes.forEach(function(type) {
+              var theTerms = {};
+              theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
+              theTerms["type"] = type;
+              var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+              /*** if UI for orgs is not present, need to get the user org from backend ***/
+              if (org.length == 0) {
+                	$.ajax ({
+  			            type: "GET",
+  			            url: '/api/demographics/{{user.id}}',
+  			            async: false
 			            }).done(function(data) {
 			            	if (data && data.careProvider) {
 			            		(data.careProvider).forEach(function(item) {
@@ -739,30 +704,38 @@ $(document).ready(function(){
 			            	}
 			            }).fail(function() {
 
-			            });
+    			            });
 		           } else {
 		               userOrgId = org.val();
 		           };
 
-                  if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
-                    var topOrg = OT.getTopLevelParentOrg(userOrgId);
-                    if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
-                  };
-                  // Post terms agreement via API
-                  tnthAjax.postTerms(theTerms);
-              });
-          };
-          // Update UI
-          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
-          $(this).attr("data-agree","true");
-          if (fc.sectionCompleted("topTerms")) {
-            $("#aboutForm").fadeIn();
-          };
-          if (fc.allFieldsCompleted()) {
-              fc.continueToFinish();
-          } else fc.continueToNext("topTerms");
-        };
+              if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
+                var topOrg = OT.getTopLevelParentOrg(userOrgId);
+                if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
+              };
+              // Post terms agreement via API
+              tnthAjax.postTerms(theTerms);
+          });
+      };
+
+      // Update UI
+      if (this.nodeName.toLowerCase() == "label")
+        $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+      else
+        $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+
+      $(this).attr("data-agree","true");
+
+      if (fc.sectionCompleted("topTerms")) {
+        $("#aboutForm").fadeIn();
+      };
+      if (fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+      } else fc.continueToNext("topTerms");
     };
+};
+
+$(document).ready(function(){
 
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
@@ -775,59 +748,7 @@ $(document).ready(function(){
         };
     });
 
-    /**** main object, this will help keeping track of missing fields *****/
-    mainSections = {
-      'topTerms': {
-          display: "terms",
-          config: "website_terms_of_use,subject_website_consent,privacy_policy",
-          subsections: {
-            "termsCheckbox": {
-                fields: [$("[data-type='terms'][data-required='true']"), $("[data-type='terms']").has("*[data-required='true']")],
-                event: termsEvent
-            }
-        }
-      },
-      'demographicsContainer': {
-          display: "your information",
-          config: "name,dob,role",
-          subsections:{
-          "nameGroup": {
-                          fields: [$("#firstname"), $("#lastname")],
-                          event: namesChangeEvent
-                       }
-          ,
-          "rolesGroup": {
-                          fields: [$("input[name='user_type']")],
-                          event: rolesGroupClickEvent
-                        }
-          ,
-          "bdGroup": {
-                        fields: [$("#month"), $("#date"), $("#year")],
-                        event: bdChangeEvent
-                     }
-          }},
-      'clinicalContainer': {
-          display: "your clinical profile",
-          config: "clinical,localized",
-          subsections:
-          {"patientQ": {
-                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
-                        event: patientQClickEvent
-                        }
-          }},
-      'orgsContainer': {
-          display: "your clinic",
-          config: "org",
-          required: hasValue(preselectClinic) ? true: false,
-          subsections:
-          {"clinics": {
-                        fields: [$("#userOrgs input[name='organization']")],
-                        event: userOrgChangeEvent
-                      }
-          }}
-    };
-
-     /*** event for the next button ***/
+    /*** event for the next button ***/
     $("#next").on("click", function() {
         $(this).hide();
         $(".loading-message-indicator").show();
@@ -844,7 +765,89 @@ $(document).ready(function(){
     $(".button-container").each(function() {
       $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-    setTimeout('$("#iqFooterWrapper").show()', 2000);;
+
+    /*
+     * the flow here :
+     * get still needed core data
+     * populate all required fields
+     * get incomplete fields thereafter
+     * note: need to delay gathering incomplete fields to allow fields to be render
+     */
+    configObj.initConfig(function() {
+
+      /**** main object, this will help keeping track of missing fields *****/
+      mainSections = {
+        'topTerms': {
+            display: "terms",
+            config: "website_terms_of_use,subject_website_consent,privacy_policy",
+            subsections: {
+              "termsCheckbox": {
+                  fields: [$("#topTerms [data-type='terms'][data-required='true']")],
+                  event: termsEvent
+              }
+            }
+        },
+        'demographicsContainer': {
+            display: "your information",
+            config: "name,dob,role",
+            subsections:{
+            "nameGroup": {
+                            fields: [$("#firstname"), $("#lastname")],
+                            event: namesChangeEvent
+                         }
+            ,
+            "rolesGroup": {
+                            fields: [$("input[name='user_type']")],
+                            event: rolesGroupClickEvent
+                          }
+            ,
+            "bdGroup": {
+                          fields: [$("#month"), $("#date"), $("#year")],
+                          event: bdChangeEvent
+                       }
+            }},
+        'clinicalContainer': {
+            display: "your clinical profile",
+            config: "clinical,localized",
+            subsections:
+            {"patientQ": {
+                          fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
+                          event: patientQClickEvent
+                          }
+            }},
+        'orgsContainer': {
+            display: "your clinic",
+            config: "org",
+            required: hasValue(preselectClinic) ? true: false,
+            subsections:
+            {"clinics": {
+                          fields: [$("#userOrgs input[name='organization']")],
+                          event: userOrgChangeEvent
+                        }
+            }}
+      };
+
+      tnthAjax.getDemo({{user.id}}, false, false, function() {
+        $("#nameGroup").attr("loaded", "true");
+        $("#rolesGroup").attr("loaded", "true");
+        $("#bdGroup").attr("loaded", "true");
+      });
+
+      fc = new FieldsChecker(mainSections);
+      fc.startTime = new Date();
+      fc.intervalId = setInterval(function() {
+        fc.endTime = new Date();
+        var elapsedTime = fc.endTime - fc.startTime;
+        elapsedTime /= 1000;
+        if (fc.sectionsLoaded() || elapsedTime >= 2) {
+          setTimeout(function() { initIncompleteFields(); }, 100);
+          setTimeout('$("#iqFooterWrapper").show()', 100);
+          fc.startTime = 0;
+          fc.endTime = 0;
+          clearInterval(fc.intervalId);
+        };
+      }, 10);
+    });
   });
 {% endblock %}
 

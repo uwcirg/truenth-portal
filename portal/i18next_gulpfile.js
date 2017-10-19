@@ -76,11 +76,28 @@ gulp.task('i18next-extraction', ['clean-src'], function() {
 gulp.task('i18nextConvertJSONToPOT', ['i18next-extraction'], function() {
 
     const options = {/* you options here */}
+    /*
+     * allow for multiple json tranlsation files
+     */
+    gulp.src(translationSourceDir+'*.json')
+        .pipe(merge_json({fileName: nameSpace+'.json'}))
+        .pipe(gulp.dest(translationSourceDir));
    /*
     * converting json to pot
     */
-    console.log('converting JSON to POT...');
-    i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+nameSpace+'.json'), options).then(save(srcPotFileName));
+   console.log('converting JSON to POT...');
+   return i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+nameSpace+'.json'), options).then(save(srcPotFileName));
+
+});
+
+gulp.task('combineSrcJson', function() {
+    /*
+     * allow for multiple json tranlsation files
+     */
+    if (fs.existsSync('translations/js/src/custom.json')) console.log("exists")
+    gulp.src('translations/js/src/*.json')
+        .pipe(merge_json({fileName: 'test.json'}))
+        .pipe(gulp.dest('translations/js/src'));
 
 });
 
@@ -180,7 +197,7 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
  */
 gulp.task('clean-src', function() {
   console.log('delete source files...')
-  return del([translationSourceDir + '']);
+  return del([translationSourceDir + nameSpace + '.json']);
 });
 
 /*
