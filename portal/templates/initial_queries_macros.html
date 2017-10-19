@@ -23,23 +23,26 @@
                {% if user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN) %}
                     <label class="terms-label tnth-hide">
                         <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                        {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                        {% trans
+                           privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true")
+                        %}
                           <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a
                             href="{{privacy_url}}" class="required-link">privacy policy</a> and <a
                             href="{{terms_url}}" class="required-link">terms</a></span>
-                          <input type="hidden"
-                            data-type="terms"
-                            data-agree="false"
-                            data-core-data-type="privacy_policy"
-                            data-tou-type="privacy policy"
-                            data-url="{{privacy_url}}"/>
-                          <input type="hidden"
-                            data-agree="false"
-                            data-type="terms"
-                            data-tou-type="website terms of use"
-                            data-core-data-type="website_terms_of_use"
-                            data-url="{{tou_url}}" />
                         {% endtrans %}
+                        <input type="hidden"
+                          data-type="terms"
+                          data-agree="false"
+                          data-core-data-type="privacy_policy"
+                          data-tou-type="privacy policy"
+                          data-url="{{url_for('portal.privacy')}}"/>
+                        <input type="hidden"
+                          data-agree="false"
+                          data-type="terms"
+                          data-tou-type="website terms of use"
+                          data-core-data-type="website_terms_of_use"
+                          data-url="{{tou_url}}" />
+
                     </label>
                 {% else %}
                     <!-- EPROMS - user account has been created by staff -->
@@ -57,22 +60,23 @@
                         </label>
                          <label class="terms-label tnth-hide">
                             <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                            {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                            {% trans
+                              privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
                               <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
                                 <a href="{{terms_url}}" class="required-link">terms</a></span>
-                              <input type="hidden"
-                                data-agree="false"
-                                data-type="terms"
-                                data-core-data-type="privacy_policy"
-                                data-tou-type="privacy policy"
-                                data-url="{{privacy_url}}" />
-                              <input type="hidden"
-                                data-agree="false"
-                                data-type="terms"
-                                data-tou-type="website terms of use"
-                                data-core-data-type="website_terms_of_use"
-                                data-url="{{tou_url}}" />
-                              {% endtrans %}
+                            {% endtrans %}
+                            <input type="hidden"
+                              data-agree="false"
+                              data-type="terms"
+                              data-core-data-type="privacy_policy"
+                              data-tou-type="privacy policy"
+                              data-url="{{url_for('portal.privacy')}}" />
+                            <input type="hidden"
+                              data-agree="false"
+                              data-type="terms"
+                              data-tou-type="website terms of use"
+                              data-core-data-type="website_terms_of_use"
+                              data-url="{{tou_url}}" />
                         </label>
                     {% else %}
                       <!-- TrueNTH -->
@@ -87,18 +91,18 @@
                         <span class="terms-tick-box-text">{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.") }}</span>
                       </label>
                       <br/>
-                      {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
                       <label
                         class="terms-label tnth-hide"
                         data-agree="false"
                         data-type="terms"
                         data-tou-type="privacy policy"
                         data-core-data-type="privacy_policy"
-                        data-url="{{privacy_policy}}">
+                        data-url="{{url_for('portal.privacy')}}">
                           <i class="fa fa-square-o fa-lg terms-tick-box"></i>
+                          {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
                           <span>&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
+                          {% endtrans %}
                       </label>
-                      {% endtrans %}
                     {% endif %}
                 {% endif %}
               </div>
