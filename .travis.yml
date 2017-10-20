@@ -117,20 +117,6 @@ deploy:
       condition:
         - $TOXENV = build
         - $DEPLOY = true
-        - -v BINTRAY_API_KEY
-    script:
-      curl
-        --upload-file debian/artifacts/*.deb
-        --user "$GH_USERNAME:$BINTRAY_API_KEY"
-        https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
-
-  - provider: script
-    skip_cleanup: true
-    on:
-      all_branches: true
-      condition:
-        - $TOXENV = build
-        - $DEPLOY = true
         - -v ARTIFACTORY_TOKEN
     script:
       curl
