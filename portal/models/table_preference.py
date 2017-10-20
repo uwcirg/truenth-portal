@@ -11,6 +11,7 @@ sort_order_types = ('asc', 'desc')
 sort_order_types_enum = ENUM(
     *sort_order_types, name='sort_order_enum', create_type=False)
 
+
 class TablePreference(db.Model):
     """Captures user preferences for UI table display
 
@@ -44,8 +45,7 @@ class TablePreference(db.Model):
         d['table_name'] = self.table_name
         d['sort_field'] = self.sort_field
         d['sort_order'] = self.sort_order
-        if self.filters:
-            d['filters'] = json.dumps(self.filters)
+        d['filters'] = self.filters
         d['updated_at'] = FHIR_datetime.as_fhir(self.updated_at)
         return d
 
@@ -61,11 +61,8 @@ class TablePreference(db.Model):
             pref = cls()
             pref.user_id = data['user_id']
             pref.table_name = data['table_name']
-        for attr in ('sort_field', 'sort_order'):
+        for attr in ('sort_field', 'sort_order', 'filters'):
             if attr in data:
                 setattr(pref, attr, data[attr])
-        if 'filters' in data:
-            pref.filters = json.loads(data['filters'])
         pref.updated_at = datetime.now()
         return pref
-
