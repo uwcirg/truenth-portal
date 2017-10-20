@@ -103,7 +103,8 @@ after_success:
   # Build portal docker image from debian package
   - docker-compose build web
 
-before_deploy: ./bin/docker-login.sh
+before_deploy:
+  - ./bin/docker-login.sh
 
 # Only deploy from default virtual env TravisCI job
 deploy:
