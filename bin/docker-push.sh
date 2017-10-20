@@ -52,6 +52,7 @@ get_configured_registries | while read config ; do
     done
 
     # Push each tag, in background
+    echo "Pushing images to $repo..."
     for tag in $DOCKER_TAGS; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
     done &
