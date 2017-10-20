@@ -26,14 +26,10 @@ env:
     - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
 
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
-    - DEB_REPO="${DEB_REPO:-portal-deb}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
     - DOCKER_REPOSITORY=""
     - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
     - DOCKER_IMAGE_TAG=travis
-
-    - DOCKER_CLOUD_USERNAME="${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}"
-    - BINTRAY_USERNAME="${BINTRAY_USERNAME:-uwcirg}"
 
 matrix:
   include:
@@ -117,12 +113,12 @@ deploy:
       condition:
         - $TOXENV = build
         - $DEPLOY = true
-        - -v ARTIFACTORY_TOKEN
+        - -v ARTIFACTORY_API_KEY
     script:
       curl
         --verbose
         --upload-file debian/artifacts/*.deb
-        --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
+        --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
 after_deploy:
