@@ -872,7 +872,7 @@
                         item["filename"] = escapeHtml(item["filename"]);
                         item["document_type"] = escapeHtml(item["document_type"]);
                         item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
-                        item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
+                        item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
                         fData.push(item);
                     });
 
@@ -897,31 +897,27 @@
                         columns: [
                             {
                                 field: 'filename',
-                                title: 'Filename',
+                                title: '{{_("Report Name")}}',
                                 searchable: true,
                                 sortable: true
                             }, {
                                 field: 'uploaded_at',
-                                title: 'Uploaded At (GMT)',
+                                title: '{{_("Generated (GMT)")}}',
                                 sortable: true,
                                 searchable: true,
                                 width: '20%'
                             }, {
                                 field: 'document_type',
-                                title: 'Document Type',
+                                title: '{{_("Document Type")}}',
                                 sortable: true,
                                 visible: false
-                            }, {
-                                field: 'contributor',
-                                title: 'Contributor',
-                                sortable: true,
-                                searchable: true
-                            }, {
+                            },{
                                 field: 'actions',
-                                title: 'Actions',
+                                title: '{{_("Download")}}',
                                 sortable: false,
                                 searchable: false,
-                                visible: true
+                                visible: true,
+                                class: "text-center"
                             }
                         ]
                     } );
