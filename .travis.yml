@@ -121,7 +121,7 @@ deploy:
         --verbose
         --upload-file debian/artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
-        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
+        "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
 after_deploy:
   - ./bin/docker-push.sh
