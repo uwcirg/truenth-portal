@@ -1212,27 +1212,38 @@ var fillContent = {
                 });
                 return found;
             };
-
-            $("#termsCheckbox [data-type='terms']").each(function() {
-                var arrTypes = ($(this).attr("data-tou-type")).split(",");
-                var self = $(this);
+            $("#topTerms label.terms-label").each(function() {
+                var arrTypes = [];
                 var item_found  = 0;
+                var self = $(this);
+
+                if (self.attr("data-tou-type")) {
+                    var o = ($(this).attr("data-tou-type")).split(",");
+                    o.forEach(function(item) {
+                        arrTypes.push(item);
+                    });
+                } else {
+                    self.find("[data-type='terms']").each(function() {
+                        var o = ($(this).attr("data-tou-type")).split(",");
+                        o.forEach(function(item) {
+                            arrTypes.push(item);
+                        }); 
+                    });
+                };
+                
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
                     };
                 });
+
                 if (item_found == arrTypes.length) {
-                    if (self.get(0).nodeName.toLowerCase() == "label") {
-                        self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                        self.show().removeClass("tnth-hide");
-                    }
-                    else {
-                        var l = self.closest("label");
-                        l.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                        l.show().removeClass("tnth-hide");
-                    };
+                    self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
+                    self.find("[data-type='terms']").each(function() {
+                        $(this).attr("data-agree", "true");
+                    })
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
