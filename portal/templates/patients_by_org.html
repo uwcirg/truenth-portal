@@ -121,12 +121,6 @@
           </div>
       </div>
   </div>
-  <script>
-    $("document").ready(function() {
-      $("#patientReportLoader").html( __getLoaderHTML());
-      $("#patientReportModal").modal({"show": false});
-    });
-  </script>
 {% endif %}
 {% endblock %}
 {% block table_export_filter_script %}
@@ -196,6 +190,12 @@ $(document).ready(function() {
     {% endfor %}
   {% endif %}
   AT.initOrgsList(org_list, 'patients');
+
+  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
+    $("#patientReportLoader").html( __getLoaderHTML());
+    $("#patientReportModal").modal({"show": false});
+  {% endif %}
+
 });
 
 {% endblock %}
