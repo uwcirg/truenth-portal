@@ -79,7 +79,7 @@
                       <td>{{ patient.phone if patient.phone}}</td>
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a class="btn btn-tnth-primary btn-report" onclick="showReport({{patient.id}})">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
+                        <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a class="btn btn-tnth-primary btn-report" onclick="AT.getReportModal({{patient.id}})">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
@@ -116,56 +116,12 @@
                   <div id="patientReportMessage" class="error-message"></div>
               </div>
               <div class="modal-footer" >
-                  <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                  <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
               </div>
           </div>
       </div>
   </div>
   <script>
-    function showReport(patientId) {
-          $("#patientReportModal").modal("show");
-          $("#patientReportLoader").removeClass("tnth-hide");
-          tnthAjax.patientReport(patientId, function(data) {
-              if (data) {
-                if (!data.error) {
-                    if (data["user_documents"] && data["user_documents"].length > 0) {
-                      var existingItems = {};
-                      /*
-                       * sort to get the latest first
-                       */
-                      var documents = data["user_documents"].sort(function(a,b){
-                         return new Date(b.uploaded_at) - new Date(a.uploaded_at);
-                      });
-                      var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
-                      content += "<TH>"+ "{{_('Report Name')}}" + "</TH><TH>" + "{{_('Generated (GMT)')}}" + "</TH><TH>" + "{{_('Download')}}" + "</TH>";
-                      documents.forEach(function(item) {
-                          /*
-                           * only draw the most recent, same report won't be displayed
-                           */
-                          if (!existingItems[item["contributor"]]) {
-                            content += "<tr>" +
-                                      "<td>" + item["filename"] + "</td>" +
-                                      "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
-                                      "<td class='text-center'>" + '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>" 
-                                      "</tr>";
-                            existingItems[item["contributor"]] = true;
-                          };
-                      });
-                      content += "</table>";
-                      content += "<br/>";
-                      content += "<a class='btn btn-tnth-primary btn-small btn-all'>{{_('View All')}}</a>";
-                      $("#patientReportContent").html(content);
-                      $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#patientReportsLoc");
-                    } else {
-                      $("#patientReportMessage").html("{{_('No report data found.')}}");
-                    };
-
-                  } else $("#patientReportMessage").html("{{_('Error occurred retrieving patient report data.')}}");
-                };
-              $("#patientReportLoader").addClass("tnth-hide");
-          });
-      };
-
     $("document").ready(function() {
       $("#patientReportLoader").html( __getLoaderHTML());
       $("#patientReportModal").modal({"show": false});

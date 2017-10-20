@@ -421,7 +421,51 @@ AdminTool.prototype.handleDownloadModal = function() {
     $("input[name='instrument'], input[name='downloadType']").on("click", function() {
         if ($(this).is(":checked")) $("#_downloadMessage").text("");
     });
-}
+};
+
+AdminTool.prototype.getReportModal = function(patientId) {
+  $("#patientReportModal").modal("show");
+  $("#patientReportLoader").removeClass("tnth-hide");
+  tnthAjax.patientReport(patientId, function(data) {
+      if (data) {
+        if (!data.error) {
+            if (data["user_documents"] && data["user_documents"].length > 0) {
+              var existingItems = {};
+              /*
+               * sort to get the latest first
+               */
+              var documents = data["user_documents"].sort(function(a,b){
+                 return new Date(b.uploaded_at) - new Date(a.uploaded_at);
+              });
+              var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
+              content += "<TH>"+ i18next.t("Report Name") + "</TH><TH>" + i18next.t("Generated (GMT)") + "</TH><TH>" + i18next.t("Downloaded") + "</TH>";
+              documents.forEach(function(item) {
+                  /*
+                   * only draw the most recent, same report won't be displayed
+                   */
+                  if (!existingItems[item["contributor"]]) {
+                    content += "<tr>" +
+                              "<td>" + item["filename"] + "</td>" +
+                              "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
+                              "<td class='text-center'>" + '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>" 
+                              "</tr>";
+                    existingItems[item["contributor"]] = true;
+                  };
+              });
+              content += "</table>";
+              content += "<br/>";
+              content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
+              $("#patientReportContent").html(content);
+              $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#patientReportsLoc");
+            } else {
+              $("#patientReportMessage").html(i18next("No report data found."));
+            };
+
+          } else $("#patientReportMessage").html(i18next.t("Error occurred retrieving patient report"));
+        };
+      $("#patientReportLoader").addClass("tnth-hide");
+  });
+};
 
 
 

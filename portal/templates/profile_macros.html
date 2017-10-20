@@ -858,7 +858,7 @@
 {% macro patientReports(person) -%}
     <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
     <div id="prTableToolBar"><span id="tableCount"></span></div>
-    <table id="profilePatientReportTable" class="smaller-text"></table>
+    <table id="profilePatientReportTable"></table>
     <div id="patientReportErrorMessage" class="text-muted"></div>
     <script>
     $(function () {
@@ -872,7 +872,7 @@
                         item["filename"] = escapeHtml(item["filename"]);
                         item["document_type"] = escapeHtml(item["document_type"]);
                         item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
-                        item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
+                        item["actions"] = '<a title="{{_('Download')}}" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
                         fData.push(item);
                     });
 
