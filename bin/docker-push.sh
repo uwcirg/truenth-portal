@@ -30,7 +30,6 @@ USAGE
 
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
     usage
-    exit 0
 fi
 
 . "$bin_path/utils.sh"
