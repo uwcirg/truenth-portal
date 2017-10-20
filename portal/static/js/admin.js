@@ -424,26 +424,83 @@ AdminTool.prototype.handleDownloadModal = function() {
 };
 
 
-AdminTool.prototype.getColumnSortOrder = function(userId, tableName) {
-    var prefData = null;
-    tnthAjax.getTablePreference(userId||this.userId, "patientList", {"sync": true}, function(data) {
-      if (data && !data.error) {
-        prefData = data;
-      };
-    });
-    return prefData ? 
-           prefData : 
-           {
-            sort_field: "id",
-            sort_order: "desc"
-           };
+AdminTool.prototype.getDefaultTablePreference = function() {
+	return {sort_field: "id",sort_order: "desc"};
 };
 
-AdminTool.prototype.setColumnSortOrder = function(userId, tableName, sortField, sortOrder) {
-  //TODO preserve filters?
-  if (hasValue(tableName) && hasValue(sortField)  && hasValue(sortOrder)) {
-      var data = {"sort_field":sortField, "sort_order":sortOrder};
+
+AdminTool.prototype.getTablePreference = function(userId, tableName) {
+    var prefData = null, self = this;
+    tnthAjax.getTablePreference(userId||self.userId, "patientList", {"sync": true}, function(data) {
+      if (data && !data.error) {
+        prefData = data || self.getDefaultTablePreference();
+        self.currentTablePreference = prefData;
+      };
+      //set filter values
+      //delay because the fields aren't available yet
+      setTimeout(function() { self.setTableFilters(userId||self.userId);}, 150);
+    });
+    return prefData;
+};
+
+AdminTool.prototype.setTableFilters = function(userId) {
+    var prefData = null;
+    if (this.currentTablePreference) {
+      prefData = this.currentTablePreference;
+    } else {
+      tnthAjax.getTablePreference(userId||this.userId, "patientList", {"sync": true}, function(data) {
+        if (data && !data.error) {
+          prefData = data;
+         };
+      });
+    };
+    if (prefData) {
+       //set filter values
+      if (prefData.filters) {
+        for (var item in prefData.filters) {
+          $("#adminTable .bootstrap-table-filter-control-"+item).val(prefData.filters[item]);
+        };
+      };
+    }
+};
+
+AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder) {
+  if (hasValue(tableName)) {
+    var data = {};
+    if (hasValue(sortField) && hasValue(sortOrder)) {
+      data["sort_field"] = sortField;
+      data["sort_order"] = sortOrder;
+    } else {
+    	//get selected sorted field information on UI
+    	var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
+    	if (sortedField.length > 0) {
+    		data["sort_field"] = sortedField.attr("data-field");
+    		var sortedOrder = "desc";
+    		sortedField.find(".sortable").each(function() {
+    			if ($(this).hasClass("desc")) sortedOrder = "desc";
+    			else if ($(this).hasClass("asc")) sortedOrder = "asc";
+    		});
+    		data["sort_order"] = sortedOrder;
+    	} else {
+	    	//It is possible the table is not sorted yet so get the default
+	    	var defaultPref = this.getDefaultTablePreference();
+	    	data["sort_field"] = defaultPref.sort_field;
+	    	data["sort_order"] = defaultPref.sort_order;
+	    };
+    }
+    var filters = {};
+    //get fields
+    $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
+    	if (hasValue($(this).val())) {
+    		var field = $(this).closest("th").attr("data-field");
+    		filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
+    	};
+    });
+    data["filters"] = filters;
+    if (Object.keys(data).length > 0) {
       tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
+      this.currentTablePreference = data;
+    };
   };
 };
 

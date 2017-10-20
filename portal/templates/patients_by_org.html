@@ -112,20 +112,20 @@
 {% block document_ready %}
 
 var AT = new AdminTool({{user.id}});
-
-var sortObj = AT.getColumnSortOrder({{user.id}}, "patientList");
+var sortObj = AT.getTablePreference({{user.id}}, "patientList", true);
 /*
 * initializing bootstrapTable
 */
-$(".tnth-admin-table").bootstrapTable({
+$("#adminTable").bootstrapTable({
   formatShowingRows: function (pageFrom, pageTo, totalRows) {
       var thisId = $(this).attr("tableId");
       var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
       $("#tableCount"+thisId).html(rowInfo);
       return rowInfo;
   },
-  sortName: sortObj?sortObj.sort_field:"email",
+  sortName: sortObj?sortObj.sort_field:"id",
   sortOrder: sortObj?sortObj.sort_order:"desc",
+  filterBy: sortObj,
   exportOptions: {
       fileName: __getExportFileName("PatientList_")
   }
@@ -139,8 +139,17 @@ $(document).ready(function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
 
+  AT.setTableFilters({{user.id}});
+
   $("#adminTable").on("sort.bs.table", function(e, name, order) {
-      AT.setColumnSortOrder({{user.id}}, "patientList", name, order);
+      AT.setTablePreference({{user.id}}, "patientList", name, order);
+  });
+
+  $("#adminTable").on("column-search.bs.table", function(e, name, text) {
+      //don't set filter preference if there is no resulting data?
+      if ($("#adminTable tr[data-index]").length > 0) {
+        AT.setTablePreference({{user.id}}, "patientList");
+      };
   });
 
   /*
