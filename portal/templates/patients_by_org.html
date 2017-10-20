@@ -139,12 +139,15 @@
                       var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
                       content += "<TH>"+ "{{_('Report Name')}}" + "</TH><TH>" + "{{_('Generated (GMT)')}}" + "</TH><TH>" + "{{_('Download')}}" + "</TH>";
                       documents.forEach(function(item) {
+                          /*
+                           * only draw the most recent, same report won't be displayed
+                           */
                           if (!existingItems[item["contributor"]]) {
-                              content += "<tr>" +
-                                         "<td>" + item["filename"] + "</td>" +
-                                         "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
-                                         "<td class='text-center'>" + '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>" 
-                                         "</tr>";
+                            content += "<tr>" +
+                                      "<td>" + item["filename"] + "</td>" +
+                                      "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
+                                      "<td class='text-center'>" + '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>" 
+                                      "</tr>";
                             existingItems[item["contributor"]] = true;
                           };
                       });
@@ -197,11 +200,6 @@ $(".tnth-admin-table").bootstrapTable({
 });
 
 $(document).ready(function() {
-
-  
-
-
-
   /*
    *  scroll to the top of page on each page change
    */
