@@ -437,8 +437,7 @@ AdminTool.prototype.getTablePreference = function(userId, tableName) {
         self.currentTablePreference = prefData;
       };
       //set filter values
-      //delay because the fields aren't available yet
-      setTimeout(function() { self.setTableFilters(userId||self.userId);}, 150);
+      self.setTableFilters(userId||self.userId);
     });
     return prefData;
 };
@@ -458,7 +457,11 @@ AdminTool.prototype.setTableFilters = function(userId) {
        //set filter values
       if (prefData.filters) {
         for (var item in prefData.filters) {
-          $("#adminTable .bootstrap-table-filter-control-"+item).val(prefData.filters[item]);
+          var fname = "#adminTable .bootstrap-table-filter-control-"+item;
+          /*
+           * note this is based on the trigger event for filtering specify in the plugin
+           */
+          $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") == "text" ? "keyup": "change");
         };
       };
     }

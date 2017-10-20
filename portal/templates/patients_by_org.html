@@ -169,7 +169,8 @@ $(document).ready(function() {
   /*
    * fade loading spinner on page load
    */
-  AT.fadeLoader();
+  DELAY_LOADING = true;
+  setTimeout(function() { AT.fadeLoader(); }, 150);
 
   /*
    *  hide checkbox for hidden id field from side menu
