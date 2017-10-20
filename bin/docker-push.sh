@@ -40,7 +40,6 @@ DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
 DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
 
 get_configured_registries | while read config ; do
-
     repo="$(echo "$config" | awk '{print $1}')"
     username="$(echo "$config" | awk '{print $2}')"
     api_key="$(echo "$config" | awk '{print $3}')"
@@ -56,7 +55,6 @@ get_configured_registries | while read config ; do
     for tag in $DOCKER_TAGS; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
     done &
-
 done
 
 # Wait for background jobs to finish
