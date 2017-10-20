@@ -3,6 +3,9 @@ language: python
 python: "2.7"
 sudo: false
 cache: pip
+# setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since the last release
+git:
+  depth: 10000
 addons:
   postgresql: "9.4"
 
@@ -61,8 +64,6 @@ before_install:
 
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
-  - git fetch --unshallow
   - export PORTAL_VERSION="$(python setup.py --version)"
 
   - createdb
