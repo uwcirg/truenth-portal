@@ -30,9 +30,9 @@ fi
 . "$bin_path/utils.sh"
 
 get_configured_registries | while read config ; do
-    repo="$(echo "$config" | cut --delimiter = --fields 1)"
-    username="$(echo "$config" | cut --delimiter = --fields 2)"
-    api_key="$(echo "$config" | cut --delimiter = --fields 3)"
+    repo="$(echo "$config" | cut --delimiter ' ' --fields 1)"
+    username="$(echo "$config" | cut --delimiter ' ' --fields 2)"
+    api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
     echo "Logging into $repo..."
     docker login \
