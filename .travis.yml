@@ -17,6 +17,7 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
+    - PORTAL_VERSION="$(python setup.py --version)"
 
     - PGUSER=postgres
     - PGPASSWORD=""
@@ -64,7 +65,6 @@ before_install:
 
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  - export PORTAL_VERSION="$(python setup.py --version)"
 
   - createdb
       --owner "$PGUSER"
