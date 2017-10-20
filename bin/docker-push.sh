@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-cmdname=$(basename $0)
-bin_path=$( cd $(dirname $0) && pwd )
+cmdname="$(basename $0)"
+bin_path="$( cd $(dirname $0) && pwd )"
 
 usage() {
    cat << USAGE >&2
