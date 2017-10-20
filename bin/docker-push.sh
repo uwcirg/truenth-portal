@@ -39,6 +39,8 @@ DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}"
 DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
 DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
 
+DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
+
 get_configured_registries | while read config ; do
     repo="$(echo "$config" | awk '{print $1}')"
     username="$(echo "$config" | awk '{print $2}')"

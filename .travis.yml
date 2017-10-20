@@ -27,13 +27,16 @@ env:
 
     - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
     - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
-    - SHORT_HASH="${TRAVIS_COMMIT:0:7}"
+    - GIT_BRANCH="$TRAVIS_BRANCH"
+    - GIT_TAG="$TRAVIS_TAG"
+    - GIT_HASH="$TRAVIS_COMMIT"
 
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
     - DOCKER_REPOSITORY=""
     - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
     - DOCKER_IMAGE_TAG=travis
+    - DOCKER_EXTRA_TAGS="$TRAVIS_BUILD_NUMBER"
 
 matrix:
   include:
@@ -83,21 +86,10 @@ after_success:
   # Only run build steps in corresponding tox env
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
-  # Set primary docker tag (TAG) based on branch, or current tag
-  # Precedence: current git tag, current branch (with develop and master mapped to latest and stable respectively)
-  - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
-    export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
-  - export TAG=${TRAVIS_TAG:-${TAG}}
-
-  # List of tags to apply to docker image
-  # TravisCI doesn't support Bash arrays
-  # See https://github.com/travis-ci/travis-ci/issues/3149
-  - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
-
   - cp docker/portal.env.default docker/portal.env
   - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
-  # Build debian package from current repo and branch (else "develop")
-  - BRANCH="${TRAVIS_BRANCH:-develop}"
+  # Build debian package from current repo and branch
+  - BRANCH="$GIT_BRANCH"
     docker-compose run builder
 
   # Build portal docker image from debian package
