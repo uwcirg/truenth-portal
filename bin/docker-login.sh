@@ -22,6 +22,7 @@ USAGE
    exit 1
 }
 
+
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
     usage
 fi
@@ -38,5 +39,4 @@ get_configured_registries | while read config ; do
         --username "$username" \
         --password "$api_key" \
     "$repo"
-
 done
