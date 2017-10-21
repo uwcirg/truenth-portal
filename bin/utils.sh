@@ -16,7 +16,7 @@ get_configured_registries() {
         # "${REGISTRY}_API_KEY" - API key or password needed to authenticate with registry
         local api_key="$(printenv "${delivery_target_name}_API_KEY" || true)"
 
-        if [ -n "$api_key" -a -n "$username" -a -n "$repo" ]; then
+        if [ -n "$api_key" ] && [ -n "$username" ] && [ -n "$repo" ]; then
             # Print docker registry configuration, one line per configuration, space separated
             echo "$repo" "$username" "$api_key"
         fi
