@@ -42,9 +42,9 @@ DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
 DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
 
 get_configured_registries | while read config ; do
-    repo="$(echo "$config" | awk '{print $1}')"
-    username="$(echo "$config" | awk '{print $2}')"
-    api_key="$(echo "$config" | awk '{print $3}')"
+    repo="$(echo "$config" | cut --delimiter ' ' --fields 1)"
+    username="$(echo "$config" | cut --delimiter ' ' --fields 2)"
+    api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
     # Apply all tags in DOCKER_TAGS to image
     for tag in $DOCKER_TAGS; do
