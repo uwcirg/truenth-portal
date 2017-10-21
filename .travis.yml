@@ -102,11 +102,11 @@ deploy:
         - $TOXENV = build
         - -v ARTIFACTORY_API_KEY
     script:
-      curl
-        --verbose
-        --upload-file debian/artifacts/*.deb
-        --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
-        "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
+      - curl
+          --verbose
+          --upload-file debian/artifacts/*.deb
+          --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
+          "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
 after_deploy:
   - ./bin/docker-push.sh
