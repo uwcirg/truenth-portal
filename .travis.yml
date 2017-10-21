@@ -101,6 +101,7 @@ deploy:
       condition:
         - $TOXENV = build
         - -v ARTIFACTORY_API_KEY
+        - -v ARTIFACTORY_DEB_REPO
     script:
       - curl
           --verbose
