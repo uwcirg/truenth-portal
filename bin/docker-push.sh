@@ -18,15 +18,17 @@ Usage:
         "\${REGISTRY}_USERNAME"
         "\${REGISTRY}_API_KEY"
         "\${REGISTRY}_REPO"
-        "\${DOCKER_TAGS}"
+        "\${DOCKER_TAGS}" - List of tags to apply to image
 
     Optional overrides:
         "\${DOCKER_REPOSITORY}"
         "\${DOCKER_IMAGE_NAME}"
         "\${DOCKER_IMAGE_TAG}"
+        "\${DOCKER_EXTRA_TAGS}" - Additional (space-separated) tags to apply to image
 USAGE
    exit 1
 }
+
 
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
     usage
