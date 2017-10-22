@@ -423,9 +423,11 @@ AdminTool.prototype.handleDownloadModal = function() {
     });
 };
 
-AdminTool.prototype.getReportModal = function(patientId) {
+AdminTool.prototype.getReportModal = function(patientId, reportType) {
+
   $("#patientReportModal").modal("show");
   $("#patientReportLoader").removeClass("tnth-hide");
+
   tnthAjax.patientReport(patientId, function(data) {
       if (data) {
         if (!data.error) {
@@ -438,23 +440,28 @@ AdminTool.prototype.getReportModal = function(patientId) {
                  return new Date(b.uploaded_at) - new Date(a.uploaded_at);
               });
               var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
-              content += "<TH>"+ i18next.t("Report Name") + "</TH><TH>" + i18next.t("Generated (GMT)") + "</TH><TH>" + i18next.t("Downloaded") + "</TH>";
+              content += "<TH>" + i18next.t("Type") + "<TH>"+ i18next.t("Report Name") + "</TH><TH>" + i18next.t("Generated (GMT)") + "</TH><TH>" + i18next.t("Downloaded") + "</TH>";
               documents.forEach(function(item) {
+
+                  var c = item["contributor"];
+
                   /*
                    * only draw the most recent, same report won't be displayed
                    */
-                  if (!existingItems[item["contributor"]]) {
+                  if (!existingItems[c] && ($.trim(c) == $.trim(reportType))) {
                     content += "<tr>" +
+                              "<td>" + item["contributor"] + "</td>" +
                               "<td>" + item["filename"] + "</td>" +
                               "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
-                              "<td class='text-center'>" + '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>" 
+                              "<td class='text-center'>" + '<a title="' + i18next.t("Download") + '" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>"
                               "</tr>";
-                    existingItems[item["contributor"]] = true;
+                    existingItems[c] = true;
                   };
               });
               content += "</table>";
               content += "<br/>";
               content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
+
               $("#patientReportContent").html(content);
               $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#patientReportsLoc");
             } else {
