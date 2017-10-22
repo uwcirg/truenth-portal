@@ -1405,6 +1405,29 @@ div.pull-right {
   word-break: break-word;
 }
 
+#mainDiv.profile,
+.tnth-table {
+  width: 100%;
+  max-width: 100%;
+  TH {
+    background-color: @rowBackgroundColor;
+    color: #FFF;
+    padding: 0.25em 0.5em;
+    font-weight: normal;
+    vertical-align: top;
+  }
+  tr:hover {
+    background-color: @rowHoverBgColor;
+    cursor: pointer;
+  }
+  tr.odd {
+    background-color: #F7F7F7;
+  }
+  tr.even {
+    background-color: #FFF;
+  }
+}
+
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
@@ -1499,23 +1522,6 @@ div.pull-right {
   #profileHeader * {
     color: #FFF;
     letter-spacing: 1px;
-  }
-  TH {
-    background-color: @rowBackgroundColor;
-    color: #FFF;
-    padding: 0.25em 0.5em;
-    font-weight: normal;
-    vertical-align: top;
-  }
-  tr:hover {
-    background-color: @rowHoverBgColor;
-    cursor: pointer;
-  }
-  tr.odd {
-    background-color: #F7F7F7;
-  }
-  tr.even {
-    background-color: #FFF;
   }
   & .copyright-container *,
   & .logo-container * {
