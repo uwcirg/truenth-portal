@@ -1221,6 +1221,11 @@ a:focus {
     color: #014c8c;
     text-decoration: underline
 }
+a.disabled:hover {
+    color: #4A4A4A !important;
+    text-decoration: none !important;
+    cursor: default !important;
+}
 a:focus {
     outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;

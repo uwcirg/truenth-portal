@@ -1,4 +1,4 @@
-{% macro tou(terms) -%}
+{% macro tou(terms, user) -%}
     <div id="topTerms" class="hide-terms">
         <br/>
         <div class="terms-of-use-intro">
@@ -8,31 +8,103 @@
           <p>{{ _("Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools") }}:</p>
         </div>
         <div class="well">
-            <div id="termsText">
-              {{ terms['asset']|safe if terms}}
-            </div>
+            {% if not (user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)) %}
+              <div id="termsText">
+                {{ terms['asset']|safe if terms}}
+              </div>
+            {% endif %}
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div id="termsCheckbox">
                <div class="terms-checkbox-container">
-               <!-- note these checkboxes are selectively hidden using css, as some are applicable only in Truenth and some only applicable in Eproms-->
-                <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent" data-url="{{terms['url'] if terms}}">
-                  <i class="fa fa-square-o fa-lg terms-tick-box edit-view"></i> <span class="edit-view"><span class="terms-tick-box-text">{{ _("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.") }}</span></span>
-                  <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
-                </label>
-                <br/>
-                <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
-                    <i class="fa fa-square-o fa-lg terms-tick-box"></i><span class="default-tou-text terms-tick-box-text">{{_("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.")}}</span>
-                    &nbsp;&nbsp;
-                    {% trans privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true" %}
-                    <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}" type="terms" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
-                    {% endtrans %}
-                </label>
-                <br/>
-                <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
-                  <i class="fa fa-square-o fa-lg terms-tick-box"></i> <span class="terms-tick-box-text">{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
-                </label>
+               {% set tou_url = terms['url'] if terms else '' %}
+               <!-- note these checkboxes are selectively hidden based on user role-->
+               {% if user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN) %}
+                    <label class="terms-label tnth-hide">
+                        <i class="fa fa-square-o fa-lg terms-tick-box"></i>
+                        {% trans
+                           privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true")
+                        %}
+                          <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a
+                            href="{{privacy_url}}" class="required-link">privacy policy</a> and <a
+                            href="{{terms_url}}" class="required-link">terms</a></span>
+                        {% endtrans %}
+                        <input type="hidden"
+                          data-type="terms"
+                          data-agree="false"
+                          data-core-data-type="privacy_policy"
+                          data-tou-type="privacy policy"
+                          data-url="{{url_for('portal.privacy')}}"/>
+                        <input type="hidden"
+                          data-agree="false"
+                          data-type="terms"
+                          data-tou-type="website terms of use"
+                          data-core-data-type="website_terms_of_use"
+                          data-url="{{tou_url}}" />
+
+                    </label>
+                {% else %}
+                    <!-- EPROMS - user account has been created by staff -->
+                    {% if user.has_role(ROLE.PATIENT) %}
+                         <label
+                          class="terms-label tnth-hide"
+                          data-agree="false"
+                          data-type="terms"
+                          data-tou-type="subject website consent"
+                          data-core-data-type="subject_website_consent"
+                          data-url="{{tou_url}}">
+                          <i class="fa fa-square-o fa-lg terms-tick-box edit-view"></i>
+                          <span class="edit-view"><span class="terms-tick-box-text">{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.") }}</span></span>
+                          <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
+                        </label>
+                         <label class="terms-label tnth-hide">
+                            <i class="fa fa-square-o fa-lg terms-tick-box"></i>
+                            {% trans
+                              privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                              <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
+                                <a href="{{terms_url}}" class="required-link">terms</a></span>
+                            {% endtrans %}
+                            <input type="hidden"
+                              data-agree="false"
+                              data-type="terms"
+                              data-core-data-type="privacy_policy"
+                              data-tou-type="privacy policy"
+                              data-url="{{url_for('portal.privacy')}}" />
+                            <input type="hidden"
+                              data-agree="false"
+                              data-type="terms"
+                              data-tou-type="website terms of use"
+                              data-core-data-type="website_terms_of_use"
+                              data-url="{{tou_url}}" />
+                        </label>
+                    {% else %}
+                      <!-- TrueNTH -->
+                      <label
+                        class="terms-label tnth-hide"
+                        data-agree="false"
+                        data-type="terms"
+                        data-tou-type="website terms of use"
+                        data-core-data-type="website_terms_of_use"
+                        data-url="{{tou_url}}">
+                        <i class="fa fa-square-o fa-lg terms-tick-box edit-view"></i>
+                        <span class="terms-tick-box-text">{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.") }}</span>
+                      </label>
+                      <br/>
+                      <label
+                        class="terms-label tnth-hide"
+                        data-agree="false"
+                        data-type="terms"
+                        data-tou-type="privacy policy"
+                        data-core-data-type="privacy_policy"
+                        data-url="{{url_for('portal.privacy')}}">
+                          <i class="fa fa-square-o fa-lg terms-tick-box"></i>
+                          {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                          <span>&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
+                          {% endtrans %}
+                      </label>
+                    {% endif %}
+                {% endif %}
               </div>
             </div>
             <br/>
@@ -59,18 +131,24 @@
           </div>
     </div>
     {{tou_agreement_url()}}
-   <!--  {% if terms and terms['editorUrl'] %}<script>appendLREditContainer($("#topTerms"), "{{terms['editorUrl']}}", false);</script>{% endif %} -->
+    <script>
+      $(function() {
+          tnthAjax.getTerms({{user.id}}, false, false, function() {
+            $("#termsCheckbox").attr("loaded", "true");
+          });
+          $("#topTerms .required-link").each(function() {
+              $(this).on("click", function(e) {
+                e.stopPropagation();
+              });
+          });
+      });
+    </script>
   {%- endmacro %}
   {% macro tou_agreement_url() -%}
        <input type="hidden" id="termsURL" data-url="" value=""/>
        <script>
             $(function () {
                 tnthAjax.getTermsUrl();
-                $(".custom-tou-text .required-link").each(function() {
-                    $(this).on("click", function(e) {
-                      e.stopPropagation();
-                    });
-                });
             });
        </script>
   {%- endmacro %}
@@ -84,9 +162,9 @@
         <div id="termsText" class="well">{{ terms['asset']|safe if terms}}</div>
     </div>
     <div id="termsCheckbox">
-      <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
+      <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{%-if terms -%}{{terms['url']}}{%-endif-%}">
           <div class="edit-view">
-          <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures.") }}</span><span class="terms-tick-box-text" data-org="IRONMAN">{{ _("The subject has read the Website Consent and IRONMAN Registry Study consent and agrees to the processing of their personal information (including their health information) on the terms described in the above consents and Terms and Conditions and a copy of both consents and information provided by the subject has been securely stored in accordance with my local site procedures.") }}</span>
+          <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures.") }}</span><span class="terms-tick-box-text" data-org="IRONMAN">{{ _("By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures.") }}</span>
           </div>
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
@@ -144,8 +222,8 @@
          <br/>
         <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent,stored website consent form" data-core-data-type="subject_website_consent,stored_website_consent_form"  data-url="{{terms['url'] if terms}}">
           <div class="edit-view">
-            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("I have read the required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
-            <span class="terms-tick-box-text" data-org="IRONMAN">{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
+            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("By checking this box, I confirm that I have read the required information to the patient and provided the opportunity for the patient to ask questions. I have addressed the questions to the patient’s satisfaction and have created an electronic copy of this declaration and have stored this copy. The patient has provided oral consent to participate in the TrueNTH Global Registry Study on the terms set out above.") }}</span>
+            <span class="terms-tick-box-text" data-org="IRONMAN">{{ _("By checking this box, I confirm that I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
           </div>
           <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
@@ -205,11 +283,10 @@
       </div>
       <div class="get-roles-error error-message"></div>
       <div class="put-roles-error error-message"></div>
-      <script>$(function () { tnthAjax.getRoles($("#iq_userId").val());});</script>
+      <script>$(function () { tnthAjax.getRoles($("#iq_userId").val(), false, function() {
+        $("#rolesGroup").attr("loaded", "true");
+      });});</script>
   {%- endmacro %}
-
-  {{tou()}}
-
   {% macro dobGroup() -%}
       <div id="bdGroup">
           <input type="hidden" name="birthDate" id="birthday" value="">
@@ -371,15 +448,20 @@
       </div>
       <script>
         $(function () {
+            tnthAjax.getTreatment({{user.id}}, function() {
+            tnthAjax.getClinical({{user.id}}, function() {
+              $("#patientQ").attr("loaded", "true");
+            });
+          });
           __convertToNumericField($("#biopsy_day, #biopsy_year"));
-          tnthAjax.getClinical($("#iq_userId").val());
-          tnthAjax.getTreatment($("#iq_userId").val());
           $("input[name='biopsy']").each(function() {
           	$(this).on("click", function(e) {
               e.stopPropagation();
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
-                if ($(this).attr("id") == "biopsy_yes") $("#biopsy_day").focus();
+                if ($(this).attr("id") == "biopsy_yes") {
+                  if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
+                };
           		} else {
           			$("#biopsyDate").val("");
                 $("#biopsy_day").val("");
@@ -411,7 +493,6 @@
                   };
               });
           });
-
           $("input[name='tx']").each(function() {
                $(this).on("click", function() {
                   if ($(this).val() == "true") {
@@ -424,7 +505,7 @@
         });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
-    <div id="clinics">
+    <div>
       <p class="subtitle">{{ _("What is your main clinic for prostate cancer care?") }}</p>
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">

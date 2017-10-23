@@ -9,7 +9,6 @@ from portal.tasks import test
 from tests import TestCase
 
 
-
 class TestScheduledJob(TestCase):
     """Scheduled Job tests"""
 
@@ -32,11 +31,9 @@ class TestScheduledJob(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
-        data = {
-                "name": "test_upsert",
+        data = {"name": "test_upsert",
                 "task": "test",
-                "schedule": "* * * * *",
-               }
+                "schedule": "* * * * *"}
         resp = self.client.post(
             '/api/scheduled_job',
             content_type='application/json',
@@ -100,10 +97,10 @@ class TestScheduledJob(TestCase):
         with SessionScope(db):
             db.session.add(job)
             db.session.commit()
-            job = db.session.merge(job)
-            job_id = job.id
+        job = db.session.merge(job)
 
-        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job_id))
+        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
+
         self.assert200(resp)
         self.assertEquals(resp.json['message'], 'Test task complete.')
 
@@ -116,13 +113,14 @@ class TestScheduledJob(TestCase):
         with SessionScope(db):
             db.session.add(job)
             db.session.commit()
-            job = db.session.merge(job)
-            job_id = job.id
-            resp = self.client.post('/api/scheduled_job/{}'
-                                    '/trigger'.format(job_id))
+        job = db.session.merge(job)
+
+        resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
 
         self.assert200(resp)
         msg = resp.json['message'].split(" - ")
         self.assertEquals(msg[0], 'Test task complete.')
         self.assertEquals(msg[1].split(","), alist)
         self.assertEquals(json.loads(msg[2]), kdict)
+
+        db.session.close_all()

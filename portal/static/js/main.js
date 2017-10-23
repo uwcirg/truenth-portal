@@ -109,7 +109,9 @@ var ConsentUIHelper = function(consentItems, userId) {
     /*
      * display text for header
      */
-    var headerEnum = {"consentStatus": i18next.t("Consent Status"),
+    var headerEnum = {
+                      "organization": i18next.t("Organization"),
+                      "consentStatus": i18next.t("Consent Status"),
                       "status": i18next.t("Status"),
                       "agreement": i18next.t("Agreement"),
                       "consentDate": i18next.t("Date"),
@@ -231,7 +233,6 @@ var ConsentUIHelper = function(consentItems, userId) {
         return item && /stock\-org\-consent/.test(item.agreement_url);
     };
     this.getConsentStatusHTMLObj = function(item) {
-        console.log(item)
         var consentStatus = this.getConsentStatus(item);
         var sDisplay = "", cflag = "";
         var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports;
@@ -355,11 +356,12 @@ var ConsentUIHelper = function(consentItems, userId) {
         };
         //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
         //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+
         this.touObj.forEach(function(item, index) {
             var org = OT.orgsList[item.organization_id];
             touContent += "<tr data-tou-type='" + item.type + "'>";
             touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-            touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + capitalize(item.display_type)) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
             touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
@@ -761,12 +763,12 @@ var fillViews = {
                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
                 };
                 if (!hasValue(displayDate)) displayDate = __NOT_PROVIDED_TEXT;
-                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content = f.closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else {
-                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content = f.closest("label").text();
             };
-            if ($("#patBiopsy input[name='biopsy']").is(":checked")) $("#biopsyDateContainer").show();
+            if (a == "true") $("#biopsyDateContainer").show();
             if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
@@ -1206,28 +1208,42 @@ var fillContent = {
             function typeInTous(type) {
                 var found = false;
                 (data.tous).forEach(function(item) {
-                    if (!found && item.type == type) found = true;
+                    if (!found && $.trim(item.type) == $.trim(type)) found = true;
                 });
                 return found;
             };
-
-            $("#termsCheckbox [data-type='terms']").each(function() {
-                var arrTypes = ($(this).attr("data-tou-type")).split(",");
-                var self = $(this);
+            $("#topTerms label.terms-label").each(function() {
+                var arrTypes = [];
                 var item_found  = 0;
+                var self = $(this);
+
+                if (self.attr("data-tou-type")) {
+                    var o = ($(this).attr("data-tou-type")).split(",");
+                    o.forEach(function(item) {
+                        arrTypes.push(item);
+                    });
+                } else {
+                    self.find("[data-type='terms']").each(function() {
+                        var o = ($(this).attr("data-tou-type")).split(",");
+                        o.forEach(function(item) {
+                            arrTypes.push(item);
+                        }); 
+                    });
+                };
+                
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
                     };
                 });
-                var additional = $(this).find("[data-core-data-subtype]");
-                if (additional.length > 0) {
-                    at = additional.attr("data-tou-type");
-                    if (typeInTous(at)) item_found++;
-                };
-                if (item_found == (arrTypes.length+additional.length)) {
+
+                if (item_found == arrTypes.length) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
+                    self.find("[data-type='terms']").each(function() {
+                        $(this).attr("data-agree", "true");
+                    })
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
@@ -1239,13 +1255,6 @@ var fillContent = {
                 };
             });
         };
-        setTimeout(function() {
-            var agreedCheckboxes = $("#termsCheckbox [data-type='terms'][data-agree='false']:visible");
-            if (agreedCheckboxes.length > 1) {
-                $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-            };
-            if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
-        }, 2000);
     }
 };
 var assembleContent = {
@@ -1262,7 +1271,7 @@ var assembleContent = {
         };
 
 
-        var bdFieldVal = $("input[name=birthDate]").val();
+        var bdFieldVal = $("#birthday").val();
 
         if (! hasValue(bdFieldVal)) {
             var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
@@ -2152,7 +2161,8 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? i18next.t(message) : i18next.t("Not provided");
+        //don't think we want to translate message sent back to the server here
+        params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
 
         $.ajax ({
             type: "GET",
@@ -2181,20 +2191,9 @@ var tnthAjax = {
 	                                if ($.trim(type) == $.trim(item)) {
 	                                    self.show().removeClass("tnth-hide");
 	                                    self.attr("data-required", "true");
+                                        var parentNode = self.closest("label.terms-label");
+                                        if (parentNode.length > 0) parentNode.show().removeClass("tnth-hide");
 	                                };
-	                            });
-	                            /*
-	                             * need to check terms of use types e.g. privacy policy, that is required of user
-	                             * in addition to website terms of use
-	                             * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
-	                             * for the purpose of checking, they need to be broken up into sub items and be checked respectively
-	                             */
-	                            $(this).find("[data-core-data-subtype]").each(function() {
-	                                 if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
-	                                    var parentNode = $(this).closest("[data-type='terms']");
-	                                    parentNode.show().removeClass("tnth-hide");
-	                                    parentNode.attr("data-required", "true");
-	                                 };
 	                            });
 	                        });
 	                    };
@@ -2285,7 +2284,7 @@ var tnthAjax = {
             if (callback) callback("<div class='error-message'>" + i18next.t("User Id is required") + "</div>");
             return false;
         };
-        this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true}, function(data) {
+        this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true, 'dataType': 'html'}, function(data) {
         	if (data) {
         		if (!data.error) {
         			if (hasValue(containerId)) $("#" + containerId).html(data);
@@ -2317,6 +2316,7 @@ var tnthAjax = {
                    else $(".get-orgs-error").html(errorMessage);
                    if (callback) callback({"error": errorMessage});
                 };
+                $("#clinics").attr("loaded", true);
             };
         });
     },
@@ -2709,7 +2709,7 @@ var tnthAjax = {
 
         return found;
     },
-    "getTreatment": function (userId) {
+    "getTreatment": function (userId, callback) {
         if (!userId) return false;
         this.sendRequest('/api/patient/'+userId+'/procedure', 'GET', userId, null, function(data) {
             if (!data.error) {
@@ -2717,6 +2717,7 @@ var tnthAjax = {
             } else {
                 $("#userProcedures").html("<span class='error-message'>" + i18next.t("Error retrieving data from server") + "</span>");
             };
+            if (callback) callback(data);
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
@@ -2826,18 +2827,20 @@ var tnthAjax = {
             };
         });
     },
-    "getRoles": function(userId,isProfile) {
+    "getRoles": function(userId,isProfile,callback) {
         this.sendRequest('/api/user/'+userId+'/roles', 'GET', userId, null, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".get-roles-error").html("");
                     fillContent.roles(data,isProfile);
+                    if (callback) callback(data);
                 } else {
                     var errorMessage = i18next.t("Server error occurred retrieving user role information.");
                    if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
                    else $(".get-roles-error").html(errorMessage);
+                   if (callback) callback({"error": errorMessage});
                 };
-            } ;
+            };
         });
     },
     "putRoles": function(userId,toSend, targetField) {
@@ -2870,16 +2873,18 @@ var tnthAjax = {
         	};
         });
     },
-    "getClinical": function(userId) {
+    "getClinical": function(userId, callback) {
     	this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, null, function(data) {
     		if (data) {
     			if (!data.error) {
     				$(".get-clinical-error").html("");
             		fillContent.clinical(data);
+                    if (callback) callback(data);
     			} else {
     			   var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
 		           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
 		           else $(".get-clinical-error").html(errorMessage);
+                   if (callback) callback({"error": errorMessage});
     			};
     		};
     	});
@@ -2981,9 +2986,6 @@ var tnthAjax = {
     				$(".get-tou-error").html("");
 		            if (data.url) {
 		                $("#termsURL").attr("data-url", data.url);
-		                $("#topTerms .general-tou").each(function() {
-		                    $(this).attr("data-url", data.url);
-		                });
 		                if (callback) callback({"url": data.url});
 		            } else {
 		                if (callback) callback({"error": i18next.t("no url returned")});
@@ -4209,6 +4211,10 @@ function containHtmlTags(text) {
 function __getExportFileName(prefix) {
     var d = new Date();
     return (prefix?prefix:"ExportList_")+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear();
+}
+function capitalize(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){

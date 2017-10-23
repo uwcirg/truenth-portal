@@ -47,6 +47,11 @@
             $("#month").on("change", function() {
                 $(this).trigger("focusout");
             });
+            $("#year", "#date").each(function() {
+                $(this).on("change", function() {
+                    $(this).trigger("blur");
+                });
+            });
             ["year", "month", "date"].forEach(function(fn) {
                 var field = $("#" + fn);
                 var triggerEvent = hasValue(field.attr("data-trigger-event")) ? field.attr("data-trigger-event") : (field.attr("type") == "text" ? "blur" : "change");
@@ -510,24 +515,32 @@
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
-        <div id="userOrgs" class="customized">
-           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
-           <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
-           <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
-           <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-               <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
-               <div class="main-state-container selector-show">
+        <div id="clinics">
+            <div id="userOrgs" class="customized">
+               <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
+               <p class="prompt text-muted">
+                {% if  current_user and current_user.has_role(ROLE.STAFF) %}
+                    {{_("In what state is the patient currently receiving prostate cancer care?")}}
+                {% else %}
+                    {{_("In what state are you currently receiving prostate cancer care?")}}
+                {% endif %}
+               </p>
+               <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
+               <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
+                   <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+                   <div class="main-state-container selector-show">
+                   </div>
                </div>
-           </div>
-            <div class="noOrg-container" style="display: none">
-                <label>
-                    <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
-                    <span>{{ _("None of the Above") }}</span>
-                </label>
+                <div class="noOrg-container" style="display: none">
+                    <label>
+                        <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
+                        <span>{{ _("None of the Above") }}</span>
+                    </label>
+                </div>
+               <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
+               <div id="defaultConsentContainer"></div>
+               {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
             </div>
-           <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
-           <div id="defaultConsentContainer"></div>
-           {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
     </div>
     <div class="get-orgs-error error-message"></div>
@@ -671,6 +684,8 @@
                     };
 
                   if ($("#mainDiv.profile").length > 0) setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+
+                  $("#clinics").attr("loaded", true);
                 };
 
             }).fail(function(xhr) {
@@ -843,7 +858,7 @@
 {% macro patientReports(person) -%}
     <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
     <div id="prTableToolBar"><span id="tableCount"></span></div>
-    <table id="profilePatientReportTable" class="smaller-text"></table>
+    <table id="profilePatientReportTable"></table>
     <div id="patientReportErrorMessage" class="text-muted"></div>
     <script>
     $(function () {
@@ -857,7 +872,7 @@
                         item["filename"] = escapeHtml(item["filename"]);
                         item["document_type"] = escapeHtml(item["document_type"]);
                         item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
-                        item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
+                        item["actions"] = '<a title="{{_('Download')}}" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
                         fData.push(item);
                     });
 
@@ -881,32 +896,34 @@
                         undefinedText: '--',
                         columns: [
                             {
+                                field: 'contributor',
+                                title: '{{_("Type")}}',
+                                searchable: true,
+                                sortable: true
+                            },
+                            {
                                 field: 'filename',
-                                title: 'Filename',
+                                title: '{{_("Report Name")}}',
                                 searchable: true,
                                 sortable: true
                             }, {
                                 field: 'uploaded_at',
-                                title: 'Uploaded At (GMT)',
+                                title: '{{_("Generated (GMT)")}}',
                                 sortable: true,
                                 searchable: true,
                                 width: '20%'
                             }, {
                                 field: 'document_type',
-                                title: 'Document Type',
+                                title: '{{_("Document Type")}}',
                                 sortable: true,
                                 visible: false
-                            }, {
-                                field: 'contributor',
-                                title: 'Contributor',
-                                sortable: true,
-                                searchable: true
-                            }, {
+                            },{
                                 field: 'actions',
-                                title: 'Actions',
+                                title: '{{_("Download")}}',
                                 sortable: false,
                                 searchable: false,
-                                visible: true
+                                visible: true,
+                                class: "text-center"
                             }
                         ]
                     } );
