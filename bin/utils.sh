@@ -25,7 +25,7 @@ get_configured_registries() {
 
 
 get_docker_tags() {
-    # Build space-separated list of tags for tagging docker images from available information
+    # Build newline-separated list of tags for tagging docker images from available information
 
     GIT_BRANCH="${GIT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
     # Standardize branch name
@@ -40,9 +40,16 @@ get_docker_tags() {
     GIT_HASH="${GIT_HASH:-$(git rev-parse HEAD)}"
     GIT_SHORT_HASH="$(echo $GIT_HASH | cut --characters 1-7)"
 
-    DOCKER_TAGS="$GIT_BRANCH $GIT_TAG $GIT_HASH $GIT_SHORT_HASH $DOCKER_EXTRA_TAGS"
-    # Remove extra spaces
-    DOCKER_TAGS="$(echo $DOCKER_TAGS | tr --squeeze-repeats ' ' ' ')"
+    DOCKER_TAGS=$(cat << BLOCK
+$GIT_BRANCH
+$GIT_TAG
+$GIT_HASH
+$GIT_SHORT_HASH
+$DOCKER_EXTRA_TAGS
+BLOCK
+)
+    # Remove extra newlines
+    DOCKER_TAGS="$(echo "$DOCKER_TAGS" | tr --squeeze-repeats '\n' '\n')"
 
     echo "$DOCKER_TAGS"
 }
