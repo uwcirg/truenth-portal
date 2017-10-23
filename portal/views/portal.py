@@ -23,14 +23,13 @@ from ..extensions import oauth, user_manager
 from ..models.app_text import (
     app_text,
     AppText,
+    get_terms,
     InitialConsent_ATMA,
     MailResource,
     StaffRegistrationEmail_ATMA,
     UndefinedAppText,
     UserInviteEmail_ATMA,
-    VersionedResource,
-    WebsiteConsentTermsByOrg_ATMA,
-    WebsiteDeclarationForm_ATMA
+    VersionedResource
 )
 from ..models.auth import validate_origin
 from ..models.communication import load_template_args, Communication
@@ -422,51 +421,6 @@ def initial_queries():
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements)
 
-
-@portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
-@roles_required(ROLE.STAFF)
-@oauth.require_oauth()
-def website_consent_script(patient_id):
-    entry_method = request.args.get('entry_method', None)
-    redirect_url = request.args.get('redirect_url', None)
-    if redirect_url:
-        """
-        redirect url here is the patient's assessment link
-        /api/present-assessment, so validate against local origin
-        """
-        validate_origin(redirect_url)
-    user = current_user()
-    patient = get_user(patient_id)
-    org = patient.first_top_organization()
-    """
-    NOTE, we are getting PATIENT's website consent terms here
-    as STAFF member needs to read the terms to the patient
-    """
-    terms = get_terms(org, ROLE.PATIENT)
-    top_org = patient.first_top_organization()
-    declaration_form = VersionedResource(app_text(WebsiteDeclarationForm_ATMA.
-                                                  name_key(organization=top_org)))
-    return render_template(
-        'website_consent_script.html', user=user,
-        terms=terms, top_organization=top_org,
-        entry_method=entry_method, redirect_url=redirect_url,
-        declaration_form=declaration_form, patient_id=patient_id)
-
-
-def get_terms(org=None, role=None):
-    terms = None
-
-    if org:
-        try:
-            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.
-                                               name_key(organization=org, role=role)))
-        except UndefinedAppText:
-            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-
-    else:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-
-    return terms
 
 @portal.route('/admin')
 @roles_required(ROLE.ADMIN)

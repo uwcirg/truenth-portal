@@ -9,22 +9,26 @@ from flask import (
     session,
     url_for
 )
+from flask_user import roles_required
 
 from ..database import db
-from ..extensions import recaptcha
+from ..extensions import oauth, recaptcha
 from ..models.app_text import (
     app_text,
+    get_terms,
     AboutATMA,
     PrivacyATMA,
     Terms_ATMA,
-    VersionedResource
+    VersionedResource,
+    WebsiteDeclarationForm_ATMA
 )
+from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.role import ROLE
-from ..models.user import current_user
+from ..models.user import current_user, get_user
 from ..views.auth import next_after_login
 
 
@@ -200,3 +204,33 @@ def contact():
     db.session.add(email)
     db.session.commit()
     return jsonify(msgid=email.id)
+
+
+@eproms.route('/website-consent-script/<int:patient_id>', methods=['GET'])
+@roles_required(ROLE.STAFF)
+@oauth.require_oauth()
+def website_consent_script(patient_id):
+    entry_method = request.args.get('entry_method', None)
+    redirect_url = request.args.get('redirect_url', None)
+    if redirect_url:
+        """
+        redirect url here is the patient's assessment link
+        /api/present-assessment, so validate against local origin
+        """
+        validate_origin(redirect_url)
+    user = current_user()
+    patient = get_user(patient_id)
+    org = patient.first_top_organization()
+    """
+    NOTE, we are getting PATIENT's website consent terms here
+    as STAFF member needs to read the terms to the patient
+    """
+    terms = get_terms(org, ROLE.PATIENT)
+    top_org = patient.first_top_organization()
+    declaration_form = VersionedResource(app_text(WebsiteDeclarationForm_ATMA.
+                                                  name_key(organization=top_org)))
+    return render_template(
+        'eproms/website_consent_script.html', user=user,
+        terms=terms, top_organization=top_org,
+        entry_method=entry_method, redirect_url=redirect_url,
+        declaration_form=declaration_form, patient_id=patient_id)

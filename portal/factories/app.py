@@ -183,7 +183,7 @@ def configure_blueprints(app, blueprints):
     """Register blueprints with application"""
     # Load GIL or ePROMs blueprint (which define several of the same request
     # paths and would therefore conflict with one another) depending on config
-    if app.config.get('GIL'):
+    if app.config.get('GIL') and not app.config.get('HIDE_GIL'):
         app.register_blueprint(gil)
     else:
         app.register_blueprint(eproms)
