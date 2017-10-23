@@ -870,6 +870,39 @@ div.search {
     }
   }
 }
+
+/* reporting dashboard styling */
+.nav-tabs.rd-nav>li.active>a, 
+.nav-tabs.rd-nav>li.active>a:focus, 
+.nav-tabs.rd-nav>li.active>a:hover {
+    background-color: #6f7984;
+    color: #FFF;
+}
+.rd-content-container {
+    min-height: 50vh;
+}
+.stats-container {
+    padding: 1em;
+    display: none;
+   .columns-right .btn {
+      padding: 0.6em;
+   }
+}
+.stats-container.active {
+   display: block;
+}
+.stats-info {
+    background-color: #F7F7F7;
+    padding: 1em;
+    margin: 1em auto;
+}
+.stats-table {
+  .filterControl .form-control {
+    font-weight: normal;
+    max-width: 100%;
+  }
+}
+
 .save-info {
   opacity: 0;
    -webkit-transition: opacity 0.8s ease-in;

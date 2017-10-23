@@ -16,7 +16,8 @@
         selectControl = $(selectControl.get(selectControl.length - 1));
         if (!existOptionInSelectControl(selectControl, value)) {
             selectControl.append($("<option></option>")
-                .attr("value", value)
+                //need to strip off HTML tags
+                .attr("value", value.replace(/(<([^>]+)>)/ig,""))
                 .text($('<div />').html(text).text()));
         }
     };
