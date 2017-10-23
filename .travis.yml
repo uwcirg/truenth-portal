@@ -78,14 +78,9 @@ after_success:
   # Only run build steps in corresponding tox env
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
-  - cp docker/portal.env.default docker/portal.env
-  - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
   # Build debian package from current repo and branch
   - BRANCH="$GIT_BRANCH"
-    docker-compose run builder
-
-  # Build portal docker image from debian package
-  - docker-compose build web
+  - ./bin/docker-build.sh
 
 before_deploy:
   - ./bin/docker-login.sh
