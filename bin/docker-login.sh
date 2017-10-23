@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-cmdname="$(basename $0)"
-bin_path="$( cd $(dirname $0) && pwd )"
+cmdname="$(basename "$0")"
+bin_path="$(cd "$(dirname "$0")" && pwd)"
 
 usage() {
    cat << USAGE >&2
@@ -23,7 +23,7 @@ USAGE
 }
 
 
-if [ "$1" = "-h" -o "$1" = "--help" ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 

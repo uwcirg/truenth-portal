@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-cmdname="$(basename $0)"
-bin_path="$( cd $(dirname $0) && pwd )"
+cmdname="$(basename "$0")"
+bin_path="$(cd "$(dirname "$0")" && pwd)"
 
 usage() {
    cat << USAGE >&2
@@ -18,17 +18,19 @@ Usage:
         "\${REGISTRY}_USERNAME"
         "\${REGISTRY}_API_KEY"
         "\${REGISTRY}_REPO"
-        "\${DOCKER_TAGS}"
+        "\${DOCKER_TAGS}" - List of tags to apply to image
 
     Optional overrides:
         "\${DOCKER_REPOSITORY}"
         "\${DOCKER_IMAGE_NAME}"
         "\${DOCKER_IMAGE_TAG}"
+        "\${DOCKER_EXTRA_TAGS}" - Additional (space-separated) tags to apply to image
 USAGE
    exit 1
 }
 
-if [ "$1" = "-h" -o "$1" = "--help" ]; then
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 
@@ -38,14 +40,15 @@ fi
 DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}"
 DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
 DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
+DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
 
 get_configured_registries | while read config ; do
-    repo="$(echo "$config" | awk '{print $1}')"
-    username="$(echo "$config" | awk '{print $2}')"
-    api_key="$(echo "$config" | awk '{print $3}')"
+    repo="$(echo "$config" | cut --delimiter ' ' --fields 1)"
+    username="$(echo "$config" | cut --delimiter ' ' --fields 2)"
+    api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
     # Apply all tags in DOCKER_TAGS to image
-    for tag in $DOCKER_TAGS; do
+    echo "$DOCKER_TAGS" | while read tag ; do
         docker tag \
             "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" \
             "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
@@ -53,7 +56,7 @@ get_configured_registries | while read config ; do
 
     # Push each tag, in background
     echo "Pushing images to $repo..."
-    for tag in $DOCKER_TAGS; do
+    echo "$DOCKER_TAGS" | while read tag ; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
     done &
 done
