@@ -31,6 +31,7 @@ env:
     - GIT_TAG="$TRAVIS_TAG"
     - GIT_HASH="$TRAVIS_COMMIT"
 
+    - BRANCH="$GIT_BRANCH"
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
     - DOCKER_REPOSITORY=""
@@ -73,14 +74,6 @@ install:
 
 script:
   - tox
-
-after_success:
-  # Only run build steps in corresponding tox env
-  - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
-
-  # Build debian package from current repo and branch
-  - BRANCH="$GIT_BRANCH"
-  - ./bin/docker-build.sh
 
 before_deploy:
   - ./bin/docker-login.sh
