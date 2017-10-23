@@ -24,7 +24,7 @@
                     <label class="terms-label tnth-hide">
                         <i class="fa fa-square-o fa-lg terms-tick-box"></i>
                         {% trans
-                           privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true")
+                           privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true"
                         %}
                           <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a
                             href="{{privacy_url}}" class="required-link">privacy policy</a> and <a
@@ -35,7 +35,7 @@
                           data-agree="false"
                           data-core-data-type="privacy_policy"
                           data-tou-type="privacy policy"
-                          data-url="{{url_for('portal.privacy')}}"/>
+                          data-url="/privacy"/>
                         <input type="hidden"
                           data-agree="false"
                           data-type="terms"
@@ -61,7 +61,7 @@
                          <label class="terms-label tnth-hide">
                             <i class="fa fa-square-o fa-lg terms-tick-box"></i>
                             {% trans
-                              privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                              privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" %}
                               <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
                                 <a href="{{terms_url}}" class="required-link">terms</a></span>
                             {% endtrans %}
@@ -70,7 +70,7 @@
                               data-type="terms"
                               data-core-data-type="privacy_policy"
                               data-tou-type="privacy policy"
-                              data-url="{{url_for('portal.privacy')}}" />
+                              data-url="/privacy" />
                             <input type="hidden"
                               data-agree="false"
                               data-type="terms"
@@ -97,9 +97,9 @@
                         data-type="terms"
                         data-tou-type="privacy policy"
                         data-core-data-type="privacy_policy"
-                        data-url="{{url_for('portal.privacy')}}">
+                        data-url="/privacy">
                           <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                          {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                          {% trans privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true" %}
                           <span>&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
                           {% endtrans %}
                       </label>
