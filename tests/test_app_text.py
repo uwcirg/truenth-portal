@@ -1,5 +1,5 @@
 """Unit test module for app_text"""
-from flask import render_template
+from flask import render_template_string
 from flask_webtest import SessionScope
 
 from portal.extensions import db
@@ -39,7 +39,8 @@ class TestAppText(TestCase):
             title.custom_text = '_expanded_'
             db.session.add(title)
             db.session.commit()
-        result = render_template('landing.html')
+        result = render_template_string(
+            '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
         self.assertTrue('_expanded_' in result)
 
     def test_missing_arg(self):
@@ -48,7 +49,9 @@ class TestAppText(TestCase):
             title.custom_text = '_expanded_ {0}'
             db.session.add(title)
             db.session.commit()
-        self.assertRaises(ValueError, render_template, 'landing.html')
+        self.assertRaises(
+            ValueError, render_template_string,
+            '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
 
     def test_permanent_url(self):
         args = {
