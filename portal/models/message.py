@@ -65,7 +65,7 @@ class EmailMessage(db.Model):
     def style_message(self, body):
         """Implicitly called on send, to wrap body with style tags"""
         # Catch duplicate styling attempts
-        restricted = (u'doctype', u'html', u'head', u'body')
+        restricted = (u'<!doctype', u'<html', u'<head', u'<body')
         lower_body = body.lower()
         for element in restricted:
             if element in lower_body:
