@@ -40,7 +40,6 @@ fi
 DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}"
 DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
 DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
-
 DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
 
 get_configured_registries | while read config ; do
@@ -49,7 +48,7 @@ get_configured_registries | while read config ; do
     api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
     # Apply all tags in DOCKER_TAGS to image
-    for tag in $DOCKER_TAGS; do
+    echo "$DOCKER_TAGS" | while read tag ; do
         docker tag \
             "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" \
             "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
@@ -57,7 +56,7 @@ get_configured_registries | while read config ; do
 
     # Push each tag, in background
     echo "Pushing images to $repo..."
-    for tag in $DOCKER_TAGS; do
+    echo "$DOCKER_TAGS" | while read tag ; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
     done &
 done
