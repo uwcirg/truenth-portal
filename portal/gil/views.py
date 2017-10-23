@@ -32,8 +32,8 @@ from ..models.organization import (
 )
 from ..models.user import current_user, get_user
 from ..system_uri import SHORTCUT_ALIAS
+from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
-from ..views.portal import next_after_login
 
 
 gil = Blueprint(

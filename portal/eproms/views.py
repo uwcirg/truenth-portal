@@ -25,7 +25,7 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.role import ROLE
 from ..models.user import current_user
-from ..views.portal import next_after_login
+from ..views.auth import next_after_login
 
 
 eproms = Blueprint(

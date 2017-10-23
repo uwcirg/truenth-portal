@@ -41,6 +41,11 @@ FIRST_NAME = u'\u2713'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
+# import hidden relation classes needed to create database
+from portal.models.communication_request import CommunicationRequest
+CommunicationRequest
+
+
 class TestCase(Base):
     """Base TestClass for application."""
 
