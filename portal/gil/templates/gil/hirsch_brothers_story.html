@@ -1,4 +1,4 @@
-{% extends "lived_experience_base.html" %}
+{% extends "gil/lived_experience_base.html" %}
 {% block title %}{{super()}} {{_("Lived Experience - Hirsch Brothers Story")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
@@ -48,7 +48,7 @@
         <div class="module">
             <div class="module__body">
                 <figure>
-                    <img src="{{ url_for('static', filename='img/LE_Hirsch_Brothers_Single.jpg') }}" alt="The Hirsch Brothers">
+                    <img src="{{ url_for('.static', filename='img/LE_Hirsch_Brothers_Single.jpg') }}" alt="The Hirsch Brothers">
                     <figcaption>{{_("The Hirsch Brothers on their Farm in Wisconsin, 2016")}}</figcaption>
               </figure>
             </div>

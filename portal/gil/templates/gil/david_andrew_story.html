@@ -1,4 +1,4 @@
-{% extends "lived_experience_base.html" %}
+{% extends "gil/lived_experience_base.html" %}
 {% block title %}{{super()}} {{_("Lived Experience - David and Andrew Perez Story")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
@@ -40,7 +40,7 @@
         <div class="module">
           <div class="module__body">
               <figure>
-                <img src="{{ url_for('static', filename='img/LE_David_Andrew_Perez_Single.jpg') }}" alt="David and Andrew Perez">
+                <img src="{{ url_for('.static', filename='img/LE_David_Andrew_Perez_Single.jpg') }}" alt="David and Andrew Perez">
                 <figcaption>{{_("David and Andrew Perez, Los Angeles, 2016")}}</figcaption>
               </figure>
           </div>
