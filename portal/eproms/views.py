@@ -143,12 +143,12 @@ def terms_and_conditions():
 @eproms.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_mo = VersionedResource(
-        app_text(AboutATMA.name_key(subject='Movember')))
+    about_tnth = VersionedResource(
+        app_text(AboutATMA.name_key(subject='TrueNTH')))
     return render_template(
         'eproms/about.html',
-        about_mo=about_mo.asset,
-        about_mo_editorUrl=about_mo.editor_url,
+        about_tnth=about_tnth.asset,
+        about_tnth_editorUrl=about_tnth.editor_url,
         user=current_user())
 
 

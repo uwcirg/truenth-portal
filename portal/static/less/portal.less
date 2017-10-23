@@ -80,6 +80,7 @@
 @labelColor: #777;
 @wellColor: rgba(203, 210, 217, 0.2);
 @wellBorderColor: #f1efef;
+@disabledColor: #bfc3c3;
 
 @inputHeight: 2.4em;
 
@@ -417,17 +418,12 @@ div.right-panel {
 #termsText.agreed {
   display: block;
 }
+#topTerms .well {
+  padding: 2em 1em 1em 1em;
+}
 #topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
-}
-#topTerms .custom-tou,
-#topTerms .custom-tou-text {
-  display: none;
-}
-
-#topTerms .custom-tou-text a {
-  text-decoration: underline;
 }
 #topTerms .terms-checkbox-container {
   margin-left: 2em;
@@ -442,6 +438,10 @@ div.right-panel {
     margin: 1em auto;
   }
   a.form-link {
+    text-decoration: underline;
+  }
+  .required-link {
+    font-weight: normal;
     text-decoration: underline;
   }
 }
@@ -564,13 +564,13 @@ div.right-panel {
     font-size: @smallBtnSize;
   }
   #next {
-    opacity: 1;
     width: 110px;
     max-width: 100%;
     margin-left: 0.2em;
   }
   #next:disabled {
-    opacity: 0.6;
+    background: @disabledColor;
+    border: 1px solid @disabledColor;
   }
   #next.open, #updateProfile.open {
     opacity: 1;
@@ -677,7 +677,7 @@ div.columns {
    top: 4px;
 }
 div.pull-right {
-	top: 0.35em;
+  top: 0.35em;
 }
 .admin-table {
   div.pull-right {
@@ -790,7 +790,7 @@ div.pull-right {
     div.org-container {
       display: block;
       * {
-      	font-size: @mobileOrgSize;
+        font-size: @mobileOrgSize;
       }
       label.org-label {
         display: inline-block;
@@ -1405,6 +1405,29 @@ div.pull-right {
   word-break: break-word;
 }
 
+#mainDiv.profile,
+.tnth-table {
+  width: 100%;
+  max-width: 100%;
+  TH {
+    background-color: @rowBackgroundColor;
+    color: #FFF;
+    padding: 0.25em 0.5em;
+    font-weight: normal;
+    vertical-align: top;
+  }
+  tr:hover {
+    background-color: @rowHoverBgColor;
+    cursor: pointer;
+  }
+  tr.odd {
+    background-color: #F7F7F7;
+  }
+  tr.even {
+    background-color: #FFF;
+  }
+}
+
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
@@ -1419,11 +1442,11 @@ div.pull-right {
   }
 
   #btnProfileSendEmail {
-  	margin-top: 1em;
-  	font-size: @smallBtnSize;
+    margin-top: 1em;
+    font-size: @smallBtnSize;
   }
   #btnPasswordResetEmail {
-  	font-size: @smallBtnSize;
+    font-size: @smallBtnSize;
   }
 
   h4.detail-title {
@@ -1500,23 +1523,6 @@ div.pull-right {
     color: #FFF;
     letter-spacing: 1px;
   }
-  TH {
-    background-color: @rowBackgroundColor;
-    color: #FFF;
-    padding: 0.25em 0.5em;
-    font-weight: normal;
-    vertical-align: top;
-  }
-  tr:hover {
-    background-color: @rowHoverBgColor;
-    cursor: pointer;
-  }
-  tr.odd {
-    background-color: #F7F7F7;
-  }
-  tr.even {
-    background-color: #FFF;
-  }
   & .copyright-container *,
   & .logo-container * {
     color: @footerWhiteThemeColor;
@@ -1545,9 +1551,9 @@ div.pull-right {
     margin-bottom: 1.8em;
   }
   #biopsyDateContainer {
-	label {
-		margin-bottom: 0.2em;
-	}
+  label {
+    margin-bottom: 0.2em;
+  }
   }
 }
 #mainDiv.profile .copyright-container,
@@ -1636,8 +1642,8 @@ div.pull-right {
     margin-bottom: 0
   }
   .checkbox {
-	  margin-left: 0.1em;
-	  margin-right: 0.1em;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
   }
 }
 .profile-create-item-container {
@@ -1676,7 +1682,7 @@ div.main-state-container .noOrg-container {
 
 #fillOrgs *,
 .noOrg-container * {
-	font-size: @mobileOrgSize;
+  font-size: @mobileOrgSize;
 }
 #fillOrgs {
   margin-top: 0.2em;
@@ -1690,8 +1696,8 @@ div.main-state-container .noOrg-container {
     padding: 0 1em;
   }
   input[type="checkbox"] {
-  	position: relative;
-  	right: 2px;
+    position: relative;
+    right: 2px;
   }
   input.clinic {
     margin-top: 6px;
@@ -1726,15 +1732,15 @@ div.noOrg-container {
   label {
     font-weight: normal;
   }
-	input[type="radio"] {
-	  top: 2px;
+  input[type="radio"] {
+    top: 2px;
   }
   span {
-	  margin-left:2px;
-	  position: relative;
-	  top: 1px;
-	  left: 2px;
-	  font-weight: normal;
+    margin-left:2px;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    font-weight: normal;
   }
 }
 #phone,#email,#altPhone  {
@@ -1762,8 +1768,8 @@ div.noOrg-container {
   #bdGroup {
     margin-bottom: 0.1em;
     padding-bottom: 0;
-	.flex {
-    	flex-wrap: wrap;
+  .flex {
+      flex-wrap: wrap;
     }
   }
   #erroremail {
@@ -1815,7 +1821,7 @@ div.noOrg-container {
 }
 #createProfileForm[data-account='staff'] {
   #userOrgs {
-	 margin-top: 0;
+   margin-top: 0;
   }
 }
 
@@ -2357,7 +2363,7 @@ div.org-container {
     margin-bottom: 0;
   }
   input {
-  	margin: 0.5em 0;
+    margin: 0.5em 0;
   }
 }
 div.biopsy-option:last-of-type{
@@ -2428,13 +2434,13 @@ div.timezone-warning.text-warning {
   }
 
   #altPhone, #email, #phone {
-  	width: 300px;
+    width: 300px;
   }
   #profileForm {
-	  #firstname,
-	  #lastname {
-	    width: 300px;
-	  }
+    #firstname,
+    #lastname {
+      width: 300px;
+    }
   }
 }
 @media (min-width: 507px) {
@@ -2564,7 +2570,7 @@ div.timezone-warning.text-warning {
     top: -1px;
   }
   .indent {
-  	padding: 0 1em;
+    padding: 0 1em;
   }
   #homeFooter {
     font-size: @footerSize;
@@ -2578,17 +2584,17 @@ div.timezone-warning.text-warning {
   }
 
   #bdGroup {
-	  #month {
-	    max-width: 100%;
-	    width: 250px;
-	  }
+    #month {
+      max-width: 100%;
+      width: 250px;
+    }
   }
 
   div.columns {
     top: 0;
   }
   div.pull-right {
-	top: 0;
+  top: 0;
   }
   .search .form-control {
     height: 3em;
@@ -2661,7 +2667,7 @@ div.timezone-warning.text-warning {
 
   #fillOrgs *,
   .noOrg-container *  {
-  	font-size: @baseFontSize * 0.95;
+    font-size: @baseFontSize * 0.95;
   }
 
   .iq-container .noOrg-container *  {
@@ -2732,8 +2738,8 @@ div.timezone-warning.text-warning {
    #progressWrapper {
       width: 80%;
     .progressbar li {
-      	font-size: 12px;
-    	}
+        font-size: 12px;
+      }
     .progressbar {
       position: relative;
       left: -3%;
@@ -2780,9 +2786,14 @@ div.timezone-warning.text-warning {
       margin: 0 0 15px 15px;
     }
   }
+  #topTerms {
+    .terms-tick-box-text {
+      width: 96.5%;
+    }
+  }
   #patientListOptions,
   #staffListOptions {
-  	display: flex;
+    display: flex;
     flex-direction: row;
     & > span:last-of-type {
       margin-top: 0.7em;
@@ -2828,14 +2839,14 @@ div.timezone-warning.text-warning {
     font-size: @subheadSize;
   }
   #biopsyDateContainer {
-  	input {
-  		margin: 0;
-  	}
+    input {
+      margin: 0;
+    }
   }
   #mainDiv.profile {
-  	.profile-item-container  {
-  		padding: 2em 3em 2.7em 3em;
-  	}
+    .profile-item-container  {
+      padding: 2em 3em 2.7em 3em;
+    }
   }
   #createProfileForm {
     #emailGroup {
@@ -2876,30 +2887,30 @@ div.timezone-warning.text-warning {
   }
 
   #aboutForm {
-  	div.heading::before {
-	   border-radius: 100%;
-	   width: 52px;
-	   height: 52px;
-	   font-size: @subheadSize;
-	   line-height: 1;
-	   content: "\EA03";
-	   display: inline-block;
-	   font-family: "symbols";
-	   font-style: normal;
-	   font-weight: normal;
-	   line-height: 1;
-	   margin: 0 auto;
-	   -webkit-font-smoothing: antialiased;
-	   color: #ccc;
-	   position: absolute;
-	   top: 3em;
-	   left: 0;
-	   right: 0;
-	   margin-left: auto;
-	   margin-right: auto;
-	   margin-bottom: 1em;
-	   cursor: pointer;
-	  }
+    div.heading::before {
+     border-radius: 100%;
+     width: 52px;
+     height: 52px;
+     font-size: @subheadSize;
+     line-height: 1;
+     content: "\EA03";
+     display: inline-block;
+     font-family: "symbols";
+     font-style: normal;
+     font-weight: normal;
+     line-height: 1;
+     margin: 0 auto;
+     -webkit-font-smoothing: antialiased;
+     color: #ccc;
+     position: absolute;
+     top: 3em;
+     left: 0;
+     right: 0;
+     margin-left: auto;
+     margin-right: auto;
+     margin-bottom: 1em;
+     cursor: pointer;
+    }
    }
 
   #profileForm {
