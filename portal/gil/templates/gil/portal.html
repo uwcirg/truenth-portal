@@ -1,0 +1,98 @@
+{%- from "gil/macros.html" import footerHTML -%}
+{%- extends "gil/base.html" -%}
+{% block title %}{{super()}} {{_("Dashboard")}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+{{ super() }}
+<main id="portalMain" class="main home--container">
+
+    <section class="page-intro page-intro--dark home--header">
+        <h3 class="page-intro__main">{{_("Welcome to your TrueNTH Dashboard")}}{% if user.first_name %}, {{user.first_name}}{% endif %}</h3>
+        <br/>
+        {% if user.has_role(ROLE.PARTNER) %}
+            <p class="page-intro__sub">{{_("More tools for you will be available as TrueNTH develops.")}}</p>
+            <p class="page-intro__sub">{{_("For now, learn more about TrueNTH:")}}</p>
+        {% else %}
+            <p class="page-intro__sub">{{_("Below are the TrueNTH tools available to you.")}}</p>
+            <p class="page-intro__sub">{{_("More will become available as TrueNTH evolves.")}}</p>
+        {% endif %}
+        <div class="button-callout">
+            <figure id="portalScrollArrow"></figure>
+        </div>
+    </section>
+
+    {# present each intervention in turn if configured for user #}
+     <section class="icon-box-group__wrapper home--items-wrapper">
+        {% if user.has_role(ROLE.PARTNER) %}
+            <div class="icon-box-group link-container">
+                <div class="link-box">
+                  <h4><a href="{{url_for('gil.about')}}">{{_("About TrueNTH")}}</a></h4>
+                </div>
+                <div class="link-box">
+                  <h4><a href="{{url_for('gil.prostate_cancer_facts')}}">{{_("About Prostate Cancer")}}</a></h4>
+                </div>
+            </div>
+        {% endif %}
+        <div id="homeItemsParentContainer" class="icon-box-group">
+        {% for intervention in interventions %}
+            {% set display = intervention.display_for_user(user) %}
+            {% if display.access %}
+                <div class="home--item-container">
+                    {% if intervention.description and intervention.description != "" %}<h4 class="icon-box__lowhead icon_box__description">{{ intervention.description }}</h4>{% endif %}
+                    <div class="home--item-text">{{ display.card_html | safe }}</div>
+                    <br/>
+                    <div>
+                    {% if display.link_url %}
+                        <a class="icon-box__button icon-box__button--main intervention-link" href="{{ display.link_url }}"><span>{% if display.link_label %}{{_(display.link_label)}}{% else %}{{_("Start")}}{% endif %}<figure></figure></span></a>
+                    {% elif display.link_url is none and display.link_label %}
+                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="#"><span class="home--disabled-button">{{_(display.link_label)}}<figure></figure></span></a>
+                    {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% if user.has_role('write_only') %}
+            <div class="icon-box-group home--registraion-wrapper">
+                <div class="home--registration-container">
+                    <h4 class="icon-box__lowhead">{{ _("Complete Registration") }}</h4>
+                    <p class="text-left">{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
+                    <div class="home--registration-button-container">
+                    <a class="icon-box__button icon-box__button--main" href="{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a></div>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+    <br class="clearfix"/>
+    <br/>
+    {{footerHTML("home--footer-container")}}
+</main>
+{% endblock %}
+{% block footer %}
+<!--placeholder-->
+{% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $("body").attr("class", "page-home");
+            $("aside").hide();
+            $(".side-nav-items__item--home").hide();
+            var hc = $(".home--item-container");
+            if (hc.length > 0) {
+                $("#portalScrollArrow").on("click", function() {
+                    var t = $("section.home--items-wrapper").offset().top;
+                    if (parseInt(t) >= 90) {
+                        $('html, body').animate({
+                            scrollTop: t - 90
+                        }, 1000);
+                    };
+                });
+            };
+            if (hc.length == 1) {
+                hc.removeClass("home--item-container").addClass("home--item-container-full");
+            };
+        });
+    </script>
+{% endblock %}
+
+

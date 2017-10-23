@@ -178,15 +178,6 @@ class TestPortal(TestCase):
         rv = self.client.get('/invite/404')
         self.assertEquals(rv.status_code, 404)
 
-    def test_celery_add(self):
-        """Try simply add task handed off to celery"""
-        x = 151
-        y = 99
-        rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'.\
-                          format(x=x, y=y), follow_redirects=True)
-        self.assert200(rv)
-        self.assertEquals(rv.data, str(x + y))
-
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
 

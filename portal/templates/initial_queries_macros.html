@@ -25,7 +25,7 @@
                 <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
                     <i class="fa fa-square-o fa-lg terms-tick-box"></i><span class="default-tou-text terms-tick-box-text">{{_("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.")}}</span>
                     &nbsp;&nbsp;
-                    {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                    {% trans privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true" %}
                     <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}" type="terms" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
                     {% endtrans %}
                 </label>
