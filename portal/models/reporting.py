@@ -1,12 +1,15 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
+from datetime import datetime
 from flask import current_app
+from flask_babel import gettext as _
 
 from ..dogpile import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
 from .procedure_codes import known_treatment_started
 from .procedure_codes import known_treatment_not_started
+from .questionnaire_bank import QuestionnaireBank
 from .role import ROLE
 from .user import User
 
@@ -82,3 +85,78 @@ def get_reporting_stats():
                         stats['encounters'][interv.description].append(st)
 
     return stats
+
+
+def calculate_days_overdue(user):
+    qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
+    if not qb:
+        return 0
+    trigger_date = qb.trigger_date(user)
+    overdue = qb.calculated_overdue(trigger_date)
+    return (datetime.utcnow() - overdue).days if overdue else 0
+
+
+def overdue_stats_by_org():
+    overdue_stats = defaultdict(list)
+    for user in User.query.filter_by(active=True):
+        if user.has_role(ROLE.TEST):
+            continue
+        overdue = calculate_days_overdue(user)
+        if overdue > 0:
+            for org in user.organizations:
+                overdue_stats[org.name].append(overdue)
+    return overdue_stats
+
+
+def generate_overdue_table_html(column_max_dates):
+    column_max_dates.sort()
+    overdue_stats = overdue_stats_by_org()
+
+    title = _(u"Days Overdue")
+    col0_header = _(u"Site")
+    html = u"""
+    <table>
+    <caption>{}</caption>
+    <thead>
+    <tr>
+        <th>{}</th>
+    """.format(title, col0_header)
+
+    curr_min = 0
+    for cmd in column_max_dates:
+        daystr = _(u"Days")
+        rangestr = "{}-{}".format(curr_min + 1, cmd)
+        html += "<th>{} {}</th>\n".format(rangestr, daystr)
+        curr_min = cmd
+    colx_header = _(u"Total")
+    html += u"""
+        <th>{}</th>
+    </tr>
+    </thead>
+    <tbody>
+    """.format(colx_header)
+
+    totals = defaultdict(int)
+    for org, counts in overdue_stats.iteritems():
+        html += u'<tr>\n<td>{}</td>\n'.format(org)
+        curr_min = 0
+        row_total = 0
+        for cmd in column_max_dates:
+            count = len([i for i in counts if ((i > curr_min) and (i <= cmd))])
+            html += "<td>{}</td>\n".format(count)
+            totals[cmd] += count
+            row_total += count
+            curr_min = cmd
+        html += u'<td>{}</td>\n</tr>\n'.format(row_total)
+
+    totalstr = _(u"TOTAL")
+    html += u'<tr>\n<td>{}</td>\n'.format(totalstr)
+    row_total = 0
+    for cmd in column_max_dates:
+        html += "<td>{}</td>\n".format(totals[cmd])
+        row_total += totals[cmd]
+    html += u'<td>{}</td></tr>\n'.format(row_total)
+
+    html += u"</tbody>\n</table>"
+
+    return html
