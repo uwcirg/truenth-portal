@@ -7,6 +7,7 @@ from flask_babel import gettext as _
 from ..dogpile import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
+from .organization import OrgTree
 from .procedure_codes import known_treatment_started
 from .procedure_codes import known_treatment_not_started
 from .questionnaire_bank import QuestionnaireBank
@@ -104,30 +105,29 @@ def overdue_stats_by_org():
         overdue = calculate_days_overdue(user)
         if overdue > 0:
             for org in user.organizations:
-                overdue_stats[org.name].append(overdue)
+                overdue_stats[org].append(overdue)
     return overdue_stats
 
 
-def generate_overdue_table_html(column_max_dates):
-    column_max_dates.sort()
-    overdue_stats = overdue_stats_by_org()
+def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
+    cutoff_days.sort()
 
     title = _(u"Days Overdue")
     col0_header = _(u"Site")
     html = u"""
     <table>
-    <caption>{}</caption>
+    <caption><b>{}</b></caption>
     <thead>
     <tr>
         <th>{}</th>
     """.format(title, col0_header)
 
     curr_min = 0
-    for cmd in column_max_dates:
+    for cd in cutoff_days:
         daystr = _(u"Days")
-        rangestr = "{}-{}".format(curr_min + 1, cmd)
+        rangestr = "{}-{}".format(curr_min + 1, cd)
         html += "<th>{} {}</th>\n".format(rangestr, daystr)
-        curr_min = cmd
+        curr_min = cd
     colx_header = _(u"Total")
     html += u"""
         <th>{}</th>
@@ -136,25 +136,37 @@ def generate_overdue_table_html(column_max_dates):
     <tbody>
     """.format(colx_header)
 
+    ot = OrgTree()
+
     totals = defaultdict(int)
-    for org, counts in overdue_stats.iteritems():
-        html += u'<tr>\n<td>{}</td>\n'.format(org)
+    for org in sorted(overdue_stats, key=lambda x: x.id):
+        if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
+            continue
+        user_accessible = False
+        for user_org in user.organizations:
+            if ot.at_or_below_ids(user_org.id, [org.id]):
+                user_accessible = True
+                break
+        if not user_accessible:
+            continue
+        counts = overdue_stats[org]
+        html += u'<tr>\n<td>{}</td>\n'.format(org.name)
         curr_min = 0
         row_total = 0
-        for cmd in column_max_dates:
-            count = len([i for i in counts if ((i > curr_min) and (i <= cmd))])
+        for cd in cutoff_days:
+            count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
             html += "<td>{}</td>\n".format(count)
-            totals[cmd] += count
+            totals[cd] += count
             row_total += count
-            curr_min = cmd
+            curr_min = cd
         html += u'<td>{}</td>\n</tr>\n'.format(row_total)
 
     totalstr = _(u"TOTAL")
     html += u'<tr>\n<td>{}</td>\n'.format(totalstr)
     row_total = 0
-    for cmd in column_max_dates:
-        html += "<td>{}</td>\n".format(totals[cmd])
-        row_total += totals[cmd]
+    for cd in cutoff_days:
+        html += "<td>{}</td>\n".format(totals[cd])
+        row_total += totals[cd]
     html += u'<td>{}</td></tr>\n'.format(row_total)
 
     html += u"</tbody>\n</table>"
