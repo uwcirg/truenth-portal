@@ -2141,22 +2141,22 @@ var tnthAjax = {
             data: (params.data ? params.data: null),
             timeout: (params.timeout ? params.timeout: 5000) //set default timeout to 5 seconds
         }).done(function(data) {
-        	params.attempts = 0;
-        	if (hasValue(data)) {
-            	if (callback) callback(data);
+            params.attempts = 0;
+            if (hasValue(data)) {
+                if (callback) callback(data);
             } else {
-            	callback({"error": true});
-            }
+                callback({"error": true});
+            };
         }).fail(function(xhr){
-        	if (params.attempts < params.max_attempts) {
+            if (params.attempts < params.max_attempts) {
         		//use closure for scope
         		(function(self, url, method, userId, params, callback) {
-        			setTimeout(function() { self.sendRequest(url, method, userId, params, callback); }, 3000); //retry after 3 seconds
+                    setTimeout(function() { self.sendRequest(url, method, userId, params, callback); }, 3000); //retry after 3 seconds
         		})(self, url, method, userId, params, callback);
         	} else {
-        		params.attempts = 0;
-	            if (callback) callback({"error": true});
-	            self.sendError(xhr, url, userId);
+                params.attempts = 0;
+                if (callback) callback({"error": true});
+                self.sendError(xhr, url, userId);
 	        };
         });
     },
