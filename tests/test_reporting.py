@@ -1,12 +1,17 @@
 """Unit test module for stat reporting"""
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
 from portal.dogpile import dogpile_cache
 from portal.extensions import db
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
-from portal.models.reporting import get_reporting_stats
+from portal.models.questionnaire import Questionnaire
+from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.reporting import get_reporting_stats, overdue_stats_by_org
+from portal.models.reporting import generate_overdue_table_html
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -73,3 +78,76 @@ class TestReporting(TestCase):
 
         # shold not have changed, if still using cached values
         self.assertEqual(len(stats2['encounters']['all']), 5)
+
+    def test_overdue_stats(self):
+        crv = Organization(name='CRV')
+        epic26 = Questionnaire(name='epic26')
+        with SessionScope(db):
+            db.session.add(crv)
+            db.session.add(epic26)
+            db.session.commit()
+        crv, epic26 = map(db.session.merge, (crv, epic26))
+
+        bank = QuestionnaireBank(
+            name='CRV', organization_id=crv.id,
+            start='{"days": 1}',
+            overdue='{"days": 2}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire_id=epic26.id,
+            rank=0)
+        bank.questionnaires.append(qbq)
+
+        self.test_user.organizations.append(crv)
+        self.consent_with_org(org_id=crv.id, backdate=relativedelta(days=18))
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+        crv, self.test_user = map(db.session.merge, (crv, self.test_user))
+
+        ostats = overdue_stats_by_org()
+
+        self.assertEqual(len(ostats), 1)
+        self.assertEqual(ostats[crv], [15])
+
+    def test_overdue_table_html(self):
+        org = Organization(name='testorg')
+        false_org = Organization(name='falseorg')
+
+        user = self.add_user('test_user)')
+
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.add(false_org)
+            user.organizations.append(org)
+            user.organizations.append(false_org)
+            db.session.add(user)
+            db.session.commit()
+        org, false_org, user = map(db.session.merge,
+                                   (org, false_org, user))
+
+        ostats = {org: [1, 8, 9, 11]}
+        cutoffs = [5, 10]
+
+        table1 = generate_overdue_table_html(cutoff_days=cutoffs,
+                                             overdue_stats=ostats,
+                                             user=user,
+                                             top_org=org)
+
+        self.assertTrue('<table>' in table1)
+        self.assertTrue('<th>1-5 Days</th>' in table1)
+        self.assertTrue('<th>6-10 Days</th>' in table1)
+        self.assertTrue('<td>{}</td>'.format(org.name) in table1)
+        self.assertTrue('<td>1</td><td>2</td>' in table1)
+
+        # confirm that the table contains no orgs
+        table2 = generate_overdue_table_html(cutoff_days=cutoffs,
+                                             overdue_stats=ostats,
+                                             user=user,
+                                             top_org=false_org)
+
+        self.assertTrue('<table>' in table2)
+        # org should not show up, as the table's top_org=false_org
+        self.assertFalse('<td>{}</td>'.format(org.name) in table2)
+        # false_org should not show up, as it's not in the ostats
+        self.assertFalse('<td>{}</td>'.format(false_org.name) in table2)
