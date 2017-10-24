@@ -1,0 +1,11 @@
+{% extends 'exercise_diet/layout.html' %}
+
+{% block body %}
+
+    <h2>Exercise</h2>
+
+    {% for asset in assets %}
+        {{ asset|safe }}
+    {% endfor %}
+
+{% endblock %}
