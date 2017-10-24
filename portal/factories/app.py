@@ -14,10 +14,8 @@ from ..config import DefaultConfig
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile import dogpile_cache
-from ..eproms.views import eproms
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
-from ..gil.views import gil
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
@@ -184,8 +182,12 @@ def configure_blueprints(app, blueprints):
     # Load GIL or ePROMs blueprint (which define several of the same request
     # paths and would therefore conflict with one another) depending on config
     if app.config.get('GIL') and not app.config.get('HIDE_GIL'):
+        from ..gil.views import gil
+        from ..exercise_diet.views import exercise_diet
         app.register_blueprint(gil)
+        app.register_blueprint(exercise_diet)
     else:
+        from ..eproms.views import eproms
         app.register_blueprint(eproms)
 
     for blueprint in blueprints:
