@@ -98,3 +98,14 @@ class EmailMessage(db.Model):
     def __str__(self):
         return "EmailMessage subj:{} sent_at:{}".format(
             self.subject, self.sent_at)
+
+    def as_json(self):
+        d = {}
+        d['id'] = self.id
+        d['sender'] = self.sender
+        d['recipients'] = self.recipients
+        d['subject'] = self.subject
+        d['body'] = self.body
+        d['sent_at'] = self.sent_at
+        d['user_id'] = self.user_id
+        return d
