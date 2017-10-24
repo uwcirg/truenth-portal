@@ -22,7 +22,8 @@ from factories.celery import create_celery
 from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
-from .models.communication import Communication
+from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
+from .models.communication import Communication, load_template_args
 from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
 from .models.organization import Organization, OrgTree
@@ -300,19 +301,20 @@ def generate_and_send_summaries(cutoff_days, org):
     if not top_org:
         raise ValueError("No org with name {} found.".format(top_org))
 
+    if top_org:
+        name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
+    else:
+        name_key = SiteSummaryEmail_ATMA.name_key()
+
     for user in User.query.filter_by(deleted_id=None).all():
         if (user.has_role(ROLE.STAFF) and (u'@' in user.email)
                 and (top_org in ot.find_top_level_org(user.organizations))):
             args = load_template_args(user=user)
-            args.days_overdue_table = generate_overdue_table_html(
+            args['eproms_site_summary_table'] = generate_overdue_table_html(
                 cutoff_days=cutoffs,
                 overdue_stats=ostats,
                 user=user,
-                top_org=org)
-            if top_org:
-                name_key = OverdueSummaryEmail_ATMA.name_key(org=top_org.name)
-            else:
-                name_key = OverdueSummaryEmail_ATMA.name_key()
+                top_org=top_org)
             summary_email = MailResource(app_text(name_key), variables=args)
             em = EmailMessage(recipients=user.email,
                               sender=current_app.config['MAIL_DEFAULT_SENDER'],
