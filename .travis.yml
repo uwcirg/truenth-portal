@@ -76,6 +76,12 @@ install:
 script:
   - tox
 
+after_success:
+  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ]; then
+      pip install codacy-coverage ;
+      python-codacy-coverage -r coverage.xml ;
+    fi
+
 before_deploy:
   - ./bin/docker-login.sh
 
