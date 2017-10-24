@@ -1952,6 +1952,7 @@ def get_user_messages(user_id):
 
     messages = []
 
+    # need to cycle through EmailMessages individually for proper validation
     for em in EmailMessage.query.all():
         recips = em.recipients.split()
         if user.email in recips:
