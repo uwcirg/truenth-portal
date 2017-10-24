@@ -132,7 +132,7 @@
 {% block document_ready %}
 
 var AT = new AdminTool({{user.id}});
-var sortObj = AT.getTablePreference({{user.id}}, "patientList", true);
+var sortObj = AT.getTablePreference({{user.id}}, "patientList");
 /*
 * initializing bootstrapTable
 */
@@ -143,8 +143,8 @@ $("#adminTable").bootstrapTable({
       $("#tableCount"+thisId).html(rowInfo);
       return rowInfo;
   },
-  sortName: sortObj?sortObj.sort_field:"id",
-  sortOrder: sortObj?sortObj.sort_order:"desc",
+  sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
+  sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
   filterBy: sortObj,
   exportOptions: {
       fileName: __getExportFileName("PatientList_")
@@ -157,20 +157,26 @@ $(document).ready(function() {
    */
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
-  });
-
-  AT.setTableFilters({{user.id}});
-
-  $("#adminTable").on("sort.bs.table", function(e, name, order) {
-      AT.setTablePreference({{user.id}}, "patientList", name, order);
-  });
-
-  $("#adminTable").on("column-search.bs.table", function(e, name, text) {
+  }).on("sort.bs.table", function(e, name, order) {
+      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
+  }).on("column-search.bs.table", function(e, name, text) {
       //don't set filter preference if there is no resulting data?
       if ($("#adminTable tr[data-index]").length > 0) {
-        AT.setTablePreference({{user.id}}, "patientList");
+        /*
+         * clear org selection(s) in filter list control
+         */
+        $("#userOrgs input[name='organization']").each(function() {
+          $(this).prop("checked", false);
+        });
+
+        setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
       };
   });
+
+  /*
+   * set user's preference for filter(s)
+   */
+   AT.setTableFilters({{user.id}});
 
   /*
    * add placeholder text for filter controls
