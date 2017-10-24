@@ -24,7 +24,10 @@ from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
-from .models.reporting import get_reporting_stats
+from .models.message import EmailMessage
+from .models.organization import Organization, OrgTree
+from .models.reporting import get_reporting_stats, overdue_stats_by_org
+from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
@@ -267,6 +270,55 @@ def send_user_messages(email, force_update=False):
     if force_update:
         message += " after forced update"
     return message
+
+
+@celery.task
+def send_questionnaire_summary(job_id, cutoff_days, org):
+    "Generate and send a summary of questionnaire counts to all Staff in org"
+    try:
+        before = datetime.now()
+        generate_and_send_summaries(cutoff_days, org)
+        duration = datetime.now() - before
+        message = (
+            'Sent summary emails in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+    except Exception as exc:
+        message = ("Unexpected exception in `send_questionnaire_summary` "
+                   "on {} : {}".format(job_id, exc))
+        logger.error(message)
+        logger.error(format_exc())
+    update_current_job(job_id, 'send_questionnaire_summary', status=message)
+    return message
+
+
+def generate_and_send_summaries(cutoff_days, org):
+    ostats = overdue_stats_by_org()
+    cutoffs = [int(i) for i in cutoff_days.split(',')]
+
+    ot = OrgTree()
+    top_org = Organization.query.filter_by(name=org).first()
+    if not top_org:
+        raise ValueError("No org with name {} found.".format(top_org))
+
+    for user in User.query.filter_by(deleted_id=None).all():
+        if (user.has_role(ROLE.STAFF) and (u'@' in user.email)
+                and (top_org in ot.find_top_level_org(user.organizations))):
+            args = load_template_args(user=user)
+            args.days_overdue_table = generate_overdue_table_html(
+                cutoff_days=cutoffs,
+                overdue_stats=ostats,
+                user=user,
+                top_org=org)
+            if top_org:
+                name_key = OverdueSummaryEmail_ATMA.name_key(org=top_org.name)
+            else:
+                name_key = OverdueSummaryEmail_ATMA.name_key()
+            summary_email = MailResource(app_text(name_key), variables=args)
+            em = EmailMessage(recipients=user.email,
+                              sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                              subject=summary_email.subject,
+                              body=summary_email.body)
+            em.send_message()
 
 
 def update_current_job(job_id, func_name, runtime=None, status=None):
