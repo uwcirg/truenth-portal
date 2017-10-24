@@ -2127,7 +2127,10 @@ var tnthAjax = {
     "sendRequest": function(url, method, userId, params, callback) {
         if (!hasValue(url)) return false;
         if (!params) params = {};
+        if (!params.attempts) params.attempts = 0;
+        if (!params.max_attempts) params.max_attempts = 3;
         var self = this;
+        params.attempts++;
         $.ajax ({
             type: hasValue(method) ? method : "GET",
             url: url,
@@ -2135,16 +2138,26 @@ var tnthAjax = {
             dataType: params.dataType? params.dataType: "json",
             cache: (params.cache ? params.cache : false),
             async: (params.sync ? false : true),
-            data: (params.data ? params.data: null)
+            data: (params.data ? params.data: null),
+            timeout: (params.timeout ? params.timeout: 5000) //set default timeout to 5 seconds
         }).done(function(data) {
-        	if (hasValue(data)) {
-            	if (callback) callback(data);
+            params.attempts = 0;
+            if (hasValue(data)) {
+                if (callback) callback(data);
             } else {
-            	callback({"error": true});
-            }
+                callback({"error": true});
+            };
         }).fail(function(xhr){
-            if (callback) callback({"error": true});
-            self.sendError(xhr, url, userId);
+            if (params.attempts < params.max_attempts) {
+        		//use closure for scope
+        		(function(self, url, method, userId, params, callback) {
+                    setTimeout(function() { self.sendRequest(url, method, userId, params, callback); }, 3000); //retry after 3 seconds
+        		})(self, url, method, userId, params, callback);
+        	} else {
+                params.attempts = 0;
+                if (callback) callback({"error": true});
+                self.sendError(xhr, url, userId);
+	        };
         });
     },
     "sendError": function(xhr, url, userId) {
