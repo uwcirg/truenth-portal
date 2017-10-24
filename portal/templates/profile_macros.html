@@ -1742,7 +1742,7 @@
                         }, method);
                     if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
                     else assessment_url += "?entry_method=" + method;
-                    var winLocation = !still_needed ? assessment_url : "{{url_for('portal.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+                    var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
                     $("#manualEntryButtonsContainer").hide();
                     $("#manualEntryLoader").show();
                     setTimeout(function() { window.location = winLocation;}, 100);
