@@ -1778,8 +1778,10 @@ def get_table_preferences(user_id, table_name):
 
     pref = TablePreference.query.filter_by(table_name=table_name,
                                            user_id=user_id).first()
+    # 404 case handled by current_user() or check_role above.  Return
+    # empty list if no preferences yet exist.
     if not pref:
-        abort(404, "no table preferences found for given user & table")
+        return jsonify({})
 
     return jsonify(pref.as_json())
 

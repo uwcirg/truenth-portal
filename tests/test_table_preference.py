@@ -71,3 +71,12 @@ class TestTablePreference(TestCase):
         self.assert200(resp)
         self.assertEquals(resp.json['user_id'], TEST_USER_ID)
         self.assertEquals(resp.json['filters'], filter_json)
+
+    def test_no_preferences(self):
+        self.login()
+        # Prior to saving prefs, should just get a valid empty
+        resp = self.client.get('/api/user/{}/table_preferences/'
+                               'testTable'.format(TEST_USER_ID))
+
+        self.assert200(resp)
+        self.assertEquals(resp.json, {})
