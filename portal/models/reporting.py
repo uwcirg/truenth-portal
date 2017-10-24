@@ -126,7 +126,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     for cd in cutoff_days:
         daystr = _(u"Days")
         rangestr = "{}-{}".format(curr_min + 1, cd)
-        html += "<th>{} {}</th>\n".format(rangestr, daystr)
+        html += "<th>{} {}</th>".format(rangestr, daystr)
         curr_min = cd
     colx_header = _(u"Total")
     html += u"""
@@ -150,25 +150,25 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         if not user_accessible:
             continue
         counts = overdue_stats[org]
-        html += u'<tr>\n<td>{}</td>\n'.format(org.name)
+        html += u'<tr><td>{}</td>'.format(org.name)
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:
             count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
-            html += "<td>{}</td>\n".format(count)
+            html += "<td>{}</td>".format(count)
             totals[cd] += count
             row_total += count
             curr_min = cd
-        html += u'<td>{}</td>\n</tr>\n'.format(row_total)
+        html += u'<td>{}</td></tr>'.format(row_total)
 
     totalstr = _(u"TOTAL")
-    html += u'<tr>\n<td>{}</td>\n'.format(totalstr)
+    html += u'<tr><td>{}</td>'.format(totalstr)
     row_total = 0
     for cd in cutoff_days:
-        html += "<td>{}</td>\n".format(totals[cd])
+        html += "<td>{}</td>".format(totals[cd])
         row_total += totals[cd]
-    html += u'<td>{}</td></tr>\n'.format(row_total)
+    html += u'<td>{}</td></tr>'.format(row_total)
 
-    html += u"</tbody>\n</table>"
+    html += u"</tbody></table>"
 
     return html
