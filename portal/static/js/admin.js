@@ -306,6 +306,10 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                   };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
+              /*
+               * clear pre-set user preference for filtering
+               */
+              AT.setTablePreference(AT.userId, "patientList", null, null, {});
               if (orgsList.length > 0) location.replace("/" + context + "?org_list=" + orgsList.join(","));
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
@@ -428,7 +432,7 @@ AdminTool.prototype.getDefaultTablePreference = function() {
 };
 
 
-AdminTool.prototype.getTablePreference = function(userId, tableName) {
+AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter) {
     var prefData = null, self = this;
     tnthAjax.getTablePreference(userId||self.userId, "patientList", {"sync": true}, function(data) {
       if (data && !data.error) {
@@ -436,7 +440,7 @@ AdminTool.prototype.getTablePreference = function(userId, tableName) {
         self.currentTablePreference = prefData;
       };
       //set filter values
-      self.setTableFilters(userId||self.userId);
+      if (setFilter) self.setTableFilters(userId||self.userId);
     });
     return prefData;
 };
@@ -466,7 +470,8 @@ AdminTool.prototype.setTableFilters = function(userId) {
     }
 };
 
-AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder) {
+
+AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder, filters) {
   if (hasValue(tableName)) {
     var data = {};
     if (hasValue(sortField) && hasValue(sortOrder)) {
@@ -490,15 +495,15 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
 	    	data["sort_order"] = defaultPref.sort_order;
 	    };
     }
-    var filters = {};
+    var __filters = filters || {};
     //get fields
     $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
     	if (hasValue($(this).val())) {
     		var field = $(this).closest("th").attr("data-field");
-    		filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
+    		__filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
     	};
     });
-    data["filters"] = filters;
+    data["filters"] = __filters;
     if (Object.keys(data).length > 0) {
       tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
       this.currentTablePreference = data;
