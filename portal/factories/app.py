@@ -287,7 +287,7 @@ def configure_cache(app):
     requests_cache.install_cache(
         cache_name=app.name,
         backend='redis',
-        expire_after=app.config.get('REQUEST_CACHE_EXPIRE', 10),
+        expire_after=app.config['REQUEST_CACHE_EXPIRE'],
         include_get_headers=True,
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),
