@@ -233,6 +233,25 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
         return "profileSendEmail invite email"
 
 
+class SiteSummaryEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Site Summary Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for Site Summary Email Content
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
+
+        :returns: string for AppText.name field
+
+        """
+        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+            return "site summary email {}".format(kwargs.get('org'))
+        return "site summary email"
+
+
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 
