@@ -385,7 +385,7 @@ def initial_queries():
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
-        return redirect(url_for('portal.landing'))
+        return redirect('/')
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     if request.method == 'POST':
