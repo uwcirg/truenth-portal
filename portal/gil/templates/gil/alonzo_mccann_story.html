@@ -1,0 +1,24 @@
+{% extends "gil/lived_experience_base.html" %}
+{% block title %}{{super()}} {{_("Lived Experience - Alonzo McCann Story")}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+    <main class="main main--story">
+      {{super()}}
+      <div class="page-intro module-wrap module-wrap--story">
+        <div class="module">
+          <div class="accent-heading">
+            {% trans %}Objective N<em>o</em><span class="text-uppercase">2: Lived Experience</span>{% endtrans %}
+          </div>
+          <div class="module__body">
+            <p class="story-title">{{_("ALONZO McCANN")}}</p>
+            <p class="story-text">{{_("A Detroit football coach, preacher, husband and father, Alonzo McCann has dedicated his life to helping others. 9 years after his prostate cancer diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on his path and his own trials in finding the help he needs.")}}</p>
+            <div class="sprout-video-container">
+              <div class="button--video__overlay"></div>
+              <button class="button--teal button--video">{{_("WATCH THE FILM")}}</button>
+              <iframe class='embed-video' src='//videos.sproutvideo.com/embed/d49ad8b51f1fedcf5c/b0bc914cac600697' frameborder='0' allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="630" height="354"></iframe>
+            </div>
+          </div>
+        </div>
+     </div>
+    </main>
+{% endblock %}

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
-    <link rel="stylesheet" href="{{config.PORTAL_STYLESHEET}}">
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/eproms.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -132,11 +132,7 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
- __i18next.init({
-  "debug": false, 
-  "initImmediate": false,
-  "ns": ["translation", "custom"]
-  });
+ __i18next.init({"debug": false, "initImmediate": true});
 
 $("#homeFooter .logo-link").each(function() {
   if (! hasValue($.trim($(this).attr("href")))) {

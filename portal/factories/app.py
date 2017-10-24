@@ -14,8 +14,10 @@ from ..config import DefaultConfig
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile import dogpile_cache
+from ..eproms.views import eproms
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
+from ..gil.views import gil
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
@@ -33,7 +35,7 @@ from ..views.intervention import intervention_api
 from ..views.patient import patient_api
 from ..views.patients import patients
 from ..views.procedure import procedure_api
-from ..views.portal import portal, page_not_found, server_error
+from ..views.portal import portal
 from ..views.organization import org_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.tou import tou_api
@@ -78,7 +80,6 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_csrf(app)
     configure_dogpile(app)
     configure_jinja(app)
-    configure_error_handlers(app)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
@@ -137,12 +138,6 @@ def configure_jinja(app):
     app.jinja_env.globals.update(ROLE=ROLE)
 
 
-def configure_error_handlers(app):
-    if not app.debug:
-        app.register_error_handler(404, page_not_found)
-        app.register_error_handler(500, server_error)
-
-
 def configure_extensions(app):
     """Bind extensions to application"""
     # flask-sqlalchemy - the ORM / DB used
@@ -186,6 +181,13 @@ def configure_extensions(app):
 
 def configure_blueprints(app, blueprints):
     """Register blueprints with application"""
+    # Load GIL or ePROMs blueprint (which define several of the same request
+    # paths and would therefore conflict with one another) depending on config
+    if app.config.get('GIL') and not app.config.get('HIDE_GIL'):
+        app.register_blueprint(gil)
+    else:
+        app.register_blueprint(eproms)
+
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 

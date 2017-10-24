@@ -36,6 +36,21 @@ def time_request(url):
     return response
 
 
+def get_terms(org=None, role=None):
+    """Shortcut to lookup correct terms given org and role"""
+    if org:
+        try:
+            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.
+                                               name_key(organization=org, role=role)))
+        except UndefinedAppText:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    return terms
+
+
 class AppText(db.Model):
     """Model representing application specific strings for customization
 

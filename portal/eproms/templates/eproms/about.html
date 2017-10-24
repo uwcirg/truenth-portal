@@ -1,0 +1,24 @@
+{% extends "eproms/base.html" %}
+{% from "flask_user/_macros.html" import back_btn, footer %}
+{% block main %}
+  {{ back_btn(PORTAL, _('Home')) }}
+
+  <h3 class="tnth-headline">{{ _("About TrueNTH") }}</h3>
+
+  <div id="aboutTruenthContainer"><p>{{ about_tnth|safe }}</p></div>
+  {% if config.metadata.version %}
+  <br />
+    {% if config.metadata.git_hash %}
+    <div class="pull-right text-muted smaller-text">TrueNTH Version: <a target="_blank" href="https://github.com/uwcirg/true_nth_usa_portal/commit/{{ config.metadata.git_hash }}" >{{ config.metadata.version }}</a></div>
+    {% else %}
+    <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
+{% block additional_scripts %}
+{% if about_tnth_editorUrl %}<script>appendLREditContainer($("#aboutTruenthContainer"), "{{about_tnth_editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>{% endif %}
+{% endblock %}
+

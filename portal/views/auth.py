@@ -109,7 +109,7 @@ def capture_next_view_function(real_function):
 
         """
         if current_user() and not current_user().has_role(ROLE.WRITE_ONLY):
-            return redirect(url_for('portal.home'))
+            return redirect('/home')
 
         if request.args.get('next'):
             session['next'] = request.args.get('next')
@@ -148,7 +148,7 @@ def next_after_login():
     user = current_user()
     if not user:
         current_app.logger.debug("next_after_login: [no user] -> landing")
-        return redirect(url_for('portal.landing'))
+        return redirect('/')
 
     # Logged in - take care of pending actions
     if 'challenge_verified_user_id' in session:
@@ -217,7 +217,7 @@ def next_after_login():
     else:
         # No better place to go, send user home
         current_app.logger.debug("next_after_login: [no state] -> home")
-        resp = redirect(url_for('portal.home'))
+        resp = redirect('/home')
 
     # make cookie max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5
@@ -312,7 +312,7 @@ def login(provider_name):
         if result.error:
             if isinstance(result.error, CancellationError):
                 current_app.logger.info("User canceled IdP auth - send home")
-                return redirect(url_for('portal.landing'))
+                return redirect('/')
 
             reload_count = session.get('force_reload_count', 0)
             if reload_count > 2:

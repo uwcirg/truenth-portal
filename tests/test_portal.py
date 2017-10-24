@@ -7,7 +7,9 @@ from swagger_spec_validator import validate_spec_url
 import tempfile
 import urllib
 
+from portal.config import TestConfig
 from portal.extensions import db
+from portal.factories.app import create_app
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.organization import Organization
 from portal.models.role import ROLE
@@ -18,7 +20,6 @@ from tests import TestCase, TEST_USER_ID
 
 class TestPortal(TestCase):
     """Portal view tests"""
-
     def test_card_html(self):
         """Interventions can customize the button text """
         client = self.add_client()
@@ -178,15 +179,6 @@ class TestPortal(TestCase):
         rv = self.client.get('/invite/404')
         self.assertEquals(rv.status_code, 404)
 
-    def test_celery_add(self):
-        """Try simply add task handed off to celery"""
-        x = 151
-        y = 99
-        rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'.\
-                          format(x=x, y=y), follow_redirects=True)
-        self.assert200(rv)
-        self.assertEquals(rv.data, str(x + y))
-
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
 
@@ -233,6 +225,17 @@ class TestPortal(TestCase):
         self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
         rv2 = self.client.get('/api/settings/bad_value')
         self.assertEquals(rv2.status_code, 400)
+
+
+class TestPortalEproms(TestCase):
+    """Portal views depending on eproms blueprint"""
+
+    def create_app(self):
+        """Overload base version to hide the GIL (allows registration of eproms)"""
+        tc = TestConfig()
+        setattr(tc, 'HIDE_GIL', True)
+        self._app = create_app(tc)
+        return self._app
 
     def test_redirect_validation(self):
         self.promote_user(role_name=ROLE.ADMIN)

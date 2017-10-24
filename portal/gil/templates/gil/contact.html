@@ -1,0 +1,159 @@
+{% extends "gil/base.html" %}
+{% block title %}{{_("Contact")}} {{super()}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+    <main class="main">
+      {{super()}}
+       {% block header %}
+        <header class="header header--white {%if user%}no-banner{%endif%}">
+          <div class="header__menu">
+            <a class="menu button button--small button--white js-nav-menu-toggle">
+                <figure></figure><span>{{_("Menu")}}</span>
+            </a>
+          </div>
+          <a class="logo" href="/"></a>
+          {% if not user %}
+            <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
+          {% endif %}
+        </header>
+      {% endblock %}
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('.static', filename='img/Contact-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">{{_("Contact Us")}}</h1>
+          <p class="page-intro__sub">{{_("Please connect with us, ask questions, share your story, and make suggestions for how we can do better.")}}</p>
+          <div class="button-callout">
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown">
+        <div class="module">
+          <div class="contact-form-wrap">
+            <div class="accent-heading">{% trans %}Objective N<em>o</em>1: TrueNTH Community{% endtrans %}</div>
+            <h3 class="module__heading">{{_("Contact Form")}}</h3>
+            <p class="module__body">{{_("Use this form to get in touch with TrueNTH USA.")}}</p>
+            <form id="contactForm" class="module__form" action="" method="post">
+              <input type="hidden" name="sendername" id="sendername" value="" />
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <div class="field-group field-group__half">
+                <div class="field field__text">
+                  <label>{{_("First Name")}}</label>
+                  <input class="field__input input-first-name" type="text" placeholder="{{_('First Name')}}" id="first-name" name="first-name" maxlength="125"/>
+                </div>
+                <div class="field field__text">
+                  <label>{{_("Last Name")}}</label>
+                  <input class="field__input input-last-name" type="text" placeholder="{{_('Last Name')}}" id="last-name" name="last-name" maxlength="125"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__text">
+                  <label>{{_("Your Email")}}</label>
+                  <input class="field__input input-email" type="email" placeholder="{{_('Email Address')}}" id="email" name="email"/>
+                </div>
+              </div>
+              {% if types|length > 0 %}
+                <div class="field-group">
+                  <div class="field field__select">
+                    <label>{{_("Enquiry Type")}}</label>
+                    <select id="type" name="type" class="field__select">
+                      {% for type in types %}
+                      <option value="{{ type[1] }}">{{ type[0] }}</option>
+                      {% endfor %}
+                      <option value="{{ config.CONTACT_SENDTO_EMAIL }}" selected>{{_("Other")}}</option>
+                    </select>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="field-group">
+                <div class="field field__text">
+                  <label>{{_("Subject")}}</label>
+                  <input class="field__input input-email" type="text" placeholder="{{_('Subject')}}" id="subject" name="subject" maxlength="200"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__textarea">
+                  <label class="field__label">{{_("Message")}}</label>
+                  <textarea class="field__textarea" id="body" name="body"></textarea>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__select">
+                  <label class="field__label">{{_("About You")}}</label>
+                  <select id="about" name="about" class="field__select">
+                    <option value="">{{_("Select")}}</option>
+                    <option value="I've been diagnosed with prostate cancer">{{_("I've been diagnosed with prostate cancer")}}</option>
+                    <option value="I want to learn more about prostate cancer">{{_("I want to learn more about prostate cancer")}}</option>
+                  </select>
+                </div>
+              </div>
+              {% if not user and config.RECAPTCHA_SITE_KEY and config.RECAPTCHA_SECRET_KEY %}
+              <div class="field-group">
+                {{ recaptcha }}
+              </div>
+              {% endif %}
+              <div class="post-contact-response response-message error-message"></div>
+              <div class="field-group contact-buttons-group">
+                <div class="button-wrap button-wrap--centered"><div class="contact-loading-indicator loading-message-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div><a id="submitButton" class="icon-box__button icon-box__button--main"><span>{{_("Submit")}}<figure></figure></span></a></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+  <script>
+      $(document).ready(function(){
+
+        $("#first-name, #last-name").each(function() {
+            $(this).on("blur", function() {
+                var name = $("#first-name").val();
+                name += (name != "" ? " " : "") + $("#last-name").val();
+                $("#sendername").val(name.trim());
+            });
+        });
+        $("#submitButton").on("click", function(e) {
+            e.preventDefault();
+            var formData = {};
+            $("#contactForm").find("input, select, textarea, type").each(function() {
+                formData[$(this).attr("name")] = $(this).val() || $(this).text();
+            });
+
+            if (hasValue(formData.sendername) && hasValue(formData.body) && hasValue(formData.email)) {
+
+              var self = $(this), loadingIndicator = $(".contact-loading-indicator");
+
+              self.hide();
+              loadingIndicator.show();
+
+              $.ajax({
+                  data: formData,
+                  type: 'POST',
+                  url: '/contact',
+                  dataType: 'json',
+                  success: function(response) {
+                      var msgid = response['msgid'];
+                      $('#contactForm .post-contact-response').html("");
+                      setTimeout(function() {
+                        self.show();
+                        loadingIndicator.hide();
+                        document.location = '/contact/' + String(msgid);
+                      }, 1000);
+
+                  },
+                  error: function(response) {
+                      var msg = $('<div></div>').html(response.responseText);
+                      var error = $('p', msg).text()
+                      $('#contactForm .post-contact-response').html(error);
+                      self.show();
+                      loadingIndicator.hide();
+                  }
+              });
+          } else {
+              $('#contactForm .post-contact-response').html('{{ _("Please confirm all fields are filled.") }}');
+          };
+        });
+        setSelectedNavItem($(".side-nav-items__item--contact"));
+      });
+  </script>
+{% endblock %}

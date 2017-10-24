@@ -41,14 +41,19 @@ FIRST_NAME = u'\u2713'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
+# import hidden relation classes needed to create database
+from portal.models.communication_request import CommunicationRequest
+CommunicationRequest
+
+
 class TestCase(Base):
     """Base TestClass for application."""
 
     def create_app(self):
         """Create and return a testing flask app."""
 
-        self.__app = create_app(TestConfig)
-        return self.__app
+        self._app = create_app(TestConfig)
+        return self._app
 
     def init_data(self):
         """Push minimal test data in test database"""
@@ -278,7 +283,7 @@ class TestCase(Base):
             db.session.commit()
         self.init_data()
 
-        self.client = self.__app.test_client()
+        self.client = self._app.test_client()
 
         # removed unwanted config items if present
         for item in ('REQUIRED_CORE_DATA', 'LOCALIZED_AFFILIATE_ORG'):
