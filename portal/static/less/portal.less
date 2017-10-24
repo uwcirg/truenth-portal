@@ -268,6 +268,76 @@ a.btn {
     text-align: left;
 }
 
+/* Accordion styles */
+.tabs-container {
+  .tab {
+    position: relative;
+    margin-bottom: 1px;
+    width: 100%;
+    overflow: hidden;
+  }
+  input.tab-input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+  }
+  label.tab-label {
+    position: relative;
+    display: block;
+    padding: 0 0.5em 0 2.5em;
+    background: #79818a;
+    color: #fff;
+    font-weight: normal;
+    line-height: 3;
+    cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+  }
+  label.tab-label:hover {
+    background-color: @linkHover;
+  }
+  .tab-content {
+    max-height: 0;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    -webkit-transition: max-height .35s;
+    -o-transition: max-height .35s;
+    transition: max-height .35s;
+  }
+  /* :checked */
+  input.tab-input:checked ~ .tab-content {
+    max-height: 20em;
+    margin: 1em auto;
+    padding: 0.5em;
+    border: 1px solid #c3c0c0;
+  }
+  /* Icon */
+  label.tab-label::after {
+    position: absolute;
+    /*right: 0;*/
+    left: 0;
+    top: 0;
+    display: block;
+    width: 3em;
+    height: 3em;
+    line-height: 3;
+    text-align: center;
+    -webkit-transition: all .35s;
+    -o-transition: all .35s;
+    transition: all .35s;
+  }
+  input.tab-input + label.tab-label::after {
+    content: "\25BC";
+  }
+  input.tab-input:checked + label.tab-label::after {
+    transform: rotateX(180deg);
+  }
+}
+
+
+
 #regForm input,
 #loginForm input
 {

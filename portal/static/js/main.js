@@ -3216,7 +3216,21 @@ var tnthAjax = {
                 if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
-    }, 
+    },
+    "emailLog": function(userId, callback) {
+        if (!userId) return false;
+        this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
+           if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    },
     "auditLog": function(userId, callback) {
     	if (!hasValue(userId)) return false;
     	this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {
