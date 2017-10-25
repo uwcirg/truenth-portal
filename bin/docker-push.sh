@@ -44,8 +44,6 @@ DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
 
 get_configured_registries | while read config ; do
     repo="$(echo "$config" | cut --delimiter ' ' --fields 1)"
-    username="$(echo "$config" | cut --delimiter ' ' --fields 2)"
-    api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
     # Apply all tags in DOCKER_TAGS to image
     echo "$DOCKER_TAGS" | while read tag ; do
