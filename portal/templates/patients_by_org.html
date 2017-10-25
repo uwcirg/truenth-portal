@@ -160,17 +160,14 @@ $(document).ready(function() {
   }).on("sort.bs.table", function(e, name, order) {
       setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
   }).on("column-search.bs.table", function(e, name, text) {
-      //don't set filter preference if there is no resulting data?
-      if ($("#adminTable tr[data-index]").length > 0) {
-        /*
-         * clear org selection(s) in filter list control
-         */
-        $("#userOrgs input[name='organization']").each(function() {
-          $(this).prop("checked", false);
-        });
+      /*
+       * clear org selection(s) in filter list control
+       */
+      $("#userOrgs input[name='organization']").each(function() {
+        $(this).prop("checked", false);
+      });
 
-        setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
-      };
+      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
   });
 
   /*
