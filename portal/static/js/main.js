@@ -1256,11 +1256,44 @@ var fillContent = {
             });
         };
     },
-    "emailLog": function(data) {
+    "emailContent": function(userId, messageId) {
+        tnthAjax.emailLog(userId, function(data) {
+            if (data.messages) {
+                (data.messages).forEach(function(item) {
+                    if (item.id == messageId) {
+                        $("#emailBodyModal .body-content").html(item.body);
+                        /*
+                         * email content contains clickable link/button - need to prevent click event of those from being triggered
+                         */
+                        $("#emailBodyModal .body-content a").each(function() {
+                          $(this).on("click", function(e) {
+                              e.preventDefault();
+                              return false;
+                          });
+                        });
+                        /*
+                         * need to remove inline style specifications - as they can be applied globally and override the classes specified in stylesheet
+                         */
+                        $("#emailBodyModal .body-content style").remove();
+                        $("#emailBodyModal .body-content a.btn").addClass("btn-tnth-primary");
+                        $("#emailBodyModal .body-content td.btn, #emailBodyModal .body-content td.btn a").addClass("btn-tnth-primary").removeAttr("width").removeAttr("style");
+                        /*
+                         * remove inline style in email body
+                         * style here is already applied via css
+                         */
+                        $("#emailBodyModal").modal("show");
+                        return true;
+                    };
+                });
+            };
+        });
+    },
+    "emailLog": function(userId, data) {
         if (!data.error) {
             if (data.messages && data.messages.length > 0) {
                 (data.messages).forEach(function(item) {
                     item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
                 });
                 $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
                 $('#profileEmailLogTable').bootstrapTable( {
@@ -1302,7 +1335,7 @@ var fillContent = {
                         }
                     ]
                 });
-                setTimeout(function() { $("#lbEmailLog").trigger("click"); }, 100);
+                setTimeout(function() { $("#lbEmailLog").addClass("active").trigger("click"); }, 100);
             } else {
                 $("#emailLogContent").html("<span class='text-muted'>" + i18next.t('No audit entry found.') + "</span>");
             };

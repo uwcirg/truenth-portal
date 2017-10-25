@@ -390,6 +390,7 @@
         <div id="profileEmailErrorMessage" class="text-danger"></div>
     </div>
     <script>$(function () {
+        $("#lbStaffRegEmail").addClass("active").trigger("click");
         function getAccessUrl() {
             var url = '';
             tnthAjax.accessUrl( $("#_userId").val(), true, function(data) {
@@ -462,21 +463,114 @@
      });</script>
     {%- endif -%}
 {%- endmacro %}
+{% macro profileCommunications(person, current_user) -%}
+    {%- if person and person.has_role(ROLE.PATIENT) -%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div id="communicationsContainer" class="tabs-container">
+                        <div class="tab">
+                          <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
+                          <div class="tab-content">
+                           {{resetPassword(person)}}
+                          </div>
+                        </div>
+                        {%- if not config.CUSTOM_PATIENT_DETAIL -%}
+                        <div class="tab">
+                          <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label for="tab-two" class="tab-label">{{_("Send registration email to patient")}}</label>
+                          <div class="tab-content">
+                            <div id="registrationEmailContainer">{{profileSendEmail(person, invite_email)}}</div>
+                          </div>
+                        </div>
+                        {%- endif %}
+                        {% if current_user and (current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
+                         <div class="tab">
+                          <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
+                          <div class="tab-content">
+                            {{profileEmailLog(person)}}
+                          </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
+                        <div id="communicationsContainer" class="tabs-container">
+                            <div class="tab">
+                                <input id="tab-four" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
+                                <label for="tab-four" class="tab-label">{{_("Send reset password email to user")}}</label>
+                                <div class="tab-content">
+                                    {{resetPassword(person)}}
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input id="tab-five" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
+                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label">{{_("Send registration email to user")}}</label>
+                                <div class="tab-content">
+                                    {{profileStaffRegistrationEmail(person)}}
+                                </div>
+                            </div>
+                        </div>
+                    {%- else -%}
+                        <div class="flex">
+                            <div id="resetPasswordContainer" class="flex-item">
+                                <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
+                                {{resetPassword(person)}}
+                            </div>
+                        </div>
+                    {%- endif -%}
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+    <script>
+        $(function() {
+            $("#communicationsContainer .tab-label").on("click", function() {
+              $("#communicationsContainer .tab-label").removeClass("active");
+              $(this).addClass("active");
+            });
+        });
+    </script>
+{%- endmacro %}
 {% macro profileEmailLog(person) -%}
     <div id="emailLogContainer">
         <div id="emailLogContent"></div>
         <div id="emailLogMessage" class="error-message"></div>
     </div>
+    <div class="modal fade" id="emailBodyModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <div class="modal-header-title">{{ _("Email Message Content") }}</div>
+            </div>
+            <div class="modal-body">
+                <div class="body-content"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+            </div>
+          </div>
+        </div>
+    </div>
     <script>
-        $(function() {
-            $("#communicationsContainer .tab-label").on("click", function() {
-                $("#communicationsContainer .tab-label").removeClass("active");
-                $(this).addClass("active");
+        {% if person %}
+            $(function() {
+                $("#emailBodyModal").modal({"show": false});
+                    tnthAjax.emailLog({{person.id}}, function(data) {setTimeout(function() { fillContent.emailLog({{person.id}}, data);}, 100);
+                });
             });
-            tnthAjax.emailLog({{person.id}}, function(data) {
-                setTimeout(function() { fillContent.emailLog(data);}, 100);
-            });
-        });
+        {% endif %}
     </script>
 {%- endmacro %}
 
@@ -2018,59 +2112,9 @@
             </div>
         </div>
     {%- endif %}
-    {%- if person and person.has_role(ROLE.PATIENT) -%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    <div id="communicationsContainer" class="tabs-container">
-                        <div class="tab">
-                          <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
-                          <div class="tab-content">
-                           {{resetPassword(person)}}
-                          </div>
-                        </div>
-                        {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                        <div class="tab">
-                          <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label for="tab-two" class="tab-label">{{_("Send registration email to patient")}}</label>
-                          <div class="tab-content">
-                            <div id="registrationEmailContainer">{{profileSendEmail(person, invite_email)}}</div>
-                          </div>
-                        </div>
-                        {%- endif %}
-                        {% if current_user and (current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
-                         <div class="tab">
-                          <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
-                          <div class="tab-content">
-                            {{profileEmailLog(person)}}
-                          </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    <div class="flex">
-                        <div id="resetPasswordContainer" class="flex-item">
-                            <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
-                            {{resetPassword(person)}}
-                        </div>
-                        {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
-                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileStaffRegistrationEmail(person)}}</div>
-                        {%- endif -%}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {%- endif -%}
+
+    {{profileCommunications(person, current_user)}}
+
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">

@@ -214,6 +214,8 @@ a.btn {
 }
 .btn a {
   text-decoration: none;
+  word-break: break-word;
+  white-space: normal;
 }
 .btn-tnth-back {
   color: #777;
@@ -323,6 +325,9 @@ select:not([multiple]) {
   label.tab-label:hover {
     color: @linkHover;
   }
+  label.tab-label.active {
+    font-weight: 500
+  }
   .tab-content {
     max-height: 0;
     overflow: auto;
@@ -360,6 +365,9 @@ select:not([multiple]) {
   input.tab-input:checked + label.tab-label::after {
     transform: rotateX(180deg);
   }
+}
+#mainDiv.profile .tabs-container {
+  margin-bottom: 1.5em;
 }
 .form-control {
   height: @inputHeight;
@@ -2279,6 +2287,10 @@ input.clinic {
 }
 #manualEntryModal .modal-title {
   margin: 0.2em;
+}
+#emailBodyModal .body-content {
+  overflow: hidden;
+  font-size: @mediumText;
 }
 .hide {
   display: none;

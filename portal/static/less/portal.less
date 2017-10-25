@@ -167,6 +167,8 @@ a.btn {
 }
 .btn a {
   text-decoration: none;
+  word-break: break-word;
+  white-space: normal;
 }
 .tnth-hide {
   display: none;
@@ -292,10 +294,14 @@ a.btn {
     cursor: pointer;
     width: 100%;
     max-width: 100%;
+    font-weight: normal;
   }
   label.tab-label.active,
   label.tab-label:hover {
     color: @linkHover;
+  }
+  label.tab-label.active {
+    font-weight: 500
   }
   .tab-content {
     max-height: 0;
@@ -335,9 +341,9 @@ a.btn {
     transform: rotateX(180deg);
   }
 }
-
-
-
+#mainDiv.profile .tabs-container {
+  margin-bottom: 1.5em;
+}
 #regForm input,
 #loginForm input
 {
@@ -2257,6 +2263,10 @@ div.noOrg-container {
 .modal button,
 .modal a.btn {
   font-size: @baseMobileFontSize;
+}
+#emailBodyModal .body-content {
+  overflow: hidden;
+  font-size: @mediumText;
 }
 .hide {
   display: none;
