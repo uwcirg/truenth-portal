@@ -167,6 +167,8 @@ a.btn {
 }
 .btn a {
   text-decoration: none;
+  word-break: break-word;
+  white-space: normal;
 }
 .tnth-hide {
   display: none;
@@ -268,6 +270,80 @@ a.btn {
     text-align: left;
 }
 
+/* Accordion styles */
+.tabs-container {
+  .tab {
+    position: relative;
+    margin-bottom: 1px;
+    width: 100%;
+    overflow: hidden;
+  }
+  input.tab-input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+  }
+  label.tab-label {
+    position: relative;
+    display: block;
+    padding: 0 0.5em 0 2.5em;
+    color: #777777;
+    border: 1px solid #b8babb;
+    font-weight: normal;
+    line-height: 3;
+    cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+    font-weight: normal;
+  }
+  label.tab-label.active,
+  label.tab-label:hover {
+    color: @linkHover;
+  }
+  label.tab-label.active {
+    font-weight: 500
+  }
+  .tab-content {
+    max-height: 0;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    -webkit-transition: max-height .35s;
+    -o-transition: max-height .35s;
+    transition: max-height .35s;
+  }
+  /* :checked */
+  input.tab-input:checked ~ .tab-content {
+    max-height: 20em;
+    margin: 1em auto;
+    padding: 0.5em;
+    border: 1px solid #e4dfdf;
+  }
+  /* Icon */
+  label.tab-label::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 3em;
+    height: 3em;
+    line-height: 3;
+    text-align: center;
+    -webkit-transition: all .35s;
+    -o-transition: all .35s;
+    transition: all .35s;
+  }
+  input.tab-input + label.tab-label::after {
+    content: "\25BC";
+  }
+  input.tab-input:checked + label.tab-label::after {
+    transform: rotateX(180deg);
+  }
+}
+#mainDiv.profile .tabs-container {
+  margin-bottom: 1.5em;
+}
 #regForm input,
 #loginForm input
 {
@@ -589,6 +665,8 @@ div.right-panel {
     height: 6em;
     line-height: 58px;
     background-color: #FFF;
+    background: -moz-linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
+    background: -webkit-linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
     background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
     border-bottom: 1px solid #FBFBFA;
     border-top: 1px solid rgba(203, 210, 217, 0.2);
@@ -673,6 +751,14 @@ div.right-panel {
   }
 }
 
+.bootstrap-table {
+  .pull-right {
+    .btn {
+      padding: 0.45em 0.8em;
+    }
+  }
+}
+
 div.columns {
    top: 4px;
 }
@@ -684,17 +770,25 @@ div.pull-right {
     width: 100%;
     max-width: 100%;
     padding: 0 0.2em;
+
+    button {
+      padding: 0.75em !important;
+    }
   }
   div.pull-right.search {
     width: 50%;
     float: left !important;
     max-width: 100%;
   }
+  .search .form-control {
+     height: 3em !important;
+  }
 }
 
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+
   div.card-view {
     display: flex;
   }
@@ -703,6 +797,8 @@ div.pull-right {
     color: @linkHover;
   }
   TH {
+    background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
+    background-image: -webkit-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
@@ -1405,6 +1501,8 @@ div.pull-right {
 }
 .profile-item-container {
   background-color: #EFF5F3;
+  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%) ;
   padding: 2em;
   margin: 0.5em auto;
@@ -1441,9 +1539,7 @@ div.pull-right {
   TH {
     background-color: @rowBackgroundColor;
     color: #FFF;
-    padding: 0.25em 0.5em;
     font-weight: normal;
-    vertical-align: top;
   }
   tr:hover {
     background-color: @rowHoverBgColor;
@@ -1843,6 +1939,8 @@ div.noOrg-container {
   width: 100%;
   max-width: 100%;
   border: solid 2px #F1F1F1;
+  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
 }
 #createProfileForm[data-account='patient'] #bdGroup {
@@ -2080,10 +2178,12 @@ div.noOrg-container {
 }
 .pagination-detail {
   font-size: @mediumText;
+  button.dropdown-toggle {
+    padding: 0.4em 0.6em;
+  }
 }
 
 .pagination {
-
   >.active>a {
     background-color: @featureBtnBgColor;
     border-color: @featureBtnBgColor;
@@ -2108,9 +2208,6 @@ div.noOrg-container {
     background-color: @linkHover;
     border-color: @linkHover;
   }
-}
-
-.pagination {
   >li>a {
     color: @btnColor;
   }
@@ -2174,6 +2271,10 @@ div.noOrg-container {
 .modal button,
 .modal a.btn {
   font-size: @baseMobileFontSize;
+}
+#emailBodyModal .body-content {
+  overflow: hidden;
+  font-size: @mediumText;
 }
 .hide {
   display: none;
@@ -2295,8 +2396,7 @@ color: @labelColor
     background-color: @rowBackgroundColor;
     color: #FFF;
     font-weight: normal;
-    padding-left: 0.6em;
-    padding-right: 0.6em;
+    padding: 8px;
   }
 }
 #identityVerificationContainer {
@@ -2434,6 +2534,8 @@ div.timezone-warning.text-warning {
   text-transform: capitalize
 }
 .gradient {
+  background-image: -moz-linear-gradient(to top right, #FFF, #e1e2e1);
+  background-image: -webkit-linear-gradient(to top right, #FFF, #e1e2e1);
   background-image: linear-gradient(to top right, #FFF, #e1e2e1);
 }
 /** Responsive sizes **/
@@ -2539,7 +2641,7 @@ div.timezone-warning.text-warning {
   }
   .fixed-table-container thead th,
   .fixed-table-container thead th .both {
-    font-size: @baseFontSize*0.95;
+    font-size: @baseFontSize*0.98;
   }
 
   .tnth-form .form-group > label {
@@ -2624,9 +2726,6 @@ div.timezone-warning.text-warning {
   }
   div.pull-right {
   top: 0;
-  }
-  .search .form-control {
-    height: 3em;
   }
 
   #adminTable {

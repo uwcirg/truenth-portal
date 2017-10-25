@@ -1227,10 +1227,10 @@ var fillContent = {
                         var o = ($(this).attr("data-tou-type")).split(",");
                         o.forEach(function(item) {
                             arrTypes.push(item);
-                        }); 
+                        });
                     });
                 };
-                
+
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
@@ -1254,6 +1254,93 @@ var fillContent = {
                     };
                 };
             });
+        };
+    },
+    "emailContent": function(userId, messageId) {
+        tnthAjax.emailLog(userId, function(data) {
+            if (data.messages) {
+                (data.messages).forEach(function(item) {
+                    if (item.id == messageId) {
+                        $("#emailBodyModal .body-content").html(item.body);
+                        /*
+                         * email content contains clickable link/button - need to prevent click event of those from being triggered
+                         */
+                        $("#emailBodyModal .body-content a").each(function() {
+                          $(this).on("click", function(e) {
+                              e.preventDefault();
+                              return false;
+                          });
+                        });
+                        /*
+                         * need to remove inline style specifications - as they can be applied globally and override the classes specified in stylesheet
+                         */
+                        $("#emailBodyModal .body-content style").remove();
+                        $("#emailBodyModal .body-content a.btn").addClass("btn-tnth-primary");
+                        $("#emailBodyModal .body-content td.btn, #emailBodyModal .body-content td.btn a").addClass("btn-tnth-primary").removeAttr("width").removeAttr("style");
+                        /*
+                         * remove inline style in email body
+                         * style here is already applied via css
+                         */
+                        $("#emailBodyModal").modal("show");
+                        return true;
+                    };
+                });
+            };
+        });
+    },
+    "emailLog": function(userId, data) {
+        if (!data.error) {
+            if (data.messages && data.messages.length > 0) {
+                (data.messages).forEach(function(item) {
+                    item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
+                });
+                $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
+                $('#profileEmailLogTable').bootstrapTable( {
+                    data: data.messages,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: 'table table-responsive profile-email-log',
+                    sortName: 'sent_at',
+                    sortOrder: 'desc',
+                    search: true,
+                    smartDisplay: true,
+                    showColumns: true,
+                    toolbar: "#emailLogTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                          };
+                    },
+                    undefinedText: '--',
+                    columns: [
+                        {
+                            field: 'sent_at',
+                            title: i18next.t("Date (GMT), Y-M-D"),
+                            searchable: true,
+                            sortable: true
+                        },
+                        {
+                            field: 'subject',
+                            title: i18next.t("Subject"),
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: 'recipients',
+                            title: i18next.t("Email"),
+                            sortable: true,
+                            searchable: true,
+                            width: '20%'
+                        }
+                    ]
+                });
+                setTimeout(function() { $("#lbEmailLog").addClass("active").trigger("click"); }, 100);
+            } else {
+                $("#emailLogContent").html("<span class='text-muted'>" + i18next.t('No audit entry found.') + "</span>");
+            };
+        } else {
+            $("#emailLogMessage").text(data.error);
         };
     }
 };
@@ -3229,7 +3316,21 @@ var tnthAjax = {
                 if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
-    }, 
+    },
+    "emailLog": function(userId, callback) {
+        if (!userId) return false;
+        this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
+           if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    },
     "auditLog": function(userId, callback) {
     	if (!hasValue(userId)) return false;
     	this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {
