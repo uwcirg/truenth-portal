@@ -40,13 +40,14 @@
                    class="stats-table table table-striped table-hover table-condensed"
                    data-table-id="usageStatsTable"
                    data-toolbar="#usageStatsTableToolbar"
+                   data-filter-control="true"
                    data-smart-display="true"
                    data-show-export="true"
                    data-export-data-type="all"
                    data-show-columns="true">
                 <thead>
                 <tr>
-                    <th data-field="usage_type" data-sortable="true">{{_("Type")}}</th>
+                    <th data-field="usage_type" data-sortable="true" data-filter-control="select">{{_("Source")}}</th>
                     <th data-field="today" data-sortable="true">{{ _("Today") }}</th>
                     <th data-field="current_month" data-sortable="true">{{ _("This Month") }}</th>
                     <th data-field="current_year" data-sortable="true">{{ _("This Year") }}</th>
