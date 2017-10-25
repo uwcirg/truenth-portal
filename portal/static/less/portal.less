@@ -285,7 +285,7 @@ a.btn {
     position: relative;
     display: block;
     padding: 0 0.5em 0 2.5em;
-    background: #79818a;
+    background: #a4acaf;
     color: #fff;
     font-weight: normal;
     line-height: 3;
@@ -311,7 +311,7 @@ a.btn {
     max-height: 20em;
     margin: 1em auto;
     padding: 0.5em;
-    border: 1px solid #c3c0c0;
+    border: 1px solid #e4dfdf;
   }
   /* Icon */
   label.tab-label::after {
@@ -743,6 +743,14 @@ div.right-panel {
   }
 }
 
+.bootstrap-table {
+  .pull-right {
+    .btn {
+      padding: 0.45em 0.8em;
+    }
+  }
+}
+
 div.columns {
    top: 4px;
 }
@@ -754,17 +762,25 @@ div.pull-right {
     width: 100%;
     max-width: 100%;
     padding: 0 0.2em;
+
+    button {
+      padding: 0.75em !important;
+    }
   }
   div.pull-right.search {
     width: 50%;
     float: left !important;
     max-width: 100%;
   }
+  .search .form-control {
+     height: 3em !important;
+  }
 }
 
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+
   div.card-view {
     display: flex;
   }
@@ -1511,9 +1527,7 @@ div.pull-right {
   TH {
     background-color: @rowBackgroundColor;
     color: #FFF;
-    padding: 0.25em 0.5em;
     font-weight: normal;
-    vertical-align: top;
   }
   tr:hover {
     background-color: @rowHoverBgColor;
@@ -2150,10 +2164,12 @@ div.noOrg-container {
 }
 .pagination-detail {
   font-size: @mediumText;
+  button.dropdown-toggle {
+    padding: 0.4em 0.6em;
+  }
 }
 
 .pagination {
-
   >.active>a {
     background-color: @featureBtnBgColor;
     border-color: @featureBtnBgColor;
@@ -2178,9 +2194,6 @@ div.noOrg-container {
     background-color: @linkHover;
     border-color: @linkHover;
   }
-}
-
-.pagination {
   >li>a {
     color: @btnColor;
   }
@@ -2365,8 +2378,7 @@ color: @labelColor
     background-color: @rowBackgroundColor;
     color: #FFF;
     font-weight: normal;
-    padding-left: 0.6em;
-    padding-right: 0.6em;
+    padding: 8px;
   }
 }
 #identityVerificationContainer {
@@ -2609,7 +2621,7 @@ div.timezone-warning.text-warning {
   }
   .fixed-table-container thead th,
   .fixed-table-container thead th .both {
-    font-size: @baseFontSize*0.95;
+    font-size: @baseFontSize*0.98;
   }
 
   .tnth-form .form-group > label {
@@ -2694,9 +2706,6 @@ div.timezone-warning.text-warning {
   }
   div.pull-right {
   top: 0;
-  }
-  .search .form-control {
-    height: 3em;
   }
 
   #adminTable {

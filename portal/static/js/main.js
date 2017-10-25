@@ -1227,10 +1227,10 @@ var fillContent = {
                         var o = ($(this).attr("data-tou-type")).split(",");
                         o.forEach(function(item) {
                             arrTypes.push(item);
-                        }); 
+                        });
                     });
                 };
-                
+
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
@@ -1254,6 +1254,60 @@ var fillContent = {
                     };
                 };
             });
+        };
+    },
+    "emailLog": function(data) {
+        if (!data.error) {
+            if (data.messages && data.messages.length > 0) {
+                (data.messages).forEach(function(item) {
+                    item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
+                });
+                $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
+                $('#profileEmailLogTable').bootstrapTable( {
+                    data: data.messages,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: 'table table-responsive profile-email-log',
+                    sortName: 'sent_at',
+                    sortOrder: 'desc',
+                    search: true,
+                    smartDisplay: true,
+                    showColumns: true,
+                    toolbar: "#emailLogTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                          };
+                    },
+                    undefinedText: '--',
+                    columns: [
+                        {
+                            field: 'sent_at',
+                            title: i18next.t("Date (GMT), Y-M-D"),
+                            searchable: true,
+                            sortable: true
+                        },
+                        {
+                            field: 'subject',
+                            title: i18next.t("Subject"),
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: 'recipients',
+                            title: i18next.t("Email"),
+                            sortable: true,
+                            searchable: true,
+                            width: '20%'
+                        }
+                    ]
+                });
+                setTimeout(function() { $("#lbEmailLog").trigger("click"); }, 100);
+            } else {
+                $("#emailLogContent").html("<span class='text-muted'>" + i18next.t('No audit entry found.') + "</span>");
+            };
+        } else {
+            $("#emailLogMessage").text(data.error);
         };
     }
 };

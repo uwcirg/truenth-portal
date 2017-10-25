@@ -311,7 +311,7 @@ select:not([multiple]) {
     position: relative;
     display: block;
     padding: 0 0.5em 0 2.5em;
-    background: #79818a;
+    background: #a4acaf;
     color: #fff;
     font-weight: normal;
     line-height: 3;
@@ -319,6 +319,7 @@ select:not([multiple]) {
     width: 100%;
     max-width: 100%;
   }
+  label.tab-label.active,
   label.tab-label:hover {
     background-color: @linkHover;
   }
@@ -337,7 +338,7 @@ select:not([multiple]) {
     max-height: 20em;
     margin: 1em auto;
     padding: 0.5em;
-    border: 1px solid #c3c0c0;
+    border: 1px solid #e4dfdf;
   }
   /* Icon */
   label.tab-label::after {
@@ -810,11 +811,32 @@ div.right-panel {
   }
 }
 
+.bootstrap-table {
+  .pull-right {
+    .btn, button {
+      padding: 0.57em;
+    }
+  }
+  div.columns {
+    top: 4px;
+  }
+  div.search {
+    top: 0.3em;
+  }
+}
+
+
 .admin-table {
+   .search .form-control {
+     height: 3em !important;
+  }
   div.pull-right {
     width: 100%;
     max-width: 100%;
     padding: 0 0.2em;
+    button {
+      padding: 0.73em !important;
+    }
   }
   div.pull-right.search {
     width: 50%;
@@ -822,12 +844,7 @@ div.right-panel {
     max-width: 100%;
   }
 }
-div.columns {
-  top: 4px;
-}
-div.search {
-  top: 0.3em;
-}
+
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -939,8 +956,8 @@ div.search {
 }
 
 /* reporting dashboard styling */
-.nav-tabs.rd-nav>li.active>a, 
-.nav-tabs.rd-nav>li.active>a:focus, 
+.nav-tabs.rd-nav>li.active>a,
+.nav-tabs.rd-nav>li.active>a:focus,
 .nav-tabs.rd-nav>li.active>a:hover {
     background-color: #6f7984;
     color: #FFF;
@@ -2160,6 +2177,9 @@ input.clinic {
 }
 .pagination-detail {
   font-size: @mediumText !important;
+  button.dropdown-toggle {
+    padding: 0.4em 0.6em;
+  }
 }
 .pagination {
 
@@ -2609,7 +2629,7 @@ div.timezone-warning.text-warning {
   }
   .fixed-table-container thead th,
   .fixed-table-container thead th .both {
-    font-size: @baseFontSize*0.95;
+    font-size: @baseFontSize*0.98;
   }
 
   .fixed-table-toolbar .dropdown-menu {
@@ -2686,9 +2706,6 @@ div.timezone-warning.text-warning {
   }
   div.search {
     top: 0;
-  }
-  .search .form-control {
-    height: 3em;
   }
 
   #adminTableToolbar {

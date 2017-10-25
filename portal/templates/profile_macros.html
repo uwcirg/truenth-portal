@@ -469,58 +469,12 @@
     </div>
     <script>
         $(function() {
+            $("#communicationsContainer .tab-label").on("click", function() {
+                $("#communicationsContainer .tab-label").removeClass("active");
+                $(this).addClass("active");
+            });
             tnthAjax.emailLog({{person.id}}, function(data) {
-                if (!data.error) {
-                    if (data.messages && data.messages.length > 0) {
-                        (data.messages).forEach(function(item) {
-                            item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
-                        });
-                        $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
-                        $('#profileEmailLogTable').bootstrapTable( {
-                            data: data.messages,
-                            pagination: true,
-                            pageSize: 5,
-                            pageList: [5, 10, 25, 50, 100],
-                            classes: 'table table-responsive profile-email-log',
-                            sortName: 'sent_at',
-                            sortOrder: 'desc',
-                            search: true,
-                            smartDisplay: true,
-                            showColumns: true,
-                            toolbar: "#emailLogTableToolBar",
-                            rowStyle: function rowStyle(row, index) {
-                                  return {
-                                    css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
-                                  };
-                            },
-                            undefinedText: '--',
-                            columns: [
-                                {
-                                    field: 'sent_at',
-                                    title: '{{_("Date (GMT), Y-M-D")}}',
-                                    searchable: true,
-                                    sortable: true
-                                },
-                                {
-                                    field: 'subject',
-                                    title: '{{_("Subject")}}',
-                                    searchable: true,
-                                    sortable: true
-                                }, {
-                                    field: 'recipients',
-                                    title: '{{_("Email")}}',
-                                    sortable: true,
-                                    searchable: true,
-                                    width: '20%'
-                                }
-                            ]
-                        });
-                    } else {
-                        $("#emailLogContent").html("<span class='text-muted'>" + "{{_('No audit entry found.')}}" + "</span>");
-                    };
-                } else {
-                    $("#emailLogMessage").text(data.error);
-                };
+                setTimeout(function() { fillContent.emailLog(data);}, 100);
             });
         });
     </script>
@@ -2069,7 +2023,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    <div class="tabs-container">
+                    <div id="communicationsContainer" class="tabs-container">
                         <div class="tab">
                           <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
@@ -2089,7 +2043,7 @@
                         {% if current_user and (current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
                          <div class="tab">
                           <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
+                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
                           <div class="tab-content">
                             {{profileEmailLog(person)}}
                           </div>
