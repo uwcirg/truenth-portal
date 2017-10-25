@@ -1,7 +1,7 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
 from datetime import datetime
-from flask import current_app
+from flask import current_app, render_template
 from flask_babel import gettext as _
 
 from ..dogpile import dogpile_cache
@@ -112,33 +112,16 @@ def overdue_stats_by_org():
 def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     cutoff_days.sort()
 
-    title = _(u"Days Overdue")
-    col0_header = _(u"Site")
-    html = u"""
-    <table>
-    <caption><b>{}</b></caption>
-    <thead>
-    <tr>
-        <th>{}</th>
-    """.format(title, col0_header)
-
+    day_ranges = []
     curr_min = 0
     for cd in cutoff_days:
-        daystr = _(u"Days")
-        rangestr = "{}-{}".format(curr_min + 1, cd)
-        html += "<th>{} {}</th>".format(rangestr, daystr)
+        day_ranges.append("{}-{}".format(curr_min + 1, cd))
         curr_min = cd
-    colx_header = _(u"Total")
-    html += u"""
-        <th>{}</th>
-    </tr>
-    </thead>
-    <tbody>
-    """.format(colx_header)
 
     ot = OrgTree()
-
+    rows = []
     totals = defaultdict(int)
+
     for org in sorted(overdue_stats, key=lambda x: x.id):
         if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
             continue
@@ -150,25 +133,25 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         if not user_accessible:
             continue
         counts = overdue_stats[org]
-        html += u'<tr><td>{}</td>'.format(org.name)
+        org_row = [org.name]
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:
             count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
-            html += "<td>{}</td>".format(count)
+            org_row.append(count)
             totals[cd] += count
             row_total += count
             curr_min = cd
-        html += u'<td>{}</td></tr>'.format(row_total)
+        org_row.append(row_total)
+        rows.append(org_row)
 
-    totalstr = _(u"TOTAL")
-    html += u'<tr><td>{}</td>'.format(totalstr)
+    totalrow = [_(u"TOTAL")]
     row_total = 0
     for cd in cutoff_days:
-        html += "<td>{}</td>".format(totals[cd])
+        totalrow.append(totals[cd])
         row_total += totals[cd]
-    html += u'<td>{}</td></tr>'.format(row_total)
+    totalrow.append(row_total)
+    rows.append(totalrow)
 
-    html += u"</tbody></table>"
-
-    return html
+    return render_template('site_overdue_table.html',
+                           ranges=day_ranges, rows=rows)
