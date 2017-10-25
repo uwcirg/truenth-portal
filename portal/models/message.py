@@ -25,7 +25,31 @@ EMAIL_HEADER = (
     "<html><head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
-    "}"
+    "} "
+    "table, th, td {"
+    " border: 1px solid #ddd;"
+    "} "
+    "table { "
+    " border-collapse: collapse;"
+    " border-spacing: 0;"
+    " display: table;"
+    "} "
+    "th { "
+    " color: #FFF;"
+    " background-color: #8a8e90;"
+    " padding: 8px;"
+    " font-weight: 400;"
+    " border-left: 1px solid #ddd;"
+    " margin: 0;"
+    " display: table-cell;"
+    "} "
+    "tr { "
+    " display: table-row;"
+    "} "
+    "td { "
+    " padding: 8px;"
+    " display: table-cell;"
+    "} "
     " .btn {"
     " font-size: 0.9em;"
     " font-family: Helvetica, Arial, sans-serif;"
@@ -65,7 +89,7 @@ class EmailMessage(db.Model):
     def style_message(self, body):
         """Implicitly called on send, to wrap body with style tags"""
         # Catch duplicate styling attempts
-        restricted = (u'doctype', u'html', u'head', u'body')
+        restricted = (u'<!doctype', u'<html', u'<head', u'<body')
         lower_body = body.lower()
         for element in restricted:
             if element in lower_body:

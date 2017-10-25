@@ -179,9 +179,11 @@ class TestCase(Base):
             db.session.add(procedure)
             db.session.commit()
 
-    def consent_with_org(self, org_id, user_id=TEST_USER_ID):
+    def consent_with_org(self, org_id, user_id=TEST_USER_ID, backdate=None):
         """Bless given user with a valid consent with org"""
         audit = Audit(user_id=user_id, subject_id=user_id)
+        if backdate:
+            audit.timestamp = datetime.utcnow() - backdate
         consent = UserConsent(
             user_id=user_id, organization_id=org_id,
             audit=audit, agreement_url='http://fake.org')

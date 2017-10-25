@@ -1,0 +1,21 @@
+<table>
+	<caption><b>{{ _("Days Overdue") }}</b></caption>
+    <thead>
+	    <tr>
+	        <th>{{ _("Site") }}</th>
+	        {% for range in ranges %}
+	        	<th>{{ range + _(" Days") }}</th>
+	        {% endfor %}
+	        <th>{{ _("Total") }}</th>
+	    </tr>
+    </thead>
+    <tbody>
+	    {% for row in rows %}
+	    <tr>
+	    	{% for cell in row %}
+	    	<td>{{ cell }}</td>
+	    	{% endfor %}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+</table>
