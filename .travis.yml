@@ -77,7 +77,7 @@ script:
   - tox
 
 after_success:
-  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ]; then
+  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ] && [ "$GIT_BRANCH" = "develop" ]; then
       pip install codacy-coverage ;
       python-codacy-coverage -r coverage.xml ;
     fi
