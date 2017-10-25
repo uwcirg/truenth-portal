@@ -285,16 +285,17 @@ a.btn {
     position: relative;
     display: block;
     padding: 0 0.5em 0 2.5em;
-    background: #a4acaf;
-    color: #fff;
+    color: #777777;
+    border: 1px solid #b8babb;
     font-weight: normal;
     line-height: 3;
     cursor: pointer;
     width: 100%;
     max-width: 100%;
   }
+  label.tab-label.active,
   label.tab-label:hover {
-    background-color: @linkHover;
+    color: @linkHover;
   }
   .tab-content {
     max-height: 0;
@@ -316,7 +317,6 @@ a.btn {
   /* Icon */
   label.tab-label::after {
     position: absolute;
-    /*right: 0;*/
     left: 0;
     top: 0;
     display: block;
