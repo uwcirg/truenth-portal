@@ -2,6 +2,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+from re import search
 
 from portal.dogpile import dogpile_cache
 from portal.extensions import db
@@ -138,7 +139,9 @@ class TestReporting(TestCase):
         self.assertTrue('<th>1-5 Days</th>' in table1)
         self.assertTrue('<th>6-10 Days</th>' in table1)
         self.assertTrue('<td>{}</td>'.format(org.name) in table1)
-        self.assertTrue('<td>1</td><td>2</td>' in table1)
+        orgrow = (r'<td>{}<\/td>\s*<td>1<\/td>\s*'
+                  '<td>2<\/td>\s*<td>3<\/td>'.format(org.name))
+        self.assertTrue(search(orgrow, table1))
 
         # confirm that the table contains no orgs
         table2 = generate_overdue_table_html(cutoff_days=cutoffs,

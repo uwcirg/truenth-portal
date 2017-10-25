@@ -300,11 +300,7 @@ def generate_and_send_summaries(cutoff_days, org):
     top_org = Organization.query.filter_by(name=org).first()
     if not top_org:
         raise ValueError("No org with name {} found.".format(top_org))
-
-    if top_org:
-        name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
-    else:
-        name_key = SiteSummaryEmail_ATMA.name_key()
+    name_key = SiteSummaryEmail_ATMA.name_key(org=org)
 
     for user in User.query.filter_by(deleted_id=None).all():
         if (user.has_role(ROLE.STAFF) and (u'@' in user.email)
