@@ -314,6 +314,7 @@ a.btn {
     transition: max-height .35s;
   }
   /* :checked */
+  label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
     max-height: 25em;
     margin: 1em auto;
@@ -814,22 +815,32 @@ div.pull-right {
     white-space: nowrap;
   }
   td.reports-field div.staff-html {
-    margin-top: 0.6em;
-    margin-bottom: 0.8em;
+    margin: 0.8em auto;
   }
-  td.reports-field a {
-    width: 4em;
-    max-width: 100%;
-    padding: 0.5em;
-    color: #fff;
-    background-color: @featureBtnBgColor;
-    border-color: @featureBtnBgColor;
-    transition: all 0.3s ease-in-out 0s;
-    -webkit-transition: all 0.3s ease-in-out 0s;
-    border-radius: 0;
-    letter-spacing: 2px;
-    margin: 0 0.2em;
-    white-space: nowrap;
+  td.reports-field {
+    a {
+      width: 4em;
+      max-width: 100%;
+      padding: 0.6em;
+      color: #fff;
+      background-color: @featureBtnBgColor;
+      border-color: @featureBtnBgColor;
+      transition: all 0.3s ease-in-out 0s;
+      -webkit-transition: all 0.3s ease-in-out 0s;
+      border-radius: 0;
+      letter-spacing: 2px;
+      margin: 0 0.2em;
+      white-space: nowrap;
+    }
+    a.btn-report {
+      padding: .4em .2em;
+      margin: 0.2em .2em 0.3em .2em;
+    }
+    a.btn-report-2 {
+      margin-left: -1.5em;
+      padding-left: 0;
+      width: 3.5em;
+    }
   }
   .eproms-id-label {
     display: none

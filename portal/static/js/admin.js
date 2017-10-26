@@ -511,7 +511,7 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
   };
 };
 
-AdminTool.prototype.getReportModal = function(patientId, reportType) {
+AdminTool.prototype.getReportModal = function(patientId) {
 
   $("#patientReportModal").modal("show");
   $("#patientReportLoader").removeClass("tnth-hide");
@@ -520,7 +520,7 @@ AdminTool.prototype.getReportModal = function(patientId, reportType) {
       if (data) {
         if (!data.error) {
             if (data["user_documents"] && data["user_documents"].length > 0) {
-              var existingItems = {};
+              var existingItems = {}, count = 0;
               /*
                * sort to get the latest first
                */
@@ -536,7 +536,7 @@ AdminTool.prototype.getReportModal = function(patientId, reportType) {
                   /*
                    * only draw the most recent, same report won't be displayed
                    */
-                  if (!existingItems[c] && ($.trim(c) == $.trim(reportType))) {
+                  if (!existingItems[c]) {
                     content += "<tr>" +
                               "<td>" + item["contributor"] + "</td>" +
                               "<td>" + item["filename"] + "</td>" +
@@ -544,6 +544,7 @@ AdminTool.prototype.getReportModal = function(patientId, reportType) {
                               "<td class='text-center'>" + '<a title="' + i18next.t("Download") + '" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>"
                               "</tr>";
                     existingItems[c] = true;
+                    count++;
                   };
               });
               content += "</table>";
@@ -551,7 +552,10 @@ AdminTool.prototype.getReportModal = function(patientId, reportType) {
               content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
 
               $("#patientReportContent").html(content);
-              $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#patientReportsLoc");
+              if (count > 1) $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
+              else $("#patientReportModal .modal-title").text(i18next.t("Patient Report"));
+              $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#profilePatientReportTable");
+              
             } else {
               $("#patientReportMessage").html(i18next("No report data found."));
             };
