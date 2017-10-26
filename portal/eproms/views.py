@@ -139,7 +139,19 @@ def privacy():
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     user = current_user()
-    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    if user:
+        organization = user.first_top_organization()
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r) and not role:
+                role = r
+        if not all((role, organization)):
+            role, organization = None, None
+
+        terms = VersionedResource(app_text(Terms_ATMA.name_key(
+            role=role, organization=organization)))
+    else:
+        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
     return render_template(
         'eproms/terms.html', content=terms.asset, editorUrl=terms.editor_url, user=user)
 
