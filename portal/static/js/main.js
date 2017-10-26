@@ -1388,7 +1388,7 @@ var assembleContent = {
 
             };
 
-            /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+            /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
             var topLevelOrgs = $("#fillOrgs legend[data-checked]");
             if (topLevelOrgs.length > 0)  {
                 topLevelOrgs.each(function() {
