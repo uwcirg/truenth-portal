@@ -1335,7 +1335,7 @@ var fillContent = {
                         }
                     ]
                 });
-                setTimeout(function() { $("#lbEmailLog").addClass("active").trigger("click"); }, 100);
+                setTimeout(function() { $("#lbEmailLog").addClass("active"); }, 100);
             } else {
                 $("#emailLogContent").html("<span class='text-muted'>" + i18next.t('No audit entry found.') + "</span>");
             };

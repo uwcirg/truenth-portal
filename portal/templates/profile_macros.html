@@ -969,6 +969,7 @@
 {% macro patientReports(person) -%}
     <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
     <div id="prTableToolBar"><span id="tableCount"></span></div>
+    <a href="#profilePatientReportTable"></a>
     <table id="profilePatientReportTable"></table>
     <div id="patientReportErrorMessage" class="text-muted"></div>
     <script>
