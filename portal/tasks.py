@@ -275,11 +275,11 @@ def send_user_messages(email, force_update=False):
 
 
 @celery.task
-def send_questionnaire_summary(job_id, cutoff_days, org):
+def send_questionnaire_summary(job_id, cutoff_days, org_id):
     "Generate and send a summary of questionnaire counts to all Staff in org"
     try:
         before = datetime.now()
-        generate_and_send_summaries(cutoff_days, org)
+        generate_and_send_summaries(cutoff_days, org_id)
         duration = datetime.now() - before
         message = (
             'Sent summary emails in {0.seconds} seconds'.format(duration))
@@ -293,15 +293,15 @@ def send_questionnaire_summary(job_id, cutoff_days, org):
     return message
 
 
-def generate_and_send_summaries(cutoff_days, org):
+def generate_and_send_summaries(cutoff_days, org_id):
     ostats = overdue_stats_by_org()
     cutoffs = [int(i) for i in cutoff_days.split(',')]
 
     ot = OrgTree()
-    top_org = Organization.query.filter_by(name=org).first()
+    top_org = Organization.query.get(org_id)
     if not top_org:
-        raise ValueError("No org with name {} found.".format(top_org))
-    name_key = SiteSummaryEmail_ATMA.name_key(org=org)
+        raise ValueError("No org with ID {} found.".format(org_id))
+    name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
         if (user.has_role(ROLE.STAFF) and (u'@' in user.email)
