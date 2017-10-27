@@ -45,8 +45,8 @@ def upgrade():
         at.custom_text = at.custom_text.replace('ePROMs', 'TrueNTH')
     session.commit()
 
-    new_crv_kwargs = '{"cutoff_days": "30,60,90", "org_id": "10000"}'
-    new_iron_kwargs = '{"cutoff_days": "7,14,21,30", "org_id": "20000"}'
+    new_crv_kwargs = '{"cutoff_days": "30,60,90", "org_id": 10000}'
+    new_iron_kwargs = '{"cutoff_days": "7,14,21,30", "org_id": 20000}'
 
     session.execute("UPDATE scheduled_jobs SET name = '{}', kwargs='{}' "
                     "WHERE name = '{}'".format('TNGR site summary email',
