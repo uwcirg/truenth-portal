@@ -238,12 +238,12 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
-        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
+        TODO: Removing hardcoding of ePROMS org names
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
             return "profileSendEmail invite email {}".format(kwargs.get('org'))
         return "profileSendEmail invite email"
 
@@ -257,12 +257,12 @@ class SiteSummaryEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
-        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
+        TODO: Removing hardcoding of ePROMs org names
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
             return "site summary email {}".format(kwargs.get('org'))
         return "site summary email"
 
