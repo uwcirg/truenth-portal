@@ -536,9 +536,9 @@ AdminTool.prototype.getReportModal = function(patientId) {
                   /*
                    * only draw the most recent, same report won't be displayed
                    */
-                  if (!existingItems[c]) {
+                  if (!existingItems[c] && hasValue(c)) {
                     content += "<tr>" +
-                              "<td>" + item["contributor"] + "</td>" +
+                              "<td>" + c + "</td>" +
                               "<td>" + item["filename"] + "</td>" +
                               "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
                               "<td class='text-center'>" + '<a title="' + i18next.t("Download") + '" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>"
@@ -555,7 +555,7 @@ AdminTool.prototype.getReportModal = function(patientId) {
               if (count > 1) $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
               else $("#patientReportModal .modal-title").text(i18next.t("Patient Report"));
               $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#profilePatientReportTable");
-              
+
             } else {
               $("#patientReportMessage").html(i18next("No report data found."));
             };
