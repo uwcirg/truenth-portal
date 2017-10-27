@@ -14,10 +14,8 @@ from ..config import DefaultConfig
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile import dogpile_cache
-from ..eproms.views import eproms
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
-from ..gil.views import gil
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
