@@ -272,6 +272,11 @@ def prostate_cancer_facts():
     return render_template('gil/what-is-prostate-cancer.html', user=current_user())
 
 
+@gil.route('/exercise-and-diet')
+def exercise_and_diet():
+    return render_template('gil/exercise-and-diet.html', user=current_user())
+
+
 @gil.route('/lived-experience')
 def lived_experience():
     return render_template('gil/lived-experience.html', user=current_user())
