@@ -27,7 +27,7 @@ def get_assets_from_tag(tag):
     return assets
 
 
-@exercise_diet.route('/exercise-and-diet')
+@exercise_diet.route('/chcr')
 def index():
     return render_template('exercise_diet/index.html')
 
