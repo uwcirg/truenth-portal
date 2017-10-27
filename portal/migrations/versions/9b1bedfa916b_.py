@@ -1,10 +1,8 @@
 from alembic import op
 import re
-import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.app_text import AppText
-from portal.models.organization import Organization
 
 """empty message
 
