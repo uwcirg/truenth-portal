@@ -184,8 +184,12 @@ def configure_blueprints(app, blueprints):
     # Load GIL or ePROMs blueprint (which define several of the same request
     # paths and would therefore conflict with one another) depending on config
     if app.config.get('GIL') and not app.config.get('HIDE_GIL'):
+        from ..gil.views import gil
+        from ..exercise_diet.views import exercise_diet
         app.register_blueprint(gil)
+        app.register_blueprint(exercise_diet)
     else:
+        from ..eproms.views import eproms
         app.register_blueprint(eproms)
 
     for blueprint in blueprints:
