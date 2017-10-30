@@ -261,7 +261,7 @@ class QuestionnaireBank(db.Model):
             if qbs and qbs[0].classification == 'recurring':
                 return
             if len(qbs) > 1:
-                current_app.logger.error(
+                current_app.logger.warn(
                     "multiple QuestionnaireBanks for {user} with "
                     "{classification} found.  The UI won't correctly display "
                     "more than one at this time.".format(

@@ -304,7 +304,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if (user.has_role(ROLE.STAFF) and (u'@' in user.email)
+        if (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
                 and (top_org in ot.find_top_level_org(user.organizations))):
             args = load_template_args(user=user)
             args['eproms_site_summary_table'] = generate_overdue_table_html(
