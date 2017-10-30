@@ -56,10 +56,8 @@ def patients_root():
         # check user table preference for organization filters
         pref = TablePreference.query.filter_by(table_name='patientList',
                                                user_id=user.id).first()
-        if pref:
-            pref_data = pref.as_json()
-            if ('filters' in pref_data) and ('orgs_filter_control' in pref_data['filters']):
-                pref_org_list = pref_data['filters']['orgs_filter_control']
+        if pref and pref.filters:
+            pref_org_list = pref.filters.get('orgs_filter_control')
 
         # Build list of all organization ids, and their decendents, the
         # user belongs to
