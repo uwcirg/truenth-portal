@@ -12,6 +12,7 @@ from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import QuestionnaireBank, visit_name
 from ..models.role import Role, ROLE
+from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
@@ -51,16 +52,25 @@ def patients_root():
     consented_users = [u.user_id for u in consent_query]
 
     if user.has_role(ROLE.STAFF):
-        request_org_list = request.args.get('org_list', None)
+        pref_org_list = None
+        # check user table preference for organization filters
+        pref = TablePreference.query.filter_by(table_name='patientList',
+                                       user_id=user.id).first()
+        if pref:
+            pref_data = pref.as_json()
+            if ('filters' in pref_data) and ('orgs_filter_control' in pref_data['filters']):
+                pref_org_list = pref_data['filters']['orgs_filter_control']
+            print("data {}".format(pref_org_list))
+
         # Build list of all organization ids, and their decendents, the
         # user belongs to
         OT = OrgTree()
 
-        if request_org_list:
-            # for selected filtered orgs, we also need to get the children
+        if pref_org_list:
+            # for preferred filtered orgs, we also need to get the children
             # of each, if any
-            request_org_list = set(request_org_list.split(","))
-            for orgId in request_org_list:
+            pref_org_list = set(pref_org_list.split(","))
+            for orgId in pref_org_list:
                 check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue

@@ -270,9 +270,12 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         if (!noPatientData) {
             var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
 	          self.filterOrgs(hbOrgs);
-        } else {
-          $("div.fixed-table-toolbar").hide();
         };
+
+        /*
+         * set user's preference for filter(s)
+         */
+        self.setTableFilters(self.userId);
 
         var ofields = $("#userOrgs input[name='organization']");
         if (ofields.length > 0) {
@@ -281,17 +284,23 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
             if ((self.getHereBelowOrgs(self.getUserOrgs())).length == 1 ||
                 (iterated && request_org_list && request_org_list[$(this).val()])) {
                 $(this).prop("checked", true);
-            }
+            } else if (self.currentTablePreference) {
+             if (self.currentTablePreference.filters) {
+               var fi = self.currentTablePreference.filters;
+               var fa = fi.orgs_filter_control? fi.orgs_filter_control.split(","): null;
+               if (fa) {
+                 var oself = $(this), val = oself.val();
+                 fa.forEach(function(item) {
+                    if (item == val) oself.prop("checked", true);
+                 });
+                };
+             };
+           };
             $(this).on("click touchstart", function(e) {
-                e.stopPropagation();
-                AT.abortRequests();
-                var orgsList = [];
-                $("#userOrgs input[name='organization']").each(function() {
-                   if ($(this).is(":checked")) orgsList.push($(this).val());
-                });
-               if (orgsList.length > 0) {
-                  location.replace("/" + context + "?org_list=" + orgsList.join(","));
-               } else location.replace("/" + context);
+              e.stopPropagation();
+              AT.abortRequests();
+              AT.setTablePreference(AT.userId, "patientList");
+              setTimeout(function() { location.reload(); }, 100);
             });
           });
 
@@ -307,16 +316,18 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
               /*
-               * clear pre-set user preference for filtering
+               * pre-set user preference for filtering
                */
-              AT.setTablePreference(AT.userId, "patientList", null, null, {});
-              if (orgsList.length > 0) location.replace("/" + context + "?org_list=" + orgsList.join(","));
+              AT.setTablePreference(AT.userId, "patientList");
+              if (orgsList.length > 0) {
+                setTimeout(function() { location.reload(); }, 100);
+              };
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
-              $("#userOrgs input[name='organization']").each(function() {
-                  $(this).prop("checked", false);
-              });
+              AT.clearOrgsSelection();
+              AT.setTablePreference(AT.userId, "patientList");
+              setTimeout(function() { location.reload(); }, 100);
           });
           $("#orglist-close-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -354,6 +365,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
       $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
     };
 };
+
 AdminTool.prototype.getInstrumentList = function() {
   var iList;
   tnthAjax.getInstrumentsList(true, function(data) {
@@ -426,7 +438,11 @@ AdminTool.prototype.handleDownloadModal = function() {
         if ($(this).is(":checked")) $("#_downloadMessage").text("");
     });
 };
-
+AdminTool.prototype.clearOrgsSelection = function() {
+  $("#userOrgs input[name='organization']").each(function() {
+      $(this).prop("checked", false);
+  });
+};
 AdminTool.prototype.getDefaultTablePreference = function() {
 	return {sort_field: "id",sort_order: "desc"};
 };
@@ -464,12 +480,11 @@ AdminTool.prototype.setTableFilters = function(userId) {
           /*
            * note this is based on the trigger event for filtering specify in the plugin
            */
-          $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") == "text" ? "keyup": "change");
+          if ($(fname).length > 0) $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") == "text" ? "keyup": "change");
         };
       };
-    }
+    };
 };
-
 
 AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder, filters) {
   if (hasValue(tableName)) {
@@ -496,13 +511,24 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
 	    };
     }
     var __filters = filters || {};
+
     //get fields
-    $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
-    	if (hasValue($(this).val())) {
-    		var field = $(this).closest("th").attr("data-field");
-    		__filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
-    	};
+    if (Object.keys(__filters).length == 0) {
+      $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
+      	if (hasValue($(this).val())) {
+      		var field = $(this).closest("th").attr("data-field");
+      		__filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
+      	};
+      });
+    };
+    /*
+     * get selected orgs from the filter list by site control
+     */
+    var selectedOrgs = "";
+    $("#userOrgs input[name='organization']:checked").each(function() {
+      selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
     });
+    if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
     data["filters"] = __filters;
     if (Object.keys(data).length > 0) {
       tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
