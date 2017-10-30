@@ -55,7 +55,7 @@ def patients_root():
         pref_org_list = None
         # check user table preference for organization filters
         pref = TablePreference.query.filter_by(table_name='patientList',
-                                                user_id=user.id).first()
+                                              user_id=user.id).first()
         if pref:
             pref_data = pref.as_json()
             if ('filters' in pref_data) and ('orgs_filter_control' in pref_data['filters']):
