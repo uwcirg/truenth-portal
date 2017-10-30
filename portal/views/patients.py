@@ -60,7 +60,6 @@ def patients_root():
             pref_data = pref.as_json()
             if ('filters' in pref_data) and ('orgs_filter_control' in pref_data['filters']):
                 pref_org_list = pref_data['filters']['orgs_filter_control']
-            print("data {}".format(pref_org_list))
 
         # Build list of all organization ids, and their decendents, the
         # user belongs to
