@@ -116,15 +116,26 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "agreement": i18next.t("Agreement"),
                       "consentDate": i18next.t("Date"),
                       "registrationDate": i18next.t("Regiatration Date"),
-                      "locale": i18next.t("GMT")
+                      "historyConsentDate": i18next.t("Consent Date"),
+                      "locale": i18next.t("GMT"),
+                      "lastUpdated": i18next.t("Last Updated") + "<br/>" + i18next.t("( GMT, Y-M-D )"),
+                      "comment": i18next.t("Action")
                       };
     /*
      * html for header cell in array
      */
-    var headerArray = ['Organization',
+    var headerArray = [
+                    headerEnum["organization"],
                     '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
                     '<span class="agreement">' + headerEnum["agreement"] + '</span>',
                     '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
+
+    var historyHeaderArray = [
+                    headerEnum["organization"],
+                    '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
+                    headerEnum["historyConsentDate"],
+                    headerEnum["lastUpdated"],
+                    headerEnum["comment"]];
 
     var consentLabels = {
                         "default": i18next.t("Consented"),
@@ -151,9 +162,10 @@ var ConsentUIHelper = function(consentItems, userId) {
     this.hasHistory = false;
 
 
-    this.getHeaderRow = function() {
+    this.getHeaderRow = function(header) {
         var content = "";
-        headerArray.forEach(function (title, index) {
+        var h = header || headerArray;
+        h.forEach(function (title, index) {
             if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
         });
         return content;
@@ -170,7 +182,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         };
         var editorUrlEl = $("#" + LROrgId + "_editor_url");
         var content = "<tr>";
-        [
+        var contentArray = [
             {
                 content: self.getConsentOrgDisplayName(item)
             },
@@ -193,8 +205,36 @@ var ConsentUIHelper = function(consentItems, userId) {
                 content: tnthDates.formatDateString(item.signed) + (self.consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentDateModalHTML(item, index) : "")
 
             }
-        ].forEach(function(cell) {
+        ];
+
+        contentArray.forEach(function(cell) {
             if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
+        });
+        content += "</tr>";
+        return content;
+    };
+    this.getConsentHistoryRow = function(item, index) {
+        var self = this;
+        var consentStatus = self.getConsentStatus(item);
+        var sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
+        var content = "<tr>";
+        var contentArray = [
+            {
+                content: self.getConsentOrgDisplayName(item)
+            },
+            {
+                content: sDisplay
+            },
+            {
+                content: tnthDates.formatDateString(item.signed)
+
+            },
+            {content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"},
+            {content: "<span class='text-danger'>" + item.deleted.comment + "</span>"}
+        ];
+
+        contentArray.forEach(function(cell) {
+            content += "<td class='consentlist-cell'>" + cell.content + "</td>";
         });
         content += "</tr>";
         return content;
@@ -227,7 +267,7 @@ var ConsentUIHelper = function(consentItems, userId) {
     this.getDeletedDisplayDate = function(item) {
         if (!item) return "";
         var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
-        return deleteDate.replace("T", " ") + " GMT";
+        return deleteDate.replace("T", " ");
     };
     this.isDefaultConsent = function(item) {
         return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -255,7 +295,6 @@ var ConsentUIHelper = function(consentItems, userId) {
                 } else {
                     sDisplay = oDisplayText["consented"];
                 };
-                sDisplay += "<br/><span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(" + i18next.t("modified on") + " " + this.getDeletedDisplayDate(item) + ")</span>";
                 break;
             case "expired":
                 sDisplay = oDisplayText["expired"];
@@ -527,19 +566,16 @@ var ConsentUIHelper = function(consentItems, userId) {
         var self = this;
         var content = "";
         content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-        content += this.getHeaderRow();
+        content += this.getHeaderRow(historyHeaderArray);
         this.items.forEach(function(item, index) {
             if (!(/null/.test(item.agreement_url))) {
                 if ((options.includeCurrent && !item.deleted) || item.deleted) {
-                    content += self.getConsentRow(item, index);
+                    content += self.getConsentHistoryRow(item, index);
                 };
             };
         });
         content += "</table></div>";
         $("#consentHistoryModal .modal-body").html(content);
-        if (!self.ctop) $("#profileConsentHistory .agreement").each(function() {
-            $(this).parent().hide();
-        });
         $("#consentHistoryModal").modal("show");
     },
     this.getConsentList = function() {
@@ -548,7 +584,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         if (this.items.length > 0) {
             var existingOrgs = {};
             var content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            content += this.getHeaderRow();
+            content += this.getHeaderRow(headerArray);
             this.items.forEach(function(item, index) {
                 if (item.deleted) {
                     self.hasHistory = true;
