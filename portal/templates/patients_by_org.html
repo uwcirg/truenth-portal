@@ -62,7 +62,7 @@
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.stripLinksTextSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
-                  <th data-field="organization" data-sortable="true" data-class="organization-field" data-filter-control="select">{{ _("Site(s)") }}</th>
+                  <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
           <tbody id="admin-table-body" data-link="row" class="rowlink">
@@ -161,20 +161,8 @@ $(document).ready(function() {
   }).on("sort.bs.table", function(e, name, order) {
       setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
   }).on("column-search.bs.table", function(e, name, text) {
-      /*
-       * clear org selection(s) in filter list control
-       */
-      $("#userOrgs input[name='organization']").each(function() {
-        $(this).prop("checked", false);
-      });
-
       setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
   });
-
-  /*
-   * set user's preference for filter(s)
-   */
-   AT.setTableFilters({{user.id}});
 
   /*
    * add placeholder text for filter controls
@@ -210,6 +198,7 @@ $(document).ready(function() {
         org_list[{{org}}] = true;
     {% endfor %}
   {% endif %}
+  
   AT.initOrgsList(org_list, 'patients');
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
