@@ -119,7 +119,8 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "historyConsentDate": i18next.t("Consent Date"),
                       "locale": i18next.t("GMT"),
                       "lastUpdated": i18next.t("Last Updated") + "<br/>" + i18next.t("( GMT, Y-M-D )"),
-                      "comment": i18next.t("Action")
+                      "comment": i18next.t("Action"),
+                      "actor": i18next.t("User")
                       };
     /*
      * html for header cell in array
@@ -135,7 +136,8 @@ var ConsentUIHelper = function(consentItems, userId) {
                     '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
                     headerEnum["historyConsentDate"],
                     headerEnum["lastUpdated"],
-                    headerEnum["comment"]];
+                    headerEnum["comment"],
+                    headerEnum["actor"]];
 
     var consentLabels = {
                         "default": i18next.t("Consented"),
@@ -230,7 +232,8 @@ var ConsentUIHelper = function(consentItems, userId) {
 
             },
             {content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"},
-            {content: "<span class='text-danger'>" + item.deleted.comment + "</span>"}
+            {content: "<span class='text-danger'>" + item.deleted.comment + "</span>"},
+            {content: (item.deleted.by && item.deleted.by.display? item.deleted.by.display: "--")}
         ];
 
         contentArray.forEach(function(cell) {
@@ -366,16 +369,16 @@ var ConsentUIHelper = function(consentItems, userId) {
             + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
             + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
             + '<div class="row">'
-            + '<div class="col-md-3 col-sm-3">'
+            + '<div class="col-md-4 col-sm-3 col-xs-3">'
             + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
             + '</div>'
-            + '<div class="col-md-2 col-sm-3">'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
             + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
             + '</div>'
-            + '<div class="col-md-2 col-sm-3">'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
             + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
             + '</div>'
-            + '<div class="col-md-2 col-sm-3">'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
             + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
             + '</div></div>'
             + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
@@ -567,12 +570,21 @@ var ConsentUIHelper = function(consentItems, userId) {
         var content = "";
         content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
         content += this.getHeaderRow(historyHeaderArray);
-        this.items.forEach(function(item, index) {
-            if (!(/null/.test(item.agreement_url))) {
-                if ((options.includeCurrent && !item.deleted) || item.deleted) {
-                    content += self.getConsentHistoryRow(item, index);
-                };
-            };
+ 		
+ 		/*
+ 		 * filtered out deleted items from all consents
+ 		 */
+        var items = $.grep(self.items, function(item) {
+        	return !(/null/.test(item.agreement_url)) && item.deleted;
+        });
+        /*
+         * sort items by last updated date in descending order
+         */
+        items = items.sort(function(a,b){
+                     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
+                });
+        items.forEach(function(item, index) {
+        	content += self.getConsentHistoryRow(item, index);
         });
         content += "</table></div>";
         $("#consentHistoryModal .modal-body").html(content);
