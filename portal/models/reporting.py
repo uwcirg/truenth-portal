@@ -93,6 +93,8 @@ def calculate_days_overdue(user):
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
+    if not trigger_date:
+        return 0
     overdue = qb.calculated_overdue(trigger_date)
     return (datetime.utcnow() - overdue).days if overdue else 0
 
