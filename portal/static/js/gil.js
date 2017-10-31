@@ -935,7 +935,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                               var eitem = $("#intervention_item_" + ct);
                               if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t(d) + '</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="intervention-link">' + i18next.t(d) + '</a></li>');
                                 ct++;
                               };
                           };
