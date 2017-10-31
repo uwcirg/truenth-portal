@@ -298,12 +298,13 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
            };
             $(this).on("click touchstart", function(e) {
               e.stopPropagation();
-              AT.abortRequests();
-              var childOrgs = AT.getHereBelowOrgs([$(this).val()]);
-              if (childOrgs && childOrgs.length > 0) {
-                childOrgs.forEach(function(org) {
-                  $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
-                });
+              if ($(this).is(":checked")) {
+                var childOrgs = AT.getHereBelowOrgs([$(this).val()]);
+                if (childOrgs && childOrgs.length > 0) {
+                  childOrgs.forEach(function(org) {
+                    $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
+                  });
+                };
               };
 
               AT.setTablePreference(AT.userId, "patientList");
