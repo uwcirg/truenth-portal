@@ -99,9 +99,8 @@ def configure_app(app, config):
 
     # Set email "from" addresss if not set yet
     if 'MAIL_DEFAULT_SENDER' not in app.config:
-        app.config['MAIL_DEFAULT_SENDER'] = (
-            'TrueNTH',
-            'noreply@{}'.format(app.config['SERVER_NAME'].split(':')[0])
+        app.config['MAIL_DEFAULT_SENDER'] = '"TrueNTH" noreply@{}'.format(
+            app.config['SERVER_NAME'].split(':')[0]
         )
 
 def configure_profiler(app):
