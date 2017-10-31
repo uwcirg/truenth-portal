@@ -877,25 +877,25 @@ module.exports = OrgTool = (function() {
                     $(".side-nav-items__item--home").hide();
                   };
                   (data.interventions).forEach(function(item) {
-                      var d = item.description;
-                      var b = item.link_url;
-                      var n = item.name.replace(/\_/g, " ");
+                      var itemDescription = item.description;
+                      var itemLink = item.link_url;
+                      var itemName = item.name.replace(/\_/g, " ");
                       var disabled = item.link_url == "disabled";
                       var dm = /decision\s?support/gi;
                       var sm = /symptom\s?tracker/gi;
                       var sm2 = /self[_\s]?management/gi;
                       //console.log(n + " " + d)
-                      if (dm.test(d) || dm.test(n)) {
+                      if (dm.test(itemDescription) || dm.test(itemName)) {
                           if (!disabled) {
                               var ditem = $("#intervention_item_decisionsupport");
                               if (ditem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Decision Support") + '</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="capitalize intervention-link">' + i18next.t("Decision Support") + '</a></li>');
                               };
 
                               found_decision_support = true;
 
                               $(".decision-support-link").each(function() {
-                                $(this).attr("href", b);
+                                $(this).attr("href", itemLink);
                                 $(this).removeClass("icon-box__button--disabled");
                               });
                               $(".icon-box-decision-support").removeClass("icon-box--theme-inactive");
@@ -907,19 +907,19 @@ module.exports = OrgTool = (function() {
                             $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
                           };
                       }
-                      else if (sm.test(d) || sm2.test(n)) {
+                      else if (sm.test(itemDescription) || sm2.test(itemName)) {
                           //do nothing - always display symptom tracker
                           if (!disabled) {
                             var sitem = $("#intervention_item_symptomtracker");
                             if (sitem.length == 0) { //only draw this when there isn't already one
-                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Symptom Tracker") + '</a></li>');
+                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="capitalize intervention-link">' + i18next.t("Symptom Tracker") + '</a></li>');
                             };
 
                             found_symptom_tracker = true;
 
                             $(this).removeClass("icon-box__button--disabled");
                             $(".symptom-tracker-link").each(function() {
-                                $(this).attr("href", b)
+                                $(this).attr("href", itemLink)
                                 $(this).removeClass("icon-box__button--disabled");
                             });
                             $(".icon-box-symptom-tracker").removeClass("icon-box--theme-inactive");
@@ -931,11 +931,11 @@ module.exports = OrgTool = (function() {
                             $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
                           };
                       }
-                      else if ($.trim(d) != "") {
+                      else if ($.trim(itemDescription) != "") {
                           if (!disabled) {
                               var eitem = $("#intervention_item_" + ct);
                               if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="intervention-link">' + i18next.t(d) + '</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="intervention-link">' + i18next.t(itemDescription) + '</a></li>');
                                 ct++;
                               };
                           };
