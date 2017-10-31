@@ -456,10 +456,8 @@ AdminTool.prototype.getDefaultTablePreference = function() {
 };
 
 
-AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter, setColumnSelections) {
+AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter) {
     var prefData = null, self = this;
-    if (self.currentTablePreference) return self.currentTablePreference;
-
     tnthAjax.getTablePreference(userId||self.userId, "patientList", {"sync": true}, function(data) {
       if (data && !data.error) {
         prefData = data || self.getDefaultTablePreference();
@@ -467,32 +465,8 @@ AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter, 
       };
       //set filter values
       if (setFilter) self.setTableFilters(userId||self.userId);
-
-      //column selections
-      if (setColumnSelections) self.setColumnSelections(prefData);
-      
     });
     return prefData;
-};
-
-AdminTool.prototype.setColumnSelections = function() {
-  var prefData = this.getTablePreference(this.userId, "patientList");
-  if (prefData && prefData.filters && prefData.filters.column_selections) {
-      var visibleColumns = $("#adminTable").bootstrapTable("getVisibleColumns");
-      /*
-       * hide visible columns
-       */
-      visibleColumns.forEach(function(c) {
-        $("#adminTable").bootstrapTable("hideColumn", c.field)
-      });
-      /*
-       * show column(s) based on preference
-       */
-      prefData.filters.column_selections.forEach(function(column) {
-          $(".fixed-table-toolbar input[type='checkbox'][data-field='" + column + "']").prop("checked", true);
-          $("#adminTable").bootstrapTable("showColumn", column);
-      });        
-  };
 };
 
 AdminTool.prototype.setTableFilters = function(userId) {
@@ -563,18 +537,7 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
       selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
     });
     if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
-    else __filters["orgs_filter_control"] = "";
-   
-    /*
-     * get column selections
-     */
-     __filters["column_selections"] = [];
-    $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
-      __filters["column_selections"].push($(this).attr("data-field"));
-    });
-
-     data["filters"] = __filters;
-
+    data["filters"] = __filters;
     if (Object.keys(data).length > 0) {
       tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
       this.currentTablePreference = data;
