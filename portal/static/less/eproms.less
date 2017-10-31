@@ -341,7 +341,7 @@ select:not([multiple]) {
   /* :checked */
   label.tab-label.active ~ .tab-content,ß
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 30em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -863,7 +863,7 @@ div.right-panel {
   }
   .truenth-id-label {
      display: none;
-  }
+  } 
   div.card-view {
     display: flex;
   }
@@ -2724,6 +2724,16 @@ div.timezone-warning.text-warning {
   }
   div.search {
     top: 0;
+  }
+
+  #adminTable {
+    TH.id-field,
+    TH[data-field='userid'] {
+      div.th-inner {
+        position: relative;
+        top: -6px;
+      }
+    }
   }
 
   #adminTableToolbar {
