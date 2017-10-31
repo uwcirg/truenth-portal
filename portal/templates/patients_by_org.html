@@ -162,8 +162,6 @@ $(document).ready(function() {
       setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
   }).on("column-search.bs.table", function(e, name, text) {
       setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
-  }).on("column-switch.bs.table", function(e, field, checked) {
-      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
   });
 
   /*
@@ -207,8 +205,6 @@ $(document).ready(function() {
     $("#patientReportLoader").html( __getLoaderHTML());
     $("#patientReportModal").modal({"show": false});
   {% endif %}
-
-  AT.setColumnSelections();
 
 });
 
