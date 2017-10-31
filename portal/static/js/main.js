@@ -136,7 +136,6 @@ var ConsentUIHelper = function(consentItems, userId) {
                     '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
                     headerEnum["historyConsentDate"],
                     headerEnum["lastUpdated"],
-                    headerEnum["comment"],
                     headerEnum["actor"]];
 
     var consentLabels = {
@@ -232,7 +231,6 @@ var ConsentUIHelper = function(consentItems, userId) {
 
             },
             {content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"},
-            {content: "<span class='text-danger'>" + item.deleted.comment + "</span>"},
             {content: (item.deleted.by && item.deleted.by.display? item.deleted.by.display: "--")}
         ];
 
