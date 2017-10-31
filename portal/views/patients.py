@@ -64,14 +64,13 @@ def patients_root():
         OT = OrgTree()
 
         if pref_org_list:
-            # for preferred filtered orgs, we also need to get the children
-            # of each, if any
+            # for preferred filtered orgs
             pref_org_list = set(pref_org_list.split(","))
             for orgId in pref_org_list:
                 check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue
-                org_list.update(OT.here_and_below_id(orgId))
+                org_list.add(orgId)
         else:
             for org in user.organizations:
                 if org.id == 0:  # None of the above doesn't count
