@@ -75,6 +75,10 @@ install:
   - pip install tox
 
 script:
+  - git branch -r
+  - echo $BRANCH
+  - git branch
+  - git remote -v
   - tox
 
 after_success:
