@@ -142,21 +142,11 @@ This script will:
 * Install any dependencies, if necessary
 * Perform any database migrations, if necessary
 * Seed any new data to the database, if necessary
-* Restart apache, if served by apache
 
 .. code:: bash
 
     $ cd $PROJECT_HOME
-    $ ./bin/deploy.sh -fv # -f to force a run, -v for verbose output
-
-When running deploy.sh for the first time, add the -i flag to initialize
-the database. Do not add this flag when running deploy.sh on a working
-database.
-
-.. code:: bash
-
-    $ cd $PROJECT_HOME
-    $ ./bin/deploy.sh -fvi # -i to initialize the database
+    $ ./bin/deploy.sh
 
 To see all available options run:
 
