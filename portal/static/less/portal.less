@@ -214,6 +214,9 @@ a.btn {
     color: #FFF;
   }
 }
+.btn-sm {
+  font-size: @mobileSmallSize;
+}
 .feature-btn {
   transition: all 0.2s ease-in-out 0s;
   -webkit-transition: all 0.2s ease-in-out 0s;
@@ -783,6 +786,9 @@ div.pull-right {
   }
   .search .form-control {
      height: 3em !important;
+  }
+  tr[data-link] {
+    cursor: pointer
   }
 }
 
@@ -2016,6 +2022,13 @@ div.noOrg-container {
   word-break:break-all;
 }
 
+#patientReportContent {
+  overflow: auto;
+  table {
+    font-size: @smallerText;
+  }
+}
+
 #patientReportErrorMessage {
   margin-top: 0.2em;
   margin-bottom: 0.5em;
@@ -2667,6 +2680,9 @@ div.timezone-warning.text-warning {
     font-size: @btnSize;
   }
 
+  .btn-sm {
+    font-size: @mobileSmallSize;
+  }
   .profile-item-container {
       .profile-item-title  {
         max-width: 150px;
@@ -2775,6 +2791,11 @@ div.timezone-warning.text-warning {
           font-size: @baseMobileFontSize;
         }
       }
+    }
+  }
+  #patientReportContent {
+    table {
+      font-size: @baseFontSize;
     }
   }
   .download-wrapper,

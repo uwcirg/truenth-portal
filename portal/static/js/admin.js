@@ -308,7 +308,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
               };
 
               AT.setTablePreference(AT.userId, "patientList");
-              setTimeout(function() { location.reload(); }, 100);
+              setTimeout(function() { loader(true); location.reload(); }, 100);
             });
           });
 
@@ -328,14 +328,14 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                */
               AT.setTablePreference(AT.userId, "patientList");
               if (orgsList.length > 0) {
-                setTimeout(function() { location.reload(); }, 100);
+                setTimeout(function() { loader(true); location.reload(); }, 100);
               };
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               AT.clearOrgsSelection();
               AT.setTablePreference(AT.userId, "patientList");
-              setTimeout(function() { location.reload(); }, 100);
+              setTimeout(function() { loader(true); location.reload(); }, 100);
           });
           $("#orglist-close-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -583,7 +583,7 @@ AdminTool.prototype.getReportModal = function(patientId) {
               });
               content += "</table>";
               content += "<br/>";
-              content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
+              content += "<a class='btn btn-tnth-primary btn-sm btn-all'>" + i18next.t("View All") + "</a>";
 
               $("#patientReportContent").html(content);
               if (count > 1) $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
@@ -597,6 +597,22 @@ AdminTool.prototype.getReportModal = function(patientId) {
           } else $("#patientReportMessage").html(i18next.t("Error occurred retrieving patient report"));
         };
       $("#patientReportLoader").addClass("tnth-hide");
+  });
+};
+
+AdminTool.prototype.rowLinkEvent = function () {
+  $("tr[data-link]").delegate("td", "click", function(e) {
+    if (e.target && (e.target.tagName.toLowerCase() != "td")) {
+      if (e.target.tagName.toLowerCase() == "a" && e.target.click) {
+        return;
+      };
+    };
+    e.preventDefault();
+    e.stopPropagation();
+    document.location = $(this).closest("tr").attr("data-link");
+  });
+  $(".admin-table button[name='toggle']").on("click", function() {
+    AT.rowLinkEvent();
   });
 };
 
