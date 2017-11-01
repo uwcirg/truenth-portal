@@ -80,6 +80,7 @@
 @labelColor: #777;
 @wellColor: rgba(203, 210, 217, 0.2);
 @wellBorderColor: #f1efef;
+@disabledColor: #bfc3c3;
 
 @inputHeight: 2.4em;
 
@@ -166,6 +167,8 @@ a.btn {
 }
 .btn a {
   text-decoration: none;
+  word-break: break-word;
+  white-space: normal;
 }
 .tnth-hide {
   display: none;
@@ -267,6 +270,81 @@ a.btn {
     text-align: left;
 }
 
+/* Accordion styles */
+.tabs-container {
+  .tab {
+    position: relative;
+    margin-bottom: 1px;
+    width: 100%;
+    overflow: hidden;
+  }
+  input.tab-input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+  }
+  label.tab-label {
+    position: relative;
+    display: block;
+    padding: 0 0.5em 0 2.5em;
+    color: #777777;
+    border: 1px solid #b8babb;
+    font-weight: normal;
+    line-height: 3;
+    cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+    font-weight: normal;
+  }
+  label.tab-label.active,
+  label.tab-label:hover {
+    color: @linkHover;
+  }
+  label.tab-label.active {
+    font-weight: 500
+  }
+  .tab-content {
+    max-height: 0;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    -webkit-transition: max-height .35s;
+    -o-transition: max-height .35s;
+    transition: max-height .35s;
+  }
+  /* :checked */
+  label.tab-label.active ~ .tab-content,
+  input.tab-input:checked ~ .tab-content {
+    max-height: 25em;
+    margin: 1em auto;
+    padding: 0.5em;
+    border: 1px solid #e4dfdf;
+  }
+  /* Icon */
+  label.tab-label::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 3em;
+    height: 3em;
+    line-height: 3;
+    text-align: center;
+    -webkit-transition: all .35s;
+    -o-transition: all .35s;
+    transition: all .35s;
+  }
+  input.tab-input + label.tab-label::after {
+    content: "\25BC";
+  }
+  input.tab-input:checked + label.tab-label::after {
+    transform: rotateX(180deg);
+  }
+}
+#mainDiv.profile .tabs-container {
+  margin-bottom: 1.5em;
+}
 #regForm input,
 #loginForm input
 {
@@ -417,17 +495,12 @@ div.right-panel {
 #termsText.agreed {
   display: block;
 }
+#topTerms .well {
+  padding: 2em 1em 1em 1em;
+}
 #topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
-}
-#topTerms .custom-tou,
-#topTerms .custom-tou-text {
-  display: none;
-}
-
-#topTerms .custom-tou-text a {
-  text-decoration: underline;
 }
 #topTerms .terms-checkbox-container {
   margin-left: 2em;
@@ -442,6 +515,10 @@ div.right-panel {
     margin: 1em auto;
   }
   a.form-link {
+    text-decoration: underline;
+  }
+  .required-link {
+    font-weight: normal;
     text-decoration: underline;
   }
 }
@@ -564,13 +641,13 @@ div.right-panel {
     font-size: @smallBtnSize;
   }
   #next {
-    opacity: 1;
     width: 110px;
     max-width: 100%;
     margin-left: 0.2em;
   }
   #next:disabled {
-    opacity: 0.6;
+    background: @disabledColor;
+    border: 1px solid @disabledColor;
   }
   #next.open, #updateProfile.open {
     opacity: 1;
@@ -589,6 +666,8 @@ div.right-panel {
     height: 6em;
     line-height: 58px;
     background-color: #FFF;
+    background: -moz-linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
+    background: -webkit-linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
     background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
     border-bottom: 1px solid #FBFBFA;
     border-top: 1px solid rgba(203, 210, 217, 0.2);
@@ -673,28 +752,44 @@ div.right-panel {
   }
 }
 
+.bootstrap-table {
+  .pull-right {
+    .btn {
+      padding: 0.45em 0.8em;
+    }
+  }
+}
+
 div.columns {
    top: 4px;
 }
 div.pull-right {
-	top: 0.35em;
+  top: 0.35em;
 }
 .admin-table {
   div.pull-right {
     width: 100%;
     max-width: 100%;
     padding: 0 0.2em;
+
+    button {
+      padding: 0.75em !important;
+    }
   }
   div.pull-right.search {
     width: 50%;
     float: left !important;
     max-width: 100%;
   }
+  .search .form-control {
+     height: 3em !important;
+  }
 }
 
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+
   div.card-view {
     display: flex;
   }
@@ -703,6 +798,8 @@ div.pull-right {
     color: @linkHover;
   }
   TH {
+    background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
+    background-image: -webkit-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
@@ -718,22 +815,32 @@ div.pull-right {
     white-space: nowrap;
   }
   td.reports-field div.staff-html {
-    margin-top: 0.6em;
-    margin-bottom: 0.8em;
+    margin: 0.8em auto;
   }
-  td.reports-field a {
-    width: 4em;
-    max-width: 100%;
-    padding: 0.5em;
-    color: #fff;
-    background-color: @featureBtnBgColor;
-    border-color: @featureBtnBgColor;
-    transition: all 0.3s ease-in-out 0s;
-    -webkit-transition: all 0.3s ease-in-out 0s;
-    border-radius: 0;
-    letter-spacing: 2px;
-    margin: 0 0.2em;
-    white-space: nowrap;
+  td.reports-field {
+    a {
+      width: 4em;
+      max-width: 100%;
+      padding: 0.6em;
+      color: #fff;
+      background-color: @featureBtnBgColor;
+      border-color: @featureBtnBgColor;
+      transition: all 0.3s ease-in-out 0s;
+      -webkit-transition: all 0.3s ease-in-out 0s;
+      border-radius: 0;
+      letter-spacing: 2px;
+      margin: 0 0.2em;
+      white-space: nowrap;
+    }
+    a.btn-report {
+      padding: .4em .2em;
+      margin: 0.2em .2em 0.3em .2em;
+    }
+    a.btn-report-2 {
+      margin-left: -1.5em;
+      padding-left: 0;
+      width: 3.5em;
+    }
   }
   .eproms-id-label {
     display: none
@@ -790,7 +897,7 @@ div.pull-right {
     div.org-container {
       display: block;
       * {
-      	font-size: @mobileOrgSize;
+        font-size: @mobileOrgSize;
       }
       label.org-label {
         display: inline-block;
@@ -814,9 +921,38 @@ div.pull-right {
     }
   }
 }
-#userStatsContainer .indent {
-  padding: 0 2em !important;
+
+/* reporting dashboard styling */
+.nav-tabs.rd-nav>li.active>a,
+.nav-tabs.rd-nav>li.active>a:focus,
+.nav-tabs.rd-nav>li.active>a:hover {
+    background-color: #6f7984;
+    color: #FFF;
 }
+.rd-content-container {
+    min-height: 50vh;
+}
+.stats-container {
+    padding: 1em;
+    display: none;
+   .columns-right .btn {
+      padding: 0.6em;
+   }
+}
+.stats-container.active {
+   display: block;
+}
+.stats-info {
+    background-color: #F7F7F7;
+    padding: 1em;
+    margin: 1em auto;
+}
+.stats-table {
+  .filterControl .form-control {
+    font-weight: normal;
+  }
+}
+
 #loginEmailReminderText
 {
   margin-left: 8px;
@@ -1376,6 +1512,8 @@ div.pull-right {
 }
 .profile-item-container {
   background-color: #EFF5F3;
+  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%) ;
   padding: 2em;
   margin: 0.5em auto;
@@ -1405,6 +1543,27 @@ div.pull-right {
   word-break: break-word;
 }
 
+#mainDiv.profile,
+.tnth-table {
+  width: 100%;
+  max-width: 100%;
+  TH {
+    background-color: @rowBackgroundColor;
+    color: #FFF;
+    font-weight: normal;
+  }
+  tr:hover {
+    background-color: @rowHoverBgColor;
+    cursor: pointer;
+  }
+  tr.odd {
+    background-color: #F7F7F7;
+  }
+  tr.even {
+    background-color: #FFF;
+  }
+}
+
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
@@ -1419,11 +1578,11 @@ div.pull-right {
   }
 
   #btnProfileSendEmail {
-  	margin-top: 1em;
-  	font-size: @smallBtnSize;
+    margin-top: 1em;
+    font-size: @smallBtnSize;
   }
   #btnPasswordResetEmail {
-  	font-size: @smallBtnSize;
+    font-size: @smallBtnSize;
   }
 
   h4.detail-title {
@@ -1500,22 +1659,6 @@ div.pull-right {
     color: #FFF;
     letter-spacing: 1px;
   }
-  TH {
-    background-color: @rowBackgroundColor;
-    color: #FFF;
-    padding: 0.25em 0.5em;
-    font-weight: normal;
-  }
-  tr:hover {
-    background-color: @rowHoverBgColor;
-    cursor: pointer;
-  }
-  tr.odd {
-    background-color: #F7F7F7;
-  }
-  tr.even {
-    background-color: #FFF;
-  }
   & .copyright-container *,
   & .logo-container * {
     color: @footerWhiteThemeColor;
@@ -1544,9 +1687,9 @@ div.pull-right {
     margin-bottom: 1.8em;
   }
   #biopsyDateContainer {
-	label {
-		margin-bottom: 0.2em;
-	}
+  label {
+    margin-bottom: 0.2em;
+  }
   }
 }
 #mainDiv.profile .copyright-container,
@@ -1583,6 +1726,34 @@ div.pull-right {
 .communication-prompt {
   margin-bottom: 1em;
 }
+.communication-detail-button {
+  margin-right: 0.5em;
+}
+#commDetailTable {
+  .label-cell {
+    padding: 0.5em 0.5em 0.5em 0
+  }
+  .content {
+    padding: 0.5em;
+    background: #f7f9fb;
+  }
+  .btn {
+    font-size: 0.9em;
+    display: inline-block;
+    color: #FFF;
+    background-color: #7C959E;
+    border-color: #7C959E;
+    border-radius: 0;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.42857143;
+    font-weight: 400;
+    padding: 0.6em;
+    text-decoration: none;
+  }
+}
 #createUserLink {
   border: 1px solid #bdb9b9;
   height: 3em;
@@ -1607,8 +1778,8 @@ div.pull-right {
     margin-bottom: 0
   }
   .checkbox {
-	  margin-left: 0.1em;
-	  margin-right: 0.1em;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
   }
 }
 .profile-create-item-container {
@@ -1647,7 +1818,7 @@ div.main-state-container .noOrg-container {
 
 #fillOrgs *,
 .noOrg-container * {
-	font-size: @mobileOrgSize;
+  font-size: @mobileOrgSize;
 }
 #fillOrgs {
   margin-top: 0.2em;
@@ -1661,8 +1832,8 @@ div.main-state-container .noOrg-container {
     padding: 0 1em;
   }
   input[type="checkbox"] {
-  	position: relative;
-  	right: 2px;
+    position: relative;
+    right: 2px;
   }
   input.clinic {
     margin-top: 6px;
@@ -1697,15 +1868,15 @@ div.noOrg-container {
   label {
     font-weight: normal;
   }
-	input[type="radio"] {
-	  top: 2px;
+  input[type="radio"] {
+    top: 2px;
   }
   span {
-	  margin-left:2px;
-	  position: relative;
-	  top: 1px;
-	  left: 2px;
-	  font-weight: normal;
+    margin-left:2px;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    font-weight: normal;
   }
 }
 #phone,#email,#altPhone  {
@@ -1733,8 +1904,8 @@ div.noOrg-container {
   #bdGroup {
     margin-bottom: 0.1em;
     padding-bottom: 0;
-	.flex {
-    	flex-wrap: wrap;
+  .flex {
+      flex-wrap: wrap;
     }
   }
   #erroremail {
@@ -1779,6 +1950,8 @@ div.noOrg-container {
   width: 100%;
   max-width: 100%;
   border: solid 2px #F1F1F1;
+  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
 }
 #createProfileForm[data-account='patient'] #bdGroup {
@@ -1786,7 +1959,7 @@ div.noOrg-container {
 }
 #createProfileForm[data-account='staff'] {
   #userOrgs {
-	 margin-top: 0;
+   margin-top: 0;
   }
 }
 
@@ -2016,10 +2189,12 @@ div.noOrg-container {
 }
 .pagination-detail {
   font-size: @mediumText;
+  button.dropdown-toggle {
+    padding: 0.4em 0.6em;
+  }
 }
 
 .pagination {
-
   >.active>a {
     background-color: @featureBtnBgColor;
     border-color: @featureBtnBgColor;
@@ -2044,9 +2219,6 @@ div.noOrg-container {
     background-color: @linkHover;
     border-color: @linkHover;
   }
-}
-
-.pagination {
   >li>a {
     color: @btnColor;
   }
@@ -2110,6 +2282,10 @@ div.noOrg-container {
 .modal button,
 .modal a.btn {
   font-size: @baseMobileFontSize;
+}
+#emailBodyModal .body-content {
+  overflow: hidden;
+  font-size: @mediumText;
 }
 .hide {
   display: none;
@@ -2204,6 +2380,19 @@ color: @labelColor
   display: inline;
 }
 
+#viewConsentHistoryButton,
+#profileConsentHistory {
+  display: none;
+}
+
+#profileConsentList,
+#profileConsentHistory {
+  .eproms-consent-status-header,
+  .eproms-consent-date-header,
+  .eproms-tou-table-text {
+      display: none;
+  }
+}
 #profileConsentList {
   max-width: 100%;
   padding: 0.1em;
@@ -2218,13 +2407,7 @@ color: @labelColor
     background-color: @rowBackgroundColor;
     color: #FFF;
     font-weight: normal;
-    padding-left: 0.6em;
-    padding-right: 0.6em;
-  }
-  .eproms-consent-status-header,
-  .eproms-consent-date-header,
-  .eproms-tou-table-text {
-      display: none;
+    padding: 8px;
   }
 }
 #identityVerificationContainer {
@@ -2320,7 +2503,7 @@ div.org-container {
     margin-bottom: 0;
   }
   input {
-  	margin: 0.5em 0;
+    margin: 0.5em 0;
   }
 }
 div.biopsy-option:last-of-type{
@@ -2362,6 +2545,8 @@ div.timezone-warning.text-warning {
   text-transform: capitalize
 }
 .gradient {
+  background-image: -moz-linear-gradient(to top right, #FFF, #e1e2e1);
+  background-image: -webkit-linear-gradient(to top right, #FFF, #e1e2e1);
   background-image: linear-gradient(to top right, #FFF, #e1e2e1);
 }
 /** Responsive sizes **/
@@ -2391,13 +2576,13 @@ div.timezone-warning.text-warning {
   }
 
   #altPhone, #email, #phone {
-  	width: 300px;
+    width: 300px;
   }
   #profileForm {
-	  #firstname,
-	  #lastname {
-	    width: 300px;
-	  }
+    #firstname,
+    #lastname {
+      width: 300px;
+    }
   }
 }
 @media (min-width: 507px) {
@@ -2467,7 +2652,7 @@ div.timezone-warning.text-warning {
   }
   .fixed-table-container thead th,
   .fixed-table-container thead th .both {
-    font-size: @baseFontSize*0.95;
+    font-size: @baseFontSize*0.98;
   }
 
   .tnth-form .form-group > label {
@@ -2527,7 +2712,7 @@ div.timezone-warning.text-warning {
     top: -1px;
   }
   .indent {
-  	padding: 0 1em;
+    padding: 0 1em;
   }
   #homeFooter {
     font-size: @footerSize;
@@ -2541,20 +2726,17 @@ div.timezone-warning.text-warning {
   }
 
   #bdGroup {
-	  #month {
-	    max-width: 100%;
-	    width: 250px;
-	  }
+    #month {
+      max-width: 100%;
+      width: 250px;
+    }
   }
 
   div.columns {
     top: 0;
   }
   div.pull-right {
-	top: 0;
-  }
-  .search .form-control {
-    height: 3em;
+  top: 0;
   }
 
   #adminTable {
@@ -2624,7 +2806,7 @@ div.timezone-warning.text-warning {
 
   #fillOrgs *,
   .noOrg-container *  {
-  	font-size: @baseFontSize * 0.95;
+    font-size: @baseFontSize * 0.95;
   }
 
   .iq-container .noOrg-container *  {
@@ -2695,8 +2877,8 @@ div.timezone-warning.text-warning {
    #progressWrapper {
       width: 80%;
     .progressbar li {
-      	font-size: 12px;
-    	}
+        font-size: 12px;
+      }
     .progressbar {
       position: relative;
       left: -3%;
@@ -2743,9 +2925,14 @@ div.timezone-warning.text-warning {
       margin: 0 0 15px 15px;
     }
   }
+  #topTerms {
+    .terms-tick-box-text {
+      width: 96.5%;
+    }
+  }
   #patientListOptions,
   #staffListOptions {
-  	display: flex;
+    display: flex;
     flex-direction: row;
     & > span:last-of-type {
       margin-top: 0.7em;
@@ -2791,14 +2978,14 @@ div.timezone-warning.text-warning {
     font-size: @subheadSize;
   }
   #biopsyDateContainer {
-  	input {
-  		margin: 0;
-  	}
+    input {
+      margin: 0;
+    }
   }
   #mainDiv.profile {
-  	.profile-item-container  {
-  		padding: 2em 3em 2.7em 3em;
-  	}
+    .profile-item-container  {
+      padding: 2em 3em 2.7em 3em;
+    }
   }
   #createProfileForm {
     #emailGroup {
@@ -2839,30 +3026,30 @@ div.timezone-warning.text-warning {
   }
 
   #aboutForm {
-  	div.heading::before {
-	   border-radius: 100%;
-	   width: 52px;
-	   height: 52px;
-	   font-size: @subheadSize;
-	   line-height: 1;
-	   content: "\EA03";
-	   display: inline-block;
-	   font-family: "symbols";
-	   font-style: normal;
-	   font-weight: normal;
-	   line-height: 1;
-	   margin: 0 auto;
-	   -webkit-font-smoothing: antialiased;
-	   color: #ccc;
-	   position: absolute;
-	   top: 3em;
-	   left: 0;
-	   right: 0;
-	   margin-left: auto;
-	   margin-right: auto;
-	   margin-bottom: 1em;
-	   cursor: pointer;
-	  }
+    div.heading::before {
+     border-radius: 100%;
+     width: 52px;
+     height: 52px;
+     font-size: @subheadSize;
+     line-height: 1;
+     content: "\EA03";
+     display: inline-block;
+     font-family: "symbols";
+     font-style: normal;
+     font-weight: normal;
+     line-height: 1;
+     margin: 0 auto;
+     -webkit-font-smoothing: antialiased;
+     color: #ccc;
+     position: absolute;
+     top: 3em;
+     left: 0;
+     right: 0;
+     margin-left: auto;
+     margin-right: auto;
+     margin-bottom: 1em;
+     cursor: pointer;
+    }
    }
 
   #profileForm {

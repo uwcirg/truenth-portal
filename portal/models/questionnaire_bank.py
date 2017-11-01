@@ -260,12 +260,17 @@ class QuestionnaireBank(db.Model):
         def validate_classification_count(qbs):
             if qbs and qbs[0].classification == 'recurring':
                 return
-            if len(qbs) > 1:
-                current_app.logger.error(
-                    "multiple QuestionnaireBanks for {user} with "
-                    "{classification} found.  The UI won't correctly display "
-                    "more than one at this time.".format(
-                        user=user, classification=classification))
+            if (len(qbs) > 1):
+                errstr = ("multiple QuestionnaireBanks for {user} with "
+                          "{classification} found.  The UI won't correctly "
+                          "display more than one at this "
+                          "time.").format(user=user,
+                                          classification=classification)
+                systype = current_app.config.get('SYSTEM_TYPE', '').lower()
+                if systype == 'production':
+                    current_app.logger.error(errstr)
+                else:
+                    current_app.logger.warn(errstr)
 
         validate_classification_count(results)
         return results

@@ -33,7 +33,7 @@ from ..views.intervention import intervention_api
 from ..views.patient import patient_api
 from ..views.patients import patients
 from ..views.procedure import procedure_api
-from ..views.portal import portal, page_not_found, server_error
+from ..views.portal import portal
 from ..views.organization import org_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.tou import tou_api
@@ -78,7 +78,6 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_csrf(app)
     configure_dogpile(app)
     configure_jinja(app)
-    configure_error_handlers(app)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
@@ -98,6 +97,11 @@ def configure_app(app, config):
     if config:
         app.config.from_object(config)
 
+    # Set email "from" addresss if not set yet
+    if 'MAIL_DEFAULT_SENDER' not in app.config:
+        app.config['MAIL_DEFAULT_SENDER'] = '"TrueNTH" <noreply@{}>'.format(
+            app.config['SERVER_NAME'].split(':')[0]
+        )
 
 def configure_profiler(app):
     if app.config.get('PROFILE'):
@@ -129,12 +133,6 @@ def configure_dogpile(app):
 def configure_jinja(app):
     app.jinja_env.globals.update(app_text=app_text)
     app.jinja_env.globals.update(ROLE=ROLE)
-
-
-def configure_error_handlers(app):
-    if not app.debug:
-        app.register_error_handler(404, page_not_found)
-        app.register_error_handler(500, server_error)
 
 
 def configure_extensions(app):
@@ -180,6 +178,17 @@ def configure_extensions(app):
 
 def configure_blueprints(app, blueprints):
     """Register blueprints with application"""
+    # Load GIL or ePROMs blueprint (which define several of the same request
+    # paths and would therefore conflict with one another) depending on config
+    if app.config.get('GIL') and not app.config.get('HIDE_GIL'):
+        from ..gil.views import gil
+        from ..exercise_diet.views import exercise_diet
+        app.register_blueprint(gil)
+        app.register_blueprint(exercise_diet)
+    else:
+        from ..eproms.views import eproms
+        app.register_blueprint(eproms)
+
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 
@@ -279,7 +288,7 @@ def configure_cache(app):
     requests_cache.install_cache(
         cache_name=app.name,
         backend='redis',
-        expire_after=app.config.get('REQUEST_CACHE_EXPIRE', 10),
+        expire_after=app.config['REQUEST_CACHE_EXPIRE'],
         include_get_headers=True,
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),

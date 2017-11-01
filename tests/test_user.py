@@ -6,7 +6,7 @@ import re
 import urllib
 from sqlalchemy import and_
 from datetime import datetime
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase, TEST_USER_ID, TEST_USERNAME
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -14,6 +14,7 @@ from portal.models.encounter import Encounter
 from portal.models.fhir import Coding, UserEthnicity, UserIndigenous
 from portal.models.fhir import CodeableConcept, ValueQuantity
 from portal.models.fhir import Observation, UserObservation
+from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrganizationLocale
 from portal.models.performer import Performer
 from portal.models.reference import Reference
@@ -1051,3 +1052,30 @@ class TestUser(TestCase):
         user.organizations.append(org)
         # test locale inheritance
         self.assertEquals(user.locale_display_options,set(['en_AU']))
+
+    def test_user_messages(self):
+        msg1 = EmailMessage(subject='Test #1',
+                            recipients=TEST_USERNAME,
+                            sender='__system__',
+                            body='Test message.',
+                            sent_at=datetime.utcnow())
+
+        msg2 = EmailMessage(subject='Test #2',
+                            recipients=TEST_USERNAME,
+                            sender='__system__',
+                            body='Test message.',
+                            sent_at=datetime.utcnow())
+
+        with SessionScope(db):
+            db.session.add(msg1)
+            db.session.add(msg2)
+            db.session.commit()
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        resp = self.client.get('/api/user/{}/messages'.format(TEST_USER_ID))
+
+        self.assert200(resp)
+        self.assertEquals(len(resp.json['messages']), 2)
+        self.assertEquals(resp.json['messages'][0]['body'], 'Test message.')

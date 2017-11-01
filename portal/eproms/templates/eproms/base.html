@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <title>{{ app_text('layout title') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/eproms.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+{# sets container to full-width #}
+{%- set splashView = false -%}
+{%- if request.path=="/user/sign-in" or no_nav=="true" -%}
+    {%- set splashView = true -%}
+{%- endif -%}
+{# sets columns of main container to col-xs-12 #}
+{%- set wideContainer = false -%}
+{%- if wide_container and wide_container=="true" -%}
+    {%- set wideContainer = true -%}
+{%- endif -%}
+<body>
+    <div id="loadingIndicator" class="loading-indicator">Loading...</div>
+    {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
+    <div id="mainNav" {% if splashView %}class="hidden"{% endif %}></div>
+    <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
+      <div id="mainDiv">
+          <div class="container{% if splashView %}-fluid{% endif %}">
+            <div class="row">
+                <div class="col-xs-12 {% if not wideContainer %}col-lg-12{% endif %}">
+                    {% block main -%}
+                    {%- endblock %}
+                </div>
+            </div>
+          </div>
+        {% block footer -%}
+            {%- from "flask_user/_macros.html" import footer -%}
+            {%- if splashView -%}
+                {{ footer(splash_style=true) }}
+            {%- else -%}
+                {{ footer() }}
+            {%- endif -%}
+        {%- endblock -%}
+      </div> {# <!-- <div id="mainDiv"> --> #}
+    </div> {# <!-- <div id="mainHolder"> --> #}
+
+    {# One-time system messages called Flash messages #}
+    {% block flash_messages %}
+        {%- with messages = get_flashed_messages(with_categories=true) -%}
+            {% if messages %}
+                {# Hack to prevent modal if it's only successful login #}
+                {% set showMessages = true %}
+                {% if messages|first|last == "You have signed in successfully." %}
+                    {% set showMessages = false %}
+                {% endif %}
+                {% if showMessages %}
+                    {# Modal dialog for alerts #}
+                    <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}"><span aria-hidden="true">&times;</span></button>
+                            <h2 class="modal-title">{{ _("TrueNTH") }}</h2>
+                          </div>
+                          <div class="modal-body">
+                            {% for category, message in messages -%}
+                                {% if category=='error' %}
+                                    {% set category='danger' %}
+                                {% endif %}
+                                <p class="text-{{category}}">{{ message|safe }}</p>
+                            {%- endfor %}
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Close") }}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {# Modal dialog opens on page load because we went to display alert(s) #}
+                    <script>
+                      $('#alertModal').modal('show')
+                    </script>
+                {% endif %}
+            {% endif %}
+        {%- endwith %}
+    {% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+<script src="https://unpkg.com/i18next-xhr-backend@1.4.3/i18nextXHRBackend.min.js"></script>
+<script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.min.js" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
+{%block table_export_filter_script %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js" async></script>
+<script src="{{ url_for('static', filename='js/bootstrap-table-filter-control.js') }}"></script>
+{% endblock %}
+{%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
+<script>
+PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
+PORTAL_HOSTNAME = "";
+function _setHostName(url) {
+    if (url) {
+        var parser = document.createElement("a");
+        parser.href = url;
+        PORTAL_HOSTNAME = parser.hostname;
+    };
+};
+_setHostName(PORTAL_NAV_PAGE);
+var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+if (LOGIN_AS_PATIENT) {
+  if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+  window.addEventListener('popstate', function(event) {
+    if (typeof history != 'undefined' && history.pushState) {
+      history.pushState(null, null, location.href);
+    } else {
+      window.history.forward(1);
+    };
+  });
+};
+var __CRSF_TOKEN = "{{csrf_token()}}";
+var __CRSF_TOKEN_HEADER = {
+    "X-CSRFToken": __CRSF_TOKEN
+};
+ __i18next.init({"debug": false, "initImmediate": true});
+
+$("#homeFooter .logo-link").each(function() {
+  if (! hasValue($.trim($(this).attr("href")))) {
+      $(this).removeAttr("target");
+      $(this).on("click", function(e) {
+        e.preventDefault();
+        return false;
+      });
+  };
+});
+{% block document_ready -%}
+{%- endblock %}
+</script>
+</body>
+</html>

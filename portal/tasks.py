@@ -22,9 +22,13 @@ from factories.celery import create_celery
 from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
-from .models.communication import Communication
+from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
+from .models.communication import Communication, load_template_args
 from .models.communication_request import queue_outstanding_messages
-from .models.reporting import get_reporting_stats
+from .models.message import EmailMessage
+from .models.organization import Organization, OrgTree
+from .models.reporting import get_reporting_stats, overdue_stats_by_org
+from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
@@ -188,6 +192,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 
     for user in valid_patients:
         if update_cache:
+            dogpile_cache.invalidate(overall_assessment_status, user.id)
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
             if not user.email or '@' not in user.email:
@@ -247,7 +252,7 @@ def send_user_messages(email, force_update=False):
     """
     if force_update:
         user = User.query.filter(User.email == email).one()
-        invalidate_assessment_status_cache(user)
+        invalidate_assessment_status_cache(user_id=user.id)
         qbd = QuestionnaireBank.most_current_qb(user=user)
         if qbd.questionnaire_bank:
             queue_outstanding_messages(
@@ -267,6 +272,52 @@ def send_user_messages(email, force_update=False):
     if force_update:
         message += " after forced update"
     return message
+
+
+@celery.task
+def send_questionnaire_summary(job_id, cutoff_days, org_id):
+    "Generate and send a summary of questionnaire counts to all Staff in org"
+    try:
+        before = datetime.now()
+        generate_and_send_summaries(cutoff_days, org_id)
+        duration = datetime.now() - before
+        message = (
+            'Sent summary emails in {0.seconds} seconds'.format(duration))
+        current_app.logger.debug(message)
+    except Exception as exc:
+        message = ("Unexpected exception in `send_questionnaire_summary` "
+                   "on {} : {}".format(job_id, exc))
+        logger.error(message)
+        logger.error(format_exc())
+    update_current_job(job_id, 'send_questionnaire_summary', status=message)
+    return message
+
+
+def generate_and_send_summaries(cutoff_days, org_id):
+    ostats = overdue_stats_by_org()
+    cutoffs = [int(i) for i in cutoff_days.split(',')]
+
+    ot = OrgTree()
+    top_org = Organization.query.get(org_id)
+    if not top_org:
+        raise ValueError("No org with ID {} found.".format(org_id))
+    name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
+
+    for user in User.query.filter_by(deleted_id=None).all():
+        if (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
+                and (top_org in ot.find_top_level_org(user.organizations))):
+            args = load_template_args(user=user)
+            args['eproms_site_summary_table'] = generate_overdue_table_html(
+                cutoff_days=cutoffs,
+                overdue_stats=ostats,
+                user=user,
+                top_org=top_org)
+            summary_email = MailResource(app_text(name_key), variables=args)
+            em = EmailMessage(recipients=user.email,
+                              sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                              subject=summary_email.subject,
+                              body=summary_email.body)
+            em.send_message()
 
 
 def update_current_job(job_id, func_name, runtime=None, status=None):

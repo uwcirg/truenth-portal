@@ -9,15 +9,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
-    {% set stylesheet = url_for('static', filename=config.PORTAL_STYLESHEET) %}
-    <link rel="stylesheet" href="{{ stylesheet }}">
+    <link rel="stylesheet" href="{{config.PORTAL_STYLESHEET}}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 {# sets container to full-width #}
 {%- set splashView = false -%}
@@ -133,7 +132,11 @@ var __CRSF_TOKEN = "{{csrf_token()}}";
 var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
- __i18next.init({"debug": false, "initImmediate": true});
+ __i18next.init({
+  "debug": false, 
+  "initImmediate": false,
+  "ns": ["translation", "custom"]
+  });
 
 $("#homeFooter .logo-link").each(function() {
   if (! hasValue($.trim($(this).attr("href")))) {

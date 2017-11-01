@@ -36,6 +36,21 @@ def time_request(url):
     return response
 
 
+def get_terms(org=None, role=None):
+    """Shortcut to lookup correct terms given org and role"""
+    if org:
+        try:
+            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.
+                                               name_key(organization=org, role=role)))
+        except UndefinedAppText:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    return terms
+
+
 class AppText(db.Model):
     """Model representing application specific strings for customization
 
@@ -223,14 +238,33 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
-        TODO: Removing hardcoding of 'CRV' and 'IRONMAN'
+        TODO: Removing hardcoding of ePROMS org names
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('CRV', 'IRONMAN'):
+        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
             return "profileSendEmail invite email {}".format(kwargs.get('org'))
         return "profileSendEmail invite email"
+
+
+class SiteSummaryEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Site Summary Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for Site Summary Email Content
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+        TODO: Removing hardcoding of ePROMs org names
+
+        :returns: string for AppText.name field
+
+        """
+        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
+            return "site summary email {}".format(kwargs.get('org'))
+        return "site summary email"
 
 
 class AboutATMA(AppTextModelAdapter):

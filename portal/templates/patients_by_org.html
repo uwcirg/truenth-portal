@@ -30,8 +30,6 @@
              class="tnth-admin-table"
              data-classes="table table-hover table-condensed table-striped table-responsive"
              data-toggle="table"
-             data-sort-name="id"
-             data-sort-order="desc"
              data-search="true"
              data-pagination="true"
              data-page-size="10"
@@ -64,7 +62,7 @@
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.stripLinksTextSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
-                  <th data-field="organization" data-sortable="true" data-class="organization-field" data-filter-control="select">{{ _("Site(s)") }}</th>
+                  <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
           <tbody id="admin-table-body" data-link="row" class="rowlink">
@@ -79,7 +77,8 @@
                       <td>{{ patient.phone if patient.phone}}</td>
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
+                        <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
+                          {% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<a class="btn btn-tnth-primary btn-report btn-report-{{loop.index}}" onclick="AT.getReportModal({{patient.id}})">{% if doc.intervention.description == 'Symptom Tracker' %}{{_('ST')}}{% else %}{{ _('DS')}}{% endif %}</a>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
@@ -102,6 +101,26 @@
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
 </div>
+{% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
+  <div class="modal fade" id="patientReportModal" tabindex="-1" role="dialog" aria-labelledby="patientReportModal">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">{{ _("Patient Report") }}</h4>
+              </div>
+              <div class="modal-body">
+                  <div id="patientReportLoader" class="tnth-hide"></div>
+                  <div id="patientReportContent"></div>
+                  <div id="patientReportMessage" class="error-message"></div>
+              </div>
+              <div class="modal-footer" >
+                  <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endif %}
 {% endblock %}
 {% block table_export_filter_script %}
 {{super()}}
@@ -114,16 +133,20 @@
 {% block document_ready %}
 
 var AT = new AdminTool({{user.id}});
+var sortObj = AT.getTablePreference({{user.id}}, "patientList");
 /*
 * initializing bootstrapTable
 */
-$(".tnth-admin-table").bootstrapTable({
+$("#adminTable").bootstrapTable({
   formatShowingRows: function (pageFrom, pageTo, totalRows) {
       var thisId = $(this).attr("tableId");
       var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
       $("#tableCount"+thisId).html(rowInfo);
       return rowInfo;
   },
+  sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
+  sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
+  filterBy: sortObj,
   exportOptions: {
       fileName: __getExportFileName("PatientList_")
   }
@@ -135,7 +158,12 @@ $(document).ready(function() {
    */
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+  }).on("sort.bs.table", function(e, name, order) {
+      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
+  }).on("column-search.bs.table", function(e, name, text) {
+      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
   });
+
   /*
    * add placeholder text for filter controls
    */
@@ -153,7 +181,8 @@ $(document).ready(function() {
   /*
    * fade loading spinner on page load
    */
-  AT.fadeLoader();
+  DELAY_LOADING = true;
+  setTimeout(function() { AT.fadeLoader(); }, 150);
 
   /*
    *  hide checkbox for hidden id field from side menu
@@ -169,7 +198,14 @@ $(document).ready(function() {
         org_list[{{org}}] = true;
     {% endfor %}
   {% endif %}
+  
   AT.initOrgsList(org_list, 'patients');
+
+  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
+    $("#patientReportLoader").html( __getLoaderHTML());
+    $("#patientReportModal").modal({"show": false});
+  {% endif %}
+
 });
 
 {% endblock %}

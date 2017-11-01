@@ -210,26 +210,11 @@ class Communication(db.Model):
             'Communication for user {0.user_id}'
             ' of {0.communication_request.name}'.format(self))
 
-    def generate_and_send(self):
-        "Collate message details and send"
-
-        if current_app.config.get('DEBUG_EMAIL', False):
-            # hack to restart trace when in loop from celery task
-            # don't want to reset if in the middle of a request
-            from celery import current_task
-            establish_trace(
-                "BEGIN trace as per DEBUG_EMAIL configuration",
-                reset_trace=current_task is None)
+    def generate_message(self):
+        "Collate message details into EmailMessage"
 
         user = User.query.get(self.user_id)
-        if not user.email or '@' not in user.email:
-            raise ValueError(
-                "can't send communication to user w/o valid email address")
 
-        trace("load variables for {user} & UUID {uuid} on {request}".format(
-            user=user,
-            uuid=self.communication_request.lr_uuid,
-            request=self.communication_request.name))
         args = load_template_args(
             user=user,
             questionnaire_bank_id=self.communication_request.
@@ -245,14 +230,48 @@ class Communication(db.Model):
                 "{} contains unknown varables: {}".format(
                     self.communication_request.content_url,
                     ','.join(missing)))
-        self.message = EmailMessage(
+
+        msg = EmailMessage(
             subject=mailresource.subject,
             body=mailresource.body,
             recipients=user.email,
-            sender=current_app.config['DEFAULT_MAIL_SENDER'],
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
             user_id=user.id)
+
+        return msg
+
+
+    def generate_and_send(self):
+        "Collate message details and send"
+
+        if current_app.config.get('DEBUG_EMAIL', False):
+            # hack to restart trace when in loop from celery task
+            # don't want to reset if in the middle of a request
+            from celery import current_task
+            establish_trace(
+                "BEGIN trace as per DEBUG_EMAIL configuration",
+                reset_trace=current_task is None)
+
+        user = User.query.get(self.user_id)
+        if not user.email or u'@' not in user.email:
+            raise ValueError(
+                "can't send communication to user w/o valid email address")
+
+        trace("load variables for {user} & UUID {uuid} on {request}".format(
+            user=user,
+            uuid=self.communication_request.lr_uuid,
+            request=self.communication_request.name))
+
+        self.message = self.generate_message()
         self.message.send_message()
         self.status = 'completed'
+
+    def preview(self):
+        "Collate message details and return preview (DOES NOT SEND)"
+
+        msg = self.generate_message()
+        msg.body = msg.style_message(msg.body)
+        return msg
 
 
 class DynamicDictLookup(MutableMapping):

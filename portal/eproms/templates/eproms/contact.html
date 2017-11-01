@@ -1,0 +1,116 @@
+{% extends "eproms/base.html" %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn, footer %}
+{% block main %}
+{{ back_btn(PORTAL, _('Home')) }}
+
+<h3 class="tnth-headline">{{ _("Contact TrueNTH") }}</h3>
+<p>{{ _("Use this form to get in touch with TrueNTH") }}</p>
+<div class="row">
+  <div class="col-md-7">
+
+    <form id="contactForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="form-group">
+        <label for="sendername">{{ _("Name") }}</label>
+        <input type="text" class="form-control" name="sendername" maxlength="250"
+          id="sendername" data-error="{{ _('Please enter your name') }}"
+          placeholder="{{ _('Your Name') }}" value="{{ sendername }}" required>
+        <div class="help-block with-errors"></div>
+      </div>
+      <div class="form-group">
+        <label for="email">{{ _("Email") }}</label>
+        <input type="email" class="form-control" name="email"
+          id="email" placeholder="{{ _('Your Email') }}" value="{{ email }}"
+          data-error="{{ _('This is not a valid e-mail address, please double-check.') }}"
+          required>
+        <div class="help-block with-errors"></div>
+      </div>
+      {% if types|length > 0 %}
+      <div class="form-group">
+        <label for="type">{{ _("Enquiry Type") }}</label>
+        <select class="form-control" maxlength="200" name="type" id="type">
+          {% for type in types %}
+          <option value="{{ type[1] }}">{{ type[0] }}</option>
+          {% endfor %}
+          <option value="{{ config.CONTACT_SENDTO_EMAIL }}" selected>{{_("Not sure")}}</option>
+        </select>
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <label for="subject">{{ _("Subject") }}</label>
+        <input type="text" class="form-control" maxlength="200" name="subject" id="subject" placeholder="{{ _('What is this about?') }}">
+      </div>
+      <div class="form-group">
+        <label for="body">{{ _("Text") }}</label>
+        <textarea class="form-control" rows="5" name="body" id="body" data-error="{{ _('Please add a message for TrueNTH') }}" placeholder="{{ _('What is on your mind?') }}" required></textarea>
+        <div class="help-block with-errors"></div>
+      </div>
+      {% if not user and config.RECAPTCHA_SITE_KEY and config.RECAPTCHA_SECRET_KEY %}
+      <div class="field-group">
+        {{ recaptcha }}
+      </div>
+      {% endif %}
+      <div class="post-contact-response response-message error-message"></div>
+      <div class="form-group">
+        <div class="contact-loading-indicator loading-message-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+        <button id="submitButton" class="btn btn-tnth-primary btn-lg">{{ _("Submit") }}</button>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+
+<script>
+  $(document).ready(function(){
+    $('#profileForm').validator({
+      disable: false
+    });
+    $("#submitButton").on("click", function(e) {
+        e.preventDefault();
+
+        var formData = {};
+        $("#contactForm").find("input, select, textarea").each(function() {
+            formData[$(this).attr("name")] = $(this).val() || $(this).text();
+        });
+
+        if (hasValue(formData.sendername) && hasValue(formData.body) && hasValue(formData.email)) {
+
+          var self = $(this), loadingIndicator = $(".contact-loading-indicator");
+
+          self.hide();
+          loadingIndicator.show();
+
+          $.ajax({
+              data: formData,
+              type: 'POST',
+              url: '/contact',
+              dataType: 'json',
+              success: function(response) {
+                  var msgid = response['msgid'];
+                  $('#contactForm .post-contact-response').html("");
+                  setTimeout(function() {
+                    self.show();
+                    loadingIndicator.hide();
+                    document.location = '/contact/' + String(msgid);
+                  }, 1000);
+
+              },
+              error: function(response) {
+                  var msg = $('<div></div>').html(response.responseText);
+                  var error = $('p', msg).text()
+                  $('#contactForm .post-contact-response').html(error);
+                  self.show();
+                  loadingIndicator.hide();
+              }
+          });
+      } else {
+          $('#contactForm .post-contact-response').html('{{ _("Please confirm all fields are filled.") }}');
+      };
+    });
+  })
+</script>
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
+{% endblock %}

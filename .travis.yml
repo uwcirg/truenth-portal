@@ -3,6 +3,9 @@ language: python
 python: "2.7"
 sudo: false
 cache: pip
+# setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since the last release
+git:
+  depth: 10000
 addons:
   postgresql: "9.4"
 
@@ -14,15 +17,27 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
-    - PGUSER='postgres'
-    - PGPASSWORD=''
-    - PGHOST='localhost'
-    - PGDATABASE='portal_unit_tests'
-    - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
-    - IMAGE_NAME=${IMAGE_NAME:-portal_web}
-    - DEB_REPO=${DEB_REPO:-portal-deb}
-    - DOCKER_REPO=${DOCKER_REPO:-portal-docker}
-    - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
+    - PORTAL_VERSION="$(python setup.py --version)"
+
+    - PGUSER=postgres
+    - PGPASSWORD=""
+    - PGHOST=localhost
+    - PGDATABASE=portal_unit_tests
+    - SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
+
+    - GH_USERNAME="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 1)"
+    - GH_REPO="$(echo $TRAVIS_REPO_SLUG | cut --delimiter / --fields 2)"
+    - GIT_BRANCH="$TRAVIS_BRANCH"
+    - GIT_TAG="$TRAVIS_TAG"
+    - GIT_HASH="$TRAVIS_COMMIT"
+
+    - BRANCH="$GIT_BRANCH"
+    - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
+    - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
+    - DOCKER_REPOSITORY=""
+    - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
+    - DOCKER_IMAGE_TAG=travis
+    - DOCKER_EXTRA_TAGS="$TRAVIS_BUILD_NUMBER"
 
 matrix:
   include:
@@ -32,43 +47,21 @@ matrix:
     - env: TOXENV=docs
       services: []
       addons: {}
+    - env: TOXENV=build
+      services:
+        - docker
+      addons: {}
     - env: TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
-    - env: TOXENV=build
-      services:
-        - docker
   # Build artifacts only (no testing)
   allow_failures:
-    - env: TOXENV=build
-      services:
-        - docker
     - env: TOXENV=ui
-      addons:
-        postgresql: "9.4"
-        sauce_connect: true
 
 before_install:
-  # Set Github env vars
-  - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
-  - export GH_USERNAME GH_REPO
-  - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
-  # Reuse PG* env vars - each TravisCI job gets its own DB
-  - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
-
-  # Only deploy from develop and master branches, and not previously configured
-  - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
-      export DEPLOY=true;
-    fi
-
-  # Set TOXENV default (if not already set by matrix environmental variables)
-  - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
-
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
-  - git fetch --unshallow
 
   - createdb
       --owner "$PGUSER"
@@ -76,7 +69,6 @@ before_install:
     "$PGDATABASE"
 
   - pip install --upgrade pip setuptools
-  - export PORTAL_VERSION="$(python setup.py --version)"
 
 install:
   - pip install tox
@@ -85,137 +77,44 @@ script:
   - tox
 
 after_success:
-  # Only run build steps in corresponding tox env
-  - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
-
-  # Set primary docker tag (TAG) based on branch, or current tag
-  # Precedence: current git tag, current branch (with develop and master mapped to latest and stable respectively)
-  - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
-    export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
-  - export TAG=${TRAVIS_TAG:-${TAG}}
-
-  # List of tags to apply to docker image
-  # TravisCI doesn't support Bash arrays
-  # See https://github.com/travis-ci/travis-ci/issues/3149
-  - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
-
-  - cp docker/portal.env.default docker/portal.env
-  - export COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
-  # Build debian package from current repo and branch (else "develop")
-  - BRANCH="${TRAVIS_BRANCH:-develop}"
-    docker-compose run builder
-
-  # Build portal docker image from debian package
-  - docker-compose build web
+  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ] && [ "$GIT_BRANCH" = "develop" ]; then
+      pip install codacy-coverage ;
+      python-codacy-coverage -r coverage.xml ;
+    fi
 
 before_deploy:
-  - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
-  - if [[ -v ARTIFACTORY_TOKEN ]]; then
-      docker login
-        --username "$ARTIFACTORY_USERNAME"
-        --password "$ARTIFACTORY_TOKEN"
-      "uwcirg-$DOCKER_REPO.jfrog.io" ;
-    fi
-  - if [[ -v BINTRAY_API_KEY ]]; then
-      docker login
-        --username "$BINTRAY_USERNAME"
-        --password "$BINTRAY_API_KEY"
-      "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io" ;
-    fi
-  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      docker login
-        --username "$DOCKER_CLOUD_USERNAME"
-        --password "$DOCKER_CLOUD_API_KEY"
-      https://index.docker.io/v1/ ;
-    fi
-
-  - if [[ -v HEROKU_API_KEY ]]; then
-      docker login
-        --username "$HEROKU_USERNAME"
-        --password "$HEROKU_API_KEY"
-      https://registry.heroku.com/ ;
-    fi
+  - ./bin/docker-login.sh
 
 # Only deploy from default virtual env TravisCI job
 deploy:
   - provider: script
     skip_cleanup: true
     on:
-      all_branches: true
+      branch:
+        - develop
+        - master
       condition:
         - $TOXENV = build
-        - $DEPLOY = true
-        - -v BINTRAY_API_KEY
+        - -v ARTIFACTORY_API_KEY
+        - -v ARTIFACTORY_DEB_REPO
     script:
-      curl
-        --upload-file debian/artifacts/*.deb
-        --user "$GH_USERNAME:$BINTRAY_API_KEY"
-        https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
+      - curl
+          --verbose
+          --upload-file debian/artifacts/*.deb
+          --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
+          "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
 
   - provider: script
     skip_cleanup: true
     on:
-      all_branches: true
+      branch:
+        - develop
+        - master
       condition:
         - $TOXENV = build
-        - $DEPLOY = true
-        - -v ARTIFACTORY_TOKEN
+        - -v ARTIFACTORY_API_KEY
     script:
-      curl
-        --verbose
-        --upload-file debian/artifacts/*.deb
-        --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
-        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
+      - ./bin/docker-push.sh
 
 after_deploy:
-  # Deploy to Artifactory, if configured
-  - if [[ -v ARTIFACTORY_TOKEN ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker tag
-          "$IMAGE_NAME:$TAG"
-          "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
-      done
-    fi
-  - if [[ -v ARTIFACTORY_TOKEN ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker push "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
-      done &
-    fi
-
-  # Deploy to Bintray, if configured
-  - if [[ -v BINTRAY_API_KEY ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker tag
-          "$IMAGE_NAME:$TAG"
-          "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
-      done
-    fi
-  - if [[ -v BINTRAY_API_KEY ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker push "$GH_USERNAME-docker-$DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
-      done &
-    fi
-
-  # Deploy to Docker Hub, if configured
-  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker tag
-          "$IMAGE_NAME:$TAG"
-          "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
-      done
-    fi
-  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      for tag in $DOCKER_TAGS; do
-        docker push "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
-      done &
-    fi
-
-  # Deploy to Heroku, if configured
-  - if [[ -v HEROKU_API_KEY ]]; then
-      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
-      docker push "registry.heroku.com/$HEROKU_APP/web" &
-    fi
   - docker images --digests --all
-
-  # Wait for background jobs to finish (if they haven't already)
-  - wait

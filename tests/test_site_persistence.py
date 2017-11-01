@@ -48,6 +48,7 @@ class TestSitePersistence(TestCase):
         if hasattr(self, 'tmpfile') and self.tmpfile:
             os.remove(self.tmpfile)
             del self.tmpfile
+        super(TestSitePersistence, self).tearDown()
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""

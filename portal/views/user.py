@@ -7,18 +7,18 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
-from ..csrf import csrf
 from ..database import db
-from ..dogpile import dogpile_cache
 from ..extensions import oauth, user_manager
-from ..models.assessment_status import overall_assessment_status
+from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
 from ..models.auth import Client, Token
 from ..models.group import Group
 from ..models.intervention import Intervention
+from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
+from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, permanently_delete_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
@@ -573,12 +573,6 @@ def set_user_consents(user_id):
         description: if user_id doesn't exist
 
     """
-    # TODO: refactor common code to better home
-    def invalidate_assessment_status_cache(user):
-        """Invalidate the assessment status cache values for this user"""
-        dogpile_cache.invalidate(
-            overall_assessment_status, user.id)
-
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
     user = current_user()
@@ -598,7 +592,7 @@ def set_user_consents(user_id):
             consent_list=consent_list, acting_user=current_user())
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
-        invalidate_assessment_status_cache(user)
+        invalidate_assessment_status_cache(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
@@ -1711,3 +1705,259 @@ def trigger_password_reset_email(user_id):
         user_id), user_id=current_user().id, subject_id=user_id,
         context='login')
     return jsonify(message="ok")
+
+
+@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>')
+@oauth.require_oauth()
+def get_table_preferences(user_id, table_name):
+    """Returns simple JSON defining user table preferences
+
+    Returns the user's view preferences for the given table.
+    ---
+    tags:
+      - User
+    operationId: get_table_preferences
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: table_name
+        in: path
+        description: Portal UI Table Name
+        required: true
+        type: string
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns JSON of the user's table view preferences.
+        schema:
+          id: table_preferences
+          properties:
+            user_id:
+              type: integer
+              format: int64
+              description: TrueNTH user ID
+            table_name:
+              type: string
+              description: Name of table in portal UI
+            sort_field:
+              type: string
+              description: Field on which to sort the table
+            sort_order:
+              type: string
+              description: Method to use for sorting (asc or desc)
+            filters:
+              type: object
+              description: JSON describing filter fields and values
+            updated_at:
+              type: string
+              format: date-time
+              description: Last updated datetime
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+      404:
+        description:
+          if no TablePreference found for given user_id and table_name
+
+    """
+    if not user_id or not table_name:
+        abort(400, "missing user or table parameters")
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    pref = TablePreference.query.filter_by(table_name=table_name,
+                                           user_id=user_id).first()
+    # 404 case handled by current_user() or check_role above.  Return
+    # empty list if no preferences yet exist.
+    if not pref:
+        return jsonify({})
+
+    return jsonify(pref.as_json())
+
+
+@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>',
+                methods=('PUT','POST',))
+@oauth.require_oauth()
+def set_table_preferences(user_id, table_name):
+    """Add a consent agreement for the user with named organization
+
+    Used to add a consent agreements between a user and an organization.
+    Assumed to have just been agreed to.  Include 'expires' if
+    necessary, defaults to now and five years from now (both in UTC).
+
+    NB only one valid consent should be in place between a user and an
+    organization.  Therefore, if this POST would create a second consent on the
+    given user / organization, the existing consent will be marked deleted.
+
+    ---
+    tags:
+      - User
+    operationId: set_table_preferences
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: table_name
+        in: path
+        description: Portal UI Table Name
+        required: true
+        type: string
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: set_preferences
+          properties:
+            sort_field:
+              type: string
+              description: Field on which to sort the table
+            sort_order:
+              type: string
+              description: Method to use for sorting (asc or desc)
+            filters:
+              type: object
+              description: JSON describing filter fields and values
+    responses:
+      200:
+        description:
+          Returns JSON of the user's table view preferences.
+        schema:
+          id: table_preferences
+          properties:
+            user_id:
+              type: integer
+              format: int64
+              description: TrueNTH user ID
+            table_name:
+              type: string
+              description: Name of table in portal UI
+            sort_field:
+              type: string
+              description: Field on which to sort the table
+            sort_order:
+              type: string
+              description: Method to use for sorting (asc or desc)
+            filters:
+              type: object
+              description: JSON describing filter fields and values
+            updated_at:
+              type: string
+              format: date-time
+              description: Last updated datetime
+      400:
+        description: if the request includes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+
+    """
+    if not user_id or not table_name:
+        abort(400, "missing user or table parameters")
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    if not request.json:
+        abort(400, "no table preference data provided")
+
+    req = request.json
+    req['user_id'] = user_id
+    req['table_name'] = table_name
+
+    pref = TablePreference.from_json(req)
+    db.session.add(pref)
+    db.session.commit()
+
+    return jsonify(pref.as_json())
+
+
+@user_api.route('/user/<int:user_id>/messages')
+@oauth.require_oauth()
+@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+def get_user_messages(user_id):
+    """Returns simple JSON defining user email messages
+
+    Returns JSON of all messages where the receipient's email matches
+    the given user.
+    ---
+    tags:
+      - User
+    operationId: get_user_messages
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns JSON of the user's table view preferences.
+        schema:
+          id: user_messages
+          properties:
+            sender:
+              type: string
+              description: Email message sender
+            recipients:
+              type: string
+              description: Email message recipients
+            subject:
+              type: string
+              description: Email message subject
+            body:
+              type: string
+              description: Email message body
+            sent_at:
+              type: string
+              format: date-time
+              description: Datetime of when email message was sent
+            user_id:
+              type: integer
+              format: int64
+              description: TrueNTH user ID
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    messages = []
+
+    # need to cycle through EmailMessages individually for proper validation
+    for em in EmailMessage.query.all():
+        recips = em.recipients.split()
+        if user.email in recips:
+            messages.append(em)
+
+    return jsonify(messages=[m.as_json() for m in messages])

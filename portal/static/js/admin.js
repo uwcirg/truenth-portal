@@ -270,9 +270,12 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         if (!noPatientData) {
             var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
 	          self.filterOrgs(hbOrgs);
-        } else {
-          $("div.fixed-table-toolbar").hide();
         };
+
+        /*
+         * set user's preference for filter(s)
+         */
+        self.setTableFilters(self.userId);
 
         var ofields = $("#userOrgs input[name='organization']");
         if (ofields.length > 0) {
@@ -281,17 +284,31 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
             if ((self.getHereBelowOrgs(self.getUserOrgs())).length == 1 ||
                 (iterated && request_org_list && request_org_list[$(this).val()])) {
                 $(this).prop("checked", true);
-            }
+            } else if (self.currentTablePreference) {
+             if (self.currentTablePreference.filters) {
+               var fi = self.currentTablePreference.filters;
+               var fa = fi.orgs_filter_control? fi.orgs_filter_control.split(","): null;
+               if (fa) {
+                 var oself = $(this), val = oself.val();
+                 fa.forEach(function(item) {
+                    if (item == val) oself.prop("checked", true);
+                 });
+                };
+             };
+           };
             $(this).on("click touchstart", function(e) {
-                e.stopPropagation();
-                AT.abortRequests();
-                var orgsList = [];
-                $("#userOrgs input[name='organization']").each(function() {
-                   if ($(this).is(":checked")) orgsList.push($(this).val());
-                });
-               if (orgsList.length > 0) {
-                  location.replace("/" + context + "?org_list=" + orgsList.join(","));
-               } else location.replace("/" + context);
+              e.stopPropagation();
+              if ($(this).is(":checked")) {
+                var childOrgs = AT.getHereBelowOrgs([$(this).val()]);
+                if (childOrgs && childOrgs.length > 0) {
+                  childOrgs.forEach(function(org) {
+                    $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
+                  });
+                };
+              };
+
+              AT.setTablePreference(AT.userId, "patientList");
+              setTimeout(function() { location.reload(); }, 100);
             });
           });
 
@@ -306,13 +323,19 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                   };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
-              if (orgsList.length > 0) location.replace("/" + context + "?org_list=" + orgsList.join(","));
+              /*
+               * pre-set user preference for filtering
+               */
+              AT.setTablePreference(AT.userId, "patientList");
+              if (orgsList.length > 0) {
+                setTimeout(function() { location.reload(); }, 100);
+              };
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
-              $("#userOrgs input[name='organization']").each(function() {
-                  $(this).prop("checked", false);
-              });
+              AT.clearOrgsSelection();
+              AT.setTablePreference(AT.userId, "patientList");
+              setTimeout(function() { location.reload(); }, 100);
           });
           $("#orglist-close-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -350,6 +373,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
       $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
     };
 };
+
 AdminTool.prototype.getInstrumentList = function() {
   var iList;
   tnthAjax.getInstrumentsList(true, function(data) {
@@ -421,7 +445,160 @@ AdminTool.prototype.handleDownloadModal = function() {
     $("input[name='instrument'], input[name='downloadType']").on("click", function() {
         if ($(this).is(":checked")) $("#_downloadMessage").text("");
     });
-}
+};
+AdminTool.prototype.clearOrgsSelection = function() {
+  $("#userOrgs input[name='organization']").each(function() {
+      $(this).prop("checked", false);
+  });
+};
+AdminTool.prototype.getDefaultTablePreference = function() {
+	return {sort_field: "id",sort_order: "desc"};
+};
+
+
+AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter) {
+    var prefData = null, self = this;
+    tnthAjax.getTablePreference(userId||self.userId, "patientList", {"sync": true}, function(data) {
+      if (data && !data.error) {
+        prefData = data || self.getDefaultTablePreference();
+        self.currentTablePreference = prefData;
+      };
+      //set filter values
+      if (setFilter) self.setTableFilters(userId||self.userId);
+    });
+    return prefData;
+};
+
+AdminTool.prototype.setTableFilters = function(userId) {
+    var prefData = null;
+    if (this.currentTablePreference) {
+      prefData = this.currentTablePreference;
+    } else {
+      tnthAjax.getTablePreference(userId||this.userId, "patientList", {"sync": true}, function(data) {
+        if (data && !data.error) {
+          prefData = data;
+         };
+      });
+    };
+    if (prefData) {
+       //set filter values
+      if (prefData.filters) {
+        for (var item in prefData.filters) {
+          var fname = "#adminTable .bootstrap-table-filter-control-"+item;
+          /*
+           * note this is based on the trigger event for filtering specify in the plugin
+           */
+          if ($(fname).length > 0) $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") == "text" ? "keyup": "change");
+        };
+      };
+    };
+};
+
+AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder, filters) {
+  if (hasValue(tableName)) {
+    var data = {};
+    if (hasValue(sortField) && hasValue(sortOrder)) {
+      data["sort_field"] = sortField;
+      data["sort_order"] = sortOrder;
+    } else {
+    	//get selected sorted field information on UI
+    	var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
+    	if (sortedField.length > 0) {
+    		data["sort_field"] = sortedField.attr("data-field");
+    		var sortedOrder = "desc";
+    		sortedField.find(".sortable").each(function() {
+    			if ($(this).hasClass("desc")) sortedOrder = "desc";
+    			else if ($(this).hasClass("asc")) sortedOrder = "asc";
+    		});
+    		data["sort_order"] = sortedOrder;
+    	} else {
+	    	//It is possible the table is not sorted yet so get the default
+	    	var defaultPref = this.getDefaultTablePreference();
+	    	data["sort_field"] = defaultPref.sort_field;
+	    	data["sort_order"] = defaultPref.sort_order;
+	    };
+    }
+    var __filters = filters || {};
+
+    //get fields
+    if (Object.keys(__filters).length == 0) {
+      $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
+      	if (hasValue($(this).val())) {
+      		var field = $(this).closest("th").attr("data-field");
+      		__filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
+      	};
+      });
+    };
+    /*
+     * get selected orgs from the filter list by site control
+     */
+    var selectedOrgs = "";
+    $("#userOrgs input[name='organization']:checked").each(function() {
+      selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+    });
+    if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
+    data["filters"] = __filters;
+    if (Object.keys(data).length > 0) {
+      tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
+      this.currentTablePreference = data;
+    };
+  };
+};
+
+AdminTool.prototype.getReportModal = function(patientId) {
+
+  $("#patientReportModal").modal("show");
+  $("#patientReportLoader").removeClass("tnth-hide");
+
+  tnthAjax.patientReport(patientId, function(data) {
+      if (data) {
+        if (!data.error) {
+            if (data["user_documents"] && data["user_documents"].length > 0) {
+              var existingItems = {}, count = 0;
+              /*
+               * sort to get the latest first
+               */
+              var documents = data["user_documents"].sort(function(a,b){
+                 return new Date(b.uploaded_at) - new Date(a.uploaded_at);
+              });
+              var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
+              content += "<TH>" + i18next.t("Type") + "<TH>"+ i18next.t("Report Name") + "</TH><TH>" + i18next.t("Generated (GMT)") + "</TH><TH>" + i18next.t("Downloaded") + "</TH>";
+              documents.forEach(function(item) {
+
+                  var c = item["contributor"];
+
+                  /*
+                   * only draw the most recent, same report won't be displayed
+                   */
+                  if (!existingItems[c] && hasValue(c)) {
+                    content += "<tr>" +
+                              "<td>" + c + "</td>" +
+                              "<td>" + item["filename"] + "</td>" +
+                              "<td>" + tnthDates.formatDateString(item["uploaded_at"], "iso") + "</td>" +
+                              "<td class='text-center'>" + '<a title="' + i18next.t("Download") + '" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"])+ '"><i class="fa fa-download"></i></a>' + "</td>"
+                              "</tr>";
+                    existingItems[c] = true;
+                    count++;
+                  };
+              });
+              content += "</table>";
+              content += "<br/>";
+              content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
+
+              $("#patientReportContent").html(content);
+              if (count > 1) $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
+              else $("#patientReportModal .modal-title").text(i18next.t("Patient Report"));
+              $("#patientReportContent .btn-all").attr("href", "patient_profile/"+patientId+"#profilePatientReportTable");
+
+            } else {
+              $("#patientReportMessage").html(i18next("No report data found."));
+            };
+
+          } else $("#patientReportMessage").html(i18next.t("Error occurred retrieving patient report"));
+        };
+      $("#patientReportLoader").addClass("tnth-hide");
+  });
+};
 
 
 

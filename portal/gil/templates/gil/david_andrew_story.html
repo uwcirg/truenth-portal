@@ -1,0 +1,50 @@
+{% extends "gil/lived_experience_base.html" %}
+{% block title %}{{super()}} {{_("Lived Experience - David and Andrew Perez Story")}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+    <main class="main main--story">
+      {{super()}}
+      <div class="page-intro module-wrap module-wrap--story">
+        <div class="module">
+          <div class="accent-heading">
+            {% trans %}Objective N<em>o</em>2: LIVED EXPERIENCE{% endtrans %}
+          </div>
+          <div class="module__body">
+            <p class="story-title">{{_("DAVID AND ANDREW PEREZ")}}</p>
+            <p class="story-text story-text--left">{{_("In 2009, Dave was diagnosed with prostate cancer. He began visiting doctors with his family and weighing up his treatment options. His son Andrew felt that this was one situation where there wasn’t much he could do to pitch in and help. But he accompanied his father in making significant dietary and lifestyle changes as required in active surveillance, and now they both strive to help other men in similar situations understand their options and consider alternatives to treatment.")}}</p>
+            <br/>
+            <p class="story-subtitle">{{_("DAVE PEREZ:")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("After I was diagnosed with prostate cancer, 5 doctors in a row told me to get treatment.  I was fortunate to have spent years advocating for my disabled son’s medical care before it was my turn to advocate for myself. I kept asking.  Finally I found my way to an Active Surveillance study at UCSF.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("There they embraced my interest in delaying or possibly avoiding treatment altogether.
+            And that gave me the time I needed to find the right alternatives, lifestyle and dietary changes necessary to beat the cancer without ever having treatment and the terrible side effects associated with that treatment.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("At least once or twice a month I get a call from a woman saying that her husband/brother/dad/uncle/etc. was diagnosed and asking if I would be willing to talk to them. I always say yes, absolutely. And the men never call. A few months later I will learn that they got treatment. That they never looked at alternatives. That they never made any lifestyle changes.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("And what is worse, sometimes those men wind up with a recurrence or another cancer. It breaks my heart to see them blindly accept whatever they are told.")}}</p>
+            <br/><br/>
+            <p class="story-subtitle">{{_("ANDREW PEREZ:")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("On the day that Michael Jackson and Farrah Fawcett died, I got a phone call from my dad telling me that he had been diagnosed with prostate cancer. I don't actually remember the phone call very clearly, but I remember everything that happened afterward.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("My dad doesn't half-ass anything. He also doesn't leap into any decisions blindly. So when he told me that the doctors had caught the cancer early and that he still had myriad options to explore before deciding on a course of action, not a shred of me doubted him.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("However, I'm not the type of person to wait and hope for the best. Growing up the older sibling of a disabled brother, my default setting is to do as much of the work as I possibly can in any situation. Much to my dismay, I realized quickly that there wasn't much I could do in this particular instance. My dad continued to explore options.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("Eventually he found the UCSF Active Surveillance program and made a series of lifestyle changes, including diet, exercise and stress reduction. Finally I had a way of helping my dad, even if it was only in my head. I threw myself into changing my lifestyle along with him, altering my eating to better reflect his, keeping up with my exercise, and even beginning yoga and meditation practices. We read the same books, had the same shopping lists, and swapped yoga stories often.")}}</p>
+            <br/>
+            <p class="story-text story-text--left">{{_("Too many men in America and across the globe believe that they cannot show emotion, believe that they cannot show weakness, believe that they cannot ask for help. And as a result of that mentality, which has been taught for far too long, generations of men are facing various cancers silently, often resignedly, when they do not have to. We need to have conversations about our health. We need to share what works and be open-minded enough to try something out of the ordinary.")}}</p>
+          </div>
+        </div>
+        <div class="module">
+          <div class="module__body">
+              <figure>
+                <img src="{{ url_for('.static', filename='img/LE_David_Andrew_Perez_Single.jpg') }}" alt="David and Andrew Perez">
+                <figcaption>{{_("David and Andrew Perez, Los Angeles, 2016")}}</figcaption>
+              </figure>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}

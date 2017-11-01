@@ -94,9 +94,574 @@ var CONSENT_ENUM = {
 var SYSTEM_IDENTIFIER_ENUM = {
     "external_study_id" : "http://us.truenth.org/identity-codes/external-study-id",
     "external_site_id" : "http://us.truenth.org/identity-codes/external-site-id",
-    "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
+    "practice_region" : "http://us.truenth.org/identity-codes/practice-region",
+    "race": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+    "ethnicity": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+    "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
+    "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+    "language": "http://hl7.org/fhir/valueset/languages"
 };
 var __NOT_PROVIDED_TEXT = "not provided";
+/*
+ * helper class for drawing consent list table
+ */
+var ConsentUIHelper = function(consentItems, userId) {
+    /*
+     * display text for header
+     */
+    var headerEnum = {
+                      "organization": i18next.t("Organization"),
+                      "consentStatus": i18next.t("Consent Status"),
+                      "status": i18next.t("Status"),
+                      "agreement": i18next.t("Agreement"),
+                      "consentDate": i18next.t("Date"),
+                      "registrationDate": i18next.t("Regiatration Date"),
+                      "historyConsentDate": i18next.t("Consent Date"),
+                      "locale": i18next.t("GMT"),
+                      "lastUpdated": i18next.t("Last Updated") + "<br/>" + i18next.t("( GMT, Y-M-D )"),
+                      "comment": i18next.t("Action"),
+                      "actor": i18next.t("User")
+                      };
+    /*
+     * html for header cell in array
+     */
+    var headerArray = [
+                    headerEnum["organization"],
+                    '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
+                    '<span class="agreement">' + headerEnum["agreement"] + '</span>',
+                    '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
+
+    var historyHeaderArray = [
+                    headerEnum["organization"],
+                    '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
+                    headerEnum["historyConsentDate"],
+                    headerEnum["lastUpdated"],
+                    headerEnum["actor"]];
+
+    var consentLabels = {
+                        "default": i18next.t("Consented"),
+                        "consented": i18next.t("Consented / Enrolled"),
+                        "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
+                                      "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
+                        "purged": "Purged / Removed"
+                    };
+
+    this.items = consentItems;
+    this.userId = userId;
+
+    /*
+     * relevant variables currently defined in profile_macro.html, but can be defined by consumer
+     *
+     */
+    this.ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
+    this.isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
+    this.editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
+    this.consentDateEditable = this.editable && (typeof isTestPatient != "undefined" && isTestPatient);
+    this.touObj = [];
+    this.showInitialConsentTerms = false;
+    this.hasConsent = false;
+    this.hasHistory = false;
+
+
+    this.getHeaderRow = function(header) {
+        var content = "";
+        var h = header || headerArray;
+        h.forEach(function (title, index) {
+            if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
+        });
+        return content;
+    };
+
+    this.getConsentRow = function(item, index) {
+        var self = this;
+        var consentStatus = self.getConsentStatus(item);
+        var sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
+        var LROrgId = item ? item.organization_id: "";
+        if (hasValue(LROrgId)) {
+            var topOrgID = OT.getTopLevelParentOrg(LROrgId);
+            if (hasValue(topOrgID) && (topOrgID != LROrgId)) LROrgId = topOrgID;
+        };
+        var editorUrlEl = $("#" + LROrgId + "_editor_url");
+        var content = "<tr>";
+        var contentArray = [
+            {
+                content: self.getConsentOrgDisplayName(item)
+            },
+            {
+                content: sDisplay + (self.editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentModalHTML(item, index): ""),
+                "_class": "indent"
+            },
+            {
+                content: (function(item) {
+                    var s = "";
+                    if (self.isDefaultConsent(item)) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                    else {
+                        s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                        ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "")
+                    };
+                    return s;
+                })(item)
+            },
+            {
+                content: tnthDates.formatDateString(item.signed) + (self.consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentDateModalHTML(item, index) : "")
+
+            }
+        ];
+
+        contentArray.forEach(function(cell) {
+            if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
+        });
+        content += "</tr>";
+        return content;
+    };
+    this.getConsentHistoryRow = function(item, index) {
+        var self = this;
+        var consentStatus = self.getConsentStatus(item);
+        var sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
+        var content = "<tr>";
+        var contentArray = [
+            {
+                content: self.getConsentOrgDisplayName(item)
+            },
+            {
+                content: sDisplay
+            },
+            {
+                content: tnthDates.formatDateString(item.signed)
+
+            },
+            {content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"},
+            {content: (item.deleted.by && item.deleted.by.display? item.deleted.by.display: "--")}
+        ];
+
+        contentArray.forEach(function(cell) {
+            content += "<td class='consentlist-cell'>" + cell.content + "</td>";
+        });
+        content += "</tr>";
+        return content;
+    };
+    this.getConsentOrgDisplayName = function(item) {
+        if (!item) return "";
+        if (!OT.initialized) tnthAjax.getOrgs(this.userId, false, true);
+        var orgId = item.organization_id;
+        var currentOrg = OT.orgsList[orgId];
+        var orgName = "";
+        if (!this.ctop) {
+            var topOrgID = OT.getTopLevelParentOrg(orgId);
+            var topOrg = OT.orgsList[topOrgID];
+            if (topOrg) {
+                try {
+                    orgName = topOrg.name;
+
+                } catch(e) {
+                    orgName = currentOrg ? currentOrg.name: "";
+                }
+            };
+        } else orgName = currentOrg ? currentOrg.name: "";
+        return orgName || item.organization_id;
+    };
+    this.getConsentStatus = function(item) {
+        if (!item) return "";
+        var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
+        return item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
+    };
+    this.getDeletedDisplayDate = function(item) {
+        if (!item) return "";
+        var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
+        return deleteDate.replace("T", " ");
+    };
+    this.isDefaultConsent = function(item) {
+        return item && /stock\-org\-consent/.test(item.agreement_url);
+    };
+    this.getConsentStatusHTMLObj = function(item) {
+        var consentStatus = this.getConsentStatus(item);
+        var sDisplay = "", cflag = "";
+        var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports;
+        var oDisplayText = {
+            "default": "<span class='text-success small-text'>" + consentLabels["default"] + "</span>",
+            "consented": "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>",
+            "withdrawn": "<span class='text-warning small-text withdrawn-label'>" + consentLabels["withdrawn"] + "</span>",
+            "purged": "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>",
+            "expired": "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>",
+        };
+
+        switch(consentStatus) {
+            case "deleted":
+                if (se && sr && ir) {
+                    sDisplay = oDisplayText["consented"];
+                } else if (se && ir && !sr) {
+                    sDisplay = oDisplayText["withdrawn"];
+                } else if (!se && !ir && !sr) {
+                    sDisplay = oDisplayText["purged"];
+                } else {
+                    sDisplay = oDisplayText["consented"];
+                };
+                break;
+            case "expired":
+                sDisplay = oDisplayText["expired"];
+                break;
+            case "active":
+                if (se && sr && ir) {
+                    if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
+                    else sDisplay = oDisplayText["consented"];
+                    cflag = "consented";
+                } else if (se && ir && !sr) {
+                    sDisplay = oDisplayText["withdrawn"];
+                    cflag = "suspended";
+                } else if (!se && !ir && !sr) {
+                    sDisplay = oDisplayText["purged"];
+                    cflag = "purged";
+                } else {
+                    sDisplay = oDisplayText["consented"];
+                    cflag = "consented";
+                };
+                break;
+        };
+
+        return {"statusText": cflag||consentStatus, "statusHTML": sDisplay };
+    };
+    this.getConsentModalHTML = function(item, index) {
+        if (!item) item = "";
+        if (!index) index = "0";
+         /****** modal content for modifying consent status *******/
+        /*
+         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
+         * different verbiage is hidden/shown via css - see .withdrawn-label class in respective css files
+         */
+         var userId = this.userId, cflag = this.getConsentStatusHTMLObj(item).statusText;
+         return '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
+            + '<div class="modal-dialog" role="document">'
+            + '<div class="modal-content">'
+            + '<div class="modal-header">'
+            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") +'"><span aria-hidden="true">&times;</span></button>'
+            + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
+            + '</div>'
+            + '<div class="modal-body" style="padding: 0 2em">'
+            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
+            + '<div>'
+            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
+            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
+            + (this.isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
+            + '</div><br/><br/>'
+            + '</div>'
+            + '<div class="modal-footer">'
+            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
+            + '</div>'
+            + '</div></div></div>';
+    };
+    this.getConsentDateModalHTML = function(item, index) {
+        if (!item) return "";
+        if (!index) index = "0";
+        /**** modal content for editing consent date for test patient ****/
+        var userId = this.userId, cflag = this.getConsentStatusHTMLObj(item).statusText;
+        return '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
+            + '<div class="modal-dialog" role="document">'
+            + '<div class="modal-content">'
+            + '<div class="modal-header">'
+            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '"><span aria-hidden="true">&times;</span></button>'
+            + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
+            + '</div>'
+            + '<div class="modal-body" style="padding: 0 2em">'
+            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+            + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
+            + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
+            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
+            + '<div class="row">'
+            + '<div class="col-md-4 col-sm-3 col-xs-3">'
+            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
+            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
+            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div>'
+            + '<div class="col-md-2 col-sm-2 col-xs-3">'
+            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+            + '</div></div>'
+            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
+            + '</div>'
+            + '<div class="modal-footer">'
+            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">' + i18next.t("Submit") + '</button>'
+            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
+            + '</div>'
+            + '</div></div></div>';
+    };
+    this.getTermsTableHTML = function(includeHeader) {
+        var touContent = "";
+        if (includeHeader) {
+            headerArray.forEach(function(title) {
+                touContent += "<th class='consentlist-header'>" + title + "</th>";
+            });
+        };
+        //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
+        //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+
+        this.touObj.forEach(function(item, index) {
+            var org = OT.orgsList[item.organization_id];
+            touContent += "<tr data-tou-type='" + item.type + "'>";
+            touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + capitalize(item.display_type)) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td>" + item.accepted + "</td></tr>";
+        });
+        return touContent;
+    };
+    this.getTerms = function() {
+        var self = this;
+        //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
+        //and also website terms of use
+        // WILL NEED TO CLARIFY
+        tnthAjax.getTerms(this.userId, false, true, function(data) {
+            if (data && data.tous) {
+                (data.tous).forEach(function(item) {
+                    var fType = $.trim(item.type).toLowerCase();
+                    if (fType == "subject website consent" || fType == "website terms of use") {
+                        item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                        item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
+                        self.touObj.push(item);
+                    };
+                });
+            };
+        });
+        //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
+        self.showInitialConsentTerms = (self.touObj.length > 0);
+    },
+    this.initConsentItemEvent = function() {
+        $("#profileConsentList input[class='radio_consent_input']").each(function() {
+            $(this).on("click", function() {
+                var o = CONSENT_ENUM[$(this).val()];
+                if (o) {
+                    o.org = $(this).attr("data-orgId");
+                    o.agreementUrl = $(this).attr("data-agreementUrl");
+                };
+                if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
+                $("#" + $(this).attr("modalId")).modal('hide');
+                if (typeof reloadConsentList != "undefined") reloadConsentList();
+            });
+        });
+    },
+    this.initConsentDateEvents = function() {
+        var today = new Date();
+        $("#profileConsentList .consent-date-modal").each(function() {
+            $(this).on("shown.bs.modal", function() {
+                $(this).find(".consent-date").focus();
+                $(this).addClass("active");
+                $(this).find("input").each(function() {
+                    if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
+                    else $(this).val("");
+                });
+                $(this).find(".set-consent-error").html("");
+            });
+            $(this).on("hidden.bs.modal", function() {
+                $(this).removeClass("active");
+            });
+        });
+        $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+        $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+            __convertToNumericField($(this));
+        });
+        $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+            $(this).on("change", function() {
+                var dataIndex = $.trim($(this).attr("data-index"));
+                var d = $("#consentDate_" + dataIndex);
+                var h = $("#consentHour_" + dataIndex).val();
+                var m = $("#consentMinute_" + dataIndex).val();
+                var s = $("#consentSecond_" + dataIndex).val();
+                var errorMessage = "";
+
+                if (hasValue(d.val())) {
+                    var isValid = tnthDates.isValidDefaultDateFormat(d.val());
+                    if (!isValid) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Date must in the valid format.");
+                        d.datepicker("hide");
+                    };
+                };
+
+                /**** validate hour [0]0 ****/
+                if (hasValue(h)) {
+                    if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Hour must be in valid format, range 0 to 23.");
+                    };
+                };
+
+                /***** validate minute [0]0 *****/
+                if (hasValue(m)) {
+                    if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Minute must be in valid format, range 0 to 59.");
+                    };
+                };
+                /***** validate second [0]0 *****/
+                if (hasValue(s)) {
+                    if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
+                        errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Second must be in valid format, range 0 to 59.");
+                    };
+                };
+
+                if (hasValue(errorMessage)) {
+                    $("#consentDateError_" + dataIndex).html(errorMessage);
+                } else $("#consentDateError_" + dataIndex).html("");
+
+            });
+        });
+
+        $("#profileConsentList .btn-submit").each(function() {
+            $(this).on("click", function() {
+                var dataIndex = $.trim($(this).attr("data-index"));
+                var ct = $("#consentDate_" + dataIndex);
+                var h = $("#consentHour_" + dataIndex).val();
+                var m = $("#consentMinute_" + dataIndex).val();
+                var s = $("#consentSecond_" + dataIndex).val();
+                var isValid = hasValue(ct.val());
+                if (isValid) {
+                    var dt = new Date(ct.val());
+                    //2017-07-06T22:04:50 format
+                    var cDate = dt.getFullYear()
+                                + "-"
+                                + (dt.getMonth()+1)
+                                + "-"
+                                + dt.getDate()
+                                + "T"
+                                + (hasValue(h) ? pad(h) : "00")
+                                + ":"
+                                + (hasValue(m) ? pad(m) : "00")
+                                + ":"
+                                + (hasValue(s) ? pad(s) : "00");
+
+                    var o = CONSENT_ENUM[ct.attr("data-status")];
+
+                    if (o) {
+                        o.org = ct.attr("data-orgId");
+                        o.agreementUrl = ct.attr("data-agreementUrl");
+                        o.acceptance_date = cDate;
+                        o.testPatient = true;
+                        setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
+                        setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
+
+                        /**** disable close buttons while processing request ***/
+                        $("#consentListTable button[data-dismiss]").attr("disabled", true);
+
+                        setTimeout(tnthAjax.setConsent(ct.attr("data-userId"),o, ct.attr("data-status"), true, function(data) {
+                            if (data) {
+                                if (data && data.error) {
+                                    $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text(i18next.t("Error processing data.  Make sure the date is in the correct format."));
+                                    setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); }, 200);
+                                    setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); }, 450);
+                                    $("#consentListTable button[data-dismiss]").attr("disabled", false);
+                                } else {
+                                    $("#consentListTable .modal").modal("hide");
+                                    if (typeof reloadConsentList != "undefined") reloadConsentList();
+                                    else setTimeout("location.reload();", 2000);
+                                };
+                            };
+                        }), 100);
+                    };
+                } else  $("#consentDateError_" + dataIndex).text(i18next.t("You must enter a valid date/time"));
+
+            });
+        });
+    },
+    this.getConsentHistory = function(options) {
+        if (!options) options = {};
+        var self = this;
+        var content = "";
+        content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+        content += this.getHeaderRow(historyHeaderArray);
+ 		
+ 		/*
+ 		 * filtered out deleted items from all consents
+ 		 */
+        var items = $.grep(self.items, function(item) {
+        	return !(/null/.test(item.agreement_url)) && item.deleted;
+        });
+        /*
+         * sort items by last updated date in descending order
+         */
+        items = items.sort(function(a,b){
+                     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
+                });
+        items.forEach(function(item, index) {
+        	content += self.getConsentHistoryRow(item, index);
+        });
+        content += "</table></div>";
+        $("#consentHistoryModal .modal-body").html(content);
+        $("#consentHistoryModal").modal("show");
+    },
+    this.getConsentList = function() {
+        this.getTerms(); //get terms of use if any
+        var self = this;
+        if (this.items.length > 0) {
+            var existingOrgs = {};
+            var content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+            content += this.getHeaderRow(headerArray);
+            this.items.forEach(function(item, index) {
+                if (item.deleted) {
+                    self.hasHistory = true;
+                    return true;
+                };
+                if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    self.hasContent = true;
+                    if (self.showInitialConsentTerms) content += self.getTermsTableHTML();
+                    content += self.getConsentRow(item, index);
+                    existingOrgs[item.organization_id] = true;
+                };
+
+            });
+            content += "</table>";
+
+            if (self.hasContent) {
+                $("#profileConsentList").html(content);
+                if (!self.ctop) $("#profileConsentList .agreement").each(function() {
+                    $(this).parent().hide();
+                });
+                $("#profileConsentList .button--LR").each(function() {
+                    if ($(this).attr("show") == "true") $(this).addClass("show");
+                });
+                $("#profileConsentList tr:visible").each(function(index) {
+                    if (index % 2 === 0) $(this).addClass("even");
+                    else $(this).addClass("odd");
+                });
+            } else {
+                if (self.showInitialConsentTerms) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += self.getTermsTableHTML(true);
+                    content += "</table>"
+                    $("#profileConsentList").html(content);
+                } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
+            };
+
+            if (self.editable && self.hasHistory) {
+                $("#profileConsentList").append("<br/><button id='viewConsentHistoryButton' class='btn btn-tnth-primary sm-btn'>" + i18next.t("History") + "</button>");
+                (function(self) {
+                    $("#viewConsentHistoryButton").on("click", function(e) {
+                        e.preventDefault();
+                        self.getConsentHistory();
+                    });
+                })(self);
+            };
+
+            if (self.editable) {
+                self.initConsentItemEvent();
+            };
+            if (self.consentDateEditable) {
+                self.initConsentDateEvents();
+            };
+
+        } else {
+            if (self.showInitialConsentTerms) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += self.getTermsTableHTML(true);
+                    content += "</table>";
+                    $("#profileConsentList").html(content);
+            } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
+        };
+
+        $("#profileConsentList").animate({opacity: 1});
+    };
+
+};
+
 var fillViews = {
     "org": function() {
         var content = "";
@@ -244,12 +809,12 @@ var fillViews = {
                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
                 };
                 if (!hasValue(displayDate)) displayDate = __NOT_PROVIDED_TEXT;
-                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content = f.closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else {
-                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content = f.closest("label").text();
             };
-            if ($("#patBiopsy input[name='biopsy']").is(":checked")) $("#biopsyDateContainer").show();
+            if (a == "true") $("#biopsyDateContainer").show();
             if (hasValue(content)) $("#biopsy_view").html("<div>" + i18next.t(content) + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
         };
@@ -350,10 +915,13 @@ var fillContent = {
         fillViews.clinical();
     },
     "demo": function(data) {
-        //console.log("in demo");
-        //console.log(data)
-        $('#firstname').val(data.name.given);
-        $('#lastname').val(data.name.family);
+        if (!data) return false;
+
+        if (data.name) {
+            $('#firstname').val(data.name.given);
+            $('#lastname').val(data.name.family);
+        };
+
         if (data.birthDate) {
             var bdArray = data.birthDate.split("-");
             $("#birthday").val(data.birthDate);
@@ -439,7 +1007,7 @@ var fillContent = {
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity") {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["ethnicity"]) {
                 //console.log(item)
                 item.valueCodeableConcept.coding.forEach(function(val){
                     $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
@@ -455,7 +1023,7 @@ var fillContent = {
     "race": function(data) {
         // Get Races
         data.extension.forEach(function(item, index) {
-            if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-race") {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["race"]) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
@@ -474,11 +1042,10 @@ var fillContent = {
     },
     "indigenous": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036") {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["indigenous"]) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userIndigenousStatus input[type='radio'][value="+val.code+"]").prop('checked', true);
-
                 });
             };
         });
@@ -493,7 +1060,7 @@ var fillContent = {
 
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
-                if (item.system === "http://us.truenth.org/identity-codes/practice-region" && hasValue(item.value)) {
+                if (item.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && hasValue(item.value)) {
                     orgStates.push((item.value).split(":")[1]);
                 }
             });
@@ -547,415 +1114,22 @@ var fillContent = {
         fillViews.siteId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
-        /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
-        var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-        var content = "";
-        if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
-            var dataArray = data["consent_agreements"].sort(function(a,b){
-                 return new Date(b.signed) - new Date(a.signed);
-            });
-            var existingOrgs = {};
-            var hasConsent = false;
-            var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-            var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            /********* Note that column headings are different between TrueNTH and EPROMs.
-                 Use css class to hide/show headings accordingly
-                 please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
-             ********/
-            var headerEnum = {"consentStatus": i18next.t("Consent Status"),
-                              "status": i18next.t("Status"),
-                              "agreement": i18next.t("Agreement"),
-                              "consentDate": i18next.t("Date"),
-                              "registrationDate": i18next.t("Regiatration Date"),
-                              "locale": i18next.t("GMT")
-                             };
-            var headerArray = ['Organization',
-                                '<span class="eproms-consent-status-header">' + headerEnum["consentStatus"] + '</span><span class="truenth-consent-status-header">' + headerEnum["status"] + '</span>',
-                                '<span class="agreement">' + headerEnum["agreement"] + '</span>',
-                                '<span class="eproms-consent-date-header">' + headerEnum["consentDate"] + '</span><span class="truenth-consent-date-header">' + headerEnum["registrationDate"] + '</span> <span class="gmt">(' + headerEnum["locale"] + ')</span>'];
-            headerArray.forEach(function (title, index) {
-                if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
-            });
-
-            var hasContent = false;
-            var touObj = [];
-
-            //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
-            //and also website terms of use
-            // WILL NEED TO CLARIFY
-            tnthAjax.getTerms(userId, false, true, function(data) {
-                if (data && data.tous) {
-                    (data.tous).forEach(function(item) {
-                        var fType = $.trim(item.type).toLowerCase();
-                        if (fType == "subject website consent" || fType == "website terms of use") {
-                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
-                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
-                            touObj.push(item);
-                        };
-                    });
-                };
-            });
-
-            //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
-            var showInitialConsentTerms = (touObj.length > 0);
-            var getTOUTableHTML = function(includeHeader) {
-                var touContent = "";
-                if (includeHeader) {
-                    headerArray.forEach(function(title) {
-                        touContent += "<th class='consentlist-header'>" + title + "</th>";
-                    });
-                };
-                //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
-                //wording is not spec'd out for EPROMs. won't add anything specific until instructed
-                touObj.forEach(function(item, index) {
-                    var org = OT.orgsList[item.organization_id];
-                    touContent += "<tr data-tou-type='" + item.type + "'>";
-                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + i18next.t(item.display_type) + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
-                    touContent += "<td>" + item.accepted + "</td></tr>";
-                });
-                return touContent;
-            };
-
-            dataArray.forEach(function(item, index) {
-                if (item.deleted) return true;
-                if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
-                    if (!OT.initialized) tnthAjax.getOrgs(userId, false, true, null);
-                    hasContent = true;
-                    var orgName = "";
-                    var orgId = item.organization_id;
-                    /*****
-                        consent with top level org config value is only set in Truenth, we need to get the top level org name(s) for each consent
-                        for displaying purpose in EPROMs
-                            ******/
-                    if (!ctop) {
-                        try {
-                            var topOrgID = OT.getTopLevelParentOrg(orgId);
-                            orgName = OT.orgsList[topOrgID].name;
-
-                        } catch(e) {
-                            orgName = OT.orgsList[orgId].name;
-                        }
-                    } else orgName = OT.orgsList[orgId].name;
-
-                    var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                    var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
-                    var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
-                    var sDisplay = "", cflag = "";
-                    var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
-                    var signedDate = tnthDates.formatDateString(item.signed);
-                    var editorUrlEl = $("#" + orgId + "_editor_url");
-                    var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    var consentLabels = {
-                        "default": i18next.t("Consented"),
-                        "consented": i18next.t("Consented / Enrolled"),
-                        "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
-                                      "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
-                        "purged": "Purged / Removed"
-                    };
-
-                    switch(consentStatus) {
-                        case "deleted":
-                            sDisplay = "<span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.9em'>(" + i18next.t("deleted on") + " " + deleteDate.replace("T", " ") + " GMT)</span>";
-                            break;
-                        case "expired":
-                            sDisplay = "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>";
-                            break;
-                        case "active":
-                            if (se && sr && ir) {
-                                    if (isDefault) sDisplay = "<span class='text-success small-text'>" + consentLabels["default"] + "</span>";
-                                    else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
-                                    cflag = "consented";
-                            } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text withdrawn-label'>" + consentLabels["withdrawn"] + "</span>";
-                                    cflag = "suspended";
-                            } else if (!se && !ir && !sr) {
-                                    sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
-                                    cflag = "purged";
-                            } else {
-                                //backward compatible?
-                                sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
-                                cflag = "consented";
-                            };
-                            break;
-                    };
-                    var modalContent = "", consentDateModalContent = "";
-
-                    if (editable && consentStatus == "active") {
-                        /****** modal content for modifying consent status *******/
-                        /*
-                         * NOTE, consent withdrawn verbiage is different between EPROMS and TRUENTH
-                         * different verbiage is hidden/shown via css - see .withdrawn-label class in respective css files
-                         */
-                        modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
-                            + '<div class="modal-dialog" role="document">'
-                            + '<div class="modal-content">'
-                            + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") +'"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">' + i18next.t("Consent Status Editor") + '</h5>'
-                            + '</div>'
-                            + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">' + i18next.t("Modify the consent status for this user to") + '</h4>'
-                            + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
-                            + '</div><br/><br/>'
-                            + '</div>'
-                            + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close", {"": "Close"}) + '</button>'
-                            + '</div>'
-                            + '</div></div></div>';
-
-                        /**** modal content for editing consent date for test patient ****/
-                        consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
-                            + '<div class="modal-dialog" role="document">'
-                            + '<div class="modal-content">'
-                            + '<div class="modal-header">'
-                            + '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '"><span aria-hidden="true">&times;</span></button>'
-                            + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
-                            + '</div>'
-                            + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
-                            + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
-                            + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
-                            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
-                            + '<div class="row">'
-                            + '<div class="col-md-3 col-sm-3">'
-                            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div>'
-                            + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
-                            + '</div></div>'
-                            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
-                            + '</div>'
-                            + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">' + i18next.t("Submit") + '</button>'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal">' + i18next.t("Close") + '</button>'
-                            + '</div>'
-                            + '</div></div></div>';
-
-                    };
-
-                    if (showInitialConsentTerms) content += getTOUTableHTML();
-
-                    content += "<tr>";
-
-                    [
-                        {
-                            content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
-                        },
-                        {
-                            content: sDisplay + (editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
-                            "_class": "indent"
-                        },
-                        {
-                            content: function(item) {
-                                var s = "";
-                                if (isDefault) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
-                                else {
-                                    s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "")
-                                };
-                                return s;
-                            } (item)
-                        },
-                        {
-                            content: signedDate + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
-
-                        }
-                    ].forEach(function(cell) {
-                        if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
-                    });
-                    content += "</tr>";
-                    existingOrgs[item.organization_id] = true;
-                };
-
-            });
-            content += "</table>";
-
-            if (hasContent) {
-                $("#profileConsentList").html(content);
-                if (!ctop) $("#profileConsentList .agreement").each(function() {
-                    $(this).parent().hide();
-                });
-                 $("#profileConsentList .button--LR").each(function() {
-                     if ($(this).attr("show") == "true") $(this).addClass("show");
-                 });
-            } else {
-                if (showInitialConsentTerms) {
-                        content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                        content += getTOUTableHTML(true);
-                        content += "</table>"
-                        $("#profileConsentList").html(content);
-                } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
-            };
-
-            $("#profileConsentList tr:visible").each(function(index) {
-                if (index % 2 === 0) $(this).addClass("even");
-                else $(this).addClass("odd");
-            });
-
-            if (editable) {
-                $("input[class='radio_consent_input']").each(function() {
-                    $(this).on("click", function() {
-                        var o = CONSENT_ENUM[$(this).val()];
-                        if (o) {
-                            o.org = $(this).attr("data-orgId");
-                            o.agreementUrl = $(this).attr("data-agreementUrl");
-                        };
-                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
-                        else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                        $("#" + $(this).attr("modalId")).modal('hide');
-                        if (typeof reloadConsentList != "undefined") reloadConsentList();
-                    });
-                });
-            };
-            if (consentDateEditable) {
-                var today = new Date();
-                $(".consent-date-modal").each(function() {
-                    $(this).on("shown.bs.modal", function() {
-                        $(this).find(".consent-date").focus();
-                        $(this).addClass("active");
-                        $(this).find("input").each(function() {
-                            if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
-                            else $(this).val("");
-                        });
-                        $(this).find(".set-consent-error").html("");
-                    });
-                    $(this).on("hidden.bs.modal", function() {
-                        $(this).removeClass("active");
-                    });
-                });
-                $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-                $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
-                    __convertToNumericField($(this));
-                });
-                $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
-                    $(this).on("change", function() {
-                        var dataIndex = $.trim($(this).attr("data-index"));
-                        var d = $("#consentDate_" + dataIndex);
-                        var h = $("#consentHour_" + dataIndex).val();
-                        var m = $("#consentMinute_" + dataIndex).val();
-                        var s = $("#consentSecond_" + dataIndex).val();
-                        var errorMessage = "";
-
-                        if (hasValue(d.val())) {
-                            var isValid = tnthDates.isValidDefaultDateFormat(d.val());
-                            if (!isValid) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Date must in the valid format.");
-                                d.datepicker("hide");
-                            };
-                        };
-
-                        /**** validate hour [0]0 ****/
-                        if (hasValue(h)) {
-                            if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Hour must be in valid format, range 0 to 23.");
-                            };
-                        };
-
-                        /***** validate minute [0]0 *****/
-                        if (hasValue(m)) {
-                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Minute must be in valid format, range 0 to 59.");
-                            };
-                        };
-                        /***** validate second [0]0 *****/
-                        if (hasValue(s)) {
-                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
-                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + i18next.t("Second must be in valid format, range 0 to 59.");
-                            };
-                        };
-
-                        if (hasValue(errorMessage)) {
-                            $("#consentDateError_" + dataIndex).html(errorMessage);
-                        } else $("#consentDateError_" + dataIndex).html("");
-
-                    });
-                });
-
-                $("#profileConsentList .btn-submit").each(function() {
-                    $(this).on("click", function() {
-                        var dataIndex = $.trim($(this).attr("data-index"));
-                        var ct = $("#consentDate_" + dataIndex);
-                        var h = $("#consentHour_" + dataIndex).val();
-                        var m = $("#consentMinute_" + dataIndex).val();
-                        var s = $("#consentSecond_" + dataIndex).val();
-                        var isValid = hasValue(ct.val());
-                        if (isValid) {
-                            var dt = new Date(ct.val());
-                            //2017-07-06T22:04:50 format
-                            var cDate = dt.getFullYear()
-                                        + "-"
-                                        + (dt.getMonth()+1)
-                                        + "-"
-                                        + dt.getDate()
-                                        + "T"
-                                        + (hasValue(h) ? pad(h) : "00")
-                                        + ":"
-                                        + (hasValue(m) ? pad(m) : "00")
-                                        + ":"
-                                        + (hasValue(s) ? pad(s) : "00");
-
-                            var o = CONSENT_ENUM[ct.attr("data-status")];
-
-                            if (o) {
-                                o.org = ct.attr("data-orgId");
-                                o.agreementUrl = ct.attr("data-agreementUrl");
-                                o.acceptance_date = cDate;
-                                o.testPatient = true;
-                                setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
-                                setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
-                                /**** disable close buttons while processing request ***/
-                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
-
-                                //serId, params, status, sync, callback)
-                                var serverErrorMessage = i18next.t("Error processing data.  Make sure the date is in the correct format.");
-                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {"
-                                            + " if (data && data.error) { "
-                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("' + serverErrorMessage + '"); '
-                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
-                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); })(), 450);'
-                                            + '  $("#consentListTable button[data-dismiss]").attr("disabled", false);'
-                                            + '  } else { '
-                                            + '  $("#consentListTable .modal").modal("hide");'
-                                            + '  if (typeof reloadConsentList != "undefined") reloadConsentList(); '
-                                            + '  else setTimeout("location.reload();", 2000); '
-                                            + '  }; '
-                                            + ' }})', 100);
-                            };
-                        } else  $("#consentDateError_" + dataIndex).text(i18next.t("You must enter a valid date/time"));
-
-                    });
-                });
-            };
-
+        if (hasValue(errorMessage)) {
+            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : ("<p class='text-muted'>" + i18next.t("No consent found for this user.") + "</p>"));
+        } else if (parseInt(errorCode) == 401) {
+            var msg = i18next.t("You do not have permission to edit this patient record.");
+            $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
         } else {
-            if (hasValue(errorMessage)) {
-                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : ("<p class='text-muted'>" + i18next.t("No consent found for this user.") + "</p>"));
-            } else if (parseInt(errorCode) == 401) {
-                var msg = i18next.t("You do not have permission to edit this patient record.");
-                $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
-            } else {
-                if (showInitialConsentTerms) {
-                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                    content += getTOUTableHTML(true);
-                    content += "</table>";
-                    $("#profileConsentList").html(content);
-                } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
+            var content = "";
+            var dataArray = [];
+            if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+                dataArray = data["consent_agreements"].sort(function(a,b){
+                     return new Date(b.signed) - new Date(a.signed);
+                });
             };
+            var co = new ConsentUIHelper(dataArray, userId);
+            co.getConsentList();
         };
-        $("#profileConsentList").animate({opacity: 1});
     },
     "treatment": function(data) {
         var treatmentCode = tnthAjax.hasTreatment(data);
@@ -969,7 +1143,7 @@ var fillContent = {
     },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
-            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({opacity: 1});
+            $("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({opacity: 1});
             $("#pastTreatmentsContainer").hide();
             fillViews.procedure();
             return false;
@@ -1044,7 +1218,7 @@ var fillContent = {
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
                 $("#profileTimeZone option").each(function() {
                     if ($.trim($(this).val()) == $.trim(item.timezone)) {
                         $(this).prop("selected", true);
@@ -1080,28 +1254,42 @@ var fillContent = {
             function typeInTous(type) {
                 var found = false;
                 (data.tous).forEach(function(item) {
-                    if (!found && item.type == type) found = true;
+                    if (!found && $.trim(item.type) == $.trim(type)) found = true;
                 });
                 return found;
             };
-
-            $("#termsCheckbox [data-type='terms']").each(function() {
-                var arrTypes = ($(this).attr("data-tou-type")).split(",");
-                var self = $(this);
+            $("#topTerms label.terms-label").each(function() {
+                var arrTypes = [];
                 var item_found  = 0;
+                var self = $(this);
+
+                if (self.attr("data-tou-type")) {
+                    var o = ($(this).attr("data-tou-type")).split(",");
+                    o.forEach(function(item) {
+                        arrTypes.push(item);
+                    });
+                } else {
+                    self.find("[data-type='terms']").each(function() {
+                        var o = ($(this).attr("data-tou-type")).split(",");
+                        o.forEach(function(item) {
+                            arrTypes.push(item);
+                        });
+                    });
+                };
+
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
                     };
                 });
-                var additional = $(this).find("[data-core-data-subtype]");
-                if (additional.length > 0) {
-                    at = additional.attr("data-tou-type");
-                    if (typeInTous(at)) item_found++;
-                };
-                if (item_found == (arrTypes.length+additional.length)) {
+
+                if (item_found == arrTypes.length) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
+                    self.find("[data-type='terms']").each(function() {
+                        $(this).attr("data-agree", "true");
+                    })
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
@@ -1113,13 +1301,93 @@ var fillContent = {
                 };
             });
         };
-        setTimeout(function() {
-            var agreedCheckboxes = $("#termsCheckbox [data-type='terms'][data-agree='false']:visible");
-            if (agreedCheckboxes.length > 1) {
-                $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
+    },
+    "emailContent": function(userId, messageId) {
+        tnthAjax.emailLog(userId, function(data) {
+            if (data.messages) {
+                (data.messages).forEach(function(item) {
+                    if (item.id == messageId) {
+                        $("#emailBodyModal .body-content").html(item.body);
+                        /*
+                         * email content contains clickable link/button - need to prevent click event of those from being triggered
+                         */
+                        $("#emailBodyModal .body-content a").each(function() {
+                          $(this).on("click", function(e) {
+                              e.preventDefault();
+                              return false;
+                          });
+                        });
+                        /*
+                         * need to remove inline style specifications - as they can be applied globally and override the classes specified in stylesheet
+                         */
+                        $("#emailBodyModal .body-content style").remove();
+                        $("#emailBodyModal .body-content a.btn").addClass("btn-tnth-primary");
+                        $("#emailBodyModal .body-content td.btn, #emailBodyModal .body-content td.btn a").addClass("btn-tnth-primary").removeAttr("width").removeAttr("style");
+                        /*
+                         * remove inline style in email body
+                         * style here is already applied via css
+                         */
+                        $("#emailBodyModal").modal("show");
+                        return true;
+                    };
+                });
             };
-            if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
-        }, 2000);
+        });
+    },
+    "emailLog": function(userId, data) {
+        if (!data.error) {
+            if (data.messages && data.messages.length > 0) {
+                (data.messages).forEach(function(item) {
+                    item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
+                });
+                $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
+                $('#profileEmailLogTable').bootstrapTable( {
+                    data: data.messages,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: 'table table-responsive profile-email-log',
+                    sortName: 'sent_at',
+                    sortOrder: 'desc',
+                    search: true,
+                    smartDisplay: true,
+                    showColumns: true,
+                    toolbar: "#emailLogTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                          };
+                    },
+                    undefinedText: '--',
+                    columns: [
+                        {
+                            field: 'sent_at',
+                            title: i18next.t("Date (GMT), Y-M-D"),
+                            searchable: true,
+                            sortable: true
+                        },
+                        {
+                            field: 'subject',
+                            title: i18next.t("Subject"),
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: 'recipients',
+                            title: i18next.t("Email"),
+                            sortable: true,
+                            searchable: true,
+                            width: '20%'
+                        }
+                    ]
+                });
+                setTimeout(function() { $("#lbEmailLog").addClass("active"); }, 100);
+            } else {
+                $("#emailLogContent").html("<span class='text-muted'>" + i18next.t('No audit entry found.') + "</span>");
+            };
+        } else {
+            $("#emailLogMessage").text(data.error);
+        };
     }
 };
 var assembleContent = {
@@ -1136,7 +1404,7 @@ var assembleContent = {
         };
 
 
-        var bdFieldVal = $("input[name=birthDate]").val();
+        var bdFieldVal = $("#birthday").val();
 
         if (! hasValue(bdFieldVal)) {
             var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
@@ -1166,7 +1434,7 @@ var assembleContent = {
 
             };
 
-            /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+            /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
             var topLevelOrgs = $("#fillOrgs legend[data-checked]");
             if (topLevelOrgs.length > 0)  {
                 topLevelOrgs.each(function() {
@@ -1213,7 +1481,7 @@ var assembleContent = {
 
                 if (ethnicityIDs) {
                     demoArray["extension"].push(
-                        {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                        {   "url": SYSTEM_IDENTIFIER_ENUM["ethnicity"],
                             "valueCodeableConcept": {
                                 "coding": ethnicityIDs
                             }
@@ -1228,7 +1496,7 @@ var assembleContent = {
                 }).get();
                 if (raceIDs) {
                     demoArray["extension"].push(
-                        {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                        {   "url": SYSTEM_IDENTIFIER_ENUM["race"],
                             "valueCodeableConcept": {
                                 "coding": raceIDs
                             }
@@ -1240,11 +1508,11 @@ var assembleContent = {
 
             if (i.length > 0) {
                 indigenousIDs = $("#userIndigenousStatus input[type='radio']:checked").map(function() {
-                    return { code: $(this).val(), system: "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036" };
+                    return { code: $(this).val(), system: SYSTEM_IDENTIFIER_ENUM["indigenous"] };
                 }).get();
                 if (indigenousIDs) {
                     demoArray["extension"].push(
-                        {   "url": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
+                        {   "url": SYSTEM_IDENTIFIER_ENUM["indigenous"],
                              "valueCodeableConcept": {
                                  "coding": indigenousIDs
                              }
@@ -1272,7 +1540,7 @@ var assembleContent = {
                     demoArray["extension"].push(
                         {
                             timezone: tzID,
-                            url: "http://hl7.org/fhir/StructureDefinition/user-timezone"
+                            url: SYSTEM_IDENTIFIER_ENUM["timezone"]
                         }
                     );
                 };
@@ -1430,7 +1698,7 @@ var assembleContent = {
                 return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
             }).get();
             demoArray["extension"].push(
-                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                { "url": SYSTEM_IDENTIFIER_ENUM["ethnicity"],
                     "valueCodeableConcept": {
                         "coding": ethnicityIDs
                     }
@@ -1442,7 +1710,7 @@ var assembleContent = {
                 return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
             }).get();
             demoArray["extension"].push(
-                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                { "url": SYSTEM_IDENTIFIER_ENUM["race"],
                     "valueCodeableConcept": {
                         "coding": raceIDs
                     }
@@ -1600,7 +1868,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
             if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
         };
     });
-    this.initialized = true;
+    if (items.length > 0) this.initialized = true;
     return orgsList;
 };
 OrgTool.prototype.populateUI = function() {
@@ -1878,7 +2146,7 @@ OrgTool.prototype.getCommunicationArray = function() {
         }
         else if (oi.extension && oi.extension.length > 0) {
             (oi.extension).forEach(function(ex) {
-                if (ex.url == "http://hl7.org/fhir/valueset/languages" && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
+                if (ex.url == SYSTEM_IDENTIFIER_ENUM["language"] && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
             });
         };
     });
@@ -1989,6 +2257,48 @@ var tnthAjax = {
             }
         });
     },
+    "sendRequest": function(url, method, userId, params, callback) {
+        if (!hasValue(url)) return false;
+        if (!params) params = {};
+        if (!params.attempts) params.attempts = 0;
+        if (!params.max_attempts) params.max_attempts = 3;
+        var self = this;
+        params.attempts++;
+        $.ajax ({
+            type: hasValue(method) ? method : "GET",
+            url: url,
+            contentType: params.contentType? params.contentType: "application/json; charset=utf-8",
+            dataType: params.dataType? params.dataType: "json",
+            cache: (params.cache ? params.cache : false),
+            async: (params.sync ? false : true),
+            data: (params.data ? params.data: null),
+            timeout: (params.timeout ? params.timeout: 5000) //set default timeout to 5 seconds
+        }).done(function(data) {
+            params.attempts = 0;
+            if (hasValue(data)) {
+                if (callback) callback(data);
+            } else {
+                callback({"error": true});
+            };
+        }).fail(function(xhr){
+            if (params.attempts < params.max_attempts) {
+        		//use closure for scope
+        		(function(self, url, method, userId, params, callback) {
+                    setTimeout(function() { self.sendRequest(url, method, userId, params, callback); }, 3000); //retry after 3 seconds
+        		})(self, url, method, userId, params, callback);
+        	} else {
+                params.attempts = 0;
+                if (callback) callback({"error": true});
+                self.sendError(xhr, url, userId);
+	        };
+        });
+    },
+    "sendError": function(xhr, url, userId) {
+    	 if (hasValue(xhr)) {
+	           var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status) + ", response text - " + (hasValue(xhr.responseText)?xhr.responseText:"no response text returned from server");
+	           tnthAjax.reportError(hasValue(userId)?userId:"Not available",url, errorMessage, true);
+         };
+    },
     "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following:
         //:subject_id: User on which action is being attempted
@@ -1997,7 +2307,8 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? i18next.t(message) : i18next.t("Not provided");
+        //don't think we want to translate message sent back to the server here
+        params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
 
         $.ajax ({
             type: "GET",
@@ -2012,115 +2323,106 @@ var tnthAjax = {
     },
     "getStillNeededCoreData": function(userId, sync, callback, entry_method) {
         if (!hasValue(userId)) return false;
-        $.ajax ({
-            type: "GET",
-            url: "/api/coredata/user/" + userId + "/still_needed" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
-            async: (sync ? false : true)
-        }).done(function(data) {
-            if (data && data.still_needed) {
-                var __localizedFound = false;
-                if ((data.still_needed).length > 0) $("#termsText").show();
-                (data.still_needed).forEach(function(item) {
-                    if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
-                        $("#termsCheckbox [data-type='terms']").each(function() {
-                            var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
-                            dataTypes.forEach(function(type) {
-                                if ($.trim(type) == $.trim(item)) {
-                                    self.show().removeClass("tnth-hide");
-                                    self.attr("data-required", "true");
-                                };
-                            });
-                            /*
-                             * need to check terms of use types e.g. privacy policy, that is required of user
-                             * in addition to website terms of use
-                             * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore
-                             * for the purpose of checking, they need to be broken up into sub items and be checked respectively
-                             */
-                            $(this).find("[data-core-data-subtype]").each(function() {
-                                 if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
-                                    var parentNode = $(this).closest("[data-type='terms']");
-                                    parentNode.show().removeClass("tnth-hide");
-                                    parentNode.attr("data-required", "true");
-                                 };
-                            });
-                        });
-                    };
-                    if (item == "localized") __localizedFound = true;
-                });
-                if (!__localizedFound) $("#patMeta").remove();
-                else $("#patientQ").show();
-                if (callback) callback(data.still_needed);
-            } else {
-                if (callback) {
+        var __url = "/api/coredata/user/" + userId + "/still_needed" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):"");
+        this.sendRequest(__url, 'GET', userId, {sync: sync, cache: true}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			var __localizedFound = false;
+	                if ((data.still_needed).length > 0) $("#termsText").show();
+	                (data.still_needed).forEach(function(item) {
+	                    if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
+	                        $("#termsCheckbox [data-type='terms']").each(function() {
+	                            var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
+	                            dataTypes.forEach(function(type) {
+	                                if ($.trim(type) == $.trim(item)) {
+	                                    self.show().removeClass("tnth-hide");
+	                                    self.attr("data-required", "true");
+                                        var parentNode = self.closest("label.terms-label");
+                                        if (parentNode.length > 0) parentNode.show().removeClass("tnth-hide");
+	                                };
+	                            });
+	                        });
+	                    };
+	                    if (item == "localized") __localizedFound = true;
+	                });
+	                if (!__localizedFound) $("#patMeta").remove();
+	                else $("#patientQ").show();
+	                if (callback) callback(data.still_needed);
+        		} else {
+        			if (callback) callback({"error": i18next.t("unable to get needed core data")});
+        		};
+        	} else {
+        		if (callback) {
                     callback({"error": i18next.t("no data returned")});
                 };
-            };
-        }).fail(function(){
-            if (callback) callback({"error": i18next.t("unable to get needed core data")});
+        	};
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
         if (!hasValue(userId)) return false;
-        $.ajax ({
-            type: "GET",
-            url: "/api/coredata/user/" + userId + "/required",
-            cache: false,
-            async: (sync ? false : true)
-        }).done(function(data) {
-            if (data && data.required) {
-                if (callback) callback(data.still_needed);
-            } else {
-                if (callback) callback({"error": i18next.t("no data returned")});
-            };
-        }).fail(function(){
-            if (callback) callback({"error": i18next.t("unable to get required core data")});
+        this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache:false}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			if (data.required) {
+        				if (callback) callback(data.required);
+        			} else {
+        				if (callback) callback({"error": i18next.t("no data returned")});
+        			}
+        		} else {
+        			if (callback) callback({"error": i18next.t("unable to get required core data")});
+        		};
+
+        	} else {
+        		if (callback) callback({"error": i18next.t("no data returned")});
+        	};
         });
     },
     "getOptionalCoreData": function(userId, sync, target, callback, entry_method) {
         if (!hasValue(userId)) return false;
+        var __url = "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):"");
         if (target) {
             target.find(".profile-item-loader").show();
         };
-        $.ajax ({
-            type: "GET",
-            url: "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
-            async: (sync ? false : true)
-        }).done(function(data) {
-            if (data && data.optional) {
-                var self = this;
-                var sections = $("#profileForm .optional");
-                sections.each(function() {
-                    var section = $(this).attr("data-section-id");
-                    var parent = $(this).closest(".profile-item-container");
-                    var visibleRows = parent.find(".view-container tr:visible").length;
-                    var noDataContainer = parent.find(".no-data-container");
-                    var btn = parent.find(".profile-item-edit-btn").hide();
-                    if (hasValue(section)) {
-                        if (OT.inArray(section, data.optional)) {
-                            $(this).show();
-                            noDataContainer.html("");
-                            btn.show();
-                        } else {
-                            $(this).hide();
-                            if (visibleRows == 0) {
-                                noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
-                                btn.hide();
-                            };
-                        };
-                    };
-                });
-                if (callback) callback(data);
-            } else {
-                if (callback) callback({"error": i18next.t("no data found")});
-            };
-            if (target) {
-                target.find(".profile-item-loader").hide();
-            };
-        }).fail(function(){
-            if (callback) callback({"error": i18next.t("unable to get required core data")});
-            if (target) {
-                target.find(".profile-item-loader").hide();
-            };
+        this.sendRequest(__url, 'GET', userId, {sync:sync, cache:true}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			if (data.optional) {
+		                var sections = $("#profileForm .optional");
+		                sections.each(function() {
+		                    var section = $(this).attr("data-section-id");
+		                    var parent = $(this).closest(".profile-item-container");
+		                    var visibleRows = parent.find(".view-container tr:visible").length;
+		                    var noDataContainer = parent.find(".no-data-container");
+		                    var btn = parent.find(".profile-item-edit-btn").hide();
+		                    if (hasValue(section)) {
+		                        if (OT.inArray(section, data.optional)) {
+		                            $(this).show();
+		                            noDataContainer.html("");
+		                            btn.show();
+		                        } else {
+		                            $(this).hide();
+		                            if (visibleRows == 0) {
+		                                noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
+		                                btn.hide();
+		                            };
+		                        };
+		                    };
+		                });
+		                if (callback) callback(data);
+        			} else {
+        				if (callback) callback({"error": i18next.t("no data found")});
+        			};
+        		} else {
+        			if (callback) callback({"error": i18next.t("unable to get required core data")});
+        		};
+
+        		if (target) {
+                	target.find(".profile-item-loader").hide();
+            	};
+
+        	} else {
+        		if (callback) callback({"error": i18next.t("no data found")});
+        	};
         });
     },
     "getPortalFooter": function(userId, sync, containerId, callback) {
@@ -2128,74 +2430,66 @@ var tnthAjax = {
             if (callback) callback("<div class='error-message'>" + i18next.t("User Id is required") + "</div>");
             return false;
         };
-        $.ajax ({
-            type: "GET",
-            url: '/api/portal-footer-html/',
-            async: sync? false : true
-        }).done(function(data) {
-            if (data) {
-                if (hasValue(containerId)) $("#" + containerId).html(data);
-                if (callback) callback(data);
-            } else {
-                if (callback) callback("<div class='error-message'>" + i18next.t("No data found") + "</div>");
-            }
-        }).fail(function() {
-           if (callback) callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
+        this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true, 'dataType': 'html'}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			if (hasValue(containerId)) $("#" + containerId).html(data);
+                	if (callback) callback(data);
+        		} else {
+        			if (callback) callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
+        		};
+        	} else {
+        		if (callback) callback("<div class='error-message'>" + i18next.t("No data found") + "</div>");
+        	};
         });
-
     },
     "getOrgs": function(userId, noOverride, sync, callback, noPopulate) {
-        loader(true);
-        var self = this;
-        $.ajax ({
-            type: "GET",
-            url: '/api/organization',
-            async: sync? false : true
-        }).done(function(data) {
-            OT.setUserId(userId);
-            $(".get-orgs-error").html("");
-            OT.populateOrgsList(data.entry);
-            if(!noPopulate) {
-                OT.handlePreSelectedClinic();
-                OT.populateUI();
-                OT.handleEvent();
+        this.sendRequest('/api/organization', 'GET', userId, {sync: sync, cache: true}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    OT.setUserId(userId);
+                    $(".get-orgs-error").html("");
+                    if (!noOverride) OT.populateOrgsList(data.entry);
+                    if (!noPopulate) {
+                        OT.handlePreSelectedClinic();
+                        OT.populateUI();
+                        OT.handleEvent();
+                    };
+                    if (callback) callback(data);
+                } else {
+                   var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
+                   if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
+                   else $(".get-orgs-error").html(errorMessage);
+                   if (callback) callback({"error": errorMessage});
+                };
+                $("#clinics").attr("loaded", true);
             };
-            if (callback) callback(data);
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
-           var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
-           if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
-           else $(".get-orgs-error").html(errorMessage);
-           if (callback) callback({"error": errorMessage});
-           loader();
         });
     },
     "getConsent": function(userId, sync) {
        if (!userId) return false;
-       $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+"/consent",
-            cache: false,
-            async: (sync ? false : true)
-        }).done(function(data) {
-           $(".get-consent-error").html("");
-           fillContent.consentList(data, userId, null, null);
-           loader();
-           return true;
-        }).fail(function(xhr) {
-            //console.log("Problem retrieving data from server.");
-            fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server.") + "<br/>" + i18next.t("Error Status Code: ") + xhr.status + (xhr.status == 401 ? "<br/>" + i18next.t("Permission denied to access patient record"): ""), xhr.status);
-            loader();
-            var errorMessage = i18next.t("Server error occurred retrieving consent information.");
-            if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
-            else $(".get-consent-error").html(errorMessage)
-            return false;
-        });
+       this.sendRequest('/api/user/'+userId+'/consent', 'GET', userId, {sync: sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".get-consent-error").html("");
+                    fillContent.consentList(data, userId, null, null);
+                    return true;
+                } else {
+                    fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server."));
+                    var errorMessage = i18next.t("Server error occurred retrieving consent information.");
+                    if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-consent-error").html(errorMessage);
+                    return false;
+                };
+            };
+       });
     },
     "setConsent": function(userId, params, status, sync, callback) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
+            var __url = '/api/user/' + userId + '/consent';
             if (!consented || params["testPatient"]) {
+
                 params["user_id"] = userId;
                 params["organization_id"] = params["org"];
                 params["agreement_url"] =  params["agreementUrl"]
@@ -2203,25 +2497,18 @@ var tnthAjax = {
                 params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
                 params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
 
-                $.ajax ({
-                    type: "POST",
-                    url: '/api/user/' + userId + '/consent',
-                    contentType: "application/json; charset=utf-8",
-                    cache: false,
-                    dataType: 'json',
-                    async: (sync? false: true),
-                    data: JSON.stringify(params)
-                }).done(function(data) {
-                    //console.log("consent updated successfully.");
-                    $(".set-consent-error").html("");
-                    if (callback) callback(data);
-                }).fail(function(xhr) {
-                    //console.log("request to updated consent failed.");
-                    //console.log(xhr.responseText)
-                    if (callback) callback({"error": xhr.responseText});
-                    var errorMessage = i18next.t("Server error occurred setting consent status.");
-                    if ($(".set-consent-error").length == 0) $(".default-error-message-container").append("<div class='set-consent-error error-message'>" + errorMessage + "</div>");
-                    else $(".set-consent-error").html(errorMessage);
+                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(params)}, function(data) {
+                    if (data) {
+                        if (!data.error) {
+                            $(".set-consent-error").html("");
+                            if (callback) callback(data);
+                        } else {
+                            var errorMessage = i18next.t("Server error occurred setting consent status.");
+                            if (callback) callback({"error": errorMessage});
+                            if ($(".set-consent-error").length == 0) $(".default-error-message-container").append("<div class='set-consent-error error-message'>" + errorMessage + "</div>");
+                            else $(".set-consent-error").html(errorMessage);
+                        };
+                    };
                 });
             };
         };
@@ -2256,6 +2543,8 @@ var tnthAjax = {
             var consented = this.getAllValidConsent(userId, params["org"]);
             //console.log("has consent: " + consented)
             if (consented) {
+                var self = this;
+                var __url = '/api/user/' + userId + '/consent';
                 //delete all consents for the org
                 consented.forEach(function(orgId) {
                     if (hasValue(params["exclude"])) {
@@ -2268,23 +2557,16 @@ var tnthAjax = {
                         });
                         if (found) return true;
                     };
-                    $.ajax ({
-                        type: "DELETE",
-                        url: '/api/user/' + userId + '/consent',
-                        contentType: "application/json; charset=utf-8",
-                        async: false,
-                        cache: false,
-                        dataType: 'json',
-                        data: JSON.stringify({"organization_id": parseInt(orgId)})
-                    }).done(function(data) {
-                        //console.log("consent deleted successfully.");
-                        $(".delete-consent-error").html("");
-                    }).fail(function(xhr) {
-                        //console.log("request to delete consent failed.");
-                        //console.log(xhr.responseText)
-                        var errorMessage = i18next.t("Server error occurred removing consent.");
-                        if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
-                        else $(".delete-consent-error").html(errorMessage)
+                    self.sendRequest(__url, "DELETE", userId, {sync:true,data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
+                        if (data) {
+                            if (!data.error) {
+                                $(".delete-consent-error").html("");
+                            } else {
+                                var errorMessage = i18next.t("Server error occurred removing consent.");
+                                if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
+                                else $(".delete-consent-error").html(errorMessage);
+                            };
+                        };
                     });
                 });
 
@@ -2292,94 +2574,85 @@ var tnthAjax = {
         };
     },
     getAllValidConsent: function(userId, orgId) {
-        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
         if (!userId) return false;
         if (!orgId) return false;
-
         var consentedOrgIds = [];
-        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
-        $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+"/consent",
-            cache: false,
-            async: false
-        }).done(function(data) {
-            if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                if (d.length > 0) {
-                    d.forEach(function(item) {
-                        //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
-                        expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                        if (!(item.deleted) && !(expired > 0)) {
-                            if (orgId == "all") {
-                                consentedOrgIds.push(item.organization_id);
-                            }
-                            else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
+        this.sendRequest('/api/user/'+userId+'/consent', 'GET', userId, {sync: true}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (data.consent_agreements) {
+                        var d = data["consent_agreements"];
+                        if (d.length > 0) {
+                            d.forEach(function(item) {
+                                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
+                                if (!(item.deleted) && !(expired > 0)) {
+                                    if (orgId == "all") consentedOrgIds.push(item.organization_id);
+                                    else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
+                                };
+                            });
                         };
-                    });
-                };
+                    };
+                } else {
+                    return false;
+                }
             };
-
-        }).fail(function() {
-            return false;
+            return consentedOrgIds;
         });
-        //console.log(consentedOrgIds)
         return consentedOrgIds;
     },
 
     /****** NOTE - this will return the latest updated consent entry *******/
     hasConsent: function(userId, orgId, filterStatus) {
-        //console.log("in hasConsent: userId: " + userId + " orgId: " + orgId)
         if (!userId) return false;
         if (!orgId) return false;
         if (filterStatus == "default") return false;
 
-        var consentedOrgIds = [], expired = 0, found = false, suspended = false;
-        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
-        $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+"/consent",
-            cache: false,
-            async: false
-        }).done(function(data) {
-            if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                if (d.length > 0) {
-                    d = d.sort(function(a,b){
-                        return new Date(b.signed) - new Date(a.signed); //latest comes first
-                    });
-                    var item = d[0];
-                    expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                    if (item.deleted) found = true;
-                    if (expired > 0) found = true;
-                    if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
-                    if (!found) {
-                        if (orgId == item.organization_id) {
-                            switch(filterStatus) {
-                                case "suspended":
-                                    if (suspended) found = true;
-                                    break;
-                                case "purged":
-                                    found = true;
-                                    break;
-                                case "consented":
-                                    if (!suspended) {
-                                        if (item.staff_editable && item.send_reminders && item.include_in_reports) found = true;
+        var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
+        var __url = '/api/user/'+userId+"/consent";
+        var self = this;
+        self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (data.consent_agreements) {
+                        var d = data["consent_agreements"];
+                        if (d.length > 0) {
+                            d = d.sort(function(a,b){
+                                return new Date(b.signed) - new Date(a.signed); //latest comes first
+                            });
+                            item = d[0];
+                            expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
+                            if (item.deleted) found = true;
+                            if (expired > 0) found = true;
+                            if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
+                            if (!found) {
+                                if (orgId == item.organization_id) {
+                                    switch(filterStatus) {
+                                        case "suspended":
+                                            if (suspended) found = true;
+                                            break;
+                                        case "purged":
+                                            found = true;
+                                            break;
+                                        case "consented":
+                                            if (!suspended) {
+                                                if (item.staff_editable && item.send_reminders && item.include_in_reports) found = true;
+                                            };
+                                            break;
+                                        default:
+                                            found = true; //default is to return both suspended and consented entries
                                     };
-                                    break;
-                                default:
-                                    found = true; //default is to return both suspended and consented entries
-                            };
-                            if (found) consentedOrgIds.push(orgId);
+                                    if (found) consentedOrgIds.push(orgId);
 
-                        };
+                                };
+                            };
+                        }
                     };
+
+                } else {
+                    return false;
                 }
             };
-
-        }).fail(function() {
-            return false;
-         });
+        });
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     },
     removeObsoleteConsent: function() {
@@ -2474,108 +2747,86 @@ var tnthAjax = {
         });
     },
     "getDemo": function(userId, noOverride, sync, callback) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/demographics/'+userId,
-            async: (sync ? false: true),
-            cache: false
-        }).done(function(data) {
-            if (!noOverride) {
-                fillContent.race(data);
-                fillContent.ethnicity(data);
-                fillContent.indigenous(data);
-                fillContent.orgs(data);
-                fillContent.demo(data);
-                fillContent.timezone(data);
-                fillContent.subjectId(data);
-                fillContent.siteId(data);
-                fillContent.language(data);
-            }
-            $(".get-demo-error").html("");
-            loader();
-            if (callback) callback();
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
-            loader();
-            if (callback) callback();
-            var errorMessage = i18next.t("Server error occurred retrieving demographics information.");
-            if ($(".get-demo-error").length == 0) $(".default-error-message-container").append("<div class='get-demo-error error-message'>" + errorMessage + "</div>");
-            else $(".get-demo-error").html(errorMessage);
+        this.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: sync}, function(data) {
+            if (!data.error) {
+                if (!noOverride) {
+                    fillContent.race(data);
+                    fillContent.ethnicity(data);
+                    fillContent.indigenous(data);
+                    fillContent.orgs(data);
+                    fillContent.demo(data);
+                    fillContent.timezone(data);
+                    fillContent.subjectId(data);
+                    fillContent.siteId(data);
+                    fillContent.language(data);
+                }
+                $(".get-demo-error").html("");
+                if (callback) callback(data);
+            } else {
+                var errorMessage = i18next.t("Server error occurred retrieving demographics information.");
+                if ($(".get-demo-error").length == 0) $(".default-error-message-container").append("<div class='get-demo-error error-message'>" + errorMessage + "</div>");
+                else $(".get-demo-error").html(errorMessage);
+                if (callback) callback({"error": errorMessage});
+            };
         });
     },
-    "putDemo": function(userId,toSend,targetField, sync) {
+    "putDemo": function(userId,toSend,targetField,sync) {
         flo.showLoader(targetField);
-        $.ajax ({
-            type: "PUT",
-            url: '/api/demographics/'+userId,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            async: (sync ? false: true),
-            data: JSON.stringify(toSend)
-        }).done(function(data) {
-            //console.log("done");
-            //console.log(data);
-            $(".put-demo-error").html("");
-            flo.showUpdate(targetField);
-            fillViews.demo();
-            fillViews.detail();
-            fillViews.org();
-        }).fail(function() {
-            var errorMessage = i18next.t("Server error occurred setting demographics information.");
-            if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
-            else $(".put-demo-error").html(errorMessage);
-            flo.showError(targetField);
+        this.sendRequest('/api/demographics/'+userId, "PUT", userId, {sync:sync, data:JSON.stringify(toSend)}, function(data) {
+            if (!data.error) {
+                $(".put-demo-error").html("");
+                flo.showUpdate(targetField);
+                fillViews.demo();
+                fillViews.detail();
+                fillViews.org();
+            } else {
+                var errorMessage = i18next.t("Server error occurred setting demographics information.");
+                if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
+                else $(".put-demo-error").html(errorMessage);
+                flo.showError(targetField);
+            };
         });
     },
     "getDob": function(userId) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/demographics/'+userId
-        }).done(function(data) {
-            fillContent.dob(data);
-            //console.log(data)
-            loader();
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
-            loader();
+        this.sendRequest('/api/demographics/'+userId, 'GET', userId, null, function(data) {
+            if (!data.error) {
+                fillContent.dob(data);
+            } else {
+                return false;
+            };
         });
     },
     "getName": function(userId) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/demographics/'+userId
-        }).done(function(data) {
-            fillContent.name(data);
-            loader();
-        }).fail(function() {
-            loader();
+        this.sendRequest('/api/demographics/'+userId, 'GET', userId, null, function(data) {
+            if (!data.error) fillContent.name(data);
+            else return false;
         });
     },
     "getLocale": function(userId) {
-        $.ajax ({
-                type: "GET",
-                url: '/api/demographics/'+userId,
-                cache: false
-        }).done(function(data) {
-            if (data && data.communication) {
-                data.communication.forEach(function(item, index) {
-                    if (item.language) {
-                        locale = item["language"]["coding"][0].code;
-                        $("#locale").find("option").each(function() {
-                            $(this).removeAttr("selected");
-                        });
-                        $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
-                        $("#locale").val(locale);
-                        fillViews.locale();
-                    };
-                });
-                $(".get-locale-error").html("");
-            };
+        this.sendRequest('/api/demographics/'+userId, 'GET', userId, null, function(data) {
+        	if (data) {
+	            if (!data.error) {
+	                if (data.communication) {
+	                    data.communication.forEach(function(item, index) {
+	                        if (item.language) {
+	                            locale = item["language"]["coding"][0].code;
+	                            $("#locale").find("option").each(function() {
+	                                $(this).removeAttr("selected");
+	                            });
+	                            $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
+	                            $("#locale").val(locale);
+	                            fillViews.locale();
+	                        };
+	                    });
+	                    $(".get-locale-error").html("");
+	                };
 
-        }).fail(function() {
-            var errorMessage = i18next.t("Server error occurred retrieving locale information.");
-            if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
-            else $(".get-locale-error").html(errorMessage);
+	            } else {
+	                var errorMessage = i18next.t("Server error occurred retrieving locale information.");
+	                if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
+	                else $(".get-locale-error").html(errorMessage);
+	            }
+	        };
         });
     },
     "hasTreatment": function(data) {
@@ -2604,17 +2855,15 @@ var tnthAjax = {
 
         return found;
     },
-    "getTreatment": function (userId) {
+    "getTreatment": function (userId, callback) {
         if (!userId) return false;
-        $.ajax ({
-            type: "GET",
-            url: '/api/patient/'+userId+'/procedure',
-            cache: false
-        }).done(function(data) {
-            fillContent.treatment(data);
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
-           $("#userProcedures").html("<span class='error-message'>" + i18next.t("Error retrieving data from server") + "</span>");
+        this.sendRequest('/api/patient/'+userId+'/procedure', 'GET', userId, null, function(data) {
+            if (!data.error) {
+                fillContent.treatment(data);
+            } else {
+                $("#userProcedures").html("<span class='error-message'>" + i18next.t("Error retrieving data from server") + "</span>");
+            };
+            if (callback) callback(data);
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
@@ -2648,190 +2897,179 @@ var tnthAjax = {
         tnthAjax.postProc(userId, procArray, targetField);
     },
     deleteTreatment: function(userId, targetField) {
-        var self = this;
-        $.ajax ({
-            type: "GET",
-            url: '/api/patient/'+userId+'/procedure',
-            async: false
-        }).done(function(data) {
-            var treatmentData = self.hasTreatment(data);
-            if (treatmentData) {
-                if (treatmentData.code == CANCER_TREATMENT_CODE) {
-                    tnthAjax.deleteProc(treatmentData.id, targetField, true);
+        this.sendRequest('/api/patient/'+userId+'/procedure', 'GET', userId, {sync: true}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    var treatmentData = tnthAjax.hasTreatment(data);
+                    if (treatmentData) {
+                        if (treatmentData.code == CANCER_TREATMENT_CODE) {
+                            tnthAjax.deleteProc(treatmentData.id, targetField, true);
+                        } else {
+                            tnthAjax.deleteProc(treatmentData.id, targetField, true);
+                        };
+                    };
+
                 } else {
-                    tnthAjax.deleteProc(treatmentData.id, targetField, true);
+                    return false;
                 };
-            };
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
+            } else return false;
         });
     },
     "getProc": function(userId,newEntry) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/patient/'+userId+'/procedure',
-            cache: false
-        }).done(function(data) {
-            $("#eventListLoad").hide();
-            fillContent.proceduresContent(data,newEntry);
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
+        this.sendRequest('/api/patient/'+userId+'/procedure', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $("#eventListLoad").hide();
+                    fillContent.proceduresContent(data,newEntry);
+                } else {
+                    return false;
+                };
+            };
         });
     },
     "postProc": function(userId,toSend, targetField) {
         flo.showLoader(targetField);
-        $.ajax ({
-            type: "POST",
-            url: '/api/procedure',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(toSend)
-        }).done(function(data) {
-            flo.showUpdate(targetField);
-            $(".get-procs-error").html("");
-        }).fail(function() {
-           // console.log("Problem updating procedure on server.");
-           var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
-            if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
-            else $(".get-procs-error").html(errorMessage);
-            flo.showError(targetField);
+        this.sendRequest('/api/procedure', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    flo.showUpdate(targetField);
+                    $(".get-procs-error").html("");
+                } else {
+                    var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
+                    if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-procs-error").html(errorMessage);
+                    flo.showError(targetField);
+                };
+            };
         });
     },
     "deleteProc": function(procedureId, targetField, sync) {
         flo.showLoader(targetField);
-        $.ajax ({
-            type: "DELETE",
-            url: '/api/procedure/'+procedureId,
-            contentType: "application/json; charset=utf-8",
-            async: (sync ? false: true)
-        }).done(function(data) {
-            flo.showUpdate(targetField);
-            $(".del-procs-error").html("");
-        }).fail(function() {
-            // console.log("Problem deleting procedure on server.");
-            var errorMessage = i18next.t("Server error occurred removing procedure/treatment information.");
-            if ($(".del-procs-error").length == 0) $("#userProcuedures").append("<div class='del-procs-error error-message'>" + errorMessage + "</div>");
-            else $(".del-procs-error").html(errorMessage);
-            flo.showError(targetField);
+        this.sendRequest('/api/procedure/'+procedureId, 'DELETE', null, {sync: sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    flo.showUpdate(targetField);
+                    $(".del-procs-error").html("");
+                } else {
+                    var errorMessage = i18next.t("Server error occurred removing procedure/treatment information.");
+                    if ($(".del-procs-error").length == 0) $("#userProcuedures").append("<div class='del-procs-error error-message'>" + errorMessage + "</div>");
+                    else $(".del-procs-error").html(errorMessage);
+                    flo.showError(targetField);
+                }
+            };
         });
     },
     "getRoleList": function(callback) {
-        $.ajax({
-            type: "GET",
-            url: "/api/roles"
-        }).done(function(data) {
-            fillContent.roleList(data);
-            if (callback) callback();
-        }).fail(function() {
-            $(".get-roles-error").html(i18next.t("Server error occurred retrieving roles information."));
+        this.sendRequest('/api/roles', 'GET', null, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    fillContent.roleList(data);
+                    if (callback) callback(data);
+                } else {
+                	var errorMessage = i18next.t("Server error occurred retrieving roles information.");
+                    $(".get-roles-error").html(errorMessage);
+                    if (callback) callback({"error": errorMessage})
+                };
+            };
         });
     },
-    "getRoles": function(userId,isProfile) {
-        var self = this;
-        $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+'/roles',
-            cache: false
-        }).done(function(data) {
-            //self.getRoleList();
-            $(".get-roles-error").html("");
-            fillContent.roles(data,isProfile);
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
-           var errorMessage = i18next.t("Server error occurred retrieving user role information.");
-           if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
-           else $(".get-roles-error").html(errorMessage);
+    "getRoles": function(userId,isProfile,callback) {
+        this.sendRequest('/api/user/'+userId+'/roles', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".get-roles-error").html("");
+                    fillContent.roles(data,isProfile);
+                    if (callback) callback(data);
+                } else {
+                    var errorMessage = i18next.t("Server error occurred retrieving user role information.");
+                   if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
+                   else $(".get-roles-error").html(errorMessage);
+                   if (callback) callback({"error": errorMessage});
+                };
+            };
         });
     },
     "putRoles": function(userId,toSend, targetField) {
         flo.showLoader(targetField);
-        $.ajax ({
-            type: "PUT",
-            url: '/api/user/'+userId+'/roles',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(toSend)
-        }).done(function(data) {
-            flo.showUpdate(targetField);
-            $(".put-roles-error").html("");
-        }).fail(function(jhr) {
-            flo.showError(targetField);
-            var errorMessage = i18next.t("Server error occurred setting user role information.");
-           if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
-           else $(".put-roles-error").html(errorMessage);
-           //console.log(jhr.responseText);
+        this.sendRequest('/api/user/'+userId+'/roles', 'PUT', userId, {data: JSON.stringify(toSend)}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    flo.showUpdate(targetField);
+                    $(".put-roles-error").html("");
+                } else {
+                    flo.showError(targetField);
+                    var errorMessage = i18next.t("Server error occurred setting user role information.");
+                    if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
+                    else $(".put-roles-error").html(errorMessage);
+                }
+            };
         });
     },
     "deleteRoles": function(userId,toSend) {
-        $.ajax ({
-            type: "DELETE",
-            url: '/api/user/'+userId+'/roles',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(toSend)
-        }).done(function(data) {
-            $(".delete-roles-error").html("");
-        }).fail(function() {
-           // console.log("Problem updating role on server.");
-           var errorMessage = i18next.t("Server error occurred deleting user role.");
-           if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
-           else $(".delete-roles-error").html(errorMessage);
-
+        this.sendRequest('/api/user/'+userId, 'GET', userId, {data: JSON.stringify(toSend)}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			$(".delete-roles-error").html("");
+        		} else {
+        			// console.log("Problem updating role on server.");
+		           var errorMessage = i18next.t("Server error occurred deleting user role.");
+		           if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
+		           else $(".delete-roles-error").html(errorMessage);
+        		};
+        	};
         });
     },
-    "getClinical": function(userId) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/patient/'+userId+'/clinical'
-        }).done(function(data) {
-            $(".get-clinical-error").html("");
-            fillContent.clinical(data);
-        }).fail(function() {
-            var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
-           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
-           else $(".get-clinical-error").html(errorMessage);
-        });
+    "getClinical": function(userId, callback) {
+    	this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				$(".get-clinical-error").html("");
+            		fillContent.clinical(data);
+                    if (callback) callback(data);
+    			} else {
+    			   var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
+		           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
+		           else $(".get-clinical-error").html(errorMessage);
+                   if (callback) callback({"error": errorMessage});
+    			};
+    		};
+    	});
     },
     "putClinical": function(userId, toCall, toSend, targetField, status) {
         flo.showLoader(targetField);
-        $.ajax ({
-            type: "POST",
-            url: '/api/patient/'+userId+'/clinical/'+toCall,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify({value: toSend})
-        }).done(function() {
-            $(".put-clinical-error").html("");
-            flo.showUpdate(targetField);
-            fillViews.clinical();
-        }).fail(function() {
-            //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = i18next.t("Server error occurred updating clinical data.");
-            if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
-            else $(".put-clinical-error").html(errorMessage);
-            flo.showError(targetField);
-            fillViews.clinical();
+        this.sendRequest('/api/patient/'+userId+'/clinical/'+toCall, 'POST', userId, {data: JSON.stringify({value: toSend})}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			$(".put-clinical-error").html("");
+		            flo.showUpdate(targetField);
+		            fillViews.clinical();
+        		} else {
+        			 //alert("There was a problem saving your answers. Please try again.");
+		            var errorMessage = i18next.t("Server error occurred updating clinical data.");
+		            if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
+		            else $(".put-clinical-error").html(errorMessage);
+		            flo.showError(targetField);
+		            fillViews.clinical();
+        		};
+        	};
         });
     },
     "getObservationId": function(userId, code) {
         if (!hasValue(userId) && !hasValue(code)) return false;
         var obId = "", _code="";
-        $.ajax ({
-            type: "GET",
-            url: '/api/patient/'+userId+'/clinical',
-            cache: false,
-            async: false
-        }).done(function(data) {
-            if (data && data.entry) {
-                (data.entry).forEach(function(item) {
-                    if (!hasValue(obId)) {
-                        _code = item.content.code.coding[0].code;
-                        if (_code == code) obId = item.content.id;
-                    };
-                });
-            }
-
-        }).fail(function() {
+        this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, {sync: true}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			if (data.entry) {
+		                (data.entry).forEach(function(item) {
+		                    if (!hasValue(obId)) {
+		                        _code = item.content.code.coding[0].code;
+		                        if (_code == code) obId = item.content.id;
+		                    };
+		                });
+		            };
+        		};
+        	};
         });
         return obId;
     },
@@ -2871,146 +3109,287 @@ var tnthAjax = {
             method = "PUT";
             url = url + "/" + obsId;
         };
-        $.ajax ({
-            type: method,
-            url: url,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            cache: false,
-            data: JSON.stringify(obsArray)
-        }).done(function() {
-            $(".post-clinical-error").html("");
-            flo.showUpdate(targetField);
-            fillViews.clinical();
-        }).fail(function() {
-            //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = i18next.t("Server error occurred updating clinical data.");
-            if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
-            else $(".post-clinical-error").html(errorMessage);
-            flo.showError(targetField);
-            fillViews.clinical();
+        this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			$(".post-clinical-error").html("");
+		            flo.showUpdate(targetField);
+		            fillViews.clinical();
+        		} else {
+        			var errorMessage = i18next.t("Server error occurred updating clinical data.");
+		            if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
+		            else $(".post-clinical-error").html(errorMessage);
+		            flo.showError(targetField);
+		            fillViews.clinical();
+        		};
+        	};
         });
     },
     "getTermsUrl": function(sync, callback) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/tou',
-            async: (sync? false: true)
-        }).done(function(data) {
-            $(".get-tou-error").html("");
-            if (data.url) {
-                $("#termsURL").attr("data-url", data.url);
-                $("#topTerms .general-tou").each(function() {
-                    $(this).attr("data-url", data.url);
-                });
-                if (callback) callback({"url": data.url});
-            } else {
-                if (callback) callback({"error": i18next.t("no url returned")});
-            }
-            //fillContent.terms(data);
-        }).fail(function() {
-           var errorMessage = i18next.t("Server error occurred retrieving tou url.");
-           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
-           else $(".get-tou-error").html(errorMessage);
-           if (callback) callback({"error": i18next.t("Server error")});
-        });
+    	this.sendRequest('/api/tou', 'GET', null, {sync:sync}, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				$(".get-tou-error").html("");
+		            if (data.url) {
+		                $("#termsURL").attr("data-url", data.url);
+		                if (callback) callback({"url": data.url});
+		            } else {
+		                if (callback) callback({"error": i18next.t("no url returned")});
+		            }
+
+    			} else {
+    			   var errorMessage = i18next.t("Server error occurred retrieving tou url.");
+		           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+		           else $(".get-tou-error").html(errorMessage);
+		           if (callback) callback({"error": i18next.t("Server error")});
+		    	};
+    		};
+    	});
     },
     /*
      *  return instruments list by organization(s)
      */
     "getInstrumentsList": function(sync, callback) {
-        $.ajax({
-            type: "GET",
-            url: "api/questionnaire_bank",
-            async: (sync?false:true)
-        }).done(function(data){
-            if (data && data.entry) {
-                if ((data.entry).length === 0) {
-                    if (callback) callback({"error": i18next.t("no data returned")});
+    	this.sendRequest('api/questionnaire_bank', 'GET', null, {sync: sync}, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (data.entry) {
+		                if ((data.entry).length === 0) {
+		                    if (callback) callback({"error": i18next.t("no data returned")});
+		                } else {
+		                    var qList = {};
+		                    (data.entry).forEach(function(item) {
+		                        if (item.organization) {
+		                            var orgID = (item.organization.reference).split("/")[2];
+		                            /*
+		                             * don't assign orgID to object if it was already present
+		                             */
+		                            if (!qList[orgID]) qList[orgID] = [];
+		                            if (item.questionnaires) {
+		                                (item.questionnaires).forEach(function(q) {
+		                                    /*
+		                                     * add instrument name to instruments array for the org
+		                                     * will not add if it is already in the array
+		                                     * NOTE: inArray returns -1 if the item is NOT in the array
+		                                     */
+		                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
+		                                        qList[orgID].push(q.questionnaire.display);
+		                                    };
+		                                });
+		                            };
+		                        };
+		                    });
+		                    if (callback) callback(qList);
+		                };
+		            } else {
+		                if (callback) callback({"error": i18next.t("no data returned")});
+		            };
+
+    			} else {
+    				if (callback) callback({"error": i18next.t("error retrieving instruments list")});
+    			};
+    		};
+    	});
+    },
+    "getTerms": function(userId, type, sync, callback) {
+    	this.sendRequest('/api/user/'+userId+'/tou'+(hasValue(type)?('/'+type):''), 'GET', userId, {sync:sync}, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				$(".get-tou-error").html("");
+		            fillContent.terms(data);
+		            if (callback) callback(data);
+    			} else {
+    				var errorMessage = i18next.t("Server error occurred retrieving tou data.");
+		            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+		            else $(".get-tou-error").html(errorMessage);
+		            if (callback) callback({"error": errorMessage})
+    			};
+    		};
+    	});
+    },
+    "postTermsByUser": function(userId, toSend) {
+        this.sendRequest('/api/user/' + userId + '/tou/accepted', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
+        	if (data) {
+        		if (!data.error) {
+        			$(".post-tou-error").html("");
+        		} else {
+        			//alert("There was a problem saving your answers. Please try again.");
+		            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+		            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+		            else $(".post-tou-error").html(errorMessage);
+        		};
+        	};
+        });
+    },
+    "postTerms": function(toSend) {
+    	this.sendRequest('/api/tou/accepted', 'POST', null, {data: JSON.stringify(toSend)}, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				$(".post-tou-error").html("");
+    			} else {
+    				//alert("There was a problem saving your answers. Please try again.");
+		            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+		            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+		            else $(".post-tou-error").html(errorMessage);
+    			}
+    		};
+    	});
+    },
+    "accessUrl": function(userId, sync,callback) {
+    	 if (!hasValue(userId)) return false;
+    	 var url = '';
+    	 this.sendRequest('/api/user/'+userId+'/access_url', 'GET', userId, {sync:sync}, function(data) {
+    	 	if (data) {
+    	 		if (!data.error) {
+    	 			if (callback) callback({url: data['access_url']});
+    	 		} else {
+    	 			if (callback) callback({"error": i18next.t("Error occurred retrieving access url.")});
+    	 		}
+    	 	} else {
+    	 		if (callback) callback({"error": i18next.t("no data returned")});
+    	 	}
+    	 });
+    },
+    "invite": function(userId, data, callback) {
+    	if (!hasValue(data)) return false;
+    	this.sendRequest('/invite', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8', 'data': data, 'dataType': 'html' }, function(data) {
+    		if (data) {
+    			if (callback) callback(data);
+    		} else {
+    		 	if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+    },
+    "passwordReset": function(userId, callback) {
+    	if (!hasValue(userId)) return false;
+    	this.sendRequest('/api/user/'+userId+'/password_reset', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8'}, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred sending password reset request.")});
+    			};
+    		} else {
+    		 if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+    },
+    "assessmentStatus": function(userId, callback) {
+    	if (!hasValue(userId)) return false;
+    	this.sendRequest('/api/patient/'+userId+'/assessment-status', 'GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment status.")});
+    			};
+
+    		} else {
+    			if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+
+    },
+    "assessmentList": function(userId, callback) {
+    	if (!hasValue(userId)) return false;
+    	this.sendRequest('/api/patient/'+userId+'/assessment', 'GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment list.")});
+    			};
+
+    		} else {
+    			if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+    },
+    "assessmentReport": function(userId, instrumentId, callback) {
+    	if (!hasValue(userId)) return false;
+    	if (!hasValue(instrumentId)) return false;
+    	this.sendRequest('/api/patient/'+userId+'/assessment/'+instrumentId, 'GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment report.")});
+    			};
+
+    		} else {
+    			if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+    },
+    "patientReport": function(userId, callback) {
+    	if (!hasValue(userId)) return false;
+    	this.sendRequest('/api/user/'+userId+'/user_documents?document_type=PatientReport', 'GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred retrieving patient report.")});
+    			};
+    		} else {
+    		 if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
+    },
+    "setTablePreference": function(userId, tableName, params, callback) {
+        if (!hasValue(userId) || !hasValue(tableName)) return false;
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/table_preferences/'+tableName, 'PUT', userId, {"data":params.data, "sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
                 } else {
-                    var qList = {};
-                    (data.entry).forEach(function(item) {
-                        if (item.organization) {
-                            var orgID = (item.organization.reference).split("/")[2];
-                            /*
-                             * don't assign orgID to object if it was already present
-                             */
-                            if (!qList[orgID]) qList[orgID] = [];
-                            if (item.questionnaires) {
-                                (item.questionnaires).forEach(function(q) {
-                                    /*
-                                     * add instrument name to instruments array for the org
-                                     * will not add if it is already in the array
-                                     * NOTE: inArray returns -1 if the item is NOT in the array
-                                     */
-                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
-                                        qList[orgID].push(q.questionnaire.display);
-                                    };
-                                });
-                            };
-                        };
-                    });
-                    if (callback) callback(qList);
+                    if (callback) callback({"error": i18next.t("Error occurred setting table preference.")});
+                };
+            };
+        });
+    },
+    "getTablePreference": function(userId, tableName, params, callback) {
+        if (!hasValue(userId) || !hasValue(tableName)) return false;
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/table_preferences/'+tableName, 'GET', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred setting table preference.")});
                 };
             } else {
                 if (callback) callback({"error": i18next.t("no data returned")});
             };
-
-        }).fail(function() {
-            if (callback) callback({"error": i18next.t("error retrieving instruments list")});
         });
     },
-    "getTerms": function(userId, type, sync, callback) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+'/tou'+(hasValue(type)?("/"+type):""),
-            cache: false,
-            async: (sync?false:true)
-        }).done(function(data) {
-            $(".get-tou-error").html("");
-            fillContent.terms(data);
-            if (callback) callback(data);
-        }).fail(function() {
-           var errorMessage = i18next.t("Server error occurred retrieving tou data.");
-           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
-           else $(".get-tou-error").html(errorMessage);
-           if (callback) callback({"error": errorMessage})
+    "emailLog": function(userId, callback) {
+        if (!userId) return false;
+        this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
+           if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
         });
     },
-    "postTermsByUser": function(userId, toSend) {
-        ///user/<user_id>/tou/accepted
-        $.ajax ({
-            type: "POST",
-            url: '/api/user/' + userId + '/tou/accepted',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(toSend)
-        }).done(function() {
-           // console.log('terms stored');
-           $(".post-tou-error").html("");
-        }).fail(function() {
-            //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
-            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
-            else $(".post-tou-error").html(errorMessage);
-        });
-    },
-    "postTerms": function(toSend) {
-        $.ajax ({
-            type: "POST",
-            url: '/api/tou/accepted',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(toSend)
-        }).done(function() {
-           // console.log('terms stored');
-           $(".post-tou-error").html("");
-        }).fail(function() {
-            //alert("There was a problem saving your answers. Please try again.");
-            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
-            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
-            else $(".post-tou-error").html(errorMessage);
-        });
+    "auditLog": function(userId, callback) {
+    	if (!hasValue(userId)) return false;
+    	this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {
+    		if (data) {
+    			if (!data.error) {
+    				if (callback) callback(data);
+    			} else {
+    				if (callback) callback({"error": i18next.t("Error occurred retrieving audit log.")});
+    			};
+    		} else {
+    		 if (callback) callback({"error": i18next.t("no data returned")});
+    		};
+    	});
     }
 };
 
@@ -3145,22 +3524,21 @@ $(document).ready(function() {
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
-                    $.ajax ({
-                        type: "GET",
-                        //url: '/api/unique_email?email='+encodeURIComponent($el.val())+addUserId
-                        url: '/api/unique_email?email='+encodeURIComponent(emailVal)+addUserId
-                    }).done(function(data) {
-                        if (data.unique) {
-                            $("#erroremail").html('').parents(".form-group").removeClass('has-error');
-                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
-                                assembleContent.demo($el.attr("data-user-id"),true, $el);
-                            };
-                        } else {
-                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass('has-error');
-                        }
-                    }).fail(function() {
-                        console.log(i18next.t("Problem retrieving data from server."));
-                    });
+                	tnthAjax.sendRequest('/api/unique_email?email='+encodeURIComponent(emailVal)+addUserId, 'GET', '', null, function(data) {
+                		if (!data.error) {
+                			if (data.unique) {
+	                            $("#erroremail").html('').parents(".form-group").removeClass('has-error');
+	                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
+	                                assembleContent.demo($el.attr("data-user-id"),true, $el);
+	                            };
+	                        } else {
+	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass('has-error');
+	                        };
+
+                		} else {
+                			console.log(i18next.t("Problem retrieving data from server."));
+                		};
+                	});
                 }
                 return emailReg.test(emailVal);
             },
@@ -3730,23 +4108,20 @@ var tnthDates = {
         var userTimeZone = "";
         if (selectVal == "") {
             if (userId) {
-                $.ajax ({
-                    type: "GET",
-                    url: '/api/demographics/'+userId,
-                    async: false
-                }).done(function(data) {
-                    if (data) {
-                        data.extension.forEach(
-                            function(item, index) {
-                                if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
-                                    userTimeZone = item.timezone;
-                                };
-                            });
-                    };
-
-                }).fail(function() {
-                    userTimeZone = "UTC";
-                });
+            	tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
+            		if (!data.error) {
+            			if (data) {
+	                        data.extension.forEach(
+	                            function(item, index) {
+	                                if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
+	                                    userTimeZone = item.timezone;
+	                                };
+	                            });
+	                    };
+            		} else {
+            			userTimeZone = "UTC";
+            		};
+            	});
             };
         } else {
             userTimeZone = selectVal;
@@ -3760,25 +4135,20 @@ var tnthDates = {
 
       if (!localeSelect) {
             if (userId) {
-                $.ajax ({
-                        type: "GET",
-                        url: '/api/demographics/'+userId,
-                        cache: false,
-                        async: false
-                }).done(function(data) {
-                    if (data && data.communication) {
-                        data.communication.forEach(
-                            function(item, index) {
-                                if (item.language) {
-                                    locale = item["language"]["coding"][0].code;
-                                    //console.log("locale: " + locale)
-                                };
-                        });
-                    };
-
-                }).fail(function() {
-                    locale = "en-us";
-                });
+            	tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+            		if (!data.error) {
+            			if (data && data.communication) {
+	                        data.communication.forEach(
+	                            function(item, index) {
+	                                if (item.language) {
+	                                    locale = item["language"]["coding"][0].code;
+	                                };
+	                        });
+                    	};
+            		} else {
+            			locale="en-us";
+            		};
+            	});
             };
        } else locale = localeSelect;
 
@@ -4030,6 +4400,10 @@ function __getExportFileName(prefix) {
     var d = new Date();
     return (prefix?prefix:"ExportList_")+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear();
 }
+function capitalize(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};
@@ -4079,7 +4453,6 @@ $.fn.sortOptions = function() {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ============================================================ */
-
 +function($){"use strict";var Rowlink=function(element,options){this.$element=$(element)
 this.options=$.extend({},Rowlink.DEFAULTS,options)
 this.$element.on('click.bs.rowlink','td:not(.rowlink-skip)',$.proxy(this.click,this))}
@@ -4099,4 +4472,5 @@ var $this=$(this)
 if($this.data('bs.rowlink'))return
 $this.rowlink($this.data())
 $(e.target).trigger('click.bs.rowlink')})}(window.jQuery);
+
 

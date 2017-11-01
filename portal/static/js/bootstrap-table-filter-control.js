@@ -14,6 +14,8 @@
     var addOptionToSelectControl = function (selectControl, value, text) {
         value = $.trim(value);
         selectControl = $(selectControl.get(selectControl.length - 1));
+        //need to strip off HTML tags
+        value = value.replace(/(<([^>]+)>)/ig,"")
         if (!existOptionInSelectControl(selectControl, value)) {
             selectControl.append($("<option></option>")
                 .attr("value", value)
