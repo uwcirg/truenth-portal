@@ -65,11 +65,11 @@
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
-          <tbody id="admin-table-body" data-link="row" class="rowlink">
+          <tbody id="admin-table-body">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="id_row_{{patient.id}}">
+                  <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" onclick="rowLinkEvent(event, this);">
                       <td>{{patient.id}}</td>
-                      <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
+                      <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
@@ -85,7 +85,7 @@
                       <td>{{patient.assessment_status if patient.assessment_status}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
                       {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{%if patient.external_study_id%}<a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.external_study_id }}</a>{%endif%}</a></td>
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
@@ -153,21 +153,26 @@ $("#adminTable").bootstrapTable({
 });
 
 $(document).ready(function() {
-  /*
-   *  scroll to the top of page on each page change
-   */
-  $("#adminTable").on("page-change.bs.table", function() {
-      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
-  }).on("sort.bs.table", function(e, name, order) {
-      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
-  }).on("column-search.bs.table", function(e, name, text) {
-      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+	/*
+	*  scroll to the top of page on each page change
+	*/
+ 	$("#adminTable").on("page-change.bs.table", function() {
+    	if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+ 	}).on("sort.bs.table", function(e, name, order) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
+ 	}).on("column-search.bs.table", function(e, name, text) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+	}).on("column-switch.bs.table", function(e, field, checked) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+	}).on("post-body.bs.table, toggle.bs.table, reset-view.bs.table", function(e) {
+  		setTimeout(function() { 
+  			AT.rowLinkEvent(); 
+  		}, 100);
   });
-
-  /*
-   * add placeholder text for filter controls
-   */
-   (function() {
+ 	/*
+	* add placeholder text for filter controls
+	*/
+	(function() {
      function addFilterPlaceHolders() {
        $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
        $("#adminTable .filterControl select option[value='']").text("Select");
@@ -176,7 +181,7 @@ $(document).ready(function() {
         addFilterPlaceHolders();
      });
      addFilterPlaceHolders();
-   })();
+	})();
 
   /*
    * fade loading spinner on page load
@@ -189,22 +194,17 @@ $(document).ready(function() {
    */
   $("input[data-field='id']:checkbox").hide();
 
-  /*
-   * variable passed into orgs dropdown to check selected org(s)
-   */
-  var org_list = {};
-  {% if org_list %}
-    {% for org in org_list %}
-        org_list[{{org}}] = true;
-    {% endfor %}
-  {% endif %}
-  
-  AT.initOrgsList(org_list, 'patients');
+ 
+  AT.initOrgsList(false, 'patients');
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
     $("#patientReportLoader").html( __getLoaderHTML());
     $("#patientReportModal").modal({"show": false});
   {% endif %}
+
+  AT.setColumnSelections();
+
+  AT.rowLinkEvent(); 
 
 });
 
