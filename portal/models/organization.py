@@ -59,6 +59,7 @@ class Organization(db.Model):
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
             cascade="save-update")
     type = db.relationship('CodeableConcept', cascade="save-update")
+    _timezone = db.Column('timezone', db.String(20))
 
     def __init__(self, **kwargs):
         self.coding_options = 14
@@ -167,6 +168,23 @@ class Organization(db.Model):
                 system='urn:ietf:bcp:47', code=value).first()
         if coding:
             self.default_locale_id = coding.id
+
+    @property
+    def timezone(self):
+        org = self
+        if org._timezone:
+            return org._timezone
+        while org.partOf_id:
+            org = Organization.query.get(org.partOf_id)
+            if org._timezone:
+                return org._timezone
+        # return 'UTC' if no parent inheritances found
+        return 'UTC'
+
+
+    @timezone.setter
+    def timezone(self, value):
+        self._timezone = value
 
     @classmethod
     def from_fhir(cls, data):
