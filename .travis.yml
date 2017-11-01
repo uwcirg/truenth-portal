@@ -62,6 +62,7 @@ matrix:
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  - git fetch
 
   - createdb
       --owner "$PGUSER"
