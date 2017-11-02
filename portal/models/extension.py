@@ -61,8 +61,8 @@ class CCExtension(Extension):
 
 
 class TimezoneExtension(CCExtension):
-    def __init__(self, org, extension):
-        self.source, self.extension = org, extension
+    def __init__(self, source, extension):
+        self.source, self.extension = source, extension
 
     extension_url =\
         "http://hl7.org/fhir/StructureDefinition/user-timezone"
