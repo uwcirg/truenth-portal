@@ -364,7 +364,8 @@ class OrganizationTimezone(CCExtension):
                 'timezone': timezone}
 
     def apply_fhir(self):
-        assert self.extension['url'] == self.extension_url
+        if self.extension['url'] != self.extension_url:
+            raise ValueError('invalid url for OrganizationTimezone')
         if 'timezone' not in self.extension:
             abort(400, "Extension missing 'timezone' field")
         timezone = self.extension['timezone']
