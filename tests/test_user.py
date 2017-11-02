@@ -21,7 +21,7 @@ from portal.models.reference import Reference
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
-from portal.models.user import UserRelationship, UserTimezone
+from portal.models.user import UserRelationship, TimezoneExtension
 from portal.models.user import permanently_delete_user
 from portal.models.user import UserIndigenousStatusExtension
 from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
@@ -281,7 +281,7 @@ class TestUser(TestCase):
         self.login()
         # Set to bogus, confirm exception
         data = {"resourceType": "Patient",
-                "extension": [{"url": UserTimezone.extension_url,
+                "extension": [{"url": TimezoneExtension.extension_url,
                                "timezone": "bogus"}]}
         rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
@@ -347,6 +347,32 @@ class TestUser(TestCase):
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
+
+    def test_tz_set_on_account_creation(self):
+        org = Organization(id=101, name='org', timezone='US/Pacific')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+
+        data = {
+            'organizations': [{'organization_id': 101}],
+            'consents': [{'organization_id': 101,
+                          'agreement_url': 'http://fake.org',
+                          'staff_editable': True,
+                          'send_reminders': False}],
+            'roles': [{'name': ROLE.PATIENT}]}
+
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        rv = self.client.post('/api/account',
+                              content_type='application/json',
+                              data=json.dumps(data))
+        self.assert200(rv)
+
+        user_id = rv.json['user_id']
+        new_user = User.query.get(user_id)
+        self.assertEquals(new_user.timezone, 'US/Pacific')
 
     def test_account_creation_by_staff(self):
         # permission challenges when done as staff
