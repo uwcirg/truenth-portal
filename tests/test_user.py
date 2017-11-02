@@ -21,7 +21,7 @@ from portal.models.reference import Reference
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
-from portal.models.user import UserRelationship, UserTimezone
+from portal.models.user import UserRelationship, TimezoneExtension
 from portal.models.user import permanently_delete_user
 from portal.models.user import UserIndigenousStatusExtension
 from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
@@ -281,7 +281,7 @@ class TestUser(TestCase):
         self.login()
         # Set to bogus, confirm exception
         data = {"resourceType": "Patient",
-                "extension": [{"url": UserTimezone.extension_url,
+                "extension": [{"url": TimezoneExtension.extension_url,
                                "timezone": "bogus"}]}
         rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',

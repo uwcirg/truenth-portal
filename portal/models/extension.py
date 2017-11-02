@@ -1,6 +1,9 @@
 """Extension model"""
 from abc import ABCMeta, abstractmethod, abstractproperty
+from flask import abort
+import pytz
 from sqlalchemy.orm.exc import NoResultFound
+
 
 class Extension:
     """Abstract base class for extension FHIR objects"""
@@ -55,3 +58,36 @@ class CCExtension(Extension):
         # Remove the stale concepts that weren't requested again
         for concept in remove_if_not_requested.values():
             self.children.remove(concept)
+
+
+class TimezoneExtension(CCExtension):
+    def __init__(self, org, extension):
+        self.source, self.extension = org, extension
+
+    extension_url =\
+        "http://hl7.org/fhir/StructureDefinition/user-timezone"
+
+    def as_fhir(self):
+        timezone = self.source.timezone
+        if not timezone or timezone == 'None':
+            timezone = 'UTC'
+        return {'url': self.extension_url,
+                'timezone': timezone}
+
+    def apply_fhir(self):
+        if self.extension['url'] != self.extension_url:
+            raise ValueError('invalid url for OrganizationTimezone')
+        if 'timezone' not in self.extension:
+            abort(400, "Extension missing 'timezone' field")
+        timezone = self.extension['timezone']
+
+        # Confirm it's a recognized timezone
+        try:
+            pytz.timezone(timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            abort(400, "Unknown Timezone: '{}'".format(timezone))
+        self.source.timezone = timezone
+
+    @property
+    def children(self):
+        raise NotImplementedError

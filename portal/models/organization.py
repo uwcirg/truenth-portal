@@ -5,7 +5,6 @@ and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
 from flask import current_app, url_for
-import pytz
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.exceptions import Unauthorized
@@ -15,7 +14,7 @@ from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource, UnversionedResource
 from ..database import db
 from ..date_tools import FHIR_datetime
-from .extension import CCExtension
+from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
@@ -349,40 +348,7 @@ class LocaleExtension(CCExtension):
         return self.organization.locales
 
 
-class OrganizationTimezone(CCExtension):
-    def __init__(self, org, extension):
-        self.organization, self.extension = org, extension
-
-    extension_url =\
-        "http://hl7.org/fhir/StructureDefinition/user-timezone"
-
-    def as_fhir(self):
-        timezone = self.organization.timezone
-        if not timezone or timezone == 'None':
-            timezone = 'UTC'
-        return {'url': self.extension_url,
-                'timezone': timezone}
-
-    def apply_fhir(self):
-        if self.extension['url'] != self.extension_url:
-            raise ValueError('invalid url for OrganizationTimezone')
-        if 'timezone' not in self.extension:
-            abort(400, "Extension missing 'timezone' field")
-        timezone = self.extension['timezone']
-
-        # Confirm it's a recognized timezone
-        try:
-            pytz.timezone(timezone)
-        except pytz.exceptions.UnknownTimeZoneError:
-            abort(400, "Unknown Timezone: '{}'".format(timezone))
-        self.organization.timezone = timezone
-
-    @property
-    def children(self):
-        raise NotImplementedError
-
-
-org_extension_classes = (LocaleExtension, OrganizationTimezone)
+org_extension_classes = (LocaleExtension, TimezoneExtension)
 
 
 def org_extension_map(organization, extension):

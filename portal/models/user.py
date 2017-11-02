@@ -4,7 +4,6 @@ from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
-import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
 from sqlalchemy import and_, or_, UniqueConstraint
@@ -20,7 +19,7 @@ from ..dict_tools import dict_match
 from .encounter import Encounter
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
-from .extension import CCExtension
+from .extension import CCExtension, TimezoneExtension
 from .fhir import Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .identifier import Identifier
@@ -82,38 +81,6 @@ class UserRaceExtension(CCExtension):
     @property
     def children(self):
         return self.user.races
-
-
-class UserTimezone(CCExtension):
-    def __init__(self, user, extension):
-        self.user, self.extension = user, extension
-
-    extension_url =\
-        "http://hl7.org/fhir/StructureDefinition/user-timezone"
-
-    def as_fhir(self):
-        timezone = self.user.timezone
-        if not timezone or timezone == 'None':
-            timezone = 'UTC'
-        return {'url': self.extension_url,
-                'timezone': timezone}
-
-    def apply_fhir(self):
-        assert self.extension['url'] == self.extension_url
-        if 'timezone' not in self.extension:
-            abort(400, "Extension missing 'timezone' field")
-        timezone = self.extension['timezone']
-
-        # Confirm it's a recognized timezone
-        try:
-            pytz.timezone(timezone)
-        except pytz.exceptions.UnknownTimeZoneError:
-            abort(400, "Unknown Timezone: '{}'".format(timezone))
-        self.user.timezone = timezone
-
-    @property
-    def children(self):
-        raise NotImplementedError
 
 
 def permanently_delete_user(
@@ -180,7 +147,7 @@ def permanently_delete_user(
 
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
-                          UserTimezone, UserIndigenousStatusExtension)
+                          TimezoneExtension, UserIndigenousStatusExtension)
 
 
 def user_extension_map(user, extension):
