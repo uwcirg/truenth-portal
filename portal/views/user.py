@@ -206,7 +206,7 @@ def account():
                     for org in request.json['organizations']]
             user.update_orgs(org_list, acting_user=acting_user,
                              excuse_top_check=True)
-            if len(org_list) == 1:
+            if org_list:
                 user.timezone = org_list[0].timezone
         except NoResultFound:
             abort(
