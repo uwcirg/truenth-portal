@@ -55,9 +55,9 @@ matrix:
       addons:
         postgresql: "9.4"
         sauce_connect: true
-  # Build artifacts only (no testing)
   allow_failures:
     - env: TOXENV=ui
+    - env: TOXENV=build
 
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
