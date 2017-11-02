@@ -348,6 +348,32 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
 
+    def test_tz_set_on_account_creation(self):
+        org = Organization(id=101, name='org', timezone='US/Pacific')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+
+        data = {
+            'organizations': [{'organization_id': 101}],
+            'consents': [{'organization_id': 101,
+                          'agreement_url': 'http://fake.org',
+                          'staff_editable': True,
+                          'send_reminders': False}],
+            'roles': [{'name': ROLE.PATIENT}]}
+
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        rv = self.client.post('/api/account',
+                              content_type='application/json',
+                              data=json.dumps(data))
+        self.assert200(rv)
+
+        user_id = rv.json['user_id']
+        new_user = User.query.get(user_id)
+        self.assertEquals(new_user.timezone, 'US/Pacific')
+
     def test_account_creation_by_staff(self):
         # permission challenges when done as staff
         self.shallow_org_tree()
