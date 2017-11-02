@@ -65,9 +65,9 @@
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
-          <tbody id="admin-table-body">
+          <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" onclick="rowLinkEvent(event, this);">
+                  <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
@@ -164,11 +164,8 @@ $(document).ready(function() {
     	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
 	}).on("column-switch.bs.table", function(e, field, checked) {
     	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
-	}).on("post-body.bs.table, toggle.bs.table, reset-view.bs.table", function(e) {
-  		setTimeout(function() { 
-  			AT.rowLinkEvent(); 
-  		}, 100);
-  });
+	});
+
  	/*
 	* add placeholder text for filter controls
 	*/
@@ -194,17 +191,15 @@ $(document).ready(function() {
    */
   $("input[data-field='id']:checkbox").hide();
 
- 
+
   AT.initOrgsList(false, 'patients');
+  AT.setColumnSelections();
+  AT.rowLinkEvent();
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
     $("#patientReportLoader").html( __getLoaderHTML());
     $("#patientReportModal").modal({"show": false});
   {% endif %}
-
-  AT.setColumnSelections();
-
-  AT.rowLinkEvent(); 
 
 });
 

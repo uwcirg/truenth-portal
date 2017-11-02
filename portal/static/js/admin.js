@@ -488,7 +488,7 @@ AdminTool.prototype.setColumnSelections = function() {
       prefData.filters.column_selections.forEach(function(column) {
           $(".fixed-table-toolbar input[type='checkbox'][data-field='" + column + "']").prop("checked", true);
           $("#adminTable").bootstrapTable("showColumn", column);
-      });        
+      });
   };
 };
 
@@ -636,18 +636,15 @@ AdminTool.prototype.getReportModal = function(patientId) {
 };
 
 AdminTool.prototype.rowLinkEvent = function () {
-  $("tr[data-link]").delegate("td", "click", function(e) {
-    if (e.target && (e.target.tagName.toLowerCase() != "td")) {
-      if (e.target.tagName.toLowerCase() == "a" && e.target.click) {
-        return;
+  $("#admin-table-body.data-link").delegate("tr", "click", function(e) {
+      if (e.target && (e.target.tagName.toLowerCase() != "td")) {
+        if (e.target.tagName.toLowerCase() == "a" && e.target.click) {
+          return;
+        };
       };
-    };
-    e.preventDefault();
-    e.stopPropagation();
-    document.location = $(this).closest("tr").attr("data-link");
-  });
-  $(".admin-table button[name='toggle']").on("click", function() {
-    AT.rowLinkEvent();
+      e.preventDefault();
+      e.stopPropagation();
+      document.location = $(this).closest("tr").attr("data-link");
   });
 };
 
