@@ -308,7 +308,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
               };
 
               AT.setTablePreference(AT.userId, "patientList");
-              setTimeout(function() { location.reload(); }, 100);
+              setTimeout(function() { loader(true); location.reload(); }, 100);
             });
           });
 
@@ -328,14 +328,14 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
                */
               AT.setTablePreference(AT.userId, "patientList");
               if (orgsList.length > 0) {
-                setTimeout(function() { location.reload(); }, 100);
+                setTimeout(function() { loader(true); location.reload(); }, 100);
               };
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               AT.clearOrgsSelection();
               AT.setTablePreference(AT.userId, "patientList");
-              setTimeout(function() { location.reload(); }, 100);
+              setTimeout(function() { loader(true); location.reload(); }, 100);
           });
           $("#orglist-close-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
@@ -456,7 +456,8 @@ AdminTool.prototype.getDefaultTablePreference = function() {
 };
 
 
-AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter) {
+AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter, setColumnSelections) {
+    if (this.currentTablePreference) return this.currentTablePreference;
     var prefData = null, self = this;
     tnthAjax.getTablePreference(userId||self.userId, "patientList", {"sync": true}, function(data) {
       if (data && !data.error) {
@@ -465,8 +466,30 @@ AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter) 
       };
       //set filter values
       if (setFilter) self.setTableFilters(userId||self.userId);
+      //set column selection(s)
+      if (setColumnSelections) self.setColumnSelections();
     });
     return prefData;
+};
+
+AdminTool.prototype.setColumnSelections = function() {
+  var prefData = this.getTablePreference(this.userId, "patientList");
+  if (prefData && prefData.filters && prefData.filters.column_selections) {
+      var visibleColumns = $("#adminTable").bootstrapTable("getVisibleColumns");
+      /*
+       * hide visible columns
+       */
+      visibleColumns.forEach(function(c) {
+        $("#adminTable").bootstrapTable("hideColumn", c.field)
+      });
+      /*
+       * show column(s) based on preference
+       */
+      prefData.filters.column_selections.forEach(function(column) {
+          $(".fixed-table-toolbar input[type='checkbox'][data-field='" + column + "']").prop("checked", true);
+          $("#adminTable").bootstrapTable("showColumn", column);
+      });
+  };
 };
 
 AdminTool.prototype.setTableFilters = function(userId) {
@@ -537,7 +560,19 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
       selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
     });
     if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
+    else __filters["orgs_filter_control"] = "";
+
+    /*
+     * get column selections
+     */
+     __filters["column_selections"] = [];
+    $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
+      __filters["column_selections"].push($(this).attr("data-field"));
+    });
+
+
     data["filters"] = __filters;
+
     if (Object.keys(data).length > 0) {
       tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
       this.currentTablePreference = data;
@@ -583,7 +618,7 @@ AdminTool.prototype.getReportModal = function(patientId) {
               });
               content += "</table>";
               content += "<br/>";
-              content += "<a class='btn btn-tnth-primary btn-small btn-all'>" + i18next.t("View All") + "</a>";
+              content += "<a class='btn btn-tnth-primary btn-sm btn-all'>" + i18next.t("View All") + "</a>";
 
               $("#patientReportContent").html(content);
               if (count > 1) $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
@@ -597,6 +632,19 @@ AdminTool.prototype.getReportModal = function(patientId) {
           } else $("#patientReportMessage").html(i18next.t("Error occurred retrieving patient report"));
         };
       $("#patientReportLoader").addClass("tnth-hide");
+  });
+};
+
+AdminTool.prototype.rowLinkEvent = function () {
+  $("#admin-table-body.data-link").delegate("tr", "click", function(e) {
+      if (e.target && (e.target.tagName.toLowerCase() != "td")) {
+        if (e.target.tagName.toLowerCase() == "a" && e.target.click) {
+          return;
+        };
+      };
+      e.preventDefault();
+      e.stopPropagation();
+      document.location = $(this).closest("tr").attr("data-link");
   });
 };
 
