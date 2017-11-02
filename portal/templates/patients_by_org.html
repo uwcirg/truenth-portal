@@ -60,7 +60,7 @@
                   <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
                   {% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -131,7 +131,6 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-
 var AT = new AdminTool({{user.id}});
 var sortObj = AT.getTablePreference({{user.id}}, "patientList");
 /*
