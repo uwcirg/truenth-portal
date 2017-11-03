@@ -354,8 +354,12 @@ var AccountCreationObj = function (roles) {
     };
 
     this.setHelpText = function(elementId, message, hasError) {
-        if (hasError) $("#" + elementId).find(".help-block").text(message).addClass("error-message")
-        else $("#" + elementId).find(".help-block").text("").removeClass("error-message");
+        if (hasError) {
+            $("#" + elementId).find(".help-block").text(message).addClass("error-message");
+        }
+        else {
+            $("#" + elementId).find(".help-block").text("").removeClass("error-message");
+        };
     };
     this.getOrgs = function(callback) {
         var self = this;
