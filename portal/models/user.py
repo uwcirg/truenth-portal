@@ -727,6 +727,11 @@ class User(db.Model, UserMixin):
             fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
+    @property
+    def rolelist(self):
+        """Generate UI friendly string of user's roles by name"""
+        return ', '.join([r.name for r in self.roles])
+
     def as_fhir(self):
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
