@@ -1,3 +1,7 @@
+/*
+ * dependency: JQuery, main.js
+ */
+
 var AccountCreationObj = function (roles) {
     this.attempts = 0;
     this.max_attempts = 3;
@@ -11,60 +15,70 @@ var AccountCreationObj = function (roles) {
     });
 
     this.__request = function(params) {
-        if (!params) return false;
+        if (!params) {
+            return false;
+        };
+        var self = this;
         if (!hasValue(params.apiUrl)) {
-            if (params.callback) (params.callback).call(self, {"error": "API url is required."});
+            if (params.callback) {
+                (params.callback).call(self, {"error": "API url is required."});
+            };
             return false;
         };
         var errorMessage = "";
-        var self = this;
         self.attempts++;
         self.params = params;
         $.ajax ({
-            type: (params.requestType ? params.requestType : 'GET'),
-            url: String(params.apiUrl).replace('//', '/'),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
+            type: (params.requestType ? params.requestType : "GET"),
+            url: String(params.apiUrl).replace("//", "/"),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
             async: params.sync ? false : true,
             data: params.requestData
         }).done(function(data) {
             self.attempts = 0;
-            if (params.callback) (params.callback).call(self, {"data": data});
+            if (params.callback) {
+                (params.callback).call(self, {"data": data});
+            };
         }).fail(function(xhr) {
             if (self.attempts < self.max_attempts) {
-                setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
+                setTimeout ( function() { self.__request( self.params ); } , $.ajaxSetup().retryAfter );
             } else {
                 var displayError = i18next.t("Server error occurred updating data.");
                 $("#error_response_text").html(displayError);
                 errorMessage = "Error processing request: " + params.apiUrl;
-                errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
+                errorMessage += ";  response status code: " + (parseInt(xhr.status) === 0 ? "request timed out/network error": xhr.status);
                 errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
                 tnthAjax.reportError(this.userId, "/patients/patient-profile-create", errorMessage, true);
                 self.attempts = 0;
-                if (params.callback) (params.callback).call(self, {"error": displayError});
+                if (params.callback) {
+                    (params.callback).call(self, {"error": displayError});
+                };
             };
         });
         return errorMessage;
     };
     this.__setAccount = function() {
-        var orgIDs = $('#userOrgs input:checked').map(function(){
+        var orgIDs = $("#userOrgs input:checked").map(function(){
             return { organization_id: $(this).val() };
         }).get();
 
         var _accountArray = {};
-        _accountArray['organizations'] = orgIDs;
-        if (this.roles) _accountArray['roles'] =  this.roles;
-        _accountArray['consents'] = this.getConsents();
+        _accountArray["organizations"] = orgIDs;
+        if (this.roles) {
+            _accountArray["roles"] =  this.roles;
+        };
+        _accountArray["consents"] = this.getConsents();
 
         //note, this will call put/demographics to update demographics after
-        this.__request({'apiUrl': '/api/account', 'requestType': 'POST', 'requestData': JSON.stringify(_accountArray), 'sync': true, 'callback': this.__setDemo});
+        this.__request({"apiUrl": "/api/account", "requestType": "POST", "requestData": JSON.stringify(_accountArray), "sync": true, "callback": this.__setDemo});
     };
     this.__setDemo = function(returnedData) {
         var responseData = returnedData && returnedData.data? returnedData.data : null;
         var self = this;
         if (responseData) {
 
-            self.userId = responseData['user_id'];
+            self.userId = responseData["user_id"];
 
             if (isNaN(self.userId)) {
                 self.__handleError("Invalid user id: " + self.userId);
@@ -73,33 +87,33 @@ var AccountCreationObj = function (roles) {
             };
 
             var _demoArray = {};
-            _demoArray['resourceType'] = 'Patient';
-            _demoArray['name'] = {
-                'given': $.trim($('input[name=firstname]').val()),
-                'family':$.trim($('input[name=lastname]').val())
+            _demoArray["resourceType"] = "Patient";
+            _demoArray["name"] = {
+                "given": $.trim($("input[name=firstname]").val()),
+                "family":$.trim($("input[name=lastname]").val())
             };
-            _demoArray['birthDate'] = $('input[name=birthDate]').val();
+            _demoArray["birthDate"] = $("input[name=birthDate]").val();
 
-            _demoArray['telecom'] = [];
+            _demoArray["telecom"] = [];
 
-            var emailVal = $.trim($('input[name=email]').val());
+            var emailVal = $.trim($("input[name=email]").val());
             if (hasValue(emailVal)) {
-                _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
+                _demoArray["telecom"].push({ "system": "email", "value": emailVal });
             } else {
-                _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
+                _demoArray["telecom"].push({ "system": "email", "value": "__no_email__"});
             };
-            _demoArray['telecom'].push({ 'system': 'phone', 'use': 'mobile', 'value': $.trim($('input[name=phone]').val())});
-            _demoArray['telecom'].push({ 'system': 'phone', 'use': 'home', 'value': $.trim($('input[name=altPhone]').val())});
+            _demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val())});
+            _demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val())});
 
-            var orgIDs = $('#userOrgs input:checked').map(function(){
-                return { reference: 'api/organization/'+$(this).val() };
+            var orgIDs = $("#userOrgs input:checked").map(function(){
+                return { reference: "api/organization/"+$(this).val() };
             }).get();
 
-            _demoArray['careProvider'] = orgIDs;
+            _demoArray["careProvider"] = orgIDs;
 
             var arrCommunication = OT.getCommunicationArray();
             if (arrCommunication.length > 0) {
-                _demoArray['communication'] = arrCommunication;
+                _demoArray["communication"] = arrCommunication;
             };
 
             /*** SYSTEM uri is defined by SYSTEM_IDENTIFIER_ENUM, see main.js for details **/
@@ -143,7 +157,7 @@ var AccountCreationObj = function (roles) {
                     });
                 });
             };
-            self.__request({'apiUrl':'/api/demographics/'+this.userId, 'requestType': 'PUT', 'requestData': JSON.stringify(_demoArray), 'sync': true, 'callback':
+            self.__request({"apiUrl":"/api/demographics/"+this.userId, "requestType": "PUT", "requestData": JSON.stringify(_demoArray), "sync": true, "callback":
                 function(data){
                     if (data.error) {
                         self.__handleError(data.error);
@@ -221,9 +235,9 @@ var AccountCreationObj = function (roles) {
         var err = responseObj && responseObj.error ? responseObj.error: null;
         var self = this;
         if (!hasValue(err)) {
-            $('#confirmMsg').fadeIn();
+            $("#confirmMsg").fadeIn();
             self.__handleButton();
-            setTimeout(function() { $('#confirmMsg').fadeOut(); }, 800);
+            setTimeout(function() { $("#confirmMsg").fadeOut(); }, 800);
             setTimeout(function() { self.__redirect(self.userId); }, 1000);
             self.__clear();
         } else {
@@ -233,7 +247,7 @@ var AccountCreationObj = function (roles) {
     };
     this.__handleError = function(errorMessage) {
         if (hasValue(errorMessage)) {
-            $('#serviceErrorMsg').html('<small>' + i18next.t('[Processing error] ') + errorMessage + '</small>').fadeIn();
+            $("#serviceErrorMsg").html("<small>" + i18next.t("[Processing error] ") + errorMessage + "</small>").fadeIn();
         };
     };
     this.__redirect = function() {
@@ -245,8 +259,8 @@ var AccountCreationObj = function (roles) {
                 });
             };
             if (isPatient) {
-                $("#redirectLink").attr('href', '/patients/patient_profile/' + this.userId);
-            } else $("#redirectLink").attr('href', '/profile/' + this.userId);
+                $("#redirectLink").attr("href", "/patients/patient_profile/" + this.userId);
+            } else $("#redirectLink").attr("href", "/profile/" + this.userId);
             $("#redirectLink")[0].click();
         };
     };
@@ -284,7 +298,7 @@ var AccountCreationObj = function (roles) {
                 hasError = true;
             } else {
                 if ($("#current_user_email").val() === $("#email").val()) {
-                    if (!silent) this.setHelpText("emailGroup", i18next.t('Email is already in use.'), true);
+                    if (!silent) this.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
                     hasError = true;
                 } else {
                     this.setHelpText("emailGroup", "", false);
@@ -293,7 +307,7 @@ var AccountCreationObj = function (roles) {
         };
         /* check organization */
         if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length == 0) {
-            if (!silent) this.setHelpText("userOrgs", i18next.t('An organization must be selected.'), true);
+            if (!silent) this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
             hasError = true;
         } else this.setHelpText("userOrgs", "", false);
 
@@ -306,7 +320,7 @@ var AccountCreationObj = function (roles) {
             if (!silent) $("#errorMsg").fadeIn("slow");
         } else {
             $("#errorMsg").hide();
-            $('#serviceErrorMsg').html('').hide();
+            $("#serviceErrorMsg").html("").hide();
         };
         return hasError;
     };
@@ -325,14 +339,14 @@ var AccountCreationObj = function (roles) {
         self.attempts++;
         $.ajax ({
             type: "GET",
-            url: '/api/organization'
+            url: "/api/organization"
         }).done(function(data) {
             self.attempts = 0;
             if (data) {
                 if (callback) callback(data);
             } else {
                 if (callback) {
-                    callback({"error": i18next.t('no data returned')});
+                    callback({"error": i18next.t("no data returned")});
                 };
             };
         }).fail(function(xhr) {
@@ -346,7 +360,7 @@ var AccountCreationObj = function (roles) {
                 if (callback) callback({"error": errorMessage});
                 self.attempts = 0;
             };
-            tnthAjax.sendError(xhr, '', '/api/organization')
+            tnthAjax.sendError(xhr, "", "/api/organization");
         });
     };
     this.populatePatientOrgs = function(data) {
@@ -387,7 +401,7 @@ var AccountCreationObj = function (roles) {
                     OT.filterOrgs(orgList);
                 };
 
-                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
 
                 $("#userOrgs input[name='organization']").each(function() {
                     $(this).on("click", function() {
@@ -448,6 +462,9 @@ var AccountCreationObj = function (roles) {
         var parentOrgId =  $(obj).attr("data-parent-id");
         if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
         return parentOrgId;
+    };
+    function hasValue(val) {
+        return val != null && val != "" && val != "undefined";
     };
 };
 
@@ -533,7 +550,7 @@ $(document).ready(function(){
           });
         });
     };
-    $('#createProfileForm').on('submit', function (e) {
+    $("#createProfileForm").on("submit", function (e) {
         if (e.isDefaultPrevented()) {
             // handle the invalid form...
             aco.__checkFields();
