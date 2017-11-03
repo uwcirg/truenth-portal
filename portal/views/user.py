@@ -23,7 +23,7 @@ from ..models.user import current_user, get_user, permanently_delete_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
-from .portal import check_int
+from ..type_tools import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 

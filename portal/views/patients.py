@@ -16,7 +16,7 @@ from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
-from .portal import check_int
+from ..type_tools import check_int
 from datetime import datetime
 
 
