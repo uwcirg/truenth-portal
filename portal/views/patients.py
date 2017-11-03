@@ -170,16 +170,9 @@ def patient_profile(patient_id):
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
 
-    top_org = patient.first_top_organization()
-    args = load_template_args(patient)
-    if top_org:
-        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
-    else:
-        name_key = UserInviteEmail_ATMA.name_key()
-    invite_email = MailResource(app_text(name_key), variables=args)
     return render_template(
         'profile.html', user=patient,
-        current_user=user, invite_email=invite_email,
+        current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
