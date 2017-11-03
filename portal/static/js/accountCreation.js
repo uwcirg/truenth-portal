@@ -81,7 +81,7 @@ var AccountCreationObj = function (roles) {
             self.userId = responseData["user_id"];
 
             if (isNaN(self.userId)) {
-                self.__handleError("Invalid user id: " + self.userId);
+                self.__handleError(i18next.t("Invalid user id: %d").replace("%d", self.userId));
                 self.__handleButton();
                 return false;
             };
@@ -188,7 +188,7 @@ var AccountCreationObj = function (roles) {
         };
 
         if (isNaN(self.userId)) {
-            self.__handleError("Invalid user id: " + self.userId);
+            self.__handleError(i18next.t("Invalid user id: %d").replace("%d", self.userId));
             self.__handleButton();
             return false;
         };
@@ -500,19 +500,6 @@ $(document).ready(function(){
         };
     });
 
-    function getDateWithTimeZone(dObj) {
-        /*
-         * param is a date object
-         * calculating UTC date using Date object's timezoneOffset method
-         * the method return offset in minutes, so need to convert it to miliseconds
-         * adding the resulting offset will be the UTC date/time
-         */
-        var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
-        //I believe this is a valid python date format, will save it as GMT date/time
-        //NOTE, conversion already occurred, so there will be no need for backend to convert it again
-        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
-    }
-
     if ($("#consentDateEditContainer").length > 0) {
         //default consent date to today's date
         var today = new Date();
@@ -523,7 +510,7 @@ $(document).ready(function(){
         $("#consentYear").val(ty);
         //saving the consent date in GMT
         //default to today's date
-        $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+        $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
         if (_isTouchDevice()) {
             $("#consentDay, #consentYear").each(function() {
                 $(this).attr("type", "tel");

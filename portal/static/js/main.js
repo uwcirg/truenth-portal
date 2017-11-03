@@ -1181,13 +1181,11 @@ var fillContent = {
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
 
-                var creatorText = i18next.t("(data entered by {})");
-                var createDateText = i18next.t(" on {}");
+                var creationText = i18next.t("(date entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}));
               
                 contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" 
                             + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText 
-                            + "&nbsp;<em>" + creatorText.replace(/\{\}/, creator)
-                            + createDateText.replace(/\{\}/, dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}))
+                            + "&nbsp;<em>" + creationText
                             + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>" 
                             + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
@@ -1216,7 +1214,7 @@ var fillContent = {
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
-            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added") + "!</em></small>");
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added!") + "</em></small>");
         }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
@@ -4185,7 +4183,20 @@ var tnthDates = {
 
        //console.log("locale? " + locale)
        return locale ? locale : "en-us";
+    },
+    getDateWithTimeZone: function(dObj) {
+        /*
+         * param is a date object
+         * calculating UTC date using Date object's timezoneOffset method
+         * the method return offset in minutes, so need to convert it to miliseconds
+         * adding the resulting offset will be the UTC date/time
+         */
+        var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
+        //I believe this is a valid python date format, will save it as GMT date/time
+        //NOTE, conversion already occurred, so there will be no need for backend to convert it again
+        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
     }
+
 };
 /***
  * Bootstrap datatables functions
