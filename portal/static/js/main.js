@@ -4228,36 +4228,9 @@ var tnthTables = {
      */
      "alphanumericSorter": function (a, b) {
         /*
-         * ideas came from
-         * http://www.davekoelle.com/files/alphanum.js
+         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
          */
-        function chunkify(t) {
-            var tz = new Array();
-            var x = 0, y = -1, n = 0, i, j;
-
-            while (i = (j = t.charAt(x++)).charCodeAt(0)) {
-              var m = (i == 46 || (i >=48 && i <= 57));
-              if (m !== n) {
-                tz[++y] = "";
-                n = m;
-              }
-              tz[y] += j;
-            }
-            return tz;
-        }
-
-        var aa = chunkify(a);
-        var bb = chunkify(b);
-
-        for (x = 0; aa[x] && bb[x]; x++) {
-            if (aa[x] !== bb[x]) {
-              var c = Number(aa[x]), d = Number(bb[x]);
-              if (c == aa[x] && d == bb[x]) {
-                return c - d;
-              } else return (aa[x] > bb[x]) ? 1 : -1;
-            }
-        };
-        return aa.length - bb.length;
+        return alphanum(a, b);
     }
 };
 /**
