@@ -4222,6 +4222,15 @@ var tnthTables = {
         if (isNaN(b_d)) b_d = 0;
 
         return  b_d - a_d;
+    },
+    /***
+     * sorting alpha numeric string
+     */
+     "alphanumericSorter": function (a, b) {
+        /*
+         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
+         */
+        return alphanum(a, b);
     }
 };
 /**
