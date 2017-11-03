@@ -63,14 +63,28 @@
             <tbody data-link="row" class="rowlink">
             {% for user in users %}
             <tr id="data_row_{{user.id}}">
-                <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                <td>{% if not user.deleted %}
+                        <a href="{{ url_for('portal.profile', user_id=user.id) }}">{{ user.id }}</a>
+                    {% else %}
+                        {{ user.id }}
+                    {% endif %}
+                </td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button onclick="deleteUser(event, {{user.id}})" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
+                <td class="text-center">
+                    {% if user.deleted %}
+                        <span class="smaller-text">{{ _("Inactive") }}</span>
+                    {% else %}
+                        {% if not user.has_role(ROLE.ADMIN) %}
+                            <button onclick="deleteUser(event, {{user.id}})" type="button" class="btn btn-default"><em>Delete</em></button>
+                        {% else %}-
+                        {% endif %}
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
             </tbody>
@@ -117,9 +131,9 @@ function deleteUser(event, userId) {
               contentType: 'application/json; charset=utf-8',
               dataType: 'json'
           }).done(function(data) {
-                if (data["message"] === "deleted") {
-                    $("#data_row_" + userId).fadeOut();
-                } else alert("System error: " + data["message"]);
+                if (data["message"] !== "deleted") {
+                    alert("System error: " + data["message"]);
+                }
           }).fail(function(xhr) {
                 console.log("response Text: " + xhr.responseText);
                 console.log("response status: " +  xhr.status);

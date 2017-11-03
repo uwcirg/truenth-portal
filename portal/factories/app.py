@@ -19,6 +19,7 @@ from ..extensions import babel, mail, oauth, session, user_manager
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
+from ..views.admin import admin
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
 from ..views.auth import auth, capture_next_view_function
@@ -42,6 +43,7 @@ from ..views.user import user_api
 
 SITE_CFG = 'site.cfg'
 DEFAULT_BLUEPRINTS = (
+    admin,
     assessment_engine_api,
     audit_api,
     auth,
