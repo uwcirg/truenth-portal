@@ -359,7 +359,7 @@
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
                     subject = '{{ app_text('profileSendEmail reminder email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                 }
-                if (body != '' && hasValue(return_url)) {
+                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
                     tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
                         if (!data.error) {
                             $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
@@ -370,7 +370,12 @@
                             $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                         };
                     });
-                } else  $('#profileEmailMessage').text('{{_("Unable to send email.")}}');
+                } else  {
+                    $('#profileEmailMessage').text('{{_("Unable to send email.")}}');
+                    if (!hasValue(body)) $('#profileEmailMessage').append('<div>' + '{{_("Email body content is missing.")}}' + '</div>');
+                    if (!hasValue(subject)) $('#profileEmailMessage').append('<div>' + '{{_("Email subject is missing.")}}' + '</div>');
+                    if (!hasValue(email)) $('#profileEmailMessage').append('<div>' + '{{_("Email address is missing.")}}' + '</div>');
+                };
             } else $('#profileEmailMessage').text('{%trans%}You must select a email type.{%endtrans%}');
         });
      });</script>
