@@ -4,7 +4,7 @@
 
 var AccountCreationObj = function (roles) {
     this.attempts = 0;
-    this.max_attempts = 3;
+    this.maxAttempts = 3;
     this.params = null;
     this.roles = roles;
     this.userId = "None created";
@@ -13,6 +13,15 @@ var AccountCreationObj = function (roles) {
         timeout: 5000,
         retryAfter:3000
     });
+
+    function getParentOrgId(obj) {
+        var parentOrgId =  $(obj).attr("data-parent-id");
+        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        return parentOrgId;
+    };
+    function hasValue(val) {
+        return val != null && val != "" && val != "undefined";
+    };
 
     this.__request = function(params) {
         if (!params) {
@@ -41,7 +50,7 @@ var AccountCreationObj = function (roles) {
                 (params.callback).call(self, {"data": data});
             };
         }).fail(function(xhr) {
-            if (self.attempts < self.max_attempts) {
+            if (self.attempts < self.maxAttempts) {
                 setTimeout ( function() { self.__request( self.params ); } , $.ajaxSetup().retryAfter );
             } else {
                 var displayError = i18next.t("Server error occurred updating data.");
@@ -137,7 +146,9 @@ var AccountCreationObj = function (roles) {
                     use: "secondary",
                     value: siteId
                 };
-                if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
+                if (!_demoArray["identifier"]) {
+                    _demoArray["identifier"] = [];
+                };
                 _demoArray["identifier"].push(siteIdObj);
             };
 
@@ -182,7 +193,7 @@ var AccountCreationObj = function (roles) {
         var self = this;
 
         var treatmentRows = $("#pastTreatmentsContainer tr[data-code]");
-        if (treatmentRows.length == 0) {
+        if (treatmentRows.length === 0) {
             self.__handleDisplay();
             return false;
         };
@@ -227,7 +238,9 @@ var AccountCreationObj = function (roles) {
                     (function(self) {
                         setTimeout(function() { self.__redirect(); }, 5000);
                     })(self);
-                } else self.__handleDisplay();
+                } else {
+                    self.__handleDisplay();
+                };
                 clearInterval(self.treatmentIntervalVar);
             };
         }, 100);
@@ -262,7 +275,9 @@ var AccountCreationObj = function (roles) {
             };
             if (isPatient) {
                 $("#redirectLink").attr("href", "/patients/patient_profile/" + this.userId);
-            } else $("#redirectLink").attr("href", "/profile/" + this.userId);
+            } else {
+                $("#redirectLink").attr("href", "/profile/" + this.userId);
+            };
             $("#redirectLink")[0].click();
         };
     };
@@ -290,7 +305,9 @@ var AccountCreationObj = function (roles) {
         $("input[required], select[required]").each(function() {
             if (!hasValue($(this).val())) {
                 //this should display error message associated with empty field
-                if (!silent) $(this).trigger("focusout");
+                if (!silent) {
+                    $(this).trigger("focusout");
+                };
                 hasError = true;
             };
         });
@@ -300,7 +317,9 @@ var AccountCreationObj = function (roles) {
                 hasError = true;
             } else {
                 if ($("#current_user_email").val() === $("#email").val()) {
-                    if (!silent) this.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
+                    if (!silent) {
+                        this.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
+                    };
                     hasError = true;
                 } else {
                     this.setHelpText("emailGroup", "", false);
@@ -315,11 +334,13 @@ var AccountCreationObj = function (roles) {
 
         /* finally check fields to make sure there isn't error, e.g. due to validation error */
         $("#createProfileForm .help-block.with-errors").each(function() {
-            if ($(this).text() != "") hasError = true;
+            if ($(this).text() !== "") hasError = true;
         });
 
         if (hasError) {
-            if (!silent) $("#errorMsg").fadeIn("slow");
+            if (!silent) {
+                $("#errorMsg").fadeIn("slow");
+            };
         } else {
             $("#errorMsg").hide();
             $("#serviceErrorMsg").html("").hide();
@@ -355,7 +376,7 @@ var AccountCreationObj = function (roles) {
             /*
              * retry here
              */
-            if (self.attempts < self.max_attempts) {
+            if (self.attempts < self.maxAttempts) {
                 setTimeout ( function() { self.getOrgs( callback ) } , $.ajaxSetup().retryAfter );
             } else {
                 var errorMessage = i18next.t("Error occurred retrieving clinics data.");
@@ -459,14 +480,6 @@ var AccountCreationObj = function (roles) {
             };
         });
         return consents;
-    };
-    function getParentOrgId(obj) {
-        var parentOrgId =  $(obj).attr("data-parent-id");
-        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
-        return parentOrgId;
-    };
-    function hasValue(val) {
-        return val != null && val != "" && val != "undefined";
     };
 };
 
