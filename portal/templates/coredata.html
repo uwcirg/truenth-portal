@@ -82,7 +82,6 @@
 <!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
 <br/>
 <div class="btn btn-tnth-primary continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
-<div class="loading-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
 <div class="error-continue error-message"></div>
 <br/><br/><br/><br/>
 
@@ -90,6 +89,10 @@
 {% endblock %}
 {% block footer %}
 <footer id="core_data_footer"></footer>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
 {% endblock %}
 
 {% block document_ready %}
@@ -116,13 +119,11 @@ $(document).ready(function(){
     $(".continue-btn").on("click", function(event){
         event.preventDefault();
         $(this).hide();
-        $(".loading-indicator").show();
         try {
             window.location.replace("{{ return_address | safe }}");
         } catch(e) {
             //report error if invalid return address is used here
             tnthAjax.reportError({{user.id}}, "{{url_for('coredata_api.acquire')}}", e.message, true);
-            $(".loading-indicator").hide();
             $(this).show();
             $(".error-continue").text(e.message);
         };

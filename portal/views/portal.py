@@ -707,8 +707,8 @@ def settings():
 @oauth.require_oauth()
 def config_settings(config_key):
     key = config_key.upper()
-    # Only handing out LifeRay keys at this time
-    if key.startswith('LR_'):
+    # check key existence in application config
+    if key in current_app.config:
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))

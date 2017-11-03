@@ -568,7 +568,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         var content = "";
         content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
         content += this.getHeaderRow(historyHeaderArray);
- 		
+
  		/*
  		 * filtered out deleted items from all consents
  		 */
@@ -1172,7 +1172,7 @@ var fillContent = {
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
                     creator = i18next.t("you");
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.85em; padding: 0.5em 0.8em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
                 }
                 else if (creator == subjectId) {
                     creator = i18next.t("this patient");
@@ -1180,7 +1180,16 @@ var fillContent = {
                 else creator = i18next.t("staff member") + ", <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(" + i18next.t("data entered by ") + creator + i18next.t(" on ") + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
+
+                var creatorText = i18next.t("(data entered by {})");
+                var createDateText = i18next.t(" on {}");
+              
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" 
+                            + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText 
+                            + "&nbsp;<em>" + creatorText.replace(/\{\}/, creator)
+                            + createDateText.replace(/\{\}/, dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}))
+                            + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>" 
+                            + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 }
@@ -1207,7 +1216,7 @@ var fillContent = {
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
-            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added") + "!</em></small>");
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added") + "!</em></small>");
         }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
@@ -2927,19 +2936,23 @@ var tnthAjax = {
             };
         });
     },
-    "postProc": function(userId,toSend, targetField) {
+    "postProc": function(userId,toSend,targetField, callback) {
         flo.showLoader(targetField);
         this.sendRequest('/api/procedure', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
                     flo.showUpdate(targetField);
                     $(".get-procs-error").html("");
+                    if (callback) callback(data);
                 } else {
                     var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
                     if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
                     else $(".get-procs-error").html(errorMessage);
                     flo.showError(targetField);
+                    if (callback) callback({error: errorMessage});
                 };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
     },
@@ -3390,6 +3403,24 @@ var tnthAjax = {
     		 if (callback) callback({"error": i18next.t("no data returned")});
     		};
     	});
+    },
+    "setting": function(key, userId, params, callback) {
+        if (!hasValue(key)) {
+            if (callback) callback({"error": i18next.t("configuration key is required.")});
+            return false;
+        };
+        if (!params) params = {};
+        this.sendRequest('/api/settings/'+key,'GET', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving content for configuration key.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     }
 };
 
