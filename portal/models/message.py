@@ -21,8 +21,7 @@ email_dispatched.connect(log_message)
 
 
 EMAIL_HEADER = (
-    u"<!DOCTYPE html>"
-    "<html><head><title>TrueNTH email</title><style>"
+    u"<head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
     "} "
@@ -71,7 +70,7 @@ EMAIL_HEADER = (
     " background-color: #576e76;"
     "}"
     "</style></head><body>")
-EMAIL_FOOTER = u"</body></html>"
+EMAIL_FOOTER = u"</body>"
 
 
 class EmailMessage(db.Model):
