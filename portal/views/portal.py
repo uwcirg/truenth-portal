@@ -591,15 +591,7 @@ def profile(user_id):
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    top_org = user.first_top_organization()
-    if top_org:
-        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
-    else:
-        name_key = UserInviteEmail_ATMA.name_key()
-    args = load_template_args(user=user)
-    invite_email = MailResource(app_text(name_key), variables=args)
-    return render_template('profile.html', user=user,
-                           invite_email=invite_email, terms=terms,
+    return render_template('profile.html', user=user, terms=terms,
                            consent_agreements=consent_agreements)
 
 
@@ -619,6 +611,31 @@ def staff_registration_email(user_id):
 
     try:
         name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
+        item = MailResource(app_text(name_key), variables=args)
+    except UndefinedAppText:
+        """return no content and 204 no content status"""
+        return ('', 204)
+
+    return jsonify(subject=item.subject, body=item.body)
+
+
+@portal.route('/patient-invite-email/<int:user_id>')
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@oauth.require_oauth()
+def patient_invite_email(user_id):
+    """Patient Invite Email Content"""
+    if user_id:
+        user = get_user(user_id)
+    else:
+        user = current_user()
+
+    try:
+        top_org = user.first_top_organization()
+        if top_org:
+            name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+        else:
+            name_key = UserInviteEmail_ATMA.name_key()
+        args = load_template_args(user=user)
         item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
