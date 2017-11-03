@@ -124,7 +124,9 @@ var AccountCreationObj = function (roles) {
                     use: "secondary",
                     value: studyId
                 };
-                if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
+                if (!_demoArray["identifier"]) {
+                    _demoArray["identifier"] = [];
+                };
                 _demoArray["identifier"].push(studyIdObj);
             };
 
