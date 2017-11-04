@@ -164,7 +164,7 @@ class TestPortal(TestCase):
 
         # confirm styling unicode functions
         body = message.style_message(message.body)
-        self.assertTrue(u'DOCTYPE' in body)
+        self.assertTrue(u'style' in body)
         self.assertTrue(isinstance(body, unicode))
 
         self.login()
