@@ -21,7 +21,8 @@ email_dispatched.connect(log_message)
 
 
 EMAIL_HEADER = (
-    u"<head><title>TrueNTH email</title><style>"
+    u"<!DOCTYPE html><html>"
+    "<head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
     "} "
@@ -70,7 +71,7 @@ EMAIL_HEADER = (
     " background-color: #576e76;"
     "}"
     "</style></head><body>")
-EMAIL_FOOTER = u"</body>"
+EMAIL_FOOTER = u"</body></html>"
 
 
 class EmailMessage(db.Model):
@@ -103,7 +104,7 @@ class EmailMessage(db.Model):
             subject=self.subject,
             recipients=self.recipients.split())
         body = self.style_message(self.body)
-        message.html = fill(body, width=280)
+        message.html = fill(body, width=280, break_long_words=False, break_on_hyphens=False)
         mail.send(message)
 
         user = User.query.filter_by(email='__system__').first()
