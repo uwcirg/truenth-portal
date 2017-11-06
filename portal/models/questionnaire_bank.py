@@ -393,7 +393,17 @@ class QuestionnaireBank(db.Model):
         """
         if hasattr(self, '__trigger_date'):
             return self.__trigger_date
-        if self.organization_id:
+        # use the patient's last treatment date, if possible
+        # TODO: business rule details like the following should
+        # move to site persistence for QB to user mappings.
+        tx_date = latest_treatment_started_date(user)
+        if tx_date:
+            trace(
+                "found latest treatment date {} for trigger_date".format(
+                    tx_date))
+            self.__trigger_date = tx_date
+            return self.__trigger_date
+        elif self.organization_id:
             # When linked via organization, use the common
             # top level consent date as `trigger` date.
             if user.valid_consents and user.valid_consents.count() > 0:
@@ -414,26 +424,16 @@ class QuestionnaireBank(db.Model):
                 raise ValueError(
                     "Can't compute trigger_date on QuestionnaireBank "
                     "with neither organization nor intervention associated")
-            # TODO: business rule details like the following should
-            # move to site persistence for QB to user mappings.
-            tx_date = latest_treatment_started_date(user)
-            if tx_date:
+            self.__trigger_date = user.fetch_datetime_for_concept(
+                CC.BIOPSY)
+            if self.__trigger_date:
                 trace(
-                    "found latest treatment date {} for trigger_date".format(
-                        tx_date))
-                self.__trigger_date = tx_date
+                    "found biopsy {} for trigger_date".format(
+                        self.__trigger_date))
                 return self.__trigger_date
             else:
-                self.__trigger_date = user.fetch_datetime_for_concept(
-                    CC.BIOPSY)
-                if self.__trigger_date:
-                    trace(
-                        "found biopsy {} for trigger_date".format(
-                            self.__trigger_date))
-                    return self.__trigger_date
-                else:
-                    trace("no treatment or biopsy date, no trigger_date")
-                    return self.__trigger_date
+                trace("no treatment or biopsy date, no trigger_date")
+                return self.__trigger_date
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

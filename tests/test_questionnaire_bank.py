@@ -4,16 +4,89 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.audit import Audit
+from portal.models.fhir import CC
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
-from tests import TestCase
+from portal.system_uri import ICHOM
+from tests import TestCase, TEST_USER_ID
 
 
 class TestQuestionnaireBank(TestCase):
+
+    def test_org_trigger_date(self):
+        # testing org-based QBs
+        q = Questionnaire(name='q')
+        org = Organization(name='org')
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.add(org)
+            db.session.commit()
+        q, org, self.test_user = map(db.session.merge,
+                                     (q, org, self.test_user))
+        qb = QuestionnaireBank(
+            name='qb', organization_id=org.id, classification='baseline',
+            start='{"days": 1}', expired='{"days": 2}')
+        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
+        qb.questionnaires.append(qbq)
+
+        # user without consents or TX date should return None
+        self.assertFalse(qb.trigger_date(self.test_user))
+
+        # user with consent should return consent date
+        now = datetime.utcnow()
+        self.consent_with_org(org.id, setdate=now)
+        self.test_user = db.session.merge(self.test_user)
+        self.assertEquals(qb.trigger_date(self.test_user), now)
+
+        # user with consent and TX date should return TX date
+        tx_date = datetime(2017, 6, 10, 20, 00, 00, 000000)
+        self.add_procedure(code='7', display='Focal therapy',
+                           system=ICHOM, setdate=tx_date)
+        self.test_user = db.session.merge(self.test_user)
+        qb.__trigger_date = None  # clear out stored trigger_date
+        self.assertEquals(qb.trigger_date(self.test_user), tx_date)
+
+    def test_intervention_trigger_date(self):
+        # testing intervention-based QBs
+        q = Questionnaire(name='q')
+        interv = Intervention(name='interv', description='test')
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.add(interv)
+            db.session.commit()
+        q, interv, self.test_user = map(db.session.merge,
+                                        (q, interv, self.test_user))
+        qb = QuestionnaireBank(
+            name='qb', intervention_id=interv.id, classification='baseline',
+            start='{"days": 1}', expired='{"days": 2}')
+        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
+        qb.questionnaires.append(qbq)
+
+        # user without biopsy or TX date should return None
+        self.assertFalse(qb.trigger_date(self.test_user))
+
+        # user with biopsy should return biopsy date
+        self.login()
+        self.test_user.save_constrained_observation(
+            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+        self.test_user = db.session.merge(self.test_user)
+        obs = self.test_user.observations.first()
+        self.assertEquals(obs.codeable_concept.codings[0].display, 'biopsy')
+        self.assertEquals(qb.trigger_date(self.test_user), obs.issued)
+
+        # user with biopsy and TX date should return TX date
+        tx_date = datetime.utcnow()
+        self.add_procedure(code='7', display='Focal therapy',
+                           system=ICHOM, setdate=tx_date)
+        self.test_user = db.session.merge(self.test_user)
+        qb.__trigger_date = None  # clear out stored trigger_date
+        self.assertEquals(qb.trigger_date(self.test_user), tx_date)
 
     def test_start(self):
         q = Questionnaire(name='q')
