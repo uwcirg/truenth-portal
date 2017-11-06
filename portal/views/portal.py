@@ -724,8 +724,11 @@ def settings():
 @oauth.require_oauth()
 def config_settings(config_key):
     key = config_key.upper()
-    # Only handing out LifeRay keys at this time
+    # handing out LifeRay keys at this time
     if key.startswith('LR_'):
+        return jsonify({key: current_app.config.get(key)})
+    # handing out consent related keys e.g. consent_with_top_level_org
+    elif key.startswith('CONSENT_'):
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))

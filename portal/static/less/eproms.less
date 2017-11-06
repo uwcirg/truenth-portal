@@ -286,7 +286,6 @@ a.btn {
 }
 select:not([multiple]) {
   border: 1px solid #bdb9b9;
-  max-width: 250px;
   overflow: hidden;
   background-image: none;
 }
@@ -1565,11 +1564,28 @@ div.right-panel {
   border-bottom: 1px solid #e8e7e7;
   padding-top: 2em;
 }
-#profileProcedureContainer table {
-  border: 0;
+#profileProcedureContainer {
+  table {
+    border: 0;
+  }
+  .confirm-delete,
+  .data-delete {
+    font-size: 0.85em;
+    padding: 0.5em 0.8em;
+    color: #777;
+    border: 1px solid #bdb9b9;
+    position: relative;
+    top: -0.3em;
+  }
+}
+#userProcedures {
+  td {
+    padding-bottom: 0.2em;
+  }
 }
 #tnthproc-submit {
-  height: 2.9em;
+  height: 2.5em;
+  padding: 0.5em 0.9em;
 }
 .profile-item-title {
   color: @sectionTitleColor;
@@ -1886,6 +1902,42 @@ input.clinic {
   label.clinics-section-label {
     margin-bottom: 0;
   }
+
+  #profileProceduresWrapper {
+    padding: 0.5em 1em;
+    background: none;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    #procDateGroup .flex-item:last-of-type {
+      margin-top: 2em;
+    }
+  }
+  .profile-item-title {
+    color: #777777;
+    font-weight: normal;
+    letter-spacing: 0;
+    font-size: @baseFontSize;
+  }
+
+  #pastTreatmentsContainer {
+    margin-top: 1em;
+    margin-bottom: 2em;
+    td {
+      padding: 0.3em 0.5em;
+    }
+  }
+
+  #tnthproc-submit {
+    height: auto;
+  }
+}
+
+#profileProceduresWrapper.profile-item-container {
+    border: 1px solid #dcdcdc;
+}
+
+#profileProceduresWrapper[data-top-org-name='IRONMAN'] {
+    display: none;
 }
 .create-account-container {
   padding: 2em;

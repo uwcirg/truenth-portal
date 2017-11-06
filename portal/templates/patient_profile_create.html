@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {%- from "flask_user/_macros.html" import back_btn, footer -%}
 {% block main %}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, accountCreationScript, profileConsentDate -%}
+{%- from "profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
@@ -34,45 +34,13 @@
                     {{profileStudyID(False)}}
                     {{profileSiteID(False)}}
                     {{profileConsentDate()}}
+                    {{profileProcedures(False, user)}}
                     <div class="divider"></div>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
                         <div class="help-block with-errors get-orgs-error error-message"></div>
                     </div>
-                    <script>$(function () {
-                        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
-                        aco.getOrgs(function(data) {
-                            if (data) {
-                                if (!data.error) {
-                                    OT.populateOrgsList(data.entry);
-                                    OT.populateUI();
-
-                                    if (leafOrgs) {
-                                        OT.filterOrgs(leafOrgs);
-                                    };
-
-                                    var userOrgs = $("#userOrgs input[name='organization']");
-                                    userOrgs.each(function() {
-                                        $(this).attr("type", "radio");
-                                    });
-
-                                    $("#userOrgs input[name='organization']").each(function() {
-                                        $(this).on("click", function() {
-                                            $("#userOrgs").find(".help-block").html("");
-                                        });
-                                    });
-
-                                    var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                                    if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
-                                } else {
-                                    $("#userOrgs .get-orgs-error").html(data.error);
-                                };
-                            } else $("#userOrgs .get-orgs-error").html('{{_("No clinics data available.")}}');
-                        });
-
-                    });</script>
                     <br/>
                     <br/>
                     <div class="save-button-container">
@@ -82,7 +50,6 @@
             <br/>
             <div class="back-button-container">
                 {{ back_btn('patients','patients list')}}
-                <a href="#" style="visibility:hidden" id="profileBackLink"></a>
             </div>
             </div>
             </div>
@@ -94,11 +61,26 @@
     {%- endif -%}
 </form>
 <a id="redirectLink" href="" name="redirectLink" class="tnth-hide">&nbsp;</a>
-{{accountCreationScript()}}
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+<script src="{{ url_for('static', filename='js/accountCreation.js') }}"></script>
+{% endblock %}
 {% block document_ready %}
-var aco = new AccountCreationObj([{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}]);
+var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+var aco = new AccountCreationObj(
+[{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}],
+{'i18next': i18next,
+'tnthAjax': tnthAjax,
+'SYSTEM_IDENTIFIER_ENUM': SYSTEM_IDENTIFIER_ENUM,
+'OrgTool': OT,
+'leafOrgs': leafOrgs
+});
+$(function() {
+    /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+    aco.getOrgs(aco.populatePatientOrgs);
+});
 {% endblock %}

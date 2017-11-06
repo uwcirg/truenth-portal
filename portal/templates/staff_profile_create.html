@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
-{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileSaveBtn, accountCreationScript %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileSaveBtn%}
 {% from "initial_queries_macros.html" import consent_fields %}
 <br/>
 <form id="createProfileForm" data-account="staff" class="form tnth-form to-validate">
@@ -36,49 +36,12 @@
                         <div id="fillOrgs"></div>
                         <div class="help-block with-errors get-orgs-error error-message"></div>
                     </div>
-                    <script>$(function () {
-                        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
-                        aco.getOrgs(function(data) {
-                            if (data) {
-                                if (!data.error) {
-                                    OT.populateOrgsList(data.entry);
-                                    OT.populateUI();
-
-                                    if (orgList) {
-                                        OT.filterOrgs(orgList);
-                                    };
-
-                                    var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-
-                                    $("#userOrgs input[name='organization']").each(function() {
-                                        $(this).on("click", function() {
-                                            $("#userOrgs").find(".help-block").html("");
-                                        });
-                                    });
-
-                                    var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                                    if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
-
-                                } else {
-                                    $("#userOrgs .get-orgs-error").html(data.error);
-                                };
-
-                            } else {
-                                $("#userOrgs .get-orgs-error").html('{{_("No clinics data available.")}}');
-                            };
-                        });
-
-                    });</script>
                     <div class="save-button-container">
                         {{profileSaveBtn()}}
                     </div>
             </div>
             <br/>
-            <div class="back-button-container">
-                {{ back_btn('staff','Staff List')}}
-                <a href="#" style="visibility:hidden" id="profileBackLink"></a>
-            </div>
+            <div class="back-button-container">{{ back_btn('staff','Staff List')}}</div>
          </div>
          </div>
         </div>
@@ -89,12 +52,26 @@
     {%- endif -%}
 </form>
 <a id="redirectLink" href="" class="tnth-hide">&nbsp;</a>
-{{accountCreationScript()}}
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/accountCreation.js') }}"></script>
+{% endblock %}
 {% block document_ready %}
+    var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
     //instantiation of account creation object, note, staff role is passed in
-    var aco = new AccountCreationObj([{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}]);
+    var aco = new AccountCreationObj(
+    [{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'},],
+    {'i18next': i18next,
+    'tnthAjax': tnthAjax,
+    'SYSTEM_IDENTIFIER_ENUM': SYSTEM_IDENTIFIER_ENUM,
+    'OrgTool': OT,
+    'orgList': orgList
+    });
+    $(function () {
+        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+        aco.getOrgs(aco.populateStaffOrgs);
+    });
 {% endblock %}

@@ -2,41 +2,78 @@ $.fn.extend({
     // Special type of select question - passes two values - the answer from
     // the select plus an associated date from a separate input
     eventInput: function(settings) {
+
+        if (!settings) {
+            settings = {};
+        };
+
+        var tnthAjax = settings["tnthAjax"]; //this will error out if not defined
+
         $(this).on("click", function() {
 
             // First disable button to prevent double-clicks
             $(this).attr('disabled', true);
 
+            var isAccountCreation = $(this).attr("data-account-create");
+            var subjectId = $("#profileProcSubjectId").val();
             var selectVal = $(this).attr('data-name');
             var selectDate = $(this).attr('data-date');
             // Only continue if both values are filled in
             if (selectVal !== undefined && selectDate !== undefined) {
-                //remove any procedure on prostate or none treatment
-                //see main.js proceduresContent function that renders these as hidden fields
-                $("#userProcedures input[name='otherProcedures']").each(function() {
-                    var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
-                    if (code == CANCER_TREATMENT_CODE) {
-                        tnthAjax.deleteProc(procId);
-                    };
-                    if (code == NONE_TREATMENT_CODE) {
-                        tnthAjax.deleteProc(procId);
-                    };
-                });
-
-                // Submit the data
-                var procArray = {};
                 var selectFriendly = $("#tnthproc option:selected").text();
-                var procID = [{ "code": selectVal, "display": selectFriendly,
-                    system: "http://snomed.info/sct" }];
+                 // gather data
+                var procArray = {};
                 procArray["resourceType"] = "Procedure";
-                procArray["subject"] = {"reference": "Patient/" + subjectId };
-                procArray["code"] = {"coding": procID};
                 procArray["performedDateTime"] = selectDate;
-                tnthAjax.postProc(subjectId,procArray);
 
-                // Update the procedure list - we animate opacity to retain the
-                // width and height so lower content doesn't go up and down
-                $("#eventListLoad").show();
+                if (isAccountCreation) {
+                    if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length === 0) {
+                        procArray["display"] = selectFriendly;
+                        procArray["code"] = selectVal;
+                        var content = "";
+                        content += "<tr ";
+                        for (var item in procArray) {
+                            content +=  " data-" + item + "='" + procArray[item] + "'";
+                        };
+                        content += ">";
+                        content += "<td>&#9679;</td><td>" + selectFriendly + "</td><td>" + selectDate + "</td><td><a class='btn btn-default btn-xs data-delete'>" + i18next.t("REMOVE") + "</a></td>";
+                        content += "</tr>";
+                        $("#pastTreatmentsContainer").append(content);
+                        setTimeout(function() { $("#pastTreatmentsContainer").show(); }, 100);
+                    };
+
+                } else {
+                    //remove any procedure on prostate or none treatment
+                    //see main.js proceduresContent function that renders these as hidden fields
+                    $("#userProcedures input[name='otherProcedures']").each(function() {
+                        var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
+                        if (code === CANCER_TREATMENT_CODE) {
+                            tnthAjax.deleteProc(procId);
+                        };
+                        if (code === NONE_TREATMENT_CODE) {
+                            tnthAjax.deleteProc(procId);
+                        };
+                    });
+
+                    var procID = [{ "code": selectVal, "display": selectFriendly, system: "http://snomed.info/sct" }];
+                    procArray["subject"] = {"reference": "Patient/" + subjectId };
+                    procArray["code"] = {"coding": procID};
+                    tnthAjax.postProc(subjectId,procArray);
+
+                    // Update the procedure list - we animate opacity to retain the
+                    // width and height so lower content doesn't go up and down
+                    $("#eventListLoad").show();
+
+                    // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+                    // more obvious when the updated list loads
+                    setTimeout(function(){
+                        tnthAjax.getProc(subjectId,true);
+                    },1500);
+
+                    $("#pastTreatmentsContainer").hide();
+
+                };
+
                 $("select[id^='tnthproc']").val('');
                 $("input[id^='tnthproc-value']").val('');
                 $("input[id^='tnthproc-date']").val('');
@@ -49,13 +86,8 @@ $.fn.extend({
                     "data-date": "",
                     "data-date-read": ""
                 });
-                $("#pastTreatmentsContainer").hide();
-                // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
-                // more obvious when the updated list loads
-                setTimeout(function(){
-                    tnthAjax.getProc(subjectId,true);
-                },1500);
-            }
+
+            };
 
             return false;
         });
@@ -78,8 +110,10 @@ $(document).ready(function() {
         });
     });
 
+    __convertToNumericField($("#procYear, #procDay"));
+
     // Trigger eventInput on submit button
-    $("button[id^='tnthproc-submit']").eventInput();
+    $("button[id^='tnthproc-submit']").eventInput({"tnthAjax": tnthAjax});
 
     function isLeapYear(year)
     {
@@ -217,6 +251,10 @@ $(document).ready(function() {
     /*** Delete functions ***/
     $('body').on('click', '.cancel-delete', function() {
         $(this).parents("div.popover").prev('a.confirm-delete').trigger('click');
+    });
+
+    $('body').on('click', '.data-delete', function() {
+        $(this).closest("tr").remove();
     });
     // Need to attach delete functionality to body b/c section gets reloaded
     $("body").on('click', ".btn-delete", function() {
