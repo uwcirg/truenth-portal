@@ -7,12 +7,7 @@ from ..database import db
 
 
 class ScheduledJob(db.Model):
-    """ORM class for user document upload data
-
-    Capture and store uploaded user documents
-    (e.g. patient reports, user avatar images, etc).
-
-    """
+    """ScheduledJob model for storing scheduled runs of celery tasks"""
     __tablename__ = 'scheduled_jobs'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
