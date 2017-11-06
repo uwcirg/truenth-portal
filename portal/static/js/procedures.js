@@ -3,7 +3,9 @@ $.fn.extend({
     // the select plus an associated date from a separate input
     eventInput: function(settings) {
 
-        if (!settings) settings = {};
+        if (!settings) {
+            settings = {};
+        };
 
         var tnthAjax = settings["tnthAjax"]; //this will error out if not defined
 
@@ -25,13 +27,13 @@ $.fn.extend({
                 procArray["performedDateTime"] = selectDate;
 
                 if (isAccountCreation) {
-                    if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length == 0) {
+                    if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length === 0) {
                         procArray["display"] = selectFriendly;
                         procArray["code"] = selectVal;
                         var content = "";
                         content += "<tr ";
                         for (var item in procArray) {
-                            content +=  " data-" + item + "='" + procArray[item] + "'"
+                            content +=  " data-" + item + "='" + procArray[item] + "'";
                         };
                         content += ">";
                         content += "<td>&#9679;</td><td>" + selectFriendly + "</td><td>" + selectDate + "</td><td><a class='btn btn-default btn-xs data-delete'>" + i18next.t("REMOVE") + "</a></td>";

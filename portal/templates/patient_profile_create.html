@@ -70,13 +70,15 @@
 <script src="{{ url_for('static', filename='js/accountCreation.js') }}"></script>
 {% endblock %}
 {% block document_ready %}
+var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
 var aco = new AccountCreationObj(
 [{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}],
 {'i18next': i18next,
 'tnthAjax': tnthAjax,
-'SYSTEM_IDENTIFIER_ENUM': SYSTEM_IDENTIFIER_ENUM
+'SYSTEM_IDENTIFIER_ENUM': SYSTEM_IDENTIFIER_ENUM,
+'OrgTool': OT,
+'leafOrgs': leafOrgs
 });
-var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
 $(function() {
     /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
     aco.getOrgs(aco.populatePatientOrgs);

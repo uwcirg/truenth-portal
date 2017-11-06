@@ -16,27 +16,33 @@ var AccountCreationObj = function (roles, dependencies) {
     });
 
     this.__getDependency = function(key) {
-        if (this.dependencies[key]) return this.dependencies[key];
+        if (key && this.dependencies.hasOwnProperty(key)) {
+            return this.dependencies[key];
+        }
         else {
-            //error should display in console, no translation needed here
-            throw new Error(key + " dependency not found.");
+            return false;
         };
     };
 
+    function hasValue(val) {
+        return val != null && val != "" && val != "undefined";
+    };
 
     function getParentOrgId(obj) {
         var parentOrgId =  $(obj).attr("data-parent-id");
-        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        if (!hasValue(parentOrgId)) {
+            parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        };
         return parentOrgId;
-    };
-    function hasValue(val) {
-        return val != null && val != "" && val != "undefined";
     };
 
 
     var i18next = this.__getDependency("i18next");
     var tnthAjax = this.__getDependency("tnthAjax");
     var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
+    var OT = this.__getDependency("OrgTool");
+    var leafOrgs = this.__getDependency("leafOrgs");
+    var orgList = this.__getDependency("orgList");
 
 
     this.__request = function(params) {
@@ -179,7 +185,9 @@ var AccountCreationObj = function (roles, dependencies) {
             });
 
             if (states.length > 0) {
-                if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
+                if (!_demoArray["identifier"]) {
+                    _demoArray["identifier"] = [];
+                };
                 states.forEach(function(state) {
                     _demoArray["identifier"].push({
                         system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
@@ -246,7 +254,7 @@ var AccountCreationObj = function (roles, dependencies) {
         });
 
         self.treatmentIntervalVar = setInterval(function() {
-            if (self.counter == self.treatmentCount) {
+            if (self.counter === self.treatmentCount) {
                 if (hasValue(errorMessage)) {
                     self.__handleError(errorMessage + i18next.t(" Account created.  Redirecting to profile..."));
                     self.__handleButton();
@@ -288,7 +296,9 @@ var AccountCreationObj = function (roles, dependencies) {
             var isPatient = false;
             if (this.roles) {
                 this.roles.forEach(function(role) {
-                    if (!isPatient && role.name.toLowerCase() == "patient") isPatient = true;
+                    if (!isPatient && role.name.toLowerCase() === "patient") {
+                        isPatient = true;
+                    };
                 });
             };
             if (isPatient) {
@@ -307,7 +317,7 @@ var AccountCreationObj = function (roles, dependencies) {
         $("#pastTreatmentsContainer").html("");
     };
     this.__handleButton = function(vis) {
-        if (vis == "hide") {
+        if (vis === "hide") {
             $("#updateProfile").attr("disabled", true).hide();
             $(".save-button-container").find(".loading-message-indicator").show();
         } else {
@@ -345,14 +355,20 @@ var AccountCreationObj = function (roles, dependencies) {
             };
         };
         /* check organization */
-        if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length == 0) {
-            if (!silent) this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
+        if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length === 0) {
+            if (!silent) {
+                this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
+            };
             hasError = true;
-        } else this.setHelpText("userOrgs", "", false);
+        } else {
+            this.setHelpText("userOrgs", "", false);
+        };
 
         /* finally check fields to make sure there isn't error, e.g. due to validation error */
         $("#createProfileForm .help-block.with-errors").each(function() {
-            if ($(this).text() !== "") hasError = true;
+            if ($(this).text() !== "") {
+                hasError = true;
+            };
         });
 
         if (hasError) {
@@ -388,7 +404,9 @@ var AccountCreationObj = function (roles, dependencies) {
         }).done(function(data) {
             self.attempts = 0;
             if (data) {
-                if (callback) callback(data);
+                if (callback) {
+                    callback(data);
+                };
             } else {
                 if (callback) {
                     callback({"error": i18next.t("no data returned")});
@@ -399,10 +417,12 @@ var AccountCreationObj = function (roles, dependencies) {
              * retry here
              */
             if (self.attempts < self.maxAttempts) {
-                setTimeout ( function() { self.getOrgs( callback ) } , $.ajaxSetup().retryAfter );
+                setTimeout ( function() { self.getOrgs( callback ); } , $.ajaxSetup().retryAfter );
             } else {
                 var errorMessage = i18next.t("Error occurred retrieving clinics data.");
-                if (callback) callback({"error": errorMessage});
+                if (callback) {
+                    callback({"error": errorMessage});
+                };
                 self.attempts = 0;
             };
             tnthAjax.sendError(xhr, "", "/api/organization");
@@ -430,11 +450,15 @@ var AccountCreationObj = function (roles, dependencies) {
                 });
 
                 var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+                if (visibleOrgs.length === 1) {
+                    visibleOrgs.prop("checked", true);
+                };
             } else {
                 $("#userOrgs .get-orgs-error").html(data.error);
             };
-        } else $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
+        } else {
+            $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
+        };
     };
     this.populateStaffOrgs = function(data) {
         if (data) {
@@ -442,7 +466,7 @@ var AccountCreationObj = function (roles, dependencies) {
                 OT.populateOrgsList(data.entry);
                 OT.populateUI();
 
-                if (typeof orgList != "undefined" && orgList) {
+                if (orgList) {
                     OT.filterOrgs(orgList);
                 };
 
@@ -455,7 +479,9 @@ var AccountCreationObj = function (roles, dependencies) {
                 });
 
                 var visibleOrgs = $("#userOrgs input[name='organization']:visible");
-                if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+                if (visibleOrgs.length === 1) {
+                    visibleOrgs.prop("checked", true);
+                };
 
             } else {
                 $("#userOrgs .get-orgs-error").html(data.error);
@@ -469,17 +495,23 @@ var AccountCreationObj = function (roles, dependencies) {
         var orgs = {}, consents = [], self = this;
         $("#createProfileForm input[name='organization']").each(function() {
             if ($(this).prop("checked")) {
-                var consent_org_id, CONSENT_WITH_TOP_LEVEL_ORG = false;
+                var consentOrgId, CONSENT_WITH_TOP_LEVEL_ORG = false;
                 tnthAjax.setting("CONSENT_WITH_TOP_LEVEL_ORG", "", {sync: true}, function(data) {
                     if (!data.error) {
-                        if (data["CONSENT_WITH_TOP_LEVEL_ORG"]) CONSENT_WITH_TOP_LEVEL_ORG = true;
+                        if (data["CONSENT_WITH_TOP_LEVEL_ORG"]) {
+                            CONSENT_WITH_TOP_LEVEL_ORG = true;
+                        };
                     };
                 });
-                if (CONSENT_WITH_TOP_LEVEL_ORG) consent_org_id = getParentOrgId(this);
-                else consent_org_id = $(this).val();
+                if (CONSENT_WITH_TOP_LEVEL_ORG) {
+                    consentOrgId = getParentOrgId(this);
+                }
+                else {
+                    consentOrgId = $(this).val();
+                }
 
-                if (consent_org_id && !orgs[consent_org_id]) {
-                    orgs[consent_org_id] = true;
+                if (consentOrgId && !orgs[consentOrgId]) {
+                    orgs[consentOrgId] = true;
                     var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
                     if (!hasValue(agreement)) {
                         var stockConsentUrl = $("#stock_consent_url").val();
@@ -491,7 +523,7 @@ var AccountCreationObj = function (roles, dependencies) {
                         if (hasValue(ct)) {
                             consentItem["acceptance_date"] = ct;
                         };
-                        consentItem["organization_id"] = consent_org_id;
+                        consentItem["organization_id"] = consentOrgId;
                         consentItem["agreement_url"] = agreement;
                         consentItem["staff_editable"] = true;
                         consentItem["include_in_reports"] = true;
