@@ -2222,6 +2222,8 @@
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}">
+                <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
+                <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
                 <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}</h4>
                 <div class="view-container"><div id="procedure_view"></div></div>
                 <div class="edit-container">
@@ -2314,11 +2316,8 @@
         </div>
     </div>
     <script>
-        var subjectId = '{{ person.id if person}}';
-        var currentUserId = {{ current_user.id if current_user}};
         $(document).ready(function(){
             {% if person %} tnthAjax.getProc('{{person.id}}', false); {% endif %}
-            __convertToNumericField($("#procYear, #procDay"));
         });
     </script>
 {%- endmacro %}

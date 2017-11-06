@@ -3,13 +3,17 @@ $.fn.extend({
     // the select plus an associated date from a separate input
     eventInput: function(settings) {
 
+        if (!settings) settings = {};
+
+        var tnthAjax = settings["tnthAjax"]; //this will error out if not defined
+
         $(this).on("click", function() {
 
             // First disable button to prevent double-clicks
             $(this).attr('disabled', true);
 
             var isAccountCreation = $(this).attr("data-account-create");
-
+            var subjectId = $("#profileProcSubjectId").val();
             var selectVal = $(this).attr('data-name');
             var selectDate = $(this).attr('data-date');
             // Only continue if both values are filled in
@@ -41,10 +45,10 @@ $.fn.extend({
                     //see main.js proceduresContent function that renders these as hidden fields
                     $("#userProcedures input[name='otherProcedures']").each(function() {
                         var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
-                        if (code == CANCER_TREATMENT_CODE) {
+                        if (code === CANCER_TREATMENT_CODE) {
                             tnthAjax.deleteProc(procId);
                         };
-                        if (code == NONE_TREATMENT_CODE) {
+                        if (code === NONE_TREATMENT_CODE) {
                             tnthAjax.deleteProc(procId);
                         };
                     });
@@ -104,8 +108,10 @@ $(document).ready(function() {
         });
     });
 
+    __convertToNumericField($("#procYear, #procDay"));
+
     // Trigger eventInput on submit button
-    $("button[id^='tnthproc-submit']").eventInput();
+    $("button[id^='tnthproc-submit']").eventInput({"tnthAjax": tnthAjax});
 
     function isLeapYear(year)
     {

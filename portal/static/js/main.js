@@ -1157,6 +1157,8 @@ var fillContent = {
         var contentHTML = "", proceduresHtml = "", otherHtml = "";
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
+        var currentUserId = $("#profileProcCurrentUserId").val();
+        var subjectId = $("#profileProcSubjectId").val();
         $.each(data.entry,function(i,val){
             var code = val.resource.code.coding[0].code;
             var procID = val.resource.id;
@@ -1182,11 +1184,11 @@ var fillContent = {
                 dateEdited = new Date(dtEdited);
 
                 var creationText = i18next.t("(date entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}));
-              
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" 
-                            + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText 
+
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>"
+                            + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText
                             + "&nbsp;<em>" + creationText
-                            + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>" 
+                            + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>"
                             + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;

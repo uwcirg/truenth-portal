@@ -2,17 +2,27 @@
  * dependency: JQuery, main.js
  */
 
-var AccountCreationObj = function (roles) {
+var AccountCreationObj = function (roles, dependencies) {
     this.attempts = 0;
     this.maxAttempts = 3;
     this.params = null;
     this.roles = roles;
     this.userId = "None created";
+    this.dependencies = dependencies||{};
 
     $.ajaxSetup({
         timeout: 5000,
         retryAfter:3000
     });
+
+    this.__getDependency = function(key) {
+        if (this.dependencies[key]) return this.dependencies[key];
+        else {
+            //error should display in console, no translation needed here
+            throw new Error(key + " dependency not found.");
+        };
+    };
+
 
     function getParentOrgId(obj) {
         var parentOrgId =  $(obj).attr("data-parent-id");
@@ -22,6 +32,12 @@ var AccountCreationObj = function (roles) {
     function hasValue(val) {
         return val != null && val != "" && val != "undefined";
     };
+
+
+    var i18next = this.__getDependency("i18next");
+    var tnthAjax = this.__getDependency("tnthAjax");
+    var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
+
 
     this.__request = function(params) {
         if (!params) {
@@ -156,7 +172,9 @@ var AccountCreationObj = function (roles) {
             var states = [];
             $("#userOrgs input[name='organization']").each(function() {
                 if ($(this).is(":checked")) {
-                    if (hasValue($(this).attr("state"))) states.push($(this).attr("state"));
+                    if (hasValue($(this).attr("state"))) {
+                        states.push($(this).attr("state"));
+                    };
                 };
             });
 
