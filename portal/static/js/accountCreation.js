@@ -15,15 +15,6 @@ var AccountCreationObj = function (roles, dependencies) {
         retryAfter:3000
     });
 
-    this.__getDependency = function(key) {
-        if (key && this.dependencies.hasOwnProperty(key)) {
-            return this.dependencies[key];
-        }
-        else {
-            return false;
-        };
-    };
-
     function hasValue(val) {
         return val != null && val != "" && val != "undefined";
     };
@@ -36,6 +27,14 @@ var AccountCreationObj = function (roles, dependencies) {
         return parentOrgId;
     };
 
+    this.__getDependency = function(key) {
+        if (key && this.dependencies.hasOwnProperty(key)) {
+            return this.dependencies[key];
+        }
+        else {
+            return false;
+        };
+    };
 
     var i18next = this.__getDependency("i18next");
     var tnthAjax = this.__getDependency("tnthAjax");
@@ -46,9 +45,8 @@ var AccountCreationObj = function (roles, dependencies) {
 
 
     this.__request = function(params) {
-        if (!params) {
-            return false;
-        };
+        params = params || {};
+
         var self = this;
         if (!hasValue(params.apiUrl)) {
             if (params.callback) {
