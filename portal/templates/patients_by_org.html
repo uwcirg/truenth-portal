@@ -93,7 +93,7 @@
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
-                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
+                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                   </tr>
                {% endfor %}
           </tbody>
@@ -131,8 +131,8 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-var AT = new AdminTool({{user.id}});
-var sortObj = AT.getTablePreference({{user.id}}, "patientList");
+var AT = new AdminTool({{user.id}}, "patientList");
+var sortObj = AT.getTablePreference({{user.id}});
 /*
 * initializing bootstrapTable
 */
@@ -158,42 +158,22 @@ $(document).ready(function() {
  	$("#adminTable").on("page-change.bs.table", function() {
     	if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
  	}).on("sort.bs.table", function(e, name, order) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
+    	setTimeout(function() { AT.setTablePreference({{user.id}}, AT.tableIdentifier, name, order); }, 10);
  	}).on("column-search.bs.table", function(e, name, text) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
 	}).on("column-switch.bs.table", function(e, field, checked) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
 	});
 
- 	/*
-	* add placeholder text for filter controls
-	*/
-	(function() {
-     function addFilterPlaceHolders() {
-       $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
-       $("#adminTable .filterControl select option[value='']").text("Select");
-     }
-     $("#adminTable").on("reset-view.bs.table", function() {
-        addFilterPlaceHolders();
-     });
-     addFilterPlaceHolders();
-	})();
-
-  /*
-   * fade loading spinner on page load
-   */
-  DELAY_LOADING = true;
-  setTimeout(function() { AT.fadeLoader(); }, 150);
-
-  /*
-   *  hide checkbox for hidden id field from side menu
-   */
-  $("input[data-field='id']:checkbox").hide();
-
-
-  AT.initOrgsList(false, 'patients');
-  AT.setColumnSelections();
-  AT.rowLinkEvent();
+  AT.init(function() {
+    /*
+     *  hide checkbox for hidden id field from side menu
+     */
+    $("input[data-field='id']:checkbox").hide();
+    AT.rowLinkEvent();
+    AT.setColumnSelections();
+    AT.initOrgsList(false, "patients");
+  });
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
     $("#patientReportLoader").html( __getLoaderHTML());
