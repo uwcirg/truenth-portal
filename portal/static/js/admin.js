@@ -5,28 +5,21 @@
    */
   DELAY_LOADING = true;
 
-  function hasValue(val) {return val != null && val != "" && val != "undefined";};
+  function hasValue(val) {return val !== null && val !== "" && val !== "undefined";}
   function showMain() {
-      $("#mainHolder").css({
-                            "visibility" : "visible",
-                            "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
-                            "filter": "alpha(opacity=100)",
-                            "-moz-opacity": 1,
-                            "-khtml-opacity": 1,
-                            "opacity": 1
-                          });
+    $("#mainHolder").css({
+                          "visibility" : "visible",
+                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
+                          "filter": "alpha(opacity=100)",
+                          "-moz-opacity": 1,
+                          "-khtml-opacity": 1,
+                          "opacity": 1
+                        });
 
   }
   // Loading indicator that appears in UI on page loads and when saving
-  var loader = function(show) {
-      if (show) {
-          $("#loadingIndicator").show();
-      } else {
-          if (!DELAY_LOADING) {
-              setTimeout(showMain, 100);
-              setTimeout(function() { $("#loadingIndicator").fadeOut();}, 200);
-          };
-      };
+  function showLoader() {
+    $("#loadingIndicator").show();
   };
 
   function __setOrgsMenuHeight(padding) {
@@ -46,7 +39,7 @@
     $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
   };
 
-  function AdminTool (userId, identifier) {
+  function AdminTool (userId, identifier, dependencies) {
     this.requestsCounter = 0;
     this.userId = userId;
     this.userOrgs = [];
@@ -55,6 +48,7 @@
     this.arrData = {};
     this.patientsIdList = [];
     this.tableIdentifier = identifier || "patientList";
+    this.dependencies = dependencies || {};
     OrgTool.call(this);
   };
 
@@ -68,6 +62,16 @@
     if (callback) {
       callback();
     };
+  };
+  AdminTool.prototype.getDependency = function(key) {
+    if (key && this.dependencies.hasOwnProperty(key)) {
+      return this.dependencies[key];
+    } else {
+      /*
+       * throw error ? should be visible in console
+       */
+      throw Error("Dependency " + key + " not found.")
+    }
   };
   AdminTool.prototype.fadeLoader = function() {
     DELAY_LOADING = false;
@@ -122,6 +126,8 @@
       if (!hasValue(userString)) {
           return false;
       };
+
+      var tnthDates = self.getDependency("tnthDates");
       /*
        *  load the data sequentially
        *  Note, NO concurrent ajax calls here,
@@ -243,7 +249,7 @@
               if (callback) {
                 setTimeout(function() { callback();}, 100);
                 if (showLoader) {
-                  loader(true);
+                  showLoader();
                 };
               };
             };
@@ -304,14 +310,14 @@
     return this.userOrgs;
   };
   AdminTool.prototype.initOrgsList = function(request_org_list, context) {
-      //set user orgs
+     
       var self = this;
-      self.setUserOrgs();
-
       //check if the location contains filtered orgs list
       var iterated = /org_list/.test(location.href);
-
       var noPatientData = $("#admin-table-body").find("tr.no-records-found").length > 0;
+      var i18next = self.getDependency("i18next");
+      //set user orgs
+      self.setUserOrgs();
 
       $.ajax ({
           type: "GET",
@@ -330,8 +336,8 @@
            * filter orgs UI based on user's orgs
            */
           if (!noPatientData) {
-              var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
-  	          self.filterOrgs(hbOrgs);
+            var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
+            self.filterOrgs(hbOrgs);
           };
 
           /*
@@ -348,7 +354,7 @@
           if (ofields.length > 0) {
             /* attach orgs related events to UI components */
             ofields.each(function() {
-              if ((self.getHereBelowOrgs(self.getUserOrgs())).length == 1 ||
+              if ((self.getHereBelowOrgs(self.getUserOrgs())).length === 1 ||
                   (iterated && request_org_list && request_org_list[$(this).val()])) {
                   $(this).prop("checked", true);
               } else if (self.currentTablePreference) {
@@ -358,7 +364,9 @@
                  if (fa) {
                    var oself = $(this), val = oself.val();
                    fa.forEach(function(item) {
-                      if (item == val) oself.prop("checked", true);
+                      if (item === val) {
+                        oself.prop("checked", true);
+                      };
                    });
                   };
                };
@@ -367,7 +375,7 @@
             $(this).on("click touchstart", function(e) {
                 e.stopPropagation();
                 if ($(this).is(":checked")) {
-                  var childOrgs = AT.getHereBelowOrgs([$(this).val()]);
+                  var childOrgs = self.getHereBelowOrgs([$(this).val()]);
                   if (childOrgs && childOrgs.length > 0) {
                     childOrgs.forEach(function(org) {
                       $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
@@ -375,8 +383,8 @@
                   };
                 };
                 $("#orglist-footer-container input[type='checkbox']").prop("checked", false);
-                AT.setTablePreference(AT.userId, AT.tableIdentifier);
-                setTimeout(function() { loader(true); location.reload(); }, 150);
+                self.setTablePreference(self.userId, self.tableIdentifier);
+                setTimeout(function() { showLoader(); location.reload(); }, 150);
               });
             });
 
@@ -394,18 +402,18 @@
                 /*
                  * pre-set user preference for filtering
                  */
-                AT.setTablePreference(AT.userId, AT.tableIdentifier);
+                self.setTablePreference(self.userId, self.tableIdentifier);
                 if (orgsList.length > 0) {
-                  setTimeout(function() { loader(true); location.reload(); }, 150);
+                  setTimeout(function() { showLoader(); location.reload(); }, 150);
                 };
             });
             $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
                 e.stopPropagation();
-                AT.clearOrgsSelection();
+                self.clearOrgsSelection();
                 $("#orglist-selectall-ckbox").prop("checked", false);
                 $("#orglist-close-ckbox").prop("checked", false);
-                AT.setTablePreference(AT.userId, AT.tableIdentifier);
-                setTimeout(function() { loader(true); location.reload(); }, 150);
+                self.setTablePreference(self.userId, self.tableIdentifier);
+                setTimeout(function() { showLoader(); location.reload(); }, 150);
             });
             $("#orglist-close-ckbox").on("click touchstart", function(e) {
                 e.stopPropagation();
@@ -415,12 +423,12 @@
                 return false;
             });
           };
-          AT.fadeLoader();
+          self.fadeLoader();
 
       }).fail(function() {
           //console.log("Problem retrieving data from server.");
           $("#org-menu").append("<span class='indent text-danger'>" + i18next.t("Error occurred retrieving data from server.") + "</span>");
-          AT.fadeLoader();
+          self.fadeLoader();
       });
 
       //orglist-dropdown
@@ -430,7 +438,7 @@
   };
 
   AdminTool.prototype.getInstrumentList = function() {
-    var iList;
+    var iList, tnthAjax = this.getDependency("tnthAjax");
     tnthAjax.getInstrumentsList(true, function(data) {
       if (data && !data.error) {
         iList = data;
@@ -441,20 +449,19 @@
 
   AdminTool.prototype.handleDownloadModal = function() {
 
-      var self = this;
+      var self = this, i18next = self.getDependency("i18next");
        /*
         *populate instruments list based on user's parent org
         */
-      $("#dataDownloadModal").on('shown.bs.modal', function () {
+      $("#dataDownloadModal").on("shown.bs.modal", function () {
           var instrumentList = self.getInstrumentList();
           if (instrumentList) {
-            var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
+            var parentOrgList = self.getUserTopLevelParentOrgs(self.getUserOrgs());
             if (parentOrgList && parentOrgList.length > 0) {
                var instrumentItems = [];
                parentOrgList.forEach(function(o) {
-                  var il = instrumentList[o];
-                  if (il) {
-                    il.forEach(function(n) {
+                  if (instrumentList[o]) {
+                    instrumentList[o].forEach(function(n) {
                       instrumentItems.push(n);
                     });
                   };
@@ -468,7 +475,9 @@
                       found = true;
                     };
                   });
-                  if (!found) $(".instrument-container").show();
+                  if (!found) {
+                    $(".instrument-container").show();
+                  };
                };
             };
           };
@@ -481,21 +490,21 @@
         var instruments = "", dataType = "";
         $("input[name='instrument'").each(function() {
             if ($(this).is(":checked")) {
-              instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
+              instruments += (instruments !== "" ? "&": "") + "instrument_id="+$(this).val();
             };
         });
         $("input[name='downloadType']").each(function() {
             if ($(this).is(":checked")) dataType = $(this).val();
         });
-        if (instruments != "" && dataType != "") {
+        if (instruments !== "" && dataType !== "") {
             //alert(instruments)
             $("#_downloadMessage").text("");
             $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
             $("#_downloadLink")[0].click();
         } else {
-            message = (instruments == "" ? i18next.t("Please choose at least one instrument."): "");
-            if (dataType == "") {
-              message += (message != "" ? "<br/>": "") + i18next.t("Please choose one download type.");
+            message = (instruments === "" ? i18next.t("Please choose at least one instrument."): "");
+            if (dataType === "") {
+              message += (message !== "" ? "<br/>": "") + i18next.t("Please choose one download type.");
             };
             $("#_downloadMessage").html(message);
         };
@@ -552,7 +561,8 @@
       var prefData = null,
           self = this,
           uid = userId||self.userId,
-          tableIdentifier = tableName||self.tableIdentifier;
+          tableIdentifier = tableName||self.tableIdentifier,
+          tnthAjax = self.getDependency("tnthAjax");
 
       tnthAjax.getTablePreference(uid, tableIdentifier, {"sync": true}, function(data) {
         if (data && !data.error) {
@@ -588,7 +598,7 @@
   };
 
   AdminTool.prototype.setTableFilters = function(userId) {
-      var prefData = null;
+      var prefData = null, tnthAjax = this.getDependency("tnthAjax");
       if (this.currentTablePreference) {
         prefData = this.currentTablePreference;
       } else {
@@ -606,13 +616,14 @@
             /*
              * note this is based on the trigger event for filtering specify in the plugin
              */
-            if ($(fname).length > 0) $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") == "text" ? "keyup": "change");
+            if ($(fname).length > 0) $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") === "text" ? "keyup": "change");
           };
         };
       };
   };
 
   AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder, filters) {
+    var tnthAjax = this.getDependency("tnthAjax");
     tableName = tableName || this.tableIdentifier;
 
     if (hasValue(tableName)) {
@@ -641,11 +652,11 @@
       var __filters = filters || {};
 
       //get fields
-      if (Object.keys(__filters).length == 0) {
+      if (Object.keys(__filters).length === 0) {
         $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
         	if (hasValue($(this).val())) {
         		var field = $(this).closest("th").attr("data-field");
-        		__filters[field] = $(this).get(0).nodeName.toLowerCase() == "select" ? $(this).find("option:selected").text(): $(this).val();
+        		__filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text(): $(this).val();
         	};
         });
       };
@@ -681,6 +692,9 @@
 
     $("#patientReportModal").modal("show");
     $("#patientReportLoader").removeClass("tnth-hide");
+
+    var self = this;
+    var tnthDates = self.getDependency("tnthDates"), tnthAjax = self.getDependency("tnthAjax"), i18next = self.getDependency("i18next");
 
     tnthAjax.patientReport(patientId, function(data) {
         if (data) {
@@ -735,7 +749,7 @@
   AdminTool.prototype.rowLinkEvent = function () {
     $("#admin-table-body.data-link").delegate("tr", "click", function(e) {
         if (e.target && (e.target.tagName.toLowerCase() != "td")) {
-          if (e.target.tagName.toLowerCase() == "a" && e.target.click) {
+          if (e.target.tagName.toLowerCase() === "a" && e.target.click) {
             return;
           };
         };

@@ -134,7 +134,11 @@ var org_list = {};
       org_list["{{org}}"] = true;
   {% endfor %}
 {% endif %}
-var AT = new window.portal.AdminTool({{user.id}}, "adminList");
+var AT = new window.portal.AdminTool({{user.id}}, "adminList", {
+  "tnthAjax": tnthAjax,
+  "i18next": i18next,
+  "tnthDates": tnthDates
+});
 $(document).ready(function() {
   AT.getTablePreference({{user.id}}, AT.tableIdentifier);
   AT.initOrgsList(org_list, 'admin');

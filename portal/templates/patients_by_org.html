@@ -131,7 +131,11 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-var AT = new window.portal.AdminTool({{user.id}}, "patientList");
+var AT = new window.portal.AdminTool({{user.id}}, "patientList", {
+  "tnthAjax": tnthAjax,
+  "i18next": i18next,
+  "tnthDates": tnthDates
+});
 var sortObj = AT.getTablePreference({{user.id}});
 /*
 * initializing bootstrapTable
