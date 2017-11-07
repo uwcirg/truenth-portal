@@ -19,7 +19,7 @@ from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
 from .role import Role, ROLE
-from ..system_uri import SHORTNAME_ID
+from ..system_uri import SHORTNAME_ID, TRUENTH_RP_EXTENSION
 from .telecom import ContactPoint, Telecom
 
 
@@ -366,8 +366,7 @@ class ResearchProtocolExtension(CCExtension):
     def __init__(self, organization, extension):
         self.organization, self.extension = organization, extension
 
-    extension_url =\
-        "XYZ"
+    extension_url = TRUENTH_RP_EXTENSION
 
     def as_fhir(self):
         rp = self.organization.research_protocol
