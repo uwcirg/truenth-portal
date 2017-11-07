@@ -5,6 +5,10 @@
    */
   DELAY_LOADING = true;
 
+  $.ajaxSetup({
+    contentType: "application/json; charset=utf-8"
+  });
+
   function hasValue(val) {return val !== null && val !== "" && val !== "undefined";}
   function showMain() {
     $("#mainHolder").css({
@@ -136,7 +140,6 @@
       var ajaxRequest = $.ajax ({
                                 type: "GET",
                                 url: "/api/consent-assessment-status",
-                                contentType: "application/json; charset=utf-8",
                                 data: userString,
                                 cache: false,
                                 timeout: 5000,
@@ -624,7 +627,9 @@
             /*
              * note this is based on the trigger event for filtering specify in the plugin
              */
-            if ($(fname).length > 0) $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") === "text" ? "keyup": "change");
+            if ($(fname).length > 0) {
+              $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") === "text" ? "keyup": "change");
+            };
           };
         };
       };
@@ -633,39 +638,41 @@
   AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, sortOrder, filters) {
     var tnthAjax = this.getDependency("tnthAjax");
     tableName = tableName || this.tableIdentifier;
-
     if (hasValue(tableName)) {
       var data = {};
       if (hasValue(sortField) && hasValue(sortOrder)) {
         data["sort_field"] = sortField;
         data["sort_order"] = sortOrder;
       } else {
-      	//get selected sorted field information on UI
-      	var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
-      	if (sortedField.length > 0) {
-      		data["sort_field"] = sortedField.attr("data-field");
-      		var sortedOrder = "desc";
-      		sortedField.find(".sortable").each(function() {
-      			if ($(this).hasClass("desc")) sortedOrder = "desc";
-      			else if ($(this).hasClass("asc")) sortedOrder = "asc";
-      		});
-      		data["sort_order"] = sortedOrder;
-      	} else {
-  	    	//It is possible the table is not sorted yet so get the default
-  	    	var defaultPref = this.getDefaultTablePreference();
-  	    	data["sort_field"] = defaultPref.sort_field;
-  	    	data["sort_order"] = defaultPref.sort_order;
-  	    };
+        //get selected sorted field information on UI
+        var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
+        if (sortedField.length > 0) {
+          data["sort_field"] = sortedField.attr("data-field");
+          var sortedOrder = "desc";
+          sortedField.find(".sortable").each(function() {
+            if ($(this).hasClass("desc")) {
+              sortedOrder = "desc";
+            } else if ($(this).hasClass("asc")) {
+              sortedOrder = "asc";
+            };
+          });
+          data["sort_order"] = sortedOrder;
+        } else {
+          //It is possible the table is not sorted yet so get the default
+          var defaultPref = this.getDefaultTablePreference();
+          data["sort_field"] = defaultPref.sort_field;
+          data["sort_order"] = defaultPref.sort_order;
+        };
       }
       var __filters = filters || {};
 
       //get fields
       if (Object.keys(__filters).length === 0) {
         $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
-        	if (hasValue($(this).val())) {
-        		var field = $(this).closest("th").attr("data-field");
-        		__filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text(): $(this).val();
-        	};
+          if (hasValue($(this).val())) {
+            var field = $(this).closest("th").attr("data-field");
+            __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text(): $(this).val();
+          };
         });
       };
       /*
@@ -675,8 +682,11 @@
       $("#userOrgs input[name='organization']:checked").each(function() {
         selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
       });
-      if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
-      else __filters["orgs_filter_control"] = "";
+      if (hasValue(selectedOrgs)) {
+        __filters["orgs_filter_control"] = selectedOrgs;
+      } else {
+        __filters["orgs_filter_control"] = "";
+      };
 
       /*
        * get column selections
@@ -716,7 +726,11 @@
                    return new Date(b.uploaded_at) - new Date(a.uploaded_at);
                 });
                 var content = "<table class='table-bordered table-condensed table-responsive tnth-table'>";
-                content += "<TH>" + i18next.t("Type") + "<TH>"+ i18next.t("Report Name") + "</TH><TH>" + i18next.t("Generated (GMT)") + "</TH><TH>" + i18next.t("Downloaded") + "</TH>";
+                content += "<TH>%type</TH><TH>%report</TH><TH>%datetime</TH><TH>%downloaded</TH>"
+                          .replace("%type", i18next.t("Type"))
+                          .replace("%report", i18next.t("Report Name"))
+                          .replace("%datetime", i18next.t("Generated (GMT)"))
+                          .replace("%downloaded", i18next.t("Downloaded"));
                 documents.forEach(function(item) {
 
                     var c = item["contributor"];
