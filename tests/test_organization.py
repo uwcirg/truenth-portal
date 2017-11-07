@@ -339,7 +339,7 @@ class TestOrganization(TestCase):
         org = Organization.query.filter_by(name='Gastroenterology').one()
         self.assertEquals(2, org.identifiers.count())
 
-    def test_shorname(self):
+    def test_shortname(self):
         shorty = Identifier(system=SHORTNAME_ID, value='shorty')
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()

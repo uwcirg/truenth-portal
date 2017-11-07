@@ -173,9 +173,11 @@ class Organization(db.Model):
     @property
     def shortname(self):
         """Return shortname identifier if found, else the org name"""
-        shortnames = [id for id in self.identifiers if id.system == SHORTNAME_ID]
+        shortnames = [
+            id for id in self.identifiers if id.system == SHORTNAME_ID]
         if len(shortnames) > 1:
-            raise ValueError("multiple shortname identifiers found for {}".format(self))
+            raise ValueError(
+                "multiple shortname identifiers found for {}".format(self))
         return shortnames[0].value if shortnames else self.name
 
     @property
