@@ -500,6 +500,11 @@ AdminTool.prototype.clearOrgsSelection = function() {
       $(this).prop("checked", false);
   });
 };
+/*
+ * client side filtering of table rows by orgs
+ * NOT Recommended for use on large tables
+ * performance presents an issue
+ */
 AdminTool.prototype.filterTableByOrgs = function() {
   var d = this.tableData || $('#adminTable').bootstrapTable("getData");
   var checkedOrgs = $("#userOrgs input[name='organization']:checked");
