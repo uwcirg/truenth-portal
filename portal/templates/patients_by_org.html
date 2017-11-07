@@ -173,6 +173,7 @@ $(document).ready(function() {
     AT.rowLinkEvent();
     AT.setColumnSelections();
     AT.initOrgsList(false, "patients");
+    setTimeout(function() { AT.fadeLoader(); }, 2500);
   });
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}

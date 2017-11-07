@@ -43,8 +43,8 @@ AdminTool.prototype.init = function(callback) {
 };
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
-  setTimeout(function() { showMain(); }, 150);
-  setTimeout(function() { $("#loadingIndicator").fadeOut(); }, 200);
+  setTimeout(function() { showMain(); }, 250);
+  setTimeout(function() { $("#loadingIndicator").fadeOut(); }, 300);
 };
 AdminTool.prototype.setLoadingMessageVis = function(vis) {
   switch(vis) {
