@@ -19,6 +19,7 @@ from models.intervention_strategies import AccessStrategy
 from models.organization import Organization
 from models.questionnaire import Questionnaire
 from models.questionnaire_bank import QuestionnaireBank
+from models.research_protocol import ResearchProtocol
 from models.scheduled_job import ScheduledJob
 
 
@@ -160,6 +161,10 @@ class SitePersistence(object):
         for job in ScheduledJob.query.all():
             d['entry'].append(job.as_json())
 
+        # Add ResearchProtocols
+        for rp in ResearchProtocol.query.all():
+            d['entry'].append(rp.as_json())
+
         # Add site.cfg
         config_data = read_site_cfg()
         d['entry'].append(config_data)
@@ -294,7 +299,26 @@ class SitePersistence(object):
                 db.session.add(cr)
             return db.session.merge(cr)
 
-        # Orgs first:
+        # ResearchProtocols before Orgs (Orgs point to RPs)
+        rps_seen = []
+        for rp_json in objs_by_type['ResearchProtocol']:
+            rp = ResearchProtocol.from_json(rp_json)
+            db.session.add(rp)
+            rps_seen.append(rp['name'])
+        db.session.commit()
+
+         # Delete any ResearchProtocols not named
+        if not keep_unmentioned:
+            query = ResearchProtocol.query.filter(
+                ~ResearchProtocol.id.in_(orgs_seen)) if rps_seen else []
+            for rp in query:
+                current_app.logger.info(
+                    "Deleting ResearchProtocol not mentioned in "
+                    "site_persistence: {}".format(rp.name))
+            if query:
+                query.delete(synchronize_session=False)
+
+        # Orgs before all else:
         max_org_id = 0
         orgs_seen = []
         for o in objs_by_type['Organization']:
