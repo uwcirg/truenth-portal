@@ -310,7 +310,7 @@ class SitePersistence(object):
          # Delete any ResearchProtocols not named
         if not keep_unmentioned:
             query = ResearchProtocol.query.filter(
-                ~ResearchProtocol.id.in_(orgs_seen)) if rps_seen else []
+                ~ResearchProtocol.name.in_(rps_seen)) if rps_seen else []
             for rp in query:
                 current_app.logger.info(
                     "Deleting ResearchProtocol not mentioned in "

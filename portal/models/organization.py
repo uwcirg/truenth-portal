@@ -4,7 +4,7 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
-from flask import current_app, url_for
+from flask import current_app, url_for, abort
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.exceptions import Unauthorized
@@ -379,10 +379,10 @@ class ResearchProtocolExtension(CCExtension):
             raise ValueError('invalid url for ResearchProtocolExtension')
         if 'research_protocol' not in self.extension:
             abort(400, "Extension missing 'research_protocol' field")
-        name = self.extension['name']
+        name = self.extension['research_protocol']
         rp = ResearchProtocol.query.filter_by(name=name).first()
         if not rp:
-            abort(404, "ResearchProtocol name {} not found".format(name))
+            abort(404, "ResearchProtocol with name {} not found".format(name))
         self.organization.research_protocol_id = rp.id
 
     @property
