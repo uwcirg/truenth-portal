@@ -17,6 +17,7 @@ from ..date_tools import FHIR_datetime
 from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
+from .research_protocol import ResearchProtocol
 from .role import Role, ROLE
 from ..system_uri import SHORTNAME_ID
 from .telecom import ContactPoint, Telecom
@@ -50,6 +51,8 @@ class Organization(db.Model):
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
     coding_options = db.Column(db.Integer, nullable=False, default=0)
     default_locale_id = db.Column(db.ForeignKey('codings.id'))
+    _timezone = db.Column('timezone', db.String(20))
+    research_protocol_id = db.Column(db.ForeignKey('research_protocols.id'))
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
@@ -60,7 +63,7 @@ class Organization(db.Model):
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
             cascade="save-update")
     type = db.relationship('CodeableConcept', cascade="save-update")
-    _timezone = db.Column('timezone', db.String(20))
+    research_protocol = db.relationship('ResearchProtocol')
 
     def __init__(self, **kwargs):
         self.coding_options = 14
@@ -359,7 +362,37 @@ class LocaleExtension(CCExtension):
         return self.organization.locales
 
 
-org_extension_classes = (LocaleExtension, TimezoneExtension)
+class ResearchProtocolExtension(CCExtension):
+    def __init__(self, organization, extension):
+        self.organization, self.extension = organization, extension
+
+    extension_url =\
+        "XYZ"
+
+    def as_fhir(self):
+        rp = self.organization.research_protocol
+        if rp:
+            return {'url': self.extension_url,
+                    'research_protocol': rp.name}
+
+    def apply_fhir(self):
+        if self.extension['url'] != self.extension_url:
+            raise ValueError('invalid url for ResearchProtocolExtension')
+        if 'research_protocol' not in self.extension:
+            abort(400, "Extension missing 'research_protocol' field")
+        name = self.extension['name']
+        rp = ResearchProtocol.query.filter_by(name=name).first()
+        if not rp:
+            abort(404, "ResearchProtocol name {} not found".format(name))
+        self.organization.research_protocol_id = rp.id
+
+    @property
+    def children(self):
+        raise NotImplementedError
+
+
+org_extension_classes = (LocaleExtension, TimezoneExtension,
+                         ResearchProtocolExtension)
 
 
 def org_extension_map(organization, extension):
