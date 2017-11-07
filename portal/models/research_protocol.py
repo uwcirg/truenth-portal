@@ -16,7 +16,6 @@ class ResearchProtocol(db.Model):
 
     @classmethod
     def from_json(cls, data):
-        instance = cls()
         if 'name' not in data:
             raise ValueError("missing required name field")
         rp = ResearchProtocol.query.filter(name=data['name']).first()
@@ -28,6 +27,7 @@ class ResearchProtocol(db.Model):
     def as_json(self):
         d = {}
         d['id'] = self.id
+        d['resourceType'] = 'ResearchProtocol'
         d['name'] = self.name
         d['created_at'] = self.created_at
         return d
