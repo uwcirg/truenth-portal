@@ -28,7 +28,7 @@ AdminTool.prototype.init = function(callback) {
   */
   (function() {
      function addFilterPlaceHolders() {
-       $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
+       $("#adminTable .filterControl input").attr("placeholder", i18next.t("Enter Text"));
        $("#adminTable .filterControl select option[value='']").text("Select");
      }
      $("#adminTable").on("reset-view.bs.table", function() {
