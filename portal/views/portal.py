@@ -985,7 +985,7 @@ def stock_consent(org_name):
             <head>
             </head>
             <body>
-                <p>I consent to sharing information with the {{ org_name }}</p>
+                <p>I consent to sharing information with {{ org_name }}</p>
             </body>
         </html>""",
         org_name=org_name)

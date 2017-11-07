@@ -4,7 +4,7 @@ import json
 import os
 
 from portal.extensions import db
-from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
+from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS, SHORTNAME_ID
 from portal.models.fhir import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
@@ -338,6 +338,20 @@ class TestOrganization(TestCase):
         # obtain the org from the db, check the identifiers
         org = Organization.query.filter_by(name='Gastroenterology').one()
         self.assertEquals(2, org.identifiers.count())
+
+    def test_shortname(self):
+        shorty = Identifier(system=SHORTNAME_ID, value='shorty')
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        # prior to adding shortname, should just get org name
+        self.assertEquals(org.name, org.shortname)
+
+        org.identifiers.append(shorty)
+        with SessionScope(db):
+            db.session.commit()
+        org = db.session.merge(org)
+        # after, should get the shortname
+        self.assertEquals(org.shortname, 'shorty')
 
     def test_org_tree_nodes(self):
         self.shallow_org_tree()
