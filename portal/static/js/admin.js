@@ -70,7 +70,7 @@
       /*
        * throw error ? should be visible in console
        */
-      throw Error("Dependency " + key + " not found.")
+      throw Error("Dependency " + key + " not found.");
     }
   };
   AdminTool.prototype.fadeLoader = function() {
@@ -309,7 +309,7 @@
     };
     return this.userOrgs;
   };
-  AdminTool.prototype.initOrgsList = function(request_org_list, context) {
+  AdminTool.prototype.initOrgsList = function(requestOrgList, context) {
      
       var self = this;
       //check if the location contains filtered orgs list
@@ -355,7 +355,7 @@
             /* attach orgs related events to UI components */
             ofields.each(function() {
               if ((self.getHereBelowOrgs(self.getUserOrgs())).length === 1 ||
-                  (iterated && request_org_list && request_org_list[$(this).val()])) {
+                  (iterated && requestOrgList && requestOrgList[$(this).val()])) {
                   $(this).prop("checked", true);
               } else if (self.currentTablePreference) {
                if (self.currentTablePreference.filters) {
@@ -494,7 +494,9 @@
             };
         });
         $("input[name='downloadType']").each(function() {
-            if ($(this).is(":checked")) dataType = $(this).val();
+            if ($(this).is(":checked")) {
+              dataType = $(this).val();
+            };
         });
         if (instruments !== "" && dataType !== "") {
             //alert(instruments)
@@ -502,7 +504,7 @@
             $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
             $("#_downloadLink")[0].click();
         } else {
-            message = (instruments === "" ? i18next.t("Please choose at least one instrument."): "");
+            var message = (instruments === "" ? i18next.t("Please choose at least one instrument."): "");
             if (dataType === "") {
               message += (message !== "" ? "<br/>": "") + i18next.t("Please choose one download type.");
             };
@@ -514,7 +516,9 @@
        * attach event to each checkbox in the download instruments modal
        */
       $("input[name='instrument'], input[name='downloadType']").on("click", function() {
-          if ($(this).is(":checked")) $("#_downloadMessage").text("");
+          if ($(this).is(":checked")) {
+            $("#_downloadMessage").text("");
+          };
       });
   };
   AdminTool.prototype.clearOrgsSelection = function() {
@@ -528,14 +532,14 @@
    * performance presents an issue
    */
   AdminTool.prototype.filterTableByOrgs = function() {
-    var d = this.tableData || $('#adminTable').bootstrapTable("getData");
+    var d = this.tableData || $("#adminTable").bootstrapTable("getData");
     var checkedOrgs = $("#userOrgs input[name='organization']:checked");
     if (checkedOrgs.length > 0) {
       var d2 = $.grep(d, function(item,i) {
         var found = false;
         checkedOrgs.each(function() {
           if (!found) {
-              var r = new RegExp($(this).val());
+              var r = new RegExp($(this).val() + "");
               //console.log("val, item, found ", $(this).val(), item.organization, r.test(item.organization))
               if (r.test(item.organization)) {
                 found = true;
@@ -552,7 +556,7 @@
     };
   };
   AdminTool.prototype.getDefaultTablePreference = function() {
-  	return {sort_field: "id",sort_order: "desc"};
+    return {sort_field: "id",sort_order: "desc"};
   };
   AdminTool.prototype.getTablePreference = function(userId, tableName, setFilter, setColumnSelections) {
       if (this.currentTablePreference) {
@@ -570,9 +574,13 @@
           self.currentTablePreference = prefData;
         };
         //set filter values
-        if (setFilter) self.setTableFilters(uid);
+        if (setFilter) {
+          self.setTableFilters(uid);
+        };
         //set column selection(s)
-        if (setColumnSelections) self.setColumnSelections();
+        if (setColumnSelections) {
+          self.setColumnSelections();
+        };
       });
       return prefData;
   };
@@ -585,7 +593,7 @@
          * hide visible columns
          */
         visibleColumns.forEach(function(c) {
-          $("#adminTable").bootstrapTable("hideColumn", c.field)
+          $("#adminTable").bootstrapTable("hideColumn", c.field);
         });
         /*
          * show column(s) based on preference
