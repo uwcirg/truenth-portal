@@ -18,6 +18,7 @@ from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
+from ..system_uri import SHORTNAME_ID
 from .telecom import ContactPoint, Telecom
 
 
@@ -170,6 +171,14 @@ class Organization(db.Model):
             self.default_locale_id = coding.id
 
     @property
+    def shortname(self):
+        """Return shortname identifier if found, else the org name"""
+        shortnames = [id for id in self.identifiers if id.system == SHORTNAME_ID]
+        if len(shortnames) > 1:
+            raise ValueError("multiple shortname identifiers found for {}".format(self))
+        return shortnames[0].value if shortnames else self.name
+
+    @property
     def timezone(self):
         org = self
         if org._timezone:
@@ -318,7 +327,7 @@ class Organization(db.Model):
                 # the dummy template
                 url = url_for('portal.stock_consent', org_name=org.name,
                               _external=True)
-                asset = stock_consent(org_name=org.name)
+                asset = stock_consent(org_name=org.shortname)
                 resource = UnversionedResource(url=url, asset=asset)
 
             resource.organization_name = org.name
