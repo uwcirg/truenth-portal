@@ -63,7 +63,6 @@ class Organization(db.Model):
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
             cascade="save-update")
     type = db.relationship('CodeableConcept', cascade="save-update")
-    research_protocol = db.relationship('ResearchProtocol')
 
     def __init__(self, **kwargs):
         self.coding_options = 14
@@ -198,6 +197,16 @@ class Organization(db.Model):
     @timezone.setter
     def timezone(self, value):
         self._timezone = value
+
+    @property
+    def research_protocol(self):
+        org = self
+        if org.research_protocol_id:
+            return ResearchProtocol.query.get(org.research_protocol_id)
+        while org.partOf_id:
+            org = Organization.query.get(org.partOf_id)
+            if org.research_protocol_id:
+                return ResearchProtocol.query.get(org.research_protocol_id)
 
     @classmethod
     def from_fhir(cls, data):
