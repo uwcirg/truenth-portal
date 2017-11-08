@@ -5,8 +5,35 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-10-18T21:58:05.108Z\n"
-"PO-Revision-Date: 2017-10-18T21:58:05.108Z\n"
+"POT-Creation-Date: 2017-11-08T19:53:32.557Z\n"
+"PO-Revision-Date: 2017-11-08T19:53:32.557Z\n"
+
+msgid "Server error occurred updating data."
+msgstr ""
+
+msgid "Invalid user id: %d"
+msgstr ""
+
+msgid " Account created.  Redirecting to profile..."
+msgstr ""
+
+msgid "[Processing error] "
+msgstr ""
+
+msgid "Email is already in use."
+msgstr ""
+
+msgid "An organization must be selected."
+msgstr ""
+
+msgid "no data returned"
+msgstr ""
+
+msgid "Error occurred retrieving clinics data."
+msgstr ""
+
+msgid "No clinics data available."
+msgstr ""
 
 msgid "Select All"
 msgstr ""
@@ -24,6 +51,36 @@ msgid "Please choose at least one instrument."
 msgstr ""
 
 msgid "Please choose one download type."
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Report Name"
+msgstr ""
+
+msgid "Generated (GMT)"
+msgstr ""
+
+msgid "Downloaded"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "View All"
+msgstr ""
+
+msgid "Patient Reports"
+msgstr ""
+
+msgid "Patient Report"
+msgstr ""
+
+msgid "No report data found."
+msgstr ""
+
+msgid "Error occurred retrieving patient report"
 msgstr ""
 
 msgid "Error retrieving demographics information for user."
@@ -62,7 +119,22 @@ msgstr ""
 msgid "Regiatration Date"
 msgstr ""
 
+msgid "Consent Date"
+msgstr ""
+
 msgid "GMT"
+msgstr ""
+
+msgid "Last Updated"
+msgstr ""
+
+msgid "( GMT, Y-M-D )"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "User"
 msgstr ""
 
 msgid "Consented"
@@ -86,9 +158,6 @@ msgstr ""
 msgid "expired"
 msgstr ""
 
-msgid "modified on"
-msgstr ""
-
 msgid "Consent Status Editor"
 msgstr ""
 
@@ -108,9 +177,6 @@ msgid "for this agreement to:"
 msgstr ""
 
 msgid "Submit"
-msgstr ""
-
-msgid "Agreed to "
 msgstr ""
 
 msgid "Agreed to terms"
@@ -182,13 +248,22 @@ msgstr ""
 msgid "staff member"
 msgstr ""
 
-msgid "data entered by "
+msgid "(date entered by %actor on %date)"
 msgstr ""
 
-msgid " on "
+msgid "Added!"
 msgstr ""
 
-msgid "Added"
+msgid "Date (GMT), Y-M-D"
+msgstr ""
+
+msgid "Subject"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "No audit entry found."
 msgstr ""
 
 msgid "Consent to share information"
@@ -200,13 +275,7 @@ msgstr ""
 msgid "Cannot ununcheck.  A staff member must be associated with an organization"
 msgstr ""
 
-msgid "Not provided"
-msgstr ""
-
 msgid "unable to get needed core data"
-msgstr ""
-
-msgid "no data returned"
 msgstr ""
 
 msgid "unable to get required core data"
@@ -317,7 +386,19 @@ msgstr ""
 msgid "Error occurred retrieving patient report."
 msgstr ""
 
+msgid "Error occurred setting table preference."
+msgstr ""
+
+msgid "Error occurred retrieving email audit entries."
+msgstr ""
+
 msgid "Error occurred retrieving audit log."
+msgstr ""
+
+msgid "configuration key is required."
+msgstr ""
+
+msgid "Error occurred retrieving content for configuration key."
 msgstr ""
 
 msgid "not provided"
@@ -362,4 +443,7 @@ msgid ""
 msgstr ""
 
 msgid "Error occurred when converting timezone: "
+msgstr ""
+
+msgid "REMOVE"
 msgstr ""
