@@ -1881,7 +1881,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
 };
 OrgTool.prototype.populateUI = function() {
     var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
-    var getState = function(item) {
+    function getState(item) {
 		var s = "", found = false;
         if (item.identifier) {
         	(item.identifier).forEach(function(i) {
