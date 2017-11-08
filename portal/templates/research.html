@@ -59,7 +59,11 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-var AT = new AdminTool({{user.id if user}});
+var AT = new window.portal.AdminTool({{user.id if user}}, "researchList", {
+  "tnthAjax": tnthAjax,
+  "i18next": i18next,
+  "tnthDates": tnthDates
+});
 $(document).ready(function() {
     AT.fadeLoader();
     AT.initOrgsList();

@@ -40,6 +40,7 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
+from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import establish_trace, dump_trace
@@ -429,15 +430,22 @@ def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
 
-    request_org_list = request.args.get('org_list', None)
+    user = current_user()
 
-    if request_org_list:
+    pref_org_list = None
+    # check user table preference for organization filters
+    pref = TablePreference.query.filter_by(table_name='adminList',
+                                           user_id=user.id).first()
+    if pref and pref.filters:
+        pref_org_list = pref.filters.get('orgs_filter_control')
+
+    if pref_org_list:
         org_list = set()
 
         # for selected filtered orgs, we also need to get the children
         # of each, if any
-        request_org_list = set(request_org_list.split(","))
-        for orgId in request_org_list:
+        pref_org_list = set(pref_org_list.split(","))
+        for orgId in pref_org_list:
             check_int(orgId)
             if orgId == 0:  # None of the above doesn't count
                 continue
@@ -455,7 +463,7 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true",
-                           org_list=list(org_list), user=current_user())
+                           org_list=list(org_list), user=user)
 
 
 @portal.route('/staff-profile-create')

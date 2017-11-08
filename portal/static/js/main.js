@@ -66,8 +66,8 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 100);
         if (!DELAY_LOADING) {
+            setTimeout("showMain();", 100);
             setTimeout('$("#loadingIndicator").fadeOut();', 200);
         };
     };
