@@ -10,11 +10,11 @@ from ..date_tools import FHIR_datetime, RelativeDelta
 from .fhir import CC
 from .intervention import Intervention
 from .intervention_strategies import observation_check
-from .organization import OrgTree
 from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
+from .research_protocol import ResearchProtocol
 from ..trace import trace
 
 
@@ -29,11 +29,10 @@ QBD = namedtuple('QBD', ['relative_start', 'iteration',
 class QuestionnaireBank(db.Model):
     __tablename__ = 'questionnaire_banks'
     __table_args__ = (
-        CheckConstraint('NOT(organization_id IS NULL AND '
+        CheckConstraint('NOT(research_protocol_id IS NULL AND '
                         'intervention_id IS NULL) '
-                        'AND NOT(organization_id IS NOT NULL AND '
-                        'intervention_id IS NOT NULL)'),
-        )
+                        'AND NOT(research_protocol_id IS NOT NULL AND '
+                        'intervention_id IS NOT NULL)'),)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
     classification = db.Column(
@@ -64,15 +63,16 @@ class QuestionnaireBank(db.Model):
     recurs = db.relationship(
         Recur, secondary='questionnaire_bank_recurs')
 
-    # QuestionnaireBank is associated with an Organization XOR an Intervention,
+    # QuestionnaireBank is associated with ResearchProtocol XOR Intervention,
     # either of which dictate whether it's given to a User
-    organization_id = db.Column(
-        db.ForeignKey('organizations.id'), nullable=True)
+    research_protocol_id = db.Column(
+        db.ForeignKey('research_protocols.id'), nullable=True)
     intervention_id = db.Column(
         db.ForeignKey('interventions.id'), nullable=True)
 
     communication_requests = db.relationship(
         'CommunicationRequest')
+    research_protocol = db.relationship('ResearchProtocol')
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -88,9 +88,9 @@ class QuestionnaireBank(db.Model):
         self.name = data['name']
         if 'classification' in data:
             self.classification = data['classification']
-        if 'organization' in data:
-            self.organization_id = Reference.parse(
-                data['organization']).id
+        if 'research_protocol' in data:
+            self.research_protocol_id = Reference.parse(
+                data['research_protocol']).id
         if 'intervention' in data:
             self.intervention_id = Reference.parse(
                 data['intervention']).id
@@ -147,9 +147,9 @@ class QuestionnaireBank(db.Model):
         if self.overdue:
             d['overdue'] = self.overdue
         d['classification'] = self.classification
-        if self.organization_id:
-            d['organization'] = Reference.organization(
-                self.organization_id).as_fhir()
+        if self.research_protocol_id:
+            d['research_protocol'] = Reference.research_protocol(
+                self.research_protocol.name).as_fhir()
         if self.intervention_id:
             d['intervention'] = Reference.intervention(
                 self.intervention_id).as_fhir()
@@ -210,25 +210,27 @@ class QuestionnaireBank(db.Model):
     def qbs_for_user(user, classification):
         """Return questionnaire banks applicable to (user, classification)
 
-        QuestionnaireBanks are associated with a user through the top
-        level organization affiliation, or through interventions
+        QuestionnaireBanks are associated with a user through the user's
+        organization's (inherited) research_protocols, or through interventions
 
         :return: matching QuestionnaireBanks if found, else empty list
 
         """
-        users_top_orgs = set()
+        user_rps = set()
         for org in (o for o in user.organizations if o.id):
-            users_top_orgs.add(OrgTree().find(org.id).top_level())
+            rp = o.research_protocol
+            if rp:
+                user_rps.add(rp.id)
 
-        if not users_top_orgs:
+        if not user_rps:
             results = []
         elif classification:
             results = QuestionnaireBank.query.filter(
-                QuestionnaireBank.organization_id.in_(users_top_orgs),
+                QuestionnaireBank.research_protocol_id.in_(user_rps),
                 QuestionnaireBank.classification == classification).all()
         else:
             results = QuestionnaireBank.query.filter(
-                QuestionnaireBank.organization_id.in_(users_top_orgs)).all()
+                QuestionnaireBank.research_protocol_id.in_(user_rps)).all()
 
         # Complicated rules (including strategies and UserIntervention rows)
         # define a user's access to an intervention.  Rely on the
@@ -403,8 +405,8 @@ class QuestionnaireBank(db.Model):
                     tx_date))
             self.__trigger_date = tx_date
             return self.__trigger_date
-        elif self.organization_id:
-            # When linked via organization, use the common
+        elif self.research_protocol_id:
+            # When linked via research protocol, use the common
             # top level consent date as `trigger` date.
             if user.valid_consents and user.valid_consents.count() > 0:
                 self.__trigger_date = user.valid_consents[0].audit.timestamp
@@ -414,16 +416,16 @@ class QuestionnaireBank(db.Model):
                 return self.__trigger_date
             else:
                 trace(
-                    "questionnaire_bank affiliated with org {}, user has "
+                    "questionnaire_bank affiliated with RP {}, user has "
                     "no valid consents, so no trigger_date".format(
-                        self.organization_id))
+                        self.research_protocol))
                 self.__trigger_date = None
                 return self.__trigger_date
         else:
             if not self.intervention_id:
                 raise ValueError(
-                    "Can't compute trigger_date on QuestionnaireBank "
-                    "with neither organization nor intervention associated")
+                    "Can't compute trigger_date on QuestionnaireBank with "
+                    "neither research protocol nor intervention associated")
             self.__trigger_date = user.fetch_datetime_for_concept(
                 CC.BIOPSY)
             if self.__trigger_date:
@@ -501,8 +503,8 @@ class QuestionnaireBankQuestionnaire(db.Model):
             assert self.id
             return self
         existing = QuestionnaireBankQuestionnaire.query.filter_by(
-                    questionnaire_bank_id=self.questionnaire_bank_id,
-                    questionnaire_id=self.questionnaire_id).first()
+            questionnaire_bank_id=self.questionnaire_bank_id,
+            questionnaire_id=self.questionnaire_id).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:
