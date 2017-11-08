@@ -1882,17 +1882,17 @@ OrgTool.prototype.populateOrgsList = function(items) {
 OrgTool.prototype.populateUI = function() {
     var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
-		var s = "", found = false;
-        if (item.identifier) {
+    	var s = "", found = false;
+    	if (item.identifier) {
         	(item.identifier).forEach(function(i) {
         		if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
                 	s = (i.value).split(":")[1];
                 	found = true;
                 };
             });
-        };
-        return s;
-    };
+		};
+		return s;
+	};
 	for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
