@@ -66,14 +66,14 @@ def status_from_recents(recents, start, overdue, expired):
         tmp = {
             'status': 'Due',
             'by_date': overdue if overdue else expired
-           }
+        }
         tmp.update(results)
         return tmp
     if overdue and now < expired:
         tmp = {
             'status': 'Overdue',
             'by_date': expired
-           }
+        }
         tmp.update(results)
         return tmp
     tmp = {'status': 'Expired'}
@@ -196,9 +196,10 @@ class AssessmentStatus(object):
     @property
     def organization(self):
         """Returns the organization associated with users's QB or None"""
-        org_id = self.qb_data.qb.organization_id
-        if org_id:
-            return Organization.query.get(org_id)
+        rp_id = self.qb_data.qb.research_protocol_id
+        for org in self.user.organizations:
+            if org.research_protocol and (org.research_protocol.id == rp_id):
+                return org
         return None
 
     def enrolled_in_classification(self, classification):
