@@ -1955,7 +1955,7 @@ OrgTool.prototype.populateUI = function() {
         };
     };
     if (!hasValue(container.text())) {
-    	container.html("No organizations available");
+    	container.html(i18next.t("No organizations available"));
     };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
