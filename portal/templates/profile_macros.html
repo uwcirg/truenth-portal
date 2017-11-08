@@ -1849,6 +1849,12 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
+        //fix for safari
+        $(window).on("beforeunload", function() {
+            $("#manualEntryButtonsContainer").show();
+            $("#manualEntryLoader").hide();
+            $("#manualEntryModal").modal("hide");
+        });
 
         $(document).delegate("#meSubmit", "click", function(event){
             var method = "";
