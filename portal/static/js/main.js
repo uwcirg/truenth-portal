@@ -56,19 +56,18 @@ function showMain() {
 }
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
-    //landing page
-    if ($("#fullSizeContainer").length > 0) {
-        $("#loadingIndicator").hide();
-        showMain();
-        return false;
-    };
-
-    if (show) {
-        $("#loadingIndicator").show();
-    } else {
-        if (!DELAY_LOADING) {
-            setTimeout("showMain();", 100);
-            setTimeout('$("#loadingIndicator").fadeOut();', 200);
+	//landing page
+	if ($("#fullSizeContainer").length > 0) {
+		$("#loadingIndicator").hide();
+		showMain();
+		return false;
+	};
+	if (show) {
+		$("#loadingIndicator").show();
+	} else {
+    	if (!DELAY_LOADING) {
+        	setTimeout("showMain();", 100);
+        	setTimeout('$("#loadingIndicator").fadeOut();', 200);
         };
     };
 };
@@ -1881,30 +1880,40 @@ OrgTool.prototype.populateOrgsList = function(items) {
     return orgsList;
 };
 OrgTool.prototype.populateUI = function() {
-    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList;
+    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     var getState = function(item) {
-                    var s = "", found = false;
-                    if (item.identifier) {
-                        (item.identifier).forEach(function(i) {
-                            if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
-                                s = (i.value).split(":")[1];
+                	var s = "", found = false;
+                	if (item.identifier) {
+                    	(item.identifier).forEach(function(i) {
+                    		if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                        		s = (i.value).split(":")[1];
                                 found = true;
                             };
                         });
                     };
                     return s;
                 };
-    for (org in orgsList) {
+	for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                    container.append("<legend orgId='" + org + "'>"+ i18next.t(orgsList[org].name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                	parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>"
+                					+ "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' />";
+                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                	container.append(parentContent);
                     parentOrgsCt++;
                 };
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
-                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t(orgsList[org].name) + '</label>');
+                	parentContent = "<label id='org-label-{{orgId}}' class='org-label'>"
+                					+ "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
+                					+ "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label>";
+                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                	container.append(parentContent);
                 };
             };
         };
@@ -1916,37 +1925,38 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
-                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
-
-                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
-
-                childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
-
-                if (orgsList[item.id].children.length > 0) {
-                    childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
-                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t(item.name) +
-                    '</label>';
-
-                 } else {
-                    childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
-                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t(item.name) +
-                    '</label>';
+        
+                if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
+                	return true;
                 };
+            
+                childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container'>"
+          					+ "<label id='org-label-{{itemId}}' class='org-label {{classes}}'>"
+                			+ "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
+                			+ "<span>{{itemName}}</span>"
+                			+ "</label>";
+                			+ "</div>";
+                childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
+                						.replace(/\{\{itemName\}\}/g, item.name)
+                						.replace(/\{\{state\}\}/g, hasValue(state)?state:"")
+                						.replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
+                						.replace(/\{\{classes\}\}/g, (orgsList[item.id].children.length > 0 ? (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter"): ""))
 
-                childClinic += '</div>';
-
-                if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
-                else container.append(childClinic);
+                if ($("#" + _parentOrgId + "_container").length > 0) {
+                	$("#" + _parentOrgId + "_container").append(childClinic);
+                } else {
+                	container.append(childClinic);
+                };
 
             });
         };
-        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
+        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) {
+        	container.append("<span class='divider'>&nbsp;</span>");
+        };
     };
-    if (!hasValue(container.text())) container.html("No organizations available");
+    if (!hasValue(container.text())) {
+    	container.html("No organizations available");
+    };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;

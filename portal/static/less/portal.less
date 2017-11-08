@@ -883,31 +883,32 @@ div.pull-right {
         input {
           cursor: pointer;
           position: relative;
-          left: -2px;
+          margin: 0;
+          left: -4px;
         }
       }
       #fillOrgs {
         .divider {
           display: none;
         }
-        label, legend {
-          font-size: @mobileOrgSize;
+        legend {
+          font-size: @baseMobileFontSize;
         }
-        label.org-label {
-          padding: 0 0.5em;
-          display:block;
-          line-height: 30px;
+        span {
+          display: inline-block;
+          line-height: 1.6em;
+          font-size: @baseMobileFontSize;
+        }
+        .divider + label {
+          margin-left: 0;
         }
       }
     }
     div.org-container {
       display: block;
-      * {
-        font-size: @mobileOrgSize;
-      }
       label.org-label {
         display: inline-block;
-        padding: 0 1em !important;
+        padding: 0 1em;
         line-height: 1.6em;
       }
     }
@@ -918,7 +919,7 @@ div.pull-right {
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: @mobileOrgSize !important;
+        font-size: @baseMobileFontSize;
       }
       input[type="checkbox"] {
         position: relative;
@@ -2792,7 +2793,7 @@ div.timezone-warning.text-warning {
         }
         div.org-container
         {
-          * {
+          label, span {
             font-size: @baseMobileFontSize;
           }
         }
@@ -2839,7 +2840,15 @@ div.timezone-warning.text-warning {
 
   #fillOrgs *,
   .noOrg-container *  {
-    font-size: @baseFontSize * 0.95;
+    font-size: @baseFontSize * 0.9;
+  }
+
+  #adminTableToolbar {
+    div.org-container {
+      label, span {
+        font-size: @baseFontSize * 0.85;
+      }
+    }
   }
 
   .iq-container .noOrg-container *  {
