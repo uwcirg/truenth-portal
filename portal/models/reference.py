@@ -117,7 +117,7 @@ class Reference(object):
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
-            (re.compile('[Rr]esearch_[Pp]rotocol/(\w+)'),
+            (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
 
         for pattern, obj, attribute in lookup:
