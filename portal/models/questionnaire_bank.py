@@ -14,7 +14,6 @@ from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
-from .research_protocol import ResearchProtocol
 from ..trace import trace
 
 
