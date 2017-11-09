@@ -25,6 +25,7 @@ from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
 
@@ -126,7 +127,15 @@ class TestSitePersistence(TestCase):
         every_six_thereafter = Recur(
             start='{"days": 720}', cycle_length='{"days": 180}')
 
-        metastatic_org = Organization(name='metastatic')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        metastatic_org = Organization(name='metastatic',
+                                      research_protocol_id=rp_id)
         questionnaire = Questionnaire(name='test_q')
         with SessionScope(db):
             db.session.add(initial_recur)
@@ -144,7 +153,7 @@ class TestSitePersistence(TestCase):
         mr_qb = QuestionnaireBank(
             name='metastatic_recurring',
             classification='recurring',
-            organization_id=metastatic_org_id,
+            research_protocol_id=rp_id,
             start='{"days": 0}', overdue='{"days": 1}',
             expired='{"days": 30}',
             recurs=recurs)
@@ -153,6 +162,11 @@ class TestSitePersistence(TestCase):
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=questionnaire, rank=1)
         mr_qb.questionnaires.append(qbq)
+        with SessionScope(db):
+            db.session.add(mr_qb)
+            db.session.commit()
+        mr_qb, initial_recur, every_six_thereafter = map(
+            db.session.merge, (mr_qb, initial_recur, every_six_thereafter))
 
         # confirm persistence of this questionnaire bank includes the bits
         # added above

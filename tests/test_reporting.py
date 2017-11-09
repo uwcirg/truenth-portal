@@ -13,6 +13,7 @@ from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.reporting import get_reporting_stats, overdue_stats_by_org
 from portal.models.reporting import generate_overdue_table_html
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -81,7 +82,14 @@ class TestReporting(TestCase):
         self.assertEqual(len(stats2['encounters']['all']), 5)
 
     def test_overdue_stats(self):
-        crv = Organization(name='CRV')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        crv = Organization(name='CRV', research_protocol_id=rp_id)
         epic26 = Questionnaire(name='epic26')
         with SessionScope(db):
             db.session.add(crv)
@@ -90,7 +98,7 @@ class TestReporting(TestCase):
         crv, epic26 = map(db.session.merge, (crv, epic26))
 
         bank = QuestionnaireBank(
-            name='CRV', organization_id=crv.id,
+            name='CRV', research_protocol_id=rp_id,
             start='{"days": 1}',
             overdue='{"days": 2}',
             expired='{"days": 90}')

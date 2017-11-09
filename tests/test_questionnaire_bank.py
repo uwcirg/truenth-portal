@@ -12,6 +12,7 @@ from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
+from portal.models.research_protocol import ResearchProtocol
 from portal.system_uri import ICHOM
 from tests import TestCase, TEST_USER_ID
 
@@ -20,8 +21,15 @@ class TestQuestionnaireBank(TestCase):
 
     def test_org_trigger_date(self):
         # testing org-based QBs
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
         q = Questionnaire(name='q')
-        org = Organization(name='org')
+        org = Organization(name='org', research_protocol_id=rp_id)
         with SessionScope(db):
             db.session.add(q)
             db.session.add(org)
@@ -29,7 +37,7 @@ class TestQuestionnaireBank(TestCase):
         q, org, self.test_user = map(db.session.merge,
                                      (q, org, self.test_user))
         qb = QuestionnaireBank(
-            name='qb', organization_id=org.id, classification='baseline',
+            name='qb', research_protocol_id=rp_id, classification='baseline',
             start='{"days": 1}', expired='{"days": 2}')
         qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
         qb.questionnaires.append(qbq)
@@ -89,15 +97,22 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(qb.trigger_date(self.test_user), tx_date)
 
     def test_start(self):
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
         q = Questionnaire(name='q')
-        org = Organization(name='org')
+        org = Organization(name='org', research_protocol_id=rp_id)
         with SessionScope(db):
             db.session.add(q)
             db.session.add(org)
             db.session.commit()
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
-            name='qb', organization_id=org.id, classification='baseline',
+            name='qb', research_protocol_id=rp_id, classification='baseline',
             start='{"days": 1}', expired='{"days": 2}')
         qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
         qb.questionnaires.append(qbq)
@@ -112,15 +127,22 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(end, expected_expiry)
 
     def test_due(self):
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
         q = Questionnaire(name='q')
-        org = Organization(name='org')
+        org = Organization(name='org', research_protocol_id=rp_id)
         with SessionScope(db):
             db.session.add(q)
             db.session.add(org)
             db.session.commit()
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
-            name='qb', organization_id=org.id, classification='baseline',
+            name='qb', research_protocol_id=rp_id, classification='baseline',
             start='{"days": 1}', due='{"days": 2}')
         qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
         qb.questionnaires.append(qbq)
@@ -145,9 +167,16 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(data['name'], 'q1')
 
     def test_serialize(self):
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
         q1 = Questionnaire(name='q1')
         q2 = Questionnaire(name='q2')
-        org = Organization(name='org')
+        org = Organization(name='org', research_protocol_id=rp_id)
         with SessionScope(db):
             db.session.add(q1)
             db.session.add(q2)
@@ -155,7 +184,7 @@ class TestQuestionnaireBank(TestCase):
             db.session.commit()
         q1, q2, org = map(db.session.merge, (q1, q2, org))
         qb = QuestionnaireBank(
-            name='qb', organization_id=org.id, classification='baseline',
+            name='qb', research_protocol_id=rp_id, classification='baseline',
             start='{"days": 0}', overdue='{"days": 5}', expired='{"days": 30}')
         for rank, q in enumerate((q1, q2)):
             qbq = QuestionnaireBankQuestionnaire(
@@ -172,7 +201,15 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(2, len(data['questionnaires']))
 
     def test_import(self):
-        org = Organization(name='org')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+        rp_name = rp.name
+
+        org = Organization(name='org', research_protocol_id=rp_id)
         q1 = Questionnaire(name='q1')
         q2 = Questionnaire(name='q2')
         with SessionScope(db):
@@ -184,8 +221,8 @@ class TestQuestionnaireBank(TestCase):
 
         data = {
             'resourceType': 'QuestionnaireBank',
-            'organization': {'reference': 'api/organization/{}'.format(
-                org.id)},
+            'research_protocol': {'reference': ('api/research_protocol/'
+                                                '{}').format(rp_name)},
             'start': '{"days": 0}',
             'overdue': '{"weeks": 1}',
             'expired': '{"days": 30}',
@@ -249,7 +286,14 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(2, len(qb.questionnaires))
 
     def test_lookup_for_user(self):
-        crv = Organization(name='CRV')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        crv = Organization(name='CRV', research_protocol_id=rp_id)
         epic26 = Questionnaire(name='epic26')
         eproms_add = Questionnaire(name='eproms_add')
         comorb = Questionnaire(name='comorb')
@@ -263,7 +307,7 @@ class TestQuestionnaireBank(TestCase):
             db.session.merge, (crv, epic26, eproms_add, comorb))
 
         bank = QuestionnaireBank(
-            name='CRV', organization_id=crv.id,
+            name='CRV', research_protocol_id=rp_id,
             start='{"days": 7}',
             expired='{"days": 90}')
         for rank, q in enumerate((epic26, eproms_add, comorb)):
@@ -325,7 +369,14 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(2, len(results))
 
     def test_questionnaire_gets(self):
-        crv = Organization(name='CRV')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        crv = Organization(name='CRV', research_protocol_id=rp_id)
         epic26 = Questionnaire(name='epic26')
         eproms_add = Questionnaire(name='eproms_add')
         comorb = Questionnaire(name='comorb')
@@ -346,7 +397,7 @@ class TestQuestionnaireBank(TestCase):
         self.assert200(resp)
         self.assertEquals(resp.json['questionnaire']['name'], 'epic26')
 
-        bank = QuestionnaireBank(name='CRV', organization_id=crv.id,
+        bank = QuestionnaireBank(name='CRV', research_protocol_id=rp_id,
                                  start='{"days": 7}',
                                  expired='{"days": 90}')
         for rank, q in enumerate((epic26, eproms_add, comorb)):
@@ -399,7 +450,14 @@ class TestQuestionnaireBank(TestCase):
 
 
 def setup_qbs():
-    crv = Organization(name='CRV')
+    rp = ResearchProtocol(name='proto')
+    with SessionScope(db):
+        db.session.add(rp)
+        db.session.commit()
+    rp = db.session.merge(rp)
+    rp_id = rp.id
+
+    crv = Organization(name='CRV', research_protocol_id=rp_id)
     epic26 = Questionnaire(name='epic26')
     recur3 = Recur(
         start='{"months": 3}', cycle_length='{"months": 6}',
@@ -420,7 +478,7 @@ def setup_qbs():
     qb_base = QuestionnaireBank(
         name='CRV Baseline',
         classification='baseline',
-        organization_id=crv.id,
+        research_protocol_id=rp_id,
         start='{"days": 0}',
         overdue='{"days": 30}',
         expired='{"months": 3}')
@@ -430,7 +488,7 @@ def setup_qbs():
     qb_m3 = QuestionnaireBank(
         name='CRV_recurring_3mo_period',
         classification='recurring',
-        organization_id=crv.id,
+        research_protocol_id=rp_id,
         start='{"days": 0}',
         overdue='{"days": 30}',
         expired='{"months": 3}',
@@ -441,7 +499,7 @@ def setup_qbs():
     qb_m6 = QuestionnaireBank(
         name='CRV_recurring_6mo_period',
         classification='recurring',
-        organization_id=crv.id,
+        research_protocol_id=rp_id,
         start='{"days": 0}',
         overdue='{"days": 30}',
         expired='{"months": 3}',
