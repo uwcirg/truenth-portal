@@ -70,7 +70,7 @@
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button onclick="deleteUser(event, {{user.id}})" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
+                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button onclick="AT.deleteUser(event, '{{user.id}}', true)" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -105,43 +105,25 @@ $("#adminTableToolbar").on("click",function(){
     $('#adminTable').bootstrapTable('filterBy', {roles: "patient"});
 });
 **/
-
-function deleteUser(event, userId) {
-    if (event) event.stopPropagation();
-    if (userId) {
-       var c = confirm("Are you sure you want to delete this user?");
-       if (c) {
-         $.ajax ({
-              type: "DELETE",
-              url: "/api/user/" + userId,
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json'
-          }).done(function(data) {
-                if (data["message"] === "deleted") {
-                    $("#data_row_" + userId).fadeOut();
-                } else alert("System error: " + data["message"]);
-          }).fail(function(xhr) {
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
-          });
-        };
-    };
-};
-
-var org_list = {};
-{% if org_list %}
-  {% for org in org_list %}
-      org_list["{{org}}"] = true;
-  {% endfor %}
-{% endif %}
-var AT = new window.portal.AdminTool({{user.id}}, "adminList", {
+var AT = new window.portal.AdminTool(
+{{user.id}},
+"adminList",
+{
   "tnthAjax": tnthAjax,
   "i18next": i18next,
   "tnthDates": tnthDates
 });
-$(document).ready(function() {
-  AT.getTablePreference({{user.id}}, AT.tableIdentifier);
-  AT.initOrgsList(org_list, 'admin');
-  setTimeout(function() { AT.fadeLoader(); }, 500);
-});
+(function() {
+  var org_list = {};
+  {% if org_list %}
+    {% for org in org_list %}
+        org_list["{{org}}"] = true;
+    {% endfor %}
+  {% endif %}
+  $(document).ready(function() {
+    AT.getTablePreference({{user.id}}, AT.tableIdentifier);
+    AT.initOrgsList(org_list, 'admin');
+    setTimeout(function() { AT.fadeLoader(); }, 500);
+  });
+})();
 {% endblock %}
