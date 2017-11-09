@@ -92,12 +92,12 @@
 {% macro footer(splash_style=false, white_theme=False, user=None) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
-        <div class="col-xs-7 col-lg-8 footer-container">
+        <div class="col-xs-6 col-lg-8 footer-container">
             <div class="copyright-container">
                 {{linksHTML(user)}}
             </div>
         </div>
-        <div class="col-xs-5 col-lg-4 footer-container logo-container">
+        <div class="col-xs-6 col-lg-4 footer-container logo-container">
             <div class="pull-right">
                 {{logo(white_theme)}}
             </div>

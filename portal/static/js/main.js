@@ -1925,11 +1925,11 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
-        
+
                 if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
                 	return true;
                 };
-            
+
                 childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container'>"
           					+ "<label id='org-label-{{itemId}}' class='org-label {{classes}}'>"
                 			+ "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
