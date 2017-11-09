@@ -928,14 +928,12 @@ div.right-panel {
           position: relative;
           left: -6px;
           top: 0.5px;
+          vertical-align: top;
         }
       }
       #fillOrgs {
         .divider {
           display: none;
-        }
-        label.org-label {
-          padding: 0 0.5em;
         }
       }
     }
@@ -946,9 +944,24 @@ div.right-panel {
       }
       label.org-label {
         display: inline-block;
-        padding: 0 1em !important;
+        padding: 0 1em;
         line-height: 1.6em;
       }
+      label.text-muted {
+        color: #6c7071;
+      }
+      label span {
+        display: inline-block;
+        width: 250px;
+      }
+    }
+
+    label.text-muted ~ div.org-container {
+      margin-left: 1em;
+    }
+
+    label.text-muter ~ div.org-container {
+      margin-left: 1.5em;
     }
     #orglist-footer-container {
       padding: 0.5em 1em;
