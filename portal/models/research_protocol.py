@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from ..database import db
+from ..date_tools import FHIR_datetime
 
 
 class ResearchProtocol(db.Model):
@@ -29,5 +30,5 @@ class ResearchProtocol(db.Model):
         d['id'] = self.id
         d['resourceType'] = 'ResearchProtocol'
         d['name'] = self.name
-        d['created_at'] = self.created_at
+        d['created_at'] = FHIR_datetime.as_fhir(self.created_at)
         return d

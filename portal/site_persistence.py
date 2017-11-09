@@ -304,7 +304,7 @@ class SitePersistence(object):
         for rp_json in objs_by_type['ResearchProtocol']:
             rp = ResearchProtocol.from_json(rp_json)
             db.session.add(rp)
-            rps_seen.append(rp['name'])
+            rps_seen.append(rp_json['name'])
         db.session.commit()
 
          # Delete any ResearchProtocols not named

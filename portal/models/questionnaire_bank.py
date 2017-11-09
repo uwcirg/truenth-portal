@@ -147,7 +147,7 @@ class QuestionnaireBank(db.Model):
         if self.overdue:
             d['overdue'] = self.overdue
         d['classification'] = self.classification
-        if self.research_protocol_id:
+        if self.research_protocol:
             d['research_protocol'] = Reference.research_protocol(
                 self.research_protocol.name).as_fhir()
         if self.intervention_id:
@@ -218,7 +218,7 @@ class QuestionnaireBank(db.Model):
         """
         user_rps = set()
         for org in (o for o in user.organizations if o.id):
-            rp = o.research_protocol
+            rp = org.research_protocol
             if rp:
                 user_rps.add(rp.id)
 
