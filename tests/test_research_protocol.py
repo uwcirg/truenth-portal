@@ -55,3 +55,24 @@ class TestResearchProtocol(TestCase):
 
         org = Organization.from_fhir(org_data)
         self.assertEquals(org.research_protocol_id, rp.id)
+
+    def test_rp_inheritance(self):
+        rp = ResearchProtocol(name="test_rp")
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+
+        parent = Organization(name='parent', id=101,
+                              research_protocol_id=rp.id)
+        child = Organization(name='child', partOf_id=101)
+        with SessionScope(db):
+            db.session.add(parent)
+            db.session.add(child)
+            db.session.commit()
+        parent, child, rp = map(db.session.merge, (parent, child, rp))
+
+        self.assertEquals(parent.research_protocol_id, rp.id)
+        self.assertEquals(parent.research_protocol.id, rp.id)
+        self.assertFalse(child.research_protocol_id)
+        self.assertEquals(child.research_protocol.id, rp.id)
