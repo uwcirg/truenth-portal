@@ -6,7 +6,7 @@
     <h3 class="tnth-headline">{{ _("Staff Administration") }}</h3>
     <br/>
     <div id="staffListOptions">
-      <a href="{{ url_for('portal.staff_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a staff record") }}</a>
+      <a href="{{ url_for('.staff_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a staff record") }}</a>
       <div class="or">or</div>
       <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
     </div>
@@ -44,7 +44,7 @@
             {% for user in staff_list %}
               <tr id="data_row_{{user.id}}">
                   <td>{{user.id}}</td>
-                  <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                  <td><a href="{{ url_for('portal.profile', user_id=user.id) }}">{{ user.id }}</a></td>
                   <td>{{ user.first_name if user.first_name }}</td>
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
