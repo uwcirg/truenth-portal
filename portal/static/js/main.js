@@ -3431,6 +3431,26 @@ var tnthAjax = {
              if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
+    },
+    "deleteUser": function(userId, params, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": i18next.t("User id is required")});
+            };
+            return false;
+        };
+        this.sendRequest('/api/user/'+userId,'DELETE', userId, (params||{}), function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred deleting user.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+
     }
 };
 

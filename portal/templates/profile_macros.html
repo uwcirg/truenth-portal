@@ -439,7 +439,7 @@
             })();
             $.ajax ({
                 type: "GET",
-                url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                url: "{{url_for('staff.staff_registration_email', user_id=person.id)}}",
                 cache: false,
                 async: false
             }).done(function(data) {

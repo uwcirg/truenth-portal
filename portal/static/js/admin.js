@@ -313,7 +313,7 @@
     return this.userOrgs;
   };
   AdminTool.prototype.initOrgsList = function(requestOrgList, context) {
-     
+
       var self = this;
       //check if the location contains filtered orgs list
       var iterated = /org_list/.test(location.href);
@@ -782,6 +782,32 @@
           document.location = $(this).closest("tr").attr("data-link");
         };
     });
+  };
+
+  AdminTool.prototype.deleteUser = function(event, userId, hideRow) {
+    if (event) {
+      event.stopPropagation();
+    };
+    if (userId) {
+      var tnthAjax = this.getDependency("tnthAjax");
+      var c = confirm(i18next.t("Are you sure you want to delete this user?"));
+      if (c) {
+        tnthAjax.deleteUser(userId, false, function(data) {
+          if (!data.error) {
+            if (hideRow) {
+              $("#data_row_" + userId).fadeOut();
+            };
+            $("#data_row_" + userId)
+            .addClass("deleted-user-row")
+            .addClass("rowlink-skip")
+            .find(".deleted-button-cell").html(i18next.t("Inactive"))
+            .find("a.profile-link").remove();
+          } else {
+            alert(data.error);
+          };
+        });
+      };
+    };
   };
 
   if (window.portal == null) {

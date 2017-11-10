@@ -83,6 +83,7 @@
 @disabledColor: #bfc3c3;
 
 @inputHeight: 2.4em;
+@disabledOpacity: 0.6;
 
 
 /**
@@ -866,6 +867,9 @@ div.pull-right {
   }
   th.status-field .loading-message-indicator {
     display: none;
+  }
+  tr.deleted-user-row {
+    opacity: @disabledOpacity
   }
 }
 #adminTableToolbar {
