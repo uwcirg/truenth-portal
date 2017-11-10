@@ -794,11 +794,14 @@
       if (c) {
         tnthAjax.deleteUser(userId, false, function(data) {
           if (!data.error) {
-            if (hideRow) $("#data_row_" + userId).fadeOut();
+            if (hideRow) {
+              $("#data_row_" + userId).fadeOut();
+            };
             $("#data_row_" + userId)
             .addClass("deleted-user-row")
             .addClass("rowlink-skip")
-            .find(".deleted-button-cell").html(i18next.t("Inactive"));
+            .find(".deleted-button-cell").html(i18next.t("Inactive"))
+            .find("a.profile-link").remove();
           } else {
             alert(data.error);
           };

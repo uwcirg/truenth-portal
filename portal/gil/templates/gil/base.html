@@ -77,6 +77,9 @@
           {% if user and user.has_role(ROLE.RESEARCHER) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Data")}}</a></li>
           {% endif %}
+          {% if user and user.has_role(ROLE.STAFF_ADMIN) %}
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('staff.staff_index')}}">{{_("Staff List")}}</a></li>
+          {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
               <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
@@ -542,7 +545,7 @@
 
             {% if request.args.get("disableLinks", "") %}
                $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
-                  if (!$(this).hasClass("side-nav-items__item--home") && 
+                  if (!$(this).hasClass("side-nav-items__item--home") &&
                       !$(this).hasClass("side-nav-items__item--logout") &&
                       !$(this).hasClass("nav-list__item--home")) {
                     $(this).children("a").each(function() {
