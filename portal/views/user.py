@@ -255,7 +255,7 @@ def account():
 
 
 @user_api.route('/user/<int:user_id>', methods=['DELETE'])
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
 def delete_user(user_id):
     """Delete the named user from the system
