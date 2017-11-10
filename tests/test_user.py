@@ -25,8 +25,12 @@ from portal.models.user import UserRelationship, TimezoneExtension
 from portal.models.user import permanently_delete_user
 from portal.models.user import UserIndigenousStatusExtension
 from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
-from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
-from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
+from portal.system_uri import (
+    TRUENTH_EXTENSTION_NHHD_291036,
+    TRUENTH_USERNAME,
+    TRUENTH_VALUESET_NHHD_291036
+)
+
 
 class TestUser(TestCase):
     """User model and view tests"""
@@ -187,6 +191,11 @@ class TestUser(TestCase):
         self.assert200(rv)
         user = db.session.merge(user)
         self.assertTrue(user.deleted_id)
+        self.assertTrue(user._email.startswith("__deleted_"))
+        self.assertEquals(user.email, TEST_USERNAME)
+        # confirm the 'TrueNTH-username' identity also got wiped
+        ids = [id for id in user.identifiers if id.system == TRUENTH_USERNAME]
+        self.assertTrue(id.value.startswith("__deleted_"))
 
     def test_delete_lock(self):
         """changing attributes on a deleted user should raise"""

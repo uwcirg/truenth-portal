@@ -12,6 +12,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from StringIO import StringIO
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
+import regex
 import time
 
 from .audit import Audit
@@ -37,6 +38,8 @@ from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
+DELETED_PREFIX = "__deleted_{time}__"
+DELETED_REGEX = r"__deleted_\d+__(.*)"
 
 # https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -384,6 +387,14 @@ class User(db.Model, UserMixin):
                 # return None as we don't have an email
                 return None
 
+            if self._email.startswith(DELETED_PREFIX[:10]):
+                match = regex.match(DELETED_REGEX, self._email)
+                if not match:
+                    raise ValueError(
+                        "Apparently deleted user's email doesn't fit "
+                        "expected pattern {}".format(self))
+                return match.groups()[0]
+
         return self._email
 
     @email.setter
@@ -459,9 +470,20 @@ class User(db.Model, UserMixin):
             self._identifiers.append(primary)
 
         if self.username:
-            secondary = Identifier(
-                use='secondary', system=TRUENTH_USERNAME, value=self.username)
-            if secondary not in self._identifiers.all():
+            # As email addresses do legitimately change when registering and
+            # deleting users, may need to update the existing Identifier
+            username_identifier = [
+                i for i in self._identifiers if i.system == TRUENTH_USERNAME]
+            if len(username_identifier) > 1:
+                raise ValueError(
+                    "Users should only have a single identifier with system {}."
+                    "Problem user: {}".format(TRUENTH_USERNAME, self))
+            if username_identifier:
+                if username_identifier[0].value != self._email:
+                    username_identifier[0].value = self._email
+            else:
+                secondary = Identifier(
+                    use='secondary', system=TRUENTH_USERNAME, value=self._email)
                 self._identifiers.append(secondary)
 
         for provider in self.auth_providers:
@@ -1265,10 +1287,15 @@ class User(db.Model, UserMixin):
                     [client.id for client in clients]))
 
         self.active = False
-        self.mask_email(prefix='__deleted_{}__'.format(int(time.time())))
+        self.mask_email(prefix=DELETED_PREFIX.format(time=int(time.time())))
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self),
                              context='account')
+        # also need to alter the TRUENTH_USERNAME identifier in case anyone
+        # in the future needs to reuse this address
+        ids = [id for id in self._identifiers if id.system == TRUENTH_USERNAME]
+        if ids:
+            ids[0].value = self._email
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

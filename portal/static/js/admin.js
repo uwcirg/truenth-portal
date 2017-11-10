@@ -798,7 +798,7 @@
             $("#data_row_" + userId)
             .addClass("deleted-user-row")
             .addClass("rowlink-skip")
-            .find(".deleted-button-cell").html("-");
+            .find(".deleted-button-cell").html(i18next.t("Inactive"));
           } else {
             alert(data.error);
           };
