@@ -14,7 +14,7 @@
 }
 
 @baseFontSize:    16px;
-@baseMobileFontSize:  14px;
+@baseMobileFontSize:  13.8px;
 @headlineSize:    1.30em;
 @subheadSize:     1.25em;
 @subSmallHeadSize: 1.10em;
@@ -1674,14 +1674,16 @@ div.pull-right {
   & .copyright-container {
     font-size: @footerSize;
     color: @footerWhiteThemeColor;
+    width: 50%;
   }
   .footer-container.flex {
     clear: both;
     display:flex;
     justify-content: space-between;
-    padding: 0.5em 0;
-    margin: 1em 4em;
+    padding: 1em 0.5em;
     border-top: 1px solid #ddd;
+    flex-wrap: nowrap;
+    margin: 0 0.5em;
   }
   #site_id_view {
     margin-top: 0.2em;
@@ -1703,9 +1705,6 @@ div.pull-right {
 #mainDiv.portal .copyright-container  {
   color: @footerWhiteThemeColor;
   margin-bottom: 1em;
-}
-#mainDiv.profile .footer-container.flex{
-    justify-content: left;
 }
 .profile-item-title {
   color: #5b5e61;
@@ -2833,6 +2832,9 @@ div.timezone-warning.text-warning {
         max-width: 100%;
       }
     }
+    .copyright-container {
+      width: 65%;
+    }
   }
   .timezone-container {
     padding-bottom: 2em;
@@ -3028,6 +3030,9 @@ div.timezone-warning.text-warning {
     .profile-item-container  {
       padding: 2em 3em 2.7em 3em;
     }
+    .copyright-container {
+      width: 80%;
+    }
   }
   #createProfileForm {
     #emailGroup {
@@ -3103,7 +3108,7 @@ div.timezone-warning.text-warning {
     }
   }
   #mainDiv.profile .footer-container.flex{
-    justify-content: center;
+    justify-content: space-between;
   }
 }
 

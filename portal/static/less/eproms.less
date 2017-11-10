@@ -429,6 +429,10 @@ select:not([multiple]) {
       margin-top: 30px;
       border-top: 1px solid #ccc;
       padding-top: 1em;
+
+      img {
+        margin-bottom: 0.5em;
+      }
     }
   }
 }
@@ -472,17 +476,15 @@ select:not([multiple]) {
   .copyright-container {
     font-size: @footerSize;
     color: @footerWhiteThemeColor;
-  }
-  .logo-container {
-    margin: auto;
+    width: 100%;
   }
   .footer-container.flex {
     clear: both;
     display:flex;
-    justify-content: space-between;
-    padding: 0.5em 0;
-    margin: 1em 4em;
+    padding: 1em 0.8em;
+    margin: 0 0.5em;
     border-top: 1px solid #ddd;
+    justify-content: space-around;
   }
   #enterManualInfoContainer {
     margin-bottom: 1em;
@@ -502,9 +504,6 @@ select:not([multiple]) {
   color: @footerWhiteThemeColor;
 }
 
-#mainDiv.profile .footer-container.flex{
-    justify-content: center;
-}
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
@@ -519,6 +518,9 @@ div.right-panel {
   position:relative;
   max-width: 991px;
   transition:margin ease .5s;
+  margin: auto;
+}
+div.footer-wrapper.right-panel {
   margin: auto;
 }
 .website-consent-script #termsText {
@@ -914,7 +916,7 @@ div.right-panel {
   div.orglist-selector {
     display: inline-block;
     .indent {
-      padding: 0 0.5em;
+      padding: 0 0.2em;
     }
     div.dropdown-menu {
       max-width: 100%;
@@ -2840,6 +2842,9 @@ div.timezone-warning.text-warning {
         max-width: 100%;
       }
     }
+    .copyright-container {
+      width: 60%;
+    }
   }
 
   #profileForm {
@@ -3036,6 +3041,11 @@ div.timezone-warning.text-warning {
     .modal-dialog {
       width: 65%;
       max-width: 100%;
+    }
+  }
+  #mainDiv.profile {
+    .copyright-container {
+      width: 80%;
     }
   }
 }
