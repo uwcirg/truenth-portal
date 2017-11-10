@@ -44,8 +44,14 @@
             <tbody data-link="row" class="rowlink">
             {% for user in staff_list %}
               <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%}>
-                  <td>{{user.id}}{{user.deleted_id}}</td>
-                  <td><a href="{{ url_for('portal.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                  <td>{{user.id}}</td>
+                  <td>
+                    {% if user.deleted %}
+                    {{user.id}}
+                    {% else %}
+                    <a href="{{ url_for('portal.profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a>
+                    {% endif %}
+                  </td>
                   <td>{{ user.first_name if user.first_name }}</td>
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
