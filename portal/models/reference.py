@@ -56,6 +56,13 @@ class Reference(object):
         return instance
 
     @classmethod
+    def research_protocol(cls, research_protocol_name):
+        """Create a reference object from a known research protocol"""
+        instance = cls()
+        instance.research_protocol_name = research_protocol_name
+        return instance
+
+    @classmethod
     def intervention(cls, intervention_id):
         """Create a reference object from given intervention
 
@@ -91,6 +98,7 @@ class Reference(object):
         from .organization import Organization, OrganizationIdentifier
         from .questionnaire import Questionnaire
         from .questionnaire_bank import QuestionnaireBank
+        from .research_protocol import ResearchProtocol
         from .user import User
 
         if 'reference' in reference_dict:
@@ -108,7 +116,9 @@ class Reference(object):
             (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
-            (re.compile('[Pp]atient/(\d+)'), User, 'id'))
+            (re.compile('[Pp]atient/(\d+)'), User, 'id'),
+            (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
+             ResearchProtocol, 'name'))
 
         for pattern, obj, attribute in lookup:
             match = pattern.search(reference_text)
@@ -183,6 +193,10 @@ class Reference(object):
             ref = "api/questionnaire_bank/{}".format(
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
+        if hasattr(self, 'research_protocol_name'):
+            ref = "api/research_protocol/{}".format(
+                self.research_protocol_name)
+            display = self.research_protocol_name
         if hasattr(self, 'intervention_name'):
             ref = "api/intervention/{}".format(
                 self.intervention_name)
