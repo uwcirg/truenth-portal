@@ -9,7 +9,7 @@ from ..models.app_text import (
     StaffRegistrationEmail_ATMA,
     UndefinedAppText,
 )
-from ..models.communication import load_template_args, Communication
+from ..models.communication import load_template_args
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import current_user, get_user, User, UserRoles
