@@ -100,6 +100,8 @@ def home():
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER):
         return redirect(url_for('.research_dashboard'))
+    if user.has_role(ROLE.STAFF_ADMIN):
+        return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
