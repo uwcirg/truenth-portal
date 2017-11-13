@@ -13,6 +13,7 @@ from flask import current_app
 import json
 from requests import Request, Session
 from requests.exceptions import RequestException
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy import and_
 from traceback import format_exc
 
@@ -279,11 +280,16 @@ def send_questionnaire_summary(job_id, cutoff_days, org_id):
     "Generate and send a summary of questionnaire counts to all Staff in org"
     try:
         before = datetime.now()
-        generate_and_send_summaries(cutoff_days, org_id)
+        error_emails = generate_and_send_summaries(cutoff_days, org_id)
         duration = datetime.now() - before
         message = (
-            'Sent summary emails in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
+            'Sent summary emails in {0.seconds} seconds.'.format(duration))
+        if error_emails:
+            message += ('\nUnable to reach recipient(s): '
+                        '{}'.format(', '.join(error_emails)))
+            logger.error(message)
+        else:
+            logger.debug(message)
     except Exception as exc:
         message = ("Unexpected exception in `send_questionnaire_summary` "
                    "on {} : {}".format(job_id, exc))
@@ -296,6 +302,7 @@ def send_questionnaire_summary(job_id, cutoff_days, org_id):
 def generate_and_send_summaries(cutoff_days, org_id):
     ostats = overdue_stats_by_org()
     cutoffs = [int(i) for i in cutoff_days.split(',')]
+    error_emails = set()
 
     ot = OrgTree()
     top_org = Organization.query.get(org_id)
@@ -317,7 +324,15 @@ def generate_and_send_summaries(cutoff_days, org_id):
                               sender=current_app.config['MAIL_DEFAULT_SENDER'],
                               subject=summary_email.subject,
                               body=summary_email.body)
-            em.send_message()
+            try:
+                em.send_message()
+            except SMTPRecipientsRefused as exc:
+                current_app.logger.error("Error sending email to recipient(s):"
+                                         " {}".format(exc))
+                for email in exc[0]:
+                    error_emails.add(email)
+
+    return error_emails or None
 
 
 def update_current_job(job_id, func_name, runtime=None, status=None):
