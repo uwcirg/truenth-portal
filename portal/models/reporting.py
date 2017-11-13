@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import current_app, render_template
 from flask_babel import gettext as _
 
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
 from .organization import OrgTree
