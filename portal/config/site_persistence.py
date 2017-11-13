@@ -1,26 +1,24 @@
 """SitePersistence Module"""
 from collections import defaultdict
-from dict_tools import dict_match
 from flask import current_app
 import json
 import os
-import requests
 from sqlalchemy import exc
 from StringIO import StringIO
-import tempfile
 
-from factories.app import SITE_CFG
-from database import db
-from models.app_text import AppText
-from models.communication_request import CommunicationRequest
-from models.fhir import FHIR_datetime
-from models.intervention import Intervention, INTERVENTION
-from models.intervention_strategies import AccessStrategy
-from models.organization import Organization
-from models.questionnaire import Questionnaire
-from models.questionnaire_bank import QuestionnaireBank
-from models.research_protocol import ResearchProtocol
-from models.scheduled_job import ScheduledJob
+from .config import SITE_CFG
+from ..database import db
+from ..dict_tools import dict_match
+from ..models.app_text import AppText
+from ..models.communication_request import CommunicationRequest
+from ..models.fhir import FHIR_datetime
+from ..models.intervention import Intervention, INTERVENTION
+from ..models.intervention_strategies import AccessStrategy
+from ..models.organization import Organization
+from ..models.questionnaire import Questionnaire
+from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.research_protocol import ResearchProtocol
+from ..models.scheduled_job import ScheduledJob
 
 
 class SitePersistence(object):
@@ -28,72 +26,47 @@ class SitePersistence(object):
 
     VERSION = '0.1'
 
-    def persistence_filename(self, read_only=True):
+    def persistence_filename(self):
         """Returns the configured persistence file
 
-        :param read_only: for imports (default), only read is needed.
-                          Set False for exports, which require write.
-
-        Using the first value found, looks for a variable named
-        `PERSISTENCE_FILE` in the configuration file(s) and then as an
-        environment variable.
-
-        For imports (read_only), the value of `PERSISTENCE_FILE` may point
-        to a repository file such as
-        `https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json`
-
-        Exports naturally require write permission, and must therefore point
-        to a writeable filesystem path.
+        Using the first value found, looks for an environment variable named
+        `PERSISTENCE_DIR`, which should define a path relative to the `portal/config`
+        directory such as `eproms`.  If no such environment variable is found, use
+        the presence of the `GIL` config setting - if set use `gil`,
+        else `eproms`.
 
         """
-        env_file = os.environ.get('PERSISTENCE_FILE')
-        config_file = current_app.config.get("PERSISTENCE_FILE", '')
+        # product level config file - use presence of env var or config setting
+        persistence_dir = os.environ.get('PERSISTENCE_DIR')
+        gil = current_app.config.get("GIL")
 
-        filename = config_file if config_file else env_file
-        if not filename:
-            raise ValueError('PERSISTENCE_FILE not defined as environment '
-                             'variable nor in a config file')
-        if filename.startswith('http'):
-            if not read_only:
-                raise ValueError('PERSISTENCE_FILE value not on filesystem; '
-                                 'cannot export to remote file {}'.format(
-                                     filename))
-            filename = self.pull_latest(filename)
+        # prefer env var
+        if not persistence_dir:
+            persistence_dir = 'gil' if gil else 'eproms'
+
+        filename = os.path.join(
+            os.path.dirname(__file__), persistence_dir, 'site_persistence_file.json')
+        if not os.path.exists(filename):
+            raise ValueError(
+                'File not found: {}  Check value of environment variable `PERSISTENCE_DIR` '
+                'Should be a relative path from portal root.'.format(filename))
         return filename
-
-    def pull_latest(self, url):
-        """Given a remote URL - pull file into temp dir and return path"""
-        r = requests.get(url)
-        with tempfile.NamedTemporaryFile(delete=False) as file:
-            file.write(r.content)
-            self.tmpfile = file.name
-            self._log("wrote {} contents to tempfile {}".format(
-                url, self.tmpfile))
-        return self.tmpfile
 
     def _log(self, msg):
         current_app.logger.info(msg)
 
     def __write__(self, data):
-        self.filename = self.persistence_filename(read_only=False)
+        self.filename = self.persistence_filename()
         if data:
             with open(self.filename, 'w') as f:
                 f.write(json.dumps(data, indent=2, sort_keys=True))
             self._log("Wrote site persistence to `{}`".format(self.filename))
 
     def __read__(self):
-        self.filename = self.persistence_filename(read_only=True)
+        self.filename = self.persistence_filename()
         with open(self.filename, 'r') as f:
             data = json.load(f)
-        if hasattr(self, 'tmpfile'):
-            os.remove(self.tmpfile)
-            del self.tmpfile
         return data
-
-    def __del__(self):
-        if hasattr(self, 'tmpfile'):
-            raise ValueError("tmpfile {} wasn't cleaned "
-                             "up!".format(self.tmpfile))
 
     def __header__(self, data):
         data['resourceType'] = 'Bundle'

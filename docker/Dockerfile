@@ -51,7 +51,7 @@ ENV \
     PORT="${PORT:-8008}" \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PATH="${PROJECT_DIR}/bin:${PATH}" \
-    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}"
+    PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}"
 
 EXPOSE "${PORT}"
 
