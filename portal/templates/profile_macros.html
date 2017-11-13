@@ -899,7 +899,7 @@
 {%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
-        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
+        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal" class="consent-modal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -998,6 +998,11 @@
                     $(this).on("show.bs.modal", function() {
                         $("#consentContainer .loading-message-indicator").hide();
                         $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
+                        var checkedOrg = $("#userOrgs input[name='organization']:checked");
+                        var shortName = OT.getShortName(checkedOrg.val());
+                        if (hasValue(shortName)) {
+                            $(this).find(".consent-clinic-name").text(shortName);
+                        };
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });

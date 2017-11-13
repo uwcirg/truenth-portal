@@ -1887,6 +1887,15 @@ OrgTool.prototype.populateOrgsList = function(items) {
     if (items.length > 0) this.initialized = true;
     return orgsList;
 };
+OrgTool.prototype.getShortName = function (orgId) {
+    var shortName = "";
+    if (hasValue(orgId)) {
+        if (orgsList[orgId] && orgsList[orgId].shortname) {
+            shortName = orgsList[orgId].shortname;
+        };
+    };
+    return shortName;
+};
 OrgTool.prototype.populateUI = function() {
     var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
