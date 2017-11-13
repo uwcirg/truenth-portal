@@ -1868,7 +1868,15 @@ OrgTool.prototype.populateOrgsList = function(items) {
         };
         if (item.extension) orgsList[item.id].extension = item.extension;
         if (hasValue(item.language)) orgsList[item.id].language = item.language;
-        if (item.identifier) orgsList[item.id].identifier = item.identifier;
+        if (item.identifier) {
+            orgsList[item.id].identifier = item.identifier;
+            (item.identifier).forEach(function(identifier) {
+                if (identifier.system === "http://us.truenth.org/identity-codes/shortname") {
+                    orgsList[item.id].shortname = identifier.value;
+                };
+            });
+        };
+
     });
     items.forEach(function(item) {
         if (item.partOf) {
@@ -1960,7 +1968,8 @@ OrgTool.prototype.populateUI = function() {
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
-        var orgId = this.getElementParentOrg(o), orgName = $(o).attr("data-parent-name");
+        orgsList = this.orgsList;
+        var orgId = this.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
             var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_defaultConsentModal">'
                 + '<div class="modal-dialog" role="document">' +

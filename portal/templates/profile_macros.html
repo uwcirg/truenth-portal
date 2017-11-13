@@ -714,89 +714,119 @@
                 async: false
             }).done(function(data) {
                 if (data && data.entry) {
-                  var entry = data.entry, states = {};
-                  /*
-                   * populate orgs list object
-                   */
-                  OT.populateOrgsList(entry);
-                  var orgsList = OT.getOrgsList();
+                    var entry = data.entry, states = {};
+                    /*
+                    * populate orgs list object
+                    */
+                    OT.populateOrgsList(entry);
+                    var orgsList = OT.getOrgsList();
 
-                  /**** draw state select element first to gather all states
+                    /**** draw state select element first to gather all states
                         assign orgs to each state in array
-                  ***/
-                  entry.forEach(function(item) {
-                    var __state = "";
-                    if (item.identifier) {
-                        (item.identifier).forEach(function(region) {
-                            if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
-                                __state = (region.value).split(":")[1];
-                                if (!states[__state]) {
-                                    $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                    $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                    states[__state] = [item.id];
-                                } else (states[__state]).push(item.id);
-                            };
-                        });
-                    };
-                  });
-
-                  /**** draw input element(s) that belongs to each state based on parent organization id ***/
-                  entry.forEach(function(item) {
-                    if (parseInt(item.id) != 0) {
-                        var parentId;
-                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                        else parentId = item.id;
-                        if (parentId) {
-                            var parentState = (function(o) {
-                                var s = "", found = false;
-                                for (var state in states) {
-                                    if (!found) {
-                                        (states[state]).forEach(function(i) {
-                                            if (i == o) {
-                                               s = state;
-                                               found = true;
-                                            };
-                                        });
+                    ***/
+                    entry.forEach(function(item) {
+                        var __state = "";
+                        if (item.identifier) {
+                            (item.identifier).forEach(function(region) {
+                                if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
+                                    __state = (region.value).split(":")[1];
+                                    if (!states[__state]) {
+                                        $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                        states[__state] = [item.id];
+                                    } else {
+                                        if ($("#stateSelector option[value='" + __state + "']").length === 0) {
+                                            $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                        };
+                                        (states[__state]).push(item.id);
                                     };
+                                    /*
+                                    * assign state for each item
+                                    */
+                                    orgsList[item.id].state = __state;
                                 };
-                                return s;
-                            })(parentId);
+                            });
+                        };
+                    });
 
-                            if ($("#" + parentState + "_container").length > 0) {
+                    /*
+                    * If an organization is a top level org and has child orgs,
+                    * we render legend for it.  This will prevent the organization from being selected by the user.
+                    * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
+                    */
+                    entry.forEach(function(item) {
+                        if (parseInt(item.id) !== 0 && !item.partOf) {
+                            var state = orgsList[item.id].state;
+                            if ($("#" + state + "_container").length > 0) {
                                 var oo = orgsList[item.id];
-                                var contentHTML = "";
-                                /*
-                                 * If an organization is a top level org and has child orgs,
-                                 * we render legend for it.  This will prevent the organization from being selected by the user.
-                                 * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
-                                 */
-                                if (oo && oo.isTopLevel && oo.children.length > 0) {
-                                    contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
-                                } else {
-                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + i18next.t(item.name) + "</label></div>"
+                                if (oo.children.length > 0) {
+                                    contentHTML = "<legend orgId='%orgId%'>%translatedOrgName%</legend>";
+                                    contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='%orgName%' ";
+                                    contentHTML += " id='%orgId%_org' value='%orgId%' />";
+                                    contentHTML = contentHTML.replace(/\%orgId\%/g, item.id)
+                                                            .replace(/\%orgName\%/g, item.name)
+                                                            .replace(/\%translatedOrgName\%/g, i18next.t(item.name));
+                                    
+                                    //contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='" + item.name + "' id='" + item.id + "_org' value='"+item.id+"' />";
+                                    $("#" + state + "_container").append(contentHTML);
                                 };
-                                $("#" + parentState + "_container").append(contentHTML);
                             };
                         };
-                    };
-                  });
+                    });
+                
+                    /**** draw input element(s) that belongs to each state based on parent organization id ***/
+                    entry.forEach(function(item) {
+                        if (parseInt(item.id) != 0 && item.partOf) {
+                            var parentId = (item.partOf.reference).split("/")[2];
+                            if (parentId) {
+                                var parentState = (function(o) {
+                                    var s = "", found = false;
+                                    for (var state in states) {
+                                        if (!found) {
+                                            (states[state]).forEach(function(i) {
+                                                if (i == o) {
+                                                   s = state;
+                                                   found = true;
+                                                };
+                                            });
+                                        };
+                                    };
+                                    return s;
+                                })(parentId);
 
-                  var selectOptions = $("#stateSelector").sortOptions();
-                  if (selectOptions.length > 0) {
-                      $("#stateSelector").empty().append(selectOptions)
-                      .append("<option value='none'>Other</option>")
-                      .prepend("<option value='' selected>Select</option>")
-                      .val("");
-                      $(".state-container, .clinic-prompt").hide();
-                      setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
-                      //case of pre-selected clinic, need to check if any clinic has prechecked
-                      setTimeout(function() { handleCheckedItem();}, 500);
-                      $("#userOrgs input[name='organization']").each(function() {
-                        if ($(this).val() != 0) OT.getDefaultModal(this);
+                                contentHTML = "<div class='radio'>" +
+                                            "<label><input class='clinic' type='radio' id='%orgId%_org' value='%orgId%' state='%state%' name='organization' data-parent-name='%parentOrgName%' data-parent-id='%parentOrgId%'>%translatedOrgName%</label>" +
+                                            "</div>";
+                                contentHTML = contentHTML.replace(/\%orgId\%/g, item.id)
+                                                        .replace(/\%state\%/g, parentState)
+                                                        .replace(/\%parentOrgName\%/g, item.name)
+                                                        .replace(/\%parentOrgId\%/g, parentId)
+                                                        .replace(/\%translatedOrgName\%/g, i18next.t(item.name));
+                                
+                                if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
+                                    $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
+                                } else {
+                                    $("#" + parentState + "_container").append(contentHTML);
+                                };
+                            };
+                        };
                       });
+                    
+                    var selectOptions = $("#stateSelector").sortOptions();
+                    if (selectOptions.length > 0) {
+                        $("#stateSelector").empty().append(selectOptions)
+                          .append("<option value='none'>Other</option>")
+                          .prepend("<option value='' selected>Select</option>")
+                          .val("");
+                        $(".state-container, .clinic-prompt").hide();
+                        setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
+                        //case of pre-selected clinic, need to check if any clinic has prechecked
+                        setTimeout(function() { handleCheckedItem();}, 500);
+                        $("#userOrgs input[name='organization']").each(function() {
+                            if ($(this).val() != 0) OT.getDefaultModal(this);
+                        });
 
-                      {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                      OT.handleEvent();
+                        {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                        OT.handleEvent();
                     } else { // if no states found, then need to draw the orgs UI
                         $("#userOrgs .selector-show").hide();
                         setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
@@ -806,9 +836,11 @@
                         }); }, 500);
                     };
 
-                  if ($("#mainDiv.profile").length > 0) setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+                    if ($("#mainDiv.profile").length > 0) {
+                        setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+                    };
 
-                  $("#clinics").attr("loaded", true);
+                    $("#clinics").attr("loaded", true);
                 };
 
             }).fail(function(xhr) {
@@ -881,7 +913,7 @@
                         </div>
                         <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
                         <br/>
-                        <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
+                        <p>{{_("I consent to sharing information with ")}}<span class="consent-clinic-name">{{consent_agreement.organization_shortname}}</span>.</p>
                         <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
                           <label class="radio-inline">
                               <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>

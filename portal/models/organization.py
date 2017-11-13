@@ -345,6 +345,7 @@ class Organization(db.Model):
                 resource = UnversionedResource(url=url, asset=asset)
 
             resource.organization_name = org.name
+            resource.organization_shortname = org.shortname
             agreements[org.id] = resource
         return agreements
 
