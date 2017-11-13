@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import datetime
 from flask import current_app
 
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from .fhir import QuestionnaireResponse
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank

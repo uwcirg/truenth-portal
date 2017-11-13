@@ -17,7 +17,7 @@ from sqlalchemy import and_
 from traceback import format_exc
 
 from .database import db
-from .dogpile import dogpile_cache
+from .dogpile_cache import dogpile_cache
 from factories.celery import create_celery
 from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache

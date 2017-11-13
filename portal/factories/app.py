@@ -13,7 +13,7 @@ from ..audit import configure_audit_log
 from ..config import DefaultConfig
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
 from ..models.app_text import app_text
