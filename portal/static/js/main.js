@@ -3613,8 +3613,21 @@ $(document).ready(function() {
             },
             customemail: function($el) {
                 var emailVal = $.trim($el.val());
-                if (emailVal == "") {
-                    return false;
+                var update = function($el) {
+                    if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
+                        assembleContent.demo($el.attr("data-user-id"),true, $el);
+                    };
+                };
+                if (emailVal === "") {
+                    if ($el.attr("data-optional")) {
+                        /*
+                        * if email address is optional, update it as is
+                        */
+                        update($el);
+                        return true;
+                    } else {
+                        return false;
+                    };
                 }
                 var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 // Add user_id to api call (used on patient_profile page so that staff can edit)
@@ -3622,19 +3635,17 @@ $(document).ready(function() {
                 if (typeof(patientId) !== "undefined") {
                     addUserId = "&user_id="+patientId;
                 } else if (hasValue($el.attr("data-user-id"))) {
-                    addUserId = "&user_id="+ $el.attr("data-user-id")
+                    addUserId = "&user_id="+ $el.attr("data-user-id");
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
-                	tnthAjax.sendRequest('/api/unique_email?email='+encodeURIComponent(emailVal)+addUserId, 'GET', '', null, function(data) {
+                	tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
                 		if (!data.error) {
                 			if (data.unique) {
-	                            $("#erroremail").html('').parents(".form-group").removeClass('has-error');
-	                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
-	                                assembleContent.demo($el.attr("data-user-id"),true, $el);
-	                            };
+	                            $("#erroremail").html('').parents(".form-group").removeClass("has-error");
+	                            update($el);
 	                        } else {
-	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass('has-error');
+	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
 	                        };
 
                 		} else {
