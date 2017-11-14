@@ -714,7 +714,7 @@
                 async: false
             }).done(function(data) {
                 if (data && data.entry) {
-                    var entry = data.entry, states = {};
+                    var entry = data.entry, states = {}, contentHTML = "";
                     /*
                     * populate orgs list object
                     */
@@ -765,8 +765,19 @@
                                     contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
                                                             .replace(/\{orgName\}/g, item.name)
                                                             .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                    $("#" + state + "_container").append(contentHTML);
+                                } else {
+                                    /*
+                                     * also need to check for top level orgs that do not have children and render those
+                                     */
+                                    contentHTML = "<div class='radio'>" +
+                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
+                                            "</div>";
+                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                        .replace(/\{state\}/g, state)
+                                                        .replace(/\{orgName\}/g, item.name)
+                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
                                 };
+                                $("#" + state + "_container").append(contentHTML);
                             };
                         };
                     });
