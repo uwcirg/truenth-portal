@@ -1978,7 +1978,7 @@ OrgTool.prototype.populateUI = function() {
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
-        orgsList = this.orgsList;
+        var orgsList = this.getOrgsList();
         var orgId = this.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
             var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_defaultConsentModal">'
