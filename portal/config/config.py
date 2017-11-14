@@ -3,6 +3,9 @@ import os
 import redis
 
 
+SITE_CFG = 'site.cfg'
+
+
 def best_sql_url():
     """Return compliant sql url from available enviornment variables"""
     env = os.environ

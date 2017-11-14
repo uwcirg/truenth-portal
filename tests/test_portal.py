@@ -7,7 +7,7 @@ from swagger_spec_validator import validate_spec_url
 import tempfile
 import urllib
 
-from portal.config import TestConfig
+from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.factories.app import create_app
 from portal.models.intervention import INTERVENTION, UserIntervention

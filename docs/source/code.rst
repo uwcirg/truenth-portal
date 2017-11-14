@@ -12,5 +12,6 @@ below by module.
     :maxdepth: 2
 
     portal
+    portal_config
     portal_models
     portal_views

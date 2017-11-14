@@ -13,7 +13,7 @@ services:
     env_file:
       - portal.env
     environment:
-      - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
+      - PERSISTENCE_DIR=${PERSISTENCE_DIR:-gil}
       - PGUSER=${PGUSER:-postgres}
       - PGPASSWORD=${PGPASSWORD:-""}
       - PGHOST=${PGHOST:-db}

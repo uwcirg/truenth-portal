@@ -42,8 +42,8 @@ env:
 matrix:
   include:
     - env: TOXENV=py27
-    - env: TOXENV=translations PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json"
-    - env: TOXENV=translations PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/ePROMs-site-config/develop/site_persistence_file.json"
+    - env: TOXENV=translations PERSISTENCE_DIR="gil"
+    - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=docs
       services: []
       addons: {}

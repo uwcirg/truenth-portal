@@ -14,7 +14,7 @@ from tests.test_assessment_status import mock_questionnairebanks
 from tempfile import NamedTemporaryFile
 
 from portal.extensions import db
-from portal.site_persistence import SitePersistence
+from portal.config.site_persistence import SitePersistence
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
@@ -29,19 +29,15 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
 
-revision = '66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7'
-known_good_persistence_file = (
-    "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/{}"
-    "/site_persistence_file.json".format(revision))
-
 
 class TestSitePersistence(TestCase):
 
     def setUp(self):
         super(TestSitePersistence, self).setUp()
-        if os.environ.get('PERSISTENCE_FILE'):
-            self.fail("unset environment var PERSISTENCE_FILE for test")
-        self.app.config['PERSISTENCE_FILE'] = known_good_persistence_file
+        if os.environ.get('PERSISTENCE_DIR'):
+            self.fail("unset environment var PERSISTENCE_DIR for test")
+        # Tests currently expect 'gil' version of persistence
+        self.app.config['GIL'] = True
         SitePersistence().import_(
             exclude_interventions=False, keep_unmentioned=False)
 
@@ -188,43 +184,3 @@ class TestSitePersistence(TestCase):
         self.assertEquals(
             [r.as_json() for r in updated_copy.recurs],
             [r.as_json() for r in (initial_recur, new_recur)])
-
-    def test_org_questionnaire_banks(self):
-        mock_questionnairebanks('eproms')
-
-        def mock_file(read_only=True):
-            '''mock version to create local testfile for site_persistence'''
-            if not hasattr(self, 'tmpfile'):
-                with NamedTemporaryFile(mode='w', delete=False) as tmpfile:
-                    self.tmpfile = tmpfile.name
-            return self.tmpfile
-
-        sp = SitePersistence()
-        sp.persistence_filename = mock_file
-        sp.export()
-        with open(self.tmpfile) as f:
-            data = f.read()
-        self.assertTrue('recur' in data)
-
-        # Pull same data back in
-        sp.import_(exclude_interventions=True, keep_unmentioned=False)
-
-    def test_intervention_questionnaire_banks(self):
-        mock_questionnairebanks('tnth')
-
-        def mock_file(read_only=True):
-            '''mock version to create local testfile for site_persistence'''
-            if not hasattr(self, 'tmpfile'):
-                with NamedTemporaryFile(mode='w', delete=False) as tmpfile:
-                    self.tmpfile = tmpfile.name
-            return self.tmpfile
-
-        sp = SitePersistence()
-        sp.persistence_filename = mock_file
-        sp.export()
-        with open(self.tmpfile) as f:
-            data = f.read()
-        self.assertTrue('recur' in data)
-
-        # Pull same data back in
-        sp.import_(exclude_interventions=True, keep_unmentioned=False)

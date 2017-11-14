@@ -10,7 +10,7 @@ import redis
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from ..audit import configure_audit_log
-from ..config import DefaultConfig
+from ..config.config import DefaultConfig, SITE_CFG
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
@@ -41,7 +41,7 @@ from ..views.tou import tou_api
 from ..views.truenth import truenth_api
 from ..views.user import user_api
 
-SITE_CFG = 'site.cfg'
+
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
     audit_api,
