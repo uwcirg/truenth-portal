@@ -3642,7 +3642,7 @@ $(document).ready(function() {
                 	tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
                 		if (!data.error) {
                 			if (data.unique) {
-	                            $("#erroremail").html('').parents(".form-group").removeClass("has-error");
+	                            $("#erroremail").html("").parents(".form-group").removeClass("has-error");
 	                            update($el);
 	                        } else {
 	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");

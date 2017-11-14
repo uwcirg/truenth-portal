@@ -70,7 +70,7 @@
                   <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
-                      <td id="{{patient.id}}_username">{{ patient.username }}</td>
+                      <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>

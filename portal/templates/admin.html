@@ -64,7 +64,7 @@
             {% for user in users %}
             <tr id="data_row_{{user.id}}">
                 <td><a href="{{ url_for('.profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a></td>
-                <td>{{ user.username }}</td>
+                <td>{{ user.username if user.username}}</td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
