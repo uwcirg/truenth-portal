@@ -1889,7 +1889,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
     return orgsList;
 };
 OrgTool.prototype.getShortName = function (orgId) {
-    var shortName = "";
+    var shortName = "", orgsList = this.getOrgsList();
     if (hasValue(orgId)) {
         if (orgsList[orgId] && orgsList[orgId].shortname) {
             shortName = orgsList[orgId].shortname;
@@ -1977,37 +1977,50 @@ OrgTool.prototype.populateUI = function() {
     };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
-        if (!o) return false;
-        var orgsList = this.getOrgsList();
-        var orgId = this.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
-        if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
-            var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_defaultConsentModal">'
+        if (!o) {
+            return false;
+        };
+        var self = this;
+        var orgsList = self.getOrgsList();
+        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
+        var title = i18next.t("Consent to share information");
+        var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
+        if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length === 0) {
+            var s = '<div class="modal fade" id="{orgId}_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="{orgId}_defaultConsentModal">'
                 + '<div class="modal-dialog" role="document">' +
                 '<div class="modal-content">' +
                 '<div class="modal-header">' +
-                '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + "<span aria-hidden='true'>&times;</span></button>" +
-                '<h4 class="modal-title">' + i18next.t("Consent to share information") + '</h4>' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="{close}">' + "<span aria-hidden='true'>&times;</span></button>" +
+                '<h4 class="modal-title">{title}</h4>' +
                 '</div>' +
                 '<div class="modal-body">' +
-                '<h4>Terms</h4>' +
-                '<p>' + i18next.t("I consent to sharing information with") +
-                '<span class="consent-clinic-name">&nbsp;' + i18next.t(orgName) +
-                '</p>' +
-                '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
+                '<div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
+                '<div class="main-content tnth-hide">' +
+                '<p>{consentText}</p>' +
+                '<div id="{orgId}defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>' + i18next.t("Yes") + '</label>' +
+                '<input type="radio" name="toConsent" id="{orgId}_consent_yes" data-org="{orgId}" value="yes"/>{yes}</label>' +
                 '<br/>' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>' + i18next.t("No") + '</label>' +
+                '<input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>' +
                 '</div>' +
-                '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
+                '</div>' +
+                '<div id="{orgId}_consentAgreementMessage" class="error-message"></div>' +
                 '</div>' +
                 '<br/>' +
                 '<div class="modal-footer" >' +
-                '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + i18next.t("Close") + '</button>' +
+                '<div id="{orgId}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
+                '<button type="button" class="btn btn-default btn-consent-close" data-org="{orgId}" data-dismiss="modal" aria-label="{close}">{close}</button>' +
                 '</div></div></div></div>';
-            if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
+                s = s.replace(/\{orgId\}/g, orgId)
+                    .replace(/\{close\}/g, i18next.t("Close"))
+                    .replace(/\{yes\}/g, i18next.t("Yes"))
+                    .replace(/\{no\}/g, i18next.t("No"))
+                    .replace(/\{title\}/g, title)
+                    .replace(/\{consentText\}/g, consentText);
+            if ($("#defaultConsentContainer").length === 0) {
+                $("body").append("<div id='defaultConsentContainer'></div>");
+            };
             $("#defaultConsentContainer").append(s);
             $("#" + orgId + "_defaultConsentModal input[name='toConsent']").each(function() {
                 $(this).on("click", function(e) {
@@ -2021,8 +2034,10 @@ OrgTool.prototype.getDefaultModal = function(o) {
                     } else {
                         tnthAjax.deleteConsent(userId, {"org":orgId});
                         setTimeout("tnthAjax.removeObsoleteConsent();", 100);
-                    }
-                    if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
+                    };
+                    if (typeof reloadConsentList != "undefined") {
+                        setTimeout("reloadConsentList();", 500);
+                    };
                     setTimeout('$(".modal").modal("hide");', 250);
                 });
              });
@@ -2040,10 +2055,17 @@ OrgTool.prototype.getDefaultModal = function(o) {
                     assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                 };
              }).on("shown.bs.modal", function() {
-                $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
-                $(this).find(".loading-message-indicator").hide();
+                var checkedOrg = $("#userOrgs input[name='organization']:checked");
+                var shortName = self.getShortName(checkedOrg.val());
+                if (hasValue(shortName)) {
+                    $(this).find(".consent-clinic-name").text(i18next.t(shortName));
+                };
                 $(this).find("input[name='toConsent']").each(function(){
                     $(this).prop("checked", false);
+                });
+                $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
+                $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
+                    $("#" + orgId + "_defaultConsentModal .main-content").removeClass("tnth-hide");
                 });
              });
         };

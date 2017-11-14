@@ -770,7 +770,7 @@
                             };
                         };
                     });
-                
+
                     /**** draw input element(s) that belongs to each state based on parent organization id ***/
                     entry.forEach(function(item) {
                         if (parseInt(item.id) != 0 && item.partOf) {
@@ -799,7 +799,7 @@
                                                         .replace(/\{parentOrgName\}/g, item.name)
                                                         .replace(/\{parentOrgId\}/g, parentId)
                                                         .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                
+
                                 if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
                                     $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
                                 } else {
@@ -808,7 +808,7 @@
                             };
                         };
                       });
-                    
+
                     var selectOptions = $("#stateSelector").sortOptions();
                     if (selectOptions.length > 0) {
                         $("#stateSelector").empty().append(selectOptions)
@@ -905,27 +905,30 @@
                     <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="terms-wrapper">
-                            <h4>Terms</h4>
-                            <div class="terms-container">{{consent_agreement.asset|safe}}</div>
-                        </div>
-                        <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
-                        <br/>
-                        <p>
-                            {% trans org_shortname=consent_agreement.organization_shortname %}
-                                I consent to sharing information with <span class="consent-clinic-name">{{org_shortname}}</span>.
-                            {% endtrans %}
-                        </p>
-                        <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                          <label class="radio-inline">
-                              <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                              {{ _("Yes") }}
-                          </label>
-                          <br/>
-                          <label class="radio-inline">
-                              <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                              {{ _("No") }}
-                          </label>
+                        <div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <div class="main-content tnth-hide">
+                            <div class="terms-wrapper">
+                                <h4>Terms</h4>
+                                <div class="terms-container">{{consent_agreement.asset|safe}}</div>
+                            </div>
+                            <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
+                            <br/>
+                            <p>
+                                {% trans org_shortname=consent_agreement.organization_shortname %}
+                                    I consent to sharing information with <span class="consent-clinic-name">{{org_shortname}}</span>.
+                                {% endtrans %}
+                            </p>
+                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                                  {{ _("Yes") }}
+                              </label>
+                              <br/>
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                                  {{ _("No") }}
+                              </label>
+                            </div>
                         </div>
                         <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
                      </div>
@@ -1003,13 +1006,19 @@
                         var checkedOrg = $("#userOrgs input[name='organization']:checked");
                         var shortName = OT.getShortName(checkedOrg.val());
                         if (hasValue(shortName)) {
-                            $(this).find(".consent-clinic-name").text(shortName);
+                            $(this).find(".consent-clinic-name").text(i18next.t(shortName));
                         };
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });
                         var agreement_url = $(this).find(".agreement-url").val();
-                        if (/stock\-org\-consent/.test(agreement_url)) $(".terms-container").hide();
+                        if (/stock\-org\-consent/.test(agreement_url)) {
+                            $(".terms-container").hide();
+                        };
+                        var self = $(this);
+                        $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
+                            self.find(".main-content").removeClass("tnth-hide");
+                        });
                     });
                 });
             });
