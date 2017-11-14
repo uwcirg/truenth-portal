@@ -98,7 +98,8 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "ethnicity": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
     "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
     "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-    "language": "http://hl7.org/fhir/valueset/languages"
+    "language": "http://hl7.org/fhir/valueset/languages",
+    "shortname": "http://us.truenth.org/identity-codes/shortname"
 };
 var __NOT_PROVIDED_TEXT = "not provided";
 /*
@@ -1871,7 +1872,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
         if (item.identifier) {
             orgsList[item.id].identifier = item.identifier;
             (item.identifier).forEach(function(identifier) {
-                if (identifier.system === "http://us.truenth.org/identity-codes/shortname") {
+                if (identifier.system === SYSTEM_IDENTIFIER_ENUM["shortname"]) {
                     orgsList[item.id].shortname = identifier.value;
                 };
             });
