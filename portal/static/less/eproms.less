@@ -1592,13 +1592,17 @@ div.footer-wrapper.right-panel {
     color: #777;
     border: 1px solid #bdb9b9;
     position: relative;
-    top: -0.3em;
+    margin-top: 0.5em;
   }
 }
 #userProcedures {
   td {
     padding-bottom: 0.2em;
   }
+}
+#tnthproc {
+  width: 100%;
+  max-width: 100%;
 }
 #tnthproc-submit {
   height: 2.5em;
@@ -1955,6 +1959,13 @@ input.clinic {
 
 #profileProceduresWrapper[data-top-org-name='IRONMAN'] {
     display: none;
+}
+#profileProceduresWrapper{
+  &[data-user-view = 'true'] {
+    .profile-item-edit-btn {
+      display: none;
+    }
+  }
 }
 .create-account-container {
   padding: 2em;
