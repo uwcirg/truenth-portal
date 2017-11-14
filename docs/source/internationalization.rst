@@ -26,27 +26,30 @@ For adding new translations, you need to add the blank translation to the .pot f
    | msgid "Cellphone"
    | msgstr ""
 
-You can create a new .pot file with all extracted translations from the code by running the following pybabel command:
+Updating Translation Files
+==========================
+GNU Gettext translation files consist of a single Portable Object Template file (POT file) and Portable Object (PO file) for each localization (language).
 
-   $ pybabel extract -F instance/babel.cfg -o portal/translations/messages.pot portal/
-
-You should then update the .pot file with all translation strings from the apptext/interventions tables using the following:
+Updating POT files
+------------------
+To update the .pot file with all source strings from the apptext/interventions tables run the following command::
 
    $ FLASK_APP=manage.py flask translations
 
-You can then use pybabel to update existing .po translation files (this command will only add new translations, it won't remove or modify any existing ones). For example, to update the en_AU translation file::
+Updating PO files
+-----------------
+To update the PO files with the latest translations from Smartling, run the following command::
 
-   $ pybabel update -i portal/translations/messages.pot -d portal/translations -l en_AU --no-wrap
+   $ FLASK_APP=manage.py flask translation_download
 
-Next, update the new translations in the .po file with the output string:
+Initializing Translation Files
+==============================
+You can create a new .pot file with all extracted translations from the code by running the following pybabel command::
 
-   | # <optional comment pointing to where in the code the translation is used>
-   | msgid "Cellphone"
-   | msgstr "Mobile"
+   $ pybabel extract -F instance/babel.cfg -o portal/translations/messages.pot portal/
 
-Finally, compile all existing .po files into .mo files::
+External Documentation
+======================
+`jinja i18n-extension <http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension>`_
 
-   $ pybabel compile -f -d portal/translations/
-
-
-Outside documentation `jinja i18n-extension <http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension>`_ and `gettext <https://docs.python.org/dev/library/gettext.html>`_
+`gettext <https://docs.python.org/dev/library/gettext.html>`_
