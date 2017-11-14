@@ -30,10 +30,10 @@ class SitePersistence(object):
         """Returns the configured persistence file
 
         Using the first value found, looks for an environment variable named
-        `PERSISTENCE_DIR`, which should define a path relative to the `portal/config`
-        directory such as `eproms`.  If no such environment variable is found, use
-        the presence of the `GIL` config setting - if set use `gil`,
-        else `eproms`.
+        `PERSISTENCE_DIR`, which should define a path relative to the
+        `portal/config` directory such as `eproms`.  If no such environment
+        variable is found, use the presence of the `GIL` config setting - if
+        set use `gil`, else `eproms`.
 
         """
         # product level config file - use presence of env var or config setting
@@ -45,11 +45,13 @@ class SitePersistence(object):
             persistence_dir = 'gil' if gil else 'eproms'
 
         filename = os.path.join(
-            os.path.dirname(__file__), persistence_dir, 'site_persistence_file.json')
+            current_app.root_path, 'config', persistence_dir,
+            'site_persistence_file.json')
         if not os.path.exists(filename):
             raise ValueError(
-                'File not found: {}  Check value of environment variable `PERSISTENCE_DIR` '
-                'Should be a relative path from portal root.'.format(filename))
+                'File not found: {}  Check value of environment variable '
+                '`PERSISTENCE_DIR` Should be a relative path from portal '
+                'root'.format(filename))
         return filename
 
     def _log(self, msg):
@@ -280,7 +282,7 @@ class SitePersistence(object):
             rps_seen.append(rp_json['name'])
         db.session.commit()
 
-         # Delete any ResearchProtocols not named
+        # Delete any ResearchProtocols not named
         if not keep_unmentioned:
             query = ResearchProtocol.query.filter(
                 ~ResearchProtocol.name.in_(rps_seen)) if rps_seen else []
