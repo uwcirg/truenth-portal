@@ -107,6 +107,7 @@ def smartling_upload():
     translation_fpath = os.path.join(current_app.root_path, "translations")
     messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
     config_fpath = os.path.join(current_app.root_path, "../instance/babel.cfg")
+
     # create new .pot file from code
     check_call((
         'pybabel', 'extract',
@@ -118,6 +119,7 @@ def smartling_upload():
         current_app.root_path,
     ))
     current_app.logger.debug("messages.pot file generated")
+
     # update .pot file with db values
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
