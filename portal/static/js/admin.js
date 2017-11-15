@@ -335,13 +335,11 @@
            */
           self.populateUI();
 
-          /*
-           * filter orgs UI based on user's orgs
-           */
-          if (!noPatientData) {
-            var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
-            self.filterOrgs(hbOrgs);
-          };
+        /*
+         * filter orgs UI based on user's orgs
+         */
+        var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
+        self.filterOrgs(hbOrgs);
 
           /*
            * initialize table data
@@ -391,12 +389,12 @@
               });
             });
 
-            $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Select All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Clear All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Close") + "</span></label></div>");
-
-            $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
-                e.stopPropagation();
-                var orgsList = [];
-                $("#userOrgs input[name='organization']:visible").each(function() {
+          $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Select All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Clear All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Close") + "</span></label></div>");
+          $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
+              e.stopPropagation();
+              var orgsList = [];
+              $("#userOrgs input[name='organization']:visible").each(function() {
+                  if ($(this).css("display") !== "none") {
                     $(this).prop("checked", true);
                     orgsList.push($(this).val());
                 });
@@ -688,7 +686,7 @@
      */
     var selectedOrgs = "";
     $("#userOrgs input[name='organization']:checked").each(function() {
-      if ($(this).is(":checked")) {
+      if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
         selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
       };
     });
