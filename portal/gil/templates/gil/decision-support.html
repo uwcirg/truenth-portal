@@ -64,7 +64,7 @@
                   <use xlink:href="#DS-Compass"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main decision-support-link {% if not user %}icon-box__button--disabled{% endif %}" href="{%if user%}{{url_for('gil.home')}}{%else%}/{%endif%}"><span>{{_("Start")}}<figure></figure></span></a></div>
+              <div class="icon-box-wrap__main__right">{% if user %}<a class="icon-box__button icon-box__button--main decision-support-link" href="{{url_for('gil.home')}}">{% else %}<a class="icon-box__button icon-box__button--main decision-support-link" href="#" data-toggle="modal" data-target="#modal-register">{% endif %}<span>{{_("Start")}}<figure></figure></span></a></div>
             </div>
           </div>
         </div>
