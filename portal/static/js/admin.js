@@ -682,27 +682,21 @@
       $("#userOrgs input[name='organization']:checked").each(function() {
         selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
       });
-      if (hasValue(selectedOrgs)) {
-        __filters["orgs_filter_control"] = selectedOrgs;
-      } else {
-        __filters["orgs_filter_control"] = "";
+    };
+    /*
+     * get selected orgs from the filter list by site control
+     */
+    var selectedOrgs = "";
+    $("#userOrgs input[name='organization']:checked").each(function() {
+      if ($(this).is(":checked")) {
+        selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
       };
-
-      /*
-       * get column selections
-       */
-       __filters["column_selections"] = [];
-      $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
-        __filters["column_selections"].push($(this).attr("data-field"));
-      });
-
-
-      data["filters"] = __filters;
-
-      if (Object.keys(data).length > 0) {
-        tnthAjax.setTablePreference(userId||this.userId, tableName, {"data": JSON.stringify(data)});
-        this.currentTablePreference = data;
-      };
+    });
+    if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
+    data["filters"] = __filters;
+    if (Object.keys(data).length > 0) {
+      tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
+      this.currentTablePreference = data;
     };
   };
 

@@ -70,7 +70,10 @@ def patients_root():
                 check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue
-                org_list.add(orgId)
+                for org in user.organizations:
+                    if int(orgId) in OT.here_and_below_id(org.id):
+                        org_list.add(orgId)
+                        break
         else:
             for org in user.organizations:
                 if org.id == 0:  # None of the above doesn't count
