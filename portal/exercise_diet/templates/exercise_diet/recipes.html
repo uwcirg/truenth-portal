@@ -1,12 +1,140 @@
 {% extends 'exercise_diet/layout.html' %}
 
 {% block body %}
+    <div>
+        <p>Even when you know which foods the experts recommend, it’s not always easy to add them to your diet. These recipes and shopping tips give you ideas for how to buy, store, and prepare Foods to Choose.</p>
+    </div>
+    <div>
+        <h4>
+            <a data-toggle="collapse" href="#healthy-fats" aria-expanded="false" class="collapsed" aria-controls="healthy-fats">Healthy Fats from Oils and Nuts</a>
+        </h4>
+    </div>
+    <div id="healthy-fats" class="collapse" role="tabpanel" aria-labelledby="heading1"style="height: 0px;">
+        <table>
+            <tr>
+            {% for asset in recipe_assets['healthy_vegetable_fat'] %}
+                <td>
+                    <a href="javascript:show_recipe('healthy_vegetable_fat','{{ loop.index0 }}');">{{ asset[0]|safe }}</a>
+                </td>
+                {% if loop.index % 3 == 0 %}
+                    </tr><tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 
-    <h2>Recipes</h2>
+    <div>
+        <h4>
+            <a data-toggle="collapse" href="#vegetables" aria-expanded="false" class="collapsed" aria-controls="vegetables">Vegetables</a>
+        </h4>
+    </div>
+    <div id="vegetables" class="collapse" role="tabpanel" aria-labelledby="heading1"style="height: 0px;">
+        <table>
+            <tr>
+            {% for asset in recipe_assets['vegetables'] %}
+                <td>
+                    <a href="javascript:show_recipe('vegetables','{{ loop.index0 }}');">{{ asset[0]|safe }}</a>
+                </td>
+                {% if loop.index % 3 == 0 %}
+                    </tr><tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 
-    {% for asset in assets %}
-        {{ asset|safe }}
-        <hr>
-    {% endfor %}
+    <div>
+        <h4>
+            <a data-toggle="collapse" href="#tomatoes" aria-expanded="false" class="collapsed" aria-controls="tomatoes">Cooked tomatoes</a>
+        </h4>
+    </div>
+    <div id="tomatoes" class="collapse" role="tabpanel" aria-labelledby="heading1"style="height: 0px;">
+        <table>
+            <tr>
+            {% for asset in recipe_assets['tomatoes'] %}
+                <td>
+                    <a href="javascript:show_recipe('tomatoes','{{ loop.index0 }}');">{{ asset[0]|safe }}</a>
+                </td>
+                {% if loop.index % 3 == 0 %}
+                    </tr><tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+
+    <div>
+        <h4>
+            <a data-toggle="collapse" href="#fish" aria-expanded="false" class="collapsed" aria-controls="fish">Fish</a>
+        </h4>
+    </div>
+    <div id="fish" class="collapse" role="tabpanel" aria-labelledby="heading1"style="height: 0px;">
+        <table>
+            <tr>
+            {% for asset in recipe_assets['fish'] %}
+                <td>
+                    <a href="javascript:show_recipe('fish','{{ loop.index0 }}');">{{ asset[0]|safe }}</a>
+                </td>
+                {% if loop.index % 3 == 0 %}
+                    </tr><tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+
+    <div>
+        <h4>
+            <a data-toggle="collapse" href="#alternatives_to_processed_meats" aria-expanded="false" class="collapsed" aria-controls="alternatives_to_processed_meats">Alternatives to Processed Meats</a>
+        </h4>
+    </div>
+    <div id="alternatives_to_processed_meats" class="collapse" role="tabpanel" aria-labelledby="heading1"style="height: 0px;">
+        <table>
+            <tr>
+            {% for asset in recipe_assets['alternatives_to_processed_meats'] %}
+                <td>
+                    <a href="javascript:show_recipe('alternatives_to_processed_meats','{{ loop.index0 }}');">{{ asset[0]|safe }}</a>
+                </td>
+                {% if loop.index % 3 == 0 %}
+                    </tr><tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="recipe-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><span>close</span>X</button>
+                <div class="modal-body">Loading...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>close</span>X</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        function show_recipe(heading, item) {
+            $('#recipe-modal').modal('show');
+            $( ".modal-body" ).load( "/recipe/" + heading + "/" + item );
+        }
+
+        $(function(){
+
+            $('td').on('mouseenter',function(){
+                $(this).addClass('cell-hover');
+                return false;
+            });
+
+            $('td').on('mouseleave',function(){
+                $(this).removeClass('cell-hover');
+                return false;
+            });
+
+        });
+
+    </script>
 
 {% endblock %}

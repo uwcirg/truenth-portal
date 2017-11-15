@@ -2,6 +2,8 @@
 
 {% block body %}
 
-<h2>this is the home page for the flask app</h2>
-	Coming Soon!
+    {% for asset in assets %}
+        {{ asset|safe }}
+    {% endfor %}
+
 {% endblock %}

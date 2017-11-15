@@ -2,10 +2,25 @@
 
 {% block body %}
 
-    <h2>Exercise</h2>
-
     {% for asset in assets %}
         {{ asset|safe }}
+    {% endfor %}
+
+        {% for id, content in modals.iteritems() %}
+        <!-- Modal -->
+        <div class="modal fade" id={{ id }} aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {{ content|safe }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>close</span>X</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     {% endfor %}
 
 {% endblock %}
