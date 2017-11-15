@@ -397,8 +397,10 @@
                 e.stopPropagation();
                 var orgsList = [];
                 $("#userOrgs input[name='organization']:visible").each(function() {
-                    $(this).prop("checked", true);
-                    orgsList.push($(this).val());
+                    if ($(this).css('display') !== "none") {
+                      $(this).prop("checked", true);
+                      orgsList.push($(this).val());
+                    };
                 });
                 $("#orglist-clearall-ckbox").prop("checked", false);
                 $("#orglist-close-ckbox").prop("checked", false);
@@ -680,7 +682,9 @@
        */
       var selectedOrgs = "";
       $("#userOrgs input[name='organization']:checked").each(function() {
-        selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+        if ($(this).css('display') !== "none") {
+          selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+        };
       });
       if (hasValue(selectedOrgs)) {
         __filters["orgs_filter_control"] = selectedOrgs;
