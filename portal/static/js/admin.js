@@ -338,10 +338,8 @@
           /*
            * filter orgs UI based on user's orgs
            */
-          if (!noPatientData) {
-            var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
-            self.filterOrgs(hbOrgs);
-          };
+          var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
+          self.filterOrgs(hbOrgs);
 
           /*
            * initialize table data
