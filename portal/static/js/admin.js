@@ -397,7 +397,7 @@
                 e.stopPropagation();
                 var orgsList = [];
                 $("#userOrgs input[name='organization']:visible").each(function() {
-                    if ($(this).css('display') !== "none") {
+                    if ($(this).css("display") !== "none") {
                       $(this).prop("checked", true);
                       orgsList.push($(this).val());
                     };
@@ -682,7 +682,7 @@
        */
       var selectedOrgs = "";
       $("#userOrgs input[name='organization']:checked").each(function() {
-        if ($(this).css('display') !== "none") {
+        if ($(this).css("display") !== "none") {
           selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
         };
       });
