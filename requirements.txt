@@ -48,7 +48,7 @@ ipython==5.5.0; python_version <= '2.7' # pyup: <6.0.0 # See uwcirg/true_nth_usa
 ipython-genutils==0.2.0
 itsdangerous==0.24
 jedi==0.11.0
-Jinja2==2.9.6
+Jinja2==2.10
 jsonschema==2.6.0
 kombu==4.1.0
 Mako==1.0.7
