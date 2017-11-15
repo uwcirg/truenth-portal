@@ -267,10 +267,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         /*
          * filter orgs UI based on user's orgs
          */
-        if (!noPatientData) {
-            var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
-	          self.filterOrgs(hbOrgs);
-        };
+        var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
+        self.filterOrgs(hbOrgs);
 
         /*
          * set user's preference for filter(s)
@@ -316,8 +314,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               var orgsList = [];
-              $("#userOrgs input[name='organization']").each(function() {
-                  if ($(this).is(":visible")) {
+              $("#userOrgs input[name='organization']:visible").each(function() {
+                  if ($(this).css("display") !== "none") {
                     $(this).prop("checked", true);
                     orgsList.push($(this).val());
                   };
@@ -534,7 +532,7 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
      */
     var selectedOrgs = "";
     $("#userOrgs input[name='organization']:checked").each(function() {
-      if ($(this).is(":checked")) {
+      if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
         selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
       };
     });
