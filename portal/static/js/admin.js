@@ -534,7 +534,9 @@ AdminTool.prototype.setTablePreference = function(userId, tableName, sortField, 
      */
     var selectedOrgs = "";
     $("#userOrgs input[name='organization']:checked").each(function() {
-      selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+      if ($(this).is(":checked")) {
+        selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+      };
     });
     if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
     data["filters"] = __filters;
