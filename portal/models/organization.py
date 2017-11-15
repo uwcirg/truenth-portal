@@ -423,7 +423,7 @@ def org_extension_map(organization, extension):
         if extension['url'] == kls.extension_url:
             return kls(organization, extension)
     # still here implies an extension we don't know how to handle
-    raise ValueError("unknown extension: {}".format(extension.url))
+    raise ValueError("unknown extension: {}".format(extension['url']))
 
 
 class UserOrganization(db.Model):
