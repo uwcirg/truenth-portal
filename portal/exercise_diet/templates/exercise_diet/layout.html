@@ -2,41 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    
     <title>Exercise Diet</title>
-    <!--<link rel="stylesheet" href="../static/styles.css">-->
-    <link href="//demo.us.truenth.org/static/css/topnav.css" rel="stylesheet" />
-    <link href="https://demo-st.us.truenth.org/css/bootstrap.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/bootstrap.css" rel="stylesheet">
+<!--     <link rel="stylesheet" type="text/css" href="https://demo.us.truenth.org/gil/static/css/gil.css" rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
+    <link rel="stylesheet" type="text/css" href="//demo.us.truenth.org/static/css/topnav.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+
 </head>
 <body>
 
 <h1 align="center">TrueNTH Header Goes Here</h1>
 
 <div class="container" id="mainNavContainer">
+    
     <nav class="navbar navbar-default" id="mainNav" role="navigation">
+        
         <div class="container-fluid">
+            
             <div class="navbar-header">
+                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
+
+<!--
                 <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="button">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                </button>
+				</button>
+-->
+            
             </div>
             <div class="navbar-collapse collapse" id="mainNavbar">
                 <ul class="nav navbar-nav">
-                    <li><a class="" href="/">Home</a></li>
-                    <li><a class="" href="/diet">Diet</a></li>
-                    <li><a class="" href="/exercise">Exercise</a></li>
-                    <li><a class="" href="/recipes">Recipes</a></li>
-                    <li><a class="" href="/resources">Resources</a></li>
+                    <li class="introduction"><a href="/introduction">Home</a></li>
+                    <li class="exercise"><a href="/exercise">Exercise</a></li>
+                    <li class="diet"><a href="/diet">Diet</a></li>
+                    <li class="recipes"><a href="/recipes"><span>Recipes & Tips</span></a></li>
                 </ul>
             </div>
         </div>
     </nav>
 </div>
 
-{% block body %}
+<!--
+    <div class="hidden-md hidden-lg">
 
+        <nav class="navbar">
+            <div class="container" id="smNavContainer">
+                <div class="sm-nav-text text-muted">
+                    Home <span id="interventionCurrentText"></span>
+                </div>
+                <div class="sm-nav-text pull-right">
+                    <a href="#" id="smNavToggle" data-toggle="collapse" data-target="#smallNavDetails">
+                        <i class="fa fa-caret-square-o"></i>
+                        <span id="smNavToggleText">Show</span> TrueNTH USA Exercise and Diet Links
+                    </a>
+                </div>
+
+                <div id="smallNavDetails" class="navbar-collapse collapse sm-nav-dropdown" aria-expanded="true">
+                    <ul class="nav navbar-nav">
+                        <li class="active dropdown "><a href="" class="">Home</a></li>
+                        <li class=""><a href="/ProReports/graphs/g/0" class="">Exercise</a></li>
+                        <li class=""><a href="/ProReports/graphs/g/1" class="">Diet</a></li>
+                        <li class=""><a href="/ProReports/graphs/g/3" class="">Recipes & Tips</a></li>
+                        
+                        <li><span class="pull-right sm-nav-close" id="smNavCloseLink" data-toggle="collapse" data-target="#smallNavDetails">
+                        <i class="fa fa-angle-double-up"></i> Close</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+-->
+<!--
+    <script>
+        $(document).ready(function(){
+            $("[data-target='#smallNavDetails']").on('shown.bs.collapse', function () {
+                $("#smallNavToggleText").text("Hide");
+            });
+
+            $("[data-target='#smallNavDetails']").on('hidden.bs.collapse', function () {
+                $("#smallNavToggleText").text("Show");
+            });
+        })
+    </script>
+-->
+
+
+{% block body %}
+<div id="page-content"></div>
 {% endblock %}
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            var pathname = $(location).attr('pathname').replace(/^\/+/g, '.');
+            $('#mainNavbar .nav '+pathname).addClass('active');
+        });
+
+    </script>
 
 </body>
 </html>

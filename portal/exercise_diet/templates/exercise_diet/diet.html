@@ -2,11 +2,54 @@
 
 {% block body %}
 
-    <h2>Diet</h2>
-
     {% for asset in assets %}
         {{ asset|safe }}
-        <hr>
     {% endfor %}
+
+    {% for id, content in modals.iteritems() %}
+        <!-- Modal -->
+        <div class="modal fade" id={{ id }} aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {{ content|safe }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><span>close</span>X</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+    <script type="text/javascript">
+
+        $(function(){
+
+            $('#diet-table tr').on('mouseenter',function(){
+                $(this).addClass('row-hover');
+                return false;
+            });
+
+            $('#diet-table tr').on('mouseleave',function(){
+                $(this).removeClass('row-hover');
+                return false;
+            });
+
+            $('#avoid-foods-table td').on('mouseenter',function(){
+                $(this).addClass('cell-hover');
+                return false;
+            });
+
+            $('#avoid-foods-table td').on('mouseleave',function(){
+                $(this).removeClass('cell-hover');
+                return false;
+            });
+
+        });
+
+    </script>
+
 
 {% endblock %}
