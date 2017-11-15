@@ -335,11 +335,11 @@
            */
           self.populateUI();
 
-        /*
-         * filter orgs UI based on user's orgs
-         */
-        var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
-        self.filterOrgs(hbOrgs);
+          /*
+           * filter orgs UI based on user's orgs
+           */
+          var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
+          self.filterOrgs(hbOrgs);
 
           /*
            * initialize table data
@@ -393,20 +393,21 @@
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               var orgsList = [];
-              $("#userOrgs input[name='organization']:visible").each(function() {
+              $("#userOrgs input[name='organization']").filter(":visible").each(function() {
                   if ($(this).css("display") !== "none") {
                     $(this).prop("checked", true);
                     orgsList.push($(this).val());
-                });
-                $("#orglist-clearall-ckbox").prop("checked", false);
-                $("#orglist-close-ckbox").prop("checked", false);
-                /*
-                 * pre-set user preference for filtering
-                 */
-                self.setTablePreference(self.userId, self.tableIdentifier);
-                if (orgsList.length > 0) {
-                  setTimeout(function() { showLoader(); location.reload(); }, 150);
-                };
+                  };
+              });
+              $("#orglist-clearall-ckbox").prop("checked", false);
+              $("#orglist-close-ckbox").prop("checked", false);
+              /*
+               * pre-set user preference for filtering
+               */
+              self.setTablePreference(self.userId, self.tableIdentifier);
+              if (orgsList.length > 0) {
+                setTimeout(function() { showLoader(); location.reload(); }, 150);
+              };
             });
             $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
                 e.stopPropagation();
@@ -673,28 +674,32 @@
           };
         });
       };
-      /*
+       /*
        * get selected orgs from the filter list by site control
        */
       var selectedOrgs = "";
-      $("#userOrgs input[name='organization']:checked").each(function() {
-        selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+      $("#userOrgs input[name='organization']").each(function() {
+        if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
+          selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+        };
       });
-    };
-    /*
-     * get selected orgs from the filter list by site control
-     */
-    var selectedOrgs = "";
-    $("#userOrgs input[name='organization']:checked").each(function() {
-      if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
-        selectedOrgs += (hasValue(selectedOrgs) ? ",": "") + $(this).val();
+      if (hasValue(selectedOrgs)) {
+        __filters["orgs_filter_control"] = selectedOrgs;
+      } else {
+        __filters["orgs_filter_control"] = "";
       };
-    });
-    if (hasValue(selectedOrgs)) __filters["orgs_filter_control"] = selectedOrgs;
-    data["filters"] = __filters;
-    if (Object.keys(data).length > 0) {
-      tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
-      this.currentTablePreference = data;
+      /*
+      * get column selections
+      */
+      __filters["column_selections"] = [];
+      $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
+        __filters["column_selections"].push($(this).attr("data-field"));
+      });
+      data["filters"] = __filters;
+      if (Object.keys(data).length > 0) {
+        tnthAjax.setTablePreference(userId||this.userId, "patientList", {"data": JSON.stringify(data)});
+        this.currentTablePreference = data;
+      };
     };
   };
 
