@@ -17,6 +17,7 @@ from smtplib import SMTPRecipientsRefused
 from sqlalchemy import and_
 from traceback import format_exc
 
+from .audit import auditable_event
 from .database import db
 from .dogpile_cache import dogpile_cache
 from factories.celery import create_celery
@@ -327,8 +328,17 @@ def generate_and_send_summaries(cutoff_days, org_id):
             try:
                 em.send_message()
             except SMTPRecipientsRefused as exc:
-                current_app.logger.error("Error sending email to recipient(s):"
-                                         " {}".format(exc))
+                msg = ("Error sending site summary email to {}: "
+                       "{}".format(user.email, exc))
+
+                sys = User.query.filter_by(email='__system__').first()
+
+                auditable_event(message=msg,
+                                user_id=(sys.id if sys else user.id),
+                                subject_id=user.id,
+                                context="user")
+
+                current_app.logger.error(msg)
                 for email in exc[0]:
                     error_emails.add(email)
 
