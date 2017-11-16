@@ -2321,14 +2321,21 @@
                                     <div class='form-group'>
                                         <select class='form-control' id='tnthproc'>
                                             <option value=''>{{ _("Select") }}...</option>
-                                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
-                                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
-                                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
-                                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
-                                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
-                                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
-                                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
-                                            <option value='999999999'>{{ _("None of the above") }}</option>
+                                            {% if config.get("TREATMENT_OPTIONS") %}
+                                                {% set treatment_options = config.get("TREATMENT_OPTIONS") %}
+                                                {% for item in treatment_options %}
+                                                    <OPTION value="{{item.code}}">{{item.display}}</OPTION>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value='373818007'>{{ _("Started watchful waiting") }}</option>
+                                                <option value='424313000'>{{ _("Started active surveillance") }}</option>
+                                                <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
+                                                <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
+                                                <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
+                                                <option value='228748004'>{{ _("Brachytherapy") }}</option>
+                                                <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
+                                                <option value='999999999'>{{ _("None of the above") }}</option>
+                                            {% endif %}
                                         </select>
                                         <div class="help-block with-errors"></div>
                                     </div>

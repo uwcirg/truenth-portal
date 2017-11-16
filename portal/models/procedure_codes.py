@@ -147,6 +147,38 @@ class TxStartedConstants(object):
             codings=[ichom], text='Focal therapy').add_if_not_found(True)
 
     @lazyprop
+    def AndrogenDeprivationTherapySurgicalOrchiectomy(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - surgical orchiectomy',
+            display='None').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(True)
+
+    @lazyprop
+    def AndrogenDeprivationTherapySurgicalChemical(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - chemical',
+            display='None').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(True)
+
+    @lazyprop
+    def WholeGlandAblation(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='whole-gland ablation',
+            display='None').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Whole-gland ablation').add_if_not_found(True)
+
+    @lazyprop
+    def FocalGlandAblation(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='focal-gland ablation',
+            display='None').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Focal-gland ablation').add_if_not_found(True)
+
+    @lazyprop
     def OtherProcedure(self):
         sno = Coding(
             system=SNOMED, code='118877007',

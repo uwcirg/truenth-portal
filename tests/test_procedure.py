@@ -157,7 +157,12 @@ class TestProcedure(TestCase):
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
             ('888', u'Other (free text)', ICHOM),
-            ('118877007', 'Procedure on prostate', SNOMED)
+            ('118877007', 'Procedure on prostate', SNOMED),
+            (u'androgen deprivation therapy - surgical orchiectomy', u'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
+            (u'androgen deprivation therapy - chemical', u'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
+            (u'whole-gland ablation', u'Whole-gland ablation', TRUENTH_CLINICAL_CODE_SYSTEM),
+            (u'focal-gland ablation', u'Focal-gland ablation', TRUENTH_CLINICAL_CODE_SYSTEM)
+
         ])
         # confirm we have the whole list:
         found = set()
