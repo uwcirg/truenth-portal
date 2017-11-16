@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     
-    <title>Exercise Diet</title>
+    <title>{% trans %}Exercise Diet{% endtrans %}</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -18,7 +18,7 @@
 </head>
 <body>
 
-<h1 align="center">{% trans %}"TrueNTH Header Goes Here"{% endtrans %}</h1>
+<h1 align="center">{% trans %}TrueNTH Header Goes Here{% endtrans %}</h1>
 
 <div class="container" id="mainNavContainer">
     
@@ -27,7 +27,7 @@
         <div class="container-fluid">
             
             <div class="navbar-header">
-                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">{% trans %}"Show TrueNTH USA Exercise and Diet Links"{% endtrans %}</button>
+                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">{% trans %}Show TrueNTH USA Exercise and Diet Links{% endtrans %}</button>
 
 <!--
                 <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="button">
@@ -39,19 +39,12 @@
             
             </div>
             <div class="navbar-collapse collapse" id="mainNavbar">
-                {% trans
-                    intro_url = url_for('.introduction'),
-                    exercise_url = url_for('.exercise'),
-                    diet_url = url_for('.diet'),
-                    recipes_url = url_for('.recipes')
-                %}
                 <ul class="nav navbar-nav">
-                    <li class="introduction"><a href="{{ intro_url }}">Home</a></li>
-                    <li class="exercise"><a href="{{ exercise_url }}">Exercise</a></li>
-                    <li class="diet"><a href="{{ diet_url }}">Diet</a></li>
-                    <li class="recipes"><a href="{{ recipes_url }}"><span>Recipes & Tips</span></a></li>
+                    <li class="introduction"><a href="url_for('.introduction')">{% trans %}Home{% endtrans %}</a></li>
+                    <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
+                    <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
+                    <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
                 </ul>
-                {% endtrans %}
             </div>
         </div>
     </nav>
