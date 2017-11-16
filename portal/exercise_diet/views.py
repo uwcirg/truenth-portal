@@ -1,6 +1,6 @@
 import requests
 import json
-from flask import Blueprint, Flask, render_template, redirect, url_for
+from flask import Blueprint, current_app, render_template, redirect, url_for
 
 
 exercise_diet = Blueprint(
@@ -9,14 +9,22 @@ exercise_diet = Blueprint(
 
 
 def get_asset(uuid):
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?version=latest&uuid=%s" % uuid
+    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
+        LR_ORIGIN=current_app.config.get("LR_ORIGIN"), uuid=uuid)
+
     data = requests.get(url).content
     return json.JSONDecoder().decode(data)['asset']
 
 
+def get_tag_data(anyTags):
+    url = (
+        "{LR_ORIGIN}/c/portal/truenth/asset/query?anyTags={anyTags}".format(
+            LR_ORIGIN=current_app.config.get("LR_ORIGIN"), anyTags=anyTags))
+    return requests.get(url).content
+
+
 def get_all_recipes():
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=recipe"
-    recipe_data = requests.get(url).content
+    recipe_data = get_tag_data(anyTags="recipe")
     recipe_assets = {'vegetables': [], 'healthy_vegetable_fat': [], 'tomatoes': [], 'fish': [],
                      'alternatives_to_processed_meats': []}
     for asset in json.JSONDecoder().decode(recipe_data)['results']:
@@ -31,8 +39,7 @@ def get_all_recipes():
         if 'alternatives_to_processed_meats' in asset['tags']:
             recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid']))
 
-    shopping_url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=shopping_tips"
-    shopping_data = requests.get(shopping_url).content
+    shopping_data = get_tag_data(anyTags="shopping_tips")
     for asset in json.JSONDecoder().decode(shopping_data)['results']:
         if 'vegetables' in asset['tags']:
             recipe_assets['vegetables'].append((asset['title'], asset['uuid']))
@@ -54,8 +61,7 @@ def index():
 
 @exercise_diet.route('/introduction')
 def introduction():
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=introduction"
-    data = requests.get(url).content
+    data = get_tag_data(anyTags="introduction")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
@@ -65,14 +71,12 @@ def introduction():
 
 @exercise_diet.route('/diet')
 def diet():
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=diet"
-    data = requests.get(url).content
+    data = get_tag_data(anyTags="diet")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=diet-modal"
-    modal_data = requests.get(url).content
+    modal_data = get_tag_data(anyTags="diet-modal")
     modals = {}
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
@@ -84,14 +88,12 @@ def diet():
 
 @exercise_diet.route('/exercise')
 def exercise():
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=exercise"
-    data = requests.get(url).content
+    data = get_tag_data(anyTags="exercise")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=exercise-modal"
-    modal_data = requests.get(url).content
+    modal_data = get_tag_data(anyTags="exercise-modal")
     modals = {}
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
@@ -103,8 +105,7 @@ def exercise():
 
 @exercise_diet.route('/resources')
 def resources():
-    url = "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/query?anyTags=resources"
-    data = requests.get(url).content
+    data = get_tag_data(anyTags="resources")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
