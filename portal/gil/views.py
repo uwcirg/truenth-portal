@@ -192,9 +192,17 @@ def privacy():
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     user = current_user()
-    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-    return render_template(
-        'gil/terms.html', content=terms.asset, editorUrl=terms.editor_url, user=user)
+    if user:
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r) and not role:
+                role = r
+        terms = VersionedResource(app_text(Terms_ATMA.name_key(
+            role=role)))
+    else:
+        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    return render_template('gil/terms.html', content=terms.asset,
+                           editorUrl=terms.editor_url, user=user)
 
 
 @gil.route('/about')
