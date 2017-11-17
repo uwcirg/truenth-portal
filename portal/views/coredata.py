@@ -7,6 +7,7 @@ from werkzeug.exceptions import Unauthorized
 from ..extensions import oauth
 from ..models.auth import validate_origin
 from ..models.coredata import Coredata
+from ..models.fhir import Coding
 from ..models.user import current_user, get_user
 
 
@@ -201,5 +202,11 @@ def acquire():
                     urlencode(qs)
         return url
 
+    code_list = current_app.config.get('TREATMENT_OPTIONS')
+    treatment_options = {} if code_list else None
+    for code in code_list:
+        treatment_options[code] = Coding.display_lookup(code)
+
     return render_template("coredata.html", user=current_user(),
-        require=require, return_address=clean_return_address(return_address))
+        require=require, return_address=clean_return_address(return_address),
+        treatment_options=treatment_options)

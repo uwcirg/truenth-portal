@@ -118,6 +118,8 @@ class BaseConfig(object):
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', None)
     RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
+    TREATMENT_OPTIONS = ['373818007', '424313000', '26294005', '26294005-nns', '33195004', '228748004', '707266006', '999999999']
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

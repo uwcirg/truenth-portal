@@ -35,6 +35,7 @@ from ..models.communication import load_template_args, Communication
 from ..models.coredata import Coredata
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
+from ..models.fhir import Coding
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
@@ -510,8 +511,13 @@ def profile(user_id):
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    code_list = current_app.config.get('TREATMENT_OPTIONS')
+    treatment_options = {} if code_list else None
+    for code in code_list:
+        treatment_options[code] = Coding.display_lookup(code)
     return render_template('profile.html', user=user, terms=terms,
-                           consent_agreements=consent_agreements)
+                           consent_agreements=consent_agreements,
+                           treatment_options=treatment_options)
 
 
 @portal.route('/patient-invite-email/<int:user_id>')

@@ -150,7 +150,7 @@ class TxStartedConstants(object):
     def AndrogenDeprivationTherapySurgicalOrchiectomy(self):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - surgical orchiectomy',
-            display='None').add_if_not_found(True)
+            display='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
                                text='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(True)
 
@@ -158,7 +158,7 @@ class TxStartedConstants(object):
     def AndrogenDeprivationTherapySurgicalChemical(self):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - chemical',
-            display='None').add_if_not_found(True)
+            display='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
                                text='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(True)
 
@@ -166,7 +166,7 @@ class TxStartedConstants(object):
     def WholeGlandAblation(self):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='whole-gland ablation',
-            display='None').add_if_not_found(True)
+            display='Whole-gland ablation').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
                                text='Whole-gland ablation').add_if_not_found(True)
 
@@ -174,7 +174,7 @@ class TxStartedConstants(object):
     def FocalGlandAblation(self):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='focal-gland ablation',
-            display='None').add_if_not_found(True)
+            display='Focal-gland ablation').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
                                text='Focal-gland ablation').add_if_not_found(True)
 
