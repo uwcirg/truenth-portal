@@ -186,9 +186,14 @@ def patient_profile(patient_id):
 def treatment_options():
     code_list = current_app.config.get('TREATMENT_OPTIONS')
     if code_list:
-        treatment_options = {}
-        for code in code_list:
-            treatment_options[code] = Coding.display_lookup(code)
+        treatment_options = []
+        for item in code_list:
+            code, system = item;
+            treatment_options.append({
+                "code": code,
+                "system": system,
+                "text": Coding.display_lookup(code, system)
+            });
     else:
-        abort(400, "Treatment options are not available")
+        abort(400, "Treatment options are not available.")
     return jsonify(treatment_options=treatment_options)

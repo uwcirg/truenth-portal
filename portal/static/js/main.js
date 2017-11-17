@@ -1133,12 +1133,14 @@ var fillContent = {
     },
     "treatmentOptions": function(data) {
         if (data.treatment_options) {
+            var entries = data.treatment_options;
             $("#tnthproc").append("<option value=''>" + i18next.t("Select") + "</option>");
-            for (var item in data.treatment_options) {
-                $("#tnthproc").append("<option value='{value}'>{text}</option>"
-                                        .replace("{value}", item)
-                                        .replace("{text}", i18next.t(data.treatment_options[item])));
-            };
+            entries.forEach(function(item) {
+                $("#tnthproc").append("<option value='{value}' data-system='{system}'>{text}</option>"
+                                        .replace("{value}", item.code)
+                                        .replace("{text}", i18next.t(item.text))
+                                        .replace("{system}", item.system));
+            });
         };
     },
     "treatment": function(data) {

@@ -104,15 +104,15 @@ class TxStartedConstants(object):
     def ExternalBeamRadiationTherapy(self):
         sno = Coding(
             system=SNOMED, code='33195004',
-            display='External beam radiation therapy'
+            display='External beam radiation therapy (EBRT)'
         ).add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='4',
-            display='External beam radiation therapy'
+            display='External beam radiation therapy (EBRT)'
         ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='External beam radiation therapy').add_if_not_found(True)
+            text='External beam radiation therapy (EBRT)').add_if_not_found(True)
 
     @lazyprop
     def Brachytherapy(self):
@@ -164,19 +164,21 @@ class TxStartedConstants(object):
 
     @lazyprop
     def WholeGlandAblation(self):
-        tnth = Coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='whole-gland ablation',
-            display='Whole-gland ablation').add_if_not_found(True)
-        return CodeableConcept(codings=[tnth],
-                               text='Whole-gland ablation').add_if_not_found(True)
+        sno = Coding(
+            system=SNOMED, code='176307007', display='Whole-gland ablation'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Whole-gland ablation').add_if_not_found(True)
 
     @lazyprop
     def FocalGlandAblation(self):
-        tnth = Coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='focal-gland ablation',
-            display='Focal-gland ablation').add_if_not_found(True)
-        return CodeableConcept(codings=[tnth],
-                               text='Focal-gland ablation').add_if_not_found(True)
+        sno = Coding(
+            system=SNOMED, code='438778003', display='Focal-gland ablation'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Focal-gland ablation').add_if_not_found(True)
 
     @lazyprop
     def OtherProcedure(self):
@@ -189,6 +191,15 @@ class TxStartedConstants(object):
         return CodeableConcept(
             codings=[sno, ichom], text='Other procedure on prostate'
         ).add_if_not_found(True)
+
+    @lazyprop
+    def NoneOfTheAbove(self):
+        sno = Coding(
+            system=SNOMED, code='999999999', display='Other primary treatment'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Other primary treatment').add_if_not_found(True)
 
 
 class TxNotStartedConstants(object):

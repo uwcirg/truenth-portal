@@ -153,15 +153,16 @@ class TestProcedure(TestCase):
             ('26294005', 'Radical prostatectomy (nerve-sparing)', SNOMED),
             ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)',
              SNOMED),
-            ('33195004', 'External beam radiation therapy', SNOMED),
+            ('33195004', 'External beam radiation therapy (EBRT)', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
             ('888', u'Other (free text)', ICHOM),
             ('118877007', 'Procedure on prostate', SNOMED),
+            ('999999999', u'Other primary treatment', SNOMED),
             (u'androgen deprivation therapy - surgical orchiectomy', u'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
             (u'androgen deprivation therapy - chemical', u'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
-            (u'whole-gland ablation', u'Whole-gland ablation', TRUENTH_CLINICAL_CODE_SYSTEM),
-            (u'focal-gland ablation', u'Focal-gland ablation', TRUENTH_CLINICAL_CODE_SYSTEM)
+            ('176307007', u'Whole-gland ablation', SNOMED),
+            ('438778003', u'Focal-gland ablation', SNOMED)
 
         ])
         # confirm we have the whole list:
