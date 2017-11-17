@@ -133,15 +133,10 @@ def patient_profile_create():
     consent_agreements = Organization.consent_agreements()
     user = current_user()
     leaf_organizations = user.leaf_organizations()
-    code_list = current_app.config.get('TREATMENT_OPTIONS')
-    treatment_options = {} if code_list else None
-    for code in code_list:
-        treatment_options[code] = Coding.display_lookup(code)
     return render_template(
         "patient_profile_create.html", user = user,
         consent_agreements=consent_agreements,
-        leaf_organizations=leaf_organizations,
-        treatment_options=treatment_options)
+        leaf_organizations=leaf_organizations)
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>/<authored_date>')
@@ -178,15 +173,22 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
-    code_list = current_app.config.get('TREATMENT_OPTIONS')
-    treatment_options = {} if code_list else None
-    for code in code_list:
-        treatment_options[code] = Coding.display_lookup(code)
 
     return render_template(
         'profile.html', user=patient,
         current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
-        user_interventions=user_interventions,
-        treatment_options = treatment_options)
+        user_interventions=user_interventions)
+
+@patients.route('/treatment-options')
+@oauth.require_oauth()
+def treatment_options():
+    code_list = current_app.config.get('TREATMENT_OPTIONS')
+    if code_list:
+        treatment_options = {}
+        for code in code_list:
+            treatment_options[code] = Coding.display_lookup(code)
+    else:
+        abort(400, "Treatment options are not available")
+    return jsonify(treatment_options=treatment_options)

@@ -1131,6 +1131,16 @@ var fillContent = {
             co.getConsentList();
         };
     },
+    "treatmentOptions": function(data) {
+        if (data.treatment_options) {
+            $("#tnthproc").append("<option value=''>" + i18next.t("Select") + "</option>");
+            for (var item in data.treatment_options) {
+                $("#tnthproc").append("<option value='{value}'>{text}</option>"
+                                        .replace("{value}", item)
+                                        .replace("{text}", i18next.t(data.treatment_options[item])));
+            };
+        };
+    },
     "treatment": function(data) {
         var treatmentCode = tnthAjax.hasTreatment(data);
         if (treatmentCode) {
@@ -3492,6 +3502,19 @@ var tnthAjax = {
             };
         });
 
+    },
+    "treatmentOptions": function(userId, params, callback) {
+        this.sendRequest('/patients/treatment-options', 'GET', userId, (params||{}), function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving treatment options.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     }
 };
 
