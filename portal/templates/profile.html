@@ -67,9 +67,9 @@
         {%- endif -%}
         <br/>
         {%- if user.id == current_user.id -%}
-          {{user_profile(user, current_user, consent_agreements, user_interventions, treatment_options)}}
+          {{user_profile(user, current_user, consent_agreements, user_interventions)}}
         {%- else -%}
-          {{profile(user, current_user, consent_agreements, user_interventions, treatment_options)}}
+          {{profile(user, current_user, consent_agreements, user_interventions)}}
         {%- endif -%}
           <br/><br/>
       </div>

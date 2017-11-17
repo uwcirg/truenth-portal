@@ -1981,7 +1981,7 @@
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions, treatment_options) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -2051,7 +2051,7 @@
             </div>
         {%- endif %}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
-        {{profileProcedures(person, current_user, treatment_options) | show_macro('procedures')}}
+        {{profileProcedures(person, current_user) | show_macro('procedures')}}
         {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
             <div class="row">
                 <div class="col-md-12 col-xs-12">
@@ -2120,7 +2120,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions, treatment_options) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
@@ -2232,7 +2232,7 @@
     {%- endif %}
 
     {%- if person and person.has_role(ROLE.PATIENT) %}
-        {{profileProcedures(person, current_user, treatment_options) | show_macro('procedures')}}
+        {{profileProcedures(person, current_user) | show_macro('procedures')}}
     {%- endif %}
 
     {%- if person and person.has_role(ROLE.PATIENT) %}
@@ -2293,7 +2293,7 @@
     {%- endif %}
 {%- endmacro %}
 
-{% macro profileProcedures(person, current_user, treatment_options) -%}
+{% macro profileProcedures(person, current_user) -%}
     {% set top_org = current_user.first_top_organization() if current_user else False %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
@@ -2320,7 +2320,7 @@
                                 <div class="col-md-6 col-xs-11">
                                     <div class='form-group'>
                                         <select class='form-control' id='tnthproc'>
-                                            <option value=''>{{ _("Select") }}...</option>
+                                            <!--
                                             {% if treatment_options %}
                                                 {% for key in treatment_options %}
                                                     <OPTION value="{{key}}">{{treatment_options[key]}}</OPTION>
@@ -2335,6 +2335,7 @@
                                                 <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
                                                 <option value='999999999'>{{ _("None of the above") }}</option>
                                             {% endif %}
+                                        -->
                                         </select>
                                         <div class="help-block with-errors"></div>
                                     </div>
@@ -2399,6 +2400,11 @@
     </div>
     <script>
         $(document).ready(function(){
+            tnthAjax.treatmentOptions("{{person.id if person}}",null, function(data) {
+                if (!data.error) {
+                    fillContent.treatmentOptions(data);
+                };
+            });
             {% if person %} tnthAjax.getProc('{{person.id}}', false); {% endif %}
         });
     </script>
