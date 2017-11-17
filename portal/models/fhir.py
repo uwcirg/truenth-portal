@@ -103,7 +103,6 @@ class CodeableConcept(db.Model):
         self = db.session.merge(self)
         return self
 
-
 class Coding(db.Model):
     __tablename__ = 'codings'
     id = db.Column(db.Integer, primary_key=True)
@@ -154,6 +153,18 @@ class Coding(db.Model):
         elif self is not match:
             self = db.session.merge(match)
         return self
+
+    @staticmethod
+    def display_lookup(code, system=TRUENTH_CLINICAL_CODE_SYSTEM):
+        """Return display value for (code, system), if found"""
+        item = Coding.query.filter(
+            Coding.code==code,
+            Coding.system==system).first()
+        if not item:
+            raise ValueError(
+                "No coding found for ({system}, {code})".format(
+                    system=system, code=code))
+        return item.display
 
 
 """ TrueNTH Clinical Codes """
