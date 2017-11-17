@@ -115,7 +115,6 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
-            print("patient {}".format(patient.id))
             a_s, qbd = overall_assessment_status(patient.id)
             patient.assessment_status = a_s
             patient.current_qb = visit_name(qbd)
