@@ -153,7 +153,7 @@ class TestProcedure(TestCase):
             ('26294005', 'Radical prostatectomy (nerve-sparing)', SNOMED),
             ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)',
              SNOMED),
-            ('33195004', 'External beam radiation therapy (EBRT)', SNOMED),
+            ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
             ('888', u'Other (free text)', ICHOM),

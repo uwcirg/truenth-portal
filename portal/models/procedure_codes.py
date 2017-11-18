@@ -104,15 +104,15 @@ class TxStartedConstants(object):
     def ExternalBeamRadiationTherapy(self):
         sno = Coding(
             system=SNOMED, code='33195004',
-            display='External beam radiation therapy (EBRT)'
+            display='External beam radiation therapy'
         ).add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='4',
-            display='External beam radiation therapy (EBRT)'
+            display='External beam radiation therapy'
         ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='External beam radiation therapy (EBRT)').add_if_not_found(True)
+            text='External beam radiation therapy').add_if_not_found(True)
 
     @lazyprop
     def Brachytherapy(self):
