@@ -9,6 +9,8 @@ var AccountCreationObj = function (roles, dependencies) {
     this.roles = roles;
     this.userId = "None created";
     this.dependencies = dependencies||{};
+    this.treatmentIntervalVar = null;
+
 
     $.ajaxSetup({
         timeout: 5000,
@@ -538,9 +540,6 @@ var AccountCreationObj = function (roles, dependencies) {
 //events associated with elements on the account creation page
 $(document).ready(function(){
 
-    if (hasValue(aco.treatmentIntervalVar)) {
-        clearInterval(aco.treatmentIntervalVar);
-    };
     $("#createProfileForm .optional-diplay-text").removeClass("tnth-hide");
 
     $("#createProfileForm .back-button-container").prepend(__getLoaderHTML());
