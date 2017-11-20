@@ -1970,7 +1970,6 @@ def get_user_messages(user_id):
 
 @user_api.route('/user/<int:user_id>/questionnaire_bank')
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 def get_current_user_qb(user_id):
     """Returns JSON defining user's current QuestionnaireBank
 
@@ -2018,10 +2017,12 @@ def get_current_user_qb(user_id):
 
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 
-    qb = qbd.questionnaire_bank.as_json() if qbd.questionnaire_bank else None
-    qbd_json = {'relative_start': FHIR_datetime.as_fhir(qbd.relative_start),
-                'recur': qbd.recur,
-                'iteration': qbd.iteration,
-                'questionnaire_bank': qb}
+    qbd_json = {}
+    qbd_json['questionnaire_bank'] = (qbd.questionnaire_bank.as_json()
+                                      if qbd.questionnaire_bank else None)
+    qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
+    qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
+                                  if qbd.relative_start else None)
+    qbd_json['iteration'] = qbd.iteration
 
     return jsonify(qbd_json)
