@@ -461,12 +461,18 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(resp.json['questionnaire_bank']['name'],
                           'CRV_recurring_3mo_period')
 
-        dt = (datetime.utcnow() - relativedelta(months=4)).strftime('%Y-%m-%d')
+        dt = (datetime.utcnow() - relativedelta(months=2)).strftime('%Y-%m-%d')
         resp2 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp2)
         self.assertEquals(resp2.json['questionnaire_bank']['name'],
                           'CRV Baseline')
+
+        dt = (datetime.utcnow() - relativedelta(months=4)).strftime('%Y-%m-%d')
+        resp3 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
+                                '{}'.format(TEST_USER_ID, dt))
+        self.assert200(resp3)
+        self.assertFalse(resp3.json['questionnaire_bank'])
 
 
 def setup_qbs():
