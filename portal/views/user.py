@@ -2018,11 +2018,14 @@ def get_current_user_qb(user_id):
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 
     qbd_json = {}
-    qbd_json['questionnaire_bank'] = (qbd.questionnaire_bank.as_json()
-                                      if qbd.questionnaire_bank else None)
-    qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
-    qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
-                                  if qbd.relative_start else None)
-    qbd_json['iteration'] = qbd.iteration
+    if date and qbd.relative_start and (date < qbd.relative_start):
+        qbd_json['questionnaire_bank'] = None
+    else:
+        qbd_json['questionnaire_bank'] = (qbd.questionnaire_bank.as_json()
+                                          if qbd.questionnaire_bank else None)
+        qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
+        qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
+                                      if qbd.relative_start else None)
+        qbd_json['iteration'] = qbd.iteration
 
     return jsonify(qbd_json)
