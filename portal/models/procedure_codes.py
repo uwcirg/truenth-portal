@@ -193,7 +193,7 @@ class TxStartedConstants(object):
         ).add_if_not_found(True)
 
     @lazyprop
-    def NoneOfTheAbove(self):
+    def OtherPrimaryTreatment(self):
         sno = Coding(
             system=SNOMED, code='999999999', display='Other primary treatment'
         ).add_if_not_found(True)
