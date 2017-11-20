@@ -2102,8 +2102,18 @@
       "resourceType": "AppText"
     }, 
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true",
       "name": "Terms and Conditions URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=20bfc5d6-41a5-a4ec-5418-0904d25e0c7c&editorUrl=true",
+      "name": "staff terms and conditions URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true",
+      "name": "patient terms and conditions URL",
       "resourceType": "AppText"
     },
     {
