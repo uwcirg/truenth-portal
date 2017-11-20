@@ -260,7 +260,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
             <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4>
-            <span class="box-modal__copy">{{_("Your session will expire in approximately ")}}</span><span class="box-modal__copy text-warning" id='remaining-time'></span>
+            <span class="box-modal__copy">{{_("Your session will expire in approximately ")}}</span><span class="box-modal__copy text-warning" id='remaining-time'></span>  {{ _("seconds due to inactivity.") }}
           </div>
            <div class="box-modal__footer">
             <button id="log-out" class="button button--teal" data-dismiss="modal">{{_("Log Out")}}</button>&nbsp;<button id="stay-logged-in" class="button button--teal" data-dismiss="modal">{{_("Stay Logged In")}}</button>
