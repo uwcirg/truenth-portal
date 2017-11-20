@@ -1,4 +1,5 @@
 """User API view functions"""
+from datetime import datetime
 from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
@@ -8,6 +9,7 @@ from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
@@ -16,6 +18,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.table_preference import TablePreference
@@ -1918,7 +1921,7 @@ def get_user_messages(user_id):
     responses:
       200:
         description:
-          Returns JSON of the user's table view preferences.
+          Returns JSON of the user's email messages.
         schema:
           id: user_messages
           properties:
@@ -1963,3 +1966,62 @@ def get_user_messages(user_id):
             messages.append(em)
 
     return jsonify(messages=[m.as_json() for m in messages])
+
+
+@user_api.route('/user/<int:user_id>/questionnaire_bank')
+@oauth.require_oauth()
+@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+def get_current_user_qb(user_id):
+    """Returns JSON defining user's current QuestionnaireBank
+
+    Returns JSON of the user's current QuestionnaireBank. Date is
+    assumed as UTCnow, unless specific as-of date provided.
+    ---
+    tags:
+      - User
+    operationId: get_current_user_qb
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: as_of_date
+        in: query
+        description: Optional datetime for user-specific QB (otherwise, now)
+        required: false
+        type: string
+        format: date-time
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns JSON of the user's current QB info
+      400:
+        description: invalid query parameters
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    date = request.args.get('as_of_date')
+    date = datetime.strptime(date, '%Y-%m-%d') if date else None
+
+    qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
+
+    qb = qbd.questionnaire_bank.as_json() if qbd.questionnaire_bank else None
+    qbd_json = {'relative_start': FHIR_datetime.as_fhir(qbd.relative_start),
+                'recur': qbd.recur,
+                'iteration': qbd.iteration,
+                'questionnaire_bank': qb}
+
+    return jsonify(qbd_json)
