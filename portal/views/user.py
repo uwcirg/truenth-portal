@@ -2018,7 +2018,8 @@ def get_current_user_qb(user_id):
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 
     qbd_json = {}
-    if date and qbd.relative_start and (date < qbd.relative_start):
+
+    if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
         qbd_json['questionnaire_bank'] = None
     else:
         qbd_json['questionnaire_bank'] = (qbd.questionnaire_bank.as_json()

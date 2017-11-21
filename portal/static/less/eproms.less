@@ -488,6 +488,13 @@ select:not([multiple]) {
   }
   #enterManualInfoContainer {
     margin-bottom: 1em;
+    .flex {
+      flex-wrap: wrap
+    }
+  }
+  #manualEntryCompletionDateContainer {
+    display: none;
+    margin-top: 1em
   }
   #study_id_view {
     margin-top: 0.4em;
@@ -1592,7 +1599,6 @@ div.footer-wrapper.right-panel {
     color: #777;
     border: 1px solid #bdb9b9;
     position: relative;
-    margin-top: 0.5em;
   }
 }
 #userProcedures {
@@ -1945,6 +1951,7 @@ input.clinic {
     margin-bottom: 2em;
     td {
       padding: 0.3em 0.5em;
+      vertical-align: top;
     }
   }
 
@@ -2249,6 +2256,18 @@ input.clinic {
     flex-grow: 1.5;
   }
 }
+/*
+ * hide duplicate feature(s) that is already present in custom detail
+ */
+ #mainDiv.profile {
+    #profileSendEmailContainer,
+    .registration-email-prompt,
+    #sendEmailLabel,
+    #loginAsPatient,
+    #navMenuXs {
+      display: none
+    }
+ }
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -2367,12 +2386,22 @@ input.clinic {
 .modal a.btn {
   font-size: @modalButtonSize;
 }
-#manualEntryModal input[type='radio'] {
-  margin-top: 4px;
-  margin-left: -20px;
-}
-#manualEntryModal .modal-title {
-  margin: 0.2em;
+#manualEntryModal {
+  .modal-dialog {
+    width: auto;
+  }
+  input[type='radio'] {
+    margin-top: 4px;
+    margin-left: -20px;
+  }
+  .modal-title {
+    margin: 0.2em;
+  }
+  #manualEntryWarningMessageContainer {
+    .indent {
+      padding: 0.1em 1.5em;
+    }
+  }
 }
 #emailBodyModal .body-content {
   overflow: hidden;
@@ -2858,6 +2887,11 @@ div.timezone-warning.text-warning {
     .copyright-container {
       width: 60%;
     }
+    #manualEntryCompletionDateContainer {
+      .flex {
+        flex-wrap: nowrap
+      }
+    }
   }
 
   #profileForm {
@@ -3059,6 +3093,11 @@ div.timezone-warning.text-warning {
   #mainDiv.profile {
     .copyright-container {
       width: 80%;
+    }
+  }
+  #manualEntryModal {
+    .modal-dialog {
+      width: 650px;
     }
   }
 }

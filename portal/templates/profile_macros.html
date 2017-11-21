@@ -1350,49 +1350,15 @@
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
-    <script>
-        $(function () {
-        var sessionListHTML = "";
-        var sessionUserId = $("#_session_user_id").val();
-
-        tnthAjax.assessmentList(sessionUserId, function(data) {
-            if (!data.error) {
-                var entries = data.entry ? data.entry : null;
-                if (entries && entries.length > 0) {
-                    entries.forEach(function(entry, index) {
-
-                        var reference = entry['questionnaire']['reference'];
-                        var arrRefs = String(reference).split('/');
-                        var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
-                        var authoredDate = String(entry['authored']);
-                        $("#gmtText").show();
-                        if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
-                            sessionListHTML += '<tr title="{%trans%}Click to view report{%endtrans%}"  ' +
-                                                (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-                                                [entry['questionnaire']['display'],
-                                                 entry['status'],
-                                                 tnthDates.formatDateString(entry['authored'], "iso")].map(function(o) {
-                                                    return  '<td><a href="' + reportLink + '">{%trans%}' + o + '{%endtrans%}</a></td>'
-                                                 }).join('') +
-                                                 '</tr>';
-                        };
-                    });
-                    $("#userSessionListTable").append(sessionListHTML);
-                    $("#userSessionListTable").show();
-
-                } else {
-                    $("#userSessionListTable").hide();
-                    $("#userSessionsListContainer").prepend("<span class='text-muted'>{%trans%}No questionnaire data found.{%endtrans%}</span>");
-                };
-
-            } else {
-                $("#userSessionListTable").hide();
-                $("#profileSessionListError").html("{%trans%}Problem retrieving session data from server.{%endtrans%}");
-            };
-        });
-    });
-    </script>
+    {% if person %}
+        <script>
+            $(function () {
+                tnthAjax.assessmentList({{person.id}}, function(data) {
+                    fillContent.assessmentList(data);
+                });
+            });
+        </script>
+    {% endif %}
 {%- endmacro %}
 {% macro profileAssessment(person, instrument_id, authored_date) -%}
         <div id="userSessionReportDetail" cellpadding="2">
@@ -1400,57 +1366,15 @@
             <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
             <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" ></table><br />
         </div>
-        <script>
-        $(function () {
-            if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
-
-            var sessionListHTML = "";
-            var sessionUserId = $("#_report_user_id").val();
-            var sessionAuthoredDate = $("#_report_authored_date").val();
-
-            tnthAjax.assessmentReport(sessionUserId, '{{instrument_id}}', function(data) {
-                if (!data.error) {
-                    $(".report-error-message").hide();
-                    $("#userSessionReportDetailTable").html('');
-                    if (data.entry && data.entry.length > 0) {
-                        var entries = data['entry'];
-                        var entry;
-                        entries.forEach(function(item) {
-                            if (!entry && (item["authored"] == sessionAuthoredDate)) entry = item;
-                        });
-
-                        if (!entry) entry = entries[0];
-                        var reportHTML = '<caption><hr/><span class="profile-item-title">{%trans%}' +
-                                        entries[0]['questionnaire']['display'] +
-                                        '{%endtrans%}</span><br/><span class="text-muted smaller-text">{%trans%}Last Updated{%endtrans%} - ' +
-                                        tnthDates.formatDateString(sessionAuthoredDate, "iso") +
-                                         " <span class='gmt'>{%trans%}(GMT, Y-M-D){%endtrans%}</span>" + '</span><hr/></caption>';
-                        reportHTML += '<tr><TH>{%trans%}Question{%endtrans%}</TH><TH>{%trans%}Response{%endtrans%}</TH></tr>';
-                        entry['group']['question'].forEach(function(entry) {
-                            var q = entry['text'] ? entry['text'] : '', a = '', qcNeeded = true;
-                            if (hasValue(q)) {
-                                q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
-                                qcNeeded = false;
-                            };
-                            if (entry['answer']) {
-                                (entry['answer']).forEach(function(item) {
-                                    if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
-                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
-                                });
-                            };
-                            if (!hasValue(q)) q = entry['linkId'];
-                            reportHTML += '<tr><td>{%trans%}' + (hasValue(q)? q: "--") + '{%endtrans%}</td><td>{%trans%}' + (String(a) !== 'undefined' ? a : '--') + '{%endtrans%}</td></tr>';
-                        });
-                        $("#userSessionReportDetailTable").append(reportHTML);
-                    };
-                } else {
-                    $(".report-error-message").show();
-                    $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
-                };
+        {% if person %}
+            <script>
+            $(function () {
+                tnthAjax.assessmentReport("{{person.id}}", "{{instrument_id}}", function(data) {
+                    fillContent.assessmentReport(data);
+                });
             });
-        });
-        </script>
-
+            </script>
+        {% endif %}
 {%- endmacro %}
 {% macro profileClinicalPCALocalized(person, current_user) -%}
 <!-- not currently being used -->
@@ -1780,21 +1704,8 @@
                          var y = $("#deathYear");
                          if (d.val() != "" && m.val() != "" && y.val() != "") {
                             if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
-                                var today = new Date();
-                                // Check to see if this is a real date
-                                var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
-                                var date = new Date(iy,im-1,iid);
-                                var errorMsg = "";
-
-                                if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                                    if (iy < 1900) errorMsg = "{{_('Year must be after 1900')}}";
-                                    // Only allow if birthdate is before today
-                                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                                        errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
-                                    };
-                                } else errorMsg = "{%trans%}Invalid Date. Please enter a valid date.{%endtrans%}";
-
-                                if (errorMsg == "") {
+                                var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
+                                if (errorMsg === "") {
                                     $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
                                     $("#boolDeath").prop("checked", true);
                                     $("#errorDeathDate").text("");
@@ -1850,40 +1761,83 @@
                     <div id="enterManualInfoContainer" class="text-info"></div>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
                     <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
-                          <div class="modal-dialog" role="document">
+                        <div class="modal-dialog" role="document">
                             <div class="modal-content">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
-                              </div>
-                              <div class="modal-body">
-                                <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>
-                                 <div class="form-group">
-                                    <div class="profile-radio-list">
-                                      <label class="radio-inline">
-                                          <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
-                                          <span>{{ _("Interview assisted") }}</span>
-                                      </label>
-                                      <br/>
-                                      <label class="radio-inline">
-                                          <input type="radio" name="entryMethod" id="paper" value="paper"/>
-                                          <span>{{ _("Paper") }}</span>
-                                      </label>
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
+                                    <input type="hidden" id="manualEntryConsentDate" value="" />
+                                    <input type="hidden" id="qCompletionDate" value="" />
+                                    <input type="hidden" id="qToday" value="" />
+                                    <div class="form-group">
+                                        <div class="profile-radio-list">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                                <span>{{ _("Interview assisted") }}</span>
+                                            </label>
+                                            <br/>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                                <span>{{ _("Paper") }}</span>
+                                            </label>
+                                        </div>
                                     </div>
-                                  </div>
-                                  <div id="manualEntryMessageContainer" class="error-message"></div>
-                              </div>
-                              <div class="modal-footer">
-                                <div id="manualEntryLoader" class="loading-message-indicator">
-                                    <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    <div id="manualEntryCompletionDateContainer" class="form-group">
+                                        <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <div id="manualEntryDateFieldsContainer" class="flex">
+                                                <div class="flex-item">
+                                                    <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" required />
+                                                </div>
+                                                <div class="flex-item" id="qCompletionMonthContainer">
+                                                    <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" required>
+                                                        <option value="">{{ _("Month") }}...</option>
+                                                        <option value="01">{{ _("January") }}</option>
+                                                        <option value="02">{{ _("February") }}</option>
+                                                        <option value="03">{{ _("March") }}</option>
+                                                        <option value="04">{{ _("April") }}</option>
+                                                        <option value="05">{{ _("May") }}</option>
+                                                        <option value="06">{{ _("June") }}</option>
+                                                        <option value="07">{{ _("July") }}</option>
+                                                        <option value="08">{{ _("August") }}</option>
+                                                        <option value="09">{{ _("September") }}</option>
+                                                        <option value="10">{{ _("October") }}</option>
+                                                        <option value="11">{{ _("November") }}</option>
+                                                        <option value="12">{{ _("December") }}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="flex-item" id="qCompletionYearContainer">
+                                                    <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" required />
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div id="errorCompletionDate" class="error-message"></div>
+                                    <div id="manualEntryWarningMessageContainer" class="tnth-hide">
+                                        <div class="error-message">{{_("Do you wish to continue?")}}</div>
+                                        <div class="indent">
+                                            <input type="radio" name="qContinue" id="qYes"/>
+                                            <span>{{_("Yes")}}</span>
+                                        </div>
+                                        <div class="indent">
+                                            <input type="radio" name="qContinue" id="qNo"/>
+                                            <span>{{_("No")}}</span>
+                                        </div>
+                                    </div>
+                                    <div id="manualEntryMessageContainer" class="error-message"></div>
                                 </div>
-                                <div id="manualEntryButtonsContainer">
-                                    <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                <div class="modal-footer">
+                                    <div id="manualEntryLoader" class="loading-message-indicator">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    </div>
+                                    <div id="manualEntryButtonsContainer">
+                                        <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1891,18 +1845,38 @@
     </div>
     <script>
     $(document).ready(function() {
-        $("#profileSendEmailContainer").hide();
-        $(".registration-email-prompt").hide();
-        $("#sendEmailLabel").hide();
-        $("#loginAsPatient").hide();
-        $("#navMenuXs").hide();
-        if (! hasValue($("#email").val()) ){
-            $("#profileEmailSelect").attr("disabled", true);
-        } else $("#profileEmailSelect").attr("disabled", false);
-        $("#email").on("keyup", function() {
-            if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
-            else $("#profileEmailSelect").attr("disabled", true);
-        });
+
+        var continueToAssessment = function(method, completionDate) {
+            //check if the user has given web consent here, if not redirect to form
+            var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+            if (hasValue(assessment_url)) {
+                var still_needed = false;
+                tnthAjax.getStillNeededCoreData("{{person.id if person}}", true, function(data) {
+                    if (data && ! data.error && data.length > 0) {
+                        still_needed = true;
+                    };
+                }, method);
+                if (/\?/.test(assessment_url)) {
+                    assessment_url += "&entry_method=" + method;
+                }
+                else{
+                    assessment_url += "?entry_method=" + method;
+                };
+
+                if (method === "paper") {
+                    assessment_url += "&authored=" + tnthDates.formatDateString(completionDate, "iso-short");
+                };
+
+                var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+                $("#manualEntryButtonsContainer").hide();
+                $("#manualEntryLoader").show();
+                setTimeout(function() { window.location = winLocation;}, 100);
+            } else {
+                $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
+            };
+        };
+
+        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false)
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1915,41 +1889,172 @@
             $("#manualEntryModal").modal("hide");
         });
 
-        $(document).delegate("#meSubmit", "click", function(event){
-            var method = "";
-            $("input[name='entryMethod']").each(function() {
-                if ($(this).is(":checked")) {
-                    method = $(this).val();
+        $("#manualEntryModal").on("shown.bs.modal", function() {
+            var today = new Date();
+            var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
+            var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+            /*
+             * get GMT date/time for today
+             */
+            var gmtToday = tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty,tm,td,th,tmi,ts));
+            $("#qCompletionDay").val(pad(td));
+            $("#qCompletionMonth").val(pad(tm));
+            $("#qCompletionYear").val(ty);
+            $("#qToday").val(gmtToday);
+            $("#qCompletionDate").val(gmtToday);
+            if ($("#paper").is(":checked")) {
+                $("#manualEntryCompletionDateContainer").show();
+            };
+            $("#manualEntryWarningMessageContainer").hide();
+            $("#qYes").prop("checked", false);
+            $("#qNo").prop("checked", false);
+            //get consent date
+            tnthAjax.getConsent("{{person.id}}", true, function(data) {
+                var dataArray = [];
+                if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+                    dataArray = data["consent_agreements"].sort(function(a,b){
+                         return new Date(b.signed) - new Date(a.signed);
+                    });
+                };
+                if (dataArray.length > 0) {
+                    /*
+                     * consent date in GMT
+                     */
+                    $("#manualEntryConsentDate").val(dataArray[0].signed);
                 };
             });
-            if (method != "") {
-                $("#manualEntryMessageContainer").text("");
-                //check if the user has given web consent here, if not redirect to form
-                var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
-                if (hasValue(assessment_url)) {
-                    var still_needed = false;
-                    tnthAjax.getStillNeededCoreData('{{person.id if person}}', true, function(data) {
-                            if (data && ! data.error && data.length > 0) still_needed = true;
-                        }, method);
-                    if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
-                    else assessment_url += "?entry_method=" + method;
-                    var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
-                    $("#manualEntryButtonsContainer").hide();
-                    $("#manualEntryLoader").show();
-                    setTimeout(function() { window.location = winLocation;}, 100);
+        });
+
+        $("#qYes").on("click", function() {
+            $(this).prop("checked", true);
+            $("#meSubmit").attr("disabled", false);
+            continueToAssessment($("input[name='entryMethod']:checked").val(), $("#qCompletionDate").val());
+        });
+
+        $("#qNo").on("click", function() {
+            $(this).prop("checked", true);
+            $("#meSubmit").attr("disabled", true);
+        });
+
+        $("input[name='entryMethod']").on("click", function() {
+            if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
+        });
+        $("#paper").on("click", function() {
+            $("#manualEntryCompletionDateContainer").show();
+        });
+        $("#interviewAssisted").on("click", function() {
+            $("#manualEntryCompletionDateContainer").hide();
+        });
+
+         __convertToNumericField($("#qCompletionDay, #qCompletionYear"));
+
+
+        ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
+            var fd = $("#" + fn);
+            var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
+            fd.on(triggerEvent, function() {
+                var d = $("#qCompletionDay");
+                var m = $("#qCompletionMonth");
+                var y = $("#qCompletionYear");
+                var today = new Date();
+                var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
+                var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+                if (d.val() != "" && m.val() != "" && y.val() != "") {
+                    if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                        var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        var consentDate = $("#manualEntryConsentDate").val();
+                        if (!hasValue(errorMsg) && hasValue(consentDate)) {
+                             /*
+                             * check if date entered is today, if so use today's date/time
+                             */
+                            if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+                            } else {
+                                var gmtDateObj = tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0);
+                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(gmtDateObj));
+                            };
+                            /*
+                             * all date/time should be in GMT date/time
+                             */
+                            var completionDate = new Date($("#qCompletionDate").val());
+                            var cConsentDate = new Date(consentDate);
+                            var cToday = new Date($("#qToday").val());
+                            var nCompletionDate = completionDate.setHours(0,0,0,0);
+                            var nConsentDate = cConsentDate.setHours(0,0,0,0);
+                            var nToday = cToday.setHours(0,0,0,0);
+                            if (nCompletionDate < nConsentDate) {
+                                errorMsg = i18next.t("Completion date cannot be before consent date.");
+                            };
+                            if (nConsentDate >= nToday) {
+                                if (nCompletionDate > nConsentDate) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            } else {
+                                if (nCompletionDate > nToday) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            };
+                        };
+                        if (errorMsg === "") {
+                            $("#errorCompletionDate").text("");
+                            $("#meSubmit").attr("disabled", false);
+                        } else {
+                            $("#errorCompletionDate").text(errorMsg);
+                            $("#meSubmit").attr("disabled", true);
+                        };
+                    } else {
+                        $("#meSubmit").attr("disabled", true);
+                    };
                 } else {
-                    $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
+                    $("#errorCompletionDate").text(i18next.t("Completion date must be valid."));
+                    $("#meSubmit").attr("disabled", true);
+                };
+            });
+        });
+        $(document).delegate("#meSubmit", "click", function(event){
+            
+            var method = $("input[name='entryMethod']:checked").val();
+            var completionDate = $("#qCompletionDate").val();
+
+            if (method != "") {
+                var errorMsg = "";
+                $("#manualEntryMessageContainer").text("");
+                if (method === "paper") {
+                    /*
+                     * check questionnaire time windows
+                     * allow user to continue if the completion date is not in windows?
+                     * may need to change pending Diana's comment
+                     * but display warning?
+                     */
+                    tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), {sync:true}, function(data) {
+                        if (!data.error) {
+                            if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
+                                errorMsg = i18next.t("Questionnaire date is not within the valid PROMS window.");
+                            };
+                        };
+                    });
+
+                    if (hasValue(errorMsg)) {
+                        $("#errorCompletionDate").text(errorMsg);
+                        $("#manualEntryWarningMessageContainer").show();
+                        $("#meSubmit").attr("disabled", true);
+                    } else {
+                        $("#errorCompletionDate").text("");
+                        $("#manualEntryWarningMessageContainer").hide();
+                        $("#meSubmit").attr("disabled", false);
+                    };
+                };
+
+                if (!hasValue(errorMsg)) {
+                    continueToAssessment(method, completionDate);
                 };
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
             };
           });
 
-          $("input[name='entryMethod']").on("click", function() {
-              if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
-          });
-
         {%- if person -%}
+
             tnthAjax.assessmentStatus({{person.id}}, function(data) {
                 if (!data.error) {
                     if ((data.assessment_status).toUpperCase() == "COMPLETED") {
