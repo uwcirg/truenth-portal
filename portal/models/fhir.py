@@ -155,6 +155,18 @@ class Coding(db.Model):
             self = db.session.merge(match)
         return self
 
+    @staticmethod
+    def display_lookup(code, system):
+        """Return display value for (code, system), if found"""
+        item = Coding.query.filter(
+            Coding.code==code,
+            Coding.system==system).first()
+        if not item:
+            raise ValueError(
+                "No coding found for ({system}, {code})".format(
+                    system=system, code=code))
+        return item.display
+
 
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):

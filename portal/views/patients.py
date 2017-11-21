@@ -8,6 +8,7 @@ from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
 from ..models.communication import load_template_args
+from ..models.fhir import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import QuestionnaireBank, visit_name
@@ -179,3 +180,20 @@ def patient_profile(patient_id):
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
+
+@patients.route('/treatment-options')
+@oauth.require_oauth()
+def treatment_options():
+    code_list = current_app.config.get('TREATMENT_OPTIONS')
+    if code_list:
+        treatment_options = []
+        for item in code_list:
+            code, system = item;
+            treatment_options.append({
+                "code": code,
+                "system": system,
+                "text": Coding.display_lookup(code, system)
+            });
+    else:
+        abort(400, "Treatment options are not available.")
+    return jsonify(treatment_options=treatment_options)

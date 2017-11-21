@@ -2300,7 +2300,7 @@
             <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %}>
                 <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
                 <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
-                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}</h4>
+                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span></h4>
                 <div class="view-container"><div id="procedure_view"></div></div>
                 <div class="edit-container">
                     <p class="text-muted">
@@ -2317,19 +2317,9 @@
                         <div id="procedureForm" class="form-inline event-element">
                             <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
                             <div class="row">
-                                <div class="col-md-6 col-xs-11">
+                                <div class="col-md-9 col-xs-11">
                                     <div class='form-group'>
-                                        <select class='form-control' id='tnthproc'>
-                                            <option value=''>{{ _("Select") }}...</option>
-                                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
-                                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
-                                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
-                                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
-                                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
-                                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
-                                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
-                                            <option value='999999999'>{{ _("None of the above") }}</option>
-                                        </select>
+                                        <select class='form-control' id='tnthproc'></select>
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
@@ -2393,6 +2383,11 @@
     </div>
     <script>
         $(document).ready(function(){
+            tnthAjax.treatmentOptions("{{person.id if person}}",null, function(data) {
+                if (!data.error) {
+                    fillContent.treatmentOptions(data);
+                };
+            });
             {% if person %} tnthAjax.getProc('{{person.id}}', false); {% endif %}
         });
     </script>

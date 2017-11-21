@@ -16,8 +16,9 @@ $.fn.extend({
 
             var isAccountCreation = $(this).attr("data-account-create");
             var subjectId = $("#profileProcSubjectId").val();
-            var selectVal = $(this).attr('data-name');
-            var selectDate = $(this).attr('data-date');
+            var selectVal = $(this).attr("data-name");
+            var selectDate = $(this).attr("data-date");
+            var selectSystem = $(this).attr("data-system");
             // Only continue if both values are filled in
             if (selectVal !== undefined && selectDate !== undefined) {
                 var selectFriendly = $("#tnthproc option:selected").text();
@@ -25,6 +26,7 @@ $.fn.extend({
                 var procArray = {};
                 procArray["resourceType"] = "Procedure";
                 procArray["performedDateTime"] = selectDate;
+                procArray["system"] = selectSystem;
 
                 if (isAccountCreation) {
                     if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length === 0) {
@@ -55,7 +57,7 @@ $.fn.extend({
                         };
                     });
 
-                    var procID = [{ "code": selectVal, "display": selectFriendly, system: "http://snomed.info/sct" }];
+                    var procID = [{ "code": selectVal, "display": selectFriendly, system: selectSystem }];
                     procArray["subject"] = {"reference": "Patient/" + subjectId };
                     procArray["code"] = {"coding": procID};
                     tnthAjax.postProc(subjectId,procArray);
@@ -84,7 +86,8 @@ $.fn.extend({
                 $("button[id^='tnthproc-submit']").addClass('disabled').attr({
                     "data-name": "",
                     "data-date": "",
-                    "data-date-read": ""
+                    "data-date-read": "",
+                    "data-system": ""
                 });
 
             };
@@ -211,13 +214,17 @@ $(document).ready(function() {
 
     // Update submit button when select changes
     $("select[id^='tnthproc']").on('change', function() {
-        $("button[id^='tnthproc-submit']").attr("data-name", $(this).val());
+        $("button[id^='tnthproc-submit']")
+        .attr("data-name", $(this).val())
+        .attr("data-system", $(this).find("option:selected").attr("data-system"));
         checkSubmit("button[id^='tnthproc-submit']");
     });
     // Update submit button when text input changes (single option)
     //datepicker field
     $("input[id^='tnthproc-value']").on('change', function() {
-        $("button[id^='tnthproc-submit']").attr("data-name", $(this).val());
+        $("button[id^='tnthproc-submit']")
+        .attr("data-name", $(this).val())
+        .attr("data-system", $(this).attr("data-system"));
         checkSubmit("button[id^='tnthproc-submit']");
     });
 
