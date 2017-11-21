@@ -53,7 +53,7 @@
       ]
     } 
   ], 
-  "id": "SitePersistence v0.1", 
+  "id": "SitePersistence v0.2",
   "meta": {
     "fhir_comments": [
       "export of dynamic site data from host", 

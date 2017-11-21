@@ -36,17 +36,17 @@ class ModelPersistence(object):
         return data
 
     def __read__(self):
-        self.filename = persistence_filename(
-            scope=self.model.__name__)
+        scope = self.model.__name__ if self.model else None
+        self.filename = persistence_filename(scope=scope)
         with open(self.filename, 'r') as f:
             data = json.load(f)
         self.__verify_header__(data)
         return data
 
     def __write__(self, data, target_dir):
+        scope = self.model.__name__ if self.model else None
         self.filename = persistence_filename(
-            scope=self.model.__name__,
-            target_dir=target_dir)
+            scope=scope, target_dir=target_dir)
         if data:
             with open(self.filename, 'w') as f:
                 f.write(json.dumps(data, indent=2, sort_keys=True))
@@ -58,7 +58,7 @@ class ModelPersistence(object):
             raise ValueError("expected 'Bundle' resourceType not found")
         if data.get('id') != 'SitePersistence v{}'.format(self.VERSION):
             raise ValueError("unexpected SitePersistence version {}".format(
-                self.VERSION))
+                data.get('id')))
 
     def export(self, target_dir):
         d = self.__header__({})
@@ -191,16 +191,13 @@ def export_model(cls, target_dir):
     return model_persistence.export(target_dir=target_dir)
 
 
-def import_model(
-        cls, objs_by_type, sequence_name, lookup_field='id',
-        keep_unmentioned=True):
-    objs_seen = []
+def import_model(cls, sequence_name, lookup_field='id', keep_unmentioned=True):
     model_persistence = ModelPersistence(
         cls, lookup_field=lookup_field, sequence_name=sequence_name)
     model_persistence.import_(keep_unmentioned=keep_unmentioned)
 
 
-def persistence_filename(scope='site_persistence_file', target_dir=None):
+def persistence_filename(scope=None, target_dir=None):
     """Returns the configured persistence file
 
     :param scope: set to limit by type, i.e. `Organization`
@@ -215,6 +212,9 @@ def persistence_filename(scope='site_persistence_file', target_dir=None):
     :returns: full path to persistence file
 
     """
+    if scope is None:
+        scope = 'site_persistence_file'
+
     # product level config file - use presence of env var or config setting
     persistence_dir = os.environ.get('PERSISTENCE_DIR')
     gil = current_app.config.get("GIL")
