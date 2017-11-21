@@ -387,7 +387,7 @@
                     onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
-              var warningText = i18next.t("Your session will expire in approximately {time} seconds due to inactivity.".replace("{time}",(sessMon.timeBeforeWarning / 1000)));
+              var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
               $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
                       .on("show.bs.modal", function() { sessMon.modalShown = true})
                       .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
