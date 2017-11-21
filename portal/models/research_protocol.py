@@ -20,10 +20,14 @@ class ResearchProtocol(db.Model):
     def from_json(cls, data):
         if 'name' not in data:
             raise ValueError("missing required name field")
-        rp = ResearchProtocol.query.filter_by(name=data['name']).first()
-        if not rp:
-            rp = cls(data['name'])
-        return rp
+        instance = cls(data['name'])
+        return instance.update_from_json(data)
+
+    def update_from_json(self, data):
+        self.name = data['name']
+        if 'created_at' in data:
+            self.created_at = data['created_at']
+        return self
 
     def as_json(self):
         d = {}
