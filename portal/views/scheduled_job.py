@@ -42,10 +42,36 @@ def jobs_list():
 def create_job():
     try:
         job = ScheduledJob.from_json(request.json)
+        # POST should only allow creation of new jobs
+        if ScheduledJob.query.filter(ScheduledJob.name == job.name).count():
+            raise ValueError("{} already exists; use PUT to update".format(
+                job))
     except ValueError as e:
         abort(400, str(e))
     if job not in db.session:
         db.session.add(job)
+    db.session.commit()
+    job = db.session.merge(job)
+    user_id = current_user().id
+    auditable_event("scheduled job '{}' updated".format(job.name),
+                    user_id=user_id, subject_id=user_id,
+                    context='other')
+    return jsonify(job.as_json())
+
+
+@scheduled_job_api.route('/api/scheduled_job', methods=('PUT',))
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def update_job():
+    try:
+        name = request.json.get('name')
+        job = ScheduledJob.query.filter(
+            ScheduledJob.name == name).first()
+        if not job:
+            abort (404, "{} not found - new should POST".format(name))
+        job.update_from_json(request.json)
+    except ValueError as e:
+        abort(400, str(e))
     db.session.commit()
     job = db.session.merge(job)
     user_id = current_user().id

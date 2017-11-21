@@ -47,6 +47,13 @@ class TestScheduledJob(TestCase):
             '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
+        # POST of an existing should raise a 400
+        self.assert400(resp)
+
+        resp = self.client.put(
+            '/api/scheduled_job',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(resp)
         self.assertEquals(resp.json['id'], orig_id)
         self.assertEquals(resp.json['schedule'], '0 0 0 0 0')
