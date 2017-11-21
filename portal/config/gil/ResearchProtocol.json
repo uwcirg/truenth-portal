@@ -1,0 +1,14 @@
+{
+  "entry": [
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

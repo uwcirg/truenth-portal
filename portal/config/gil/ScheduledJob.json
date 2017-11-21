@@ -1,0 +1,42 @@
+{
+  "entry": [
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "17 * * * *",
+      "name": "Update assessment status cache",
+      "active": true,
+      "task": "cache_assessment_status"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "0,20,40 * * * *",
+      "name": "Prepare ready communications",
+      "active": true,
+      "task": "prepare_communications"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "10,30,50 * * * *",
+      "name": "Send ready communications",
+      "active": true,
+      "task": "send_queued_communications"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "48 * * * *",
+      "name": "Update reporting stats cache",
+      "active": true,
+      "task": "cache_reporting_stats"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}
