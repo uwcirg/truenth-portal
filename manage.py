@@ -90,14 +90,12 @@ def sync():
     seed()
 
 
-@click.option('--exclude_interventions', '-e', default=False,
-              help="Exclude (don't overwrite) intervention data")
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 @app.cli.command(name="seed")
-def seed_command(exclude_interventions, keep_unmentioned):
-    seed(exclude_interventions, keep_unmentioned)
+def seed_command(keep_unmentioned):
+    seed(keep_unmentioned)
 
-def seed(exclude_interventions=False, keep_unmentioned=False):
+def seed(keep_unmentioned=False):
     """Seed database with required data"""
 
     # Request context necessary for generating data from own HTTP APIs
@@ -111,12 +109,8 @@ def seed(exclude_interventions=False, keep_unmentioned=False):
     db_maintenance()
     db.session.commit()
 
-    # Always update interventions on development systems
-    if app.config["SYSTEM_TYPE"].lower() == 'development':
-        exclude_interventions = False
-
     # import site export file if found
-    SitePersistence().import_(exclude_interventions, keep_unmentioned)
+    SitePersistence().import_(keep_unmentioned=keep_unmentioned)
 
 
 @app.cli.command()
