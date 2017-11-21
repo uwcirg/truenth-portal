@@ -1279,7 +1279,7 @@ var fillContent = {
                 });
                 return found;
             };
-            $("#topTerms label.terms-label").each(function() {
+            $("#termsCheckbox label.terms-label").each(function() {
                 var arrTypes = [];
                 var item_found  = 0;
                 var self = $(this);

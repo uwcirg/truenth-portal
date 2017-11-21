@@ -1814,17 +1814,6 @@
                                             </div>
                                     </div>
                                     <div id="errorCompletionDate" class="error-message"></div>
-                                    <div id="manualEntryWarningMessageContainer" class="tnth-hide">
-                                        <div class="error-message">{{_("Do you wish to continue?")}}</div>
-                                        <div class="indent">
-                                            <input type="radio" name="qContinue" id="qYes"/>
-                                            <span>{{_("Yes")}}</span>
-                                        </div>
-                                        <div class="indent">
-                                            <input type="radio" name="qContinue" id="qNo"/>
-                                            <span>{{_("No")}}</span>
-                                        </div>
-                                    </div>
                                     <div id="manualEntryMessageContainer" class="error-message"></div>
                                 </div>
                                 <div class="modal-footer">
@@ -1905,9 +1894,6 @@
             if ($("#paper").is(":checked")) {
                 $("#manualEntryCompletionDateContainer").show();
             };
-            $("#manualEntryWarningMessageContainer").hide();
-            $("#qYes").prop("checked", false);
-            $("#qNo").prop("checked", false);
             //get consent date
             tnthAjax.getConsent("{{person.id}}", true, function(data) {
                 var dataArray = [];
@@ -2036,11 +2022,9 @@
 
                     if (hasValue(errorMsg)) {
                         $("#errorCompletionDate").text(errorMsg);
-                        $("#manualEntryWarningMessageContainer").show();
                         $("#meSubmit").attr("disabled", true);
                     } else {
                         $("#errorCompletionDate").text("");
-                        $("#manualEntryWarningMessageContainer").hide();
                         $("#meSubmit").attr("disabled", false);
                     };
                 };
