@@ -48,9 +48,8 @@ def patients_root():
 
     consent_query = UserConsent.query.filter(and_(
                          UserConsent.deleted_id.is_(None),
-                         UserConsent.expires > now)).with_entities(
-                             UserConsent.user_id)
-    consented_users = [u.user_id for u in consent_query]
+                         UserConsent.expires > now))
+    consented_users = [u.user_id for u in consent_query if u.staff_editable]
 
     if user.has_role(ROLE.STAFF):
         pref_org_list = None
