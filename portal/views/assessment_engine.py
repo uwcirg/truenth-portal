@@ -1385,6 +1385,12 @@ def present_assessment(instruments=None):
         description: User ID to Collect QuestionnaireResponses as
         required: false
         type: integer
+      - name: authored
+        in: query
+        description: Override QuestionnaireResponse.authored with given datetime
+        required: false
+        type: string
+        format: date-time
     responses:
       303:
         description: successful operation
@@ -1429,6 +1435,7 @@ def present_assessment(instruments=None):
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
         "subject_id": request.args.get('subject_id'),
+        "authored": request.args.get('authored'),
     }
     # Clear empty querystring params
     assessment_params = {k:v for k,v in assessment_params.items() if v}
