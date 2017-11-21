@@ -1,0 +1,565 @@
+{
+  "entry": [
+     {
+      "address": [],
+      "id": 0,
+      "identifier": [],
+      "name": "none of the above",
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 10000,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "crv_temp_id"
+        },
+        {
+          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "crv"
+        }
+      ],
+      "name": "TrueNTH Global Registry",
+      "resourceType": "Organization",
+      "telecom": [{
+        "system": "email",
+        "value": "contact.eproms@truenth.org"
+       }],
+      "extension": [
+        {
+          "url": "http://us.truenth.org/identity-codes/research-protocol",
+          "research_protocol": "TNGR v1"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 11000,
+      "identifier": [],
+      "name": "AUA Local Data Center",
+      "partOf": {
+        "reference": "api/organization/10000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "language": "en_AU",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "Australia/Melbourne"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 11100,
+      "identifier": [],
+      "name": "Australian Urology Associates (AUA)",
+      "partOf": {
+        "reference": "api/organization/11000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13000,
+      "identifier": [],
+      "name": "Queensland University of Technology LDC",
+      "partOf": {
+        "reference": "api/organization/10000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "language": "en_AU",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "Australia/Brisbane"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 13100,
+      "identifier": [],
+      "name": "Wesley Urology Clinic",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13200,
+      "identifier": [],
+      "name": "Genesis Cancer Care Queensland",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13300,
+      "identifier": [],
+      "name": "Australian Prostate Cancer Research Centre",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13400,
+      "identifier": [],
+      "name": "Gc Urology",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13500,
+      "identifier": [],
+      "name": "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13600,
+      "identifier": [],
+      "name": "Urology South Brisbane",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 13700,
+      "identifier": [],
+      "name": "Department Of Urology, Princess Alexandra Hospital",
+      "partOf": {
+        "reference": "api/organization/13000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 20000,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "ironman"
+        },
+        {
+          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "ironman_temp_id"
+        }
+      ],
+      "name": "IRONMAN",
+      "resourceType": "Organization",
+      "telecom": [{
+        "system": "email",
+        "value": "pcctcironmanregistry@mskcc.org"
+       }],
+      "extension": [
+        {
+          "url": "http://us.truenth.org/identity-codes/research-protocol",
+          "research_protocol": "IRONMAN v2"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 21000,
+      "identifier": [],
+      "name": "Australia (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "language": "en_AU"
+    },
+    {
+      "address": [],
+      "id": 21100,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-34"
+        }
+      ],
+      "name": "Australian Urology Associates (AUA)",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "Australia/Melbourne"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 21200,
+      "identifier": [],
+      "name": "Australia Recruiting Site B",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 21210,
+      "identifier": [],
+      "name": "AU B Child Site 1",
+      "partOf": {
+        "reference": "api/organization/21200"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 21220,
+      "identifier": [],
+      "name": "AU B Child Site 2",
+      "partOf": {
+        "reference": "api/organization/21200"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 21300,
+      "identifier": [],
+      "name": "Australian Prostate Cancer Research Centre - Queensland",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "Australia/Brisbane"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 21400,
+      "identifier": [],
+      "name": "Eastern Health",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "Australia/Melbourne"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 22000,
+      "identifier": [],
+      "name": "USA (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "language": "en_US"
+    },
+    {
+      "address": [],
+      "id": 22100,
+      "identifier": [],
+      "name": "Memorial Sloan Kettering",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "America/New_York"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 22110,
+      "identifier": [],
+      "name": "MSK Kimmel Center",
+      "partOf": {
+        "reference": "api/organization/22100"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22120,
+      "identifier": [],
+      "name": "MSK Basking Ridge",
+      "partOf": {
+        "reference": "api/organization/22100"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22300,
+      "identifier": [],
+      "name": "Thomas Jefferson University",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "America/New_York"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 22310,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-29"
+        }
+	  ],
+      "name": "Aria Health",
+      "partOf": {
+        "reference": "api/organization/22300"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22320,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-30"
+        }
+	  ],
+      "name": "Doylestown Health",
+      "partOf": {
+        "reference": "api/organization/22300"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22330,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-31"
+        }
+	  ],
+      "name": "Easton Hospital",
+      "partOf": {
+        "reference": "api/organization/22300"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22340,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-32"
+        }
+	  ],
+      "name": "Reading Health System",
+      "partOf": {
+        "reference": "api/organization/22300"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22350,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-99"
+        }
+	  ],
+      "name": "Thomas Jefferson University",
+      "partOf": {
+        "reference": "api/organization/22300"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22200,
+      "identifier": [],
+      "name": "UNC Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "America/New_York"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 22210,
+      "identifier": [],
+      "name": "UNC Uro Med Ctr Office",
+      "partOf": {
+        "reference": "api/organization/22200"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22220,
+      "identifier": [],
+      "name": "UNC Uro Carolina Pointe 1",
+      "partOf": {
+        "reference": "api/organization/22200"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22230,
+      "identifier": [],
+      "name": "UNC Uro NC Cancer Hosp",
+      "partOf": {
+        "reference": "api/organization/22200"
+      },
+      "resourceType": "Organization",
+      "telecom": []
+    },
+    {
+      "address": [],
+      "id": 22400,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-82"
+        }
+	  ],
+      "name": "University of Virgina (UVA)",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "America/New_York"
+        }
+      ]
+    },
+    {
+      "address": [],
+      "id": 22500,
+      "identifier": [
+        {
+          "assigner": null,
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-02"
+        }
+	  ],
+      "name": "Duke Cancer Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization",
+      "telecom": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "timezone": "America/New_York"
+        }
+      ]
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

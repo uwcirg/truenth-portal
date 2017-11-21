@@ -1,0 +1,89 @@
+{
+  "entry": [
+   {
+      "card_html": "set by access strategy depending on state",
+      "description": "",
+      "display_rank": 1,
+      "link_label": "Begin questionnaire",
+      "name": "assessment_engine",
+      "public_access": true,
+      "resourceType": "Intervention",
+      "status_text": ""
+    },
+    {
+      "card_html": "<p>Organization and support for the many details of life as a prostate cancer survivor</p>",
+      "description": "Care Plan",
+      "link_label": "Care Plan",
+      "name": "care_plan",
+      "public_access": false,
+      "resourceType": "Intervention"
+    },
+    {
+      "card_html": "Community of Wellness",
+      "description": "Community of Wellness",
+      "name": "community_of_wellness",
+      "public_access": false,
+      "resourceType": "Intervention"
+    },
+    {
+      "card_html": " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>",
+      "description": "Decision Support tool",
+      "display_rank": 3,
+      "link_label": "Go to Decision Support",
+      "name": "decision_support_p3p",
+      "public_access": false,
+      "resourceType": "Intervention"
+    },
+    {
+      "card_html": "Decision Support WiserCare",
+      "description": "Decision Support WiserCare",
+      "name": "decision_support_wisercare",
+      "public_access": false,
+      "resourceType": "Intervention"
+    },
+    {
+      "description": "OTHER: not yet officially supported",
+      "link_label": "",
+      "name": "default",
+      "public_access": false,
+      "resourceType": "Intervention",
+      "status_text": ""
+    },
+    {
+      "card_html": "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>",
+      "description": "Symptom Tracker tool",
+      "display_rank": 2,
+      "link_label": "Go to Symptom Tracker",
+      "name": "self_management",
+      "public_access": false,
+      "resourceType": "Intervention",
+      "status_text": ""
+    },
+    {
+      "card_html": "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>",
+      "description": "Sexual Recovery",
+      "link_label": "Sexual Recovery",
+      "name": "sexual_recovery",
+      "public_access": false,
+      "resourceType": "Intervention",
+      "status_text": ""
+    },
+    {
+      "card_html": "Social Support Network",
+      "description": "Social Support Network",
+      "name": "social_support",
+      "public_access": false,
+      "resourceType": "Intervention"
+    }
+   ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

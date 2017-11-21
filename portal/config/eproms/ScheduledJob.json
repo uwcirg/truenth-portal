@@ -1,0 +1,58 @@
+{
+  "entry": [
+   {
+      "resourceType": "ScheduledJob",
+      "schedule": "3 * * * *",
+      "name": "Update assessment status cache",
+      "active": true,
+      "task": "cache_assessment_status"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "5,25,45 * * * *",
+      "name": "Prepare ready communications",
+      "active": true,
+      "task": "prepare_communications"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "15,35,55 * * * *",
+      "name": "Send ready communications",
+      "active": true,
+      "task": "send_queued_communications"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "57 * * * *",
+      "name": "Update reporting stats cache",
+      "active": true,
+      "task": "cache_reporting_stats"
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "0 20 * * 0",
+      "name": "IRONMAN site summary email",
+      "active": true,
+      "task": "send_questionnaire_summary",
+      "kwargs": {"cutoff_days":"7,14,21,30","org_id":20000}
+    },
+    {
+      "resourceType": "ScheduledJob",
+      "schedule": "0 21 * * 0",
+      "name": "TNGR site summary email",
+      "active": true,
+      "task": "send_questionnaire_summary",
+      "kwargs": {"cutoff_days":"30,60,90","org_id":10000}
+    }
+   ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}
