@@ -230,7 +230,7 @@ def update_card_html_on_completion():
         def thank_you_block(name, registry):
             greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                u"You've completed the {} Registry Study questionnaire"
+                u"You've completed the {} questionnaire"
                 ".").format(registry)
             reminder = _(
                 u"You will be notified when the next "
@@ -273,9 +273,9 @@ def update_card_html_on_completion():
                 assert due_date
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} registry study "
+                    u"Please complete your {} "
                     "questionnaire by {}.").format(
-                        assessment_status.organization.name,
+                        assessment_status.top_organization.name,
                         due_date.strftime('%-d %b %Y'))
                 return u"""
                     <div class="portal-header-container">
@@ -291,9 +291,9 @@ def update_card_html_on_completion():
             if any(indefinite_questionnaires):
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} registry study "
+                    u"Please complete your {} "
                     "questionnaire at your convenience.").format(
-                        assessment_status.organization.name)
+                        assessment_status.top_organization.name)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -308,7 +308,7 @@ def update_card_html_on_completion():
             if assessment_status.overall_status == "Completed":
                 return thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.organization.name)
+                    registry=assessment_status.top_organization.name)
             raise ValueError("Unexpected state generating intro_heml")
 
         def completed_card_html(assessment_status):
@@ -460,7 +460,7 @@ def update_card_html_on_completion():
             if assessment_status.enrolled_in_classification('indefinite'):
                 card_html = thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.organization.name)
+                    registry=assessment_status.top_organization.name)
             else:
                 message = _(
                     u"The assessment is no longer available.\n"
