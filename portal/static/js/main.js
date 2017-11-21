@@ -1409,6 +1409,100 @@ var fillContent = {
         } else {
             $("#emailLogMessage").text(data.error);
         };
+    },
+    "assessmentList": function(data) {
+        if (!data.error) {
+            var sessionListHTML = "";
+            var sessionUserId = $("#_session_user_id").val();
+            var entries = data.entry ? data.entry : null;
+            if (entries && entries.length > 0) {
+                entries.forEach(function(entry, index) {
+                    var reference = entry["questionnaire"]["reference"];
+                    var arrRefs = String(reference).split("/");
+                    var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
+                    var authoredDate = String(entry["authored"]);
+                    if (instrumentId) {
+                        var reportLink = "/patients/sessionReport/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var rowText = "<tr title='{title}' {class}>" +
+                                        "<td><a href='{link}'>{display}</a></td>" +
+                                        "<td><a href='{link}'>{status}</a></td>" +
+                                        "<td><a href='{link}'>{date}</a></td>" +
+                                        "</tr>";
+                            rowText = rowText.replace(/\{title\}/g, i18next.t("Click to view report"))
+                                            .replace(/\{link\}/g, reportLink)
+                                            .replace(/\{display\}/g, i18next.t(entry["questionnaire"]["display"]))
+                                            .replace(/\{status\}/g, i18next.t(entry["status"]))
+                                            .replace(/\{class\}/g, (index % 2 !== 0 ? "class='odd'": "class='even'"))
+                                            .replace(/\{date\}/g, tnthDates.formatDateString(entry["authored"], "iso"));
+                        sessionListHTML += rowText;
+                    };
+                });
+                $("#userSessionListTable").append(sessionListHTML);
+                $("#userSessionListTable").show();
+
+            } else {
+                $("#userSessionListTable").hide();
+                $("#userSessionsListContainer").prepend("<span class='text-muted'>" + i18next.t("No questionnaire data found.") + "</span>");
+            };
+
+        } else {
+            $("#userSessionListTable").hide();
+            $("#profileSessionListError").html(i18next.t("Problem retrieving session data from server."));
+        };
+    },
+    "assessmentReport": function(data) {
+        if (!(_isTouchDevice())) {
+            $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
+        };
+
+        var sessionListHTML = "";
+        var sessionUserId = $("#_report_user_id").val();
+        var sessionAuthoredDate = $("#_report_authored_date").val();
+
+        if (!data.error) {
+            $(".report-error-message").hide();
+            $("#userSessionReportDetailTable").html("");
+            if (data.entry && data.entry.length > 0) {
+                var entries = data["entry"];
+                var entry;
+
+                entries.forEach(function(item) {
+                    if (!entry && (item["authored"] == sessionAuthoredDate)) {
+                        entry = item;
+                    };
+                });
+
+                if (!entry) entry = entries[0];
+                var caption = "<caption><hr/><span class='profile-item-title'>{title}" +
+                                "</span><br/><span class='text-muted smaller-text'>{lastUpdated}" +
+                                " <span class='gmt'>{GMT}</span></span><hr/></caption>";
+                caption = caption.replace(/\{title\}/g, i18next.t(entries[0]["questionnaire"]["display"]))
+                                .replace(/\{lastUpdated\}/g, i18next.t("Last Updated - {date}".replace("{date}", tnthDates.formatDateString(sessionAuthoredDate, "iso"))))
+                                .replace(/\{GMT\}/g, i18next.t("GMT, Y-M-D"));
+
+                var reportHTML = caption;
+                reportHTML += "<tr><TH>" + i18next.t("Question") + "</TH><TH>" + i18next.t("Response") + "</TH></tr>";
+                entry['group']['question'].forEach(function(entry) {
+                    var q = entry["text"] ? entry["text"] : "", a = "", qcNeeded = true;
+                    if (hasValue(q)) {
+                        q = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
+                        qcNeeded = false;
+                    };
+                    if (entry["answer"]) {
+                        (entry["answer"]).forEach(function(item) {
+                            if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
+                            if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
+                        });
+                    };
+                    if (!hasValue(q)) q = entry["linkId"];
+                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (String(a) !== "undefined" ? i18next.t(a) : "--") + "</td></tr>";
+                });
+                $("#userSessionReportDetailTable").append(reportHTML);
+            };
+        } else {
+            $(".report-error-message").show();
+            $(".report-error-message").append("<div>" + i18next.t("Server Error occurred retrieving report data") + "</div>");
+        };
     }
 };
 var assembleContent = {
@@ -2538,19 +2632,30 @@ var tnthAjax = {
             };
         });
     },
-    "getConsent": function(userId, sync) {
+    "getConsent": function(userId, sync, callback) {
        if (!userId) return false;
        this.sendRequest('/api/user/'+userId+'/consent', 'GET', userId, {sync: sync}, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".get-consent-error").html("");
-                    fillContent.consentList(data, userId, null, null);
+                    if (callback) {
+                        callback(data);
+                    } else {
+                        fillContent.consentList(data, userId, null, null);
+                    };
                     return true;
                 } else {
-                    fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server."));
                     var errorMessage = i18next.t("Server error occurred retrieving consent information.");
-                    if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
-                    else $(".get-consent-error").html(errorMessage);
+                    if (callback) {
+                        callback({"error": errorMessage});
+                    } else {
+                        fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server."));
+                        if ($(".get-consent-error").length === 0) {
+                            $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
+                        } else {
+                            $(".get-consent-error").html(errorMessage);
+                        };
+                    };
                     return false;
                 };
             };
@@ -3366,6 +3471,30 @@ var tnthAjax = {
     	});
 
     },
+    "updateAssessment": function(userId, data, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": "User id is required."});
+            };
+        };
+        if (!hasValue(data)) {
+            if (callback) {
+                callback({"error": "Response data to be update is required."})
+            };
+        };
+        this.sendRequest('/api/patient/'+userId+'/assessment', 'PUT', userId, {data: JSON.stringify(data)}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving assessment list.")});
+                };
+
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    },
     "assessmentList": function(userId, callback) {
     	if (!hasValue(userId)) return false;
     	this.sendRequest('/api/patient/'+userId+'/assessment', 'GET', userId, null, function(data) {
@@ -3396,6 +3525,30 @@ var tnthAjax = {
     			if (callback) callback({"error": i18next.t("no data returned")});
     		};
     	});
+    },
+    "getCurrentQB": function(userId, completionDate, params, callback) {
+        if (!hasValue(userId)) {
+            return false;
+        };
+        params = params||{};
+        this.sendRequest('/api/user/' + userId + '/questionnaire_bank', 'GET', userId, {data: {as_of_date: completionDate}, sync: params.sync?true:false}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) {
+                        callback(data);
+                    };
+                } else {
+                    if (callback) {
+                        callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
+                    };
+                };
+
+            } else {
+                if (callback) {
+                    callback({"error": i18next.t("no data returned")});
+                };
+            };
+        });
     },
     "patientReport": function(userId, callback) {
     	if (!hasValue(userId)) return false;
@@ -3718,7 +3871,7 @@ var tnthDates = {
                     errorField.html(i18next.t("Invalid date. Please try again.")).show();
                     return false;
                 }
-                else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                     errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
                     return false; //shouldn't be in the future
                 }
@@ -4304,6 +4457,37 @@ var tnthDates = {
         //I believe this is a valid python date format, will save it as GMT date/time
         //NOTE, conversion already occurred, so there will be no need for backend to convert it again
         return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
+    },
+    /*
+     * parameters: day, month and year values in numeric
+     * boolean value for restrictToPresent, true if the date needs to be before today, false is the default
+     */
+    dateValidator: function(day, month, year, restrictToPresent) {
+        var errorMessage = "";
+        if (hasValue(day) && hasValue(month) && hasValue(year)) {
+            // Check to see if this is a real date
+            var iy = parseInt(year), im = parseInt(month), iid=parseInt(day);
+            var date = new Date(iy,im-1,iid);
+
+            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                if (iy < 1900) {
+                    errorMessage = i18next.t("Year must be after 1900");
+                };
+                // Only allow if date is before today
+                if (restrictToPresent) {
+                    var today = new Date();
+                    console.log("date: ", date.setHours(0,0,0,0), " today: ", today.setHours(0,0,0,0))
+                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorMessage = i18next.t("The date must not be in the future.");
+                    };
+                };
+            } else {
+                errorMessage = i18next.t("Invalid Date. Please enter a valid date.");
+            };
+        } else {
+            errorMessage = i18next.t("Missing value.");
+        };
+        return errorMessage;
     }
 
 };

@@ -585,16 +585,27 @@ $(document).ready(function(){
         };
         $("#consentDay, #consentMonth, #consentYear").each(function() {
           $(this).on("change", function() {
-              var d = $("#consentDay");
-              var m = $("#consentMonth");
-              var y = $("#consentYear");
+                var d = $("#consentDay");
+                var m = $("#consentMonth");
+                var y = $("#consentYear");
+                //get today's date/time
+                var today = new Date();
+                var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
+                var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
               if (d.val() != "" && m.val() != "" && y.val() != "") {
                   if (this.validity.valid) {
                       var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorConsentDate");
                       if (isValid) {
-                        var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
-                        //saving the time at 12
-                        $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
+                        /*
+                         * check if date entered is today, if so use today's date/time
+                         */
+                        if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+                        } else {
+                            var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
+                            //saving the time at 12
+                            $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
+                        };
                         $("#errorConsentDate").text("").hide();
                         //success
                       } else {
