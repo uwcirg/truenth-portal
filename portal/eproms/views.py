@@ -144,9 +144,10 @@ def terms_and_conditions():
     if user:
         organization = user.first_top_organization()
         role = None
-        for r in (ROLE.STAFF, ROLE.PATIENT):
-            if user.has_role(r) and not role:
-                role = r
+        if any(user.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)):
+            role = ROLE.STAFF
+        elif user.has_role(ROLE.PATIENT):
+            role = ROLE.PATIENT
         if not all((role, organization)):
             role, organization = None, None
 
