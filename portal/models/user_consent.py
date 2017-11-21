@@ -1,5 +1,6 @@
 """User Consent module"""
 from datetime import datetime, timedelta
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from validators import url as url_validation
 
@@ -9,6 +10,7 @@ from ..date_tools import FHIR_datetime
 from .organization import Organization
 from .user import User
 
+
 def default_expires():
     """5 year from now, in UTC"""
     return datetime.utcnow() + timedelta(days=365*5)
@@ -17,6 +19,10 @@ def default_expires():
 STAFF_EDITABLE_MASK = 0b001
 INCLUDE_IN_REPORTS_MASK = 0b010
 SEND_REMINDERS_MASK = 0b100
+
+status_types = ('consented', 'suspended', 'expired')
+status_types_enum = ENUM(
+    *status_types, name='status_enum', create_type=False)
 
 
 class UserConsent(db.Model):
@@ -35,6 +41,7 @@ class UserConsent(db.Model):
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
     agreement_url = db.Column(db.Text, nullable=False)
     options = db.Column(db.Integer, nullable=False, default=0)
+    status = db.Column('status', status_types_enum, nullable=False)
 
     audit = db.relationship(Audit, cascade="save-update, delete",
                             foreign_keys=[audit_id])
@@ -97,6 +104,7 @@ class UserConsent(db.Model):
                          'send_reminders'):
                 if getattr(self, attr):
                     d[attr] = True
+        d['status'] = self.status
         return d
 
     @classmethod
@@ -130,9 +138,10 @@ class UserConsent(db.Model):
                 data.get('acceptance_date'),
                 error_subject='acceptance_date')
         for attr in (
-            'staff_editable', 'include_in_reports', 'send_reminders'):
+                'staff_editable', 'include_in_reports', 'send_reminders'):
             if attr in data:
                 setattr(obj, attr, data.get(attr))
+        obj.status = data.get('status') or 'consented'
 
         return obj
 
