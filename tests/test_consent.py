@@ -47,6 +47,7 @@ class TestUserConsent(TestCase):
         uc1.send_reminders = False
         uc2.staff_editable = True
         uc2.send_reminders = False
+        uc2.status = 'suspended'
         with SessionScope(db):
             db.session.add(uc1)
             db.session.add(uc2)
@@ -60,6 +61,10 @@ class TestUserConsent(TestCase):
                         rv.json['consent_agreements'][0])
         self.assertTrue('staff_editable' in
                         rv.json['consent_agreements'][0])
+        self.assertEquals(rv.json['consent_agreements'][0]['status'],
+                          'consented')
+        self.assertEquals(rv.json['consent_agreements'][1]['status'],
+                          'suspended')
 
     def test_post_user_consent(self):
         self.shallow_org_tree()
@@ -117,10 +122,12 @@ class TestUserConsent(TestCase):
         self.assertEqual(consent.organization_id, org1.id)
         self.assertTrue(consent.staff_editable)
         self.assertTrue(consent.send_reminders)
+        self.assertEqual(consent.status, 'consented')
 
         # modify flags & repost - should have new values and only one
         data['staff_editable'] = False
         data['send_reminders'] = False
+        data['status'] = 'suspended'
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
@@ -130,6 +137,7 @@ class TestUserConsent(TestCase):
         self.assertEqual(consent.organization_id, org1.id)
         self.assertFalse(consent.staff_editable)
         self.assertFalse(consent.send_reminders)
+        self.assertEqual(consent.status, 'suspended')
 
 
     def test_delete_user_consent(self):
