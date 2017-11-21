@@ -1477,7 +1477,7 @@ var fillContent = {
                                 "</span><br/><span class='text-muted smaller-text'>{lastUpdated}" +
                                 " <span class='gmt'>{GMT}</span></span><hr/></caption>";
                 caption = caption.replace(/\{title\}/g, i18next.t(entries[0]["questionnaire"]["display"]))
-                                .replace(/\{lastUpdated\}/g, i18next.t("Last Updated - {date}".replace("{date}", tnthDates.formatDateString(sessionAuthoredDate, "iso"))))
+                                .replace(/\{lastUpdated\}/g, i18next.t("Last Updated - {date}").replace("{date}", tnthDates.formatDateString(sessionAuthoredDate, "iso")))
                                 .replace(/\{GMT\}/g, i18next.t("GMT, Y-M-D"));
 
                 var reportHTML = caption;
@@ -3474,12 +3474,12 @@ var tnthAjax = {
     "updateAssessment": function(userId, data, callback) {
         if (!hasValue(userId)) {
             if (callback) {
-                callback({"error": "User id is required."});
+                callback({"error": i18next.t("User id is required.")});
             };
         };
         if (!hasValue(data)) {
             if (callback) {
-                callback({"error": "Response data to be update is required."})
+                callback({"error": i18next.t("Response data to be update is required.")})
             };
         };
         this.sendRequest('/api/patient/'+userId+'/assessment', 'PUT', userId, {data: JSON.stringify(data)}, function(data) {
