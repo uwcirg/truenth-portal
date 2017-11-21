@@ -4476,7 +4476,6 @@ var tnthDates = {
                 // Only allow if date is before today
                 if (restrictToPresent) {
                     var today = new Date();
-                    console.log("date: ", date.setHours(0,0,0,0), " today: ", today.setHours(0,0,0,0))
                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                         errorMessage = i18next.t("The date must not be in the future.");
                     };

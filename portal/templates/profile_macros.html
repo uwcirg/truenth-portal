@@ -1864,7 +1864,7 @@
                 };
 
                 if (method === "paper") {
-                    assessment_url += "&completion_date=" + tnthDates.formatDateString(completionDate, "iso-short");
+                    assessment_url += "&authored=" + tnthDates.formatDateString(completionDate, "iso-short");
                 };
 
                 var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
