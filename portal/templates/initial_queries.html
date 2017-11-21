@@ -839,9 +839,9 @@ $(document).ready(function(){
         fc.endTime = new Date();
         var elapsedTime = fc.endTime - fc.startTime;
         elapsedTime /= 1000;
-        if (fc.sectionsLoaded() || elapsedTime >= 2) {
-          setTimeout(function() { initIncompleteFields(); }, 100);
-          setTimeout('$("#iqFooterWrapper").show()', 100);
+        if (fc.sectionsLoaded() || elapsedTime >= 3) {
+          setTimeout(function() { initIncompleteFields(); }, 300);
+          setTimeout('$("#iqFooterWrapper").show()', 500);
           fc.startTime = 0;
           fc.endTime = 0;
           clearInterval(fc.intervalId);
