@@ -5,7 +5,7 @@ from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
 from .fhir import QuestionnaireResponse
-from .organization import Organization
+from .organization import Organization, OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from ..trace import trace
 from .user import User
@@ -200,6 +200,17 @@ class AssessmentStatus(object):
         for org in self.user.organizations:
             if org.research_protocol and (org.research_protocol.id == rp_id):
                 return org
+        return None
+
+    @property
+    def top_organization(self):
+        """Returns the top-level organization for the established A_S org"""
+        org = self.organization
+        if org:
+            OT = OrgTree()
+            top = OT.find_top_level_org([org])
+            if top:
+                return top[0]
         return None
 
     def enrolled_in_classification(self, classification):
