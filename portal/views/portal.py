@@ -605,13 +605,16 @@ def settings():
             wide_container="true")
 
     if form.import_orgs.data:
-        from ..trace import dump_trace, establish_trace
+        from ..trace import dump_trace, establish_trace, trace
         from ..config.model_persistence import ModelPersistence
         establish_trace("Initiate import...")
-        org_persistence = ModelPersistence(
-            model_class=Organization, sequence_name='organizations_id_seq',
-            lookup_field='id')
-        org_persistence.import_(keep_unmentioned=False)
+        try:
+            org_persistence = ModelPersistence(
+                model_class=Organization, sequence_name='organizations_id_seq',
+                lookup_field='id')
+            org_persistence.import_(keep_unmentioned=False)
+        except ValueError as e:
+            trace("IMPORT ERROR: {}".format(e))
 
         # Purge cached data and reload.
         OrgTree().invalidate_cache()
