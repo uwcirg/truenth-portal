@@ -1507,7 +1507,7 @@ var fillContent = {
                     var q = (entry["text"] ? entry["text"] : ""), a = "";
                     
                     if (hasValue(q)) {
-                        q = q.replace(/^[\d\w]{1,3}\./, "");
+                        q = q.replace(/^[\d\w]{1,3}\./, ""); //replace question # in the beginning of the question
                     };
 
                     if (entry["answer"]) {
