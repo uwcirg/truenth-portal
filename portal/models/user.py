@@ -839,8 +839,11 @@ class User(db.Model, UserMixin):
             db.session.add(consent)
         for replaced in delete_consents:
             replaced.deleted = Audit(
-                comment="new consent replacing existing", user_id=current_user().id,
+                comment="new consent replacing existing",
+                user_id=current_user().id,
                 subject_id=self.id, context='consent')
+            replaced.status = "deleted"
+            db.session.add(replaced)
         db.session.commit()
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
