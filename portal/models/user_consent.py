@@ -20,7 +20,7 @@ STAFF_EDITABLE_MASK = 0b001
 INCLUDE_IN_REPORTS_MASK = 0b010
 SEND_REMINDERS_MASK = 0b100
 
-status_types = ('consented', 'suspended', 'expired')
+status_types = ('consented', 'suspended', 'purged')
 status_types_enum = ENUM(
     *status_types, name='status_enum', create_type=False)
 
@@ -41,7 +41,8 @@ class UserConsent(db.Model):
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
     agreement_url = db.Column(db.Text, nullable=False)
     options = db.Column(db.Integer, nullable=False, default=0)
-    status = db.Column('status', status_types_enum, nullable=False)
+    status = db.Column('status', status_types_enum,
+                       server_default='consented', nullable=False)
 
     audit = db.relationship(Audit, cascade="save-update, delete",
                             foreign_keys=[audit_id])
@@ -137,11 +138,10 @@ class UserConsent(db.Model):
             obj.acceptance_date = FHIR_datetime.parse(
                 data.get('acceptance_date'),
                 error_subject='acceptance_date')
-        for attr in (
-                'staff_editable', 'include_in_reports', 'send_reminders'):
+        for attr in ('staff_editable', 'include_in_reports',
+                     'send_reminders', 'status'):
             if attr in data:
                 setattr(obj, attr, data.get(attr))
-        obj.status = data.get('status') or 'consented'
 
         return obj
 

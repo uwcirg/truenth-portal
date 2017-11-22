@@ -113,8 +113,8 @@ class TestUserConsent(TestCase):
 
         self.login()
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+                              content_type='application/json',
+                              data=json.dumps(data))
         self.assert200(rv)
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
@@ -129,8 +129,8 @@ class TestUserConsent(TestCase):
         data['send_reminders'] = False
         data['status'] = 'suspended'
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+                              content_type='application/json',
+                              data=json.dumps(data))
         self.assert200(rv)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
         consent = self.test_user.valid_consents[0]
@@ -139,6 +139,10 @@ class TestUserConsent(TestCase):
         self.assertFalse(consent.send_reminders)
         self.assertEqual(consent.status, 'suspended')
 
+        dc = UserConsent.query.filter_by(user_id=TEST_USER_ID,
+                                         organization_id=org1.id,
+                                         status='purged').first()
+        self.assertTrue(dc.deleted_id)
 
     def test_delete_user_consent(self):
         self.shallow_org_tree()

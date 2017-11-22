@@ -25,7 +25,7 @@ def upgrade():
     session = Session(bind=bind)
 
     status_enum = sa.Enum(
-        'consented', 'suspended', 'expired', name='status_enum')
+        'consented', 'suspended', 'purged', name='status_enum')
     status_enum.create(op.get_bind(), checkfirst=False)
 
     op.add_column('user_consents',
@@ -40,7 +40,7 @@ def upgrade():
         elif (not uc.staff_editable
                 and not uc.include_in_reports
                 and not uc.send_reminders):
-            uc.status = "expired"
+            uc.status = "purged"
         session.add(uc)
     session.commit()
 
