@@ -118,13 +118,15 @@ $(document).ready(function(){
     // Class for both "done" and "skip" buttons
     $(".continue-btn").on("click", function(event){
         event.preventDefault();
-        $(this).hide();
+        $(this).attr("disabled", true);
+        $(".loading-indicator").show();
         try {
             window.location.replace("{{ return_address | safe }}");
         } catch(e) {
             //report error if invalid return address is used here
             tnthAjax.reportError({{user.id}}, "{{url_for('coredata_api.acquire')}}", e.message, true);
-            $(this).show();
+            $(this).attr("disabled", false);
+            $(".loading-indicator").hide();
             $(".error-continue").text(e.message);
         };
     });
