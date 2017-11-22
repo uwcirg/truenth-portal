@@ -1,5 +1,6 @@
 """Unit test module for user consent"""
 from dateutil import parser
+from flask import current_app
 from flask_webtest import SessionScope
 import json
 
@@ -74,8 +75,8 @@ class TestUserConsent(TestCase):
 
         self.login()
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+                              content_type='application/json',
+                              data=json.dumps(data))
         self.assert200(rv)
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
@@ -94,8 +95,8 @@ class TestUserConsent(TestCase):
 
         self.login()
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+                              content_type='application/json',
+                              data=json.dumps(data))
         self.assert200(rv)
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
@@ -167,8 +168,8 @@ class TestUserConsent(TestCase):
         self.login()
 
         rv = self.client.delete('/api/user/{}/consent'.format(TEST_USER_ID),
-                             content_type='application/json',
-                             data=json.dumps(data))
+                                content_type='application/json',
+                                data=json.dumps(data))
         self.assert200(rv)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
         self.assertEqual(self.test_user.valid_consents[0].organization_id,
@@ -178,3 +179,42 @@ class TestUserConsent(TestCase):
         # their audit data.
         rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assertTrue('deleted' in json.dumps(rv.json))
+
+    def test_withdraw_user_consent(self):
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id = org.id
+
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit)
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        self.assertEqual(self.test_user.valid_consents.count(), 1)
+
+        data = {'organization_id': org_id}
+        self.login()
+        resp = self.client.post('/api/user/{}/consent/'
+                                'withdraw'.format(TEST_USER_ID),
+                                content_type='application/json',
+                                data=json.dumps(data))
+
+        self.assert200(resp)
+
+        # check that old consent is marked as deleted/purged
+        old_consent = UserConsent.query.filter_by(user_id=TEST_USER_ID,
+                                                  organization_id=org_id,
+                                                  status='purged').first()
+        self.assertTrue(old_consent.deleted_id)
+
+        # check new withdrawn consent
+        new_consent = UserConsent.query.filter_by(user_id=TEST_USER_ID,
+                                                  organization_id=org_id,
+                                                  status='suspended').first()
+        self.assertEqual(old_consent.agreement_url, new_consent.agreement_url)
+        self.assertEqual(new_consent.staff_editable,
+                         (not current_app.config.get('GIL')))
+        self.assertFalse(new_consent.send_reminders)
