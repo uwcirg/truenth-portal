@@ -9,7 +9,7 @@ from ..database import db
 from ..dict_tools import dict_match
 from ..date_tools import FHIR_datetime
 from ..models.identifier import Identifier
-
+from ..trace import trace
 
 class ModelPersistence(object):
     """Adapter class to handle persistence of model tables"""
@@ -25,6 +25,7 @@ class ModelPersistence(object):
     @staticmethod
     def _log(msg):
         current_app.logger.info(msg)
+        trace(msg)
 
     def __header__(self, data):
         data['resourceType'] = 'Bundle'
@@ -99,6 +100,7 @@ class ModelPersistence(object):
                 query.delete(synchronize_session=False)
 
         self.update_sequence()
+        trace("Import of {} complete".format(self.model.__name__))
 
     def serialize(self):
         if hasattr(self.model, 'as_fhir'):
