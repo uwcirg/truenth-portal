@@ -1911,19 +1911,11 @@
             });
         });
 
-        $("#qYes").on("click", function() {
-            $(this).prop("checked", true);
-            $("#meSubmit").attr("disabled", false);
-            continueToAssessment($("input[name='entryMethod']:checked").val(), $("#qCompletionDate").val());
-        });
-
-        $("#qNo").on("click", function() {
-            $(this).prop("checked", true);
-            $("#meSubmit").attr("disabled", true);
-        });
-
         $("input[name='entryMethod']").on("click", function() {
-            if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
+            if ($(this).is(":checked")) {
+                $("#manualEntryModal .error-message").text("");
+                $("#meSubmit").attr("disabled", false);
+            };
         });
         $("#paper").on("click", function() {
             $("#manualEntryCompletionDateContainer").show();
@@ -2003,34 +1995,43 @@
             var completionDate = $("#qCompletionDate").val();
 
             if (method != "") {
-                var errorMsg = "";
                 $("#manualEntryMessageContainer").text("");
                 if (method === "paper") {
                     /*
                      * check questionnaire time windows
-                     * allow user to continue if the completion date is not in windows?
-                     * may need to change pending Diana's comment
-                     * but display warning?
+                     * disallow user to continue if the completion date is not in windows?
+                     * but display warning
                      */
-                    tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), {sync:true}, function(data) {
+
+                    $("#manualEntryButtonsContainer").hide();
+                    $("#manualEntryLoader").show();
+
+                    var errorMsg = "";
+
+                    tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
                         if (!data.error) {
                             if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
                                 errorMsg = i18next.t("Questionnaire date is not within the valid PROMS window.");
                             };
+
+                            if (hasValue(errorMsg)) {
+                                $("#errorCompletionDate").text(errorMsg);
+                                $("#meSubmit").attr("disabled", true);
+                                $("#manualEntryButtonsContainer").show();
+                                $("#manualEntryLoader").hide();
+                            } else {
+                                $("#errorCompletionDate").text("");
+                                $("#meSubmit").attr("disabled", false);
+                            };
+
                         };
                     });
 
-                    if (hasValue(errorMsg)) {
-                        $("#errorCompletionDate").text(errorMsg);
-                        $("#meSubmit").attr("disabled", true);
-                    } else {
-                        $("#errorCompletionDate").text("");
-                        $("#meSubmit").attr("disabled", false);
+                    if (!hasValue(errorMsg)) {
+                        continueToAssessment(method, completionDate);
                     };
-                };
-
-                if (!hasValue(errorMsg)) {
-                    continueToAssessment(method, completionDate);
+                } else {
+                    continueToAssessment(method);
                 };
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
