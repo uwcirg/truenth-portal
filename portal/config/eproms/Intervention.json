@@ -1,6 +1,6 @@
 {
   "entry": [
-   {
+    {
       "card_html": "set by access strategy depending on state",
       "description": "",
       "display_rank": 1,
@@ -75,14 +75,14 @@
       "public_access": false,
       "resourceType": "Intervention"
     }
-   ],
+  ],
   "id": "SitePersistence v0.2",
   "meta": {
     "fhir_comments": [
       "export of dynamic site data from host",
       "stg.us.truenth.org"
     ],
-    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+    "lastUpdated": "2017-11-22T00:23:12.491176Z"
   },
   "resourceType": "Bundle",
   "type": "document"
