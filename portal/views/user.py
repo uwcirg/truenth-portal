@@ -662,8 +662,9 @@ def withdraw_user_consent(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to edit requested user_id
       404:
-        description: if user_id doesn't exist, or it no consent found
-        for given user/org combination
+        description:
+          if user_id doesn't exist, or it no consent found
+          for given user org combination
 
     """
     current_app.logger.debug('withdraw user consent called w/: '
