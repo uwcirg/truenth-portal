@@ -842,7 +842,7 @@ class User(db.Model, UserMixin):
                 comment="new consent replacing existing",
                 user_id=current_user().id,
                 subject_id=self.id, context='consent')
-            replaced.status = "purged"
+            replaced.status = "deleted"
             db.session.add(replaced)
         db.session.commit()
 

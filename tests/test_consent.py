@@ -142,7 +142,7 @@ class TestUserConsent(TestCase):
 
         dc = UserConsent.query.filter_by(user_id=TEST_USER_ID,
                                          organization_id=org1.id,
-                                         status='purged').first()
+                                         status='deleted').first()
         self.assertTrue(dc.deleted_id)
 
     def test_delete_user_consent(self):
@@ -180,6 +180,11 @@ class TestUserConsent(TestCase):
         rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assertTrue('deleted' in json.dumps(rv.json))
 
+        # confirm deleted status
+        dc = UserConsent.query.filter_by(user_id=TEST_USER_ID,
+                                         organization_id=org1_id).first()
+        self.assertEqual(dc.status, 'deleted')
+
     def test_withdraw_user_consent(self):
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
@@ -204,10 +209,10 @@ class TestUserConsent(TestCase):
 
         self.assert200(resp)
 
-        # check that old consent is marked as deleted/purged
+        # check that old consent is marked as deleted
         old_consent = UserConsent.query.filter_by(user_id=TEST_USER_ID,
                                                   organization_id=org_id,
-                                                  status='purged').first()
+                                                  status='deleted').first()
         self.assertTrue(old_consent.deleted_id)
 
         # check new withdrawn consent

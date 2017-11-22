@@ -20,7 +20,7 @@ STAFF_EDITABLE_MASK = 0b001
 INCLUDE_IN_REPORTS_MASK = 0b010
 SEND_REMINDERS_MASK = 0b100
 
-status_types = ('consented', 'suspended', 'purged')
+status_types = ('consented', 'suspended', 'deleted')
 status_types_enum = ENUM(
     *status_types, name='status_enum', create_type=False)
 
