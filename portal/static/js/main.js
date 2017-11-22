@@ -118,7 +118,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "registrationDate": i18next.t("Regiatration Date"),
                       "historyConsentDate": i18next.t("Consent Date"),
                       "locale": i18next.t("GMT"),
-                      "lastUpdated": i18next.t("Last Updated") + "<br/>" + i18next.t("( GMT, Y-M-D )"),
+                      "lastUpdated": i18next.t("Last Updated") + "<br/><span class='smaller-text'>" + i18next.t("( GMT, Y-M-D )") + "</span>",
                       "comment": i18next.t("Action"),
                       "actor": i18next.t("User")
                       };
@@ -289,7 +289,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             case "deleted":
                 if (se && sr && ir) {
                     sDisplay = oDisplayText["consented"];
-                } else if (se && ir && !sr) {
+                } else if (se && ir && !sr || (!se && ir && !sr)) {
                     sDisplay = oDisplayText["withdrawn"];
                 } else if (!se && !ir && !sr) {
                     sDisplay = oDisplayText["purged"];
@@ -301,19 +301,23 @@ var ConsentUIHelper = function(consentItems, userId) {
                 sDisplay = oDisplayText["expired"];
                 break;
             case "active":
-                if (se && sr && ir) {
-                    if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
-                    else sDisplay = oDisplayText["consented"];
-                    cflag = "consented";
-                } else if (se && ir && !sr) {
-                    sDisplay = oDisplayText["withdrawn"];
-                    cflag = "suspended";
-                } else if (!se && !ir && !sr) {
-                    sDisplay = oDisplayText["purged"];
-                    cflag = "purged";
-                } else {
-                    sDisplay = oDisplayText["consented"];
-                    cflag = "consented";
+                switch(item.status) {
+                    case "consented":
+                        if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
+                        else sDisplay = oDisplayText["consented"];
+                        cflag = "consented";
+                        break;
+                    case "suspended":
+                        sDisplay = oDisplayText["withdrawn"];
+                        cflag = "suspended";
+                        break;
+                    case "deleted":
+                        sDisplay = oDisplayText["purged"];
+                        cflag = "purged";
+                        break;
+                    default:
+                        sDisplay = oDisplayText["consented"];
+                        cflag = "consented";
                 };
                 break;
         };
@@ -435,10 +439,27 @@ var ConsentUIHelper = function(consentItems, userId) {
                     o.org = $(this).attr("data-orgId");
                     o.agreementUrl = $(this).attr("data-agreementUrl");
                 };
-                if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
-                else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                $("#" + $(this).attr("modalId")).modal('hide');
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                if ($(this).val() == "purged") {
+                    tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                } else if ($(this).val() == "suspended") {
+                    var modalElement = $("#" + $(this).attr("modalId"));
+                    tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"),null, function(data) {
+                        modalElement.modal('hide');
+                        if (data.error) {
+                            $(".set-consent-error").text(data.error);
+                        } else {
+                            if (typeof reloadConsentList !== "undefined") {
+                                reloadConsentList();
+                            };
+                        };
+                    });
+                } else {
+                    tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
+                    $("#" + $(this).attr("modalId")).modal('hide');
+                    if (typeof reloadConsentList !== "undefined") {
+                        reloadConsentList();
+                    };
+                };
             });
         });
     },
@@ -2644,6 +2665,37 @@ var tnthAjax = {
 
             };
         };
+    },
+    withdrawConsent: function(userId, orgId, params, callback) {
+        if (!userId) {
+            if (callback) {
+                return {"error": i18next.t("User id is required.")};
+            }
+            return false;
+        }
+        if (!orgId) {
+            if (callback) {
+                return {"error": i18next.t("Organization id is required.")};
+            }
+            return false;
+        };
+        params = params || {};
+        this.sendRequest('/api/user/'+userId+'/consent/withdraw',
+            'POST',
+            userId,
+            {sync: (params.sync?true:false), data: JSON.stringify({organization_id: orgId})},
+            function(data) {
+                if (!data.error) {
+                    if (callback) {
+                        callback(data);
+                    }
+                } else {
+                    if (callback) {
+                        callback({"error": i18next.t("Error occurred setting consent status.")});
+                    }
+                };
+            }
+        );
     },
     getAllValidConsent: function(userId, orgId) {
         if (!userId) return false;
