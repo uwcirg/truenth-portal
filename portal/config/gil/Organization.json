@@ -330,6 +330,46 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
+      "id": 302,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1639429368"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Karmanos Cancer Institute at Wayne State University",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 301,
       "identifier": [
         {
@@ -369,46 +409,6 @@
         "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 302,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1639429368"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MI"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "Karmanos Cancer Institute at Wayne State University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -517,6 +517,46 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
+      "id": 402,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1508001561"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of Michigan",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 401,
       "identifier": [
         {
@@ -567,30 +607,30 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "America/New_York",
+          "timezone": "UTC",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
-      "id": 402,
+      "id": 502,
       "identifier": [
         {
           "system": "http://us.truenth.org/identity-codes/decision-support-group",
           "use": "secondary",
-          "value": "p3p"
+          "value": "wisercare"
         },
         {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
-          "value": "state:MI"
+          "value": "state:CA"
         },
         {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
-          "value": "1508001561"
+          "value": "1912987553"
         }
       ],
       "indigenous_codings": true,
-      "name": "University of Michigan",
+      "name": "University of California, Davis",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -661,11 +701,11 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "UTC",
+          "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
-      "id": 502,
+      "id": 602,
       "identifier": [
         {
           "system": "http://us.truenth.org/identity-codes/decision-support-group",
@@ -680,11 +720,11 @@
         {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
-          "value": "1912987553"
+          "value": "1639306798"
         }
       ],
       "indigenous_codings": true,
-      "name": "University of California, Davis",
+      "name": "University of California, Los Angeles",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -760,46 +800,6 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 602,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1639306798"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "University of California, Los Angeles",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
           "timezone": "America/Denver",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -828,6 +828,46 @@
         "display": "University of California, Los Angeles",
         "reference": "api/organization/602"
       },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 702,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1972758506"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:GA"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Emory University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -887,46 +927,6 @@
         "display": "Emory University",
         "reference": "api/organization/702"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 702,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1972758506"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:GA"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "Emory University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1046,6 +1046,46 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
+      "id": 902,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1215097910"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MA"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Dana-Farber Cancer Institute",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 901,
       "identifier": [
         {
@@ -1085,46 +1125,6 @@
         "display": "Dana-Farber Cancer Institute",
         "reference": "api/organization/902"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 902,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1215097910"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MA"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "Dana-Farber Cancer Institute",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1284,6 +1284,46 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
+      "id": 1202,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1598980310"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CO"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of Colorado, Denver",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1201,
       "identifier": [
         {
@@ -1338,26 +1378,26 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
-      "id": 1202,
+      "id": 1302,
       "identifier": [
         {
           "system": "http://us.truenth.org/identity-codes/decision-support-group",
           "use": "secondary",
-          "value": "wisercare"
+          "value": "p3p"
         },
         {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
-          "value": "1598980310"
+          "value": "1588030878"
         },
         {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
-          "value": "state:CO"
+          "value": "state:NC"
         }
       ],
       "indigenous_codings": true,
-      "name": "University of Colorado, Denver",
+      "name": "Duke University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1417,46 +1457,6 @@
         "display": "Duke University",
         "reference": "api/organization/1302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 1302,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1588030878"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:NC"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "Duke University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1565,6 +1565,46 @@
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
+      "id": 1402,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1295731966"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MD"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Johns Hopkins University",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1401,
       "identifier": [
         {
@@ -1604,46 +1644,6 @@
         "display": "Johns Hopkins University",
         "reference": "api/organization/1402"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 1402,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1295731966"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MD"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "Johns Hopkins University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1704,6 +1704,46 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1502,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NC"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1285689299"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of North Carolina at Chapel Hill",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1742,46 +1782,6 @@
         "display": "University of North Carolina at Chapel Hill",
         "reference": "api/organization/1502"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
-    },
-    {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 1502,
-      "identifier": [
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:NC"
-        },
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1285689299"
-        }
-      ],
-      "indigenous_codings": true,
-      "name": "University of North Carolina at Chapel Hill",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
