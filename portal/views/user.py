@@ -4,6 +4,7 @@ from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
 from sqlalchemy import and_
+from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
@@ -602,6 +603,110 @@ def set_user_consents(user_id):
         abort(400, str(e))
 
     return jsonify(message="ok")
+
+
+@user_api.route('/user/<int:user_id>/consent/withdraw', methods=('POST','PUT'))
+@oauth.require_oauth()
+def withdraw_user_consent(user_id):
+    """Withdraw existing consent agreement for the user with named organization
+
+    Used to withdraw a consent agreements between a user and an organization.
+    If a consent exists for the given user/org, the consent will be marked
+    deleted, and a matching consent (with new status/option values) will be
+    created in its place.
+
+    ---
+    tags:
+      - User
+      - Consent
+      - Organization
+    operationId: withdraw_user_consent
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: withdraw_consent_agreement
+          required:
+            - organization_id
+          properties:
+            organization_id:
+              type: integer
+              format: int64
+              description:
+                Organization identifier defining with whom the consent
+                agreement applies
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response_ok
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request includes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist, or it no consent found
+        for given user/org combination
+
+    """
+    current_app.logger.debug('withdraw user consent called w/: '
+                             '{}'.format(request.json))
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+    if not request.json:
+        abort(400, "Requires JSON with submission including "
+                   "HEADER 'Content-Type: application/json'")
+
+    org_id = request.json.get('organization_id')
+    if not org_id:
+        abort(400, "missing required organization ID")
+
+    current_app.logger.debug('withdraw user consent called for user {} '
+                             'and org {}'.format(user.id, org_id))
+
+    uc = UserConsent.query.filter_by(user_id=user.id,
+                                     organization_id=org_id,
+                                     status='consented').first()
+
+    if not uc:
+        abort(404, "no UserConsent found for user ID {} and org ID "
+              "{}".format(user.id, org_id))
+    try:
+        make_transient(uc)
+        uc.status = 'suspended'
+        uc.send_reminders = False
+        uc.include_in_reports = True
+        uc.staff_editable = (not current_app.config.get('GIL'))
+        consent_list = [uc, ]
+        user.update_consents(
+            consent_list=consent_list, acting_user=current_user())
+        # The updated consent may have altered the cached assessment
+        # status - invalidate this user's data at this time.
+        invalidate_assessment_status_cache(user_id=user.id)
+    except ValueError as e:
+        abort(400, str(e))
+
+    return jsonify(uc.as_json())
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
