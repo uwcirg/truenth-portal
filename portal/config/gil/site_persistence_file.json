@@ -1,42 +1,42 @@
 {
   "entry": [
     {
-      "resourceType": "site.cfg", 
+      "resourceType": "site.cfg",
       "results": [
-        "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n", 
-        "DEFAULT_LOCALE = 'en_US'\n", 
+        "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n",
+        "DEFAULT_LOCALE = 'en_US'\n",
         "NO_CHALLENGE_WO_DATA = True  # Grandfather in users missing data\n",
         "PATIENT_LIST_ADDL_FIELDS = ['reports']\n",
-        "PORTAL_STYLESHEET = '/static/css/portal.css'\n", 
-        "GIL = True\n", 
+        "PORTAL_STYLESHEET = '/static/css/portal.css'\n",
+        "GIL = True\n",
         "SHOW_WELCOME = True\n",
-        "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'consent', 'clinical_questions', 'intervention_reports', 'procedures', 'gender', 'interventions']\n", 
+        "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'consent', 'clinical_questions', 'intervention_reports', 'procedures', 'gender', 'interventions']\n",
         "USER_FORGOT_PASSWORD_EMAIL_TEMPLATE = 'flask_user/emails/truenth_forgot_password'\n",
         "CONSENT_EDIT_PERMISSIBLE_ROLES=['patient', 'admin']\n",
         "CONSENT_WITH_TOP_LEVEL_ORG=True\n",
         "REQUIRED_CORE_DATA=['name', 'dob', 'role', 'org', 'clinical', 'localized', 'race', 'ethnicity', 'indigenous', 'privacy_policy', 'website_terms_of_use']\n",
         "TRUENTH_LINK_URL='https://us.movember.com/'\n",
         "MOVEMER_LINK_URL='https://us.movember.com/'\n",
-	"STAFF_BULK_DATA_ACCESS=False\n",
-	"SMARTLING_PROJECT_ID='13f8e2dcf'\n",
-        "\n", 
-        "# Assessment Engine configuration\n", 
-        "INSTRUMENTS = [\n", 
-        "    'epic26',\n", 
-        "    'eq5d',\n", 
-        "#    'EuroQOL'\n", 
+        "STAFF_BULK_DATA_ACCESS=False\n",
+        "SMARTLING_PROJECT_ID='13f8e2dcf'\n",
+        "\n",
+        "# Assessment Engine configuration\n",
+        "INSTRUMENTS = [\n",
+        "    'epic26',\n",
+        "    'eq5d',\n",
+        "#    'EuroQOL'\n",
         "]\n"
       ]
-    }    
-  ], 
+    }
+  ],
   "id": "SitePersistence v0.2",
   "meta": {
     "fhir_comments": [
-      "export of dynamic site data from host", 
+      "export of dynamic site data from host",
       "stg.us.truenth.org"
-    ], 
-    "lastUpdated": "2016-09-13T00:50:09.179010Z"
-  }, 
-  "resourceType": "Bundle", 
+    ],
+    "lastUpdated": "2017-11-22T00:05:44.264778Z"
+  },
+  "resourceType": "Bundle",
   "type": "document"
 }

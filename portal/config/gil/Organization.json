@@ -2,1187 +2,1796 @@
   "entry": [
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 0,
       "identifier": [],
+      "indigenous_codings": true,
       "name": "none of the above",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 101,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1447420906"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:WA"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "uwmc"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "p3pinstitution"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/decision-support-group",
           "use": "secondary",
           "value": "p3p"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:WA"
         }
       ],
+      "indigenous_codings": true,
       "name": "University of Washington",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Los_Angeles"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 102,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "uwurology"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "p3pclinica"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "p3pclinca"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:WA"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UWMC"
         }
       ],
+      "indigenous_codings": true,
       "name": "UW Medicine (University of Washington)",
       "partOf": {
+        "display": "University of Washington",
         "reference": "api/organization/101"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 103,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "sccaurology"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortname",
-          "use": "secondary",
-          "value": "SCCA"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "p3pclinicb"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:WA"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "SCCA"
         }
       ],
+      "indigenous_codings": true,
       "name": "Seattle Cancer Care Alliance (SCCA) Urology Clinic",
       "partOf": {
+        "display": "University of Washington",
         "reference": "api/organization/101"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 104,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "harborviewurology"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortname",
-          "use": "secondary",
-          "value": "Harborview"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "p3pclinicc"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:WA"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Harborview"
         }
       ],
+      "indigenous_codings": true,
       "name": "The Urology Clinic at Harborview",
       "partOf": {
+        "display": "University of Washington",
         "reference": "api/organization/101"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 202,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 201,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1164512851"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "University of California, San Francisco",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 201,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "ucsf"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "wcinstitution"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UCSF"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "UCSF Urologic Surgical Oncology Clinic",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 202,
+      "identifier": [
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1164512851"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:CA"
         }
       ],
-      "name": "UCSF Urologic Surgical Oncology Clinic",
+      "indigenous_codings": true,
+      "name": "University of California, San Francisco",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Los_Angeles"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 302,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 301,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1639429368"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "kciwsu"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MI"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        }
-      ],
-      "name": "Karmanos Cancer Institute at Wayne State University",
-      "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
-        }
-      ]
-    },
-    {
-      "address": [],
-      "id": 301,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "wsupg"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UPG Urology"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Wayne State University Physician Group, Dearborn",
+      "partOf": {
+        "display": "Karmanos Cancer Institute at Wayne State University",
+        "reference": "api/organization/302"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 302,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1639429368"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MI"
         }
       ],
-      "name": "Wayne State University Physician Group, Dearborn",
-      "partOf": {
-        "reference": "api/organization/302"
-      },
+      "indigenous_codings": true,
+      "name": "Karmanos Cancer Institute at Wayne State University",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 303,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "kciweisberg"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Weisberg Cancer Treatment Center"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MI"
         }
       ],
+      "indigenous_codings": true,
       "name": "Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center",
       "partOf": {
+        "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Los_Angeles"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 304,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "kciwertz"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Wertz Clinic"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MI"
         }
       ],
+      "indigenous_codings": true,
       "name": "Wertz Clinic at Karmanos Cancer Center",
       "partOf": {
+        "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Los_Angeles"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 402,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 401,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1508001561"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MI"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        }
-      ],
-      "name": "University of Michigan",
-      "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
-        }
-      ]
-    },
-    {
-      "address": [],
-      "id": 401,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "umich"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "The University of Michigan"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MI"
         }
       ],
+      "indigenous_codings": true,
       "name": "The University of Michigan Department of Urology",
       "partOf": {
+        "display": "University of Michigan",
         "reference": "api/organization/402"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 502,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 402,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1508001561"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of Michigan",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 501,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1912987553"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "University of California, Davis",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 501,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "ucdav"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UC Davis Health"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
         }
       ],
+      "indigenous_codings": true,
       "name": "UC Davis Medical Center",
       "partOf": {
+        "display": "University of California, Davis",
         "reference": "api/organization/502"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 602,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 502,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1912987553"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of California, Davis",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 601,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1639306798"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "ucla"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "University of California, Los Angeles",
-      "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
-        }
-      ]
-    },
-    {
-      "address": [],
-      "id": 601,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "uclaww"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UCLA Health"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
         }
       ],
+      "indigenous_codings": true,
       "name": "Clark Urology Center, Westwood",
       "partOf": {
+        "display": "University of California, Los Angeles",
         "reference": "api/organization/602"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Los_Angeles"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 602,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1639306798"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of California, Los Angeles",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Denver",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 603,
       "identifier": [
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
-          "use": "usual",
-          "value": "uclasm"
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "UCLA Health"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "uclasm"
         }
       ],
+      "indigenous_codings": true,
       "name": "Frank Clark Urology Center, Santa Monica",
       "partOf": {
+        "display": "University of California, Los Angeles",
         "reference": "api/organization/602"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/Denver"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 702,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 701,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1972758506"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "emory"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:GA"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        }
-      ],
-      "name": "Emory University",
-      "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
-        }
-      ]
-    },
-    {
-      "address": [],
-      "id": 701,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "emorystj"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "St. Joseph's Hospital"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Emory Saint Joseph's Hospital",
+      "partOf": {
+        "display": "Emory University",
+        "reference": "api/organization/702"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 702,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1972758506"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:GA"
         }
       ],
-      "name": "Emory Saint Joseph's Hospital",
-      "partOf": {
-        "reference": "api/organization/702"
-      },
+      "indigenous_codings": true,
+      "name": "Emory University",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 703,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:GA"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "emorywin"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Winship"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:GA"
         }
       ],
+      "indigenous_codings": true,
       "name": "Winship Cancer Institute of Emory University",
       "partOf": {
+        "display": "Emory University",
         "reference": "api/organization/702"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 801,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1083942064"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
-          "value": "mcc"
+          "value": "moffit"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortname",
-          "use": "secondary",
-          "value": "Moffitt Cancer Center"
-        },
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:FL"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "mcc"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "p3p"
+          "value": "Moffitt Cancer Center"
         }
       ],
+      "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 902,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 901,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1215097910"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "dfci"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MA"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        }
-      ],
-      "name": "Dana-Farber Cancer Institute",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 901,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "dfcibw"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Dana-Farber/Brigham and Women's Cancer Center"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Dana-Farber/Brigham and Women's Cancer Center",
+      "partOf": {
+        "display": "Dana-Farber Cancer Institute",
+        "reference": "api/organization/902"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 902,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1215097910"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MA"
         }
       ],
-      "name": "Dana-Farber/Brigham and Women's Cancer Center",
-      "partOf": {
-        "reference": "api/organization/902"
-      },
+      "indigenous_codings": true,
+      "name": "Dana-Farber Cancer Institute",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 903,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MA"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "bidmc"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Beth Israel Deaconess"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MA"
         }
       ],
+      "indigenous_codings": true,
       "name": "The Cancer Center at Beth Israel Deaconess Medical Center",
       "partOf": {
+        "display": "Dana-Farber Cancer Institute",
         "reference": "api/organization/902"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1001,
       "identifier": [
         {
-          "assigner": null,
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1134306855"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
-          "use": "usual",
-          "value": "mskcc"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortname",
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
           "use": "secondary",
-          "value": "Memorial Sloan Kettering"
+          "value": "wisercare"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:NY"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1134306855"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "mskcc"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "wisercare"
+          "value": "Memorial Sloan Kettering"
         }
       ],
+      "indigenous_codings": true,
       "name": "Memorial Sloan Kettering Cancer Center",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1101,
       "identifier": [
         {
-          "assigner": null,
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1649623406"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "ohsu"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortname",
-          "use": "secondary",
-          "value": "Oregon Health & Science University"
-        },
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:OR"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Oregon Health & Science University"
         }
       ],
+      "indigenous_codings": true,
       "name": "Oregon Health & Science University",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 1202,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1201,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1598980310"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CO"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "University of Colorado, Denver",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 1201,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "ucden"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CO"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "CU Cancer Center"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "University of Colorado Cancer Center - Anschutz",
+      "partOf": {
+        "display": "University of Colorado, Denver",
+        "reference": "api/organization/1202"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1202,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1598980310"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:CO"
         }
       ],
-      "name": "University of Colorado Cancer Center - Anschutz",
-      "partOf": {
-        "reference": "api/organization/1202"
-      },
+      "indigenous_codings": true,
+      "name": "University of Colorado, Denver",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 1302,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1301,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1588030878"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "duke"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:NC"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "p3p"
-        }
-      ],
-      "name": "Duke University",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 1301,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "dukeuro"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Duke Urology"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Duke Urology",
+      "partOf": {
+        "display": "Duke University",
+        "reference": "api/organization/1302"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1302,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1588030878"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:NC"
         }
       ],
-      "name": "Duke Urology",
-      "partOf": {
-        "reference": "api/organization/1302"
-      },
+      "indigenous_codings": true,
+      "name": "Duke University",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1303,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NC"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "dcc"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "The Duke Cancer Center"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:NC"
         }
       ],
+      "indigenous_codings": true,
       "name": "Duke Cancer Center",
       "partOf": {
+        "display": "Duke University",
         "reference": "api/organization/1302"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1304,
       "identifier": [
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
-          "use": "usual",
-          "value": "dccnd"
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NC"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "The Duke Cancer Center"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:NC"
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "dccnd"
         }
       ],
+      "indigenous_codings": true,
       "name": "Duke Cancer Center North Durham",
       "partOf": {
+        "display": "Duke University",
         "reference": "api/organization/1302"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 1402,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1401,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1295731966"
         },
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "jhu"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MD"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "Johns Hopkins University",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 1401,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "jhusibley"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Sibley"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Sibley Memorial Hospital",
+      "partOf": {
+        "display": "Johns Hopkins University",
+        "reference": "api/organization/1402"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1402,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
         },
         {
-          "assigner": null,
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1295731966"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MD"
         }
       ],
-      "name": "Sibley Memorial Hospital",
-      "partOf": {
-        "reference": "api/organization/1402"
-      },
+      "indigenous_codings": true,
+      "name": "Johns Hopkins University",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1403,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MD"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "jhusubur"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Suburban"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:MD"
         }
       ],
+      "indigenous_codings": true,
       "name": "Surburban Hospital",
       "partOf": {
+        "display": "Johns Hopkins University",
         "reference": "api/organization/1402"
       },
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": []
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     },
     {
       "address": [],
-      "id": 1502,
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1501,
       "identifier": [
         {
-          "assigner": null,
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NC"
+        },
+        {
           "system": "http://hl7.org/fhir/sid/us-npi",
           "use": "official",
           "value": "1285689299"
         },
         {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:NC"
-        },
-        {
-          "assigner": null,
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        }
-      ],
-      "name": "University of North Carolina at Chapel Hill",
-      "resourceType": "Organization",
-      "telecom": []
-    },
-    {
-      "address": [],
-      "id": 1501,
-      "identifier": [
-        {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "unc"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
           "value": "Lineberger"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "UNC Lineberger Comprehensive Cancer Center",
+      "partOf": {
+        "display": "University of North Carolina at Chapel Hill",
+        "reference": "api/organization/1502"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "UTC",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1502,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
         },
         {
-          "assigner": null,
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:NC"
+        },
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1285689299"
         }
       ],
-      "name": "UNC Lineberger Comprehensive Cancer Center",
-      "partOf": {
-        "reference": "api/organization/1502"
-      },
+      "indigenous_codings": true,
+      "name": "University of North Carolina at Chapel Hill",
+      "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [],
-      "extension": [
+      "telecom": [
         {
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "timezone": "America/New_York"
+          "system": "phone",
+          "use": "work",
+          "value": null
         }
-      ]
+      ],
+      "use_specific_codings": false
     }
   ],
   "id": "SitePersistence v0.2",
@@ -1191,7 +1800,7 @@
       "export of dynamic site data from host",
       "stg.us.truenth.org"
     ],
-    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+    "lastUpdated": "2017-11-21T21:11:27.403280Z"
   },
   "resourceType": "Bundle",
   "type": "document"

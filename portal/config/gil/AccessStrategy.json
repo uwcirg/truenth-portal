@@ -1,14 +1,58 @@
 {
   "entry": [
     {
+      "description": "Confirm user is patient who hasn't been given access to Sexual Recovery",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "all"
+          },
+          {
+            "name": "strategy_1",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "sexual_recovery"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "in_role_list"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "role_list",
+                "value": [
+                  "patient"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1001,
+      "intervention_name": "self_management",
+      "name": "Allow Self Management if patient not in Sexual Recovery",
+      "resourceType": "AccessStrategy"
+    },
+    {
       "description": "P3P [strategy_1: <a nested combined strategy>: (user is PATIENT) AND (user NOT IN (sexual_recovery, care_plan, community_of_wellness)] AND [strategy_2 <a nested combined strategy>: ((user NOT IN wisercare clinic) OR (user IN both p3p and wisercare))] AND [strategy_3: (user has NOT started TX)] AND [strategy_4: (user has PCaLocalized)]",
       "function_details": {
         "function": "combine_strategies",
         "kwargs": [
           {
+            "description": "User is patient and not in list of interventions",
             "name": "strategy_1",
-            "value": "combine_strategies",
-            "description": "User is patient and not in list of interventions"
+            "value": "combine_strategies"
           },
           {
             "name": "strategy_1_kwargs",
@@ -27,7 +71,7 @@
                   {
                     "name": "role_list",
                     "value": [
-                        "patient"
+                      "patient"
                     ]
                   }
                 ]
@@ -74,9 +118,9 @@
             ]
           },
           {
+            "description": "User not in WC or (both p3p and WC)",
             "name": "strategy_2",
-            "value": "combine_strategies",
-            "description": "User not in WC or (both p3p and WC)"
+            "value": "combine_strategies"
           },
           {
             "name": "strategy_2_kwargs",
@@ -198,7 +242,7 @@
                   {
                     "name": "role_list",
                     "value": [
-                        "patient"
+                      "patient"
                     ]
                   }
                 ]
@@ -325,10 +369,6 @@
       "resourceType": "AccessStrategy"
     },
     {
-      "resourceType": "AccessStrategy",
-      "intervention_name": "decision_support_unavailable",
-      "id": 1004,
-      "name": "exclusive decision support strategy when real DS aren't avail",
       "function_details": {
         "function": "combine_strategies",
         "kwargs": [
@@ -381,56 +421,16 @@
               {
                 "name": "role_list",
                 "value": [
-                    "patient"
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "description": "Confirm user is patient who hasn't been given access to Sexual Recovery",
-      "function_details": {
-        "function": "combine_strategies",
-        "kwargs": [
-          {
-            "name": "combinator",
-            "value": "all"
-          },
-          {
-            "name": "strategy_1",
-            "value": "allow_if_not_in_intervention"
-          },
-          {
-            "name": "strategy_1_kwargs",
-            "value": [
-              {
-                "name": "intervention_name",
-                "value": "sexual_recovery"
-              }
-            ]
-          },
-          {
-            "name": "strategy_2",
-            "value": "in_role_list"
-          },
-          {
-            "name": "strategy_2_kwargs",
-            "value": [
-              {
-                "name": "role_list",
-                "value": [
-                    "patient"
+                  "patient"
                 ]
               }
             ]
           }
         ]
       },
-      "id": 1001,
-      "intervention_name": "self_management",
-      "name": "Allow Self Management if patient not in Sexual Recovery",
+      "id": 1004,
+      "intervention_name": "decision_support_unavailable",
+      "name": "exclusive decision support strategy when real DS aren't avail",
       "resourceType": "AccessStrategy"
     },
     {
@@ -482,7 +482,7 @@
       "export of dynamic site data from host",
       "stg.us.truenth.org"
     ],
-    "lastUpdated": "2016-09-13T00:50:09.179010Z"
+    "lastUpdated": "2017-11-22T00:05:44.211453Z"
   },
   "resourceType": "Bundle",
   "type": "document"
