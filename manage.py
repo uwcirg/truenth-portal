@@ -19,7 +19,6 @@ from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import permanently_delete_user, flag_test
-from portal.models.user_consent import db_maintenance
 from portal.config.site_persistence import SitePersistence
 
 app = create_app()
@@ -90,14 +89,12 @@ def sync():
     seed()
 
 
-@click.option('--exclude_interventions', '-e', default=False,
-              help="Exclude (don't overwrite) intervention data")
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 @app.cli.command(name="seed")
-def seed_command(exclude_interventions, keep_unmentioned):
-    seed(exclude_interventions, keep_unmentioned)
+def seed_command(keep_unmentioned):
+    seed(keep_unmentioned)
 
-def seed(exclude_interventions=False, keep_unmentioned=False):
+def seed(keep_unmentioned=False):
     """Seed database with required data"""
 
     # Request context necessary for generating data from own HTTP APIs
@@ -108,20 +105,22 @@ def seed(exclude_interventions=False, keep_unmentioned=False):
     add_static_organization()
     add_static_relationships()
     add_static_roles()
-    db_maintenance()
     db.session.commit()
 
-    # Always update interventions on development systems
-    if app.config["SYSTEM_TYPE"].lower() == 'development':
-        exclude_interventions = False
-
     # import site export file if found
-    SitePersistence().import_(exclude_interventions, keep_unmentioned)
+    SitePersistence().import_(keep_unmentioned=keep_unmentioned)
 
 
-@app.cli.command()
-def export_site():
+@click.option('--dir', '-d', default=None, help="Export directory")
+@app.cli.command(name="export_site")
+def export_command(dir):
+    export_site(dir)
+
+
+def export_site(dir):
     """Generate JSON file containing dynamic site config
+
+    :param dir: used to name a non-default target directory for export files
 
     Portions of site configuration live in the database, such as
     Organizations and Access Strategies.  Generate a single export
@@ -131,7 +130,7 @@ def export_site():
     other static data.
 
     """
-    SitePersistence().export()
+    SitePersistence().export(dir)
 
 
 @click.option('--email', '-e', help='Email of user to purge.')

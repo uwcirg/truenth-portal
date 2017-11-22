@@ -23,12 +23,6 @@ class TestResearchProtocol(TestCase):
         self.assertTrue(rp.id)
         self.assertTrue(rp.created_at)
 
-        # test from_fhir for existing RP does not create new
-        rp2 = ResearchProtocol.from_json(data)
-        self.assertEquals(ResearchProtocol.query.count(), 1)
-        self.assertEquals(rp2.id, rp.id)
-        self.assertEquals(rp2.created_at, rp.created_at)
-
     def test_rp_as_json(self):
         rp = ResearchProtocol(name="test_rp")
         with SessionScope(db):

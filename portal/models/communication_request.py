@@ -91,6 +91,21 @@ class CommunicationRequest(db.Model):
                 config=current_app.config, uuid=self.lr_uuid))
 
     @classmethod
+    def find_by_identifier(cls, identifier):
+        """Query method to lookup by identifier"""
+        c_ids = CommunicationRequestIdentifier.query.filter(
+            CommunicationRequestIdentifier.identifier_id == identifier.id
+        )
+        if c_ids.count() > 1:
+            raise ValueError(
+                "Multiple CommunicationRequests mapped to {}".format(
+                    identifier
+                ))
+        elif c_ids.count():
+            first = c_ids.first()
+            return cls.query.get(first.communication_request_id)
+
+    @classmethod
     def from_fhir(cls, data):
         instance = cls()
         return instance.update_from_fhir(data)

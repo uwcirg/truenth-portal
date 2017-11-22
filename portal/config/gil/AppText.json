@@ -1,0 +1,134 @@
+{
+  "entry": [
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true",
+      "name": "About Movember URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true",
+      "name": "About TrueNTH URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Cellphone",
+      "name": "Cellphone",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d57adc33-738c-67bf-187d-a6a9c5af81c5&editorUrl=true",
+      "name": "Initial Consent Terms URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true",
+      "name": "P3P Clinical Institution organization consent URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true",
+      "name": "Privacy URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true",
+      "name": "Terms and Conditions URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true",
+      "name": "WiserCare Clinical Institution organization consent URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Consent Date",
+      "name": "consent date label",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Tools for navigating the prostate cancer journey",
+      "name": "landing sub-title",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Welcome to TrueNTH",
+      "name": "landing title",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH USA",
+      "name": "layout title",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true",
+      "name": "patient terms and conditions URL",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH Registration",
+      "name": "portal registration",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e45bef79-e2c1-ff89-4834-137e6937dae3",
+      "name": "profileSendEmail invite email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "<p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>",
+      "name": "profileSendEmail invite email_body",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH Invitation",
+      "name": "profileSendEmail invite email_subject",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH Invitation",
+      "name": "profileSendEmail option invite",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH Reminder",
+      "name": "profileSendEmail option reminder",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "<p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>",
+      "name": "profileSendEmail reminder email_body",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "TrueNTH Reminder",
+      "name": "profileSendEmail reminder email_subject",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Create an account",
+      "name": "registration prompt",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "Register for TrueNTH",
+      "name": "registration title",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=20bfc5d6-41a5-a4ec-5418-0904d25e0c7c&editorUrl=true",
+      "name": "staff terms and conditions URL",
+      "resourceType": "AppText"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2017-11-22T00:05:44.259246Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}
