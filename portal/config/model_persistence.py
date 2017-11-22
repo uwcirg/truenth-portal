@@ -22,7 +22,8 @@ class ModelPersistence(object):
         self.lookup_field = lookup_field
         self.sequence_name = sequence_name
 
-    def _log(self, msg):
+    @staticmethod
+    def _log(msg):
         current_app.logger.info(msg)
 
     def __header__(self, data):
@@ -49,7 +50,7 @@ class ModelPersistence(object):
             scope=scope, target_dir=target_dir)
         if data:
             with open(self.filename, 'w') as f:
-                f.write(json.dumps(data, indent=2, sort_keys=True))
+                f.write(json.dumps(data, indent=2, sort_keys=True, separators=(',', ': ')))
             self._log("Wrote site persistence to `{}`".format(self.filename))
 
     def __verify_header__(self, data):
@@ -106,33 +107,39 @@ class ModelPersistence(object):
             serialize = 'as_json'
 
         results = []
-        for item in self.model.query.all():
+
+        order_col = (
+            self.model.__table__.c[self.lookup_field].asc()
+            if self.lookup_field != "identifier" else "id")
+
+        for item in self.model.query.order_by(order_col).all():
             results.append(getattr(item, serialize)())
         return results
 
+    def lookup_existing(self, new_obj, new_data):
+        match, field_description = None, None
+        if self.lookup_field == 'id':
+            field_description = unicode(new_obj.id)
+            match = (
+                self.model.query.get(new_obj.id)
+                if new_obj.id is not None else None)
+        elif self.lookup_field == 'identifier':
+            ids = new_data.get('identifier')
+            if len(ids) == 1:
+                id = Identifier.from_fhir(ids[0]).add_if_not_found()
+                field_description = unicode(id)
+                match = self.model.find_by_identifier(id) if id else None
+            elif len(ids) > 1:
+                raise ValueError(
+                    "Multiple identifiers for {} "
+                    "don't know which to match on".format(new_data))
+        else:
+            args = {self.lookup_field: new_data[self.lookup_field]}
+            field_description = getattr(new_obj, self.lookup_field)
+            match = self.model.query.filter_by(**args).first()
+        return match, field_description
+
     def update(self, new_data):
-        def lookup_existing():
-            match, field_description = None, None
-            if self.lookup_field == 'id':
-                field_description = unicode(new_obj.id)
-                match = (
-                    self.model.query.get(new_obj.id)
-                    if new_obj.id is not None else None)
-            elif self.lookup_field == 'identifier':
-                ids = new_data.get('identifier')
-                if len(ids) == 1:
-                    id = Identifier.from_fhir(ids[0])
-                    field_description = unicode(id)
-                    match = self.model.find_by_identifier(id) if id else None
-                elif len(ids) > 1:
-                    raise ValueError(
-                        "Multiple identifiers for {} "
-                        "don't know which to match on".format(new_data))
-            else:
-                args = {self.lookup_field: new_data[self.lookup_field]}
-                field_description = getattr(new_obj, self.lookup_field)
-                match = self.model.query.filter_by(**args).first()
-            return match, field_description
 
         if hasattr(self.model, 'from_fhir'):
             from_method = self.model.from_fhir
@@ -145,7 +152,9 @@ class ModelPersistence(object):
 
         merged = None
         new_obj = from_method(new_data)
-        existing, id_description = lookup_existing()
+        existing, id_description = self.lookup_existing(
+            new_obj=new_obj, new_data=new_data)
+
         if existing:
             details = StringIO()
             if not dict_match(new_data, getattr(existing, serialize)(), details):
@@ -186,12 +195,12 @@ class ModelPersistence(object):
                     self.sequence_name, max_known + 1))
 
 
-def export_model(cls, target_dir):
-    model_persistence = ModelPersistence(cls)
+def export_model(cls, lookup_field, target_dir):
+    model_persistence = ModelPersistence(cls, lookup_field=lookup_field)
     return model_persistence.export(target_dir=target_dir)
 
 
-def import_model(cls, sequence_name, lookup_field='id', keep_unmentioned=True):
+def import_model(cls, sequence_name, lookup_field, keep_unmentioned=True):
     model_persistence = ModelPersistence(
         cls, lookup_field=lookup_field, sequence_name=sequence_name)
     model_persistence.import_(keep_unmentioned=keep_unmentioned)

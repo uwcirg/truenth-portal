@@ -1,4 +1,5 @@
 """SitePersistence Module"""
+from collections import namedtuple
 from flask import current_app
 
 from .config_persistence import export_config, import_config
@@ -15,13 +16,30 @@ from ..models.scheduled_job import ScheduledJob
 from .model_persistence import export_model, import_model
 
 
+# NB - order MATTERS, as any type depending on another must find
+# the dependent bits in place on import, such as the known:
+#   ResearchProtocols before Orgs (Orgs point to RPs)
+#   Orgs before all else
+#   CommunicationRequest depends on QuestionnaireBanks
+
+ModelDetails = namedtuple(
+    'ModelDetails', ['cls', 'sequence_name', 'lookup_field'])
+models = (
+    ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
+    ModelDetails(Organization, 'organizations_id_seq', 'id'),
+    ModelDetails(Questionnaire, 'questionnaires_id_seq', 'name'),
+    ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
+    ModelDetails(Intervention, 'interventions_id_seq', 'name'),
+    ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),
+    ModelDetails(CommunicationRequest, 'communication_requests_id_seq', 'identifier'),
+    ModelDetails(AppText, 'apptext_id_seq', 'name'),
+    ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
+
+
 class SitePersistence(object):
     """Manage import and export of dynamic site data"""
 
     VERSION = '0.1'
-
-    def _log(self, msg):
-        current_app.logger.info(msg)
 
     def export(self, dir):
         """Generate JSON files defining dynamic site objects
@@ -37,15 +55,11 @@ class SitePersistence(object):
         """
 
         # The following model classes write to independent files
-        for model in (
-                Organization, Intervention, AccessStrategy, Questionnaire,
-                QuestionnaireBank, AppText, CommunicationRequest,
-                ResearchProtocol):
-            export_model(model, target_dir=dir)
+        for model in models:
+            export_model(cls=model.cls, lookup_field=model.lookup_field, target_dir=dir)
 
         # Add site.cfg
         export_config(target_dir=dir)
-
 
     def import_(self, keep_unmentioned):
         """If persistence file is found, import the data
@@ -57,54 +71,15 @@ class SitePersistence(object):
             the import process.
 
         """
-        # ResearchProtocols before Orgs (Orgs point to RPs)
-        import_model(
-            ResearchProtocol, 'research_protocols_id_seq',
-            lookup_field='name', keep_unmentioned=keep_unmentioned)
+        for model in models:
+            import_model(
+                cls=model.cls,
+                sequence_name=model.sequence_name,
+                lookup_field=model.lookup_field,
+                keep_unmentioned=keep_unmentioned)
 
-        # Orgs before all else:
-        import_model(
-            Organization, 'organizations_id_seq',
-            keep_unmentioned=keep_unmentioned)
-
-        # Questionnaires:
-        import_model(
-            Questionnaire, 'questionnaires_id_seq', lookup_field='name',
-            keep_unmentioned=keep_unmentioned)
-
-        # QuestionnaireBanks:
-        import_model(
-            QuestionnaireBank, 'questionnaire_banks_id_seq',
-            lookup_field='name', keep_unmentioned=keep_unmentioned)
-
-        # Interventions
-        import_model(
-            Intervention, 'interventions_id_seq', lookup_field='name',
-            keep_unmentioned=keep_unmentioned)
-
-        # Access rules next
-        import_model(
-            AccessStrategy, 'access_strategies_id_seq',
-            keep_unmentioned=keep_unmentioned)
-
-        # CommunicationRequest depends on QuestionnaireBanks
-        import_model(
-            CommunicationRequest, 'communication_requests_id_seq',
-            lookup_field='identifier', keep_unmentioned=keep_unmentioned)
-
-        # App Text shouldn't be order dependent, now is good.
-        import_model(
-            AppText, 'apptext_id_seq', lookup_field='name',
-            keep_unmentioned=keep_unmentioned)
-
-        # ScheduledJobs shouldn't be order dependent, now is good.
-        import_model(
-            ScheduledJob, 'scheduled_jobs_id_seq', lookup_field='name',
-            keep_unmentioned=keep_unmentioned)
-
-        # Config isn't order dependent, now is good.
+        # Config isn't a model - separate function
         import_config()
 
         db.session.commit()
-
-        self._log("SitePersistence import complete")
+        current_app.logger.info("SitePersistence import complete")

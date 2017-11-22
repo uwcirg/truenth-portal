@@ -32,10 +32,8 @@ class ConfigPersistence(ModelPersistence):
         cfg_file = os.path.join(current_app.instance_path, SITE_CFG)
         with open(cfg_file, 'r') as fp:
             results = [line for line in fp.readlines()]
-        # Package for inclusion
-        d = {"resourceType": SITE_CFG,
-             "results": results}
-        return d
+        # Package like all other resourceType bundles
+        return [{"resourceType": SITE_CFG, "results": results}]
 
 
 def export_config(target_dir):
