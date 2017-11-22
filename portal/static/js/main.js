@@ -1504,19 +1504,34 @@ var fillContent = {
                 var reportHTML = caption;
                 reportHTML += "<tr><TH>" + i18next.t("Question") + "</TH><TH>" + i18next.t("Response") + "</TH></tr>";
                 entry['group']['question'].forEach(function(entry) {
-                    var q = entry["text"] ? entry["text"] : "", a = "", qcNeeded = true;
+                    var q = (entry["text"] ? entry["text"] : ""), a = "";
+                    
                     if (hasValue(q)) {
-                        q = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
-                        qcNeeded = false;
+                        q = q.replace(/^[\d\w]{1,3}\./, "");
                     };
+
                     if (entry["answer"]) {
                         (entry["answer"]).forEach(function(item) {
-                            if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
-                            if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
+                            if (hasValue(item.valueString)) {
+                                a += (hasValue(a) ? "<br/>" : "") + item.valueString;
+                            };
                         });
                     };
-                    if (!hasValue(q)) q = entry["linkId"];
-                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (String(a) !== "undefined" ? i18next.t(a) : "--") + "</td></tr>";
+
+                    /*
+                     * using valueCoding.code for answer and linkId for question if empty strings are in BOTH question and answer
+                     */
+
+                    if (!hasValue(q) && !hasValue(a)) {
+                        q = entry["linkId"];
+                        (entry["answer"]).forEach(function(item) {
+                            if (hasValue(item.valueString)) {
+                                if (item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
+                            };
+                        });
+                    };
+
+                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (hasValue(a) ? i18next.t(a) : "--") + "</td></tr>";
                 });
                 $("#userSessionReportDetailTable").append(reportHTML);
             };
