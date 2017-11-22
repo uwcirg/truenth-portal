@@ -11,7 +11,7 @@ from flask_wtf import FlaskForm
 from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import validators, HiddenField, IntegerField, StringField
+from wtforms import validators, BooleanField, HiddenField, IntegerField, StringField
 from datetime import datetime
 
 from .auth import next_after_login, logout
@@ -571,7 +571,8 @@ def contact_sent(message_id):
 
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
-                           validators=[validators.Required()])
+                           validators=[validators.DataRequired()])
+    import_orgs = BooleanField('Import Organizations from Site Persistence')
 
 
 @portal.route('/settings', methods=['GET', 'POST'])
@@ -603,6 +604,19 @@ def settings():
             organization_consents=organization_consents,
             wide_container="true")
 
+    if form.import_orgs.data:
+        from ..trace import dump_trace, establish_trace
+        from ..config.model_persistence import ModelPersistence
+        establish_trace("Initiate import...")
+        org_persistence = ModelPersistence(
+            model_class=Organization, sequence_name='organizations_id_seq',
+            lookup_field='id')
+        org_persistence.import_(keep_unmentioned=False)
+
+        # Purge cached data and reload.
+        OrgTree().invalidate_cache()
+        organization_consents = Organization.consent_agreements()
+
     # make max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5
     response = make_response(render_template(
@@ -610,6 +624,7 @@ def settings():
         form=form,
         apptext=apptext,
         organization_consents=organization_consents,
+        trace_data=dump_trace(),
         wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
