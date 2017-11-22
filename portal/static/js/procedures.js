@@ -47,15 +47,19 @@ $.fn.extend({
                 } else {
                     //remove any procedure on prostate or none treatment
                     //see main.js proceduresContent function that renders these as hidden fields
-                    $("#userProcedures input[name='otherProcedures']").each(function() {
-                        var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
-                        if (code === CANCER_TREATMENT_CODE) {
-                            tnthAjax.deleteProc(procId);
-                        };
-                        if (code === NONE_TREATMENT_CODE) {
-                            tnthAjax.deleteProc(procId);
-                        };
-                    });
+
+                    var otherProcElements = $("#userProcedures input[name='otherProcedures']");
+                    if (otherProcElements.length > 0) {
+                        otherProcElements.each(function() {
+                            var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
+                            if (code === CANCER_TREATMENT_CODE) {
+                                tnthAjax.deleteProc(procId);
+                            };
+                            if (code === NONE_TREATMENT_CODE) {
+                                tnthAjax.deleteProc(procId);
+                            };
+                        });
+                    };
 
                     var procID = [{ "code": selectVal, "display": selectFriendly, system: selectSystem }];
                     procArray["subject"] = {"reference": "Patient/" + subjectId };
