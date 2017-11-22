@@ -64,8 +64,6 @@ class ScheduledJob(db.Model):
         d['kwargs'] = self.kwargs
         d['schedule'] = self.schedule
         d['active'] = self.active
-        d['last_runtime'] = self.last_runtime
-        d['last_status'] = self.last_status
         return d
 
     def crontab_schedule(self):
