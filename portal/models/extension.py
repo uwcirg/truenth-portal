@@ -42,12 +42,8 @@ class CCExtension(Extension):
         remove_if_not_requested = {e.code: e for e in self.children}
 
         for coding in self.extension['valueCodeableConcept']['coding']:
-            try:
-                concept = Coding.query.filter_by(
-                    system=coding['system'], code=coding['code']).one()
-            except NoResultFound:
-                raise ValueError("Unknown code: {} for system {}".format(
-                                     coding['code'], coding['system']))
+            concept = Coding.from_fhir(coding)
+            assert concept
             if concept.code in remove_if_not_requested:
                 # The concept existed before and is to be retained
                 remove_if_not_requested.pop(concept.code)
