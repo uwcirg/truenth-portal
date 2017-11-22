@@ -605,7 +605,8 @@ def set_user_consents(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/consent/withdraw', methods=('POST','PUT'))
+@user_api.route('/user/<int:user_id>/consent/withdraw',
+                methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def withdraw_user_consent(user_id):
     """Withdraw existing consent agreement for the user with named organization
@@ -693,6 +694,7 @@ def withdraw_user_consent(user_id):
               "{}".format(user.id, org_id))
     try:
         make_transient(uc)
+        uc.id = None
         uc.status = 'suspended'
         uc.send_reminders = False
         uc.include_in_reports = True
