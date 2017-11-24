@@ -1879,6 +1879,11 @@
         });
 
         $("#manualEntryModal").on("shown.bs.modal", function() {
+
+            $("#manualEntryMessageContainer").text("");
+            $("#errorCompletionDate").text("");
+            $("#meSubmit").attr("disabled", false);
+
             var today = new Date();
             var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
             var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
@@ -1904,9 +1909,17 @@
                 };
                 if (dataArray.length > 0) {
                     /*
+                     * filtered out non-deleted items from all consents
+                     */
+                    var items = $.grep(dataArray, function(item) {
+                        return !item.deleted && item.status == "consented";
+                    });
+                    /*
                      * consent date in GMT
                      */
-                    $("#manualEntryConsentDate").val(dataArray[0].signed);
+                    if (items.length > 0) {
+                        $("#manualEntryConsentDate").val(items[0].signed);
+                    };
                 };
             });
         });
@@ -1915,6 +1928,19 @@
             if ($(this).is(":checked")) {
                 $("#manualEntryModal .error-message").text("");
                 $("#meSubmit").attr("disabled", false);
+                if ($(this).val() == "interview_assisted") {
+                    /*
+                    * reset completion date to GMT date/time for today
+                    */
+                    var today = new Date();
+                    var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
+                    var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+                    var gmtToday = tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty,tm,td,th,tmi,ts));
+                    $("#qCompletionDay").val(pad(td));
+                    $("#qCompletionMonth").val(pad(tm));
+                    $("#qCompletionYear").val(ty);
+                    $("#qCompletionDate").val(gmtToday);
+                };
             };
         });
         $("#paper").on("click", function() {
@@ -1961,7 +1987,7 @@
                             var nConsentDate = cConsentDate.setHours(0,0,0,0);
                             var nToday = cToday.setHours(0,0,0,0);
                             if (nCompletionDate < nConsentDate) {
-                                errorMsg = i18next.t("Completion date cannot be before consent date.");
+                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
                             };
                             if (nConsentDate >= nToday) {
                                 if (nCompletionDate > nConsentDate) {
@@ -1990,7 +2016,7 @@
             });
         });
         $(document).delegate("#meSubmit", "click", function(event){
-            
+
             var method = $("input[name='entryMethod']:checked").val();
             var completionDate = $("#qCompletionDate").val();
 
@@ -2011,7 +2037,7 @@
                     tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
                         if (!data.error) {
                             if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
-                                errorMsg = i18next.t("Questionnaire date is not within the valid PROMS window.");
+                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
                             };
 
                             if (hasValue(errorMsg)) {
