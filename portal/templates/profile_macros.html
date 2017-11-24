@@ -1912,7 +1912,7 @@
                      * filtered out non-deleted items from all consents
                      */
                     var items = $.grep(dataArray, function(item) {
-                        return !item.deleted;
+                        return !item.deleted && item.status == "consented";
                     });
                     /*
                      * consent date in GMT
