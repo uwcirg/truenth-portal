@@ -1879,6 +1879,11 @@
         });
 
         $("#manualEntryModal").on("shown.bs.modal", function() {
+
+            $("#manualEntryMessageContainer").text("");
+            $("#errorCompletionDate").text("");
+            $("#meSubmit").attr("disabled", false);
+
             var today = new Date();
             var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
             var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
