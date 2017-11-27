@@ -2128,14 +2128,25 @@ def get_current_user_qb(user_id):
 
     qbd_json = {}
 
+    qbd_questionnaire_bank = qbd.questionnaire_bank if qbd.questionnaire_bank else None
+
+    expiry = None
+
+    if qbd_questionnaire_bank:
+      expiry = qbd_questionnaire_bank.calculated_expiry(qbd_questionnaire_bank.trigger_date(user))
+
     if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
         qbd_json['questionnaire_bank'] = None
+    elif date and expiry and (date.date() >= expiry.date()):
+        qbd_json['questionnaire_bank'] = None
     else:
-        qbd_json['questionnaire_bank'] = (qbd.questionnaire_bank.as_json()
-                                          if qbd.questionnaire_bank else None)
+        qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
+                                          if qbd_questionnaire_bank else None)
         qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
         qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
                                       if qbd.relative_start else None)
+        qbd_json['relative_expired'] = (FHIR_datetime.as_fhir(expiry)
+                                      if expiry else None)
         qbd_json['iteration'] = qbd.iteration
 
     return jsonify(qbd_json)

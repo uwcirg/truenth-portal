@@ -1768,25 +1768,29 @@
                                     <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
-                                    <input type="hidden" id="manualEntryConsentDate" value="" />
-                                    <input type="hidden" id="qCompletionDate" value="" />
-                                    <input type="hidden" id="qToday" value="" />
-                                    <div class="form-group">
-                                        <div class="profile-radio-list">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
-                                                <span>{{ _("Interview assisted") }}</span>
-                                            </label>
-                                            <br/>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="entryMethod" id="paper" value="paper"/>
-                                                <span>{{ _("Paper") }}</span>
-                                            </label>
-                                        </div>
+                                    <div id="manualEntryBodyLoader">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
-                                    <div id="manualEntryCompletionDateContainer" class="form-group">
-                                        <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                    <div id="manualEntryMain">
+                                        <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
+                                        <input type="hidden" id="manualEntryConsentDate" value="" />
+                                        <input type="hidden" id="qCompletionDate" value="" />
+                                        <input type="hidden" id="qToday" value="" />
+                                        <div class="form-group">
+                                            <div class="profile-radio-list">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                                    <span>{{ _("Interview assisted") }}</span>
+                                                </label>
+                                                <br/>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                                    <span>{{ _("Paper") }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div id="manualEntryCompletionDateContainer" class="form-group">
+                                            <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
                                                 <div class="flex-item">
                                                     <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" required />
@@ -1812,9 +1816,10 @@
                                                     <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" required />
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div id="errorCompletionDate" class="error-message"></div>
+                                        <div id="manualEntryMessageContainer" class="error-message"></div>
                                     </div>
-                                    <div id="errorCompletionDate" class="error-message"></div>
-                                    <div id="manualEntryMessageContainer" class="error-message"></div>
                                 </div>
                                 <div class="modal-footer">
                                     <div id="manualEntryLoader" class="loading-message-indicator">
@@ -1833,6 +1838,15 @@
         </div>
     </div>
     <script>
+    var manualEntryModalVis = function(hide) {
+        if (hide) {
+            $("#manualEntryButtonsContainer").hide();
+            $("#manualEntryLoader").show();
+        } else {
+            $("#manualEntryButtonsContainer").show();
+            $("#manualEntryLoader").hide();
+        };
+    };
     $(document).ready(function() {
 
         var continueToAssessment = function(method, completionDate) {
@@ -1857,8 +1871,13 @@
                 };
 
                 var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
-                $("#manualEntryButtonsContainer").hide();
-                $("#manualEntryLoader").show();
+
+                manualEntryModalVis(true);
+
+                setTimeout(function() {
+                    manualEntryModalVis();
+                }, 2000);
+
                 setTimeout(function() { window.location = winLocation;}, 100);
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
@@ -1878,24 +1897,25 @@
             $("#manualEntryModal").modal("hide");
         });
 
+        $("#manualEntryModal").on("show.bs.modal", function() {
+            $("#manualEntryBodyLoader").show();
+            $("#manualEntryMain").hide();
+        });
         $("#manualEntryModal").on("shown.bs.modal", function() {
 
             $("#manualEntryMessageContainer").text("");
             $("#errorCompletionDate").text("");
             $("#meSubmit").attr("disabled", false);
-
-            var today = new Date();
-            var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
-            var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
             /*
-             * get GMT date/time for today
-             */
-            var gmtToday = tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty,tm,td,th,tmi,ts));
-            $("#qCompletionDay").val(pad(td));
-            $("#qCompletionMonth").val(pad(tm));
-            $("#qCompletionYear").val(ty);
-            $("#qToday").val(gmtToday);
-            $("#qCompletionDate").val(gmtToday);
+            * get GMT date/time for today
+            */
+            var todayObj = tnthDates.getTodayDateObj();
+            $("#qCompletionDay").val(todayObj.displayDay);
+            $("#qCompletionMonth").val(todayObj.displayMonth);
+            $("#qCompletionYear").val(todayObj.displayYear);
+            $("#qCompletionDate").val(todayObj.gmtDate);
+            $("#qToday").val(todayObj.gmtDate);
+
             if ($("#paper").is(":checked")) {
                 $("#manualEntryCompletionDateContainer").show();
             };
@@ -1922,6 +1942,12 @@
                     };
                 };
             });
+
+            setTimeout(function() {
+                $("#manualEntryBodyLoader").hide();
+                $("#manualEntryMain").show();
+
+            }, 10);
         });
 
         $("input[name='entryMethod']").on("click", function() {
@@ -1930,16 +1956,14 @@
                 $("#meSubmit").attr("disabled", false);
                 if ($(this).val() == "interview_assisted") {
                     /*
+                    * if method is interview assisted,
                     * reset completion date to GMT date/time for today
                     */
-                    var today = new Date();
-                    var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
-                    var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-                    var gmtToday = tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty,tm,td,th,tmi,ts));
-                    $("#qCompletionDay").val(pad(td));
-                    $("#qCompletionMonth").val(pad(tm));
-                    $("#qCompletionYear").val(ty);
-                    $("#qCompletionDate").val(gmtToday);
+                    var todayObj = tnthDates.getTodayDateObj();
+                    $("#qCompletionDay").val(todayObj.displayDay);
+                    $("#qCompletionMonth").val(todayObj.displayMonth);
+                    $("#qCompletionYear").val(todayObj.displayYear);
+                    $("#qCompletionDate").val(todayObj.gmtDate);
                 };
             };
         });
@@ -1955,14 +1979,13 @@
 
         ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
             var fd = $("#" + fn);
-            var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
-            fd.on(triggerEvent, function() {
+            fd.on("change", function() {
                 var d = $("#qCompletionDay");
                 var m = $("#qCompletionMonth");
                 var y = $("#qCompletionYear");
-                var today = new Date();
-                var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
-                var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+                var todayObj = tnthDates.getTodayDateObj();
+                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
+
                 if (d.val() != "" && m.val() != "" && y.val() != "") {
                     if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
                         var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
@@ -1972,7 +1995,7 @@
                              * check if date entered is today, if so use today's date/time
                              */
                             if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
-                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+                                $("#qCompletionDate").val(todayObj.gmtDate);
                             } else {
                                 var gmtDateObj = tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0);
                                 $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(gmtDateObj));
@@ -2029,8 +2052,7 @@
                      * but display warning
                      */
 
-                    $("#manualEntryButtonsContainer").hide();
-                    $("#manualEntryLoader").show();
+                    manualEntryModalVis(true);
 
                     var errorMsg = "";
 
@@ -2043,19 +2065,18 @@
                             if (hasValue(errorMsg)) {
                                 $("#errorCompletionDate").text(errorMsg);
                                 $("#meSubmit").attr("disabled", true);
-                                $("#manualEntryButtonsContainer").show();
-                                $("#manualEntryLoader").hide();
+                                manualEntryModalVis();
                             } else {
                                 $("#errorCompletionDate").text("");
                                 $("#meSubmit").attr("disabled", false);
                             };
 
+                            if (!hasValue(errorMsg)) {
+                                continueToAssessment(method, completionDate);
+                            };
+
                         };
                     });
-
-                    if (!hasValue(errorMsg)) {
-                        continueToAssessment(method, completionDate);
-                    };
                 } else {
                     continueToAssessment(method);
                 };
