@@ -4511,6 +4511,32 @@ var tnthDates = {
         return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
     },
     /*
+     * return object containing today's date/time information
+     */
+    getTodayDateObj: function() {
+        var today = new Date();
+        var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
+        var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+        var gmtToday = this.getDateWithTimeZone(this.getDateObj(ty,tm,td,th,tmi,ts));
+
+        return {
+            date: today,
+            day: td,
+            month: tm,
+            year: ty,
+            hour: th,
+            minute: tmi,
+            second: ts,
+            displayDay: pad(td),
+            displayMonth: pad(tm),
+            displayYear: pad(ty),
+            displayHour: pad(th),
+            displayMinute: pad(tmi),
+            displaySecond: pad(ts),
+            gmtDate: gmtToday
+        }
+    },
+    /*
      * parameters: day, month and year values in numeric
      * boolean value for restrictToPresent, true if the date needs to be before today, false is the default
      */

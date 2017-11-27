@@ -604,7 +604,7 @@ $(document).ready(function(){
                         } else {
                             var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
                             //saving the time at 12
-                            $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
+                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
                         };
                         $("#errorConsentDate").text("").hide();
                         //success
