@@ -119,14 +119,14 @@ class BaseConfig(object):
     RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
     TREATMENT_OPTIONS = [
-    ('373818007', 'http://snomed.info/sct'),
-    ('424313000', 'http://snomed.info/sct'),
-    ('26294005', 'http://snomed.info/sct'),
-    ('26294005-nns', 'http://snomed.info/sct'),
-    ('33195004', 'http://snomed.info/sct'),
-    ('228748004', 'http://snomed.info/sct'),
-    ('707266006', 'http://snomed.info/sct'),
-    ('999999999', 'http://snomed.info/sct')]
+    ('373818007', 'http://snomed.info/sct', ''),
+    ('424313000', 'http://snomed.info/sct', ''),
+    ('26294005', 'http://snomed.info/sct', ''),
+    ('26294005-nns', 'http://snomed.info/sct', ''),
+    ('33195004', 'http://snomed.info/sct', ''),
+    ('228748004', 'http://snomed.info/sct', ''),
+    ('707266006', 'http://snomed.info/sct', ''),
+    ('999999999', 'http://snomed.info/sct', '')]
 
 
 class DefaultConfig(BaseConfig):
