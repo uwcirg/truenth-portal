@@ -1196,7 +1196,7 @@ var fillContent = {
             var code = val.resource.code.coding[0].code;
             var procID = val.resource.id;
             if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
-                var displayText = val.resource.code.coding[0].display;
+                var displayText = $("#tnthproc option[value='" + code + "']").text() || val.resource.code.coding[0].display;
                 var performedDateTime = val.resource.performedDateTime;
                 var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
                 var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});

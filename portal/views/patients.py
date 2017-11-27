@@ -187,11 +187,11 @@ def treatment_options():
     if code_list:
         treatment_options = []
         for item in code_list:
-            code, system = item;
+            code, system, text = item
             treatment_options.append({
                 "code": code,
                 "system": system,
-                "text": Coding.display_lookup(code, system)
+                "text": Coding.display_lookup(code, system) if not text else text
             });
     else:
         abort(400, "Treatment options are not available.")
