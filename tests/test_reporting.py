@@ -82,6 +82,8 @@ class TestReporting(TestCase):
         self.assertEqual(len(stats2['encounters']['all']), 5)
 
     def test_overdue_stats(self):
+        self.promote_user(user=self.test_user, role_name=ROLE.PATIENT)
+
         rp = ResearchProtocol(name='proto')
         with SessionScope(db):
             db.session.add(rp)
