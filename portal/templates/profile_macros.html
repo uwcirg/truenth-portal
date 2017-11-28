@@ -2109,10 +2109,13 @@
                                         });
                                         instruments_string = instruments_list.join("&");
 
-                                        if (hasValue(instruments_string)) {
-                                            linkUrl = "{{url_for(
-                 'assessment_engine_api.present_assessment')}}?subject_id={{person.id}}&" + instruments_string;
-                                        };
+
+                                        {% if person %}
+                                            if (hasValue(instruments_string)) {
+                                                linkUrl = "{{url_for(
+                     'assessment_engine_api.present_assessment')}}?subject_id={{person.id}}&" + instruments_string;
+                                            };
+                                        {% endif %}
                                     };
                                 };
                                 {%}
