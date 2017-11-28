@@ -1849,9 +1849,11 @@
     };
     $(document).ready(function() {
 
-        var continueToAssessment = function(method, completionDate, instruments) {
-            //check if the user has given web consent here, if not redirect to form
-            var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+        var continueToAssessment = function(method, completionDate, linkUrl) {
+            /*
+             * note the linkUrl is present will override the existing asssessment link
+             */
+            var assessment_url = linkUrl || {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
             if (hasValue(assessment_url)) {
                 var still_needed = false;
 
@@ -1875,10 +1877,6 @@
                     assessment_url += "&authored=" + tnthDates.formatDateString(completionDate, "iso-short");
                 };
 
-                if (hasValue(instruments)) {
-                    assessment_url += "&" + instruments;
-                };
-
                 var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
 
                 manualEntryModalVis(true);
@@ -1888,6 +1886,7 @@
                 }, 2000);
 
                 setTimeout(function() { window.location = winLocation;}, 100);
+                
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
             };
@@ -2094,6 +2093,7 @@
                                 var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
 
                                 var instruments_string = "";
+                                var linkUrl = "";
 
                                 if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
                                     if (data.questionnaire_bank.questionnaires) {
@@ -2108,13 +2108,18 @@
                                             };
                                         });
                                         instruments_string = instruments_list.join("&");
+
+                                        if (hasValue(instruments_string)) {
+                                            linkUrl = "{{url_for(
+                 'assessment_engine_api.present_assessment')}}?subject_id={{person.id}}&" + instruments_string;
+                                        };
                                     };
                                 };
-                                //console.log("instruments: ", instruments_string)
+                                //console.log("linkUrl: ", linkUrl)
                                 /*
                                  * passed along instruments for the current questionnaire bank
                                  */
-                                continueToAssessment(method, completionDate, instruments_string);
+                                continueToAssessment(method, completionDate, linkUrl);
                             };
 
                         };
