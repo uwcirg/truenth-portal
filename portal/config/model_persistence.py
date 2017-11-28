@@ -80,35 +80,11 @@ class ModelPersistence(object):
             db.session.commit()
             objs_seen.append(result.id)
 
-            if False:
-                if self.lookup_field == 'identifier':
-                    objs_seen.append(result.id)
-                elif isinstance(self.lookup_field, tuple):
-                    objs_seen.append(
-                        tuple(getattr(result, v) for v in self.lookup_field))
-                else:
-                    objs_seen.append(getattr(result, self.lookup_field))
-
         # Delete any not named
         if not keep_unmentioned:
             query = self.model.query.filter(
                 ~getattr(self.model, 'id').in_(
                     objs_seen)) if objs_seen else []
-            if False:
-                if self.lookup_field == 'identifier':
-                    query = self.model.query.filter(
-                        ~getattr(self.model, 'id').in_(
-                            objs_seen)) if objs_seen else []
-                elif isinstance(self.lookup_field, tuple):
-                    how = tuple(getattr(result, v) for v in self.lookup_field)
-                    query = []
-                    #query = self.model.query.filter(tuple(
-                    #    ~getattr(result, v) for v in self.lookup_field))
-                else:
-                    ids = self.model.query.filter_by(self.model, self.lookup_field[0])
-                    query = self.model.query.filter(
-                        ~getattr(self.model, self.lookup_field).in_(
-                            objs_seen)) if objs_seen else []
             for obj in query:
                 current_app.logger.info(
                     "Deleting {} not mentioned in "
