@@ -2,6 +2,7 @@
 from collections import MutableMapping
 from flask import current_app, url_for
 import regex
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from string import Formatter
@@ -240,7 +241,6 @@ class Communication(db.Model):
 
         return msg
 
-
     def generate_and_send(self):
         "Collate message details and send"
 
@@ -263,8 +263,19 @@ class Communication(db.Model):
             request=self.communication_request.name))
 
         self.message = self.generate_message()
-        self.message.send_message()
-        self.status = 'completed'
+        try:
+            self.message.send_message()
+            self.status = 'completed'
+        except SMTPRecipientsRefused as exc:
+            msg = ("Error sending Communication {} to {}: "
+                   "{}".format(self.id, user.email, exc))
+            current_app.logger.error(msg)
+            sys = User.query.filter_by(email='__system__').first()
+            auditable_event(message=msg,
+                            user_id=(sys.id if sys else user.id),
+                            subject_id=user.id,
+                            context="user")
+            self.status = 'aborted'
 
     def preview(self):
         "Collate message details and return preview (DOES NOT SEND)"
