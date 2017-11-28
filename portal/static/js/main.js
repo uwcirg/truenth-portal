@@ -1198,9 +1198,6 @@ var fillContent = {
             if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
                 var displayText = val.resource.code.coding[0].display;
                 var performedDateTime = val.resource.performedDateTime;
-                var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
-                var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
-                //console.log("date: " + performedDateTime + " cdate: " + performedDate);
                 var deleteInvocation = '';
                 var creatorDisplay = val.resource.meta.by.display;
                 var creator = val.resource.meta.by.reference;
@@ -1219,7 +1216,7 @@ var fillContent = {
                 var creationText = i18next.t("(date entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}));
 
                 contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>"
-                            + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText
+                            + (tnthDates.formatDateString(performedDateTime)) + "&nbsp;--&nbsp;" + displayText
                             + "&nbsp;<em>" + creationText
                             + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>"
                             + deleteInvocation + "</td></tr>";
@@ -1505,7 +1502,7 @@ var fillContent = {
                 reportHTML += "<tr><TH>" + i18next.t("Question") + "</TH><TH>" + i18next.t("Response") + "</TH></tr>";
                 entry['group']['question'].forEach(function(entry) {
                     var q = (entry["text"] ? entry["text"] : ""), a = "";
-                    
+
                     if (hasValue(q)) {
                         q = q.replace(/^[\d\w]{1,3}\./, ""); //replace question # in the beginning of the question
                     };

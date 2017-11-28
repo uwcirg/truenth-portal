@@ -1,5 +1,6 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
+from flask import current_app
 from html.parser import HTMLParser
 import json
 from sqlalchemy import UniqueConstraint, or_
@@ -117,20 +118,29 @@ class Coding(db.Model):
         """Print friendly format for logging, etc."""
         return "Coding {0.code}, {0.display}, {0.system}".format(self)
 
+    def update_from_fhir(self, data):
+        for i in ("system", "code", "display"):
+            if i in data:
+                self.__setattr__(i, data[i])
+        return self.add_if_not_found(True)
+
     @classmethod
     def from_fhir(cls, data):
         """Factory method to lookup or create instance from fhir"""
         cc = cls()
-        for i in ("system", "code", "display"):
-            if i in data:
-                cc.__setattr__(i, data[i])
-        return cc.add_if_not_found(True)
+        return cc.update_from_fhir(data)
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         d = {}
+        d['resourceType'] = 'Coding'
+        if not (self.system and self.code):
+            current_app.logger.error(
+                "Ill defined coding {} - requires system and code".format(
+                    self))
+
         for i in ("system", "code", "display"):
-            if getattr(self, i):
+            if getattr(self, i) is not None:
                 d[i] = getattr(self, i)
         return d
 
@@ -145,8 +155,13 @@ class Coding(db.Model):
         if self.id:
             return self
 
-        match = self.query.filter_by(system=self.system,
-                code=self.code).first()
+        if not (self.system and self.code):
+            current_app.logger.error(
+                "Ill defined coding {} - requires system and code"
+                "".format(self))
+
+        match = self.query.filter_by(
+            system=self.system, code=self.code).first()
         if not match:
             db.session.add(self)
             if commit_immediately:
