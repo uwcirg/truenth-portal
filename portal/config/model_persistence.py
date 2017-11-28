@@ -37,9 +37,10 @@ class ModelPersistence(object):
         data['type'] = 'document'
         return data
 
-    def __read__(self):
+    def __read__(self, target_dir):
         scope = self.model.__name__ if self.model else None
-        self.filename = persistence_filename(scope=scope)
+        self.filename = persistence_filename(
+            scope=scope, target_dir=target_dir)
         with open(self.filename, 'r') as f:
             data = json.load(f)
         self.__verify_header__(data)
@@ -67,9 +68,9 @@ class ModelPersistence(object):
         d['entry'] = self.serialize()
         self.__write__(data=d, target_dir=target_dir)
 
-    def import_(self, keep_unmentioned):
+    def import_(self, keep_unmentioned, target_dir):
         objs_seen = []
-        data = self.__read__()
+        data = self.__read__(target_dir=target_dir)
         for o in data['entry']:
             if not o.get('resourceType') == self.model.__name__:
                 raise ValueError(
@@ -77,21 +78,13 @@ class ModelPersistence(object):
                         self.model.__name__, o.get('resourceType')))
             result = self.update(o)
             db.session.commit()
-            if self.lookup_field == 'identifier':
-                objs_seen.append(result.id)
-            else:
-                objs_seen.append(getattr(result, self.lookup_field))
+            objs_seen.append(result.id)
 
         # Delete any not named
         if not keep_unmentioned:
-            if self.lookup_field == 'identifier':
-                query = self.model.query.filter(
-                    ~getattr(self.model, 'id').in_(
-                        objs_seen)) if objs_seen else []
-            else:
-                query = self.model.query.filter(
-                    ~getattr(self.model, self.lookup_field).in_(
-                        objs_seen)) if objs_seen else []
+            query = self.model.query.filter(
+                ~getattr(self.model, 'id').in_(
+                    objs_seen)) if objs_seen else []
             for obj in query:
                 current_app.logger.info(
                     "Deleting {} not mentioned in "
@@ -110,12 +103,19 @@ class ModelPersistence(object):
 
         results = []
 
-        order_col = (
-            self.model.__table__.c[self.lookup_field].asc()
-            if self.lookup_field != "identifier" else "id")
+        if isinstance(self.lookup_field, tuple):
+            order_col = tuple(
+                self.model.__table__.c[field].asc() for field in
+                self.lookup_field)
+            for item in self.model.query.order_by(*order_col).all():
+                results.append(getattr(item, serialize)())
+        else:
+            order_col = (
+                self.model.__table__.c[self.lookup_field].asc()
+                if self.lookup_field != "identifier" else "id")
+            for item in self.model.query.order_by(order_col).all():
+                results.append(getattr(item, serialize)())
 
-        for item in self.model.query.order_by(order_col).all():
-            results.append(getattr(item, serialize)())
         return results
 
     def lookup_existing(self, new_obj, new_data):
@@ -135,6 +135,11 @@ class ModelPersistence(object):
                 raise ValueError(
                     "Multiple identifiers for {} "
                     "don't know which to match on".format(new_data))
+        elif isinstance(self.lookup_field, tuple):
+            # Composite key case
+            args = {k: new_data.get(k) for k in self.lookup_field}
+            field_description = unicode(args)
+            match = self.model.query.filter_by(**args).first()
         else:
             args = {self.lookup_field: new_data[self.lookup_field]}
             field_description = getattr(new_obj, self.lookup_field)
@@ -202,10 +207,13 @@ def export_model(cls, lookup_field, target_dir):
     return model_persistence.export(target_dir=target_dir)
 
 
-def import_model(cls, sequence_name, lookup_field, keep_unmentioned=True):
+def import_model(
+        cls, sequence_name, lookup_field, keep_unmentioned=True,
+        target_dir=None):
     model_persistence = ModelPersistence(
         cls, lookup_field=lookup_field, sequence_name=sequence_name)
-    model_persistence.import_(keep_unmentioned=keep_unmentioned)
+    model_persistence.import_(
+        keep_unmentioned=keep_unmentioned, target_dir=target_dir)
 
 
 def persistence_filename(scope=None, target_dir=None):
