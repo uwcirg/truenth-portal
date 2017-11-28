@@ -6,6 +6,7 @@ from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
 from ..models.communication_request import CommunicationRequest
+from ..models.fhir import Coding
 from ..models.intervention import Intervention
 from ..models.intervention_strategies import AccessStrategy
 from ..models.organization import Organization
@@ -30,6 +31,7 @@ models = (
     ModelDetails(Questionnaire, 'questionnaires_id_seq', 'name'),
     ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
     ModelDetails(Intervention, 'interventions_id_seq', 'name'),
+    ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),
     ModelDetails(CommunicationRequest, 'communication_requests_id_seq', 'identifier'),
     ModelDetails(AppText, 'apptext_id_seq', 'name'),
