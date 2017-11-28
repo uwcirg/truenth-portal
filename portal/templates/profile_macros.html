@@ -2466,10 +2466,10 @@
                                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
                                 <div class="flex">
                                     <div class="flex-item">
-                                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" />
+                                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}"/>
                                     </div>
                                     <div class="flex-item">
-                                        <select class="form-control" name="procMonth" id="procMonth">
+                                        <select class="form-control" name="procMonth" id="procMonth" data-error="{{_('Date must be valid and in the required format.')}}">
                                             <option value="">{{ _("Month") }}...</option>
                                             <option value="01">{{ _("January") }}</option>
                                             <option value="02">{{ _("February") }}</option>
@@ -2486,14 +2486,12 @@
                                         </select>
                                     </div>
                                     <div class="flex-item">
-                                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"/>
-                                    </div>
-                                    <div class="flex-item">
-                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' {% if not person %}data-account-create='true'{% endif %} type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{%-if person-%}{{_("Save")}}{%-else-%}{{_("Add")}}{%-endif-%}</span></button>
+                                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}"/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                     <div class="col-md-10 col-xs-10"><div id="procDateErrorContainer" class="help-block with-errors"></div></div>
+                                <div id="procDateErrorContainer" class="help-block with-errors"></div>
+                                <div class="button-container">
+                                    <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' {% if not person %}data-account-create='true'{% endif %} type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{%-if person-%}{{_("Save")}}{%-else-%}{{_("Add")}}{%-endif-%}</span></button>
                                 </div>
                             </div>
                             {% if person %}

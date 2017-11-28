@@ -136,7 +136,7 @@ $(document).ready(function() {
         var dTest = procDateReg.test(d);
         var mTest = (m != "");
         var yTest = procYearReg.test(y);
-        var errorText = "The procedure date must be valid and in required format.";
+        var errorText = i18next.t("The procedure date must be valid and in required format.");
         var dgField = $("#procDateGroup");
         var deField = $("#procDateErrorContainer");
         var errorColor = "#a94442";
@@ -149,7 +149,7 @@ $(document).ready(function() {
             //console.log("dy: " + date.getFullYear() + " y: " + parseInt(y) + " dm: " + (date.getMonth() + 1) + " m: " + parseInt(m) + " dd: " + date.getDate() + " d: " + parseInt(d))
             if (date.getFullYear() == parseInt(y) && ((date.getMonth() + 1) == parseInt(m)) && date.getDate() == parseInt(d)) {
                 if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                    deField.text("The procedure date must be in the past.").css("color", errorColor);
+                    deField.text(i18next.t("The procedure date must be in the past.")).css("color", errorColor);
                     return false;
                 };
             } else {
@@ -186,14 +186,12 @@ $(document).ready(function() {
         var isValid = checkDate();
         if (isValid) {
             var passedDate = dateFields.map(function(fn) {
-            fd = $("#" + fn);
-            if (fd.attr("type") == "text") return fd.val();
-            else return fd.find("option:selected").val();
+                fd = $("#" + fn);
+                return fd.val();
             }).join("/");
-            //console.log("passedDate: " + passedDate);
             $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
             dateFormatted = tnthDates.swap_mm_dd(passedDate);
-            //console.log("formatted date: " + dateFormatted);
+           // console.log("formatted date: " + dateFormatted);
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
         } else {
             $("button[id^='tnthproc-submit']").attr('data-date-read',"");
@@ -237,8 +235,11 @@ $(document).ready(function() {
 
     dateFields.forEach(function(fn) {
         var triggerEvent = $("#" + fn).attr("type") == "text" ? "keyup": "change";
+        if (_isTouchDevice()) {
+            triggerEvent = "change";
+        }
         $("#" + fn).on(triggerEvent, function() {
-                setDate();
+            setDate();
         });
     });
 
