@@ -240,7 +240,6 @@ class Communication(db.Model):
 
         return msg
 
-
     def generate_and_send(self):
         "Collate message details and send"
 
@@ -263,8 +262,13 @@ class Communication(db.Model):
             request=self.communication_request.name))
 
         self.message = self.generate_message()
-        self.message.send_message()
-        self.status = 'completed'
+        try:
+            self.message.send_message()
+            self.status = 'completed'
+        except SMTPRecipientsRefused as exc:
+            current_app.logger.error("Error sending Communication {} to {}: "
+                                     "{}".format(self.id, user.email, exc))
+            self.status = 'aborted'
 
     def preview(self):
         "Collate message details and return preview (DOES NOT SEND)"
