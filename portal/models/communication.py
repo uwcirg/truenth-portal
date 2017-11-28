@@ -2,6 +2,7 @@
 from collections import MutableMapping
 from flask import current_app, url_for
 import regex
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from string import Formatter
