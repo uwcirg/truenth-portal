@@ -2104,7 +2104,7 @@
                                          */
                                         qs.forEach(function(item) {
                                             if (item.questionnaire) {
-                                                instruments_list.push("instument_id="+item.questionnaire.display);
+                                                instruments_list.push("instrument_id="+item.questionnaire.display);
                                             };
                                         });
                                         instruments_string = instruments_list.join("&");
@@ -2115,6 +2115,7 @@
                                         };
                                     };
                                 };
+                                {%}
                                 //console.log("linkUrl: ", linkUrl)
                                 /*
                                  * passed along instruments for the current questionnaire bank
