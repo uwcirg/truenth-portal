@@ -5858,7 +5858,7 @@
     },
     {
       "code": "999999999",
-      "display": "None of the above",
+      "display": "Other primary treatment",
       "resourceType": "Coding",
       "system": "http://snomed.info/sct"
     },
