@@ -267,8 +267,14 @@ class Communication(db.Model):
             self.message.send_message()
             self.status = 'completed'
         except SMTPRecipientsRefused as exc:
-            current_app.logger.error("Error sending Communication {} to {}: "
-                                     "{}".format(self.id, user.email, exc))
+            msg = ("Error sending Communication {} to {}: "
+                   "{}".format(self.id, user.email, exc))
+            current_app.logger.error(msg)
+            sys = User.query.filter_by(email='__system__').first()
+            auditable_event(message=msg,
+                            user_id=(sys.id if sys else user.id),
+                            subject_id=user.id,
+                            context="user")
             self.status = 'aborted'
 
     def preview(self):
