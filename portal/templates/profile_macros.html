@@ -2082,22 +2082,33 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-                                var linkUrl = "";
+    
                                 /*
                                  * retrieve instrument ids from present questionnaire bank
+                                 * only if the date is backdated, i.e. before today's date
                                  */
-                                if (data.questionnaire_bank.questionnaires) {
-                                    var qs = data.questionnaire_bank.questionnaires;
-                                    var instruments_list = [], instruments_string = "";
-                                    /*
-                                     * loop through questionnaires in current questionnaire bank
-                                     */
-                                    qs.forEach(function(item) {
-                                        if (item.questionnaire) {
-                                            instruments_list.push("instument_id="+item.questionnaire.display);
-                                        };
-                                    });
-                                    instruments_string = instruments_list.join("&");
+                                var d = $("#qCompletionDay").val();
+                                var m = $("#qCompletionMonth").val();
+                                var y = $("#qCompletionYear").val();
+                                var todayObj = tnthDates.getTodayDateObj();
+                                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
+
+                                var instruments_string = "";
+
+                                if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
+                                    if (data.questionnaire_bank.questionnaires) {
+                                        var qs = data.questionnaire_bank.questionnaires;
+                                        var instruments_list = [];
+                                        /*
+                                         * loop through questionnaires in current questionnaire bank
+                                         */
+                                        qs.forEach(function(item) {
+                                            if (item.questionnaire) {
+                                                instruments_list.push("instument_id="+item.questionnaire.display);
+                                            };
+                                        });
+                                        instruments_string = instruments_list.join("&");
+                                    };
                                 };
                                 //console.log("instruments: ", instruments_string)
                                 /*
