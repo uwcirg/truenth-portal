@@ -1,0 +1,6080 @@
+{
+  "entry": [
+    {
+      "code": "2135-2",
+      "display": "Hispanic or Latino",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2137-8",
+      "display": "Spaniard",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2138-6",
+      "display": "Andalusian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2139-4",
+      "display": "Asturian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2140-2",
+      "display": "Castillian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2141-0",
+      "display": "Catalonian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2142-8",
+      "display": "Belearic Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2143-6",
+      "display": "Gallego",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2144-4",
+      "display": "Valencian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2145-1",
+      "display": "Canarian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2146-9",
+      "display": "Spanish Basque",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2148-5",
+      "display": "Mexican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2149-3",
+      "display": "Mexican American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2150-1",
+      "display": "Mexicano",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2151-9",
+      "display": "Chicano",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2152-7",
+      "display": "La Raza",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2153-5",
+      "display": "Mexican American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2155-0",
+      "display": "Central American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2156-8",
+      "display": "Costa Rican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2157-6",
+      "display": "Guatemalan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2158-4",
+      "display": "Honduran",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2159-2",
+      "display": "Nicaraguan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2160-0",
+      "display": "Panamanian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2161-8",
+      "display": "Salvadoran",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2162-6",
+      "display": "Central American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2163-4",
+      "display": "Canal Zone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2165-9",
+      "display": "South American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2166-7",
+      "display": "Argentinean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2167-5",
+      "display": "Bolivian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2168-3",
+      "display": "Chilean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2169-1",
+      "display": "Colombian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2170-9",
+      "display": "Ecuadorian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2171-7",
+      "display": "Paraguayan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2172-5",
+      "display": "Peruvian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2173-3",
+      "display": "Uruguayan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2174-1",
+      "display": "Venezuelan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2175-8",
+      "display": "South American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2176-6",
+      "display": "Criollo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2178-2",
+      "display": "Latin American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2180-8",
+      "display": "Puerto Rican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2182-4",
+      "display": "Cuban",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2184-0",
+      "display": "Dominican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "2186-5",
+      "display": "Not Hispanic or Latino",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Ethnicity"
+    },
+    {
+      "code": "1002-5",
+      "display": "American Indian or Alaska Native",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1004-1",
+      "display": "American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1006-6",
+      "display": "Abenaki",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1008-2",
+      "display": "Algonquian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1010-8",
+      "display": "Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1011-6",
+      "display": "Chiricahua",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1012-4",
+      "display": "Fort Sill Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1013-2",
+      "display": "Jicarilla Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1014-0",
+      "display": "Lipan Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1015-7",
+      "display": "Mescalero Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1016-5",
+      "display": "Oklahoma Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1017-3",
+      "display": "Payson Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1018-1",
+      "display": "San Carlos Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1019-9",
+      "display": "White Mountain Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1021-5",
+      "display": "Arapaho",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1022-3",
+      "display": "Northern Arapaho",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1023-1",
+      "display": "Southern Arapaho",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1024-9",
+      "display": "Wind River Arapaho",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1026-4",
+      "display": "Arikara",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1028-0",
+      "display": "Assiniboine",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1030-6",
+      "display": "Assiniboine Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1031-4",
+      "display": "Fort Peck Assiniboine Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1033-0",
+      "display": "Bannock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1035-5",
+      "display": "Blackfeet",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1037-1",
+      "display": "Brotherton",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1039-7",
+      "display": "Burt Lake Band",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1041-3",
+      "display": "Caddo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1042-1",
+      "display": "Oklahoma Cado",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1044-7",
+      "display": "Cahuilla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1045-4",
+      "display": "Agua Caliente Cahuilla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1046-2",
+      "display": "Augustine",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1047-0",
+      "display": "Cabazon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1048-8",
+      "display": "Los Coyotes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1049-6",
+      "display": "Morongo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1050-4",
+      "display": "Santa Rosa Cahuilla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1051-2",
+      "display": "Torres-Martinez",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1053-8",
+      "display": "California Tribes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1054-6",
+      "display": "Cahto",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1055-3",
+      "display": "Chimariko",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1056-1",
+      "display": "Coast Miwok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1057-9",
+      "display": "Digger",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1058-7",
+      "display": "Kawaiisu",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1059-5",
+      "display": "Kern River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1060-3",
+      "display": "Mattole",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1061-1",
+      "display": "Red Wood",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1062-9",
+      "display": "Santa Rosa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1063-7",
+      "display": "Takelma",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1064-5",
+      "display": "Wappo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1065-2",
+      "display": "Yana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1066-0",
+      "display": "Yuki",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1068-6",
+      "display": "Canadian and Latin American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1069-4",
+      "display": "Canadian Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1070-2",
+      "display": "Central American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1071-0",
+      "display": "French American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1072-8",
+      "display": "Mexican American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1073-6",
+      "display": "South American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1074-4",
+      "display": "Spanish American Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1076-9",
+      "display": "Catawba",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1078-5",
+      "display": "Cayuse",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1080-1",
+      "display": "Chehalis",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1082-7",
+      "display": "Chemakuan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1083-5",
+      "display": "Hoh",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1084-3",
+      "display": "Quileute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1086-8",
+      "display": "Chemehuevi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1088-4",
+      "display": "Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1089-2",
+      "display": "Cherokee Alabama",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1090-0",
+      "display": "Cherokees of Northeast Alabama",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1091-8",
+      "display": "Cherokees of Southeast Alabama",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1092-6",
+      "display": "Eastern Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1093-4",
+      "display": "Echota Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1094-2",
+      "display": "Etowah Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1095-9",
+      "display": "Northern Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1096-7",
+      "display": "Tuscola",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1097-5",
+      "display": "United Keetowah Band of Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1098-3",
+      "display": "Western Cherokee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1100-7",
+      "display": "Cherokee Shawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1102-3",
+      "display": "Cheyenne",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1103-1",
+      "display": "Northern Cheyenne",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1104-9",
+      "display": "Southern Cheyenne",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1106-4",
+      "display": "Cheyenne-Arapaho",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1108-0",
+      "display": "Chickahominy",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1109-8",
+      "display": "Eastern Chickahominy",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1110-6",
+      "display": "Western Chickahominy",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1112-2",
+      "display": "Chickasaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1114-8",
+      "display": "Chinook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1115-5",
+      "display": "Clatsop",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1116-3",
+      "display": "Columbia River Chinook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1117-1",
+      "display": "Kathlamet",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1118-9",
+      "display": "Upper Chinook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1119-7",
+      "display": "Wakiakum Chinook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1120-5",
+      "display": "Willapa Chinook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1121-3",
+      "display": "Wishram",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1123-9",
+      "display": "Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1124-7",
+      "display": "Bad River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1125-4",
+      "display": "Bay Mills Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1126-2",
+      "display": "Bois Forte",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1127-0",
+      "display": "Burt Lake Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1128-8",
+      "display": "Fond du Lac",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1129-6",
+      "display": "Grand Portage",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1130-4",
+      "display": "Grand Traverse Band of Ottawa-Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1131-2",
+      "display": "Keweenaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1132-0",
+      "display": "Lac Courte Oreilles",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1133-8",
+      "display": "Lac du Flambeau",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1134-6",
+      "display": "Lac Vieux Desert Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1135-3",
+      "display": "Lake Superior",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1136-1",
+      "display": "Leech Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1137-9",
+      "display": "Little Shell Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1138-7",
+      "display": "Mille Lacs",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1139-5",
+      "display": "Minnesota Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1140-3",
+      "display": "Ontonagon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1141-1",
+      "display": "Red Cliff Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1142-9",
+      "display": "Red Lake Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1143-7",
+      "display": "Saginaw Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1144-5",
+      "display": "St. Croix Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1145-2",
+      "display": "Sault Ste. Marie Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1146-0",
+      "display": "Sokoagon Chippewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1147-8",
+      "display": "Turtle Mountain",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1148-6",
+      "display": "White Earth",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1150-2",
+      "display": "Chippewa Cree",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1151-0",
+      "display": "Rocky Boy's Chippewa Cree",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1153-6",
+      "display": "Chitimacha",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1155-1",
+      "display": "Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1156-9",
+      "display": "Clifton Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1157-7",
+      "display": "Jena Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1158-5",
+      "display": "Mississippi Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1159-3",
+      "display": "Mowa Band of Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1160-1",
+      "display": "Oklahoma Choctaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1162-7",
+      "display": "Chumash",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1163-5",
+      "display": "Santa Ynez",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1165-0",
+      "display": "Clear Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1167-6",
+      "display": "Coeur D'Alene",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1169-2",
+      "display": "Coharie",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1171-8",
+      "display": "Colorado River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1173-4",
+      "display": "Colville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1175-9",
+      "display": "Comanche",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1176-7",
+      "display": "Oklahoma Comanche",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1178-3",
+      "display": "Coos, Lower Umpqua, Siuslaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1180-9",
+      "display": "Coos",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1182-5",
+      "display": "Coquilles",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1184-1",
+      "display": "Costanoan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1186-6",
+      "display": "Coushatta",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1187-4",
+      "display": "Alabama Coushatta",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1189-0",
+      "display": "Cowlitz",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1191-6",
+      "display": "Cree",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1193-2",
+      "display": "Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1194-0",
+      "display": "Alabama Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1195-7",
+      "display": "Alabama Quassarte",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1196-5",
+      "display": "Eastern Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1197-3",
+      "display": "Eastern Muscogee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1198-1",
+      "display": "Kialegee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1199-9",
+      "display": "Lower Muscogee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1200-5",
+      "display": "Machis Lower Creek Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1201-3",
+      "display": "Poarch Band",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1202-1",
+      "display": "Principal Creek Indian Nation",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1203-9",
+      "display": "Star Clan of Muscogee Creeks",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1204-7",
+      "display": "Thlopthlocco",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1205-4",
+      "display": "Tuckabachee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1207-0",
+      "display": "Croatan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1209-6",
+      "display": "Crow",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1211-2",
+      "display": "Cupeno",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1212-0",
+      "display": "Agua Caliente",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1214-6",
+      "display": "Delaware",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1215-3",
+      "display": "Eastern Delaware",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1216-1",
+      "display": "Lenni-Lenape",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1217-9",
+      "display": "Munsee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1218-7",
+      "display": "Oklahoma Delaware",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1219-5",
+      "display": "Rampough Mountain",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1220-3",
+      "display": "Sand Hill",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1222-9",
+      "display": "Diegueno",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1223-7",
+      "display": "Campo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1224-5",
+      "display": "Capitan Grande",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1225-2",
+      "display": "Cuyapaipe",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1226-0",
+      "display": "La Posta",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1227-8",
+      "display": "Manzanita",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1228-6",
+      "display": "Mesa Grande",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1229-4",
+      "display": "San Pasqual",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1230-2",
+      "display": "Santa Ysabel",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1231-0",
+      "display": "Sycuan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1233-6",
+      "display": "Eastern Tribes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1234-4",
+      "display": "Attacapa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1235-1",
+      "display": "Biloxi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1236-9",
+      "display": "Georgetown",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1237-7",
+      "display": "Moor",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1238-5",
+      "display": "Nansemond",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1239-3",
+      "display": "Natchez",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1240-1",
+      "display": "Nausu Waiwash",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1241-9",
+      "display": "Nipmuc",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1242-7",
+      "display": "Paugussett",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1243-5",
+      "display": "Pocomoke Acohonock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1244-3",
+      "display": "Southeastern Indians",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1245-0",
+      "display": "Susquehanock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1246-8",
+      "display": "Tunica Biloxi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1247-6",
+      "display": "Waccamaw-Siousan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1248-4",
+      "display": "Wicomico",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1250-0",
+      "display": "Esselen",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1252-6",
+      "display": "Fort Belknap",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1254-2",
+      "display": "Fort Berthold",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1256-7",
+      "display": "Fort Mcdowell",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1258-3",
+      "display": "Fort Hall",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1260-9",
+      "display": "Gabrieleno",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1262-5",
+      "display": "Grand Ronde",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1264-1",
+      "display": "Gros Ventres",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1265-8",
+      "display": "Atsina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1267-4",
+      "display": "Haliwa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1269-0",
+      "display": "Hidatsa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1271-6",
+      "display": "Hoopa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1272-4",
+      "display": "Trinity",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1273-2",
+      "display": "Whilkut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1275-7",
+      "display": "Hoopa Extension",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1277-3",
+      "display": "Houma",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1279-9",
+      "display": "Inaja-Cosmit",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1281-5",
+      "display": "Iowa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1282-3",
+      "display": "Iowa of Kansas-Nebraska",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1283-1",
+      "display": "Iowa of Oklahoma",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1285-6",
+      "display": "Iroquois",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1286-4",
+      "display": "Cayuga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1287-2",
+      "display": "Mohawk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1288-0",
+      "display": "Oneida",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1289-8",
+      "display": "Onondaga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1290-6",
+      "display": "Seneca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1291-4",
+      "display": "Seneca Nation",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1292-2",
+      "display": "Seneca-Cayuga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1293-0",
+      "display": "Tonawanda Seneca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1294-8",
+      "display": "Tuscarora",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1295-5",
+      "display": "Wyandotte",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1297-1",
+      "display": "Juaneno",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1299-7",
+      "display": "Kalispel",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1301-1",
+      "display": "Karuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1303-7",
+      "display": "Kaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1305-2",
+      "display": "Kickapoo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1306-0",
+      "display": "Oklahoma Kickapoo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1307-8",
+      "display": "Texas Kickapoo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1309-4",
+      "display": "Kiowa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1310-2",
+      "display": "Oklahoma Kiowa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1312-8",
+      "display": "Klallam",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1313-6",
+      "display": "Jamestown",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1314-4",
+      "display": "Lower Elwha",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1315-1",
+      "display": "Port Gamble Klallam",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1317-7",
+      "display": "Klamath",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1319-3",
+      "display": "Konkow",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1321-9",
+      "display": "Kootenai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1323-5",
+      "display": "Lassik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1325-0",
+      "display": "Long Island",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1326-8",
+      "display": "Matinecock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1327-6",
+      "display": "Montauk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1328-4",
+      "display": "Poospatuck",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1329-2",
+      "display": "Setauket",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1331-8",
+      "display": "Luiseno",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1332-6",
+      "display": "La Jolla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1333-4",
+      "display": "Pala",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1334-2",
+      "display": "Pauma",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1335-9",
+      "display": "Pechanga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1336-7",
+      "display": "Soboba",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1337-5",
+      "display": "Twenty-Nine Palms",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1338-3",
+      "display": "Temecula",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1340-9",
+      "display": "Lumbee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1342-5",
+      "display": "Lummi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1344-1",
+      "display": "Maidu",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1345-8",
+      "display": "Mountain Maidu",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1346-6",
+      "display": "Nishinam",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1348-2",
+      "display": "Makah",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1350-8",
+      "display": "Maliseet",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1352-4",
+      "display": "Mandan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1354-0",
+      "display": "Mattaponi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1356-5",
+      "display": "Menominee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1358-1",
+      "display": "Miami",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1359-9",
+      "display": "Illinois Miami",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1360-7",
+      "display": "Indiana Miami",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1361-5",
+      "display": "Oklahoma Miami",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1363-1",
+      "display": "Miccosukee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1365-6",
+      "display": "Micmac",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1366-4",
+      "display": "Aroostook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1368-0",
+      "display": "Mission Indians",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1370-6",
+      "display": "Miwok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1372-2",
+      "display": "Modoc",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1374-8",
+      "display": "Mohegan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1376-3",
+      "display": "Mono",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1378-9",
+      "display": "Nanticoke",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1380-5",
+      "display": "Narragansett",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1382-1",
+      "display": "Navajo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1383-9",
+      "display": "Alamo Navajo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1384-7",
+      "display": "Canoncito Navajo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1385-4",
+      "display": "Ramah Navajo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1387-0",
+      "display": "Nez Perce",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1389-6",
+      "display": "Nomalaki",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1391-2",
+      "display": "Northwest Tribes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1392-0",
+      "display": "Alsea",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1393-8",
+      "display": "Celilo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1394-6",
+      "display": "Columbia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1395-3",
+      "display": "Kalapuya",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1396-1",
+      "display": "Molala",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1397-9",
+      "display": "Talakamish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1398-7",
+      "display": "Tenino",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1399-5",
+      "display": "Tillamook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1400-1",
+      "display": "Wenatchee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1401-9",
+      "display": "Yahooskin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1403-5",
+      "display": "Omaha",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1405-0",
+      "display": "Oregon Athabaskan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1407-6",
+      "display": "Osage",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1409-2",
+      "display": "Otoe-Missouria",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1411-8",
+      "display": "Ottawa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1412-6",
+      "display": "Burt Lake Ottawa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1413-4",
+      "display": "Michigan Ottawa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1414-2",
+      "display": "Oklahoma Ottawa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1416-7",
+      "display": "Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1417-5",
+      "display": "Bishop",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1418-3",
+      "display": "Bridgeport",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1419-1",
+      "display": "Burns Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1420-9",
+      "display": "Cedarville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1421-7",
+      "display": "Fort Bidwell",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1422-5",
+      "display": "Fort Independence",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1423-3",
+      "display": "Kaibab",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1424-1",
+      "display": "Las Vegas",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1425-8",
+      "display": "Lone Pine",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1426-6",
+      "display": "Lovelock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1427-4",
+      "display": "Malheur Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1428-2",
+      "display": "Moapa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1429-0",
+      "display": "Northern Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1430-8",
+      "display": "Owens Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1431-6",
+      "display": "Pyramid Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1432-4",
+      "display": "San Juan Southern Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1433-2",
+      "display": "Southern Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1434-0",
+      "display": "Summit Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1435-7",
+      "display": "Utu Utu Gwaitu Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1436-5",
+      "display": "Walker River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1437-3",
+      "display": "Yerington Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1439-9",
+      "display": "Pamunkey",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1441-5",
+      "display": "Passamaquoddy",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1442-3",
+      "display": "Indian Township",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1443-1",
+      "display": "Pleasant Point Passamaquoddy",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1445-6",
+      "display": "Pawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1446-4",
+      "display": "Oklahoma Pawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1448-0",
+      "display": "Penobscot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1450-6",
+      "display": "Peoria",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1451-4",
+      "display": "Oklahoma Peoria",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1453-0",
+      "display": "Pequot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1454-8",
+      "display": "Marshantucket Pequot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1456-3",
+      "display": "Pima",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1457-1",
+      "display": "Gila River Pima-Maricopa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1458-9",
+      "display": "Salt River Pima-Maricopa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1460-5",
+      "display": "Piscataway",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1462-1",
+      "display": "Pit River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1464-7",
+      "display": "Pomo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1465-4",
+      "display": "Central Pomo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1466-2",
+      "display": "Dry Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1467-0",
+      "display": "Eastern Pomo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1468-8",
+      "display": "Kashia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1469-6",
+      "display": "Northern Pomo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1470-4",
+      "display": "Scotts Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1471-2",
+      "display": "Stonyford",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1472-0",
+      "display": "Sulphur Bank",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1474-6",
+      "display": "Ponca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1475-3",
+      "display": "Nebraska Ponca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1476-1",
+      "display": "Oklahoma Ponca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1478-7",
+      "display": "Potawatomi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1479-5",
+      "display": "Citizen Band Potawatomi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1480-3",
+      "display": "Forest County",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1481-1",
+      "display": "Hannahville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1482-9",
+      "display": "Huron Potawatomi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1483-7",
+      "display": "Pokagon Potawatomi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1484-5",
+      "display": "Prairie Band",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1485-2",
+      "display": "Wisconsin Potawatomi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1487-8",
+      "display": "Powhatan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1489-4",
+      "display": "Pueblo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1490-2",
+      "display": "Acoma",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1491-0",
+      "display": "Arizona Tewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1492-8",
+      "display": "Cochiti",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1493-6",
+      "display": "Hopi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1494-4",
+      "display": "Isleta",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1495-1",
+      "display": "Jemez",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1496-9",
+      "display": "Keres",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1497-7",
+      "display": "Laguna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1498-5",
+      "display": "Nambe",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1499-3",
+      "display": "Picuris",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1500-8",
+      "display": "Piro",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1501-6",
+      "display": "Pojoaque",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1502-4",
+      "display": "San Felipe",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1503-2",
+      "display": "San Ildefonso",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1504-0",
+      "display": "San Juan Pueblo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1505-7",
+      "display": "San Juan De",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1506-5",
+      "display": "San Juan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1507-3",
+      "display": "Sandia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1508-1",
+      "display": "Santa Ana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1509-9",
+      "display": "Santa Clara",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1510-7",
+      "display": "Santo Domingo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1511-5",
+      "display": "Taos",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1512-3",
+      "display": "Tesuque",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1513-1",
+      "display": "Tewa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1514-9",
+      "display": "Tigua",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1515-6",
+      "display": "Zia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1516-4",
+      "display": "Zuni",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1518-0",
+      "display": "Puget Sound Salish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1519-8",
+      "display": "Duwamish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1520-6",
+      "display": "Kikiallus",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1521-4",
+      "display": "Lower Skagit",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1522-2",
+      "display": "Muckleshoot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1523-0",
+      "display": "Nisqually",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1524-8",
+      "display": "Nooksack",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1525-5",
+      "display": "Port Madison",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1526-3",
+      "display": "Puyallup",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1527-1",
+      "display": "Samish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1528-9",
+      "display": "Sauk-Suiattle",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1529-7",
+      "display": "Skokomish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1530-5",
+      "display": "Skykomish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1531-3",
+      "display": "Snohomish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1532-1",
+      "display": "Snoqualmie",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1533-9",
+      "display": "Squaxin Island",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1534-7",
+      "display": "Steilacoom",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1535-4",
+      "display": "Stillaguamish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1536-2",
+      "display": "Suquamish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1537-0",
+      "display": "Swinomish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1538-8",
+      "display": "Tulalip",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1539-6",
+      "display": "Upper Skagit",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1541-2",
+      "display": "Quapaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1543-8",
+      "display": "Quinault",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1545-3",
+      "display": "Rappahannock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1547-9",
+      "display": "Reno-Sparks",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1549-5",
+      "display": "Round Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1551-1",
+      "display": "Sac and Fox",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1552-9",
+      "display": "Iowa Sac and Fox",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1553-7",
+      "display": "Missouri Sac and Fox",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1554-5",
+      "display": "Oklahoma Sac and Fox",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1556-0",
+      "display": "Salinan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1558-6",
+      "display": "Salish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1560-2",
+      "display": "Salish and Kootenai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1562-8",
+      "display": "Schaghticoke",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1564-4",
+      "display": "Scott Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1566-9",
+      "display": "Seminole",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1567-7",
+      "display": "Big Cypress",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1568-5",
+      "display": "Brighton",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1569-3",
+      "display": "Florida Seminole",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1570-1",
+      "display": "Hollywood Seminole",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1571-9",
+      "display": "Oklahoma Seminole",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1573-5",
+      "display": "Serrano",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1574-3",
+      "display": "San Manual",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1576-8",
+      "display": "Shasta",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1578-4",
+      "display": "Shawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1579-2",
+      "display": "Absentee Shawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1580-0",
+      "display": "Eastern Shawnee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1582-6",
+      "display": "Shinnecock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1584-2",
+      "display": "Shoalwater Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1586-7",
+      "display": "Shoshone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1587-5",
+      "display": "Battle Mountain",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1588-3",
+      "display": "Duckwater",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1589-1",
+      "display": "Elko",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1590-9",
+      "display": "Ely",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1591-7",
+      "display": "Goshute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1592-5",
+      "display": "Panamint",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1593-3",
+      "display": "Ruby Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1594-1",
+      "display": "Skull Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1595-8",
+      "display": "South Fork Shoshone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1596-6",
+      "display": "Te-Moak Western Shoshone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1597-4",
+      "display": "Timbi-Sha Shoshone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1598-2",
+      "display": "Washakie",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1599-0",
+      "display": "Wind River Shoshone",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1600-6",
+      "display": "Yomba",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1602-2",
+      "display": "Shoshone Paiute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1603-0",
+      "display": "Duck Valley",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1604-8",
+      "display": "Fallon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1605-5",
+      "display": "Fort McDermitt",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1607-1",
+      "display": "Siletz",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1609-7",
+      "display": "Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1610-5",
+      "display": "Blackfoot Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1611-3",
+      "display": "Brule Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1612-1",
+      "display": "Cheyenne River Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1613-9",
+      "display": "Crow Creek Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1614-7",
+      "display": "Dakota Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1615-4",
+      "display": "Flandreau Santee",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1616-2",
+      "display": "Fort Peck",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1617-0",
+      "display": "Lake Traverse Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1618-8",
+      "display": "Lower Brule Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1619-6",
+      "display": "Lower Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1620-4",
+      "display": "Mdewakanton Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1621-2",
+      "display": "Miniconjou",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1622-0",
+      "display": "Oglala Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1623-8",
+      "display": "Pine Ridge Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1624-6",
+      "display": "Pipestone Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1625-3",
+      "display": "Prairie Island Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1626-1",
+      "display": "Prior Lake Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1627-9",
+      "display": "Rosebud Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1628-7",
+      "display": "Sans Arc Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1629-5",
+      "display": "Santee Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1630-3",
+      "display": "Sisseton-Wahpeton",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1631-1",
+      "display": "Sisseton Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1632-9",
+      "display": "Spirit Lake Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1633-7",
+      "display": "Standing Rock Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1634-5",
+      "display": "Teton Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1635-2",
+      "display": "Two Kettle Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1636-0",
+      "display": "Upper Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1637-8",
+      "display": "Wahpekute Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1638-6",
+      "display": "Wahpeton Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1639-4",
+      "display": "Wazhaza Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1640-2",
+      "display": "Yankton Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1641-0",
+      "display": "Yanktonai Sioux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1643-6",
+      "display": "Siuslaw",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1645-1",
+      "display": "Spokane",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1647-7",
+      "display": "Stewart",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1649-3",
+      "display": "Stockbridge",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1651-9",
+      "display": "Susanville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1653-5",
+      "display": "Tohono O'Odham",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1654-3",
+      "display": "Ak-Chin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1655-0",
+      "display": "Gila Bend",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1656-8",
+      "display": "San Xavier",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1657-6",
+      "display": "Sells",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1659-2",
+      "display": "Tolowa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1661-8",
+      "display": "Tonkawa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1663-4",
+      "display": "Tygh",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1665-9",
+      "display": "Umatilla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1667-5",
+      "display": "Umpqua",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1668-3",
+      "display": "Cow Creek Umpqua",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1670-9",
+      "display": "Ute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1671-7",
+      "display": "Allen Canyon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1672-5",
+      "display": "Uintah Ute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1673-3",
+      "display": "Ute Mountain Ute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1675-8",
+      "display": "Wailaki",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1677-4",
+      "display": "Walla-Walla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1679-0",
+      "display": "Wampanoag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1680-8",
+      "display": "Gay Head Wampanoag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1681-6",
+      "display": "Mashpee Wampanoag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1683-2",
+      "display": "Warm Springs",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1685-7",
+      "display": "Wascopum",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1687-3",
+      "display": "Washoe",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1688-1",
+      "display": "Alpine",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1689-9",
+      "display": "Carson",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1690-7",
+      "display": "Dresslerville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1692-3",
+      "display": "Wichita",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1694-9",
+      "display": "Wind River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1696-4",
+      "display": "Winnebago",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1697-2",
+      "display": "Ho-chunk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1698-0",
+      "display": "Nebraska Winnebago",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1700-4",
+      "display": "Winnemucca",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1702-0",
+      "display": "Wintun",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1704-6",
+      "display": "Wiyot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1705-3",
+      "display": "Table Bluff",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1707-9",
+      "display": "Yakama",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1709-5",
+      "display": "Yakama Cowlitz",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1711-1",
+      "display": "Yaqui",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1712-9",
+      "display": "Barrio Libre",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1713-7",
+      "display": "Pascua Yaqui",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1715-2",
+      "display": "Yavapai Apache",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1717-8",
+      "display": "Yokuts",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1718-6",
+      "display": "Chukchansi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1719-4",
+      "display": "Tachi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1720-2",
+      "display": "Tule River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1722-8",
+      "display": "Yuchi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1724-4",
+      "display": "Yuman",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1725-1",
+      "display": "Cocopah",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1726-9",
+      "display": "Havasupai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1727-7",
+      "display": "Hualapai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1728-5",
+      "display": "Maricopa",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1729-3",
+      "display": "Mohave",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1730-1",
+      "display": "Quechan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1731-9",
+      "display": "Yavapai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1732-7",
+      "display": "Yurok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1733-5",
+      "display": "Coast Yurok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1735-0",
+      "display": "Alaska Native",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1737-6",
+      "display": "Alaska Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1739-2",
+      "display": "Alaskan Athabascan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1740-0",
+      "display": "Ahtna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1741-8",
+      "display": "Alatna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1742-6",
+      "display": "Alexander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1743-4",
+      "display": "Allakaket",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1744-2",
+      "display": "Alanvik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1745-9",
+      "display": "Anvik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1746-7",
+      "display": "Arctic",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1747-5",
+      "display": "Beaver",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1748-3",
+      "display": "Birch Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1749-1",
+      "display": "Cantwell",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1750-9",
+      "display": "Chalkyitsik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1751-7",
+      "display": "Chickaloon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1752-5",
+      "display": "Chistochina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1753-3",
+      "display": "Chitina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1754-1",
+      "display": "Circle",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1755-8",
+      "display": "Cook Inlet",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1756-6",
+      "display": "Copper Center",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1757-4",
+      "display": "Copper River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1758-2",
+      "display": "Dot Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1759-0",
+      "display": "Doyon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1760-8",
+      "display": "Eagle",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1761-6",
+      "display": "Eklutna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1762-4",
+      "display": "Evansville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1763-2",
+      "display": "Fort Yukon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1764-0",
+      "display": "Gakona",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1765-7",
+      "display": "Galena",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1766-5",
+      "display": "Grayling",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1767-3",
+      "display": "Gulkana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1768-1",
+      "display": "Healy Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1769-9",
+      "display": "Holy Cross",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1770-7",
+      "display": "Hughes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1771-5",
+      "display": "Huslia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1772-3",
+      "display": "Iliamna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1773-1",
+      "display": "Kaltag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1774-9",
+      "display": "Kluti Kaah",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1775-6",
+      "display": "Knik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1776-4",
+      "display": "Koyukuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1777-2",
+      "display": "Lake Minchumina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1778-0",
+      "display": "Lime",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1779-8",
+      "display": "Mcgrath",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1780-6",
+      "display": "Manley Hot Springs",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1781-4",
+      "display": "Mentasta Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1782-2",
+      "display": "Minto",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1783-0",
+      "display": "Nenana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1784-8",
+      "display": "Nikolai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1785-5",
+      "display": "Ninilchik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1786-3",
+      "display": "Nondalton",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1787-1",
+      "display": "Northway",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1788-9",
+      "display": "Nulato",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1789-7",
+      "display": "Pedro Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1790-5",
+      "display": "Rampart",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1791-3",
+      "display": "Ruby",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1792-1",
+      "display": "Salamatof",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1793-9",
+      "display": "Seldovia",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1794-7",
+      "display": "Slana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1795-4",
+      "display": "Shageluk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1796-2",
+      "display": "Stevens",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1797-0",
+      "display": "Stony River",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1798-8",
+      "display": "Takotna",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1799-6",
+      "display": "Tanacross",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1800-2",
+      "display": "Tanaina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1801-0",
+      "display": "Tanana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1802-8",
+      "display": "Tanana Chiefs",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1803-6",
+      "display": "Tazlina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1804-4",
+      "display": "Telida",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1805-1",
+      "display": "Tetlin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1806-9",
+      "display": "Tok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1807-7",
+      "display": "Tyonek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1808-5",
+      "display": "Venetie",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1809-3",
+      "display": "Wiseman",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1811-9",
+      "display": "Southeast Alaska",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1813-5",
+      "display": "Tlingit-Haida",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1814-3",
+      "display": "Angoon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1815-0",
+      "display": "Central Council of Tlingit and Haida Tribes",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1816-8",
+      "display": "Chilkat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1817-6",
+      "display": "Chilkoot",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1818-4",
+      "display": "Craig",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1819-2",
+      "display": "Douglas",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1820-0",
+      "display": "Haida",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1821-8",
+      "display": "Hoonah",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1822-6",
+      "display": "Hydaburg",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1823-4",
+      "display": "Kake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1824-2",
+      "display": "Kasaan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1825-9",
+      "display": "Kenaitze",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1826-7",
+      "display": "Ketchikan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1827-5",
+      "display": "Klawock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1828-3",
+      "display": "Pelican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1829-1",
+      "display": "Petersburg",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1830-9",
+      "display": "Saxman",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1831-7",
+      "display": "Sitka",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1832-5",
+      "display": "Tenakee Springs",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1833-3",
+      "display": "Tlingit",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1834-1",
+      "display": "Wrangell",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1835-8",
+      "display": "Yakutat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1837-4",
+      "display": "Tsimshian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1838-2",
+      "display": "Metlakatla",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1840-8",
+      "display": "Eskimo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1842-4",
+      "display": "Greenland Eskimo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1844-0",
+      "display": "Inupiat Eskimo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1845-7",
+      "display": "Ambler",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1846-5",
+      "display": "Anaktuvuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1847-3",
+      "display": "Anaktuvuk Pass",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1848-1",
+      "display": "Arctic Slope Inupiat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1849-9",
+      "display": "Arctic Slope Corporation",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1850-7",
+      "display": "Atqasuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1851-5",
+      "display": "Barrow",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1852-3",
+      "display": "Bering Straits Inupiat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1853-1",
+      "display": "Brevig Mission",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1854-9",
+      "display": "Buckland",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1855-6",
+      "display": "Chinik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1856-4",
+      "display": "Council",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1857-2",
+      "display": "Deering",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1858-0",
+      "display": "Elim",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1859-8",
+      "display": "Golovin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1860-6",
+      "display": "Inalik Diomede",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1861-4",
+      "display": "Inupiaq",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1862-2",
+      "display": "Kaktovik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1863-0",
+      "display": "Kawerak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1864-8",
+      "display": "Kiana",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1865-5",
+      "display": "Kivalina",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1866-3",
+      "display": "Kobuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1867-1",
+      "display": "Kotzebue",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1868-9",
+      "display": "Koyuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1869-7",
+      "display": "Kwiguk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1870-5",
+      "display": "Mauneluk Inupiat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1871-3",
+      "display": "Nana Inupiat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1872-1",
+      "display": "Noatak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1873-9",
+      "display": "Nome",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1874-7",
+      "display": "Noorvik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1875-4",
+      "display": "Nuiqsut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1876-2",
+      "display": "Point Hope",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1877-0",
+      "display": "Point Lay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1878-8",
+      "display": "Selawik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1879-6",
+      "display": "Shaktoolik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1880-4",
+      "display": "Shishmaref",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1881-2",
+      "display": "Shungnak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1882-0",
+      "display": "Solomon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1883-8",
+      "display": "Teller",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1884-6",
+      "display": "Unalakleet",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1885-3",
+      "display": "Wainwright",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1886-1",
+      "display": "Wales",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1887-9",
+      "display": "White Mountain",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1888-7",
+      "display": "White Mountain Inupiat",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1889-5",
+      "display": "Mary's Igloo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1891-1",
+      "display": "Siberian Eskimo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1892-9",
+      "display": "Gambell",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1893-7",
+      "display": "Savoonga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1894-5",
+      "display": "Siberian Yupik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1896-0",
+      "display": "Yupik Eskimo",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1897-8",
+      "display": "Akiachak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1898-6",
+      "display": "Akiak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1899-4",
+      "display": "Alakanuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1900-0",
+      "display": "Aleknagik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1901-8",
+      "display": "Andreafsky",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1902-6",
+      "display": "Aniak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1903-4",
+      "display": "Atmautluak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1904-2",
+      "display": "Bethel",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1905-9",
+      "display": "Bill Moore's Slough",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1906-7",
+      "display": "Bristol Bay Yupik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1907-5",
+      "display": "Calista Yupik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1908-3",
+      "display": "Chefornak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1909-1",
+      "display": "Chevak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1910-9",
+      "display": "Chuathbaluk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1911-7",
+      "display": "Clark's Point",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1912-5",
+      "display": "Crooked Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1913-3",
+      "display": "Dillingham",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1914-1",
+      "display": "Eek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1915-8",
+      "display": "Ekuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1916-6",
+      "display": "Ekwok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1917-4",
+      "display": "Emmonak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1918-2",
+      "display": "Goodnews Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1919-0",
+      "display": "Hooper Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1920-8",
+      "display": "Iqurmuit (Russian Mission)",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1921-6",
+      "display": "Kalskag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1922-4",
+      "display": "Kasigluk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1923-2",
+      "display": "Kipnuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1924-0",
+      "display": "Koliganek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1925-7",
+      "display": "Kongiganak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1926-5",
+      "display": "Kotlik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1927-3",
+      "display": "Kwethluk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1928-1",
+      "display": "Kwigillingok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1929-9",
+      "display": "Levelock",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1930-7",
+      "display": "Lower Kalskag",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1931-5",
+      "display": "Manokotak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1932-3",
+      "display": "Marshall",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1933-1",
+      "display": "Mekoryuk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1934-9",
+      "display": "Mountain Village",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1935-6",
+      "display": "Naknek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1936-4",
+      "display": "Napaumute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1937-2",
+      "display": "Napakiak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1938-0",
+      "display": "Napaskiak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1939-8",
+      "display": "Newhalen",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1940-6",
+      "display": "New Stuyahok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1941-4",
+      "display": "Newtok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1942-2",
+      "display": "Nightmute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1943-0",
+      "display": "Nunapitchukv",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1944-8",
+      "display": "Oscarville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1945-5",
+      "display": "Pilot Station",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1946-3",
+      "display": "Pitkas Point",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1947-1",
+      "display": "Platinum",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1948-9",
+      "display": "Portage Creek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1949-7",
+      "display": "Quinhagak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1950-5",
+      "display": "Red Devil",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1951-3",
+      "display": "St. Michael",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1952-1",
+      "display": "Scammon Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1953-9",
+      "display": "Sheldon's Point",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1954-7",
+      "display": "Sleetmute",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1955-4",
+      "display": "Stebbins",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1956-2",
+      "display": "Togiak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1957-0",
+      "display": "Toksook",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1958-8",
+      "display": "Tulukskak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1959-6",
+      "display": "Tuntutuliak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1960-4",
+      "display": "Tununak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1961-2",
+      "display": "Twin Hills",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1962-0",
+      "display": "Georgetown",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1963-8",
+      "display": "St. Mary's",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1964-6",
+      "display": "Umkumiate",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1966-1",
+      "display": "Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1968-7",
+      "display": "Alutiiq Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1969-5",
+      "display": "Tatitlek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1970-3",
+      "display": "Ugashik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1972-9",
+      "display": "Bristol Bay Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1973-7",
+      "display": "Chignik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1974-5",
+      "display": "Chignik Lake",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1975-2",
+      "display": "Egegik",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1976-0",
+      "display": "Igiugig",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1977-8",
+      "display": "Ivanof Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1978-6",
+      "display": "King Salmon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1979-4",
+      "display": "Kokhanok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1980-2",
+      "display": "Perryville",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1981-0",
+      "display": "Pilot Point",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1982-8",
+      "display": "Port Heiden",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1984-4",
+      "display": "Chugach Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1985-1",
+      "display": "Chenega",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1986-9",
+      "display": "Chugach Corporation",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1987-7",
+      "display": "English Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1988-5",
+      "display": "Port Graham",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1990-1",
+      "display": "Eyak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1992-7",
+      "display": "Koniag Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1993-5",
+      "display": "Akhiok",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1994-3",
+      "display": "Agdaagux",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1995-0",
+      "display": "Karluk",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1996-8",
+      "display": "Kodiak",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1997-6",
+      "display": "Larsen Bay",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1998-4",
+      "display": "Old Harbor",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "1999-2",
+      "display": "Ouzinkie",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2000-8",
+      "display": "Port Lions",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2002-4",
+      "display": "Sugpiaq",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2004-0",
+      "display": "Suqpigaq",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2006-5",
+      "display": "Unangan Aleut",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2007-3",
+      "display": "Akutan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2008-1",
+      "display": "Aleut Corporation",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2009-9",
+      "display": "Aleutian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2010-7",
+      "display": "Aleutian Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2011-5",
+      "display": "Atka",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2012-3",
+      "display": "Belkofski",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2013-1",
+      "display": "Chignik Lagoon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2014-9",
+      "display": "King Cove",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2015-6",
+      "display": "False Pass",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2016-4",
+      "display": "Nelson Lagoon",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2017-2",
+      "display": "Nikolski",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2018-0",
+      "display": "Pauloff Harbor",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2019-8",
+      "display": "Qagan Toyagungin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2020-6",
+      "display": "Qawalangin",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2021-4",
+      "display": "St. George",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2022-2",
+      "display": "St. Paul",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2023-0",
+      "display": "Sand Point",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2024-8",
+      "display": "South Naknek",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2025-5",
+      "display": "Unalaska",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2026-3",
+      "display": "Unga",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2028-9",
+      "display": "Asian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2029-7",
+      "display": "Asian Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2030-5",
+      "display": "Bangladeshi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2031-3",
+      "display": "Bhutanese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2032-1",
+      "display": "Burmese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2033-9",
+      "display": "Cambodian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2034-7",
+      "display": "Chinese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2035-4",
+      "display": "Taiwanese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2036-2",
+      "display": "Filipino",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2037-0",
+      "display": "Hmong",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2038-8",
+      "display": "Indonesian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2039-6",
+      "display": "Japanese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2040-4",
+      "display": "Korean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2041-2",
+      "display": "Laotian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2042-0",
+      "display": "Malaysian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2043-8",
+      "display": "Okinawan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2044-6",
+      "display": "Pakistani",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2045-3",
+      "display": "Sri Lankan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2046-1",
+      "display": "Thai",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2047-9",
+      "display": "Vietnamese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2048-7",
+      "display": "Iwo Jiman",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2049-5",
+      "display": "Maldivian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2050-3",
+      "display": "Nepalese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2051-1",
+      "display": "Singaporean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2052-9",
+      "display": "Madagascar",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2054-5",
+      "display": "Black or African American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2056-0",
+      "display": "Black",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2058-6",
+      "display": "African American",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2060-2",
+      "display": "African",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2061-0",
+      "display": "Botswanan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2062-8",
+      "display": "Ethiopian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2063-6",
+      "display": "Liberian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2064-4",
+      "display": "Namibian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2065-1",
+      "display": "Nigerian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2066-9",
+      "display": "Zairean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2067-7",
+      "display": "Bahamian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2068-5",
+      "display": "Barbadian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2069-3",
+      "display": "Dominican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2070-1",
+      "display": "Dominica Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2071-9",
+      "display": "Haitian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2072-7",
+      "display": "Jamaican",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2073-5",
+      "display": "Tobagoan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2074-3",
+      "display": "Trinidadian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2075-0",
+      "display": "West Indian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2076-8",
+      "display": "Native Hawaiian or Other Pacific Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2078-4",
+      "display": "Polynesian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2079-2",
+      "display": "Native Hawaiian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2080-0",
+      "display": "Samoan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2081-8",
+      "display": "Tahitian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2082-6",
+      "display": "Tongan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2083-4",
+      "display": "Tokelauan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2085-9",
+      "display": "Micronesian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2086-7",
+      "display": "Guamanian or Chamorro",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2087-5",
+      "display": "Guamanian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2088-3",
+      "display": "Chamorro",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2089-1",
+      "display": "Mariana Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2090-9",
+      "display": "Marshallese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2091-7",
+      "display": "Palauan",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2092-5",
+      "display": "Carolinian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2093-3",
+      "display": "Kosraean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2094-1",
+      "display": "Pohnpeian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2095-8",
+      "display": "Saipanese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2096-6",
+      "display": "Kiribati",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2097-4",
+      "display": "Chuukese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2098-2",
+      "display": "Yapese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2100-6",
+      "display": "Melanesian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2101-4",
+      "display": "Fijian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2102-2",
+      "display": "Papua New Guinean",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2103-0",
+      "display": "Solomon Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2104-8",
+      "display": "New Hebrides",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2106-3",
+      "display": "White",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2108-9",
+      "display": "European",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2109-7",
+      "display": "Armenian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2110-5",
+      "display": "English",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2111-3",
+      "display": "French",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2112-1",
+      "display": "German",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2113-9",
+      "display": "Irish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2114-7",
+      "display": "Italian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2115-4",
+      "display": "Polish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2116-2",
+      "display": "Scottish",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2118-8",
+      "display": "Middle Eastern or North African",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2119-6",
+      "display": "Assyrian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2120-4",
+      "display": "Egyptian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2121-2",
+      "display": "Iranian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2122-0",
+      "display": "Iraqi",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2123-8",
+      "display": "Lebanese",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2124-6",
+      "display": "Palestinian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2125-3",
+      "display": "Syrian",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2126-1",
+      "display": "Afghanistani",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2127-9",
+      "display": "Israeili",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2129-5",
+      "display": "Arab",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2131-1",
+      "display": "Other Race",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "2500-7",
+      "display": "Other Pacific Islander",
+      "resourceType": "Coding",
+      "system": "http://hl7.org/fhir/v3/Race"
+    },
+    {
+      "code": "8302-2",
+      "display": "Body height",
+      "resourceType": "Coding",
+      "system": "http://loinc.org"
+    },
+    {
+      "code": "8335-2",
+      "display": "Body weight Estimated",
+      "resourceType": "Coding",
+      "system": "http://loinc.org"
+    },
+    {
+      "code": "118877007",
+      "display": "Procedure on prostate",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "176307007",
+      "display": "Whole-gland ablation",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "228748004",
+      "display": "Brachytherapy",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "26294005",
+      "display": "Radical prostatectomy (nerve-sparing)",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "26294005-nns",
+      "display": "Radical prostatectomy (non-nerve-sparing)",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "33195004",
+      "display": "External beam radiation therapy",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "373818007",
+      "display": "Started watchful waiting",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "424313000",
+      "display": "Started active surveillance",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "438778003",
+      "display": "Focal-gland ablation",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "707266006",
+      "display": "Androgen deprivation therapy",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "999999999",
+      "display": "None of the above",
+      "resourceType": "Coding",
+      "system": "http://snomed.info/sct"
+    },
+    {
+      "code": "",
+      "display": "",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "111",
+      "display": "biopsy",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "121",
+      "display": "PCa diagnosis",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "131",
+      "display": "treatment begun",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "141",
+      "display": "PCa localized diagnosis",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "666",
+      "display": "PSA",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "999",
+      "display": "None",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "GLEASONBIOP1",
+      "display": "Primary Gleason Score",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "GLEASONBIOP2",
+      "display": "Secondary Gleason Score",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "HEIGHT",
+      "display": "height",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "PSA",
+      "display": "Prostate Specific Antigen",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "TNMCN",
+      "display": "T-Stage",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "WEIGHT",
+      "display": "weight",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "androgen deprivation therapy - chemical",
+      "display": "Androgen deprivation therapy (ADT) - Chemical",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "androgen deprivation therapy - surgical orchiectomy",
+      "display": "Androgen deprivation therapy (ADT) - Surgical orchiectomy",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/clinical-codes"
+    },
+    {
+      "code": "paper",
+      "display": "Information collected on paper",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/encounter-types"
+    },
+    {
+      "code": "phone",
+      "display": "Information collected over telephone system",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/encounter-types"
+    },
+    {
+      "code": "1",
+      "display": "Aboriginal but not Torres Strait Islander origin",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036"
+    },
+    {
+      "code": "2",
+      "display": "Torres Strait Islander but not Aboriginal origin",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036"
+    },
+    {
+      "code": "3",
+      "display": "Both Aboriginal and Torres Strait Islander origin",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036"
+    },
+    {
+      "code": "4",
+      "display": "Neither Aboriginal nor Torres Strait Islander origin",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036"
+    },
+    {
+      "code": "9",
+      "display": "Not stated/inadequately described",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036"
+    },
+    {
+      "code": "1",
+      "display": "Watchful waiting",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "2",
+      "display": "Active surveillance",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "3",
+      "display": "Radical prostatectomy (nerve-sparing)",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "3-nns",
+      "display": "Radical prostatectomy (non-nerve-sparing)",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "4",
+      "display": "External beam radiation therapy",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "5",
+      "display": "Brachytherapy",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "6",
+      "display": "Androgen deprivation therapy",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "7",
+      "display": "Focal therapy",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "888",
+      "display": "Other (free text)",
+      "resourceType": "Coding",
+      "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
+    },
+    {
+      "code": "",
+      "display": "Default",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "en_AU",
+      "display": "Australian English",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "en_US",
+      "display": "American English",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "localhost:5000"
+    ],
+    "lastUpdated": "2017-11-27T20:54:45.923392Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}
