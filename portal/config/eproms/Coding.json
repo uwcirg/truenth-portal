@@ -5816,7 +5816,7 @@
     },
     {
       "code": "26294005",
-      "display": "Radical prostatectomy (nerve-sparing)",
+      "display": "Radical prostatectomy",
       "resourceType": "Coding",
       "system": "http://snomed.info/sct"
     },
