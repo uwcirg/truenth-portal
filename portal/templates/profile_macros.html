@@ -1849,16 +1849,21 @@
     };
     $(document).ready(function() {
 
-        var continueToAssessment = function(method, completionDate) {
+        var continueToAssessment = function(method, completionDate, linkUrl) {
             //check if the user has given web consent here, if not redirect to form
-            var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+            var assessment_url = linkUrl || {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
             if (hasValue(assessment_url)) {
                 var still_needed = false;
+
                 tnthAjax.getStillNeededCoreData("{{person.id if person}}", true, function(data) {
                     if (data && ! data.error && data.length > 0) {
                         still_needed = true;
                     };
                 }, method);
+
+                /*
+                 * passing additional query params
+                 */
                 if (/\?/.test(assessment_url)) {
                     assessment_url += "&entry_method=" + method;
                 }
@@ -2010,7 +2015,7 @@
                             var nConsentDate = cConsentDate.setHours(0,0,0,0);
                             var nToday = cToday.setHours(0,0,0,0);
                             if (nCompletionDate < nConsentDate) {
-                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
+                                errorMsg = i18next.t("Completion date cannot be before consent date. Date of completion is outside the days allowed.");
                             };
                             if (nConsentDate >= nToday) {
                                 if (nCompletionDate > nConsentDate) {
@@ -2072,7 +2077,32 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-                                continueToAssessment(method, completionDate);
+                                var linkUrl = "";
+                                /*
+                                 * retrieve instrument ids from present questionnaire bank
+                                 */
+                                if (data.questionnaire_bank.questionnaires) {
+                                    var qs = data.questionnaire_bank.questionnaires;
+                                    var instruments_list = [], instruments_string = "";
+                                    /*
+                                     * loop through questionnaires in current questionnaire bank
+                                     */
+                                    qs.forEach(function(item) {
+                                        if (item.questionnaire) {
+                                            instruments_list.push("instument_id="+item.questionnaire.display);
+                                        };
+                                    });
+                                    instruments_string = instruments_list.join("&");
+                                    if (hasValue(instruments_string)) {
+                                        linkUrl = "{{url_for(
+                'assessment_engine_api.present_assessment')}}?subject_id={{person.id}}&" + instruments_string;
+                                    };
+                                };
+                                //console.log("link url: ", linkUrl)
+                                /*
+                                 * assessment link url has format like: /api/present-assessment?subject_id=29&instument_id=epic26&instument_id=eproms_add&instument_id=comorb
+                                 */
+                                continueToAssessment(method, completionDate, linkUrl);
                             };
 
                         };
