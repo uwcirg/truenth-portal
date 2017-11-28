@@ -612,7 +612,7 @@ def settings():
             org_persistence = ModelPersistence(
                 model_class=Organization, sequence_name='organizations_id_seq',
                 lookup_field='id')
-            org_persistence.import_(keep_unmentioned=False)
+            org_persistence.import_(keep_unmentioned=False, target_dir=None)
         except ValueError as e:
             trace("IMPORT ERROR: {}".format(e))
 
