@@ -4331,9 +4331,9 @@ var tnthDates = {
                    year = dArray[0];
                    month = dArray[1];
                    day = dArray[2];
-                   hours = dArray[3];
-                   minutes = dArray[4];
-                   seconds = dArray[5];
+                   hours = dArray[3] || "0";
+                   minutes = dArray[4] || "0";
+                   seconds = dArray[5] || "0";
                 }
                 else {
                    day = d.getDate();
