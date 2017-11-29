@@ -80,7 +80,7 @@ var AccountCreationObj = function (roles, dependencies) {
                 errorMessage = "Error processing request: " + params.apiUrl;
                 errorMessage += ";  response status code: " + (parseInt(xhr.status) === 0 ? "request timed out/network error": xhr.status);
                 errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
-                tnthAjax.reportError(this.userId, "/patients/patient-profile-create", errorMessage, true);
+                tnthAjax.reportError(self.userId, "/patients/patient-profile-create", errorMessage, true);
                 self.attempts = 0;
                 if (params.callback) {
                     (params.callback).call(self, {"error": displayError});
