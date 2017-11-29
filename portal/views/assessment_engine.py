@@ -1,6 +1,6 @@
 """Assessment Engine API view functions"""
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
-from flask import session
+from flask import session, url_for
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
@@ -1333,6 +1333,29 @@ def invalidate(user_id):
         abort(404)
     invalidate_assessment_status_cache(user_id)
     return jsonify(invalidated=user.as_fhir())
+
+
+@assessment_engine_api.route('/present-needed')
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@oauth.require_oauth()
+def present_needed():
+    """Look up needed and in process q's for user and then present_assessment"""
+    subject_id = request.args.get('subject_id') or current_user().id
+    subject = get_user(subject_id)
+    if subject != current_user():
+        current_user().check_role(permission='edit', other_id=subject_id)
+
+    assessment_status = AssessmentStatus(
+        subject, as_of_date=request.args.get('authored'))
+    args = request.args.copy()
+    args['instrument_id'] = (
+        assessment_status.instruments_needing_full_assessment(
+            classification='all'))
+    args['resume_instrument_id'] = (
+        assessment_status.instruments_in_progress(
+            classification='all'))
+    url = url_for('.present_assessment', **args)
+    return redirect(url, code=303)
 
 
 @assessment_engine_api.route('/present-assessment')
