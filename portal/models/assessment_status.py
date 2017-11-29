@@ -109,9 +109,16 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
-    def __init__(self, user):
+    def __init__(self, user, as_of_date):
+        """ Initialize and lookup status for respective questionnaires
+
+        :param user: subject for details
+        :param as_of_date: None value implies now
+
+        """
         self.user = user
-        self.qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
+        self.qb = QuestionnaireBank.most_current_qb(
+            user, as_of_date=as_of_date).questionnaire_bank
         self.status_by_q = qb_status_dict(user=user,
                                           questionnaire_bank=self.qb)
 
@@ -162,14 +169,16 @@ class AssessmentStatus(object):
 
     """
 
-    def __init__(self, user):
+    def __init__(self, user, as_of_date=None):
         """Initialize assessment status object for given user/consent
 
         :param user: The user in question - patient on whom to check status
+        :param as_of_date: Use to override default of `now` for status calc
 
         """
         self.user = user
-        self.qb_data = QuestionnaireBankDetails(user)
+        self.as_of_date = as_of_date
+        self.qb_data = QuestionnaireBankDetails(user, as_of_date=as_of_date)
 
     def __str__(self):
         """Present friendly format for logging, etc."""
