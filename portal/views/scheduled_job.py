@@ -27,7 +27,8 @@ def jobs_list():
     """
     celery = create_celery(current_app)
     jobs = ScheduledJob.query.filter(
-        ScheduledJob.name != "__test_celery__").all()
+        ScheduledJob.name != "__test_celery__").order_by(
+            ScheduledJob.id.asc()).all()
     tasks = []
     for task in celery.tasks.keys():
         path = task.split('.')
@@ -68,7 +69,7 @@ def update_job():
         job = ScheduledJob.query.filter(
             ScheduledJob.name == name).first()
         if not job:
-            abort (404, "{} not found - new should POST".format(name))
+            abort(404, "{} not found - new should POST".format(name))
         job.update_from_json(request.json)
     except ValueError as e:
         abort(400, str(e))
@@ -117,4 +118,5 @@ def trigger_job(job_id):
     if not job:
         abort(404, 'job ID not found')
     msg = job.trigger()
-    return jsonify(message=msg)
+    last_run = ScheduledJob.query.get(job_id).last_runtime
+    return jsonify(message=msg, runtime=last_run)

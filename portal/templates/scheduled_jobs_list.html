@@ -10,20 +10,24 @@
     <ul>
         {% for job in jobs %}
             <li>
-                <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
-                <b>{{ job.name }}</b>
-                <br />{{ _("Task") }}: {{ job.task }}
-                {% if job.args %}
-                <br />{{ _("Args") }}: {{ job.args }}
-                {% endif %}
-                {% if job.kwargs %}
-                <br />{{ _("Kwargs") }}: {{ job.kwargs }}
-                {% endif %}
-                <br />{{ _("Schedule") }}: {{ job.schedule }}
-                <br />{{ _("Active") }}: {{ job.active }}
-                <br />{{ _("Last Runtime") }}: {{ job.last_runtime }}
-                <br />{{ _("Last Status") }}: {{ job.last_status }}
-                <div id="triggerMessage_{{job.id}}" class="text-info"></div>
+                <div id="job_{{ job.id }}">
+                    <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
+                    <b>{{ job.name }}</b>
+                    <br />{{ _("Task") }}: {{ job.task }}
+                    {% if job.args %}
+                    <br />{{ _("Args") }}: {{ job.args }}
+                    {% endif %}
+                    {% if job.kwargs %}
+                    <br />{{ _("Kwargs") }}: {{ job.kwargs }}
+                    {% endif %}
+                    <br />{{ _("Schedule") }}: {{ job.schedule }}
+                    <br />{{ _("Active") }}: {{ job.active }}
+                    <br />{{ _("Last Runtime") }}:
+                    <div id="lastRuntime_{{job.id}}" class="text-info">{{ job.last_runtime }}</div>
+                    {{ _("Last Status") }}:
+                    <div id="lastStatus_{{job.id}}" class="text-info">{{ job.last_status }}</div>
+                    <br />
+                </div>
             </li>
         {% endfor %}
     </ul>
@@ -49,20 +53,36 @@
 function triggerJob(event, jobId) {
     if (event) event.stopPropagation();
     if (jobId) {
-         $.ajax ({
-              type: "POST",
-              url: "/api/scheduled_job/" + jobId + "/trigger",
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json'
-          }).done(function(data) {
-                if (data) {
-                    $("#triggerMessage_" + jobId).text(data["message"]);
-                }
-          }).fail(function(xhr) {
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
-                $("#triggerMessage_" + jobId).text(xhr.status + ": " + xhr.responseText);
-          });
+        var current_job = '#job_'+jobId
+        var current_status = "#lastStatus_" + jobId
+        var current_runtime = "#lastRuntime_" + jobId
+        $(current_job).children().prop('disabled',true);
+        $(current_job).fadeTo('slow',.6);
+        $.ajax ({
+            type: "POST",
+            url: "/api/scheduled_job/" + jobId + "/trigger",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json'
+        }).done(function(data) {
+            if (data) {
+                $(current_status).text(data["message"]);
+                $(current_runtime).text(data["runtime"]);
+                $(current_job).fadeTo('slow',1);
+                $(current_job).children().prop('disabled',false);
+            } else {
+                $(current_status).text("{{_('No response received')}}");
+                $(current_runtime).text("--");
+                $(current_status).fadeTo('slow',1);
+                $(current_runtime).fadeTo('slow',1);
+            }
+        }).fail(function(xhr) {
+            console.log("response Text: " + xhr.responseText);
+            console.log("response status: " +  xhr.status);
+            $(current_status).text(xhr.status + ": " + xhr.responseText);
+            $(current_runtime).text("--")
+            $(current_status).fadeTo('slow',1);
+            $(current_runtime).fadeTo('slow',1);
+        });
     };
 };
 
