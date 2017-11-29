@@ -1874,7 +1874,7 @@
                 };
 
                 if (method === "paper") {
-                    assessment_url += "&authored=" + tnthDates.formatDateString(completionDate, "iso-short");
+                    assessment_url += "&authored=" + completionDate;
                 };
 
                 var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
@@ -2018,7 +2018,7 @@
                             var nConsentDate = cConsentDate.setHours(0,0,0,0);
                             var nToday = cToday.setHours(0,0,0,0);
                             if (nCompletionDate < nConsentDate) {
-                                errorMsg = i18next.t("Completion date cannot be before consent date. Date of completion is outside the days allowed.");
+                                errorMsg = i18next.t("Completion date cannot be before consent date.");
                             };
                             if (nConsentDate >= nToday) {
                                 if (nCompletionDate > nConsentDate) {
@@ -2096,32 +2096,11 @@
                                 var linkUrl = "";
 
                                 if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
-                                    if (data.questionnaire_bank.questionnaires) {
-                                        var qs = data.questionnaire_bank.questionnaires;
-                                        var instruments_list = [];
-                                        /*
-                                         * loop through questionnaires in current questionnaire bank
-                                         */
-                                        qs.forEach(function(item) {
-                                            if (item.questionnaire) {
-                                                instruments_list.push("instrument_id="+item.questionnaire.display);
-                                            };
-                                        });
-                                        instruments_string = instruments_list.join("&");
-
-
-                                        {% if person %}
-                                            if (hasValue(instruments_string)) {
-                                                linkUrl = "{{url_for(
-                     'assessment_engine_api.present_assessment')}}?subject_id={{person.id}}&" + instruments_string;
-                                            };
-                                        {% endif %}
-                                    };
+                                    /*
+                                     * note the API will redirect to AE with the necessary instruments information
+                                     */
+                                    linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
                                 };
-                                //console.log("linkUrl: ", linkUrl)
-                                /*
-                                 * passed along instruments for the current questionnaire bank
-                                 */
                                 continueToAssessment(method, completionDate, linkUrl);
                             };
 
