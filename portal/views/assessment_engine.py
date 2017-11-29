@@ -1345,15 +1345,16 @@ def present_needed():
     if subject != current_user():
         current_user().check_role(permission='edit', other_id=subject_id)
 
-    assessment_status = AssessmentStatus(
-        subject, as_of_date=request.args.get('authored'))
-    args = request.args.copy()
+    as_of_date = FHIR_datetime.parse(request.args.get('authored'))
+    assessment_status = AssessmentStatus(subject, as_of_date=as_of_date)
+    args = dict(request.args.items())
     args['instrument_id'] = (
         assessment_status.instruments_needing_full_assessment(
             classification='all'))
     args['resume_instrument_id'] = (
         assessment_status.instruments_in_progress(
             classification='all'))
+
     url = url_for('.present_assessment', **args)
     return redirect(url, code=303)
 
