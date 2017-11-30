@@ -315,7 +315,7 @@ class QuestionnaireBank(db.Model):
                 if qbd.relative_start is None:
                     # indicates QB hasn't started yet, continue
                     continue
-                expiry = qb.calculated_expiry(trigger_date)
+                expiry = qb.calculated_expiry(trigger_date, as_of_date)
                 last_found = qbd._replace(questionnaire_bank=qb)
 
                 if qbd.relative_start <= as_of_date and as_of_date < expiry:
@@ -351,24 +351,24 @@ class QuestionnaireBank(db.Model):
         return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
                    iteration=None, recur=None, questionnaire_bank=self)
 
-    def calculated_expiry(self, trigger_date):
+    def calculated_expiry(self, trigger_date, as_of_date=None):
         """Return calculated expired date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
+        start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
-    def calculated_due(self, trigger_date):
+    def calculated_due(self, trigger_date, as_of_date=None):
         """Return calculated due date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
+        start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not (start and self.due):
             return None
 
         return start + RelativeDelta(self.due)
 
-    def calculated_overdue(self, trigger_date):
+    def calculated_overdue(self, trigger_date, as_of_date=None):
         """Return calculated overdue date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
+        start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not (start and self.overdue):
             return None
 
