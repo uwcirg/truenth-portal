@@ -438,6 +438,46 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertFalse(a_s.instruments_needing_full_assessment())
         self.assertFalse(a_s.instruments_in_progress())
 
+    def test_localized_as_of_date(self):
+        # backdating consent beyond expired and the status lookup date
+        # within a valid window should show available assessments.
+
+        # backdate so the baseline q's have expired
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
+                status='in-progress',
+                timestamp=datetime.utcnow() - relativedelta(months=3))
+        self.bless_with_basics(backdate=relativedelta(months=3))
+        self.mark_localized()
+        self.test_user = db.session.merge(self.test_user)
+        as_of_date = datetime.utcnow() - relativedelta(months=2, days=28)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
+        self.assertEquals(a_s.overall_status, "In Progress")
+
+        # with only epic26 started, should see results for both
+        # instruments_needing_full_assessment and insturments_in_progress
+        self.assertEquals(['eproms_add', 'comorb'], a_s.instruments_needing_full_assessment())
+        self.assertEquals(['epic26'], a_s.instruments_in_progress())
+
+    def test_metastatic_as_of_date(self):
+        # backdating consent beyond expired and the status lookup date
+        # within a valid window should show available assessments.
+
+        # backdate so the baseline q's have expired
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic23',
+                status='in-progress',
+                timestamp=datetime.utcnow() - relativedelta(months=3))
+        self.bless_with_basics(backdate=relativedelta(months=3))
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        as_of_date = datetime.utcnow() - relativedelta(months=2, days=28)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
+        self.assertEquals(a_s.overall_status, "In Progress")
+
+        # with only epic26 started, should see results for both
+        # instruments_needing_full_assessment and instruments_in_progress
+        self.assertEquals(['epic23'], a_s.instruments_in_progress())
+        self.assertTrue(a_s.instruments_needing_full_assessment())
+
     def test_initial_recur_due(self):
 
         # backdate so baseline q's have expired, and we within the first

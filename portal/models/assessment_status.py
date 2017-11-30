@@ -40,7 +40,7 @@ def recent_qnr_status(user, questionnaire_name):
     return results
 
 
-def status_from_recents(recents, start, overdue, expired):
+def status_from_recents(recents, start, overdue, expired, as_of_date=None):
     """Returns dict defining available values from recents
 
     Return dict will only define values which make sense.  i.e.
@@ -57,19 +57,19 @@ def status_from_recents(recents, start, overdue, expired):
     if 'in-progress' in recents:
         results['status'] = 'In Progress'
         results['in-progress'] = recents['in-progress']
-    now = datetime.utcnow()
-    if now < start:
+    as_of_date = as_of_date or datetime.utcnow()
+    if as_of_date < start:
         raise ValueError(
             "unexpected call for status on unstarted Questionnaire")
 
-    if (overdue and now < overdue) or (not overdue and now < expired):
+    if (overdue and as_of_date < overdue) or (not overdue and as_of_date < expired):
         tmp = {
             'status': 'Due',
             'by_date': overdue if overdue else expired
         }
         tmp.update(results)
         return tmp
-    if overdue and now < expired:
+    if overdue and as_of_date < expired:
         tmp = {
             'status': 'Overdue',
             'by_date': expired
@@ -81,7 +81,7 @@ def status_from_recents(recents, start, overdue, expired):
     return tmp
 
 
-def qb_status_dict(user, questionnaire_bank):
+def qb_status_dict(user, questionnaire_bank, as_of_date):
     """Gather status details for a user on a given QB"""
     d = OrderedDict()
     if not questionnaire_bank:
@@ -95,7 +95,7 @@ def qb_status_dict(user, questionnaire_bank):
     for q in questionnaire_bank.questionnaires:
         recents = recent_qnr_status(user, q.name)
         d[q.name] = status_from_recents(
-            recents, start, overdue, expired)
+            recents, start, overdue, expired, as_of_date=as_of_date)
     trace("QuestionnaireBank status for {}:".format(questionnaire_bank.name))
     for k, v in d.items():
         trace("  {}:{}".format(k, v))
@@ -109,11 +109,18 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
-    def __init__(self, user):
+    def __init__(self, user, as_of_date):
+        """ Initialize and lookup status for respective questionnaires
+
+        :param user: subject for details
+        :param as_of_date: None value implies now
+
+        """
         self.user = user
-        self.qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
-        self.status_by_q = qb_status_dict(user=user,
-                                          questionnaire_bank=self.qb)
+        self.qb = QuestionnaireBank.most_current_qb(
+            user, as_of_date=as_of_date).questionnaire_bank
+        self.status_by_q = qb_status_dict(
+            user=user, questionnaire_bank=self.qb, as_of_date=as_of_date)
 
     def completed_date(self):
         """Returns timestamp from most recent completed assessment"""
@@ -162,14 +169,16 @@ class AssessmentStatus(object):
 
     """
 
-    def __init__(self, user):
+    def __init__(self, user, as_of_date=None):
         """Initialize assessment status object for given user/consent
 
         :param user: The user in question - patient on whom to check status
+        :param as_of_date: Use to override default of `now` for status calc
 
         """
         self.user = user
-        self.qb_data = QuestionnaireBankDetails(user)
+        self.as_of_date = as_of_date
+        self.qb_data = QuestionnaireBankDetails(user, as_of_date=as_of_date)
 
     def __str__(self):
         """Present friendly format for logging, etc."""
@@ -228,7 +237,7 @@ class AssessmentStatus(object):
             qb = QuestionnaireBank.qbs_for_user(self.user, 'indefinite')
             if qb:
                 assert len(qb) == 1
-                results.update(qb_status_dict(self.user, qb[0]))
+                results.update(qb_status_dict(self.user, qb[0], as_of_date=self.as_of_date))
         return results
 
     def instruments_needing_full_assessment(self, classification=None):
