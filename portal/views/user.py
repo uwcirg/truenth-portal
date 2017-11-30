@@ -2133,7 +2133,8 @@ def get_current_user_qb(user_id):
     expiry = None
 
     if qbd_questionnaire_bank:
-        expiry = qbd_questionnaire_bank.calculated_expiry(qbd_questionnaire_bank.trigger_date(user))
+        expiry = qbd_questionnaire_bank.calculated_expiry(
+            qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
 
     if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
         qbd_json['questionnaire_bank'] = None
