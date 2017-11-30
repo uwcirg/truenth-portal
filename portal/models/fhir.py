@@ -21,6 +21,7 @@ from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
+
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
 
