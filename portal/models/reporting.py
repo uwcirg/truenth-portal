@@ -60,6 +60,8 @@ def get_reporting_stats():
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
                     desc = 'Decision Support P3P'
+                elif interv.name == 'community_of_wellness':
+                    desc = 'Community of Wellness'
                 if interv.quick_access_check(user):
                     stats['intervention_access'][desc] += 1
                 if interv in user.interventions:
