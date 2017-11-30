@@ -484,7 +484,7 @@
                       function(data) {
                         if (data) {
                           if (data.name) {
-                            $("#access_code_info").html("{%trans%}Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration . . .{%endtrans%}");
+                            $("#access_code_info").html(i18next.t("Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ...").replace("{shortcut_alias}", "<b>"+$("#shortcut_alias").val()+"</b>").replace("{org_name}", "<b>"+data.name+"</b>"));
                             $("#access_code_error").text("");
 
                           } else {
