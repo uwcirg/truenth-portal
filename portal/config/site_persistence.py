@@ -6,7 +6,7 @@ from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
 from ..models.communication_request import CommunicationRequest
-from ..models.fhir import Coding
+from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.intervention_strategies import AccessStrategy
 from ..models.organization import Organization

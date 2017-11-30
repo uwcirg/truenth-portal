@@ -7,7 +7,7 @@ from portal.config.model_persistence import ModelPersistence
 from portal.database import db
 from portal.models.app_text import AppText
 from portal.models.communication_request import CommunicationRequest
-from portal.models.fhir import Coding
+from portal.models.coding import Coding
 from portal.models.organization import Organization
 from portal.system_uri import SNOMED
 

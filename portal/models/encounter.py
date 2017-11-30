@@ -6,7 +6,6 @@ from datetime import datetime
 
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
-from .fhir import Coding
 from .reference import Reference
 from .role import ROLE
 from sqlalchemy.dialects.postgresql import ENUM
