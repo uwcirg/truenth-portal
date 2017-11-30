@@ -6049,12 +6049,6 @@
       "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
     },
     {
-      "code": "",
-      "display": "Default",
-      "resourceType": "Coding",
-      "system": "urn:ietf:bcp:47"
-    },
-    {
       "code": "en_AU",
       "display": "Australian English",
       "resourceType": "Coding",
