@@ -1,5 +1,6 @@
 """Module for pre defined procedure codes and shortcuts"""
-from .fhir import Coding, CodeableConcept
+from .coding import Coding
+from .codeable_concept import CodeableConcept
 from .lazy import lazyprop
 from ..system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 

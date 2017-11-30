@@ -16,13 +16,15 @@ import regex
 import time
 
 from .audit import Audit
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from ..dict_tools import dict_match
 from .encounter import Encounter
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .extension import CCExtension, TimezoneExtension
 from .fhir import Observation, UserObservation
-from .fhir import Coding, CodeableConcept, ValueQuantity
+from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .performer import Performer
@@ -30,10 +32,13 @@ from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
-from ..system_uri import TRUENTH_PROVIDER_SYSTEMS
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
-from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
+from ..system_uri import (
+    IETF_LANGUAGE_TAG,
+    TRUENTH_EXTENSTION_NHHD_291036,
+    TRUENTH_EXTERNAL_STUDY_SYSTEM,
+    TRUENTH_ID,
+    TRUENTH_PROVIDER_SYSTEMS,
+    TRUENTH_USERNAME)
 from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
@@ -370,7 +375,7 @@ class User(db.Model, UserMixin):
         # IETF BCP 47 standard uses hyphens, but we instead store w/
         # underscores, to better integrate with babel/LR URLs/etc
         data = {"coding": [{'code': lang_info[0], 'display': lang_info[1],
-                            'system': "urn:ietf:bcp:47"}]}
+                            'system': IETF_LANGUAGE_TAG}]}
         self._locale = CodeableConcept.from_fhir(data)
 
     @hybrid_property

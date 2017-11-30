@@ -18,9 +18,11 @@ from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.auth import Client
+from portal.models.codeable_concept import CodeableConcept
+from portal.models.coding import Coding
 from portal.models.coredata import configure_coredata
 from portal.models.encounter import Encounter
-from portal.models.fhir import CC, Coding, CodeableConcept
+from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.organization import Organization, add_static_organization

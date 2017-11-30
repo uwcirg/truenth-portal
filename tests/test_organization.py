@@ -4,8 +4,12 @@ import json
 import os
 
 from portal.extensions import db
-from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS, SHORTNAME_ID
-from portal.models.fhir import Coding
+from portal.system_uri import (
+    IETF_LANGUAGE_TAG,
+    PRACTICE_REGION,
+    SHORTCUT_ALIAS,
+    SHORTNAME_ID)
+from portal.models.coding import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
@@ -24,7 +28,7 @@ class TestOrganization(TestCase):
 
         #prepopuate database with matching locale
         Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                  'system': "urn:ietf:bcp:47"})
+                  'system': IETF_LANGUAGE_TAG})
         org = Organization.from_fhir(data)
         self.assertEquals(org.addresses[0].line1,
                           data['address'][0]['line'][0])

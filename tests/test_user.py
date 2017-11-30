@@ -10,9 +10,11 @@ from tests import TestCase, TEST_USER_ID, TEST_USERNAME
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.codeable_concept import CodeableConcept
+from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import Coding, UserEthnicity, UserIndigenous
-from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import UserEthnicity, UserIndigenous
+from portal.models.fhir import ValueQuantity
 from portal.models.fhir import Observation, UserObservation
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrganizationLocale

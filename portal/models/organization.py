@@ -12,6 +12,8 @@ from werkzeug.exceptions import Unauthorized
 import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource, UnversionedResource
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from ..database import db
 from ..date_tools import FHIR_datetime
 from .extension import CCExtension, TimezoneExtension
@@ -19,7 +21,7 @@ from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
 from .role import Role, ROLE
-from ..system_uri import SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
 from .telecom import ContactPoint, Telecom
 
 
@@ -151,7 +153,6 @@ class Organization(db.Model):
 
     @property
     def default_locale(self):
-        from .fhir import Coding  # local due to cycle
         coding = None
         org = self
         if org.default_locale_id:
@@ -166,11 +167,13 @@ class Organization(db.Model):
 
     @default_locale.setter
     def default_locale(self, value):
-        from .fhir import Coding  # local due to cycle
-        coding = Coding.query.filter_by(
-                system='urn:ietf:bcp:47', code=value).first()
-        if coding:
-            self.default_locale_id = coding.id
+        coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=value).first()
+        if not coding:
+            raise ValueError(
+                "Can't find locale code {value} - constrained to "
+                "pre-existing values in the {system} system".format(
+                    value=value, system=IETF_LANGUAGE_TAG))
+        self.default_locale_id = coding.id
 
     @property
     def shortname(self):
@@ -214,8 +217,6 @@ class Organization(db.Model):
         return org.update_from_fhir(data)
 
     def update_from_fhir(self, data):
-        from .fhir import CodeableConcept  # local to avoid cycle
-
         if 'id' in data:
             self.id = data['id']
         if 'name' in data:
