@@ -50,21 +50,25 @@ function save(target) {
  */
 gulp.task('i18next-extraction', ['clean-src'], function() {
     console.log('extracting text and generate json file ...');
-    return gulp.src(['static/**/*.{js,html}'])
+    return gulp.src(['static/**/*.{js,html}', 'templates/*.html', 'gil/templates/gil/*.html', 'eproms/templates/eproms/*.html'])
                .pipe(scanner({
-                    keySeparator: "|",
-                    nsSeparator: "|",
+                    keySeparator: '|',
+                    nsSeparator: '|',
                     attr: {
                         list: ['data-i18n'],
                         extensions: ['.js', '.html', '.htm']
                     },
                     func: {
                         list: ['i18next.t', 'i18n.t'],
-                        extensions: ['.js', '.jsx']
+                        extensions: ['.js', '.jsx', '.html', '.htm']
                     },
                     resource: {
                         //the source path is relative to current working directory as specified in the destination folder
                         savePath: './src/' + nameSpace + '.json'
+                    },
+                    interpolation: {
+                        prefix: '{',
+                        suffix: '}'
                     }
                 }))
               .pipe(gulp.dest('translations/js'));
