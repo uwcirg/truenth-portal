@@ -359,11 +359,11 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
     def test_st_undone(self):
         # Symptom Tracker QB with incompleted should generate communication
-        mock_communication_request('symptom_tracker', '{"days": 90}')
+        mock_communication_request('symptom_tracker', '{"days": 30}')
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.add_required_clinical_data(backdate=timedelta(days=31))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
