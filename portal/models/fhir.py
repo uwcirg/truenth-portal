@@ -135,7 +135,7 @@ class Coding(db.Model):
         d = {}
         d['resourceType'] = 'Coding'
         if not (self.system and self.code):
-            current_app.logger.error(
+            current_app.logger.warn(
                 "Ill defined coding {} - requires system and code".format(
                     self))
 
@@ -156,7 +156,7 @@ class Coding(db.Model):
             return self
 
         if not (self.system and self.code):
-            current_app.logger.error(
+            current_app.logger.warn(
                 "Ill defined coding {} - requires system and code"
                 "".format(self))
 
