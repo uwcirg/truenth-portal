@@ -1,4 +1,5 @@
 """Assessment Engine API view functions"""
+from datetime import datetime
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session, url_for
 from flask_swagger import swagger
@@ -1295,11 +1296,13 @@ def assessment_add(patient_id):
         encounter.type.append(encounter_type)
 
     qnr_qb = None
+    authored = FHIR_datetime.parse(request.json['authored'])
     if "questionnaire" in request.json:
         qn_ref = request.json.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qbd = QuestionnaireBank.most_current_qb(patient)
+        qbd = QuestionnaireBank.most_current_qb(
+            patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
@@ -1339,7 +1342,14 @@ def invalidate(user_id):
 @roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
 @oauth.require_oauth()
 def present_needed():
-    """Look up needed and in process q's for user and then present_assessment"""
+    """Look up needed and in process q's for user and then present_assessment
+
+    Takes the same attributes as present_assessment.
+
+    If `authored` date is different from utcnow(), any instruments found to be
+    in an `in_progress` state will be treated as if they haven't been started.
+
+    """
     subject_id = request.args.get('subject_id') or current_user().id
     subject = get_user(subject_id)
     if subject != current_user():
@@ -1351,9 +1361,18 @@ def present_needed():
     args['instrument_id'] = (
         assessment_status.instruments_needing_full_assessment(
             classification='all'))
-    args['resume_instrument_id'] = (
-        assessment_status.instruments_in_progress(
-            classification='all'))
+
+    # As the AssessmentEngine isn't yet equipped to restart out
+    # of sequence instruments, treat all as new if as_of_date
+    # isn't today.
+    if as_of_date and as_of_date.date() != datetime.utcnow().date():
+        args['instrument_id'] += (
+            assessment_status.instruments_in_progress(
+                classification='all'))
+    else:
+        args['resume_instrument_id'] = (
+            assessment_status.instruments_in_progress(
+                classification='all'))
 
     url = url_for('.present_assessment', **args)
     return redirect(url, code=303)
@@ -1656,7 +1675,8 @@ def patient_assessment_status(patient_id):
     patient = get_user(patient_id)
     if patient:
         current_user().check_role(permission='view', other_id=patient_id)
-        assessment_status = AssessmentStatus(user=patient)
+        now = datetime.utcnow()
+        assessment_status = AssessmentStatus(user=patient, as_of_date=now)
         assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
                 None)

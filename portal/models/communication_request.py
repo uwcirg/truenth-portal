@@ -246,7 +246,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     now = datetime.utcnow()
     trigger_date = questionnaire_bank.trigger_date(user)
     trace('trigger_date = {}'.format(trigger_date))
-    qbd = questionnaire_bank.calculated_start(trigger_date)
+    qbd = questionnaire_bank.calculated_start(trigger_date, as_of_date=now)
     start = qbd.relative_start
     if not start:
         trace("no relative start found, can't continue")

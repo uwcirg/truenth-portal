@@ -118,11 +118,13 @@ class TestQuestionnaireBank(TestCase):
         qb.questionnaires.append(qbq)
 
         trigger_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
-        start = qb.calculated_start(trigger_date).relative_start
+        now = datetime.utcnow()
+        start = qb.calculated_start(
+            trigger_date, as_of_date=now).relative_start
         self.assertTrue(start > trigger_date)
         self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
 
-        end = qb.calculated_expiry(trigger_date)
+        end = qb.calculated_expiry(trigger_date, as_of_date=now)
         expected_expiry = datetime.strptime('2000-01-04', '%Y-%m-%d')
         self.assertEquals(end, expected_expiry)
 
@@ -148,11 +150,13 @@ class TestQuestionnaireBank(TestCase):
         qb.questionnaires.append(qbq)
 
         trigger_date = datetime.strptime('2000-01-01', '%Y-%m-%d')
-        start = qb.calculated_start(trigger_date).relative_start
+        now = datetime.now()
+        start = qb.calculated_start(
+            trigger_date, as_of_date=now).relative_start
         self.assertTrue(start > trigger_date)
         self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
 
-        due = qb.calculated_due(trigger_date)
+        due = qb.calculated_due(trigger_date, as_of_date=now)
         expected_due = datetime.strptime('2000-01-04', '%Y-%m-%d')
         self.assertEquals(due, expected_due)
 
@@ -325,7 +329,8 @@ class TestQuestionnaireBank(TestCase):
         # User associated with CRV org should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb = QuestionnaireBank.most_current_qb(self.test_user).questionnaire_bank
+        qb = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None).questionnaire_bank
         results = list(qb.questionnaires)
         self.assertEquals(3, len(results))
         # confirm rank sticks
@@ -364,7 +369,8 @@ class TestQuestionnaireBank(TestCase):
         # User associated with INTV intervention should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb = QuestionnaireBank.most_current_qb(self.test_user).questionnaire_bank
+        qb = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None).questionnaire_bank
         results = list(qb.questionnaires)
         self.assertEquals(2, len(results))
 
@@ -421,7 +427,8 @@ class TestQuestionnaireBank(TestCase):
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
-        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        qbd = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None)
         self.assertEquals("Baseline", visit_name(qbd))
 
     def test_visit_3mo(self):
@@ -430,7 +437,8 @@ class TestQuestionnaireBank(TestCase):
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
-        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        qbd = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None)
         self.assertEquals("Month 3", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
@@ -442,7 +450,8 @@ class TestQuestionnaireBank(TestCase):
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
-        qbd = QuestionnaireBank.most_current_qb(self.test_user)
+        qbd = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None)
         self.assertEquals("Month 6", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)

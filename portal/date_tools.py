@@ -55,10 +55,14 @@ class FHIR_datetime(object):
             current_app.logger.warn(msg)
             abort(400, msg)
         if dt.tzinfo:
-            epoch = pytz.utc.localize(epoch)
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:
                 dt = dt.astimezone(pytz.utc)
+            # Delete tzinfo for safe comparisons with other non tz aware objects
+            # All datetime values stored in the db are expected to be in
+            # UTC, and timezone unaware.
+            dt = dt.replace(tzinfo=None)
+
         # As we use datetime.strftime for display, and it can't handle dates
         # older than 1900, treat all such dates as an error
         if dt < epoch:
