@@ -1,5 +1,6 @@
 """Communication model"""
 from collections import MutableMapping
+from datetime import datetime
 from flask import current_app, url_for
 import regex
 from smtplib import SMTPRecipientsRefused
@@ -37,7 +38,8 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        assessment_status = AssessmentStatus(user=user)
+        now = datetime.utcnow()
+        assessment_status = AssessmentStatus(user=user, as_of_date=now)
         link_url = url_for(
             'assessment_engine_api.present_assessment',
             instrument_id=assessment_status.
@@ -128,8 +130,9 @@ def load_template_args(user, questionnaire_bank_id=None):
             return ''
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
-        due = qb.calculated_start(trigger_date).relative_start
-        due = qb.calculated_due(trigger_date) or due
+        now = datetime.utcnow()
+        due = qb.calculated_start(trigger_date, now).relative_start
+        due = qb.calculated_due(trigger_date, now) or due
         trace("UTC due date: {}".format(due))
         due_date = localize_datetime(due, user)
         tz = user.timezone or 'UTC'

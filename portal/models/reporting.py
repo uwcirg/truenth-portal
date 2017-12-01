@@ -91,13 +91,15 @@ def get_reporting_stats():
 
 
 def calculate_days_overdue(user):
-    qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
+    now = datetime.utcnow()
+    qb = QuestionnaireBank.most_current_qb(
+        user, as_of_date=now).questionnaire_bank
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
     if not trigger_date:
         return 0
-    overdue = qb.calculated_overdue(trigger_date)
+    overdue = qb.calculated_overdue(trigger_date, as_of_date=now)
     return (datetime.utcnow() - overdue).days if overdue else 0
 
 

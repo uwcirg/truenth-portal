@@ -128,8 +128,12 @@ class TestFHIR(TestCase):
         eastern = pytz.timezone('US/Eastern')
         aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
         parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        # FHIR_datetime converts to UTC and strips the tzinfo
+        # for safe comparisons with other tz unaware strings
+        self.assertEquals(parsed.tzinfo, None)
+        # Add it back in to confirm values match
+        parsed = parsed.replace(tzinfo=pytz.utc)
         self.assertEquals(aware, parsed)
-        self.assertEquals(pytz.utc, parsed.tzinfo)
 
     def test_tz_unaware_conversion(self):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)

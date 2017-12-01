@@ -72,7 +72,7 @@ class Recur(db.Model):
                 d[field] = getattr(self, field)
         return d
 
-    def active_interval_start(self, trigger_date, as_of_date=None):
+    def active_interval_start(self, trigger_date, as_of_date):
         """Return two tuple (start, iteration_count)
 
         Return UTC datetime for active recurrence start and the
