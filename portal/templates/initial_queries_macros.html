@@ -136,11 +136,6 @@
           tnthAjax.getTerms({{user.id}}, false, false, function() {
             $("#termsCheckbox").attr("loaded", "true");
           });
-          $("#topTerms .required-link").each(function() {
-              $(this).on("click", function(e) {
-                e.stopPropagation();
-              });
-          });
       });
     </script>
   {%- endmacro %}
@@ -259,10 +254,10 @@
     </div>
     <script>
       $(function () {
-        $("#firstname, #lastname").each(function() {
-            $(this).on("blur", function() {
-              if ($(this).val() != "") assembleContent.demo($("#iq_userId").val());
-            });
+        tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
+          $("#nameGroup").attr("loaded", "true");
+          $("#rolesGroup").attr("loaded", "true");
+          $("#bdGroup").attr("loaded", "true");
         });
       });
     </script>
@@ -339,7 +334,7 @@
               </label>
             </div>
             <div id="biopsyDateContainer" class="indent form-group">
-            	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
+            	<label>{{_("Biopsy Date")}}:</label>
             	<input id="biopsyDate" type="hidden" data-name="biopsy" class="form-control" value="">
               <div class="row">
                 <div class="col-md-3 col-sm-6 col-xs-10">
@@ -455,22 +450,22 @@
           });
           __convertToNumericField($("#biopsy_day, #biopsy_year"));
           $("input[name='biopsy']").each(function() {
-          	$(this).on("click", function(e) {
+            $(this).on("click", function(e) {
               e.stopPropagation();
-          		if ($(this).val() == "true") {
-          			$("#biopsyDateContainer").show();
+              if ($(this).val() == "true") {
+                $("#biopsyDateContainer").show();
                 if ($(this).attr("id") == "biopsy_yes") {
                   if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
                 };
-          		} else {
-          			$("#biopsyDate").val("");
+              } else {
+                $("#biopsyDate").val("");
                 $("#biopsy_day").val("");
                 $("#biopsy_month").val("");
                 $("#biopsy_year").val("");
                 $("#biopsyDateError").text("");
-          			$("#biopsyDateContainer").hide();
-          		};
-          	});
+                $("#biopsyDateContainer").hide();
+              };
+            });
           });
           $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
               $(this).on("change", function() {
@@ -505,7 +500,7 @@
         });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
-    <div>
+    <div id="clinics">
       <p class="subtitle">{{ _("What is your main clinic for prostate cancer care?") }}</p>
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
@@ -529,6 +524,7 @@
               $(this).attr("type", "radio");
               if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
           });
+          $("#clinics").attr("loaded", true);
       {% endif %}
     };
     $(function () {
