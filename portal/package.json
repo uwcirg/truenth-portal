@@ -20,12 +20,14 @@
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-uglify": "^3.0.0",
+    "gulp-using": "^0.1.1",
     "i18next-conv": "^4.0.3",
     "i18next-scanner": "^1.9.4",
     "less-plugin-clean-css": "^1.5.1",
     "merge2": "^1.1.0",
     "path": "^0.12.7",
     "request": "^2.81.0",
+    "run-sequence": "^2.2.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {

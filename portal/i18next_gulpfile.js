@@ -17,6 +17,7 @@ var del = require('del');
 var scanner = require('i18next-scanner');
 var concatPo = require('gulp-concat-po');
 var merge_json = require('gulp-merge-json');
+var using = require('gulp-using');
 const path = require('path');
 const fs = require('fs');
 const i18nextConv = require('i18next-conv');
@@ -30,11 +31,16 @@ const translationSourceDir = path.join(__dirname, './translations/js/src/');
  * note json files are saved for each specific locale
  */
 const translationDestinationDir = path.join(__dirname,'./static/files/locales/');
+
 /*
  * namespace
  */
 const nameSpace = 'frontend';
+const epromsNameSpace = 'eproms';
+const truenthNameSpace = 'truenth';
 const srcPotFileName = translationSourceDir+nameSpace+'.pot';
+const epromsSrcPotFileName =  translationSourceDir+epromsNameSpace+'.pot';
+const truenthSrcPotFileName = translationSourceDir+truenthNameSpace+'.pot';
 
 /*
  * helper function for writing file
@@ -50,7 +56,7 @@ function save(target) {
  */
 gulp.task('i18next-extraction', ['clean-src'], function() {
     console.log('extracting text and generate json file ...');
-    return gulp.src(['static/**/*.{js,html}', 'templates/*.html', 'gil/templates/gil/*.html', 'eproms/templates/eproms/*.html'])
+    return gulp.src(['static/**/*.{js,html}', 'templates/*.html'])
                .pipe(scanner({
                     keySeparator: '|',
                     nsSeparator: '|',
@@ -74,6 +80,94 @@ gulp.task('i18next-extraction', ['clean-src'], function() {
               .pipe(gulp.dest('translations/js'));
 });
 
+
+/*
+ * extracting text from  Eproms html files into json file
+ */
+gulp.task('i18next-extraction-eproms', ['clean-eproms-src'], function() {
+    console.log('extracting text and generate json file ...');
+    return gulp.src(['eproms/templates/eproms/*.html'])
+               .pipe(scanner({
+                    keySeparator: '|',
+                    nsSeparator: '|',
+                    attr: {
+                        list: ['data-i18n'],
+                        extensions: ['.js', '.html', '.htm']
+                    },
+                    func: {
+                        list: ['i18next.t', 'i18n.t'],
+                        extensions: ['.js', '.jsx', '.html', '.htm']
+                    },
+                    resource: {
+                        //the source path is relative to current working directory as specified in the destination folder
+                        savePath: './src/' + epromsNameSpace + '.json'
+                    },
+                    interpolation: {
+                        prefix: '{',
+                        suffix: '}'
+                    }
+                }))
+              .pipe(gulp.dest('translations/js'));
+});
+
+
+/*
+ * extracting text from TrueNTH html files into json file
+ */
+gulp.task('i18next-extraction-truenth', ['clean-truenth-src'], function() {
+    console.log('extracting text and generate json file ...');
+    return gulp.src(['gil/templates/gil/*.html'])
+               .pipe(scanner({
+                    keySeparator: '|',
+                    nsSeparator: '|',
+                    attr: {
+                        list: ['data-i18n'],
+                        extensions: ['.js', '.html', '.htm']
+                    },
+                    func: {
+                        list: ['i18next.t', 'i18n.t'],
+                        extensions: ['.js', '.jsx', '.html', '.htm']
+                    },
+                    resource: {
+                        //the source path is relative to current working directory as specified in the destination folder
+                        savePath: './src/' + truenthNameSpace + '.json'
+                    },
+                    interpolation: {
+                        prefix: '{',
+                        suffix: '}'
+                    }
+                }))
+              .pipe(gulp.dest('translations/js'));
+});
+
+/*
+ * convert eproms json to pot (the definition file) for translator's consumption
+ */
+gulp.task('i18nextConvertEpromsJSONToPOT', ['i18next-extraction-eproms'], function() {
+
+    const options = {/* you options here */}
+   /*
+    * converting json to pot
+    */
+   console.log('converting Eproms JSON to POT...');
+   return i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+epromsNameSpace+'.json'), options).then(save(epromsSrcPotFileName));
+
+});
+
+/*
+ * convert TrueNTH json to pot (the definition file) for translator's consumption
+ */
+gulp.task('i18nextConvertTruenthJSONToPOT', ['i18next-extraction-truenth'], function() {
+
+    const options = {/* you options here */}
+   /*
+    * converting json to pot
+    */
+   console.log('converting Truenth JSON to POT...');
+   return i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+truenthNameSpace+'.json'), options).then(save(truenthSrcPotFileName));
+
+});
+
 /*
  * convert json to pot (the definition file) for translator's consumption
  */
@@ -91,17 +185,6 @@ gulp.task('i18nextConvertJSONToPOT', ['i18next-extraction'], function() {
     */
    console.log('converting JSON to POT...');
    return i18nextConv.i18nextToPot('en', fs.readFileSync(translationSourceDir+nameSpace+'.json'), options).then(save(srcPotFileName));
-
-});
-
-gulp.task('combineSrcJson', function() {
-    /*
-     * allow for multiple json tranlsation files
-     */
-    if (fs.existsSync('translations/js/src/custom.json')) console.log("exists")
-    gulp.src('translations/js/src/*.json')
-        .pipe(merge_json({fileName: 'test.json'}))
-        .pipe(gulp.dest('translations/js/src'));
 
 });
 
@@ -140,61 +223,142 @@ gulp.task('i18nextConvertPOToJSON', ['clean-dest'], function() {
                  * directories are EN_US, EN_AU, etc.
                  * so check to see if each has a PO file
                  */
-                let poFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
-                let fpoFilePath = __path + '/' + file + '/LC_MESSAGES/frontend.po';
-                let destDir = translationDestinationDir+file.replace('_', '-');
-                let poExisted = fs.existsSync(poFilePath);
-                let fpoExisted = fs.existsSync(fpoFilePath);
+                let messageFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
+                let frontendPoFilePath = __path + '/' + file + '/LC_MESSAGES/frontend.po';
+
+                let epromsPoFilePath = __path + '/' + file + '/LC_MESSAGES/eproms.po';
+                let truenthPoFilePath = __path + '/' + file + '/LC_MESSAGES/truenth.po';
+
+
+                let destDir = translationDestinationDir+(file.replace('_', '-'));
+                let messagePoExisted = fs.existsSync(messageFilePath);
+                let frontendPoExisted = fs.existsSync(frontendPoFilePath);
+                let epromsPoExisted = fs.existsSync(epromsPoFilePath);
+                let truenthPoExisted = fs.existsSync(truenthPoFilePath);
 
                 if (!fs.existsSync(destDir)){
                     fs.mkdirSync(destDir);
                 };
 
-                if (poExisted && fpoExisted) {
-                    console.log('messages po locale found: ' + file);
-                    /*
-                     * write corresponding json file from each messages po file
-                     */
-                    i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
-                    .then(save(destDir+'/messages.json'));
+                if (messagePoExisted) {
+                  /*
+                   * write corresponding json file from each messages po file
+                   */
+                  console.log('messages po file found for locale: ' + file);
+                  console.log('destionation directory: ', destDir);
+                  i18nextConv.gettextToI18next(file, fs.readFileSync(messageFilePath), false)
+                  .then(save(destDir+'/messages.json'));
+                };
 
-                    console.log('frontend po locale found: ' + file);
-                    /*
-                     * write corresponding json file from each frontend po file
-                     */
-                    i18nextConv.gettextToI18next(file, fs.readFileSync(fpoFilePath), false)
-                    .then(save(destDir+'/frontend.json'));
+                if (frontendPoExisted) {
+                  /*
+                   * write corresponding json file from each frontend po file
+                   */
+                  console.log('frontend po file found for locale: ' + file);
+                  console.log('destionation directory: ', destDir);
+                  i18nextConv.gettextToI18next(file, fs.readFileSync(frontendPoFilePath), false)
+                  .then(save(destDir+'/frontend.json'));
+                };
 
-                    console.log("merge json files to translation.json..");
-                    /*
-                     * merge json files into one for frontend to consume
-                     * note this plug-in will remove duplicate entries
-                     */
-                    gulp.src(destDir+'/*.json')
-                    .pipe(merge_json({
-                      fileName: 'translation.json'
-                    }))
-                    .pipe(gulp.dest(destDir));
-                } else if (poExisted) {
-                    console.log('messages po locale found: ' + file + ' in ' + poFilePath);
-                    /*
-                     * write corresponding json file from each messages po file
-                     */
-                    i18nextConv.gettextToI18next(file, fs.readFileSync(poFilePath), false)
-                    .then(save(destDir+'/translation.json'));
-                } else if (fpoExisted) {
-                    console.log('frontend po locale found: ' + file);
-                    /*
-                     * write corresponding json file from each frontend po file
-                     */
-                    i18nextConv.gettextToI18next(file, fs.readFileSync(fpoFilePath), false)
-                    .then(save(destDir+'/translation.json'));
+
+                if (epromsPoExisted) {
+                  /*
+                   * write corresponding json file from each eproms po file
+                   */
+                  console.log('eproms po file found for locale: ' + file);
+                  console.log('destionation directory: ', destDir);
+                  i18nextConv.gettextToI18next(file, fs.readFileSync(epromsPoFilePath), false)
+                  .then(save(destDir+'/' + epromsNameSpace +'.json'));
+                };
+
+
+                if (truenthPoExisted) {
+                  /*
+                   * write corresponding json file from each truenth po file
+                   */
+                  console.log('truenth po file found for locale: ' + file);
+                  console.log('destionation directory: ', destDir);
+                  i18nextConv.gettextToI18next(file, fs.readFileSync(truenthPoFilePath), false)
+                  .then(save(destDir+'/' + truenthNameSpace +'.json'));
                 };
               };
           });
       });
   });
 });
+
+
+/*
+ * combining each json file in each locale folder into one file, translation.json, to be consumed by the frontend
+ * note this task will need to be run after i18nextConvertPOToJSON task, which creates json files from po files
+ */
+gulp.task('combineTranslationJsons', function() {
+  console.log('combining json files ...');
+  const options = {/* you options here */}
+   /*
+    * translating po file to json for supported languages
+    */
+  var __path = path.join(__dirname,'./translations');
+  return fs.readdir(__path, function(err, files) {
+      files.forEach(function(file) {
+          let filePath = __path + '/' + file;
+          fs.stat(filePath, function(err, stat) {
+              if (stat.isDirectory()) {
+                /*
+                 * directories are EN_US, EN_AU, etc.
+                 * so check to see if each has a PO file
+                 */
+                let messageFilePath = __path + '/' + file + '/LC_MESSAGES/messages.po';
+                let frontendPoFilePath = __path + '/' + file + '/LC_MESSAGES/frontend.po';
+
+                let epromsPoFilePath = __path + '/' + file + '/LC_MESSAGES/eproms.po';
+                let truenthPoFilePath = __path + '/' + file + '/LC_MESSAGES/truenth.po';
+
+
+                let destDir = translationDestinationDir+(file.replace('_', '-'));
+                let messagePoExisted = fs.existsSync(messageFilePath);
+                let frontendPoExisted = fs.existsSync(frontendPoFilePath);
+                let epromsPoExisted = fs.existsSync(epromsPoFilePath);
+                let truenthPoExisted = fs.existsSync(truenthPoFilePath);
+
+                /*
+                 * merge json files into one for frontend to consume
+                 * note this plug-in will remove duplicate entries
+                 */
+                if (messagePoExisted || frontendPoExisted || epromsPoExisted || truenthPoExisted) {
+                  console.log('merge json files...');
+                  console.log("destionation: " + destDir)
+                  gulp.src(destDir +'/*.json')
+                    .pipe(using({}))
+                    .pipe(merge_json({
+                      fileName: 'translation.json'
+                    }))
+                    .pipe(gulp.dest(destDir));
+                  
+                };
+              };
+          });
+      });
+  });
+});
+
+/*
+ * clean eproms source file
+ */
+gulp.task('clean-eproms-src', function() {
+  console.log('delete source files...')
+  return del([translationSourceDir + 'eproms.json']);
+});
+
+
+/*
+ * clean truenth source file
+ */
+gulp.task('clean-truenth-src', function() {
+  console.log('delete source files...')
+  return del([translationSourceDir + 'truenth.json']);
+});
+
 
 /*
  * clean all generated source files
@@ -210,6 +374,20 @@ gulp.task('clean-src', function() {
 gulp.task('clean-dest', function() {
   console.log('delete json files...')
   return del([translationDestinationDir + '*/*.json']);
+});
+
+/*
+ * convert eproms translation json file to pot file
+ */
+gulp.task('eproms', ['i18nextConvertEpromsJSONToPOT'], function() {
+  console.log("Running eproms translation task...");
+});
+
+/*
+ * convert truenth translation json file to pot file
+ */
+gulp.task('truenth', ['i18nextConvertTruenthJSONToPOT'], function() {
+  console.log("Running truenth translation task...");
 });
 
 
