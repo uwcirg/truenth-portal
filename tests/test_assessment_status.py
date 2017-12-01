@@ -130,8 +130,6 @@ def mock_eproms_questionnairebanks():
         db.session.commit()
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
-    localized_org_id = localized_org.id
-    metastatic_org_id = metastatic_org.id
     three_q_recur = db.session.merge(three_q_recur)
     four_q_recur1 = db.session.merge(four_q_recur1)
     four_q_recur2 = db.session.merge(four_q_recur2)
@@ -455,7 +453,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # with only epic26 started, should see results for both
         # instruments_needing_full_assessment and insturments_in_progress
-        self.assertEquals(['eproms_add', 'comorb'], a_s.instruments_needing_full_assessment())
+        self.assertEquals(
+            set(['eproms_add', 'comorb']),
+            set(a_s.instruments_needing_full_assessment()))
         self.assertEquals(['epic26'], a_s.instruments_in_progress())
 
     def test_metastatic_as_of_date(self):
