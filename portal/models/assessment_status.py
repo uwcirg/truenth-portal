@@ -40,7 +40,7 @@ def recent_qnr_status(user, questionnaire_name):
     return results
 
 
-def status_from_recents(recents, start, overdue, expired, as_of_date=None):
+def status_from_recents(recents, start, overdue, expired, as_of_date):
     """Returns dict defining available values from recents
 
     Return dict will only define values which make sense.  i.e.
@@ -89,9 +89,12 @@ def qb_status_dict(user, questionnaire_bank, as_of_date):
     trigger_date = questionnaire_bank.trigger_date(user)
     if not trigger_date:
         return d
-    start = questionnaire_bank.calculated_start(trigger_date).relative_start
-    overdue = questionnaire_bank.calculated_overdue(trigger_date)
-    expired = questionnaire_bank.calculated_expiry(trigger_date)
+    start = questionnaire_bank.calculated_start(
+        trigger_date, as_of_date=as_of_date).relative_start
+    overdue = questionnaire_bank.calculated_overdue(
+        trigger_date, as_of_date=as_of_date)
+    expired = questionnaire_bank.calculated_expiry(
+        trigger_date, as_of_date=as_of_date)
     for q in questionnaire_bank.questionnaires:
         recents = recent_qnr_status(user, q.name)
         d[q.name] = status_from_recents(
@@ -169,7 +172,7 @@ class AssessmentStatus(object):
 
     """
 
-    def __init__(self, user, as_of_date=None):
+    def __init__(self, user, as_of_date):
         """Initialize assessment status object for given user/consent
 
         :param user: The user in question - patient on whom to check status
@@ -343,6 +346,7 @@ def overall_assessment_status(user_id):
     user = User.query.get(user_id)
     current_app.logger.debug("CACHE MISS: {} {}".format(
         __name__, user_id))
-    a_s = AssessmentStatus(user)
-    qbd = QuestionnaireBank.most_current_qb(user)
+    now = datetime.utcnow()
+    a_s = AssessmentStatus(user, as_of_date=now)
+    qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)
     return (a_s.overall_status, qbd)

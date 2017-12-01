@@ -192,6 +192,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
                  User.deleted_id.is_(None),
                  UserRoles.role_id == patient_role_id))
 
+    now = datetime.utcnow()
     for user in valid_patients:
         if update_cache:
             dogpile_cache.invalidate(overall_assessment_status, user.id)
@@ -200,7 +201,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             if not user.email or '@' not in user.email:
                 # can't send to users w/o legit email
                 continue
-            qbd = QuestionnaireBank.most_current_qb(user=user)
+            qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(
                     user=user,
@@ -255,7 +256,8 @@ def send_user_messages(email, force_update=False):
     if force_update:
         user = User.query.filter(User.email == email).one()
         invalidate_assessment_status_cache(user_id=user.id)
-        qbd = QuestionnaireBank.most_current_qb(user=user)
+        qbd = QuestionnaireBank.most_current_qb(
+            user=user, as_of_date=datetime.utcnow())
         if qbd.questionnaire_bank:
             queue_outstanding_messages(
                 user=user,

@@ -277,7 +277,7 @@ class QuestionnaireBank(db.Model):
         return results
 
     @staticmethod
-    def most_current_qb(user, as_of_date=None):
+    def most_current_qb(user, as_of_date):
         """Return namedtuple (QBD) for user representing their most current QB
 
         Return namedtuple of QB Details for user, containing the current QB,
@@ -322,7 +322,7 @@ class QuestionnaireBank(db.Model):
                     return last_found
         return last_found
 
-    def calculated_start(self, trigger_date, as_of_date=None):
+    def calculated_start(self, trigger_date, as_of_date):
         """Return namedtuple (QBD) for QB
 
         Returns namdetuple (QBD) containing the calculated start date in UTC
@@ -351,14 +351,14 @@ class QuestionnaireBank(db.Model):
         return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
                    iteration=None, recur=None, questionnaire_bank=self)
 
-    def calculated_expiry(self, trigger_date, as_of_date=None):
+    def calculated_expiry(self, trigger_date, as_of_date):
         """Return calculated expired date (UTC) for QB or None"""
         start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
-    def calculated_due(self, trigger_date, as_of_date=None):
+    def calculated_due(self, trigger_date, as_of_date):
         """Return calculated due date (UTC) for QB or None"""
         start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not (start and self.due):
@@ -366,7 +366,7 @@ class QuestionnaireBank(db.Model):
 
         return start + RelativeDelta(self.due)
 
-    def calculated_overdue(self, trigger_date, as_of_date=None):
+    def calculated_overdue(self, trigger_date, as_of_date):
         """Return calculated overdue date (UTC) for QB or None"""
         start = self.calculated_start(trigger_date, as_of_date).relative_start
         if not (start and self.overdue):
