@@ -1,12 +1,14 @@
 
 (function() {
 
-  function hasValue(val) {return val != null && val != "" && val != "undefined";};
+  function hasValue(val) {
+    return val != null && val != "" && val != "undefined";
+  };
 
   function disableHeaderFooterLinks() {
     var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
     links.addClass("disabled");
-    links.prop('onclick',null).off('click');
+    links.prop("onclick",null).off("click");
     links.on("click", function(e) {
         e.preventDefault();
         return false;
@@ -30,16 +32,16 @@
       }
       else {
         //should show up in console
-        throw Error("Dependency with key value: " + key + " not found.");
+        throw new Error("Dependency with key value: " + key + " not found.");
       };
     };
-  	this.userId = userId;
-  	this.CONFIG_DEFAULT_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
-  	this.CONFIG_REQUIRED_CORE_DATA = CONFIG_REQUIRED_CORE_DATA;
-  	this.roleRequired = roleRequired;
-  	this.preselectClinic = preselectClinic;
-  	this.mainSections = {};
-  	this.defaultSections = {};
+    this.userId = userId;
+    this.CONFIG_DEFAULT_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
+    this.CONFIG_REQUIRED_CORE_DATA = CONFIG_REQUIRED_CORE_DATA;
+    this.roleRequired = roleRequired;
+    this.preselectClinic = preselectClinic;
+    this.mainSections = {};
+    this.defaultSections = {};
     this.incompleteFields = [];
     this.dependencies = dependencies || {};
 
@@ -147,14 +149,14 @@
                 },
                 handleIncomplete: function() {
                   if (hasValue(preselectClinic)) {
-                      orgTool.handlePreSelectedClinic()
+                      orgTool.handlePreSelectedClinic();
                       var __modal = orgTool.getConsentModal();
                       if (__modal) {
                           __modal.modal("show");
                       };
                     $("#orgsContainer").fadeIn(500).addClass("open");
                   } else {
-                    $("#orgsContainer").fadeIn(500).addClass("open")
+                    $("#orgsContainer").fadeIn(500).addClass("open");
                   }
                 }
           }
@@ -246,10 +248,10 @@
   };
 
   FieldsChecker.prototype.getTotalSections = function() {
-  	/*** note counting all the default main sections to show progress for each**/
-  	var configData = this.getDefaultConfig();
-  	var self = this;
-  	if (configData) {
+    /*** note counting all the default main sections to show progress for each**/
+    var configData = this.getDefaultConfig();
+    var self = this;
+    if (configData) {
       return configData.length;
     } else {
       return Object.keys(this.defaultSections);
@@ -260,7 +262,7 @@
     var ct = 0, self = this;
     for (var section in this.mainSections) {
         if (self.sectionCompleted(section)) {
-        	ct++;
+          ct++;
         };
     };
     return ct;
@@ -269,17 +271,19 @@
   FieldsChecker.prototype.constructProgressBar = function() {
     //don't construct progress bar when terms present
     if ($("#topTerms").length > 0 && !this.sectionCompleted("topTerms")) {
-    	return false;
+      return false;
     };
     var self = this;
     var totalSections = self.getTotalSections();
 
     if (totalSections > 1) {
         var availableSections = 0;
-        for (var section in self.defaultSections) {
-            var active = self.sectionCompleted(section);
-            $("#progressbar").append("<li sectionId='" + section + "'  " + (active? " class='active'": "") + ">" + self.defaultSections[section].display + "</li>");
-            availableSections++;
+        if (self.defaultSections) {
+          for (var section in self.defaultSections) {
+              var active = self.sectionCompleted(section);
+              $("#progressbar").append("<li sectionId='" + section + "'  " + (active? " class='active'": "") + ">" + self.defaultSections[section].display + "</li>");
+              availableSections++;
+          };
         };
         if (availableSections > 0) {
             var w = (1/availableSections) * 100;
@@ -291,13 +295,13 @@
             };
         };
     } else {
-    	$("#progressWrapper").remove();
+      $("#progressWrapper").remove();
     };
   };
 
   FieldsChecker.prototype.setProgressBar = function (sectionId) {
     if (this.allFieldsCompleted()) {
-    	$("#progressWrapper").hide();
+      $("#progressWrapper").hide();
     } else {
       if (hasValue(sectionId)) {
         if (this.sectionCompleted(sectionId)) {
@@ -334,7 +338,7 @@
   };
 
   FieldsChecker.prototype.reset = function() {
-  	this.incompleteFields = [];
+    this.incompleteFields = [];
   };
 
   FieldsChecker.prototype.sectionCompleted = function(sectionId) {
@@ -382,9 +386,9 @@
                   case "terms":
                       var isAgreed = true;
                       field.each(function() {
-                          if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
-                            isAgreed = false;
-                          };
+                        if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
+                          isAgreed = false;
+                        };
                       });
                       if (!isAgreed) {
                         isComplete = false;
@@ -411,7 +415,7 @@
   FieldsChecker.prototype.showAll = function() {
     var mainSections = this.mainSections;
     if (mainSections) {
-      for (sec in mainSections) {
+      for (var sec in mainSections) {
         var mf = $("#" + sec);
         if (mf.attr("skipped") === "true") {
           continue;
@@ -552,7 +556,7 @@
   };
 
   FieldsChecker.prototype.termsCheckboxEvent = function(fields) {
-    var self = this;
+    var __self = this;
     var userId = self.userId;
     var tnthAjax = this.__getDependency("tnthAjax");
     var orgTool = this.__getDependency("orgTool");
@@ -608,28 +612,35 @@
           $(this).attr("data-agree","true");
         };
 
-        if (self.sectionCompleted("topTerms")) {
+        if (__self.sectionCompleted("topTerms")) {
           $("#aboutForm").fadeIn();
         };
-        if (self.allFieldsCompleted()) {
-          self.continueToFinish();
+        if (__self.allFieldsCompleted()) {
+          __self.continueToFinish();
         } else {
-          self.continueToNext("topTerms");
+          __self.continueToNext("topTerms");
         };
     };
 
     /*
      * account for the fact that some terms items are hidden as child elements to a label
      */
-    $("#topTerms label.terms-label").on("click", function() {
-        $(this).find("[data-required]").each(function() {
+    $("#topTerms label.terms-label").each(function() {
+      $(this).on("click", function() {
+        if ($(this).attr("data-required")) {
           termsEvent.apply(this);
-        });
+        } else {
+          $(this).find("[data-required]").each(function() {
+            termsEvent.apply(this);
+          });
+        };
+      });
     });
+
 
     fields.forEach(function(item){
       $(item).each(function() {
-        $(this).on(self.getFieldEventType(item), termsEvent);
+        $(this).on(__self.getFieldEventType(item), termsEvent);
       });
     });
 
