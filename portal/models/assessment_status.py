@@ -11,11 +11,12 @@ from ..trace import trace
 from .user import User
 
 
-def recent_qnr_status(user, questionnaire_name):
+def recent_qnr_status(user, questionnaire_name, qb):
     """Look up recent status/timestamp for matching QuestionnaireResponse
 
     :param user: Patient to whom completed QuestionnaireResponses belong
     :param questionnaire_name: name of associated questionnaire
+    :param qb: QuestionnaireBank of associated questionnaire
     :return: dictionary with authored (timestamp) of the most recent
         QuestionnaireResponse keyed by status found
 
@@ -26,7 +27,8 @@ def recent_qnr_status(user, questionnaire_name):
         ).filter(
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')
-            ].astext.endswith(questionnaire_name)
+            ].astext.endswith(questionnaire_name),
+            QuestionnaireResponse.questionnaire_bank_id == qb.id
         ).order_by(
             QuestionnaireResponse.status,
             QuestionnaireResponse.authored).limit(9).with_entities(
@@ -96,7 +98,7 @@ def qb_status_dict(user, questionnaire_bank, as_of_date):
     expired = questionnaire_bank.calculated_expiry(
         trigger_date, as_of_date=as_of_date)
     for q in questionnaire_bank.questionnaires:
-        recents = recent_qnr_status(user, q.name)
+        recents = recent_qnr_status(user, q.name, questionnaire_bank)
         d[q.name] = status_from_recents(
             recents, start, overdue, expired, as_of_date=as_of_date)
     trace("QuestionnaireBank status for {}:".format(questionnaire_bank.name))
