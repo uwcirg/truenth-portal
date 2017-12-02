@@ -17,10 +17,11 @@ from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
+from portal.models.user import get_user
 from tests import TestCase, TEST_USER_ID
 
 
-def mock_qr(user_id, instrument_id, status='completed', timestamp=None):
+def mock_qr(instrument_id, status='completed', timestamp=None, qb=None):
     timestamp = timestamp or datetime.utcnow()
     qr_document = {
         "questionnaire": {
@@ -36,16 +37,19 @@ def mock_qr(user_id, instrument_id, status='completed', timestamp=None):
         db.session.add(enc)
         db.session.commit()
     enc = db.session.merge(enc)
+    qb = qb or QuestionnaireBank.most_current_qb(get_user(TEST_USER_ID),
+                                                 timestamp).questionnaire_bank
     qr = QuestionnaireResponse(
         subject_id=TEST_USER_ID,
         status=status,
         authored=timestamp,
         document=qr_document,
-        encounter_id=enc.id)
+        encounter_id=enc.id,
+        questionnaire_bank=qb)
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
-    invalidate_assessment_status_cache(user_id)
+    invalidate_assessment_status_cache(TEST_USER_ID)
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
@@ -332,9 +336,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb')
+        mock_qr(instrument_id='eproms_add')
+        mock_qr(instrument_id='epic26')
+        mock_qr(instrument_id='comorb')
 
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
@@ -348,12 +352,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb',
-                status='in-progress')
+        mock_qr(instrument_id='eproms_add', status='in-progress')
+        mock_qr(instrument_id='epic26', status='in-progress')
+        mock_qr(instrument_id='comorb', status='in-progress')
 
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
@@ -368,7 +369,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # User finished one, time remains for other
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
+        mock_qr(instrument_id='eproms_add')
 
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
@@ -384,11 +385,13 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_metastatic_on_time(self):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
-        for i in metastatic_baseline_instruments:
-            mock_qr(user_id=TEST_USER_ID, instrument_id=i)
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
-
         self.mark_metastatic()
+        for i in metastatic_baseline_instruments:
+            mock_qr(instrument_id=i)
+        mi_qb = QuestionnaireBank.query.filter_by(
+            name='metastatic_indefinite').first()
+        mock_qr(instrument_id='irondemog', qb=mi_qb)
+
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
         self.assertEquals(a_s.overall_status, "Completed")
@@ -421,11 +424,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # if the user completed something on time, and nothing else
         # is due, should see the thankyou message.
 
-        # backdate so the baseline q's have expired
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
-                status='in-progress')
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
+        # backdate so the baseline q's have expired
+        mock_qr(instrument_id='epic26', status='in-progress')
+
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
         self.assertEquals(a_s.overall_status, "Partially Completed")
@@ -440,12 +443,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # backdating consent beyond expired and the status lookup date
         # within a valid window should show available assessments.
 
-        # backdate so the baseline q's have expired
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
-                status='in-progress',
-                timestamp=datetime.utcnow() - relativedelta(months=3))
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
+        # backdate so the baseline q's have expired
+        mock_qr(instrument_id='epic26', status='in-progress',
+                timestamp=datetime.utcnow() - relativedelta(months=3))
+
         self.test_user = db.session.merge(self.test_user)
         as_of_date = datetime.utcnow() - relativedelta(months=2, days=28)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
@@ -462,12 +465,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # backdating consent beyond expired and the status lookup date
         # within a valid window should show available assessments.
 
-        # backdate so the baseline q's have expired
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic23',
-                status='in-progress',
-                timestamp=datetime.utcnow() - relativedelta(months=3))
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_metastatic()
+        # backdate so the baseline q's have expired
+        mock_qr(instrument_id='epic23', status='in-progress',
+                timestamp=datetime.utcnow() - relativedelta(months=3))
+
         self.test_user = db.session.merge(self.test_user)
         as_of_date = datetime.utcnow() - relativedelta(months=2, days=28)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
@@ -553,9 +556,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=relativedelta(months=3, hours=-1))
         self.mark_localized()
         for instrument in localized_instruments:
-            mock_qr(
-                user_id=TEST_USER_ID, instrument_id=instrument,
-                status='in-progress')
+            mock_qr(instrument_id=instrument, status='in-progress')
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
         self.assertEquals(a_s.overall_status, 'In Progress')
@@ -565,9 +566,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
         for instrument in localized_instruments:
-            mock_qr(
-                user_id=TEST_USER_ID, instrument_id=instrument,
-                status='in-progress')
+            mock_qr(instrument_id=instrument, status='in-progress')
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
         self.assertEquals(a_s.overall_status, 'Partially Completed')
