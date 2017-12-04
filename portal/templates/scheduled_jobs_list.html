@@ -11,9 +11,11 @@
         {% for job in jobs %}
             <li>
                 <div id="job_{{ job.id }}">
+                    <button title="Toggle Job" onclick="toggleJob(event, {{ job.id }})"><i id="activeIcon_{{job.id}}" class="{{'fa fa-toggle-on' if job.active else 'fa fa-toggle-off'}}" /></i></button>
                     <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
                     <b>{{ job.name }}</b>
-                    <br />{{ _("Task") }}: {{ job.task }}
+                    <div id="activeText_{{job.id}}" class="{{'text-info' if job.active else 'text-danger'}}">{{ "Active" if job.active else "Inactive" }}</div>
+                    {{ _("Task") }}: {{ job.task }}
                     {% if job.args %}
                     <br />{{ _("Args") }}: {{ job.args }}
                     {% endif %}
@@ -21,7 +23,6 @@
                     <br />{{ _("Kwargs") }}: {{ job.kwargs }}
                     {% endif %}
                     <br />{{ _("Schedule") }}: {{ job.schedule }}
-                    <br />{{ _("Active") }}: {{ job.active }}
                     <br />{{ _("Last Runtime") }}:
                     <div id="lastRuntime_{{job.id}}" class="text-info">{{ job.last_runtime }}</div>
                     {{ _("Last Status") }}:
@@ -71,17 +72,63 @@ function triggerJob(event, jobId) {
                 $(current_job).children().prop('disabled',false);
             } else {
                 $(current_status).text("{{_('No response received')}}");
-                $(current_runtime).text("--");
-                $(current_status).fadeTo('slow',1);
-                $(current_runtime).fadeTo('slow',1);
+                $(current_status).removeClass("text-info")
+                $(current_status).addClass("text-danger");
             }
         }).fail(function(xhr) {
             console.log("response Text: " + xhr.responseText);
             console.log("response status: " +  xhr.status);
             $(current_status).text(xhr.status + ": " + xhr.responseText);
-            $(current_runtime).text("--")
-            $(current_status).fadeTo('slow',1);
-            $(current_runtime).fadeTo('slow',1);
+            $(current_status).removeClass("text-info")
+            $(current_status).addClass("text-danger");
+        });
+    };
+};
+
+function toggleJob(event, jobId) {
+    if (event) event.stopPropagation();
+    if (jobId) {
+        var current_job = '#job_'+jobId
+        var current_text = "#activeText_" + jobId
+        var current_icon = "#activeIcon_" + jobId
+        var current_status = "#lastStatus_" + jobId
+        jobData = {active: ($(current_text).text() != "Active")}
+        $(current_job).children().prop('disabled',true);
+        $(current_job).fadeTo('slow',.6);
+        $.ajax ({
+            type: "PUT",
+            url: "/api/scheduled_job/" + jobId,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data: JSON.stringify(jobData)
+        }).done(function(data) {
+            if (data) {
+                if (data["active"]) {
+                    $(current_text).text("Active");
+                    $(current_text).removeClass("text-danger")
+                    $(current_icon).removeClass("fa fa-toggle-off")
+                    $(current_text).addClass("text-info")
+                    $(current_icon).addClass("fa fa-toggle-on")
+                } else {
+                    $(current_text).text("Inactive");
+                    $(current_text).removeClass("text-info")
+                    $(current_icon).removeClass("fa fa-toggle-on")
+                    $(current_text).addClass("text-danger")
+                    $(current_icon).addClass("fa fa-toggle-off")
+                }
+                $(current_job).fadeTo('slow',1);
+                $(current_job).children().prop('disabled',false);
+            } else {
+                $(current_status).text("{{_('No response received')}}");
+                $(current_status).removeClass("text-info")
+                $(current_status).addClass("text-danger");
+            }
+        }).fail(function(xhr) {
+            console.log("response Text: " + xhr.responseText);
+            console.log("response status: " +  xhr.status);
+            $(current_status).text(xhr.status + ": " + xhr.responseText);
+            $(current_status).removeClass("text-info")
+            $(current_status).addClass("text-danger");
         });
     };
 };
