@@ -2291,7 +2291,7 @@ OrgTool.prototype.handleEvent = function() {
                     var isStaff = false;
                      $("#rolesGroup input[name='user_type']").each(function() {
                         if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
-                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot ununcheck.  A staff member must be associated with an organization"));
+                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot uncheck.  A staff member must be associated with an organization"));
                             isStaff = true;
                         };
                      });
