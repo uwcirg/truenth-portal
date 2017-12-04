@@ -115,7 +115,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "status": i18next.t("Status"),
                       "agreement": i18next.t("Agreement"),
                       "consentDate": i18next.t("Date"),
-                      "registrationDate": i18next.t("Regiatration Date"),
+                      "registrationDate": i18next.t("Registration Date"),
                       "historyConsentDate": i18next.t("Consent Date"),
                       "locale": i18next.t("GMT"),
                       "lastUpdated": i18next.t("Last Updated") + "<br/><span class='smaller-text'>" + i18next.t("( GMT, Y-M-D )") + "</span>",
@@ -405,8 +405,11 @@ var ConsentUIHelper = function(consentItems, userId) {
             var org = OT.orgsList[item.organization_id];
             touContent += "<tr data-tou-type='" + item.type + "'>";
             touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+            /*
+             * note terms of use text is hidden/unhidden using respective project's stylesheet
+             */
             touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + capitalize(item.display_type)) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{project name} Terms of Use").replace("{project name}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
         return touContent;
