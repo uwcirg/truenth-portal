@@ -2,7 +2,7 @@
 (function() {
 
   function hasValue(val) {
-    return val != null && val != "" && val != "undefined";
+    return String(val) !== "null" && String(val) !== "" && String(val) !== "undefined";
   };
 
   function disableHeaderFooterLinks() {
@@ -416,17 +416,19 @@
     var mainSections = this.mainSections;
     if (mainSections) {
       for (var sec in mainSections) {
-        var mf = $("#" + sec);
-        if (mf.attr("skipped") === "true") {
-          continue;
-        };
-        mf.fadeIn();
-        for (var sectionId in mainSections[sec].subsections) {
-          mainSections[sec].subsections[sectionId].fields.forEach(function(field) {
-            if (field.attr("skipped") !== "true") {
-              field.fadeIn();
-            };
-          });
+        if (mainSections.hasOwnProperty(sec)) {
+          var mf = $("#" + sec);
+          if (mf.attr("skipped") === "true") {
+            continue;
+          };
+          mf.fadeIn();
+          for (var sectionId in mainSections[sec].subsections) {
+            mainSections[sec].subsections[sectionId].fields.forEach(function(field) {
+              if (field.attr("skipped") !== "true") {
+                field.fadeIn();
+              };
+            });
+          };
         };
       };
     };
@@ -514,7 +516,7 @@
   FieldsChecker.prototype.initIncompleteFields = function() {
     var self = this;
     self.setIncompleteFields();
-    incompleteFields = self.getIncompleteFields();
+    var incompleteFields = self.getIncompleteFields();
     incompleteFields.forEach(function(field, index) {
       self.initEvent(field);
     });
@@ -525,11 +527,44 @@
       //    console.log(field.elements)
       //});
     ************/
+  };
+
+  FieldsChecker.prototype.onIncompleteFieldsDidInit = function() {
+
+    var self = this;
 
     /****** prep work after initializing incomplete fields *****/
     /*****  set visuals e.g. top terms ************************/
 
     self.constructProgressBar();
+    var i18next = self.__getDependency("i18next");
+
+    $("#queriesForm").validator().on("submit", function (e) {
+      if (e.isDefaultPrevented()) {
+        $("#iqErrorMessage").text(i18next.t("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid."));
+      } else {
+        $("#updateProfile").hide();
+        $("#next").hide();
+        $(".loading-message-indicator").show();
+        setTimeout(function() {
+          assembleContent.demo($("#iq_userId").val(),null, null, true);
+        }, 250);
+      };
+    });
+
+    /*** event for the next button ***/
+    $("#next").on("click", function() {
+        $(this).hide();
+        $(".loading-message-indicator").show();
+        setTimeout(function() { window.location.reload(); }, 100);
+    });
+
+    /*** event for the arrow in the header**/
+    $("div.heading").on("click", function() {
+       $('html, body').animate({
+          scrollTop: $(this).next("div.content-body").children().first().offset().top
+       }, 1000);
+    });
 
     //if term of use form not present - need to show the form
     if ($("#topTerms").length === 0)  {
@@ -552,7 +587,6 @@
     };
 
     setTimeout(function() { $("#iqFooterWrapper").show(); }, 500);
-
   };
 
   FieldsChecker.prototype.termsCheckboxEvent = function(fields) {

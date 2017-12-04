@@ -512,24 +512,23 @@
       <div class="get-orgs-error error-message"></div>
     </div>
     <script>
-    function _orgsCallback() {
-      {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
-          var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-          if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
-          var checkedOrgs = {};
-          userOrgs.each(function() {
-              if ($(this).prop("checked")) {
-                  checkedOrgs[$(this).val()] = true;
-              };
-              $(this).attr("type", "radio");
-              if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
-          });
-          $("#clinics").attr("loaded", true);
-      {% endif %}
-    };
     $(function () {
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-        tnthAjax.getOrgs($("#iq_userId").val(), false,true, _orgsCallback);
+        tnthAjax.getOrgs($("#iq_userId").val(), false, true, function() {
+          {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+            var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
+            if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
+            var checkedOrgs = {};
+            userOrgs.each(function() {
+                if ($(this).prop("checked")) {
+                    checkedOrgs[$(this).val()] = true;
+                };
+                $(this).attr("type", "radio");
+                if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+            });
+            $("#clinics").attr("loaded", true);
+          {% endif %}
+        });
       });
     </script>
   {%- endmacro %}
