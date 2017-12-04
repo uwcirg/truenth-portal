@@ -31,6 +31,7 @@ class TestScheduledJob(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
+        # test new job POST
         data = {"name": "test_upsert",
                 "task": "test",
                 "schedule": "* * * * *"}
@@ -39,23 +40,24 @@ class TestScheduledJob(TestCase):
             content_type='application/json',
             data=json.dumps(data))
         self.assert200(resp)
-        orig_id = resp.json['id']
+        job_id = resp.json['id']
         self.assertEquals(resp.json['schedule'], '* * * * *')
 
-        data['schedule'] = "0 0 0 0 0"
+        # POST of an existing should raise a 400
         resp = self.client.post(
             '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
-        # POST of an existing should raise a 400
         self.assert400(resp)
 
+        # test existing job PUT
+        data2 = {'schedule': "0 0 0 0 0"}
         resp = self.client.put(
-            '/api/scheduled_job',
+            '/api/scheduled_job/{}'.format(job_id),
             content_type='application/json',
-            data=json.dumps(data))
+            data=json.dumps(data2))
         self.assert200(resp)
-        self.assertEquals(resp.json['id'], orig_id)
+        self.assertEquals(resp.json['name'], data['name'])
         self.assertEquals(resp.json['schedule'], '0 0 0 0 0')
 
     def test_job_get(self):

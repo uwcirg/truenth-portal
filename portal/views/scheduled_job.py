@@ -10,6 +10,7 @@ from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
+from .portal import check_int
 
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
@@ -60,17 +61,19 @@ def create_job():
     return jsonify(job.as_json())
 
 
-@scheduled_job_api.route('/api/scheduled_job', methods=('PUT',))
+@scheduled_job_api.route('/api/scheduled_job/<int:job_id>', methods=('PUT',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
-def update_job():
+def update_job(job_id):
+    check_int(job_id)
+    job = ScheduledJob.query.get(job_id)
+    if not job:
+        abort(404, 'job ID {} not found'.format(job_id))
     try:
-        name = request.json.get('name')
-        job = ScheduledJob.query.filter(
-            ScheduledJob.name == name).first()
-        if not job:
-            abort(404, "{} not found - new should POST".format(name))
-        job.update_from_json(request.json)
+        job_data = job.as_json()
+        for field in request.json:
+            job_data[field] = request.json[field]
+        job.update_from_json(job_data)
     except ValueError as e:
         abort(400, str(e))
     db.session.commit()
@@ -88,7 +91,7 @@ def update_job():
 def get_job(job_id):
     job = ScheduledJob.query.get(job_id)
     if not job:
-        abort(404, 'job ID not found')
+        abort(404, 'job ID {} not found'.format(job_id))
     return jsonify(job.as_json())
 
 
