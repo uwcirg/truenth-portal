@@ -562,7 +562,7 @@
 
     /*** event for the arrow in the header**/
     $("div.heading").on("click", function() {
-       $('html, body').animate({
+       $("html, body").animate({
           scrollTop: $(this).next("div.content-body").children().first().offset().top
        }, 1000);
     });
