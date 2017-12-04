@@ -1078,8 +1078,9 @@ class User(db.Model, UserMixin):
             abort(404, 'other_id {} not found'.format(other_id))
 
         # direct attributes on user
-        # intentionally skip {id, email, reset_password_token}
-        exclude = ['id', '_email', 'reset_password_token']
+        # intentionally skip {id, email, reset_password_token, timezone}
+        # as we prefer the original values for these during account promotion
+        exclude = ['id', '_email', 'reset_password_token', 'timezone']
         for attr in (col for col in self.column_names() if col not in exclude):
             if not getattr(other, attr):
                 continue

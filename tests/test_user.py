@@ -990,6 +990,7 @@ class TestUser(TestCase):
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
+            other.timezone = 'US/Eastern'
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
@@ -999,6 +1000,7 @@ class TestUser(TestCase):
             other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
+            user.timezone = 'US/Central'  # want to retain the original
             user.merge_with(other.id)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
@@ -1008,6 +1010,7 @@ class TestUser(TestCase):
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
             self.assertTrue(user.deceased)
+            self.assertEquals(user.timezone, 'US/Central')
 
 
     def test_promote(self):
