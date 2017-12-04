@@ -91,7 +91,7 @@ class ScheduledJob(db.Model):
         return 'task {} not found'.format(self.task)
 
 
-def update_job(job_id, runtime=None, status=None):
+def update_job_status(job_id, runtime=None, status=None):
     if job_id:
         runtime = runtime or datetime.now()
         sj = ScheduledJob.query.get(job_id)

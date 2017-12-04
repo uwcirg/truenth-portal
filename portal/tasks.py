@@ -34,7 +34,7 @@ from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
-from .models.scheduled_job import update_job
+from .models.scheduled_job import update_job_status
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug
@@ -349,7 +349,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 def update_current_job(job_id, func_name, runtime=None, status=None):
     try:
-        update_job(job_id, runtime=runtime, status=status)
+        update_job_status(job_id, runtime=runtime, status=status)
     except Exception as exc:
         logger.error("Failed to update job {} for task `{}`:"
                      " {}".format(job_id, func_name, exc))
