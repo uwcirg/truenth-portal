@@ -3544,7 +3544,7 @@ var tnthAjax = {
         };
         if (!hasValue(data)) {
             if (callback) {
-                callback({"error": i18next.t("Response data to be update is required.")})
+                callback({"error": i18next.t("Questionnaire response data is required.")})
             };
         };
         this.sendRequest('/api/patient/'+userId+'/assessment', 'PUT', userId, {data: JSON.stringify(data)}, function(data) {

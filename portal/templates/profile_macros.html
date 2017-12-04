@@ -362,7 +362,7 @@
                 if (hasValue(body) && hasValue(subject) && hasValue(email)) {
                     tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
                         if (!data.error) {
-                            $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                            $('#profileEmailMessage').html(i18next.t("<strong class='text-success'>{emailType} email sent to {emailAddress}</strong>").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email));
                             $('#profileEmailSelect').val("");
                             $('#btnProfileSendEmail').addClass('disabled');
 
