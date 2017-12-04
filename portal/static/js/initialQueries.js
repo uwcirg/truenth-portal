@@ -538,6 +538,7 @@
 
     self.constructProgressBar();
     var i18next = self.__getDependency("i18next");
+    var assembleContent = self.__getDependency("assembleContent");
 
     $("#queriesForm").validator().on("submit", function (e) {
       if (e.isDefaultPrevented()) {
