@@ -82,8 +82,10 @@ class ScheduledJob(db.Model):
         if func:
             args_in = self.args.split(',') if self.args else []
             kwargs_in = self.kwargs or {}
+            kwargs_in['job_id'] = self.id
+            kwargs_in['manual_run'] = True
             try:
-                msg = func(self.id, *args_in, **kwargs_in)
+                msg = func(*args_in, **kwargs_in)
             except Exception as exc:
                 msg = ("Unexpected exception in task `{}` (job_id={}):"
                        " {}".format(self.task, self.id, exc))
@@ -101,3 +103,8 @@ def update_job_status(job_id, runtime=None, status=None):
             db.session.add(sj)
             db.session.commit()
             return db.session.merge(sj)
+
+
+def check_active(job_id):
+    sj = ScheduledJob.query.get(job_id)
+    return sj.active if sj else False

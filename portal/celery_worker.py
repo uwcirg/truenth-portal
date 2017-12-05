@@ -21,6 +21,7 @@ app = create_app()
 celery = create_celery(app)
 app.app_context().push()
 
+
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     """Configure scheduled jobs in Celery"""
@@ -38,6 +39,6 @@ def setup_periodic_tasks(sender, **kwargs):
         if task:
             args_in = job.args.split(',') if job.args else []
             kwargs_in = job.kwargs or {}
+            kwargs_in['job_id'] = job.id
             sender.add_periodic_task(job.crontab_schedule(),
-                                     task.s(job.id, *args_in,
-                                            **kwargs_in))
+                                     task.s(*args_in, **kwargs_in))
