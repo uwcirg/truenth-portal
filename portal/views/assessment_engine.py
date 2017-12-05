@@ -16,7 +16,12 @@ from ..models.assessment_status import AssessmentStatus
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.assessment_status import overall_assessment_status
 from ..models.auth import validate_origin
-from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
+from ..models.fhir import (
+    aggregate_responses,
+    EC,
+    generate_qnr_csv,
+    QuestionnaireResponse,
+    qnr_document_id)
 from ..models.intervention import INTERVENTION
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
@@ -1362,17 +1367,22 @@ def present_needed():
         assessment_status.instruments_needing_full_assessment(
             classification='all'))
 
-    # As the AssessmentEngine isn't yet equipped to restart out
-    # of sequence instruments, treat all as new if as_of_date
-    # isn't today.
-    if as_of_date and as_of_date.date() != datetime.utcnow().date():
-        args['instrument_id'] += (
-            assessment_status.instruments_in_progress(
-                classification='all'))
-    else:
-        args['resume_instrument_id'] = (
-            assessment_status.instruments_in_progress(
-                classification='all'))
+    # If we find any instruments_in_progress, need to fetch their
+    # identifiers for reliable resume behavior on the AE side.
+    # This is also done now to avoid the overhead of looking up
+    # when generating reports and reminders.
+    resume_ids = []
+    for questionnaire_name in assessment_status.instruments_in_progress(
+            classification=all):
+        resume_ids.append(
+            qnr_document_id(
+                subject_id=subject_id,
+                questionniare_bank_id=assessment_status.qb_data.qb.id,
+                questionnaire_name=questionnaire_name,
+                status='in-progress'))
+
+    if resume_ids:
+        args['resume_identifier'] = resume_ids
 
     url = url_for('.present_assessment', **args)
     return redirect(url, code=303)
@@ -1453,6 +1463,7 @@ def present_assessment(instruments=None):
 
     queued_instruments = request.args.getlist('instrument_id')
     resume_instruments = request.args.getlist('resume_instrument_id')
+    resume_identifiers = request.args.getlist('resume_identifier')
 
     # Hack to allow deprecated API to piggyback
     # Remove when deprecated_present_assessment() is fully removed
@@ -1477,6 +1488,7 @@ def present_assessment(instruments=None):
     assessment_params = {
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
+        "resume_identifier": ",".join(resume_identifiers),
         "subject_id": request.args.get('subject_id'),
         "authored": request.args.get('authored'),
     }

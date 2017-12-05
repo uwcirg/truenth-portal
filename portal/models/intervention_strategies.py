@@ -369,13 +369,7 @@ def update_card_html_on_completion():
             link_label = 'Continue questionnaire' if (
                 assessment_status.overall_status == 'In Progress') else (
                     'Go to questionnaire')
-            link_url = url_for(
-                'assessment_engine_api.present_assessment',
-                instrument_id=assessment_status.
-                instruments_needing_full_assessment(classification='all'),
-                resume_instrument_id=assessment_status.
-                instruments_in_progress(classification='all'))
-
+            link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
             card_html = u"""
             {intro}
@@ -399,11 +393,7 @@ def update_card_html_on_completion():
             link_label = _(u'Continue questionnaire') if (
                 indefinite_questionnaires[1]) else (
                     _(u'Go to questionnaire'))
-            link_url = url_for(
-                'assessment_engine_api.present_assessment',
-                instrument_id=indefinite_questionnaires[0],
-                resume_instrument_id=indefinite_questionnaires[1])
-
+            link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
             card_html = u"""
             {intro}
