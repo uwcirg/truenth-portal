@@ -273,7 +273,7 @@ gulp.task("combineTranslationJsons", function() {
  * clean eproms source file
  */
 gulp.task("clean-eproms-src", function() {
-  console.log("delete source file...")
+  console.log("delete source file...");
   return del([translationSourceDir + epromsNameSpace + ".json"]);
 });
 
@@ -282,7 +282,7 @@ gulp.task("clean-eproms-src", function() {
  * clean truenth source file
  */
 gulp.task("clean-truenth-src", function() {
-  console.log("delete source file...")
+  console.log("delete source file...");
   return del([translationSourceDir + truenthNameSpace + ".json"]);
 });
 
@@ -290,7 +290,7 @@ gulp.task("clean-truenth-src", function() {
  * clean common source file
  */
 gulp.task("clean-src", function() {
-  console.log("delete source file...")
+  console.log("delete source file...");
   return del([translationSourceDir + nameSpace + ".json"]);
 });
 
@@ -298,7 +298,7 @@ gulp.task("clean-src", function() {
  * clean all generated destination json files
  */
 gulp.task("clean-dest", function() {
-  console.log("delete json files...")
+  console.log("delete json files...");
   return del([translationDestinationDir + "*/*.json"]);
 });
 
