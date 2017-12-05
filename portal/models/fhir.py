@@ -572,6 +572,30 @@ def aggregate_responses(instrument_ids, current_user):
 
     return bundle
 
+
+def qnr_document_id(
+        subject_id, questionniare_bank_id, questionnaire_name, status):
+    """Return document['identifier'] for matching QuestionnaireResponse
+
+    Using the given filter data to look for a matching QuestionnaireResponse.
+    Expecting to find exactly one, or raises NoResultFound
+
+    :return: the document identifier
+
+    """
+    qnr = QuestionnaireResponse.query.filter(
+        QuestionnaireResponse.status == status).filter(
+        QuestionnaireResponse.subject_id == subject_id).filter(
+        QuestionnaireResponse.document[
+            ('questionnaire', 'reference')
+        ].astext.endswith(questionnaire_name)).filter(
+        QuestionnaireResponse.questionnaire_bank_id ==
+        questionniare_bank_id).with_entities(
+        QuestionnaireResponse.document[(
+            'questionnaire', 'identifier', 'value')]).one()
+    return qnr[0]
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
