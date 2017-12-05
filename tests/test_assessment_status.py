@@ -2,8 +2,9 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-from random import randint
+from random import choice
 from sqlalchemy.orm.exc import NoResultFound
+from string import ascii_letters
 
 from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
@@ -27,7 +28,7 @@ def mock_qr(
         instrument_id, status='completed', timestamp=None, qb=None,
         doc_id=None):
     if not doc_id:
-        doc_id = randint(10000, 50000)
+        doc_id = ''.join(choice(ascii_letters) for _ in range(10))
     timestamp = timestamp or datetime.utcnow()
     qr_document = {
         "questionnaire": {
@@ -318,11 +319,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         mock_qr(
             instrument_id='irondemog',
             status='in-progress', qb=qb,
-            doc_id=21212)
+            doc_id='two11')
         qb = db.session.merge(qb)
         result = qnr_document_id(
             TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
-        self.assertEquals(result, 21212)
+        self.assertEquals(result, 'two11')
 
     def test_qnr_id_missing(self):
         qb = QuestionnaireBank.query.first()
