@@ -8,7 +8,6 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from string import Formatter
 
-from .assessment_status import AssessmentStatus  # avoid cycle
 from .app_text import MailResource
 from ..audit import auditable_event
 from ..database import db
@@ -38,16 +37,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        now = datetime.utcnow()
-        assessment_status = AssessmentStatus(user=user, as_of_date=now)
-        link_url = url_for(
-            'assessment_engine_api.present_assessment',
-            instrument_id=assessment_status.
-            instruments_needing_full_assessment(classification='all'),
-            resume_instrument_id=assessment_status.
-            instruments_in_progress(classification='all'),
-            _external=True)
-        return link_url
+        return url_for('assessment_engine_api.present_needed', _external=True)
 
     def make_button(text):
         inline = False
