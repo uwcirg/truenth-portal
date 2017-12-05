@@ -76,8 +76,8 @@
           "valueCodeableConcept": {
             "coding": [
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_AU",
+                "display": "Australian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -154,8 +154,8 @@
           "valueCodeableConcept": {
             "coding": [
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_AU",
+                "display": "Australian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -473,15 +473,15 @@
           "valueCodeableConcept": {
             "coding": [
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_AU",
+                "display": "Australian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
           }
         },
         {
-          "timezone": "UTC",
+          "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
@@ -543,7 +543,7 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "UTC",
+          "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
@@ -571,7 +571,7 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "UTC",
+          "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
@@ -599,7 +599,7 @@
       "ethnicity_codings": true,
       "extension": [
         {
-          "timezone": "UTC",
+          "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
@@ -695,7 +695,7 @@
           }
         },
         {
-          "timezone": "UTC",
+          "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
