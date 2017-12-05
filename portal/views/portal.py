@@ -627,7 +627,7 @@ def settings():
         form=form,
         apptext=apptext,
         organization_consents=organization_consents,
-        trace_data=(dump_trace() if form.import_orgs.data else None),
+        trace_data=dump_trace(),
         wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
