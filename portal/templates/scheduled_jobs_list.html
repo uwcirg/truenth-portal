@@ -58,7 +58,7 @@ function triggerJob(event, jobId) {
         var current_status = "#lastStatus_" + jobId
         var current_runtime = "#lastRuntime_" + jobId
         $(current_job).children().prop('disabled',true);
-        $(current_job).fadeTo('slow',.6);
+        $(current_job).fadeTo('fast',.6);
         $.ajax ({
             type: "POST",
             url: "/api/scheduled_job/" + jobId + "/trigger",
@@ -68,7 +68,7 @@ function triggerJob(event, jobId) {
             if (data) {
                 $(current_status).text(data["message"]);
                 $(current_runtime).text(data["runtime"]);
-                $(current_job).fadeTo('slow',1);
+                $(current_job).fadeTo('fast',1);
                 $(current_job).children().prop('disabled',false);
             } else {
                 $(current_status).text("{{_('No response received')}}");
@@ -94,7 +94,7 @@ function toggleJob(event, jobId) {
         var current_status = "#lastStatus_" + jobId
         jobData = {active: ($(current_text).text() != "Active")}
         $(current_job).children().prop('disabled',true);
-        $(current_job).fadeTo('slow',.6);
+        $(current_job).fadeTo('fast',.6);
         $.ajax ({
             type: "PUT",
             url: "/api/scheduled_job/" + jobId,
@@ -116,7 +116,7 @@ function toggleJob(event, jobId) {
                     $(current_text).addClass("text-danger")
                     $(current_icon).addClass("fa fa-toggle-off")
                 }
-                $(current_job).fadeTo('slow',1);
+                $(current_job).fadeTo('fast',1);
                 $(current_job).children().prop('disabled',false);
             } else {
                 $(current_status).text("{{_('No response received')}}");
