@@ -37,7 +37,7 @@ const translationDestinationDir = path.join(__dirname,"./static/files/locales/")
  */
 const nameSpace = "frontend";
 const epromsNameSpace = "eproms";
-const truenthNameSpace = "truenth";
+const truenthNameSpace = "gil";
 const srcPotFileName = translationSourceDir+nameSpace+".pot";
 const epromsSrcPotFileName =  translationSourceDir+epromsNameSpace+".pot";
 const truenthSrcPotFileName = translationSourceDir+truenthNameSpace+".pot";
@@ -147,7 +147,7 @@ gulp.task("i18nextConvertTruenthJSONToPOT", ["i18next-extraction-truenth"], func
   /*
   * converting json to pot
   */
-  console.log("converting Truenth JSON to POT...");
+  console.log("converting gil JSON to POT...");
   return i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+truenthNameSpace+".json"), options).then(save(truenthSrcPotFileName));
 
 });
@@ -211,7 +211,7 @@ gulp.task("i18nextConvertPOToJSON", ["clean-dest"], function() {
                 [ __path + "/" + file + "/LC_MESSAGES/messages.po",
                   __path + "/" + file + "/LC_MESSAGES/frontend.po",
                   __path + "/" + file + "/LC_MESSAGES/eproms.po",
-                  __path + "/" + file + "/LC_MESSAGES/truenth.po"
+                  __path + "/" + file + "/LC_MESSAGES/gil.po"
                 ].forEach(function(item) {
                   /*
                    * write corresponding json file from each messages po file
@@ -273,7 +273,7 @@ gulp.task("combineTranslationJsons", function() {
  * clean eproms source file
  */
 gulp.task("clean-eproms-src", function() {
-  console.log("delete source files...")
+  console.log("delete source file...")
   return del([translationSourceDir + epromsNameSpace + ".json"]);
 });
 
@@ -282,7 +282,7 @@ gulp.task("clean-eproms-src", function() {
  * clean truenth source file
  */
 gulp.task("clean-truenth-src", function() {
-  console.log("delete source files...")
+  console.log("delete source file...")
   return del([translationSourceDir + truenthNameSpace + ".json"]);
 });
 
@@ -290,7 +290,7 @@ gulp.task("clean-truenth-src", function() {
  * clean common source file
  */
 gulp.task("clean-src", function() {
-  console.log("delete source files...")
+  console.log("delete source file...")
   return del([translationSourceDir + nameSpace + ".json"]);
 });
 
@@ -312,8 +312,8 @@ gulp.task("eproms", ["i18nextConvertEpromsJSONToPOT"], function() {
 /*
  * convert truenth translation json file to pot file
  */
-gulp.task("truenth", ["i18nextConvertTruenthJSONToPOT"], function() {
-  console.log("Running truenth translation task...");
+gulp.task("gil", ["i18nextConvertTruenthJSONToPOT"], function() {
+  console.log("Running gil translation task...");
 });
 
 
