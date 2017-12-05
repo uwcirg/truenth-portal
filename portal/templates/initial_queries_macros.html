@@ -8,11 +8,9 @@
           <p>{{ _("Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools") }}:</p>
         </div>
         <div class="well">
-            {% if not (user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)) %}
-              <div id="termsText">
-                {{ terms['asset']|safe if terms}}
-              </div>
-            {% endif %}
+            <div id="termsText">
+              {{ terms['asset']|safe if terms}}
+            </div>
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
