@@ -10,6 +10,7 @@ NB: a celery worker must be started for these to ever return.  See
 from celery.utils.log import get_task_logger
 from datetime import datetime
 from flask import current_app
+from functools import wraps
 import json
 from requests import Request, Session
 from requests.exceptions import RequestException
@@ -34,7 +35,7 @@ from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
-from .models.scheduled_job import update_job_status
+from .models.scheduled_job import check_active, update_job_status
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug
@@ -46,6 +47,39 @@ from .models.scheduled_job import update_job_status
 logger = get_task_logger(__name__)
 
 celery = create_celery(create_app())
+
+
+def scheduled_task(func):
+    @wraps(func)
+    def call_and_update(*args, **kwargs):
+        job_id = kwargs.get('job_id')
+        manual_run = kwargs.get('manual_run')
+
+        if not manual_run and job_id and not check_active(job_id):
+            message = "Job id `{}` inactive.".format(job_id)
+            logger.debug(message)
+            return message
+
+        try:
+            before = datetime.now()
+            output = func(*args, **kwargs)
+            duration = datetime.now() - before
+            message = ('{} ran in {} '
+                       'seconds.'.format(func.__name__, duration.seconds))
+            if output:
+                message += " {}".format(output)
+            current_app.logger.debug(message)
+        except Exception as exc:
+            message = ("Unexpected exception in `{}` "
+                       "on {} : {}".format(func.__name__, job_id, exc))
+            logger.error(message)
+            logger.error(format_exc())
+
+        if job_id:
+            update_job_status(job_id, status=message)
+
+        return message
+    return call_and_update
 
 
 @celery.task(name="tasks.add")
@@ -92,91 +126,51 @@ def post_request(self, url, data, timeout=10, retries=3):
 
 
 @celery.task
-def test(job_id=None):
-    update_current_job(job_id, 'test', status="success")
-    return "Test task complete."
+@scheduled_task
+def test(**kwargs):
+    return "Test"
 
 
 @celery.task
-def test_args(job_id=None, *args, **kwargs):
+@scheduled_task
+def test_args(*args, **kwargs):
     alist = ",".join(args)
     klist = json.dumps(kwargs)
-    msg = "Test task complete. - {} - {}".format(alist, klist)
-    update_current_job(job_id, 'test_args', status=msg)
-    return msg
+    return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
 @celery.task
-def cache_reporting_stats(job_id=None):
+@scheduled_task
+def cache_reporting_stats(**kwargs):
     """Populate reporting dashboard stats cache
 
     Reporting stats can be a VERY expensive lookup - cached for an hour
-    at a time.  This task is responsible for renewing the potenailly
+    at a time.  This task is responsible for renewing the potentially
     stale cache.  Expected to be called as a scheduled job.
 
     """
-    try:
-        message = "failed"
-        before = datetime.now()
-        dogpile_cache.invalidate(get_reporting_stats)
-        dogpile_cache.refresh(get_reporting_stats)
-        duration = datetime.now() - before
-        message = (
-            'Reporting stats updated in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
-    except Exception as exc:
-        message = ("Unexpected exception in `cache_reporting_stats` "
-                     "on {} : {}".format(job_id, exc))
-        logger.error(message)
-        logger.error(format_exc())
-    update_current_job(job_id, 'cache_reporting_stats', status=message)
-    return message
+    dogpile_cache.invalidate(get_reporting_stats)
+    dogpile_cache.refresh(get_reporting_stats)
 
 
 @celery.task
-def cache_assessment_status(job_id=None):
+@scheduled_task
+def cache_assessment_status(**kwargs):
     """Populate assessment status cache
 
     Assessment status is an expensive lookup - cached for an hour
-    at a time.  This task is responsible for renewing the potenailly
+    at a time.  This task is responsible for renewing the potentially
     stale cache.  Expected to be called as a scheduled job.
 
     """
-    try:
-        message = "failed"
-        before = datetime.now()
-        update_patient_loop(update_cache=True, queue_messages=False)
-        duration = datetime.now() - before
-        message = (
-            'Assessment Cache updated in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
-    except Exception as exc:
-        message = ("Unexpected exception in `cache_assessment_status` "
-                     "on {} : {}".format(job_id, exc))
-        logger.error(message)
-        logger.error(format_exc())
-    update_current_job(job_id, 'cache_assessment_status', status=message)
-    return message
+    update_patient_loop(update_cache=True, queue_messages=False)
 
 
 @celery.task
-def prepare_communications(job_id=None):
+@scheduled_task
+def prepare_communications(**kwargs):
     """Move any ready communications into prepared state """
-    try:
-        message = "failed"
-        before = datetime.now()
-        update_patient_loop(update_cache=False, queue_messages=True)
-        duration = datetime.now() - before
-        message = (
-            'Prepared messages queued in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
-    except Exception as exc:
-        message = ("Unexpected exception in `prepare_communications` "
-                     "on {} : {}".format(job_id, exc))
-        logger.error(message)
-        logger.error(format_exc())
-    update_current_job(job_id, 'prepare_communications', status=message)
-    return message
+    update_patient_loop(update_cache=False, queue_messages=True)
 
 
 def update_patient_loop(update_cache=True, queue_messages=True):
@@ -211,22 +205,10 @@ def update_patient_loop(update_cache=True, queue_messages=True):
 
 
 @celery.task
-def send_queued_communications(job_id=None):
+@scheduled_task
+def send_queued_communications(**kwargs):
     "Look for communication objects ready to send"
-    try:
-        before = datetime.now()
-        send_messages()
-        duration = datetime.now() - before
-        message = (
-            'Sent queued messages in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
-    except Exception as exc:
-        message = ("Unexpected exception in `send_queued_communications` "
-                   "on {} : {}".format(job_id, exc))
-        logger.error(message)
-        logger.error(format_exc())
-    update_current_job(job_id, 'send_queued_communications', status=message)
-    return message
+    send_messages()
 
 
 def send_messages():
@@ -279,27 +261,15 @@ def send_user_messages(email, force_update=False):
 
 
 @celery.task
-def send_questionnaire_summary(job_id, cutoff_days, org_id):
+@scheduled_task
+def send_questionnaire_summary(**kwargs):
     "Generate and send a summary of questionnaire counts to all Staff in org"
-    try:
-        before = datetime.now()
-        error_emails = generate_and_send_summaries(cutoff_days, org_id)
-        duration = datetime.now() - before
-        message = (
-            'Sent summary emails in {0.seconds} seconds.'.format(duration))
-        if error_emails:
-            message += ('\nUnable to reach recipient(s): '
-                        '{}'.format(', '.join(error_emails)))
-            logger.error(message)
-        else:
-            logger.debug(message)
-    except Exception as exc:
-        message = ("Unexpected exception in `send_questionnaire_summary` "
-                   "on {} : {}".format(job_id, exc))
-        logger.error(message)
-        logger.error(format_exc())
-    update_current_job(job_id, 'send_questionnaire_summary', status=message)
-    return message
+    cutoff_days = kwargs['cutoff_days']
+    org_id = kwargs['org_id']
+    error_emails = generate_and_send_summaries(cutoff_days, org_id)
+    if error_emails:
+        return ('\nUnable to reach recipient(s): '
+                '{}'.format(', '.join(error_emails)))
 
 
 def generate_and_send_summaries(cutoff_days, org_id):
@@ -345,11 +315,3 @@ def generate_and_send_summaries(cutoff_days, org_id):
                     error_emails.add(email)
 
     return error_emails or None
-
-
-def update_current_job(job_id, func_name, runtime=None, status=None):
-    try:
-        update_job_status(job_id, runtime=runtime, status=status)
-    except Exception as exc:
-        logger.error("Failed to update job {} for task `{}`:"
-                     " {}".format(job_id, func_name, exc))
