@@ -2,13 +2,15 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+from random import randint
+from sqlalchemy.orm.exc import NoResultFound
 
 from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
-from portal.models.fhir import CC, QuestionnaireResponse
+from portal.models.fhir import CC, QuestionnaireResponse, qnr_document_id
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
@@ -21,14 +23,23 @@ from portal.models.user import get_user
 from tests import TestCase, TEST_USER_ID
 
 
-def mock_qr(instrument_id, status='completed', timestamp=None, qb=None):
+def mock_qr(
+        instrument_id, status='completed', timestamp=None, qb=None,
+        doc_id=None):
+    if not doc_id:
+        doc_id = randint(10000, 50000)
     timestamp = timestamp or datetime.utcnow()
     qr_document = {
         "questionnaire": {
             "display": "Additional questions",
             "reference":
             "https://{}/api/questionnaires/{}".format(
-                'SERVER_NAME', instrument_id)
+                'SERVER_NAME', instrument_id),
+            "identifier": {
+                "use": "official",
+                "label": "cPRO survey session ID",
+                "value": doc_id,
+                "system": "https://stg-ae.us.truenth.org/eproms-demo"}
         }
     }
     enc = Encounter(status='planned', auth_method='url_authenticated',
@@ -301,6 +312,25 @@ class TestQuestionnaireSetup(TestCase):
 
 
 class TestAssessmentStatus(TestQuestionnaireSetup):
+
+    def test_qnr_id(self):
+        qb = QuestionnaireBank.query.first()
+        mock_qr(
+            instrument_id='irondemog',
+            status='in-progress', qb=qb,
+            doc_id=21212)
+        qb = db.session.merge(qb)
+        result = qnr_document_id(
+            TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+        self.assertEquals(result, 21212)
+
+    def test_qnr_id_missing(self):
+        qb = QuestionnaireBank.query.first()
+        qb = db.session.merge(qb)
+        with self.assertRaises(NoResultFound):
+            result = qnr_document_id(
+                TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""
         self.bless_with_basics()
