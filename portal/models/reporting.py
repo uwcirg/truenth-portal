@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import current_app, render_template
 from flask_babel import gettext as _
 
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
 from .organization import OrgTree
@@ -60,6 +60,8 @@ def get_reporting_stats():
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
                     desc = 'Decision Support P3P'
+                elif interv.name == 'community_of_wellness':
+                    desc = 'Community of Wellness'
                 if interv.quick_access_check(user):
                     stats['intervention_access'][desc] += 1
                 if interv in user.interventions:
@@ -89,20 +91,22 @@ def get_reporting_stats():
 
 
 def calculate_days_overdue(user):
-    qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
+    now = datetime.utcnow()
+    qb = QuestionnaireBank.most_current_qb(
+        user, as_of_date=now).questionnaire_bank
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
     if not trigger_date:
         return 0
-    overdue = qb.calculated_overdue(trigger_date)
+    overdue = qb.calculated_overdue(trigger_date, as_of_date=now)
     return (datetime.utcnow() - overdue).days if overdue else 0
 
 
 def overdue_stats_by_org():
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST):
+        if user.has_role(ROLE.TEST) or not user.has_role(ROLE.PATIENT):
             continue
         overdue = calculate_days_overdue(user)
         if overdue > 0:

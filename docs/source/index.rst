@@ -21,6 +21,7 @@ Contents:
     user_experience
     sessions
     development
+    internationalization
     code
     docker
     contributing

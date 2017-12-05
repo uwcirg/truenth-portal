@@ -14,7 +14,7 @@
 }
 
 @baseFontSize:    16px;
-@baseMobileFontSize:  14px;
+@baseMobileFontSize:  13.8px;
 @headlineSize:    1.30em;
 @subheadSize:     1.25em;
 @subSmallHeadSize: 1.10em;
@@ -83,6 +83,7 @@
 @disabledColor: #bfc3c3;
 
 @inputHeight: 2.4em;
+@disabledOpacity: 0.6;
 
 
 /**
@@ -213,6 +214,9 @@ a.btn {
   & .glyphicon {
     color: #FFF;
   }
+}
+.btn-sm {
+  font-size: @mobileSmallSize;
 }
 .feature-btn {
   transition: all 0.2s ease-in-out 0s;
@@ -784,6 +788,9 @@ div.pull-right {
   .search .form-control {
      height: 3em !important;
   }
+  tr[data-link] {
+    cursor: pointer
+  }
 }
 
 #adminTable {
@@ -861,12 +868,15 @@ div.pull-right {
   th.status-field .loading-message-indicator {
     display: none;
   }
+  tr.deleted-user-row {
+    opacity: @disabledOpacity
+  }
 }
 #adminTableToolbar {
   div.orglist-selector {
     display: inline-block;
     .indent {
-      padding: 0 0.2em;
+      padding: 0 0.4em;
     }
     div.dropdown-menu {
       max-width: 100%;
@@ -877,31 +887,32 @@ div.pull-right {
         input {
           cursor: pointer;
           position: relative;
-          left: -2px;
+          margin: 0;
+          left: -4px;
         }
       }
       #fillOrgs {
         .divider {
           display: none;
         }
-        label, legend {
-          font-size: @mobileOrgSize;
+        legend {
+          font-size: @baseMobileFontSize;
         }
-        label.org-label {
-          padding: 0 0.5em;
-          display:block;
-          line-height: 30px;
+        span {
+          display: inline-block;
+          line-height: 1.6em;
+          font-size: @baseMobileFontSize;
+        }
+        .divider + label {
+          margin-left: 0;
         }
       }
     }
     div.org-container {
       display: block;
-      * {
-        font-size: @mobileOrgSize;
-      }
       label.org-label {
         display: inline-block;
-        padding: 0 1em !important;
+        padding: 0 1em;
         line-height: 1.6em;
       }
     }
@@ -912,7 +923,7 @@ div.pull-right {
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: @mobileOrgSize !important;
+        font-size: @baseMobileFontSize;
       }
       input[type="checkbox"] {
         position: relative;
@@ -1667,14 +1678,16 @@ div.pull-right {
   & .copyright-container {
     font-size: @footerSize;
     color: @footerWhiteThemeColor;
+    width: 50%;
   }
   .footer-container.flex {
     clear: both;
     display:flex;
     justify-content: space-between;
-    padding: 0.5em 0;
-    margin: 1em 4em;
+    padding: 1em 0.5em;
     border-top: 1px solid #ddd;
+    flex-wrap: nowrap;
+    margin: 0 0.5em;
   }
   #site_id_view {
     margin-top: 0.2em;
@@ -1696,9 +1709,6 @@ div.pull-right {
 #mainDiv.portal .copyright-container  {
   color: @footerWhiteThemeColor;
   margin-bottom: 1em;
-}
-#mainDiv.profile .footer-container.flex{
-    justify-content: left;
 }
 .profile-item-title {
   color: #5b5e61;
@@ -1944,6 +1954,9 @@ div.noOrg-container {
   label.clinics-section-label {
     margin-bottom: 0;
   }
+  #profileProceduresWrapper {
+    display: none;
+  }
 }
 .create-account-container {
   padding: 2em;
@@ -2014,6 +2027,13 @@ div.noOrg-container {
 
 #userAssessementReport table {
   word-break:break-all;
+}
+
+#patientReportContent {
+  overflow: auto;
+  table {
+    font-size: @smallerText;
+  }
 }
 
 #patientReportErrorMessage {
@@ -2470,7 +2490,7 @@ div.org-container {
     margin-left:0.5em;
   }
   .inner {
-    margin: 1em 0.5em 1em 0.5em
+    margin: 1em 0.5em
   }
   .procedureDateLabel {
     margin-bottom: 0;
@@ -2481,9 +2501,22 @@ div.org-container {
     height: 2.35em;
     padding: 0 1em;
   }
+  .confirm-delete,
+  .data-delete {
+    font-size: 0.85em;
+    padding: 0.5em 0.8em;
+    color: #777;
+    border: 1px solid #bdb9b9;
+    position: relative;
+    margin-top: 0.5em;
+  }
   #pastTreatmentsContainer,
   #eventListLoad {
     display: none;
+  }
+  .button-container {
+    margin-top: 2em;
+    margin-bottom: 1em;
   }
 }
 #eventListtnthproc {
@@ -2491,6 +2524,9 @@ div.org-container {
   td {
     padding: 0.15em;
     line-height: 2.3em;
+  }
+  .list-cell, .descriptionCell {
+    padding-top: 0.4em;
   }
 }
 
@@ -2667,6 +2703,9 @@ div.timezone-warning.text-warning {
     font-size: @btnSize;
   }
 
+  .btn-sm {
+    font-size: @mobileSmallSize;
+  }
   .profile-item-container {
       .profile-item-title  {
         max-width: 150px;
@@ -2741,9 +2780,9 @@ div.timezone-warning.text-warning {
 
   #adminTable {
     TH.id-field,
-    TH[data-field='userid'] {
+    TH[data-field='userid']{
       div.th-inner {
-        padding-top: 4px;
+        padding-top: 2px;
       }
     }
   }
@@ -2764,7 +2803,7 @@ div.timezone-warning.text-warning {
         }
         div.org-container
         {
-          * {
+          label, span {
             font-size: @baseMobileFontSize;
           }
         }
@@ -2775,6 +2814,11 @@ div.timezone-warning.text-warning {
           font-size: @baseMobileFontSize;
         }
       }
+    }
+  }
+  #patientReportContent {
+    table {
+      font-size: @baseFontSize;
     }
   }
   .download-wrapper,
@@ -2799,6 +2843,9 @@ div.timezone-warning.text-warning {
         max-width: 100%;
       }
     }
+    .copyright-container {
+      width: 65%;
+    }
   }
   .timezone-container {
     padding-bottom: 2em;
@@ -2806,7 +2853,15 @@ div.timezone-warning.text-warning {
 
   #fillOrgs *,
   .noOrg-container *  {
-    font-size: @baseFontSize * 0.95;
+    font-size: @baseFontSize * 0.9;
+  }
+
+  #adminTableToolbar {
+    div.org-container {
+      label, span {
+        font-size: @baseFontSize * 0.85;
+      }
+    }
   }
 
   .iq-container .noOrg-container *  {
@@ -2986,6 +3041,9 @@ div.timezone-warning.text-warning {
     .profile-item-container  {
       padding: 2em 3em 2.7em 3em;
     }
+    .copyright-container {
+      width: 80%;
+    }
   }
   #createProfileForm {
     #emailGroup {
@@ -3061,7 +3119,7 @@ div.timezone-warning.text-warning {
     }
   }
   #mainDiv.profile .footer-container.flex{
-    justify-content: center;
+    justify-content: space-between;
   }
 }
 

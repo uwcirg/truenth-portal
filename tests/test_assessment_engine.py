@@ -6,6 +6,7 @@ from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -39,8 +40,15 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
         qn = Questionnaire(name='epic26')
-        org = Organization(name="testorg")
+        org = Organization(name="testorg", research_protocol_id=rp_id)
         with SessionScope(db):
             db.session.add(qn)
             db.session.add(org)
@@ -50,7 +58,7 @@ class TestAssessmentEngine(TestCase):
         qb = QuestionnaireBank(
             name='Test Questionnaire Bank',
             classification='baseline',
-            organization_id=org.id,
+            research_protocol_id=rp_id,
             start='{"days": 0}',
             overdue='{"days": 7}',
             expired='{"days": 90}')

@@ -77,6 +77,9 @@
           {% if user and user.has_role(ROLE.RESEARCHER) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Data")}}</a></li>
           {% endif %}
+          {% if user and user.has_role(ROLE.STAFF_ADMIN) %}
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('staff.staff_index')}}">{{_("Staff List")}}</a></li>
+          {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
               <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
@@ -257,7 +260,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
             <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4>
-            <span class="box-modal__copy">{{_("Your session will expire in approximately ")}}</span><span class="box-modal__copy text-warning" id='remaining-time'></span>
+            <span class="box-modal__copy" id="remaining-time"></span>
           </div>
            <div class="box-modal__footer">
             <button id="log-out" class="button button--teal" data-dismiss="modal">{{_("Log Out")}}</button>&nbsp;<button id="stay-logged-in" class="button button--teal" data-dismiss="modal">{{_("Stay Logged In")}}</button>
@@ -384,13 +387,14 @@
                     onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
-               // Configure the session timeout warning modal
+              var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
               $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
                       .on("show.bs.modal", function() { sessMon.modalShown = true})
                       .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
                       .on("click", "#stay-logged-in", sessMon.extendsess)
                       .on("click", "#log-out", sessMon.logout)
-                      .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+                      .find("#remaining-time").text(warningText);
+
           {% endif %}
 
           var __loader = function(show) {
@@ -542,7 +546,7 @@
 
             {% if request.args.get("disableLinks", "") %}
                $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
-                  if (!$(this).hasClass("side-nav-items__item--home") && 
+                  if (!$(this).hasClass("side-nav-items__item--home") &&
                       !$(this).hasClass("side-nav-items__item--logout") &&
                       !$(this).hasClass("nav-list__item--home")) {
                     $(this).children("a").each(function() {

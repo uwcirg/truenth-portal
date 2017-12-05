@@ -108,14 +108,20 @@
   "ethnicity_codings": false,
   "indigenous_codings": true,
   "extension": [
-    {"url": "http://hl7.org/fhir/valueset/languages",
+    {
+      "url": "http://hl7.org/fhir/valueset/languages",
       "valueCodeableConcept": {
         "coding": [
           {"system": "urn:ietf:bcp:47",
            "code": "en_AU"
           }
         ]
-      }}
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+      "timezone": "US/Pacific"
+    }
   ],
   "language": "en_AU"
 }

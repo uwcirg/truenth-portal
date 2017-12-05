@@ -91,6 +91,21 @@ class CommunicationRequest(db.Model):
                 config=current_app.config, uuid=self.lr_uuid))
 
     @classmethod
+    def find_by_identifier(cls, identifier):
+        """Query method to lookup by identifier"""
+        c_ids = CommunicationRequestIdentifier.query.filter(
+            CommunicationRequestIdentifier.identifier_id == identifier.id
+        )
+        if c_ids.count() > 1:
+            raise ValueError(
+                "Multiple CommunicationRequests mapped to {}".format(
+                    identifier
+                ))
+        elif c_ids.count():
+            first = c_ids.first()
+            return cls.query.get(first.communication_request_id)
+
+    @classmethod
     def from_fhir(cls, data):
         instance = cls()
         return instance.update_from_fhir(data)
@@ -231,7 +246,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     now = datetime.utcnow()
     trigger_date = questionnaire_bank.trigger_date(user)
     trace('trigger_date = {}'.format(trigger_date))
-    qbd = questionnaire_bank.calculated_start(trigger_date)
+    qbd = questionnaire_bank.calculated_start(trigger_date, as_of_date=now)
     start = qbd.relative_start
     if not start:
         trace("no relative start found, can't continue")

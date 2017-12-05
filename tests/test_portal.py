@@ -7,7 +7,7 @@ from swagger_spec_validator import validate_spec_url
 import tempfile
 import urllib
 
-from portal.config import TestConfig
+from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.factories.app import create_app
 from portal.models.intervention import INTERVENTION, UserIntervention
@@ -165,6 +165,7 @@ class TestPortal(TestCase):
         # confirm styling unicode functions
         body = message.style_message(message.body)
         self.assertTrue(u'DOCTYPE' in body)
+        self.assertTrue(u'style' in body)
         self.assertTrue(isinstance(body, unicode))
 
         self.login()

@@ -13,6 +13,7 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
+from datetime import datetime
 from flask import current_app, url_for
 from flask_babel import gettext as _
 import json
@@ -219,7 +220,8 @@ def update_card_html_on_completion():
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
-        assessment_status = AssessmentStatus(user=user)
+        now = datetime.utcnow()
+        assessment_status = AssessmentStatus(user=user, as_of_date=now)
         current_app.logger.debug("{}".format(assessment_status))
         indefinite_questionnaires = (
             assessment_status.instruments_needing_full_assessment(
@@ -230,7 +232,7 @@ def update_card_html_on_completion():
         def thank_you_block(name, registry):
             greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                u"You've completed the {} Registry Study questionnaire"
+                u"You've completed the {} questionnaire"
                 ".").format(registry)
             reminder = _(
                 u"You will be notified when the next "
@@ -267,15 +269,17 @@ def update_card_html_on_completion():
                     'Due', 'Overdue', 'In Progress'):
                 qb = assessment_status.qb_data.qb
                 trigger_date = qb.trigger_date(user)
-                utc_due = qb.calculated_start(trigger_date).relative_start
-                utc_due = qb.calculated_due(trigger_date) or utc_due
+                utc_due = qb.calculated_start(
+                    trigger_date, as_of_date=now).relative_start
+                utc_due = qb.calculated_due(
+                    trigger_date, as_of_date=now) or utc_due
                 due_date = localize_datetime(utc_due, user)
                 assert due_date
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} registry study "
+                    u"Please complete your {} "
                     "questionnaire by {}.").format(
-                        assessment_status.organization.name,
+                        assessment_status.top_organization.name,
                         due_date.strftime('%-d %b %Y'))
                 return u"""
                     <div class="portal-header-container">
@@ -291,9 +295,9 @@ def update_card_html_on_completion():
             if any(indefinite_questionnaires):
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} registry study "
+                    u"Please complete your {} "
                     "questionnaire at your convenience.").format(
-                        assessment_status.organization.name)
+                        assessment_status.top_organization.name)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -308,7 +312,7 @@ def update_card_html_on_completion():
             if assessment_status.overall_status == "Completed":
                 return thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.organization.name)
+                    registry=assessment_status.top_organization.name)
             raise ValueError("Unexpected state generating intro_heml")
 
         def completed_card_html(assessment_status):
@@ -460,7 +464,7 @@ def update_card_html_on_completion():
             if assessment_status.enrolled_in_classification('indefinite'):
                 card_html = thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.organization.name)
+                    registry=assessment_status.top_organization.name)
             else:
                 message = _(
                     u"The assessment is no longer available.\n"

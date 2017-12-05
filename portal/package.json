@@ -16,6 +16,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-concat-po": "^0.1.1",
     "gulp-less": "^3.3.2",
+    "gulp-merge-json": "^1.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-uglify": "^3.0.0",

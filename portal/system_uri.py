@@ -32,6 +32,8 @@ DECISION_SUPPORT_GROUP = '{}/decision-support-group'.format(
     TRUENTH_IDENTITY_SYSTEM)
 PRACTICE_REGION = '{}/practice-region'.format(TRUENTH_IDENTITY_SYSTEM)
 SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)
+SHORTNAME_ID = '{}/shortname'.format(TRUENTH_IDENTITY_SYSTEM)
+TRUENTH_RP_EXTENSION = '{}/research-protocol'.format(TRUENTH_IDENTITY_SYSTEM)
 
 TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(
     TRUENTH_NAMESPACE)

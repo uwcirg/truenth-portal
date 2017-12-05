@@ -1,0 +1,2134 @@
+/* Symptom-tracker background-color: #5f7783; */
+/* .start-button a:hover color: #435928; */
+/* TrueNTH darkest gray: #404141 */
+
+body {
+  	margin: 0;
+  	padding: 0;
+  	font-size: 1.5em;
+  	line-height: 1.4em;
+  	letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+	background-color: #fffff8;
+	background-color: #fff;
+}
+	
+.row-hover {
+	background-color: lightgoldenrodyellow;
+}
+
+.cell-hover {
+	background-color: pink;
+}
+
+a:hover, a:focus {
+	text-decoration: none;
+	outline: none;
+	outline-offset: none;
+}
+
+.container {    position: relative;
+    max-width: 1000px;
+    min-width: 320px;
+    width: 100%;
+    min-height: auto;
+    background-color: transparent;
+    padding: 0;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 60px 5px 60px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+    background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+
+b, strong {
+	color: #5e7c38;
+	font-weight: 600;
+	letter-spacing: .01em;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	padding: 0px;
+    margin: 0px auto;
+	width: 100%;
+	max-width: 768px;
+}
+
+#Intro-Hero {
+	position: absolute;
+	width: 100%;
+	padding: 0 10px;
+}
+
+.Hero-image {
+	position: relative;
+	z-index: 0;
+}
+
+#Intro-Hero img {
+	border: 1px solid #404141;
+	width: 100%;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    top: 38%;
+    left: 0;
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 1.6em;
+    font-size: 1.9em;
+
+    line-height: 1.3em;
+    
+    padding: 0 15px;
+    padding: 0 30px;
+
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: .03em;
+    text-shadow: 1px 1px #000;
+}
+
+.clearfix {
+    clear:both;
+}
+
+#Intro-content {
+	position: absolute;
+	padding: 0px 7px;
+    margin: 0px auto;
+}
+
+.start-button {
+    font-size: 13px;
+    line-height: 3em;
+    letter-spacing: .2em;
+    display: block;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: #829d64;
+    color: #fff;
+    
+	width: 220px;
+    margin: 10px auto 40px;
+}
+
+.start-button a {
+	color:	#fff;
+	padding: 12px 39px;
+	text-decoration: none;
+	transition: all 0.3s ease-out;
+	display: inline;
+}
+
+.start-button a:hover {
+	background-color: #435928;
+	color: #fff;
+	padding: 11px 40px;
+	text-decoration: none;
+	transition: all 0.3s ease-out;
+	display: inline;
+}
+
+/*
+.fa-lg {
+	color: #645f49;
+	vertical-align: -1px;
+}
+
+.fa-lg:hover {
+	color: #fff;
+	vertical-align: -1px;
+}
+*/
+
+.fa-lg {
+	color: #fff;
+	vertical-align: -1px;
+}
+
+h1 {
+	font-size: 1.6em;
+    color: #5e7c38;
+    text-align: center;
+    border: 1px solid #829d64;
+    padding: 15px;
+    line-height: 1.3em;
+    margin: 0 10px;
+}
+/*
+
+h2 {
+	font-size: 1.4em;
+    color: #5e7c38;
+    text-align: center;
+    border: 1px solid #829d64;
+    padding: 15px;
+    line-height: 1.3em;
+}
+*/
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+#Resources p {
+	margin: 0px;
+	font-size: 1em;
+	line-height: 1.4em;
+	letter-spacing: .02em;
+	font-weight: 400;
+	font-style: normal;
+	color: #333;
+}
+
+#Resources p a {
+	margin: 0px;
+	font-size: 1em;
+	line-height: 1.4em;
+	letter-spacing: .02em;
+	font-weight: 400;
+	font-style: normal;
+	color: #5f7783;
+	text-decoration: underline;
+}
+
+#Resources .btn-primary {
+    color: #fff;
+    background: #5e7c38;
+    border: none;
+    
+    margin: 10px auto 20px;
+	height: 2.2em;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 90%;
+	text-shadow: none;
+	border-radius: 0;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+#Resources .btn-primary:hover {
+    color: #fff;
+    background: #435928;
+    border: none;
+    
+    margin: 10px auto 20px;
+	height: 2.2em;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 90%;
+	text-shadow: none;
+	border-radius: 0;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+/*
+.modal .close {
+    z-index: 10;
+    top: 40px;
+    right: 6px;
+    background-color: #fff;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background-image: url(../img/assets/x-2fff.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-color: transparent;
+    -webkit-transform: rotate(45deg);
+    border: none;
+    border-radius: 80px;
+}
+*/
+
+.btn-secondary span {
+    font-weight: 400;
+    color: #fff;
+    background: #5e7c38;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    height: 1.2em;
+    padding: .2em;
+    font-size: 22px;
+    line-height: .01px;
+    letter-spacing: .1px;
+}
+
+.btn-secondary span:hover {
+	font-weight: 600;
+	color: #fff;
+    background: #435928;
+    background: #829d64;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    height: 1.2em;
+    padding: .2em;
+    font-size: 22px;
+    line-height: .01px;
+    letter-spacing: .1px;
+/*     -webkit-transform: rotate(90deg); */
+    cursor: pointer;
+}
+
+
+.btn-secondary {
+    font-weight: 400;
+    color: #fff;
+    background: #5e7c38;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    height: 1.2em;
+    padding: .2em;
+    font-size: 22px;
+    line-height: .01px;
+    letter-spacing: .1px;
+}
+
+.btn-secondary:hover {
+	font-weight: 600;
+	color: #fff;
+    background: #435928;
+    background: #829d64;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    height: 1.2em;
+    padding: .2em;
+    font-size: 22px;
+    line-height: .01px;
+    letter-spacing: .1px;
+/*     -webkit-transform: rotate(90deg); */
+    cursor: pointer;
+}
+
+#ED-Intro h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+.exercise-button-container {
+	border: 1px solid #829d64;
+	padding: 5px;
+	margin: 15px auto;
+	width: 100%;
+	height: auto;
+	max-width: 766px;
+}
+
+.exercise-button {
+	border: 1px solid #b7c597; /* lighter */
+	border: 1px solid #829d64;
+	padding: 0 10px;
+	margin: 7px;
+	width: 48%;
+	min-height: 180px;
+	float: left;
+}
+
+.exercise-button:hover {
+	border: 1px solid #b7c597; /* lighter */
+	border: 1px solid #829d64;
+	padding: 0 10px;
+/* 	margin: 5px; */
+	width: 48%;
+/* 	height: 180px; */
+	float: left;
+	background-color: #ebefe3;
+}
+
+.exercise-button h3 {
+	font-size: 20px;
+	line-height: 1.1em;
+	font-weight: 500;
+	letter-spacing: .03em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.exercise-button p {
+    font-size: 1em;
+    line-height: 1.3em;
+    letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+}
+
+.exercise-read-more {
+	font-size: .8em;
+	line-height: 1.5em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/*
+div#exercise-benefits.modal.fade.in {
+    position: relative;
+    padding: 0 10px 10px;
+}
+*/
+
+td {
+	padding: 4px 4px;
+	vertical-align: top;
+	border: 1px solid #5e7c38;
+	line-height: 1.3em; 
+}
+
+tr {
+	padding: 3px;
+	vertical-align: top;
+	border: 1px solid #5e7c38; 
+}
+
+table b, strong {
+    font-size: 1em;
+    line-height: 1.3em;
+    letter-spacing: .02em;
+    font-weight: 700;
+    font-style: normal;
+    color: #5e7c38;
+}
+
+/*
+div#exercise-benefits.modal.fade.in h2 b {
+	position: relative;
+	font-size: 22px;
+    letter-spacing: .01em;
+	background-color: #5e7c38;
+	color: #fff;
+	text-align: left;
+	padding: 10px 10px 10px;
+	margin: -15px -15px 15px -15px;
+	display: block;
+	height: 45px;
+}
+*/
+
+div#exercise-benefits.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-benefits.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-benefits.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#exercise-benefits.modal.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-benefits.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-benefits.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+div#exercise-types.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+	font-weight: 400;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-types.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-types.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#exercise-types.modal.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-types.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-types.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+div#exercise-works.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+	font-weight: 400;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-works.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-works.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#exercise-works.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-works.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-works.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+div#exercise-prescription.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+	font-weight: 400;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-prescription.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-prescription.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+}
+div#exercise-prescription.modal.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-prescription.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-prescription.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+div#exercise-safety.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+	font-weight: 400;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-safety.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-safety.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#exercise-safety.modal.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-safety.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-safety.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+div#exercise-partner.modal.fade.in h2 {
+	position: relative;
+	font-size: 22px;
+	font-weight: 400;
+    letter-spacing: .03em;
+    background-color: #5e7c38;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-partner.modal.fade.in h3 {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+}
+div#exercise-partner.modal.fade.in ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#exercise-partner.modal.fade.in ul li:first-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-partner.modal.fade.in ul li:last-child {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-partner.modal.fade.in ul li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: url('../img/green-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 5px;
+	padding-left: 13px;
+    padding-bottom: 5px;
+    margin-left: 0px;
+    list-style-position: outside;
+    list-style-type: none;
+}
+div#exercise-works.benefits.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+div#exercise-types.modal.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+div#exercise-works.modal.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+div#exercise-prescription.modal.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+div#exercise-safety.modal.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+div#exercise-partner.modal.fade.in h4 b, strong {
+    font-size: .9em;
+    font-weight: 500;
+    font-style: oblique;
+    line-height: 1.3em;
+    margin: 20px auto;
+}
+
+.modal-open .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-width: 768px;
+    margin: 0 auto;
+}
+
+strong {
+    font-size: 1em;
+    font-weight: 600;
+    font-style: normal;
+    line-height: 1.3em;
+    margin: 20px auto;
+    vertical-align: top;
+}
+
+
+
+
+
+
+
+/* Bootstrap breakpoints 
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/*
+@media  (min-width: 1200px) {
+
+.container {
+	position: relative;
+	max-width: 768px;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+}
+
+@media  (min-width: 992px) {
+
+}
+
+@media  (min-width: 768px) {
+
+.container {
+	position: relative;
+	width: 100%;
+}
+.navbar-toggle {
+    display: none;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 60px 5px 60px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; 
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+}
+*/
+
+/* Breakpoints > (max-width: 768px) */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+
+@media  (max-width: 768px) {
+
+.container {
+	position: relative;
+	max-width: 768px;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 40px 5px 40px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+#ED-Exercise h3 {
+	font-size: 17px;
+	line-height: 1.2em;
+	font-weight: 500;
+	letter-spacing: .03em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.exercise-button-container {
+	border: 1px solid #cde5be;
+	padding: 5px;
+	margin: 15px auto;
+	width: 100%;
+	height: auto;
+	max-width: 766px;
+}
+
+.exercise-button {
+	border: 1px solid #b7c597; /* lighter */
+	border: 1px solid #829d64;
+	padding: 0 10px;
+	margin: 5px;
+	width: 48%;
+/* 	min-height: 180px; */
+	float: left;
+}
+
+.exercise-button:hover {
+	border: 1px solid #b7c597; /* lighter */
+	border: 1px solid #829d64;
+	padding: 0 10px;
+/* 	margin: 5px; */
+	width: 48%;
+/* 	height: 180px; */
+	float: left;
+	background-color: #ebefe3;
+}
+
+.exercise-button p {
+    font-size: 1em;
+    line-height: 1.2em;
+    letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+}
+
+.exercise-read-more {
+	font-size: .8em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+
+}
+
+
+/* Breakpoints > (max-width: 720px) */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+
+@media  (max-width: 720px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 25px 5px 25px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+#ED-Exercise h3 {
+	font-size: 17px;
+	line-height: 1.2em;
+	font-weight: 500;
+	letter-spacing: .03em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.exercise-button-container {
+	border: 1px solid #cde5be;
+	padding: 5px;
+	margin: 15px auto;
+	width: 100%;
+	height: auto;
+	max-width: 766px;
+}
+
+.exercise-button {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+	margin: 7px;
+	min-height: 120px;
+	float: left;
+	max-width: 98%;
+	width: 100%;
+}
+
+.exercise-button:hover {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+/* 	margin: 5px; */
+/* 	min-height: 120px; */
+	float: left;
+	background-color: #ebefe3;
+	max-width: 98%;
+	width: 100%;
+}
+
+.exercise-button p {
+    font-size: 1em;
+    line-height: 1.2em;
+    letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+}
+
+.exercise-read-more {
+	font-size: .8em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 0 0 10px;
+    margin: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+
+}
+
+/* Breakpoints > (max-width: 668px) */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+
+@media  (max-width: 668px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 25px 5px 25px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+#ED-Exercise h3 {
+	font-size: 17px;
+	line-height: 1.2em;
+	font-weight: 500;
+	letter-spacing: .03em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.exercise-button-container {
+	border: 1px solid #cde5be;
+	padding: 5px;
+	margin: 15px auto;
+	width: 100%;
+	height: auto;
+	max-width: 766px;
+}
+
+.exercise-button {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+	margin: 5px;
+	min-height: 120px;
+	float: left;
+	max-width: 600px;
+	width: 100%;
+}
+
+.exercise-button:hover {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+/* 	margin: 5px; */
+/* 	min-height: 120px; */
+	float: left;
+	background-color: #ebefe3;
+	max-width: 600px;
+	width: 100%;
+}
+
+.exercise-button p {
+    font-size: 1em;
+    line-height: 1.2em;
+    letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+}
+
+.exercise-read-more {
+	font-size: .8em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 0 0 10px;
+    margin: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+
+}
+
+
+
+
+/* Breakpoints > (max-width: 640px) */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+
+@media  (max-width: 640px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 25px 5px 25px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+#ED-Exercise h3 {
+	font-size: 17px;
+	line-height: 1.2em;
+	font-weight: 500;
+	letter-spacing: .03em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.exercise-button-container {
+	border: 1px solid #cde5be;
+	padding: 5px;
+	margin: 15px auto;
+	width: 100%;
+	height: auto;
+	max-width: 766px;
+}
+
+.exercise-button {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+	margin: 5px;
+	min-height: 120px;
+	float: left;
+	max-width: 98%;
+	max-width: 97%;
+
+	width: 100%;
+}
+
+.exercise-button:hover {
+	border: 1px solid #829d64;
+	padding: 0 10px;
+/* 	margin: 5px; */
+/* 	min-height: 120px; */
+	float: left;
+	background-color: #ebefe3;
+	max-width: 98%;
+	max-width: 97%;
+	width: 100%;
+}
+
+.exercise-button p {
+    font-size: 1em;
+    line-height: 1.2em;
+    letter-spacing: .02em;
+    font-weight: 400;
+    font-style: normal;
+    color: #333;
+}
+
+.exercise-read-more {
+	font-size: .8em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #5e7c38;
+    text-align: left;
+    border-top: none;
+    padding: 0 0 10px;
+    margin: 0;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+
+}
+
+
+
+
+
+
+
+/* MORE MEDIA QUERIES */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+
+
+@media  (max-width: 530px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    top: 34%;
+    left: 0;
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 1.5em;
+    line-height: 1.3em;
+    padding: 0 25px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: .05em;
+    text-shadow: 1px 1px #000;
+}
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+}
+
+
+@media  (max-width: 480px) {
+
+.container {
+	position: relative;
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    top: 31%;
+    left: 0;
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 1.5em;
+    line-height: 1.3em;
+    padding: 0 25px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: .05em;
+    text-shadow: 1px 1px #000;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 15px 5px 15px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+}
+
+/* iphone 6 plus */
+@media  (min-width: 415px) and (max-width: 768px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+}
+
+/* iphone 6 plus */
+@media  (max-width: 414px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+.container {
+	position: relative;
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    top: 26%;
+    left: 0;
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 1.5em;
+    line-height: 1.3em;
+    padding: 0 25px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: .05em;
+    text-shadow: 1px 1px #000;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 15px 5px 15px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+#Resources h3 {
+	font-size: 22px;
+	letter-spacing: 1px;
+    color: #5e7c38;
+    text-align: center;
+    border-top: 1px dotted #829d64;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+
+
+}
+
+
+/* iphone 6 */
+@media  (max-width: 375px) {
+
+.container {
+	position: relative;
+
+	width: 100%;
+}
+.navbar-toggle {
+    display: none;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    top: 22%;
+    left: 0;
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 1.5em;
+    line-height: 1.3em;
+    padding: 0 25px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: .05em;
+    text-shadow: 1px 1px #000;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+	position: relative;
+	margin: 0 auto;
+	padding: 0;
+	max-width: 768px;
+}
+
+#mainNavbar > ul > li > a {
+    display: flex;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: #5e7c38;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 260px;
+    height: 50px;
+    text-align: center;
+    padding: 5px 15px 5px 15px;
+    align-items: center;
+}
+
+#mainNavbar > ul > li.active > a {
+    font-weight: bold;
+	background-color: white;
+    background-image: none;
+    color: black;
+    z-index: 999;
+    -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+}
+
+
+.navbar-collapse {
+    overflow-x: visible;
+    padding-right: 0px;
+    padding-left: 0px;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-overflow-scrolling: touch;
+    
+    display: contents; /* override bootstrap .collapse */
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+}
+
+/* iphone 5, 5s, SE */
+@media  (max-width: 320px) {
+
+.container {
+	width: 100%;
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+}
+
+
+}
+
+
+/* END MEDIA QUERIES */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */
+/* ======================================================================================== */

@@ -11,7 +11,7 @@ from flask_wtf import FlaskForm
 from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import validators, HiddenField, IntegerField, StringField
+from wtforms import validators, BooleanField, HiddenField, IntegerField, StringField
 from datetime import datetime
 
 from .auth import next_after_login, logout
@@ -26,7 +26,6 @@ from ..models.app_text import (
     get_terms,
     InitialConsent_ATMA,
     MailResource,
-    StaffRegistrationEmail_ATMA,
     UndefinedAppText,
     UserInviteEmail_ATMA,
     VersionedResource
@@ -39,8 +38,9 @@ from ..models.identifier import Identifier
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
-from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
-from ..models.user import current_user, get_user, User, UserRoles
+from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
+from ..models.table_preference import TablePreference
+from ..models.user import current_user, get_user, User
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import establish_trace, dump_trace
 
@@ -429,15 +429,22 @@ def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
 
-    request_org_list = request.args.get('org_list', None)
+    user = current_user()
 
-    if request_org_list:
+    pref_org_list = None
+    # check user table preference for organization filters
+    pref = TablePreference.query.filter_by(table_name='adminList',
+                                           user_id=user.id).first()
+    if pref and pref.filters:
+        pref_org_list = pref.filters.get('orgs_filter_control')
+
+    if pref_org_list:
         org_list = set()
 
         # for selected filtered orgs, we also need to get the children
         # of each, if any
-        request_org_list = set(request_org_list.split(","))
-        for orgId in request_org_list:
+        pref_org_list = set(pref_org_list.split(","))
+        for orgId in pref_org_list:
             check_int(orgId)
             if orgId == 0:  # None of the above doesn't count
                 continue
@@ -455,95 +462,7 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true",
-                           org_list=list(org_list), user=current_user())
-
-
-@portal.route('/staff-profile-create')
-@roles_required(ROLE.STAFF_ADMIN)
-@oauth.require_oauth()
-def staff_profile_create():
-    consent_agreements = Organization.consent_agreements()
-    user = current_user()
-
-    #compiling org list for staff
-    #org list should include all orgs under the current user's org(s)
-    OT = OrgTree()
-    org_list = set()
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-            continue
-        org_list.update(OT.here_and_below_id(org.id))
-
-    return render_template(
-        "staff_profile_create.html", user=user,
-        consent_agreements=consent_agreements,
-        org_list=list(org_list))
-
-@portal.route('/staff')
-@roles_required(ROLE.STAFF_ADMIN)
-@oauth.require_oauth()
-def staff():
-    """staff view function, intended for staff admin
-
-    Present the logged in staff admin the list of staff matching
-    the staff admin's organizations (and any decendent organizations)
-
-    """
-    user = current_user()
-
-    OT = OrgTree()
-
-    staff_role_id = Role.query.filter(
-        Role.name==ROLE.STAFF).with_entities(Role.id).first()
-    admin_role_id = Role.query.filter(
-        Role.name==ROLE.ADMIN).with_entities(Role.id).first()
-    staff_admin_role_id = Role.query.filter(
-        Role.name==ROLE.STAFF_ADMIN).with_entities(Role.id).first()
-
-    # empty patient query list to start, unionize with other relevant lists
-    staff_list = User.query.filter(User.id==-1)
-
-    org_list = set()
-
-    user_orgs = set()
-
-    # Build list of all organization ids, and their decendents, the
-    # user belongs to
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-            continue
-        org_list.update(OT.here_and_below_id(org.id))
-        user_orgs.add(org.id)
-
-    #Gather up all staff admin and admin that belongs to user's org(s)
-    admin_staff = User.query.join(UserRoles).filter(
-        and_(User.id==UserRoles.user_id,
-             UserRoles.role_id.in_([admin_role_id, staff_admin_role_id]),
-             User.deleted_id.is_(None)
-             )
-        ).join(UserOrganization).filter(
-            and_(UserOrganization.user_id==User.id,
-                 UserOrganization.organization_id.in_(user_orgs)))
-    admin_list = [u.id for u in admin_staff]
-
-
-    # Gather up all staff belonging to any of the orgs (and their children)
-    # NOTE, need to exclude staff_admin or admin user at the same org(s) as the user
-    # as the user should NOT be able to edit their record
-    org_staff = User.query.join(UserRoles).filter(
-        and_(User.id==UserRoles.user_id,
-            ~User.id.in_(admin_list),
-             UserRoles.role_id==staff_role_id,
-             User.deleted_id.is_(None)
-             )
-        ).join(UserOrganization).filter(
-            and_(UserOrganization.user_id==User.id,
-                 UserOrganization.organization_id.in_(org_list)))
-    staff_list = staff_list.union(org_staff)
-
-    return render_template(
-        'staff_by_org.html', staff_list=staff_list.all(),
-        user=user, wide_container="true")
+                           org_list=list(org_list), user=user)
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
@@ -591,34 +510,27 @@ def profile(user_id):
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    top_org = user.first_top_organization()
-    if top_org:
-        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
-    else:
-        name_key = UserInviteEmail_ATMA.name_key()
-    args = load_template_args(user=user)
-    invite_email = MailResource(app_text(name_key), variables=args)
-    return render_template('profile.html', user=user,
-                           invite_email=invite_email, terms=terms,
+    return render_template('profile.html', user=user, terms=terms,
                            consent_agreements=consent_agreements)
 
 
-@portal.route('/staff-registration-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
+@portal.route('/patient-invite-email/<int:user_id>')
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
 @oauth.require_oauth()
-def staff_registration_email(user_id):
-    """Staff Registration Email Content"""
+def patient_invite_email(user_id):
+    """Patient Invite Email Content"""
     if user_id:
         user = get_user(user_id)
     else:
         user = current_user()
 
-    org = user.first_top_organization()
-
-    args = load_template_args(user=user)
-
     try:
-        name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
+        top_org = user.first_top_organization()
+        if top_org:
+            name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+        else:
+            name_key = UserInviteEmail_ATMA.name_key()
+        args = load_template_args(user=user)
         item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
@@ -659,7 +571,8 @@ def contact_sent(message_id):
 
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
-                           validators=[validators.Required()])
+                           validators=[validators.DataRequired()])
+    import_orgs = BooleanField('Import Organizations from Site Persistence')
 
 
 @portal.route('/settings', methods=['GET', 'POST'])
@@ -691,6 +604,22 @@ def settings():
             organization_consents=organization_consents,
             wide_container="true")
 
+    if form.import_orgs.data:
+        from ..trace import dump_trace, establish_trace, trace
+        from ..config.model_persistence import ModelPersistence
+        establish_trace("Initiate import...")
+        try:
+            org_persistence = ModelPersistence(
+                model_class=Organization, sequence_name='organizations_id_seq',
+                lookup_field='id')
+            org_persistence.import_(keep_unmentioned=False, target_dir=None)
+        except ValueError as e:
+            trace("IMPORT ERROR: {}".format(e))
+
+        # Purge cached data and reload.
+        OrgTree().invalidate_cache()
+        organization_consents = Organization.consent_agreements()
+
     # make max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5
     response = make_response(render_template(
@@ -698,6 +627,7 @@ def settings():
         form=form,
         apptext=apptext,
         organization_consents=organization_consents,
+        trace_data=dump_trace(),
         wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
@@ -707,8 +637,11 @@ def settings():
 @oauth.require_oauth()
 def config_settings(config_key):
     key = config_key.upper()
-    # Only handing out LifeRay keys at this time
+    # handing out LifeRay keys at this time
     if key.startswith('LR_'):
+        return jsonify({key: current_app.config.get(key)})
+    # handing out consent related keys e.g. consent_with_top_level_org
+    elif key.startswith('CONSENT_'):
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))
@@ -965,7 +898,7 @@ def stock_consent(org_name):
             <head>
             </head>
             <body>
-                <p>I consent to sharing information with the {{ org_name }}</p>
+                <p>I consent to sharing information with {{ org_name }}</p>
             </body>
         </html>""",
         org_name=org_name)

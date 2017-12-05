@@ -238,7 +238,7 @@
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail" data-loader-container="true">
         <label for="email">{{ _("Email Address") }}</label>
-        <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" required />
+        <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT)%}data-optional="true"{% else %}required{% endif %} />
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
     <script>
@@ -270,7 +270,7 @@
     });</script>
 {%- endmacro %}
 
-{% macro profileEmailForm(person, invite_email) -%}
+{% macro profileEmailForm(person) -%}
     {%- if person -%}
     <div id="sendEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -338,22 +338,28 @@
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
-                    {% if invite_email %}
-                        if (hasValue(return_url)) {
-                            {#- javascript variables are not available at template
-                               rendering time.  insert a placeholder and then
-                               replace once the variable is available. -#}
-                            body = '{{ invite_email.body.encode("unicode-escape") | safe}}';
-                            body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                            subject = '{{ invite_email.subject }}';
-                        };
-                    {% endif %}
+                    if (hasValue(return_url)) {
+                        $.ajax ({
+                            type: "GET",
+                            url: "{{url_for('portal.patient_invite_email', user_id=person.id)}}",
+                            cache: false,
+                            async: false
+                        }).done(function(data) {
+                            if (hasValue(data)) {
+                                subject = data["subject"];
+                                body = data["body"];
+                            };
+                        }).fail(function(xhr) {
+
+                        });
+                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
+                    };
                 }
                 else { // reminder
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
                     subject = '{{ app_text('profileSendEmail reminder email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                 }
-                if (body != '' && hasValue(return_url)) {
+                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
                     tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
                         if (!data.error) {
                             $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
@@ -364,15 +370,20 @@
                             $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                         };
                     });
-                } else  $('#profileEmailMessage').text('{{_("Unable to send email.")}}');
+                } else  {
+                    $('#profileEmailMessage').text('{{_("Unable to send email.")}}');
+                    if (!hasValue(body)) $('#profileEmailMessage').append('<div>' + '{{_("Email body content is missing.")}}' + '</div>');
+                    if (!hasValue(subject)) $('#profileEmailMessage').append('<div>' + '{{_("Email subject is missing.")}}' + '</div>');
+                    if (!hasValue(email)) $('#profileEmailMessage').append('<div>' + '{{_("Email address is missing.")}}' + '</div>');
+                };
             } else $('#profileEmailMessage').text('{%trans%}You must select a email type.{%endtrans%}');
         });
      });</script>
     {%- endif -%}
 {%- endmacro %}
-{% macro profileSendEmail(person, invite_email) -%}
+{% macro profileSendEmail(person) -%}
     {%- if person -%}
-        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person, invite_email)}}</div>
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     {% endif %}
 {%- endmacro %}
 {% macro profileStaffRegistrationEmail(person) -%}
@@ -428,7 +439,7 @@
             })();
             $.ajax ({
                 type: "GET",
-                url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                url: "{{url_for('staff.staff_registration_email', user_id=person.id)}}",
                 cache: false,
                 async: false
             }).done(function(data) {
@@ -464,7 +475,7 @@
      });</script>
     {%- endif -%}
 {%- endmacro %}
-{% macro profileCommunications(person, current_user, invite_email) -%}
+{% macro profileCommunications(person, current_user) -%}
     {%- if person and person.has_role(ROLE.PATIENT) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -483,7 +494,7 @@
                           <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label id="lbPatientRegEmail" for="tab-two" class="tab-label">{{_("Send registration email to patient")}}</label>
                           <div class="tab-content">
-                            <div id="registrationEmailContainer">{{profileSendEmail(person, invite_email)}}</div>
+                            <div id="registrationEmailContainer">{{profileSendEmail(person)}}</div>
                           </div>
                         </div>
                         {%- endif %}
@@ -703,89 +714,128 @@
                 async: false
             }).done(function(data) {
                 if (data && data.entry) {
-                  var entry = data.entry, states = {};
-                  /*
-                   * populate orgs list object
-                   */
-                  OT.populateOrgsList(entry);
-                  var orgsList = OT.getOrgsList();
+                    var entry = data.entry, states = {}, contentHTML = "";
+                    /*
+                    * populate orgs list object
+                    */
+                    OT.populateOrgsList(entry);
+                    var orgsList = OT.getOrgsList();
 
-                  /**** draw state select element first to gather all states
+                    /**** draw state select element first to gather all states
                         assign orgs to each state in array
-                  ***/
-                  entry.forEach(function(item) {
-                    var __state = "";
-                    if (item.identifier) {
-                        (item.identifier).forEach(function(region) {
-                            if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
-                                __state = (region.value).split(":")[1];
-                                if (!states[__state]) {
-                                    $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                    $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                    states[__state] = [item.id];
-                                } else (states[__state]).push(item.id);
-                            };
-                        });
-                    };
-                  });
-
-                  /**** draw input element(s) that belongs to each state based on parent organization id ***/
-                  entry.forEach(function(item) {
-                    if (parseInt(item.id) != 0) {
-                        var parentId;
-                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                        else parentId = item.id;
-                        if (parentId) {
-                            var parentState = (function(o) {
-                                var s = "", found = false;
-                                for (var state in states) {
-                                    if (!found) {
-                                        (states[state]).forEach(function(i) {
-                                            if (i == o) {
-                                               s = state;
-                                               found = true;
-                                            };
-                                        });
+                    ***/
+                    entry.forEach(function(item) {
+                        var __state = "";
+                        if (item.identifier) {
+                            (item.identifier).forEach(function(region) {
+                                if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
+                                    __state = (region.value).split(":")[1];
+                                    if (!states[__state]) {
+                                        $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                        states[__state] = [item.id];
+                                    } else {
+                                        if ($("#stateSelector option[value='" + __state + "']").length === 0) {
+                                            $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                        };
+                                        (states[__state]).push(item.id);
                                     };
+                                    /*
+                                    * assign state for each item
+                                    */
+                                    orgsList[item.id].state = __state;
                                 };
-                                return s;
-                            })(parentId);
+                            });
+                        };
+                    });
 
-                            if ($("#" + parentState + "_container").length > 0) {
+                    /*
+                    * If an organization is a top level org and has child orgs,
+                    * we render legend for it.  This will prevent the organization from being selected by the user.
+                    * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
+                    */
+                    entry.forEach(function(item) {
+                        if (parseInt(item.id) !== 0 && !item.partOf) {
+                            var state = orgsList[item.id].state;
+                            if ($("#" + state + "_container").length > 0) {
                                 var oo = orgsList[item.id];
-                                var contentHTML = "";
-                                /*
-                                 * If an organization is a top level org and has child orgs,
-                                 * we render legend for it.  This will prevent the organization from being selected by the user.
-                                 * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
-                                 */
-                                if (oo && oo.isTopLevel && oo.children.length > 0) {
-                                    contentHTML = "<legend orgId='" + item.id + "'>"+ i18next.t(item.name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + item.name + "\" id='" + item.id + "_org' value='"+item.id+"' />"
+                                if (oo.children.length > 0) {
+                                    contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
+                                    contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
+                                    contentHTML += " id='{orgId}_org' value='{orgId}' />";
+                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                            .replace(/\{orgName\}/g, item.name)
+                                                            .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
                                 } else {
-                                    contentHTML = "<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + i18next.t(item.name) + "</label></div>"
+                                    /*
+                                     * also need to check for top level orgs that do not have children and render those
+                                     */
+                                    contentHTML = "<div class='radio'>" +
+                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
+                                            "</div>";
+                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                        .replace(/\{state\}/g, state)
+                                                        .replace(/\{orgName\}/g, item.name)
+                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
                                 };
-                                $("#" + parentState + "_container").append(contentHTML);
+                                $("#" + state + "_container").append(contentHTML);
                             };
                         };
-                    };
-                  });
+                    });
 
-                  var selectOptions = $("#stateSelector").sortOptions();
-                  if (selectOptions.length > 0) {
-                      $("#stateSelector").empty().append(selectOptions)
-                      .append("<option value='none'>Other</option>")
-                      .prepend("<option value='' selected>Select</option>")
-                      .val("");
-                      $(".state-container, .clinic-prompt").hide();
-                      setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
-                      //case of pre-selected clinic, need to check if any clinic has prechecked
-                      setTimeout(function() { handleCheckedItem();}, 500);
-                      $("#userOrgs input[name='organization']").each(function() {
-                        if ($(this).val() != 0) OT.getDefaultModal(this);
+                    /**** draw input element(s) that belongs to each state based on parent organization id ***/
+                    entry.forEach(function(item) {
+                        if (parseInt(item.id) != 0 && item.partOf) {
+                            var parentId = (item.partOf.reference).split("/")[2];
+                            if (parentId) {
+                                var parentState = (function(o) {
+                                    var s = "", found = false;
+                                    for (var state in states) {
+                                        if (!found) {
+                                            (states[state]).forEach(function(i) {
+                                                if (i == o) {
+                                                   s = state;
+                                                   found = true;
+                                                };
+                                            });
+                                        };
+                                    };
+                                    return s;
+                                })(parentId);
+
+                                contentHTML = "<div class='radio'>" +
+                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
+                                            "</div>";
+                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                        .replace(/\{state\}/g, parentState)
+                                                        .replace(/\{parentOrgName\}/g, item.name)
+                                                        .replace(/\{parentOrgId\}/g, parentId)
+                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+
+                                if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
+                                    $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
+                                } else {
+                                    $("#" + parentState + "_container").append(contentHTML);
+                                };
+                            };
+                        };
                       });
 
-                      {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                      OT.handleEvent();
+                    var selectOptions = $("#stateSelector").sortOptions();
+                    if (selectOptions.length > 0) {
+                        $("#stateSelector").empty().append(selectOptions)
+                          .append("<option value='none'>{{_('Other')}}</option>")
+                          .prepend("<option value='' selected>{{_('Select')}}</option>")
+                          .val("");
+                        $(".state-container, .clinic-prompt").hide();
+                        setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
+                        //case of pre-selected clinic, need to check if any clinic has prechecked
+                        setTimeout(function() { handleCheckedItem();}, 500);
+                        $("#userOrgs input[name='organization']").each(function() {
+                            if (parseInt($(this).val()) !== 0) OT.getDefaultModal(this);
+                        });
+
+                        {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                        OT.handleEvent();
                     } else { // if no states found, then need to draw the orgs UI
                         $("#userOrgs .selector-show").hide();
                         setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
@@ -795,13 +845,15 @@
                         }); }, 500);
                     };
 
-                  if ($("#mainDiv.profile").length > 0) setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+                    if ($("#mainDiv.profile").length > 0) {
+                        setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+                    };
 
-                  $("#clinics").attr("loaded", true);
+                    $("#clinics").attr("loaded", true);
                 };
 
             }).fail(function(xhr) {
-                tnthAjax.sendError(xhr, '/api/organization', {{person.id if person}})
+                tnthAjax.sendError(xhr, "/api/organization", {{person.id if person}})
             });
         });
     </script>
@@ -856,7 +908,7 @@
 {%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
-        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
+        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal" class="consent-modal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -864,23 +916,30 @@
                     <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="terms-wrapper">
-                            <h4>Terms</h4>
-                            <div class="terms-container">{{consent_agreement.asset|safe}}</div>
-                        </div>
-                        <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
-                        <br/>
-                        <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
-                        <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                          <label class="radio-inline">
-                              <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                              {{ _("Yes") }}
-                          </label>
-                          <br/>
-                          <label class="radio-inline">
-                              <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                              {{ _("No") }}
-                          </label>
+                        <div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <div class="main-content tnth-hide">
+                            <div class="terms-wrapper">
+                                <h4>Terms</h4>
+                                <div class="terms-container">{{consent_agreement.asset|safe}}</div>
+                            </div>
+                            <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
+                            <br/>
+                            <p>
+                                {% trans org_shortname=consent_agreement.organization_shortname %}
+                                    I consent to sharing information with <span class="consent-clinic-name">{{org_shortname}}</span>.
+                                {% endtrans %}
+                            </p>
+                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                                  {{ _("Yes") }}
+                              </label>
+                              <br/>
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                                  {{ _("No") }}
+                              </label>
+                            </div>
                         </div>
                         <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
                      </div>
@@ -955,11 +1014,22 @@
                     $(this).on("show.bs.modal", function() {
                         $("#consentContainer .loading-message-indicator").hide();
                         $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
+                        var checkedOrg = $("#userOrgs input[name='organization']:checked");
+                        var shortName = OT.getShortName(checkedOrg.val());
+                        if (hasValue(shortName)) {
+                            $(this).find(".consent-clinic-name").text(i18next.t(shortName));
+                        };
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });
                         var agreement_url = $(this).find(".agreement-url").val();
-                        if (/stock\-org\-consent/.test(agreement_url)) $(".terms-container").hide();
+                        if (/stock\-org\-consent/.test(agreement_url)) {
+                            $(".terms-container").hide();
+                        };
+                        var self = $(this);
+                        $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
+                            self.find(".main-content").removeClass("tnth-hide");
+                        });
                     });
                 });
             });
@@ -1280,49 +1350,15 @@
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
-    <script>
-        $(function () {
-        var sessionListHTML = "";
-        var sessionUserId = $("#_session_user_id").val();
-
-        tnthAjax.assessmentList(sessionUserId, function(data) {
-            if (!data.error) {
-                var entries = data.entry ? data.entry : null;
-                if (entries && entries.length > 0) {
-                    entries.forEach(function(entry, index) {
-
-                        var reference = entry['questionnaire']['reference'];
-                        var arrRefs = String(reference).split('/');
-                        var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
-                        var authoredDate = String(entry['authored']);
-                        $("#gmtText").show();
-                        if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
-                            sessionListHTML += '<tr title="{%trans%}Click to view report{%endtrans%}"  ' +
-                                                (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-                                                [entry['questionnaire']['display'],
-                                                 entry['status'],
-                                                 tnthDates.formatDateString(entry['authored'], "iso")].map(function(o) {
-                                                    return  '<td><a href="' + reportLink + '">{%trans%}' + o + '{%endtrans%}</a></td>'
-                                                 }).join('') +
-                                                 '</tr>';
-                        };
-                    });
-                    $("#userSessionListTable").append(sessionListHTML);
-                    $("#userSessionListTable").show();
-
-                } else {
-                    $("#userSessionListTable").hide();
-                    $("#userSessionsListContainer").prepend("<span class='text-muted'>{%trans%}No questionnaire data found.{%endtrans%}</span>");
-                };
-
-            } else {
-                $("#userSessionListTable").hide();
-                $("#profileSessionListError").html("{%trans%}Problem retrieving session data from server.{%endtrans%}");
-            };
-        });
-    });
-    </script>
+    {% if person %}
+        <script>
+            $(function () {
+                tnthAjax.assessmentList({{person.id}}, function(data) {
+                    fillContent.assessmentList(data);
+                });
+            });
+        </script>
+    {% endif %}
 {%- endmacro %}
 {% macro profileAssessment(person, instrument_id, authored_date) -%}
         <div id="userSessionReportDetail" cellpadding="2">
@@ -1330,57 +1366,15 @@
             <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
             <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" ></table><br />
         </div>
-        <script>
-        $(function () {
-            if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
-
-            var sessionListHTML = "";
-            var sessionUserId = $("#_report_user_id").val();
-            var sessionAuthoredDate = $("#_report_authored_date").val();
-
-            tnthAjax.assessmentReport(sessionUserId, '{{instrument_id}}', function(data) {
-                if (!data.error) {
-                    $(".report-error-message").hide();
-                    $("#userSessionReportDetailTable").html('');
-                    if (data.entry && data.entry.length > 0) {
-                        var entries = data['entry'];
-                        var entry;
-                        entries.forEach(function(item) {
-                            if (!entry && (item["authored"] == sessionAuthoredDate)) entry = item;
-                        });
-
-                        if (!entry) entry = entries[0];
-                        var reportHTML = '<caption><hr/><span class="profile-item-title">{%trans%}' +
-                                        entries[0]['questionnaire']['display'] +
-                                        '{%endtrans%}</span><br/><span class="text-muted smaller-text">{%trans%}Last Updated{%endtrans%} - ' +
-                                        tnthDates.formatDateString(sessionAuthoredDate, "iso") +
-                                         " <span class='gmt'>{%trans%}(GMT, Y-M-D){%endtrans%}</span>" + '</span><hr/></caption>';
-                        reportHTML += '<tr><TH>{%trans%}Question{%endtrans%}</TH><TH>{%trans%}Response{%endtrans%}</TH></tr>';
-                        entry['group']['question'].forEach(function(entry) {
-                            var q = entry['text'] ? entry['text'] : '', a = '', qcNeeded = true;
-                            if (hasValue(q)) {
-                                q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
-                                qcNeeded = false;
-                            };
-                            if (entry['answer']) {
-                                (entry['answer']).forEach(function(item) {
-                                    if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
-                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
-                                });
-                            };
-                            if (!hasValue(q)) q = entry['linkId'];
-                            reportHTML += '<tr><td>{%trans%}' + (hasValue(q)? q: "--") + '{%endtrans%}</td><td>{%trans%}' + (String(a) !== 'undefined' ? a : '--') + '{%endtrans%}</td></tr>';
-                        });
-                        $("#userSessionReportDetailTable").append(reportHTML);
-                    };
-                } else {
-                    $(".report-error-message").show();
-                    $(".report-error-message").append("<div>" + "{{_('Server Error occurred retrieving report data')}}" + "</div>");
-                };
+        {% if person %}
+            <script>
+            $(function () {
+                tnthAjax.assessmentReport("{{person.id}}", "{{instrument_id}}", function(data) {
+                    fillContent.assessmentReport(data);
+                });
             });
-        });
-        </script>
-
+            </script>
+        {% endif %}
 {%- endmacro %}
 {% macro profileClinicalPCALocalized(person, current_user) -%}
 <!-- not currently being used -->
@@ -1710,21 +1704,8 @@
                          var y = $("#deathYear");
                          if (d.val() != "" && m.val() != "" && y.val() != "") {
                             if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
-                                var today = new Date();
-                                // Check to see if this is a real date
-                                var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
-                                var date = new Date(iy,im-1,iid);
-                                var errorMsg = "";
-
-                                if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                                    if (iy < 1900) errorMsg = "{{_('Year must be after 1900')}}";
-                                    // Only allow if birthdate is before today
-                                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                                        errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
-                                    };
-                                } else errorMsg = "{%trans%}Invalid Date. Please enter a valid date.{%endtrans%}";
-
-                                if (errorMsg == "") {
+                                var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
+                                if (errorMsg === "") {
                                     $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
                                     $("#boolDeath").prop("checked", true);
                                     $("#errorDeathDate").text("");
@@ -1742,7 +1723,7 @@
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Study ID")}}</label>
+        <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
@@ -1756,7 +1737,7 @@
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
 {%- endmacro %}
-{% macro profileCustomDetail(person, invite_email) -%}
+{% macro profileCustomDetail(person) -%}
      <div class="row">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
@@ -1767,7 +1748,7 @@
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
                     <br/>
-                    <div>{{profileEmailForm(person, invite_email)}}</div>
+                    <div>{{profileEmailForm(person)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
@@ -1780,100 +1761,361 @@
                     <div id="enterManualInfoContainer" class="text-info"></div>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
                     <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
-                          <div class="modal-dialog" role="document">
+                        <div class="modal-dialog" role="document">
                             <div class="modal-content">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
-                              </div>
-                              <div class="modal-body">
-                                <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>
-                                 <div class="form-group">
-                                    <div class="profile-radio-list">
-                                      <label class="radio-inline">
-                                          <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
-                                          <span>{{ _("Interview assisted") }}</span>
-                                      </label>
-                                      <br/>
-                                      <label class="radio-inline">
-                                          <input type="radio" name="entryMethod" id="paper" value="paper"/>
-                                          <span>{{ _("Paper") }}</span>
-                                      </label>
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="manualEntryBodyLoader">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
-                                  </div>
-                                  <div id="manualEntryMessageContainer" class="error-message"></div>
-                              </div>
-                              <div class="modal-footer">
-                                <div id="manualEntryLoader" class="loading-message-indicator">
-                                    <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    <div id="manualEntryMain">
+                                        <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
+                                        <input type="hidden" id="manualEntryConsentDate" value="" />
+                                        <input type="hidden" id="qCompletionDate" value="" />
+                                        <input type="hidden" id="qToday" value="" />
+                                        <div class="form-group">
+                                            <div class="profile-radio-list">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                                    <span>{{ _("Interview assisted") }}</span>
+                                                </label>
+                                                <br/>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                                    <span>{{ _("Paper") }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div id="manualEntryCompletionDateContainer" class="form-group">
+                                            <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <div id="manualEntryDateFieldsContainer" class="flex">
+                                                <div class="flex-item">
+                                                    <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" required />
+                                                </div>
+                                                <div class="flex-item" id="qCompletionMonthContainer">
+                                                    <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" required>
+                                                        <option value="">{{ _("Month") }}...</option>
+                                                        <option value="01">{{ _("January") }}</option>
+                                                        <option value="02">{{ _("February") }}</option>
+                                                        <option value="03">{{ _("March") }}</option>
+                                                        <option value="04">{{ _("April") }}</option>
+                                                        <option value="05">{{ _("May") }}</option>
+                                                        <option value="06">{{ _("June") }}</option>
+                                                        <option value="07">{{ _("July") }}</option>
+                                                        <option value="08">{{ _("August") }}</option>
+                                                        <option value="09">{{ _("September") }}</option>
+                                                        <option value="10">{{ _("October") }}</option>
+                                                        <option value="11">{{ _("November") }}</option>
+                                                        <option value="12">{{ _("December") }}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="flex-item" id="qCompletionYearContainer">
+                                                    <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="errorCompletionDate" class="error-message"></div>
+                                        <div id="manualEntryMessageContainer" class="error-message"></div>
+                                    </div>
                                 </div>
-                                <div id="manualEntryButtonsContainer">
-                                    <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                <div class="modal-footer">
+                                    <div id="manualEntryLoader" class="loading-message-indicator">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    </div>
+                                    <div id="manualEntryButtonsContainer">
+                                        <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
+    var manualEntryModalVis = function(hide) {
+        if (hide) {
+            $("#manualEntryButtonsContainer").hide();
+            $("#manualEntryLoader").show();
+        } else {
+            $("#manualEntryButtonsContainer").show();
+            $("#manualEntryLoader").hide();
+        };
+    };
     $(document).ready(function() {
-        $("#profileSendEmailContainer").hide();
-        $(".registration-email-prompt").hide();
-        $("#sendEmailLabel").hide();
-        $("#loginAsPatient").hide();
-        $("#navMenuXs").hide();
-        if (! hasValue($("#email").val()) ){
-            $("#profileEmailSelect").attr("disabled", true);
-        } else $("#profileEmailSelect").attr("disabled", false);
-        $("#email").on("keyup", function() {
-            if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
-            else $("#profileEmailSelect").attr("disabled", true);
-        });
+
+        var continueToAssessment = function(method, completionDate, linkUrl) {
+            /*
+             * note the linkUrl is present will override the existing asssessment link
+             */
+            var assessment_url = linkUrl || {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+            if (hasValue(assessment_url)) {
+                var still_needed = false;
+
+                tnthAjax.getStillNeededCoreData("{{person.id if person}}", true, function(data) {
+                    if (data && ! data.error && data.length > 0) {
+                        still_needed = true;
+                    };
+                }, method);
+
+                /*
+                 * passing additional query params
+                 */
+                if (/\?/.test(assessment_url)) {
+                    assessment_url += "&entry_method=" + method;
+                }
+                else{
+                    assessment_url += "?entry_method=" + method;
+                };
+
+                if (method === "paper") {
+                    assessment_url += "&authored=" + completionDate;
+                };
+
+                var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+
+                manualEntryModalVis(true);
+
+                setTimeout(function() {
+                    manualEntryModalVis();
+                }, 2000);
+
+                setTimeout(function() { window.location = winLocation;}, 100);
+                
+            } else {
+                $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
+            };
+        };
+
+        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false)
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
             handleLoginAs(e);
         });
+        //fix for safari
+        $(window).on("beforeunload", function() {
+            $("#manualEntryButtonsContainer").show();
+            $("#manualEntryLoader").hide();
+            $("#manualEntryModal").modal("hide");
+        });
 
-        $(document).delegate("#meSubmit", "click", function(event){
-            var method = "";
-            $("input[name='entryMethod']").each(function() {
-                if ($(this).is(":checked")) {
-                    method = $(this).val();
+        $("#manualEntryModal").on("show.bs.modal", function() {
+            $("#manualEntryBodyLoader").show();
+            $("#manualEntryMain").hide();
+        });
+        $("#manualEntryModal").on("shown.bs.modal", function() {
+
+            $("#manualEntryMessageContainer").text("");
+            $("#errorCompletionDate").text("");
+            $("#meSubmit").attr("disabled", false);
+            /*
+            * get GMT date/time for today
+            */
+            var todayObj = tnthDates.getTodayDateObj();
+            $("#qCompletionDay").val(todayObj.displayDay);
+            $("#qCompletionMonth").val(todayObj.displayMonth);
+            $("#qCompletionYear").val(todayObj.displayYear);
+            $("#qCompletionDate").val(todayObj.gmtDate);
+            $("#qToday").val(todayObj.gmtDate);
+
+            if ($("#paper").is(":checked")) {
+                $("#manualEntryCompletionDateContainer").show();
+            };
+            //get consent date
+            tnthAjax.getConsent("{{person.id}}", true, function(data) {
+                var dataArray = [];
+                if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+                    dataArray = data["consent_agreements"].sort(function(a,b){
+                         return new Date(b.signed) - new Date(a.signed);
+                    });
+                };
+                if (dataArray.length > 0) {
+                    /*
+                     * filtered out non-deleted items from all consents
+                     */
+                    var items = $.grep(dataArray, function(item) {
+                        return !item.deleted && item.status == "consented";
+                    });
+                    /*
+                     * consent date in GMT
+                     */
+                    if (items.length > 0) {
+                        $("#manualEntryConsentDate").val(items[0].signed);
+                    };
                 };
             });
+
+            setTimeout(function() {
+                $("#manualEntryBodyLoader").hide();
+                $("#manualEntryMain").show();
+
+            }, 10);
+        });
+
+        $("input[name='entryMethod']").on("click", function() {
+            if ($(this).is(":checked")) {
+                $("#manualEntryModal .error-message").text("");
+                $("#meSubmit").attr("disabled", false);
+                if ($(this).val() == "interview_assisted") {
+                    /*
+                    * if method is interview assisted,
+                    * reset completion date to GMT date/time for today
+                    */
+                    var todayObj = tnthDates.getTodayDateObj();
+                    $("#qCompletionDay").val(todayObj.displayDay);
+                    $("#qCompletionMonth").val(todayObj.displayMonth);
+                    $("#qCompletionYear").val(todayObj.displayYear);
+                    $("#qCompletionDate").val(todayObj.gmtDate);
+                };
+            };
+        });
+        $("#paper").on("click", function() {
+            $("#manualEntryCompletionDateContainer").show();
+        });
+        $("#interviewAssisted").on("click", function() {
+            $("#manualEntryCompletionDateContainer").hide();
+        });
+
+         __convertToNumericField($("#qCompletionDay, #qCompletionYear"));
+
+
+        ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
+            var fd = $("#" + fn);
+            fd.on("change", function() {
+                var d = $("#qCompletionDay");
+                var m = $("#qCompletionMonth");
+                var y = $("#qCompletionYear");
+                var todayObj = tnthDates.getTodayDateObj();
+                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
+
+                if (d.val() != "" && m.val() != "" && y.val() != "") {
+                    if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                        var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        var consentDate = $("#manualEntryConsentDate").val();
+                        if (!hasValue(errorMsg) && hasValue(consentDate)) {
+                             /*
+                             * check if date entered is today, if so use today's date/time
+                             */
+                            if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                                $("#qCompletionDate").val(todayObj.gmtDate);
+                            } else {
+                                var gmtDateObj = tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0);
+                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(gmtDateObj));
+                            };
+                            /*
+                             * all date/time should be in GMT date/time
+                             */
+                            var completionDate = new Date($("#qCompletionDate").val());
+                            var cConsentDate = new Date(consentDate);
+                            var cToday = new Date($("#qToday").val());
+                            var nCompletionDate = completionDate.setHours(0,0,0,0);
+                            var nConsentDate = cConsentDate.setHours(0,0,0,0);
+                            var nToday = cToday.setHours(0,0,0,0);
+                            if (nCompletionDate < nConsentDate) {
+                                errorMsg = i18next.t("Completion date cannot be before consent date.");
+                            };
+                            if (nConsentDate >= nToday) {
+                                if (nCompletionDate > nConsentDate) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            } else {
+                                if (nCompletionDate > nToday) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            };
+                        };
+                        if (errorMsg === "") {
+                            $("#errorCompletionDate").text("");
+                            $("#meSubmit").attr("disabled", false);
+                        } else {
+                            $("#errorCompletionDate").text(errorMsg);
+                            $("#meSubmit").attr("disabled", true);
+                        };
+                    } else {
+                        $("#meSubmit").attr("disabled", true);
+                    };
+                } else {
+                    $("#errorCompletionDate").text(i18next.t("Completion date must be valid."));
+                    $("#meSubmit").attr("disabled", true);
+                };
+            });
+        });
+        $(document).delegate("#meSubmit", "click", function(event){
+
+            var method = $("input[name='entryMethod']:checked").val();
+            var completionDate = $("#qCompletionDate").val();
+
             if (method != "") {
                 $("#manualEntryMessageContainer").text("");
-                //check if the user has given web consent here, if not redirect to form
-                var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
-                if (hasValue(assessment_url)) {
-                    var still_needed = false;
-                    tnthAjax.getStillNeededCoreData('{{person.id if person}}', true, function(data) {
-                            if (data && ! data.error && data.length > 0) still_needed = true;
-                        }, method);
-                    if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
-                    else assessment_url += "?entry_method=" + method;
-                    var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
-                    $("#manualEntryButtonsContainer").hide();
-                    $("#manualEntryLoader").show();
-                    setTimeout(function() { window.location = winLocation;}, 100);
+                if (method === "paper") {
+
+                    /*
+                     * check questionnaire time windows
+                     * disallow user to continue if the completion date is not in windows?
+                     * but display warning
+                     */
+
+                    manualEntryModalVis(true);
+
+                    var errorMsg = "";
+
+                    tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
+                        if (!data.error) {
+                            if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
+                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
+                            };
+
+                            if (hasValue(errorMsg)) {
+                                $("#errorCompletionDate").text(errorMsg);
+                                $("#meSubmit").attr("disabled", true);
+                                manualEntryModalVis();
+                            } else {
+                                $("#errorCompletionDate").text("");
+                                $("#meSubmit").attr("disabled", false);
+                            };
+
+                            if (!hasValue(errorMsg)) {
+    
+                                /*
+                                 * retrieve instrument ids from present questionnaire bank
+                                 * only if the date is backdated, i.e. before today's date
+                                 */
+                                var d = $("#qCompletionDay").val();
+                                var m = $("#qCompletionMonth").val();
+                                var y = $("#qCompletionYear").val();
+                                var todayObj = tnthDates.getTodayDateObj();
+                                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
+
+                                var instruments_string = "";
+                                var linkUrl = "";
+
+                                if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
+                                    /*
+                                     * note the API will redirect to AE with the necessary instruments information
+                                     */
+                                    linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
+                                };
+                                continueToAssessment(method, completionDate, linkUrl);
+                            };
+
+                        };
+                    });
                 } else {
-                    $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
+                    continueToAssessment(method);
                 };
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
             };
           });
 
-          $("input[name='entryMethod']").on("click", function() {
-              if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
-          });
-
         {%- if person -%}
+
             tnthAjax.assessmentStatus({{person.id}}, function(data) {
                 if (!data.error) {
                     if ((data.assessment_status).toUpperCase() == "COMPLETED") {
@@ -2044,11 +2286,11 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions, invite_email) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
-            {{ profileCustomDetail(person, invite_email) }}
+            {{ profileCustomDetail(person) }}
         {%- endif -%}
     {%- endif -%}
     {% if person and person.has_role(ROLE.PATIENT) -%}
@@ -2115,7 +2357,7 @@
         </div>
     {%- endif %}
 
-    {{profileCommunications(person, current_user, invite_email)}}
+    {{profileCommunications(person, current_user)}}
 
     <div class="row">
         <div class="col-md-12 col-xs-12">
@@ -2218,32 +2460,32 @@
 {%- endmacro %}
 
 {% macro profileProcedures(person, current_user) -%}
-    <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
+    {% set top_org = current_user.first_top_organization() if current_user else False %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="procedure">
-                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}</h4>
+            <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %}>
+                <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
+                <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
+                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span></h4>
                 <div class="view-container"><div id="procedure_view"></div></div>
                 <div class="edit-container">
-                    <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
-                            date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
+                    <p class="text-muted">
+                        {%-if current_user and current_user.has_role(ROLE.STAFF)-%}
+                            {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
+                        {%-elif person and current_user and (person.id == current_user.id) -%}
+                            {{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+                            date, please make your best guess.") }}
+                        {% else %}
+                            {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
+                        {%-endif-%}
+                    </p><br/>
                     <div id="profileProcedureContainer">
                         <div id="procedureForm" class="form-inline event-element">
                             <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
                             <div class="row">
-                                <div class="col-md-6 col-xs-11">
+                                <div class="col-md-9 col-xs-11">
                                     <div class='form-group'>
-                                        <select class='form-control' id='tnthproc'>
-                                            <option value=''>{{ _("Select") }}...</option>
-                                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
-                                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
-                                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
-                                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
-                                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
-                                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
-                                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
-                                            <option value='999999999'>{{ _("None of the above") }}</option>
-                                        </select>
+                                        <select class='form-control' id='tnthproc'></select>
                                         <div class="help-block with-errors"></div>
                                     </div>
                                 </div>
@@ -2253,10 +2495,10 @@
                                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
                                 <div class="flex">
                                     <div class="flex-item">
-                                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" />
+                                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}"/>
                                     </div>
                                     <div class="flex-item">
-                                        <select class="form-control" name="procMonth" id="procMonth">
+                                        <select class="form-control" name="procMonth" id="procMonth" data-error="{{_('Date must be valid and in the required format.')}}">
                                             <option value="">{{ _("Month") }}...</option>
                                             <option value="01">{{ _("January") }}</option>
                                             <option value="02">{{ _("February") }}</option>
@@ -2273,28 +2515,30 @@
                                         </select>
                                     </div>
                                     <div class="flex-item">
-                                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"/>
-                                    </div>
-                                    <div class="flex-item">
-                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{{_("Save")}}</span></button>
+                                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}"/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                     <div class="col-md-10 col-xs-10"><div id="procDateErrorContainer" class="help-block with-errors"></div></div>
+                                <div id="procDateErrorContainer" class="help-block with-errors"></div>
+                                <div class="button-container">
+                                    <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' {% if not person %}data-account-create='true'{% endif %} type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{%-if person-%}{{_("Save")}}{%-else-%}{{_("Add")}}{%-endif-%}</span></button>
                                 </div>
                             </div>
-                            <br />
-                            <div id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
-                            <div id="pastTreatmentsContainer" class="inner">
-                                 <hr style="border-bottom: 1px solid #e5e5e5"/>
-                                {%- if person.id == current_user.id -%}
-                                    <p class="text-muted">{{_("My History")}}:</p>
-                                {%- else -%}
-                                    <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
-                                {%- endif -%}
-                                <div id="userProcedures"></div>
-                            </div>
-                            <br/>
+                            {% if person %}
+                                <br />
+                                <div id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
+                                <div id="pastTreatmentsContainer" class="inner">
+                                     <hr style="border-bottom: 1px solid #e5e5e5"/>
+                                    {%- if person.id == current_user.id -%}
+                                        <p class="text-muted">{{_("My History")}}:</p>
+                                    {%- else -%}
+                                        <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                                    {%- endif -%}
+                                    <div id="userProcedures"></div>
+                                </div>
+                                <br/>
+                            {% else %}
+                                <table id="pastTreatmentsContainer" class="inner"></table>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -2302,11 +2546,13 @@
         </div>
     </div>
     <script>
-        var subjectId = {{ person.id if person}};
-        var currentUserId = {{ current_user.id if current_user}};
         $(document).ready(function(){
-            tnthAjax.getProc({{ person.id if person}}, false);
-            __convertToNumericField($("#procYear, #procDay"));
+            tnthAjax.treatmentOptions("{{person.id if person}}",null, function(data) {
+                if (!data.error) {
+                    fillContent.treatmentOptions(data);
+                };
+            });
+            {% if person %} tnthAjax.getProc('{{person.id}}', false); {% endif %}
         });
     </script>
 {%- endmacro %}
@@ -2316,435 +2562,4 @@
     <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">{{ _("Save") }}</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>{{ _("Profile changes have been saved") }}</em></span>
-{%- endmacro %}
-{% macro accountCreationScript() -%}
-    <script>
-    var AccountCreationObj = function (roles) {
-        this.attempts = 0;
-        this.max_attempts = 3;
-        this.params = null;
-        this.roles = roles;
-        this.userId = "None created";
-
-        $.ajaxSetup({
-            timeout: 5000,
-            retryAfter:3000
-        });
-
-        this.__request = function(params) {
-            if (!params) return false;
-            if (!hasValue(params.apiUrl)) {
-                if (params.callback) (params.callback).call(self, {"error": "API url is required."});
-                return false;
-            };
-            var errorMessage = "";
-            var self = this;
-            self.attempts++;
-            self.params = params;
-            $.ajax ({
-                type: (params.requestType ? params.requestType : 'GET'),
-                url: String(params.apiUrl).replace('//', '/'),
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                async: params.sync ? false : true,
-                data: params.requestData
-            }).done(function(data) {
-                self.attempts = 0;
-                if (params.callback) (params.callback).call(self, {"data": data});
-            }).fail(function(xhr) {
-                if (self.attempts < self.max_attempts) {
-                    setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
-                } else {
-                    var displayError = "{{_('Server error occurred updating data.')}}";
-                    $("#error_response_text").html(displayError);
-                    errorMessage = "Error processing request: " + params.apiUrl;
-                    errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
-                    errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
-                    tnthAjax.reportError(this.userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
-                    self.attempts = 0;
-                    if (params.callback) (params.callback).call(self, {"error": displayError});
-                };
-            });
-            return errorMessage;
-        };
-        this.__setAccount = function() {
-            var orgIDs = $('#userOrgs input:checked').map(function(){
-                return { organization_id: $(this).val() };
-            }).get();
-
-            var _accountArray = {};
-            _accountArray['organizations'] = orgIDs;
-            if (this.roles) _accountArray['roles'] =  this.roles;
-            _accountArray['consents'] = getConsents();
-
-            //note, this will call put/demographics to update demographics after
-            this.__request({'apiUrl': '/api/account', 'requestType': 'POST', 'requestData': JSON.stringify(_accountArray), 'sync': true, 'callback': this.__setDemo});
-        };
-        this.__setDemo = function(returnedData) {
-            var responseData = returnedData && returnedData.data? returnedData.data : null;
-            var self = this;
-            if (responseData) {
-
-                self.userId = responseData['user_id'];
-                if (isNaN(self.userId)) {
-                    self.__handleError("Invalid user id: " + self.userId);
-                    self.__handleButton();
-                    return false;
-                };
-
-                var _demoArray = {};
-                _demoArray['resourceType'] = 'Patient';
-                _demoArray['name'] = {
-                    'given': $.trim($('input[name=firstname]').val()),
-                    'family':$.trim($('input[name=lastname]').val())
-                };
-                _demoArray['birthDate'] = $('input[name=birthDate]').val();
-
-                _demoArray['telecom'] = [];
-
-                var emailVal = $.trim($('input[name=email]').val());
-                if (hasValue(emailVal)) {
-                    _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
-                } else {
-                    _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
-                };
-                _demoArray['telecom'].push({ 'system': 'phone', 'use': 'mobile', 'value': $.trim($('input[name=phone]').val())});
-                _demoArray['telecom'].push({ 'system': 'phone', 'use': 'home', 'value': $.trim($('input[name=altPhone]').val())});
-
-                var orgIDs = $('#userOrgs input:checked').map(function(){
-                    return { reference: 'api/organization/'+$(this).val() };
-                }).get();
-
-                _demoArray['careProvider'] = orgIDs;
-
-                var arrCommunication = OT.getCommunicationArray();
-                if (arrCommunication.length > 0) {
-                    _demoArray['communication'] = arrCommunication;
-                };
-
-                /*** SYSTEM uri is defined by SYSTEM_IDENTIFIER_ENUM, see main.js for details **/
-                var studyId = $("#profileStudyId").val();
-                if (hasValue(studyId)) {
-                    var studyIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
-                        use: "secondary",
-                        value: studyId
-                    };
-                    if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
-                    _demoArray["identifier"].push(studyIdObj);
-                };
-
-                var siteId = $("#profileSiteId").val();
-                if (hasValue(siteId)) {
-                    var siteIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
-                        use: "secondary",
-                        value: siteId
-                    };
-                    if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
-                    _demoArray["identifier"].push(siteIdObj);
-                };
-
-
-                var states = [];
-                $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).is(":checked")) {
-                        if (hasValue($(this).attr("state"))) states.push($(this).attr("state"));
-                    };
-                });
-
-                if (states.length > 0) {
-                    if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
-                    states.forEach(function(state) {
-                        _demoArray["identifier"].push({
-                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
-                            use: "secondary",
-                            value: "state:" + state
-                        });
-                    });
-                };
-
-                self.__request({'apiUrl':'/api/demographics/'+this.userId, 'requestType': 'PUT', 'requestData': JSON.stringify(_demoArray), 'sync': true, 'callback': this.__handleDisplay});
-
-            } else {
-                //Display Error Here
-                if (returnedData.error) {
-                   this.__handleError(returnedData.error);
-                   this.__handleButton();
-                };
-            };
-        };
-        this.__handleDisplay = function(responseObj) {
-            var err = responseObj && responseObj.error ? responseObj.error: null;
-            var self = this;
-            if (!hasValue(err)) {
-                $('#confirmMsg').fadeIn();
-                self.__handleButton();
-                setTimeout(function() { $('#confirmMsg').fadeOut(); }, 800);
-                setTimeout(function() { self.__redirect(self.userId); }, 1000);
-                self.__clear();
-            } else {
-                self.__handleError(err);
-                self.__handleButton();
-            };
-        };
-        this.__handleError = function(errorMessage) {
-            if (hasValue(errorMessage)) {
-                $('#serviceErrorMsg').html('<small>' + "{{_('[Processing error]')}} " + errorMessage + '</small>').fadeIn();
-            };
-        };
-        this.__redirect = function() {
-            if (this.userId) {
-                var isPatient = false;
-                if (this.roles) {
-                    this.roles.forEach(function(role) {
-                        if (!isPatient && role.name.toLowerCase() == "patient") isPatient = true;
-                    });
-                };
-                if (isPatient) {
-                    $("#redirectLink").attr('href', '/patients/patient_profile/' + this.userId);
-                } else $("#redirectLink").attr('href', '/profile/' + this.userId);
-                $("#redirectLink")[0].click();
-            };
-        };
-        this.__clear = function() {
-            $("input.form-control, select.form-control").each(
-                function() {
-                    $(this).val("");
-            });
-        };
-        this.__handleButton = function(vis) {
-            if (vis == "hide") {
-                $("#updateProfile").attr("disabled", true).hide();
-                $(".save-button-container").find(".loading-message-indicator").show();
-            } else {
-                $("#updateProfile").attr("disabled", false).show();
-                $(".save-button-container").find(".loading-message-indicator").hide();
-            };
-        };
-
-        this.__checkFields = function(silent) {
-            var hasError = false;
-
-            /* check all required fields to make sure all fields are filled in */
-            $("input[required], select[required]").each(function() {
-                if (!hasValue($(this).val())) {
-                    //this should display error message associated with empty field
-                    if (!silent) $(this).trigger("focusout");
-                    hasError = true;
-                };
-            });
-            /* check email field */
-            if ($("#noEmail").length > 0 && !$("#noEmail").is(":checked")) {
-                if ($("#emailGroup").hasClass("has-error")) {
-                    hasError = true;
-                } else {
-                    if ($("#current_user_email").val() === $("#email").val()) {
-                        if (!silent) this.setHelpText("emailGroup", "{{_('Email is already in use.')}}", true);
-                        hasError = true;
-                    } else {
-                        this.setHelpText("emailGroup", "", false);
-                    };
-                };
-            };
-            /* check organization */
-            if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length == 0) {
-                if (!silent) this.setHelpText("userOrgs", "{{_('An organization must be selected.')}}", true);
-                hasError = true;
-            } else this.setHelpText("userOrgs", "", false);
-
-            /* finally check fields to make sure there isn't error, e.g. due to validation error */
-            $("#createProfileForm .help-block.with-errors").each(function() {
-                if ($(this).text() != "") hasError = true;
-            });
-
-            if (hasError) {
-                if (!silent) $("#errorMsg").fadeIn("slow");
-            } else {
-                $("#errorMsg").hide();
-                $('#serviceErrorMsg').html('').hide();
-            };
-            return hasError;
-        };
-
-        this.clearError = function() {
-            var hasError = this.__checkFields(true);
-            if (!hasError) $("#errorMsg").html("").hide();
-        };
-
-        this.setHelpText = function(elementId, message, hasError) {
-            if (hasError) $("#" + elementId).find(".help-block").text(message).addClass("error-message")
-            else $("#" + elementId).find(".help-block").text("").removeClass("error-message");
-        };
-        this.getOrgs = function(callback) {
-            var self = this;
-            self.attempts++;
-            $.ajax ({
-                type: "GET",
-                url: '/api/organization'
-            }).done(function(data) {
-                self.attempts = 0;
-                if (data) {
-                    if (callback) callback(data);
-                } else {
-                    if (callback) {
-                        callback({"error": "{{_('no data returned')}}"});
-                    };
-                };
-            }).fail(function(xhr) {
-                /*
-                 * retry here
-                 */
-                if (self.attempts < self.max_attempts) {
-                    setTimeout ( function() { self.getOrgs( callback ) } , $.ajaxSetup().retryAfter );
-                } else {
-                    var errorMessage = '{{_("Error occurred retrieving clinics data.")}}';
-                    if (callback) callback({"error": errorMessage});
-                    self.attempts = 0;
-                };
-                tnthAjax.sendError(xhr, '', '/api/organization')
-            });
-        };
-        function getParentOrgId(obj) {
-            var parentOrgId =  $(obj).attr("data-parent-id");
-            if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
-            return parentOrgId;
-        };
-
-        function getConsents() {
-            var orgs = {}, consents = [];
-            $("#createProfileForm input[name='organization']").each(function() {
-                if ($(this).prop("checked")) {
-                    var consent_org_id;
-                    {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
-                        consent_org_id = getParentOrgId(this);
-                    {% else %}
-                        consent_org_id = $(this).val();
-                    {% endif %}
-                    if (consent_org_id && !orgs[consent_org_id]) {
-                        orgs[consent_org_id] = true;
-                        var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
-                        if (!hasValue(agreement)) {
-                            var stockConsentUrl = $("#stock_consent_url").val();
-                            agreement = stockConsentUrl.replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
-                        };
-                        if (hasValue(agreement)) {
-                            var ct = $("#consentDate").val();
-                            var consentItem = {};
-                            if (hasValue(ct)) {
-                                consentItem["acceptance_date"] = ct;
-                            };
-                            consentItem["organization_id"] = consent_org_id;
-                            consentItem["agreement_url"] = agreement;
-                            consentItem["staff_editable"] = true;
-                            consentItem["include_in_reports"] = true;
-                            consentItem["send_reminders"] = true;
-                            consents.push(consentItem);
-                        };
-                    };
-                };
-            });
-            return consents;
-        };
-    };
-
-    //events associated with elements on the account creation page
-    $(document).ready(function(){
-        $("#createProfileForm .back-button-container").prepend(__getLoaderHTML());
-        $("#createProfileForm .save-button-container").prepend(__getLoaderHTML());
-        $("#createProfileForm .btn-tnth-back").on("click", function(e) {
-            e.preventDefault();
-            $(this).prev(".loading-message-indicator").show();
-            $(this).hide();
-            window.location = $(this).attr("href");
-        });
-        $("#updateProfile").attr("disabled", true);
-        $("#createProfileForm input, #createProfileForm select").on("focusout", function() {
-            $("#updateProfile").attr("disabled", false);
-            setTimeout(function() { aco.clearError(); }, 600);
-        });
-        $("#noEmail").on("click, change", function() {
-            if ($(this).is(":checked")) {
-                $("#erroremail").css("visibility", "hidden");
-                $("#email").val("").attr("disabled", true).removeAttr("required").removeAttr("data-customemail");
-                setTimeout('$("#erroremail").text(""); $("#email").closest("form-group").removeClass("has-error"); $("#email").css("border-color", "#ccc");', 600);
-            }
-            else {
-                $("#erroremail").css("visibility", "visible");
-                $("#email").attr("disabled", false).attr("required", "required").attr("data-customemail", "true");
-            };
-        });
-
-        function getDateWithTimeZone(dObj) {
-            /*
-             * param is a date object
-             * calculating UTC date using Date object's timezoneOffset method
-             * the method return offset in minutes, so need to convert it to miliseconds
-             * adding the resulting offset will be the UTC date/time
-             */
-            var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
-            //I believe this is a valid python date format, will save it as GMT date/time
-            //NOTE, conversion already occurred, so there will be no need for backend to convert it again
-            return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
-        }
-
-        if ($("#consentDateEditContainer").length > 0) {
-            //default consent date to today's date
-            var today = new Date();
-            var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
-            var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-            $("#consentDay").val(td);
-            $("#consentMonth").val(tm);
-            $("#consentYear").val(ty);
-            //saving the consent date in GMT
-            //default to today's date
-            $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
-            if (_isTouchDevice()) {
-                $("#consentDay, #consentYear").each(function() {
-                    $(this).attr("type", "tel");
-                });
-            };
-            $("#consentDay, #consentMonth, #consentYear").each(function() {
-              $(this).on("change", function() {
-                  var d = $("#consentDay");
-                  var m = $("#consentMonth");
-                  var y = $("#consentYear");
-                  if (d.val() != "" && m.val() != "" && y.val() != "") {
-                      if (this.validity.valid) {
-                          var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorConsentDate");
-                          if (isValid) {
-                            var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
-                            //saving the time at 12
-                            $("#consentDate").val(getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
-                            $("#errorConsentDate").text("").hide();
-                            //success
-                          } else {
-                             //fail
-                            $("#consentDate").val("");
-                          };
-                      };
-                  };
-              });
-            });
-        };
-        $('#createProfileForm').on('submit', function (e) {
-            if (e.isDefaultPrevented()) {
-                // handle the invalid form...
-                aco.__checkFields();
-                return false;
-            } else {
-               var hasError = aco.__checkFields();
-               if (hasError) return false;
-
-                // everything looks good!
-                e.preventDefault();
-
-                aco.__handleButton("hide");
-                setTimeout("aco.__setAccount();", 0);
-
-            };
-        });
-    });
-
-    </script>
 {%- endmacro %}

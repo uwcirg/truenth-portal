@@ -286,7 +286,6 @@ a.btn {
 }
 select:not([multiple]) {
   border: 1px solid #bdb9b9;
-  max-width: 250px;
   overflow: hidden;
   background-image: none;
 }
@@ -430,6 +429,10 @@ select:not([multiple]) {
       margin-top: 30px;
       border-top: 1px solid #ccc;
       padding-top: 1em;
+
+      img {
+        margin-bottom: 0.5em;
+      }
     }
   }
 }
@@ -473,20 +476,25 @@ select:not([multiple]) {
   .copyright-container {
     font-size: @footerSize;
     color: @footerWhiteThemeColor;
-  }
-  .logo-container {
-    margin: auto;
+    width: 100%;
   }
   .footer-container.flex {
     clear: both;
     display:flex;
-    justify-content: space-between;
-    padding: 0.5em 0;
-    margin: 1em 4em;
+    padding: 1em 0.8em;
+    margin: 0 0.5em;
     border-top: 1px solid #ddd;
+    justify-content: space-around;
   }
   #enterManualInfoContainer {
     margin-bottom: 1em;
+    .flex {
+      flex-wrap: wrap
+    }
+  }
+  #manualEntryCompletionDateContainer {
+    display: none;
+    margin-top: 1em
   }
   #study_id_view {
     margin-top: 0.4em;
@@ -503,9 +511,6 @@ select:not([multiple]) {
   color: @footerWhiteThemeColor;
 }
 
-#mainDiv.profile .footer-container.flex{
-    justify-content: center;
-}
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
@@ -520,6 +525,9 @@ div.right-panel {
   position:relative;
   max-width: 991px;
   transition:margin ease .5s;
+  margin: auto;
+}
+div.footer-wrapper.right-panel {
   margin: auto;
 }
 .website-consent-script #termsText {
@@ -853,8 +861,12 @@ div.right-panel {
     float: left !important;
     max-width: 100%;
   }
+  th.id-field div.th-inner,
+  th.organization-field div.th-inner {
+    position: relative;
+    top: 0.2em;
+  }
 }
-
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -870,6 +882,7 @@ div.right-panel {
   tr[data-uniqueid]:hover {
    background-color: #ececea;
    color: @linkHover;
+   cursor: pointer;
   }
   TH {
     background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
@@ -905,6 +918,9 @@ div.right-panel {
   th.visit-field {
     min-width: 150px;
   }
+  tr.deleted-user-row {
+    opacity: @disabledOpacity;
+  }
 }
 .truenth-id-label {
    display: none;
@@ -928,14 +944,12 @@ div.right-panel {
           position: relative;
           left: -6px;
           top: 0.5px;
+          vertical-align: top;
         }
       }
       #fillOrgs {
         .divider {
           display: none;
-        }
-        label.org-label {
-          padding: 0 0.5em;
         }
       }
     }
@@ -946,9 +960,23 @@ div.right-panel {
       }
       label.org-label {
         display: inline-block;
-        padding: 0 1em !important;
+        padding: 0 1em;
         line-height: 1.6em;
       }
+      label.text-muted {
+        color: #6c7071;
+      }
+      label span {
+        display: inline-block;
+      }
+    }
+
+    label.text-muted ~ div.org-container {
+      margin-left: 1em;
+    }
+
+    label.text-muter ~ div.org-container {
+      margin-left: 1.5em;
     }
     #orglist-footer-container {
       padding: 0.5em 1em;
@@ -1564,11 +1592,34 @@ div.right-panel {
   border-bottom: 1px solid #e8e7e7;
   padding-top: 2em;
 }
-#profileProcedureContainer table {
-  border: 0;
+#profileProcedureContainer {
+  table {
+    border: 0;
+  }
+  .confirm-delete,
+  .data-delete {
+    font-size: 0.85em;
+    padding: 0.5em 0.8em;
+    color: #777;
+    border: 1px solid #bdb9b9;
+    position: relative;
+  }
+}
+#userProcedures {
+  td {
+    padding-bottom: 0.2em;
+  }
+  .list-cell, .descriptionCell {
+    padding-top: 0.2em;
+  }
+}
+#tnthproc {
+  width: 100%;
+  max-width: 100%;
 }
 #tnthproc-submit {
-  height: 2.9em;
+  height: 2.5em;
+  padding: 0.5em 0.9em;
 }
 .profile-item-title {
   color: @sectionTitleColor;
@@ -1885,6 +1936,46 @@ input.clinic {
   label.clinics-section-label {
     margin-bottom: 0;
   }
+
+  #profileProceduresWrapper {
+    padding: 0.5em 1em;
+    background: none;
+    margin-top: 1em;
+    margin-bottom: 2em;
+  }
+  .profile-item-title {
+    color: #777777;
+    font-weight: normal;
+    letter-spacing: 0;
+    font-size: @baseFontSize;
+  }
+
+  #pastTreatmentsContainer {
+    margin-top: 1em;
+    margin-bottom: 2em;
+    td {
+      padding: 0.3em 0.5em;
+    }
+  }
+
+  #tnthproc-submit {
+    height: auto;
+  }
+}
+
+#profileProceduresWrapper.profile-item-container {
+    border: 1px solid #dcdcdc;
+}
+
+#profileProceduresWrapper[data-top-org-name='IRONMAN'] {
+    display: none;
+}
+#profileProceduresWrapper{
+  &[data-user-view = 'true'] {
+    .profile-item-edit-btn {
+      display: none;
+    }
+  }
 }
 .create-account-container {
   padding: 2em;
@@ -2168,6 +2259,18 @@ input.clinic {
     flex-grow: 1.5;
   }
 }
+/*
+ * hide duplicate feature(s) that is already present in custom detail
+ */
+ #mainDiv.profile {
+    #profileSendEmailContainer,
+    .registration-email-prompt,
+    #sendEmailLabel,
+    #loginAsPatient,
+    #navMenuXs {
+      display: none
+    }
+ }
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -2286,12 +2389,22 @@ input.clinic {
 .modal a.btn {
   font-size: @modalButtonSize;
 }
-#manualEntryModal input[type='radio'] {
-  margin-top: 4px;
-  margin-left: -20px;
-}
-#manualEntryModal .modal-title {
-  margin: 0.2em;
+#manualEntryModal {
+  .modal-dialog {
+    width: auto;
+  }
+  input[type='radio'] {
+    margin-top: 4px;
+    margin-left: -20px;
+  }
+  .modal-title {
+    margin: 0.2em;
+  }
+  #manualEntryWarningMessageContainer {
+    .indent {
+      padding: 0.1em 1.5em;
+    }
+  }
 }
 #emailBodyModal .body-content {
   overflow: hidden;
@@ -2653,6 +2766,13 @@ div.timezone-warning.text-warning {
   .fixed-table-toolbar .dropdown-menu {
     overflow-x: hidden;
   }
+  .admin-table {
+      th.id-field div.th-inner,
+      th.organization-field div.th-inner {
+        position: relative;
+        top: -0.4em;
+      }
+  }
   .tnth-form .form-group > label {
     font-size: @formSize;
   }
@@ -2772,6 +2892,14 @@ div.timezone-warning.text-warning {
     .profile-item-container {
       .profile-item-title  {
         max-width: 100%;
+      }
+    }
+    .copyright-container {
+      width: 60%;
+    }
+    #manualEntryCompletionDateContainer {
+      .flex {
+        flex-wrap: nowrap
       }
     }
   }
@@ -2972,6 +3100,16 @@ div.timezone-warning.text-warning {
       max-width: 100%;
     }
   }
+  #mainDiv.profile {
+    .copyright-container {
+      width: 80%;
+    }
+  }
+  #manualEntryModal {
+    .modal-dialog {
+      width: 650px;
+    }
+  }
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -3039,6 +3177,11 @@ div.timezone-warning.text-warning {
     .communications-container .flex-item {
         flex: 1 30%;
       }
+  }
+  #profileProcedureContainer {
+     .button-container {
+      margin-top: 2em;
+    }
   }
 }
 

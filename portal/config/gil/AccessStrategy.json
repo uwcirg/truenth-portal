@@ -1,0 +1,489 @@
+{
+  "entry": [
+    {
+      "description": "Confirm user is patient who hasn't been given access to Sexual Recovery",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "all"
+          },
+          {
+            "name": "strategy_1",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "sexual_recovery"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "in_role_list"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "role_list",
+                "value": [
+                  "patient"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1001,
+      "intervention_name": "self_management",
+      "name": "Allow Self Management if patient not in Sexual Recovery",
+      "resourceType": "AccessStrategy"
+    },
+    {
+      "description": "P3P [strategy_1: <a nested combined strategy>: (user is PATIENT) AND (user NOT IN (sexual_recovery, care_plan, community_of_wellness)] AND [strategy_2 <a nested combined strategy>: ((user NOT IN wisercare clinic) OR (user IN both p3p and wisercare))] AND [strategy_3: (user has NOT started TX)] AND [strategy_4: (user has PCaLocalized)]",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "description": "User is patient and not in list of interventions",
+            "name": "strategy_1",
+            "value": "combine_strategies"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "combinator",
+                "value": "all"
+              },
+              {
+                "name": "strategy_1",
+                "value": "in_role_list"
+              },
+              {
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "role_list",
+                    "value": [
+                      "patient"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "sexual_recovery"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_3",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_3_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "care_plan"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_4",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_4_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "community_of_wellness"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "User not in WC or (both p3p and WC)",
+            "name": "strategy_2",
+            "value": "combine_strategies"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "combinator",
+                "value": "any"
+              },
+              {
+                "name": "strategy_1",
+                "value": "not_in_clinic_w_id"
+              },
+              {
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "identifier_value",
+                    "value": "wisercare"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "combine_strategies"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "strategy_1",
+                    "value": "limit_by_clinic_w_id"
+                  },
+                  {
+                    "name": "strategy_1_kwargs",
+                    "value": [
+                      {
+                        "name": "identifier_value",
+                        "value": "wisercare"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "strategy_2",
+                    "value": "limit_by_clinic_w_id"
+                  },
+                  {
+                    "name": "strategy_2_kwargs",
+                    "value": [
+                      {
+                        "name": "identifier_value",
+                        "value": "p3p"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "strategy_3",
+            "value": "tx_begun"
+          },
+          {
+            "name": "strategy_3_kwargs",
+            "value": [
+              {
+                "name": "boolean_value",
+                "value": "false"
+              }
+            ]
+          },
+          {
+            "name": "strategy_4",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_4_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa localized diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1002,
+      "intervention_name": "decision_support_p3p",
+      "name": "P3P Access Conditions",
+      "resourceType": "AccessStrategy"
+    },
+    {
+      "description": "Wisercare [strategy_1: <a nested combined strategy>: (user is PATIENT) AND (user NOT IN (sexual_recovery, care_plan, community_of_wellness)] AND [strategy_2: <a nested combined strategy>: ((user NOT IN p3p clinics) AND (user IN WiserCare clinic)] AND [strategy_3: (user has NOT started TX)] AND [strategy_4: (user has PCaLocalized)]",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "strategy_1",
+            "value": "combine_strategies"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "combinator",
+                "value": "all"
+              },
+              {
+                "name": "strategy_1",
+                "value": "in_role_list"
+              },
+              {
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "role_list",
+                    "value": [
+                      "patient"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "sexual_recovery"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_3",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_3_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "care_plan"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_4",
+                "value": "allow_if_not_in_intervention"
+              },
+              {
+                "name": "strategy_4_kwargs",
+                "value": [
+                  {
+                    "name": "intervention_name",
+                    "value": "community_of_wellness"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "combine_strategies"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "combinator",
+                "value": "all"
+              },
+              {
+                "name": "strategy_1",
+                "value": "not_in_clinic_w_id"
+              },
+              {
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "identifier_value",
+                    "value": "p3p"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "limit_by_clinic_w_id"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "identifier_value",
+                    "value": "wisercare"
+                  },
+                  {
+                    "name": "combinator",
+                    "value": "any"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "strategy_3",
+            "value": "tx_begun"
+          },
+          {
+            "name": "strategy_3_kwargs",
+            "value": [
+              {
+                "name": "boolean_value",
+                "value": "false"
+              }
+            ]
+          },
+          {
+            "name": "strategy_4",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_4_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa localized diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1003,
+      "intervention_name": "decision_support_wisercare",
+      "name": "Wisercare Access Conditions",
+      "resourceType": "AccessStrategy"
+    },
+    {
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "strategy_1",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "decision_support_p3p"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "decision_support_wisercare"
+              }
+            ]
+          },
+          {
+            "name": "strategy_3",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_3_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "sexual_recovery"
+              }
+            ]
+          },
+          {
+            "name": "strategy_4",
+            "value": "in_role_list"
+          },
+          {
+            "name": "strategy_4_kwargs",
+            "value": [
+              {
+                "name": "role_list",
+                "value": [
+                  "patient"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1004,
+      "intervention_name": "decision_support_unavailable",
+      "name": "exclusive decision support strategy when real DS aren't avail",
+      "resourceType": "AccessStrategy"
+    },
+    {
+      "description": "Confirm user hasn't been given access to Community of Wellness or Sexual Recovery",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "all"
+          },
+          {
+            "name": "strategy_1",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "community_of_wellness"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "allow_if_not_in_intervention"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "intervention_name",
+                "value": "sexual_recovery"
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1006,
+      "intervention_name": "exercise_diet",
+      "name": "Allow Exercise & Diet if not in Communitiy of Wellness or Sexual Recovery",
+      "resourceType": "AccessStrategy"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2017-11-22T00:05:44.211453Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

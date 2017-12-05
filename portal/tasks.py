@@ -13,11 +13,13 @@ from flask import current_app
 import json
 from requests import Request, Session
 from requests.exceptions import RequestException
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy import and_
 from traceback import format_exc
 
+from .audit import auditable_event
 from .database import db
-from .dogpile import dogpile_cache
+from .dogpile_cache import dogpile_cache
 from factories.celery import create_celery
 from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
@@ -190,6 +192,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
                  User.deleted_id.is_(None),
                  UserRoles.role_id == patient_role_id))
 
+    now = datetime.utcnow()
     for user in valid_patients:
         if update_cache:
             dogpile_cache.invalidate(overall_assessment_status, user.id)
@@ -198,7 +201,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             if not user.email or '@' not in user.email:
                 # can't send to users w/o legit email
                 continue
-            qbd = QuestionnaireBank.most_current_qb(user=user)
+            qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(
                     user=user,
@@ -253,7 +256,8 @@ def send_user_messages(email, force_update=False):
     if force_update:
         user = User.query.filter(User.email == email).one()
         invalidate_assessment_status_cache(user_id=user.id)
-        qbd = QuestionnaireBank.most_current_qb(user=user)
+        qbd = QuestionnaireBank.most_current_qb(
+            user=user, as_of_date=datetime.utcnow())
         if qbd.questionnaire_bank:
             queue_outstanding_messages(
                 user=user,
@@ -279,11 +283,16 @@ def send_questionnaire_summary(job_id, cutoff_days, org_id):
     "Generate and send a summary of questionnaire counts to all Staff in org"
     try:
         before = datetime.now()
-        generate_and_send_summaries(cutoff_days, org_id)
+        error_emails = generate_and_send_summaries(cutoff_days, org_id)
         duration = datetime.now() - before
         message = (
-            'Sent summary emails in {0.seconds} seconds'.format(duration))
-        current_app.logger.debug(message)
+            'Sent summary emails in {0.seconds} seconds.'.format(duration))
+        if error_emails:
+            message += ('\nUnable to reach recipient(s): '
+                        '{}'.format(', '.join(error_emails)))
+            logger.error(message)
+        else:
+            logger.debug(message)
     except Exception as exc:
         message = ("Unexpected exception in `send_questionnaire_summary` "
                    "on {} : {}".format(job_id, exc))
@@ -296,6 +305,7 @@ def send_questionnaire_summary(job_id, cutoff_days, org_id):
 def generate_and_send_summaries(cutoff_days, org_id):
     ostats = overdue_stats_by_org()
     cutoffs = [int(i) for i in cutoff_days.split(',')]
+    error_emails = set()
 
     ot = OrgTree()
     top_org = Organization.query.get(org_id)
@@ -317,7 +327,24 @@ def generate_and_send_summaries(cutoff_days, org_id):
                               sender=current_app.config['MAIL_DEFAULT_SENDER'],
                               subject=summary_email.subject,
                               body=summary_email.body)
-            em.send_message()
+            try:
+                em.send_message()
+            except SMTPRecipientsRefused as exc:
+                msg = ("Error sending site summary email to {}: "
+                       "{}".format(user.email, exc))
+
+                sys = User.query.filter_by(email='__system__').first()
+
+                auditable_event(message=msg,
+                                user_id=(sys.id if sys else user.id),
+                                subject_id=user.id,
+                                context="user")
+
+                current_app.logger.error(msg)
+                for email in exc[0]:
+                    error_emails.add(email)
+
+    return error_emails or None
 
 
 def update_current_job(job_id, func_name, runtime=None, status=None):

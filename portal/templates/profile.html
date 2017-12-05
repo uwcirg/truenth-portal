@@ -69,7 +69,7 @@
         {%- if user.id == current_user.id -%}
           {{user_profile(user, current_user, consent_agreements, user_interventions)}}
         {%- else -%}
-          {{profile(user, current_user, consent_agreements, user_interventions, invite_email)}}
+          {{profile(user, current_user, consent_agreements, user_interventions)}}
         {%- endif -%}
           <br/><br/>
       </div>
@@ -79,6 +79,9 @@
 <script>$("#mainDiv").addClass("profile");</script>
 {% endblock %}
 {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+{% endblock %}
 {% block document_ready %}
 {% if user.has_role(ROLE.PATIENT) and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 function handleLoginAs(e) {

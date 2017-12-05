@@ -14,7 +14,7 @@ from tests.test_assessment_status import mock_questionnairebanks
 from tempfile import NamedTemporaryFile
 
 from portal.extensions import db
-from portal.site_persistence import SitePersistence
+from portal.config.site_persistence import SitePersistence
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
@@ -25,24 +25,20 @@ from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
-
-revision = '66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7'
-known_good_persistence_file = (
-    "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/{}"
-    "/site_persistence_file.json".format(revision))
 
 
 class TestSitePersistence(TestCase):
 
     def setUp(self):
         super(TestSitePersistence, self).setUp()
-        if os.environ.get('PERSISTENCE_FILE'):
-            self.fail("unset environment var PERSISTENCE_FILE for test")
-        self.app.config['PERSISTENCE_FILE'] = known_good_persistence_file
-        SitePersistence().import_(
-            exclude_interventions=False, keep_unmentioned=False)
+        if os.environ.get('PERSISTENCE_DIR'):
+            self.fail("unset environment var PERSISTENCE_DIR for test")
+        # Tests currently expect 'gil' version of persistence
+        self.app.config['GIL'] = True
+        SitePersistence().import_(keep_unmentioned=False)
 
     def tearDown(self):
         if hasattr(self, 'tmpfile') and self.tmpfile:
@@ -68,8 +64,7 @@ class TestSitePersistence(TestCase):
 
         # with deep (test) org tree in place, perform a delete by
         # repeating import w/o keep_unmentioned set
-        SitePersistence().import_(
-            exclude_interventions=False, keep_unmentioned=False)
+        SitePersistence().import_(keep_unmentioned=False)
 
     def testP3Pstrategy(self):
         # Prior to meeting conditions in strategy, user shouldn't have access
@@ -126,7 +121,15 @@ class TestSitePersistence(TestCase):
         every_six_thereafter = Recur(
             start='{"days": 720}', cycle_length='{"days": 180}')
 
-        metastatic_org = Organization(name='metastatic')
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        metastatic_org = Organization(name='metastatic',
+                                      research_protocol_id=rp_id)
         questionnaire = Questionnaire(name='test_q')
         with SessionScope(db):
             db.session.add(initial_recur)
@@ -144,7 +147,7 @@ class TestSitePersistence(TestCase):
         mr_qb = QuestionnaireBank(
             name='metastatic_recurring',
             classification='recurring',
-            organization_id=metastatic_org_id,
+            research_protocol_id=rp_id,
             start='{"days": 0}', overdue='{"days": 1}',
             expired='{"days": 30}',
             recurs=recurs)
@@ -153,6 +156,11 @@ class TestSitePersistence(TestCase):
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=questionnaire, rank=1)
         mr_qb.questionnaires.append(qbq)
+        with SessionScope(db):
+            db.session.add(mr_qb)
+            db.session.commit()
+        mr_qb, initial_recur, every_six_thereafter = map(
+            db.session.merge, (mr_qb, initial_recur, every_six_thereafter))
 
         # confirm persistence of this questionnaire bank includes the bits
         # added above
@@ -175,42 +183,20 @@ class TestSitePersistence(TestCase):
             [r.as_json() for r in updated_copy.recurs],
             [r.as_json() for r in (initial_recur, new_recur)])
 
-    def test_org_questionnaire_banks(self):
-        mock_questionnairebanks('eproms')
 
-        def mock_file(read_only=True):
-            '''mock version to create local testfile for site_persistence'''
-            if not hasattr(self, 'tmpfile'):
-                with NamedTemporaryFile(mode='w', delete=False) as tmpfile:
-                    self.tmpfile = tmpfile.name
-            return self.tmpfile
+class TestEpromsSitePersistence(TestCase):
 
-        sp = SitePersistence()
-        sp.persistence_filename = mock_file
-        sp.export()
-        with open(self.tmpfile) as f:
-            data = f.read()
-        self.assertTrue('recur' in data)
+    def setUp(self):
+        super(TestEpromsSitePersistence, self).setUp()
+        if os.environ.get('PERSISTENCE_DIR'):
+            self.fail("unset environment var PERSISTENCE_DIR for test")
+        # Tests currently expect 'gil' version of persistence
+        self.app.config['GIL'] = False
+        SitePersistence().import_(keep_unmentioned=False)
 
-        # Pull same data back in
-        sp.import_(exclude_interventions=True, keep_unmentioned=False)
-
-    def test_intervention_questionnaire_banks(self):
-        mock_questionnairebanks('tnth')
-
-        def mock_file(read_only=True):
-            '''mock version to create local testfile for site_persistence'''
-            if not hasattr(self, 'tmpfile'):
-                with NamedTemporaryFile(mode='w', delete=False) as tmpfile:
-                    self.tmpfile = tmpfile.name
-            return self.tmpfile
-
-        sp = SitePersistence()
-        sp.persistence_filename = mock_file
-        sp.export()
-        with open(self.tmpfile) as f:
-            data = f.read()
-        self.assertTrue('recur' in data)
-
-        # Pull same data back in
-        sp.import_(exclude_interventions=True, keep_unmentioned=False)
+    def testOrgs(self):
+        """Confirm persisted organizations came into being"""
+        self.assertTrue(Organization.query.count() > 5)
+        tngr = Organization.query.filter(
+            Organization.name=='TrueNTH Global Registry').one()
+        self.assertEquals(tngr.id, 10000)

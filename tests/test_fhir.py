@@ -7,6 +7,8 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
 from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
+from portal.system_uri import SNOMED
+
 
 class TestFHIR(TestCase):
     """FHIR model tests"""
@@ -56,6 +58,13 @@ class TestFHIR(TestCase):
         self.assertEquals(cc_parsed.codings, persisted.codings)
         self.assertEquals(len(persisted.codings), 3)
         self.assertEquals(persisted.text, 'given two codings')
+
+    def test_display_lookup(self):
+        # example used: Coding(system=SNOMED, code='707266006',
+        #  display='Androgen deprivation therapy').add_if_not_found(True)
+
+        display = Coding.display_lookup(system=SNOMED, code='707266006')
+        self.assertEquals('Androgen deprivation therapy', display)
 
     def test_codeable_concept_parse(self):
         system = "urn:ietf:bcp:47"
@@ -117,8 +126,12 @@ class TestFHIR(TestCase):
         eastern = pytz.timezone('US/Eastern')
         aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
         parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        # FHIR_datetime converts to UTC and strips the tzinfo
+        # for safe comparisons with other tz unaware strings
+        self.assertEquals(parsed.tzinfo, None)
+        # Add it back in to confirm values match
+        parsed = parsed.replace(tzinfo=pytz.utc)
         self.assertEquals(aware, parsed)
-        self.assertEquals(pytz.utc, parsed.tzinfo)
 
     def test_tz_unaware_conversion(self):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)

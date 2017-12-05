@@ -147,6 +147,40 @@ class TxStartedConstants(object):
             codings=[ichom], text='Focal therapy').add_if_not_found(True)
 
     @lazyprop
+    def AndrogenDeprivationTherapySurgicalOrchiectomy(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - surgical orchiectomy',
+            display='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(True)
+
+    @lazyprop
+    def AndrogenDeprivationTherapySurgicalChemical(self):
+        tnth = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='androgen deprivation therapy - chemical',
+            display='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(True)
+
+    @lazyprop
+    def WholeGlandAblation(self):
+        sno = Coding(
+            system=SNOMED, code='176307007', display='Whole-gland ablation'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Whole-gland ablation').add_if_not_found(True)
+
+    @lazyprop
+    def FocalGlandAblation(self):
+        sno = Coding(
+            system=SNOMED, code='438778003', display='Focal-gland ablation'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Focal-gland ablation').add_if_not_found(True)
+
+    @lazyprop
     def OtherProcedure(self):
         sno = Coding(
             system=SNOMED, code='118877007',
@@ -157,6 +191,15 @@ class TxStartedConstants(object):
         return CodeableConcept(
             codings=[sno, ichom], text='Other procedure on prostate'
         ).add_if_not_found(True)
+
+    @lazyprop
+    def OtherPrimaryTreatment(self):
+        sno = Coding(
+            system=SNOMED, code='999999999', display='Other primary treatment'
+        ).add_if_not_found(True)
+        return CodeableConcept(
+            codings=[sno],
+            text='Other primary treatment').add_if_not_found(True)
 
 
 class TxNotStartedConstants(object):

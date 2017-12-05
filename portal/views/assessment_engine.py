@@ -1,6 +1,7 @@
 """Assessment Engine API view functions"""
+from datetime import datetime
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
-from flask import session
+from flask import session, url_for
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
@@ -1295,11 +1296,13 @@ def assessment_add(patient_id):
         encounter.type.append(encounter_type)
 
     qnr_qb = None
+    authored = FHIR_datetime.parse(request.json['authored'])
     if "questionnaire" in request.json:
         qn_ref = request.json.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qbd = QuestionnaireBank.most_current_qb(patient)
+        qbd = QuestionnaireBank.most_current_qb(
+            patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
@@ -1333,6 +1336,46 @@ def invalidate(user_id):
         abort(404)
     invalidate_assessment_status_cache(user_id)
     return jsonify(invalidated=user.as_fhir())
+
+
+@assessment_engine_api.route('/present-needed')
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@oauth.require_oauth()
+def present_needed():
+    """Look up needed and in process q's for user and then present_assessment
+
+    Takes the same attributes as present_assessment.
+
+    If `authored` date is different from utcnow(), any instruments found to be
+    in an `in_progress` state will be treated as if they haven't been started.
+
+    """
+    subject_id = request.args.get('subject_id') or current_user().id
+    subject = get_user(subject_id)
+    if subject != current_user():
+        current_user().check_role(permission='edit', other_id=subject_id)
+
+    as_of_date = FHIR_datetime.parse(request.args.get('authored'))
+    assessment_status = AssessmentStatus(subject, as_of_date=as_of_date)
+    args = dict(request.args.items())
+    args['instrument_id'] = (
+        assessment_status.instruments_needing_full_assessment(
+            classification='all'))
+
+    # As the AssessmentEngine isn't yet equipped to restart out
+    # of sequence instruments, treat all as new if as_of_date
+    # isn't today.
+    if as_of_date and as_of_date.date() != datetime.utcnow().date():
+        args['instrument_id'] += (
+            assessment_status.instruments_in_progress(
+                classification='all'))
+    else:
+        args['resume_instrument_id'] = (
+            assessment_status.instruments_in_progress(
+                classification='all'))
+
+    url = url_for('.present_assessment', **args)
+    return redirect(url, code=303)
 
 
 @assessment_engine_api.route('/present-assessment')
@@ -1385,6 +1428,12 @@ def present_assessment(instruments=None):
         description: User ID to Collect QuestionnaireResponses as
         required: false
         type: integer
+      - name: authored
+        in: query
+        description: Override QuestionnaireResponse.authored with given datetime
+        required: false
+        type: string
+        format: date-time
     responses:
       303:
         description: successful operation
@@ -1429,6 +1478,7 @@ def present_assessment(instruments=None):
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
         "subject_id": request.args.get('subject_id'),
+        "authored": request.args.get('authored'),
     }
     # Clear empty querystring params
     assessment_params = {k:v for k,v in assessment_params.items() if v}
@@ -1625,7 +1675,8 @@ def patient_assessment_status(patient_id):
     patient = get_user(patient_id)
     if patient:
         current_user().check_role(permission='view', other_id=patient_id)
-        assessment_status = AssessmentStatus(user=patient)
+        now = datetime.utcnow()
+        assessment_status = AssessmentStatus(user=patient, as_of_date=now)
         assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
                 None)

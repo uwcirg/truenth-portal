@@ -5,7 +5,11 @@
         <div class="module">
           <div class="accent-heading accent-heading--white">{% trans %}Objective N<em>o</em>1: TrueNTH Community {% endtrans %}</div>
           <h3 class="module__head">{{_("Everyone has a part to play in improving the prostate cancer journey.")}}</h3>
+          <p class="module__body">{{_("The more people that join us, the better the tools will become for you and future generations.")}}</p>
           <div class="module--flex">
+            {% if not user %}
+              <div class="button-callout"><a href="#" class="button button--large button--teal" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
+            {% endif %}
             <div class="button-callout"><a href="{{url_for('.contact')}}" class="button button--large button--teal" id="lnShareYourStory">{{_("Share Your Story")}}</a></div>
             <div class="button-callout"><a href="{{url_for('.lived_experience')}}" class="button button--large button--teal" id="lnReadMoreStory">{{_("Read More Stories")}}</a></div>
           </div>

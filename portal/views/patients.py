@@ -8,6 +8,7 @@ from ..extensions import oauth
 from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
 from ..models.communication import load_template_args
+from ..models.fhir import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import QuestionnaireBank, visit_name
@@ -47,9 +48,8 @@ def patients_root():
 
     consent_query = UserConsent.query.filter(and_(
                          UserConsent.deleted_id.is_(None),
-                         UserConsent.expires > now)).with_entities(
-                             UserConsent.user_id)
-    consented_users = [u.user_id for u in consent_query]
+                         UserConsent.expires > now))
+    consented_users = [u.user_id for u in consent_query if u.staff_editable]
 
     if user.has_role(ROLE.STAFF):
         pref_org_list = None
@@ -173,16 +173,26 @@ def patient_profile(patient_id):
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
 
-    top_org = patient.first_top_organization()
-    args = load_template_args(patient)
-    if top_org:
-        name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
-    else:
-        name_key = UserInviteEmail_ATMA.name_key()
-    invite_email = MailResource(app_text(name_key), variables=args)
     return render_template(
         'profile.html', user=patient,
-        current_user=user, invite_email=invite_email,
+        current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
+
+@patients.route('/treatment-options')
+@oauth.require_oauth()
+def treatment_options():
+    code_list = current_app.config.get('TREATMENT_OPTIONS')
+    if code_list:
+        treatment_options = []
+        for item in code_list:
+            code, system = item;
+            treatment_options.append({
+                "code": code,
+                "system": system,
+                "text": Coding.display_lookup(code, system)
+            });
+    else:
+        abort(400, "Treatment options are not available.")
+    return jsonify(treatment_options=treatment_options)

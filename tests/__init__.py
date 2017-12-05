@@ -13,7 +13,7 @@ from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
 
 from portal.factories.app import create_app
-from portal.config import TestConfig
+from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
@@ -157,7 +157,7 @@ class TestCase(Base):
                 audit=audit, issued=timestamp)
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
-                     system=SNOMED):
+                      system=SNOMED, setdate=None):
         "Add procedure data into the db for the test user"
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
@@ -173,16 +173,27 @@ class TestCase(Base):
             enc = db.session.merge(enc)
             procedure.code = code
             procedure.user = db.session.merge(self.test_user)
-            procedure.start_time = datetime.utcnow()
+            procedure.start_time = setdate or datetime.utcnow()
             procedure.end_time = datetime.utcnow()
             procedure.encounter = enc
             db.session.add(procedure)
             db.session.commit()
 
-    def consent_with_org(self, org_id, user_id=TEST_USER_ID, backdate=None):
-        """Bless given user with a valid consent with org"""
+    def consent_with_org(self, org_id, user_id=TEST_USER_ID,
+                         backdate=None, setdate=None):
+        """Bless given user with a valid consent with org
+
+        :param backdate: timedelta value.  Define to mock consents
+          happening said period in the past
+
+        :param setdate: datetime value.  Define to mock consents
+          happening at exact time in the past
+
+        """
         audit = Audit(user_id=user_id, subject_id=user_id)
-        if backdate:
+        if setdate:
+            audit.timestamp = setdate
+        elif backdate:
             audit.timestamp = datetime.utcnow() - backdate
         consent = UserConsent(
             user_id=user_id, organization_id=org_id,

@@ -4,7 +4,7 @@ import json
 import os
 
 from portal.extensions import db
-from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
+from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS, SHORTNAME_ID
 from portal.models.fhir import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
@@ -37,6 +37,7 @@ class TestOrganization(TestCase):
         self.assertFalse(org.ethnicity_codings)
         self.assertEquals(org.locales.count(),1)
         self.assertEquals(org.default_locale, "en_AU")
+        self.assertEquals(org._timezone, "US/Pacific")
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
@@ -69,6 +70,34 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         self.assertTrue(org.id)
         self.assertEquals(org.partOf_id, parent_id)
+
+    def test_timezone_inheritance(self):
+        parent = Organization(id=101, name='parentOrg')
+        org = Organization(id=102, name='org', partOf_id=101)
+
+        # test that with no timezones set, defaults to UTC
+        with SessionScope(db):
+            db.session.add(parent)
+            db.session.add(org)
+            db.session.commit()
+        parent, org = map(db.session.merge,(parent, org))
+        self.assertEquals(org.timezone, 'UTC')
+
+        # test that timezone-less child org inherits from parent
+        parent.timezone = 'Asia/Tokyo'
+        with SessionScope(db):
+            db.session.add(parent)
+            db.session.commit()
+        parent, org = map(db.session.merge,(parent, org))
+        self.assertEquals(org.timezone, 'Asia/Tokyo')
+
+        # test that child org with timezone does NOT inherit from parent
+        org.timezone = 'Europe/Rome'
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        self.assertEquals(org.timezone, 'Europe/Rome')
 
     def test_as_fhir(self):
         org = Organization(name='Homer\'s Hospital')
@@ -309,6 +338,20 @@ class TestOrganization(TestCase):
         # obtain the org from the db, check the identifiers
         org = Organization.query.filter_by(name='Gastroenterology').one()
         self.assertEquals(2, org.identifiers.count())
+
+    def test_shortname(self):
+        shorty = Identifier(system=SHORTNAME_ID, value='shorty')
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        # prior to adding shortname, should just get org name
+        self.assertEquals(org.name, org.shortname)
+
+        org.identifiers.append(shorty)
+        with SessionScope(db):
+            db.session.commit()
+        org = db.session.merge(org)
+        # after, should get the shortname
+        self.assertEquals(org.shortname, 'shorty')
 
     def test_org_tree_nodes(self):
         self.shallow_org_tree()

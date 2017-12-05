@@ -1,7 +1,9 @@
 """Communication model"""
 from collections import MutableMapping
+from datetime import datetime
 from flask import current_app, url_for
 import regex
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from string import Formatter
@@ -36,7 +38,8 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        assessment_status = AssessmentStatus(user=user)
+        now = datetime.utcnow()
+        assessment_status = AssessmentStatus(user=user, as_of_date=now)
         link_url = url_for(
             'assessment_engine_api.present_assessment',
             instrument_id=assessment_status.
@@ -127,8 +130,9 @@ def load_template_args(user, questionnaire_bank_id=None):
             return ''
         qb = QuestionnaireBank.query.get(questionnaire_bank_id)
         trigger_date = qb.trigger_date(user)
-        due = qb.calculated_start(trigger_date).relative_start
-        due = qb.calculated_due(trigger_date) or due
+        now = datetime.utcnow()
+        due = qb.calculated_start(trigger_date, now).relative_start
+        due = qb.calculated_due(trigger_date, now) or due
         trace("UTC due date: {}".format(due))
         due_date = localize_datetime(due, user)
         tz = user.timezone or 'UTC'
@@ -240,7 +244,6 @@ class Communication(db.Model):
 
         return msg
 
-
     def generate_and_send(self):
         "Collate message details and send"
 
@@ -263,8 +266,19 @@ class Communication(db.Model):
             request=self.communication_request.name))
 
         self.message = self.generate_message()
-        self.message.send_message()
-        self.status = 'completed'
+        try:
+            self.message.send_message()
+            self.status = 'completed'
+        except SMTPRecipientsRefused as exc:
+            msg = ("Error sending Communication {} to {}: "
+                   "{}".format(self.id, user.email, exc))
+            current_app.logger.error(msg)
+            sys = User.query.filter_by(email='__system__').first()
+            auditable_event(message=msg,
+                            user_id=(sys.id if sys else user.id),
+                            subject_id=user.id,
+                            context="user")
+            self.status = 'aborted'
 
     def preview(self):
         "Collate message details and return preview (DOES NOT SEND)"

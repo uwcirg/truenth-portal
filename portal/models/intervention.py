@@ -71,27 +71,19 @@ class Intervention(db.Model):
 
     @classmethod
     def from_json(cls, data):
-        """Looks for match on name - merges data with existing or new
+        intervention = cls()
+        return intervention.update_from_json(data)
 
-        If the intervention named in data isn't found, a new one will
-        be generated.
-
-        The given data will be used to overwrite / replace any existing
-        data found.
-
-        """
+    def update_from_json(self, data):
         if not 'name' in data:
             raise ValueError("required 'name' field not found")
-        instance = Intervention.query.filter_by(name=data['name']).first()
-        if not instance:
-            instance = cls()
 
         for attr in ('name', 'description', 'card_html', 'link_label',
                      'status_text', 'public_access', 'display_rank'):
             if data.get(attr, None) is not None:
-                setattr(instance, attr, data[attr])
+                setattr(self, attr, data[attr])
             else:
-                setattr(instance, attr, None)
+                setattr(self, attr, None)
 
         # static_link_url is special - generally we don't pull links
         # from persisted format as each instance is configured to
@@ -99,9 +91,9 @@ class Intervention(db.Model):
         # is an exception - if present, set link_url to match - but
         # don't include in exports
         if 'static_link_url' in data:
-            instance.link_url = data['static_link_url']
+            self.link_url = data['static_link_url']
 
-        return instance
+        return self
 
     def fetch_strategies(self):
         """Generator to return each registered strategy

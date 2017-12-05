@@ -42,12 +42,12 @@ env:
 matrix:
   include:
     - env: TOXENV=py27
-    - env: TOXENV=translations PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json"
-    - env: TOXENV=translations PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/ePROMs-site-config/develop/site_persistence_file.json"
+    - env: TOXENV=translations PERSISTENCE_DIR="gil"
+    - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=docs
       services: []
       addons: {}
-    - env: TOXENV=build
+    - env: TOXENV=build-artifacts
       services:
         - docker
       addons: {}
@@ -55,9 +55,9 @@ matrix:
       addons:
         postgresql: "9.4"
         sauce_connect: true
-  # Build artifacts only (no testing)
   allow_failures:
     - env: TOXENV=ui
+    - env: TOXENV=build-artifacts
 
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
@@ -94,7 +94,7 @@ deploy:
         - develop
         - master
       condition:
-        - $TOXENV = build
+        - $TOXENV = build-artifacts
         - -v ARTIFACTORY_API_KEY
         - -v ARTIFACTORY_DEB_REPO
     script:
@@ -111,7 +111,7 @@ deploy:
         - develop
         - master
       condition:
-        - $TOXENV = build
+        - $TOXENV = build-artifacts
         - -v ARTIFACTORY_API_KEY
     script:
       - ./bin/docker-push.sh

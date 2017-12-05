@@ -1,13 +1,16 @@
 """User API view functions"""
+from datetime import datetime
 from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
 from sqlalchemy import and_
+from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
@@ -16,6 +19,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.table_preference import TablePreference
@@ -206,6 +210,8 @@ def account():
                     for org in request.json['organizations']]
             user.update_orgs(org_list, acting_user=acting_user,
                              excuse_top_check=True)
+            if org_list:
+                user.timezone = org_list[0].timezone
         except NoResultFound:
             abort(
                 400,
@@ -253,7 +259,7 @@ def account():
 
 
 @user_api.route('/user/<int:user_id>', methods=['DELETE'])
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
 def delete_user(user_id):
     """Delete the named user from the system
@@ -599,6 +605,113 @@ def set_user_consents(user_id):
     return jsonify(message="ok")
 
 
+@user_api.route('/user/<int:user_id>/consent/withdraw',
+                methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def withdraw_user_consent(user_id):
+    """Withdraw existing consent agreement for the user with named organization
+
+    Used to withdraw a consent agreements between a user and an organization.
+    If a consent exists for the given user/org, the consent will be marked
+    deleted, and a matching consent (with new status/option values) will be
+    created in its place.
+
+    ---
+    tags:
+      - User
+      - Consent
+      - Organization
+    operationId: withdraw_user_consent
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: withdraw_consent_agreement
+          required:
+            - organization_id
+          properties:
+            organization_id:
+              type: integer
+              format: int64
+              description:
+                Organization identifier defining with whom the consent
+                agreement applies
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response_ok
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request includes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description:
+          if user_id doesn't exist, or it no consent found
+          for given user org combination
+
+    """
+    current_app.logger.debug('withdraw user consent called w/: '
+                             '{}'.format(request.json))
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+    if not request.json:
+        abort(400, "Requires JSON with submission including "
+                   "HEADER 'Content-Type: application/json'")
+
+    org_id = request.json.get('organization_id')
+    if not org_id:
+        abort(400, "missing required organization ID")
+
+    current_app.logger.debug('withdraw user consent called for user {} '
+                             'and org {}'.format(user.id, org_id))
+
+    uc = UserConsent.query.filter_by(user_id=user.id,
+                                     organization_id=org_id,
+                                     status='consented').first()
+
+    if not uc:
+        abort(404, "no UserConsent found for user ID {} and org ID "
+              "{}".format(user.id, org_id))
+    try:
+        make_transient(uc)
+        uc.id = None
+        uc.status = 'suspended'
+        uc.send_reminders = False
+        uc.include_in_reports = True
+        uc.staff_editable = (not current_app.config.get('GIL'))
+        consent_list = [uc, ]
+        user.update_consents(
+            consent_list=consent_list, acting_user=current_user())
+        # The updated consent may have altered the cached assessment
+        # status - invalidate this user's data at this time.
+        invalidate_assessment_status_cache(user_id=user.id)
+    except ValueError as e:
+        abort(400, str(e))
+
+    return jsonify(uc.as_json())
+
+
 @user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
 @oauth.require_oauth()
 def delete_user_consents(user_id):
@@ -678,6 +791,7 @@ def delete_user_consents(user_id):
     remove_uc.deleted = Audit(
         user_id=current_user().id, subject_id=user_id,
         comment="Deleted consent agreement", context='consent')
+    remove_uc.status = 'deleted'
     db.session.commit()
 
     return jsonify(message="ok")
@@ -1916,7 +2030,7 @@ def get_user_messages(user_id):
     responses:
       200:
         description:
-          Returns JSON of the user's table view preferences.
+          Returns JSON of the user's email messages.
         schema:
           id: user_messages
           properties:
@@ -1961,3 +2075,79 @@ def get_user_messages(user_id):
             messages.append(em)
 
     return jsonify(messages=[m.as_json() for m in messages])
+
+
+@user_api.route('/user/<int:user_id>/questionnaire_bank')
+@oauth.require_oauth()
+def get_current_user_qb(user_id):
+    """Returns JSON defining user's current QuestionnaireBank
+
+    Returns JSON of the user's current QuestionnaireBank. Date is
+    assumed as UTCnow, unless specific as-of date provided.
+    ---
+    tags:
+      - User
+    operationId: get_current_user_qb
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: as_of_date
+        in: query
+        description: Optional datetime for user-specific QB (otherwise, now)
+        required: false
+        type: string
+        format: date-time
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns JSON of the user's current QB info
+      400:
+        description: invalid query parameters
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    date = request.args.get('as_of_date')
+    date = datetime.strptime(date, '%Y-%m-%d') if date else None
+
+    qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
+
+    qbd_json = {}
+
+    qbd_questionnaire_bank = qbd.questionnaire_bank if qbd.questionnaire_bank else None
+
+    expiry = None
+
+    if qbd_questionnaire_bank:
+        expiry = qbd_questionnaire_bank.calculated_expiry(
+            qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
+
+    if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
+        qbd_json['questionnaire_bank'] = None
+    elif date and expiry and (date.date() >= expiry.date()):
+        qbd_json['questionnaire_bank'] = None
+    else:
+        qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
+                                          if qbd_questionnaire_bank else None)
+        qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
+        qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
+                                      if qbd.relative_start else None)
+        qbd_json['relative_expired'] = (FHIR_datetime.as_fhir(expiry)
+                                        if expiry else None)
+        qbd_json['iteration'] = qbd.iteration
+
+    return jsonify(qbd_json)

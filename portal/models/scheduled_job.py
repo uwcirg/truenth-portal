@@ -7,12 +7,7 @@ from ..database import db
 
 
 class ScheduledJob(db.Model):
-    """ORM class for user document upload data
-
-    Capture and store uploaded user documents
-    (e.g. patient reports, user avatar images, etc).
-
-    """
+    """ScheduledJob model for storing scheduled runs of celery tasks"""
     __tablename__ = 'scheduled_jobs'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
@@ -42,21 +37,22 @@ class ScheduledJob(db.Model):
 
     @classmethod
     def from_json(cls, data):
+        instance = cls()
+        return instance.update_from_json(data)
+
+    def update_from_json(self, data):
         if 'name' not in data:
             raise ValueError("missing required name field")
-        job = ScheduledJob.query.filter_by(name=data['name']).first()
-        if not job:
-            job = cls()
-            job.name = data['name']
+        self.name = data['name']
         for attr in ('task', 'schedule'):
             if data.get(attr):
-                setattr(job, attr, data[attr])
-            elif not getattr(job, attr, None):
+                setattr(self, attr, data[attr])
+            elif not getattr(self, attr, None):
                 raise ValueError("missing required {} value".format(attr))
         for attr in ('args', 'kwargs', 'active'):
             if data.get(attr, None) is not None:
-                setattr(job, attr, data[attr])
-        return job
+                setattr(self, attr, data[attr])
+        return self
 
     def as_json(self):
         d = {}
@@ -68,8 +64,6 @@ class ScheduledJob(db.Model):
         d['kwargs'] = self.kwargs
         d['schedule'] = self.schedule
         d['active'] = self.active
-        d['last_runtime'] = self.last_runtime
-        d['last_status'] = self.last_status
         return d
 
     def crontab_schedule(self):

@@ -1,5 +1,6 @@
 """User Consent module"""
 from datetime import datetime, timedelta
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from validators import url as url_validation
 
@@ -9,6 +10,7 @@ from ..date_tools import FHIR_datetime
 from .organization import Organization
 from .user import User
 
+
 def default_expires():
     """5 year from now, in UTC"""
     return datetime.utcnow() + timedelta(days=365*5)
@@ -17,6 +19,10 @@ def default_expires():
 STAFF_EDITABLE_MASK = 0b001
 INCLUDE_IN_REPORTS_MASK = 0b010
 SEND_REMINDERS_MASK = 0b100
+
+status_types = ('consented', 'suspended', 'deleted')
+status_types_enum = ENUM(
+    *status_types, name='status_enum', create_type=False)
 
 
 class UserConsent(db.Model):
@@ -35,6 +41,8 @@ class UserConsent(db.Model):
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
     agreement_url = db.Column(db.Text, nullable=False)
     options = db.Column(db.Integer, nullable=False, default=0)
+    status = db.Column('status', status_types_enum,
+                       server_default='consented', nullable=False)
 
     audit = db.relationship(Audit, cascade="save-update, delete",
                             foreign_keys=[audit_id])
@@ -97,6 +105,7 @@ class UserConsent(db.Model):
                          'send_reminders'):
                 if getattr(self, attr):
                     d[attr] = True
+        d['status'] = self.status
         return d
 
     @classmethod
@@ -129,40 +138,9 @@ class UserConsent(db.Model):
             obj.acceptance_date = FHIR_datetime.parse(
                 data.get('acceptance_date'),
                 error_subject='acceptance_date')
-        for attr in (
-            'staff_editable', 'include_in_reports', 'send_reminders'):
+        for attr in ('staff_editable', 'include_in_reports',
+                     'send_reminders', 'status'):
             if attr in data:
                 setattr(obj, attr, data.get(attr))
 
         return obj
-
-
-def db_maintenance():
-    """Patch up any user_consents from days when POST didn't delete old"""
-    # This is expected to be run once to clean up messy data, part of
-    # the seed process.  SLOW - don't use in production code.
-    from collections import defaultdict
-
-    admin = User.query.filter_by(email='bob25mary@gmail.com').first()
-
-    def delete_all_but_current(user, consent_list):
-        keeper = consent_list[0]
-        for item in consent_list:
-            if item.audit.timestamp > keeper.audit.timestamp:
-                keeper = item
-
-        audit = Audit(
-            comment="new consent replacing existing", user_id=admin.id,
-            subject_id=user.id, context='consent')
-        for item in consent_list:
-            item.deleted = audit
-
-    for user in User.query.all():
-        if user.valid_consents.count() > 1:
-            consents_by_org = defaultdict(list)
-            for consent in user.valid_consents:
-                consents_by_org[consent.organization_id].append(consent)
-
-            for org_id, consent_list in consents_by_org.items():
-                if len(consent_list) > 1:
-                    delete_all_but_current(user, consent_list)

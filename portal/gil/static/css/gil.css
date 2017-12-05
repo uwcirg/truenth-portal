@@ -7447,7 +7447,9 @@ aside .module--flex {
     }
     .home--footer-container {
         margin-top: 25em;
-        overflow: hidden
+        overflow: hidden;
+        position: relative;
+        top: 2.2em;
     }
     .home--registraion-wrapper {
         margin-top: 1.3em

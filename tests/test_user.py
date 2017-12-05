@@ -21,12 +21,16 @@ from portal.models.reference import Reference
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
-from portal.models.user import UserRelationship, UserTimezone
+from portal.models.user import UserRelationship, TimezoneExtension
 from portal.models.user import permanently_delete_user
 from portal.models.user import UserIndigenousStatusExtension
 from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
-from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
-from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
+from portal.system_uri import (
+    TRUENTH_EXTENSTION_NHHD_291036,
+    TRUENTH_USERNAME,
+    TRUENTH_VALUESET_NHHD_291036
+)
+
 
 class TestUser(TestCase):
     """User model and view tests"""
@@ -187,6 +191,11 @@ class TestUser(TestCase):
         self.assert200(rv)
         user = db.session.merge(user)
         self.assertTrue(user.deleted_id)
+        self.assertTrue(user._email.startswith("__deleted_"))
+        self.assertEquals(user.email, TEST_USERNAME)
+        # confirm the 'TrueNTH-username' identity also got wiped
+        ids = [id for id in user.identifiers if id.system == TRUENTH_USERNAME]
+        self.assertTrue(id.value.startswith("__deleted_"))
 
     def test_delete_lock(self):
         """changing attributes on a deleted user should raise"""
@@ -281,7 +290,7 @@ class TestUser(TestCase):
         self.login()
         # Set to bogus, confirm exception
         data = {"resourceType": "Patient",
-                "extension": [{"url": UserTimezone.extension_url,
+                "extension": [{"url": TimezoneExtension.extension_url,
                                "timezone": "bogus"}]}
         rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
@@ -347,6 +356,32 @@ class TestUser(TestCase):
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
+
+    def test_tz_set_on_account_creation(self):
+        org = Organization(id=101, name='org', timezone='US/Pacific')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+
+        data = {
+            'organizations': [{'organization_id': 101}],
+            'consents': [{'organization_id': 101,
+                          'agreement_url': 'http://fake.org',
+                          'staff_editable': True,
+                          'send_reminders': False}],
+            'roles': [{'name': ROLE.PATIENT}]}
+
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        rv = self.client.post('/api/account',
+                              content_type='application/json',
+                              data=json.dumps(data))
+        self.assert200(rv)
+
+        user_id = rv.json['user_id']
+        new_user = User.query.get(user_id)
+        self.assertEquals(new_user.timezone, 'US/Pacific')
 
     def test_account_creation_by_staff(self):
         # permission challenges when done as staff
@@ -955,6 +990,7 @@ class TestUser(TestCase):
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
+            other.timezone = 'US/Eastern'
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
@@ -964,6 +1000,7 @@ class TestUser(TestCase):
             other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
+            user.timezone = 'US/Central'  # want to retain the original
             user.merge_with(other.id)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
@@ -973,6 +1010,7 @@ class TestUser(TestCase):
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
             self.assertTrue(user.deceased)
+            self.assertEquals(user.timezone, 'US/Central')
 
 
     def test_promote(self):

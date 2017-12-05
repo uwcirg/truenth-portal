@@ -56,19 +56,18 @@ function showMain() {
 }
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
-    //landing page
-    if ($("#fullSizeContainer").length > 0) {
-        $("#loadingIndicator").hide();
-        showMain();
-        return false;
-    };
-
-    if (show) {
-        $("#loadingIndicator").show();
-    } else {
-        setTimeout("showMain();", 100);
-        if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 200);
+	//landing page
+	if ($("#fullSizeContainer").length > 0) {
+		$("#loadingIndicator").hide();
+		showMain();
+		return false;
+	};
+	if (show) {
+		$("#loadingIndicator").show();
+	} else {
+    	if (!DELAY_LOADING) {
+        	setTimeout("showMain();", 100);
+        	setTimeout('$("#loadingIndicator").fadeOut();', 200);
         };
     };
 };
@@ -99,7 +98,8 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "ethnicity": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
     "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
     "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-    "language": "http://hl7.org/fhir/valueset/languages"
+    "language": "http://hl7.org/fhir/valueset/languages",
+    "shortname": "http://us.truenth.org/identity-codes/shortname"
 };
 var __NOT_PROVIDED_TEXT = "not provided";
 /*
@@ -118,7 +118,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "registrationDate": i18next.t("Regiatration Date"),
                       "historyConsentDate": i18next.t("Consent Date"),
                       "locale": i18next.t("GMT"),
-                      "lastUpdated": i18next.t("Last Updated") + "<br/>" + i18next.t("( GMT, Y-M-D )"),
+                      "lastUpdated": i18next.t("Last Updated") + "<br/><span class='smaller-text'>" + i18next.t("( GMT, Y-M-D )") + "</span>",
                       "comment": i18next.t("Action"),
                       "actor": i18next.t("User")
                       };
@@ -289,7 +289,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             case "deleted":
                 if (se && sr && ir) {
                     sDisplay = oDisplayText["consented"];
-                } else if (se && ir && !sr) {
+                } else if (se && ir && !sr || (!se && ir && !sr)) {
                     sDisplay = oDisplayText["withdrawn"];
                 } else if (!se && !ir && !sr) {
                     sDisplay = oDisplayText["purged"];
@@ -301,19 +301,23 @@ var ConsentUIHelper = function(consentItems, userId) {
                 sDisplay = oDisplayText["expired"];
                 break;
             case "active":
-                if (se && sr && ir) {
-                    if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
-                    else sDisplay = oDisplayText["consented"];
-                    cflag = "consented";
-                } else if (se && ir && !sr) {
-                    sDisplay = oDisplayText["withdrawn"];
-                    cflag = "suspended";
-                } else if (!se && !ir && !sr) {
-                    sDisplay = oDisplayText["purged"];
-                    cflag = "purged";
-                } else {
-                    sDisplay = oDisplayText["consented"];
-                    cflag = "consented";
+                switch(item.status) {
+                    case "consented":
+                        if (this.isDefaultConsent(item)) sDisplay = oDisplayText["default"];
+                        else sDisplay = oDisplayText["consented"];
+                        cflag = "consented";
+                        break;
+                    case "suspended":
+                        sDisplay = oDisplayText["withdrawn"];
+                        cflag = "suspended";
+                        break;
+                    case "deleted":
+                        sDisplay = oDisplayText["purged"];
+                        cflag = "purged";
+                        break;
+                    default:
+                        sDisplay = oDisplayText["consented"];
+                        cflag = "consented";
                 };
                 break;
         };
@@ -435,10 +439,27 @@ var ConsentUIHelper = function(consentItems, userId) {
                     o.org = $(this).attr("data-orgId");
                     o.agreementUrl = $(this).attr("data-agreementUrl");
                 };
-                if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
-                else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                $("#" + $(this).attr("modalId")).modal('hide');
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                if ($(this).val() == "purged") {
+                    tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                } else if ($(this).val() == "suspended") {
+                    var modalElement = $("#" + $(this).attr("modalId"));
+                    tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"),null, function(data) {
+                        modalElement.modal('hide');
+                        if (data.error) {
+                            $(".set-consent-error").text(data.error);
+                        } else {
+                            if (typeof reloadConsentList !== "undefined") {
+                                reloadConsentList();
+                            };
+                        };
+                    });
+                } else {
+                    tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
+                    $("#" + $(this).attr("modalId")).modal('hide');
+                    if (typeof reloadConsentList !== "undefined") {
+                        reloadConsentList();
+                    };
+                };
             });
         });
     },
@@ -568,7 +589,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         var content = "";
         content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
         content += this.getHeaderRow(historyHeaderArray);
- 		
+
  		/*
  		 * filtered out deleted items from all consents
  		 */
@@ -1131,6 +1152,18 @@ var fillContent = {
             co.getConsentList();
         };
     },
+    "treatmentOptions": function(data) {
+        if (data.treatment_options) {
+            var entries = data.treatment_options;
+            $("#tnthproc").append("<option value=''>" + i18next.t("Select") + "</option>");
+            entries.forEach(function(item) {
+                $("#tnthproc").append("<option value='{value}' data-system='{system}'>{text}</option>"
+                                        .replace("{value}", item.code)
+                                        .replace("{text}", i18next.t(item.text))
+                                        .replace("{system}", item.system));
+            });
+        };
+    },
     "treatment": function(data) {
         var treatmentCode = tnthAjax.hasTreatment(data);
         if (treatmentCode) {
@@ -1157,22 +1190,21 @@ var fillContent = {
         var contentHTML = "", proceduresHtml = "", otherHtml = "";
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
+        var currentUserId = $("#profileProcCurrentUserId").val();
+        var subjectId = $("#profileProcSubjectId").val();
         $.each(data.entry,function(i,val){
             var code = val.resource.code.coding[0].code;
             var procID = val.resource.id;
             if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
                 var displayText = val.resource.code.coding[0].display;
                 var performedDateTime = val.resource.performedDateTime;
-                var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
-                var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
-                //console.log("date: " + performedDateTime + " cdate: " + performedDate);
                 var deleteInvocation = '';
                 var creatorDisplay = val.resource.meta.by.display;
                 var creator = val.resource.meta.by.reference;
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
                     creator = i18next.t("you");
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.85em; padding: 0.5em 0.8em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
                 }
                 else if (creator == subjectId) {
                     creator = i18next.t("this patient");
@@ -1180,7 +1212,14 @@ var fillContent = {
                 else creator = i18next.t("staff member") + ", <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(" + i18next.t("data entered by ") + creator + i18next.t(" on ") + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
+
+                var creationText = i18next.t("(date entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}));
+
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>"
+                            + (tnthDates.formatDateString(performedDateTime)) + "&nbsp;--&nbsp;" + displayText
+                            + "&nbsp;<em>" + creationText
+                            + "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>"
+                            + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 }
@@ -1207,7 +1246,7 @@ var fillContent = {
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
-            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added") + "!</em></small>");
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added!") + "</em></small>");
         }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
@@ -1258,7 +1297,7 @@ var fillContent = {
                 });
                 return found;
             };
-            $("#topTerms label.terms-label").each(function() {
+            $("#termsCheckbox label.terms-label").each(function() {
                 var arrTypes = [];
                 var item_found  = 0;
                 var self = $(this);
@@ -1387,6 +1426,113 @@ var fillContent = {
             };
         } else {
             $("#emailLogMessage").text(data.error);
+        };
+    },
+    "assessmentList": function(data) {
+        if (!data.error) {
+            var sessionListHTML = "";
+            var sessionUserId = $("#_session_user_id").val();
+            var entries = data.entry ? data.entry : null;
+            if (entries && entries.length > 0) {
+                entries.forEach(function(entry, index) {
+                    var reference = entry["questionnaire"]["reference"];
+                    var arrRefs = String(reference).split("/");
+                    var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
+                    var authoredDate = String(entry["authored"]);
+                    if (instrumentId) {
+                        var reportLink = "/patients/sessionReport/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var rowText = "<tr title='{title}' {class}>" +
+                                        "<td><a href='{link}'>{display}</a></td>" +
+                                        "<td><a href='{link}'>{status}</a></td>" +
+                                        "<td><a href='{link}'>{date}</a></td>" +
+                                        "</tr>";
+                            rowText = rowText.replace(/\{title\}/g, i18next.t("Click to view report"))
+                                            .replace(/\{link\}/g, reportLink)
+                                            .replace(/\{display\}/g, i18next.t(entry["questionnaire"]["display"]))
+                                            .replace(/\{status\}/g, i18next.t(entry["status"]))
+                                            .replace(/\{class\}/g, (index % 2 !== 0 ? "class='odd'": "class='even'"))
+                                            .replace(/\{date\}/g, tnthDates.formatDateString(entry["authored"], "iso"));
+                        sessionListHTML += rowText;
+                    };
+                });
+                $("#userSessionListTable").append(sessionListHTML);
+                $("#userSessionListTable").show();
+
+            } else {
+                $("#userSessionListTable").hide();
+                $("#userSessionsListContainer").prepend("<span class='text-muted'>" + i18next.t("No questionnaire data found.") + "</span>");
+            };
+
+        } else {
+            $("#userSessionListTable").hide();
+            $("#profileSessionListError").html(i18next.t("Problem retrieving session data from server."));
+        };
+    },
+    "assessmentReport": function(data) {
+        if (!(_isTouchDevice())) {
+            $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
+        };
+
+        var sessionListHTML = "";
+        var sessionUserId = $("#_report_user_id").val();
+        var sessionAuthoredDate = $("#_report_authored_date").val();
+
+        if (!data.error) {
+            $(".report-error-message").hide();
+            $("#userSessionReportDetailTable").html("");
+            if (data.entry && data.entry.length > 0) {
+                var entries = data["entry"];
+                var entry;
+
+                entries.forEach(function(item) {
+                    if (!entry && (item["authored"] == sessionAuthoredDate)) {
+                        entry = item;
+                    };
+                });
+
+                if (!entry) entry = entries[0];
+                var caption = "<caption><hr/><span class='profile-item-title'>{title}" +
+                                "</span><br/><span class='text-muted smaller-text'>{lastUpdated}" +
+                                " <span class='gmt'>{GMT}</span></span><hr/></caption>";
+                caption = caption.replace(/\{title\}/g, i18next.t(entries[0]["questionnaire"]["display"]))
+                                .replace(/\{lastUpdated\}/g, i18next.t("Last Updated - {date}").replace("{date}", tnthDates.formatDateString(sessionAuthoredDate, "iso")))
+                                .replace(/\{GMT\}/g, i18next.t("GMT, Y-M-D"));
+
+                var reportHTML = caption;
+                reportHTML += "<tr><TH>" + i18next.t("Question") + "</TH><TH>" + i18next.t("Response") + "</TH></tr>";
+                entry['group']['question'].forEach(function(entry) {
+                    var q = (entry["text"] ? entry["text"] : ""), a = "";
+
+                    if (hasValue(q)) {
+                        q = q.replace(/^[\d\w]{1,3}\./, ""); //replace question # in the beginning of the question
+                    };
+
+                    if (entry["answer"]) {
+                        (entry["answer"]).forEach(function(item) {
+                            if (hasValue(item.valueString)) {
+                                a += (hasValue(a) ? "<br/>" : "") + item.valueString;
+                            };
+                        });
+                    };
+
+                    /*
+                     * using valueCoding.code for answer and linkId for question if BOTH question and answer are empty strings
+                     */
+
+                    if (!hasValue(q) && !hasValue(a)) {
+                        q = entry["linkId"];
+                        (entry["answer"]).forEach(function(item) {
+                            if (item.valueCoding && item.valueCoding.code) a += (hasValue(a) ? "<br/>" : "") + item.valueCoding.code;
+                        });
+                    };
+
+                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (hasValue(a) ? i18next.t(a) : "--") + "</td></tr>";
+                });
+                $("#userSessionReportDetailTable").append(reportHTML);
+            };
+        } else {
+            $(".report-error-message").show();
+            $(".report-error-message").append("<div>" + i18next.t("Server Error occurred retrieving report data") + "</div>");
         };
     }
 };
@@ -1860,7 +2006,15 @@ OrgTool.prototype.populateOrgsList = function(items) {
         };
         if (item.extension) orgsList[item.id].extension = item.extension;
         if (hasValue(item.language)) orgsList[item.id].language = item.language;
-        if (item.identifier) orgsList[item.id].identifier = item.identifier;
+        if (item.identifier) {
+            orgsList[item.id].identifier = item.identifier;
+            (item.identifier).forEach(function(identifier) {
+                if (identifier.system === SYSTEM_IDENTIFIER_ENUM["shortname"]) {
+                    orgsList[item.id].shortname = identifier.value;
+                };
+            });
+        };
+
     });
     items.forEach(function(item) {
         if (item.partOf) {
@@ -1871,31 +2025,50 @@ OrgTool.prototype.populateOrgsList = function(items) {
     if (items.length > 0) this.initialized = true;
     return orgsList;
 };
+OrgTool.prototype.getShortName = function (orgId) {
+    var shortName = "", orgsList = this.getOrgsList();
+    if (hasValue(orgId)) {
+        if (orgsList[orgId] && orgsList[orgId].shortname) {
+            shortName = orgsList[orgId].shortname;
+        };
+    };
+    return shortName;
+};
 OrgTool.prototype.populateUI = function() {
-    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList;
-    var getState = function(item) {
-                    var s = "", found = false;
-                    if (item.identifier) {
-                        (item.identifier).forEach(function(i) {
-                            if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
-                                s = (i.value).split(":")[1];
-                                found = true;
-                            };
-                        });
-                    };
-                    return s;
+    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
+    function getState(item) {
+    	var s = "", found = false;
+    	if (item.identifier) {
+        	(item.identifier).forEach(function(i) {
+        		if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                	s = (i.value).split(":")[1];
+                	found = true;
                 };
-    for (org in orgsList) {
+            });
+		};
+		return s;
+	};
+	for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                    container.append("<legend orgId='" + org + "'>"+ i18next.t(orgsList[org].name) +"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                	parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>"
+                					+ "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' />";
+                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                	container.append(parentContent);
                     parentOrgsCt++;
                 };
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
-                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t(orgsList[org].name) + '</label>');
+                	parentContent = "<label id='org-label-{{orgId}}' class='org-label'>"
+                					+ "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
+                					+ "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label>";
+                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                	container.append(parentContent);
                 };
             };
         };
@@ -1907,69 +2080,84 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
-                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
 
-                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
-
-                childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
-
-                if (orgsList[item.id].children.length > 0) {
-                    childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
-                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t(item.name) +
-                    '</label>';
-
-                 } else {
-                    childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
-                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    i18next.t(item.name) +
-                    '</label>';
+                if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
+                	return true;
                 };
 
-                childClinic += '</div>';
+                childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container'>"
+          					+ "<label id='org-label-{{itemId}}' class='org-label {{classes}}'>"
+                			+ "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
+                			+ "<span>{{itemName}}</span>"
+                			+ "</label>";
+                			+ "</div>";
+                childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
+                						.replace(/\{\{itemName\}\}/g, item.name)
+                						.replace(/\{\{state\}\}/g, hasValue(state)?state:"")
+                						.replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
+                						.replace(/\{\{classes\}\}/g, (orgsList[item.id].children.length > 0 ? (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter"): ""))
 
-                if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
-                else container.append(childClinic);
+                if ($("#" + _parentOrgId + "_container").length > 0) {
+                	$("#" + _parentOrgId + "_container").append(childClinic);
+                } else {
+                	container.append(childClinic);
+                };
 
             });
         };
-        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
+        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) {
+        	container.append("<span class='divider'>&nbsp;</span>");
+        };
     };
-    if (!hasValue(container.text())) container.html("No organizations available");
+    if (!hasValue(container.text())) {
+    	container.html(i18next.t("No organizations available"));
+    };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
-        if (!o) return false;
-        var orgId = this.getElementParentOrg(o), orgName = $(o).attr("data-parent-name");
-        if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
-            var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_defaultConsentModal">'
+        if (!o) {
+            return false;
+        };
+        var self = this;
+        var orgsList = self.getOrgsList();
+        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
+        var title = i18next.t("Consent to share information");
+        var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
+        if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length === 0) {
+            var s = '<div class="modal fade" id="{orgId}_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="{orgId}_defaultConsentModal">'
                 + '<div class="modal-dialog" role="document">' +
                 '<div class="modal-content">' +
                 '<div class="modal-header">' +
-                '<button type="button" class="close" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + "<span aria-hidden='true'>&times;</span></button>" +
-                '<h4 class="modal-title">' + i18next.t("Consent to share information") + '</h4>' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="{close}">' + "<span aria-hidden='true'>&times;</span></button>" +
+                '<h4 class="modal-title">{title}</h4>' +
                 '</div>' +
                 '<div class="modal-body">' +
-                '<h4>Terms</h4>' +
-                '<p>' + i18next.t("I consent to sharing information with") +
-                '<span class="consent-clinic-name">&nbsp;' + i18next.t(orgName) +
-                '</p>' +
-                '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
+                '<div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
+                '<div class="main-content tnth-hide">' +
+                '<p>{consentText}</p>' +
+                '<div id="{orgId}defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>' + i18next.t("Yes") + '</label>' +
+                '<input type="radio" name="toConsent" id="{orgId}_consent_yes" data-org="{orgId}" value="yes"/>{yes}</label>' +
                 '<br/>' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>' + i18next.t("No") + '</label>' +
+                '<input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>' +
                 '</div>' +
-                '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
+                '</div>' +
+                '<div id="{orgId}_consentAgreementMessage" class="error-message"></div>' +
                 '</div>' +
                 '<br/>' +
                 '<div class="modal-footer" >' +
-                '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="' + i18next.t("Close") + '">' + i18next.t("Close") + '</button>' +
+                '<div id="{orgId}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
+                '<button type="button" class="btn btn-default btn-consent-close" data-org="{orgId}" data-dismiss="modal" aria-label="{close}">{close}</button>' +
                 '</div></div></div></div>';
-            if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
+                s = s.replace(/\{orgId\}/g, orgId)
+                    .replace(/\{close\}/g, i18next.t("Close"))
+                    .replace(/\{yes\}/g, i18next.t("Yes"))
+                    .replace(/\{no\}/g, i18next.t("No"))
+                    .replace(/\{title\}/g, title)
+                    .replace(/\{consentText\}/g, consentText);
+            if ($("#defaultConsentContainer").length === 0) {
+                $("body").append("<div id='defaultConsentContainer'></div>");
+            };
             $("#defaultConsentContainer").append(s);
             $("#" + orgId + "_defaultConsentModal input[name='toConsent']").each(function() {
                 $(this).on("click", function(e) {
@@ -1983,8 +2171,10 @@ OrgTool.prototype.getDefaultModal = function(o) {
                     } else {
                         tnthAjax.deleteConsent(userId, {"org":orgId});
                         setTimeout("tnthAjax.removeObsoleteConsent();", 100);
-                    }
-                    if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
+                    };
+                    if (typeof reloadConsentList != "undefined") {
+                        setTimeout("reloadConsentList();", 500);
+                    };
                     setTimeout('$(".modal").modal("hide");', 250);
                 });
              });
@@ -2002,10 +2192,17 @@ OrgTool.prototype.getDefaultModal = function(o) {
                     assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                 };
              }).on("shown.bs.modal", function() {
-                $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
-                $(this).find(".loading-message-indicator").hide();
+                var checkedOrg = $("#userOrgs input[name='organization']:checked");
+                var shortName = self.getShortName(checkedOrg.val());
+                if (hasValue(shortName)) {
+                    $(this).find(".consent-clinic-name").text(i18next.t(shortName));
+                };
                 $(this).find("input[name='toConsent']").each(function(){
                     $(this).prop("checked", false);
+                });
+                $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
+                $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
+                    $("#" + orgId + "_defaultConsentModal .main-content").removeClass("tnth-hide");
                 });
              });
         };
@@ -2466,19 +2663,30 @@ var tnthAjax = {
             };
         });
     },
-    "getConsent": function(userId, sync) {
+    "getConsent": function(userId, sync, callback) {
        if (!userId) return false;
        this.sendRequest('/api/user/'+userId+'/consent', 'GET', userId, {sync: sync}, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".get-consent-error").html("");
-                    fillContent.consentList(data, userId, null, null);
+                    if (callback) {
+                        callback(data);
+                    } else {
+                        fillContent.consentList(data, userId, null, null);
+                    };
                     return true;
                 } else {
-                    fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server."));
                     var errorMessage = i18next.t("Server error occurred retrieving consent information.");
-                    if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
-                    else $(".get-consent-error").html(errorMessage);
+                    if (callback) {
+                        callback({"error": errorMessage});
+                    } else {
+                        fillContent.consentList(null, userId, i18next.t("Problem retrieving data from server."));
+                        if ($(".get-consent-error").length === 0) {
+                            $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
+                        } else {
+                            $(".get-consent-error").html(errorMessage);
+                        };
+                    };
                     return false;
                 };
             };
@@ -2572,6 +2780,37 @@ var tnthAjax = {
 
             };
         };
+    },
+    withdrawConsent: function(userId, orgId, params, callback) {
+        if (!userId) {
+            if (callback) {
+                return {"error": i18next.t("User id is required.")};
+            }
+            return false;
+        }
+        if (!orgId) {
+            if (callback) {
+                return {"error": i18next.t("Organization id is required.")};
+            }
+            return false;
+        };
+        params = params || {};
+        this.sendRequest('/api/user/'+userId+'/consent/withdraw',
+            'POST',
+            userId,
+            {sync: (params.sync?true:false), data: JSON.stringify({organization_id: orgId})},
+            function(data) {
+                if (!data.error) {
+                    if (callback) {
+                        callback(data);
+                    }
+                } else {
+                    if (callback) {
+                        callback({"error": i18next.t("Error occurred setting consent status.")});
+                    }
+                };
+            }
+        );
     },
     getAllValidConsent: function(userId, orgId) {
         if (!userId) return false;
@@ -2927,19 +3166,23 @@ var tnthAjax = {
             };
         });
     },
-    "postProc": function(userId,toSend, targetField) {
+    "postProc": function(userId,toSend,targetField, callback) {
         flo.showLoader(targetField);
         this.sendRequest('/api/procedure', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
                     flo.showUpdate(targetField);
                     $(".get-procs-error").html("");
+                    if (callback) callback(data);
                 } else {
                     var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
                     if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
                     else $(".get-procs-error").html(errorMessage);
                     flo.showError(targetField);
+                    if (callback) callback({error: errorMessage});
                 };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
     },
@@ -3290,6 +3533,30 @@ var tnthAjax = {
     	});
 
     },
+    "updateAssessment": function(userId, data, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": i18next.t("User id is required.")});
+            };
+        };
+        if (!hasValue(data)) {
+            if (callback) {
+                callback({"error": i18next.t("Response data to be update is required.")})
+            };
+        };
+        this.sendRequest('/api/patient/'+userId+'/assessment', 'PUT', userId, {data: JSON.stringify(data)}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving assessment list.")});
+                };
+
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    },
     "assessmentList": function(userId, callback) {
     	if (!hasValue(userId)) return false;
     	this.sendRequest('/api/patient/'+userId+'/assessment', 'GET', userId, null, function(data) {
@@ -3320,6 +3587,30 @@ var tnthAjax = {
     			if (callback) callback({"error": i18next.t("no data returned")});
     		};
     	});
+    },
+    "getCurrentQB": function(userId, completionDate, params, callback) {
+        if (!hasValue(userId)) {
+            return false;
+        };
+        params = params||{};
+        this.sendRequest('/api/user/' + userId + '/questionnaire_bank', 'GET', userId, {data: {as_of_date: completionDate}, sync: params.sync?true:false}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) {
+                        callback(data);
+                    };
+                } else {
+                    if (callback) {
+                        callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
+                    };
+                };
+
+            } else {
+                if (callback) {
+                    callback({"error": i18next.t("no data returned")});
+                };
+            };
+        });
     },
     "patientReport": function(userId, callback) {
     	if (!hasValue(userId)) return false;
@@ -3390,6 +3681,57 @@ var tnthAjax = {
     		 if (callback) callback({"error": i18next.t("no data returned")});
     		};
     	});
+    },
+    "setting": function(key, userId, params, callback) {
+        if (!hasValue(key)) {
+            if (callback) callback({"error": i18next.t("configuration key is required.")});
+            return false;
+        };
+        if (!params) params = {};
+        this.sendRequest('/api/settings/'+key,'GET', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving content for configuration key.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+    },
+    "deleteUser": function(userId, params, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": i18next.t("User id is required")});
+            };
+            return false;
+        };
+        this.sendRequest('/api/user/'+userId,'DELETE', userId, (params||{}), function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred deleting user.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+
+    },
+    "treatmentOptions": function(userId, params, callback) {
+        this.sendRequest('/patients/treatment-options', 'GET', userId, (params||{}), function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving treatment options.")});
+                };
+            } else {
+             if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     }
 };
 
@@ -3511,8 +3853,21 @@ $(document).ready(function() {
             },
             customemail: function($el) {
                 var emailVal = $.trim($el.val());
-                if (emailVal == "") {
-                    return false;
+                var update = function($el) {
+                    if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
+                        assembleContent.demo($el.attr("data-user-id"),true, $el);
+                    };
+                };
+                if (emailVal === "") {
+                    if ($el.attr("data-optional")) {
+                        /*
+                        * if email address is optional, update it as is
+                        */
+                        update($el);
+                        return true;
+                    } else {
+                        return false;
+                    };
                 }
                 var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 // Add user_id to api call (used on patient_profile page so that staff can edit)
@@ -3520,19 +3875,17 @@ $(document).ready(function() {
                 if (typeof(patientId) !== "undefined") {
                     addUserId = "&user_id="+patientId;
                 } else if (hasValue($el.attr("data-user-id"))) {
-                    addUserId = "&user_id="+ $el.attr("data-user-id")
+                    addUserId = "&user_id="+ $el.attr("data-user-id");
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
-                	tnthAjax.sendRequest('/api/unique_email?email='+encodeURIComponent(emailVal)+addUserId, 'GET', '', null, function(data) {
+                	tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
                 		if (!data.error) {
                 			if (data.unique) {
-	                            $("#erroremail").html('').parents(".form-group").removeClass('has-error');
-	                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
-	                                assembleContent.demo($el.attr("data-user-id"),true, $el);
-	                            };
+	                            $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+	                            update($el);
 	                        } else {
-	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass('has-error');
+	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
 	                        };
 
                 		} else {
@@ -3580,7 +3933,7 @@ var tnthDates = {
                     errorField.html(i18next.t("Invalid date. Please try again.")).show();
                     return false;
                 }
-                else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                     errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
                     return false; //shouldn't be in the future
                 }
@@ -3969,7 +4322,8 @@ var tnthDates = {
                var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
                var d = new Date(dateString);
                var ap, day, month, year, hours, minutes, seconds, nd;
-               if (!this.isDateObj(d)) return "";
+               //note instantiating ios formatted date using Date object resulted in error in IE
+               if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) return "";
                if (iosDateTest.test(dateString)) {
                    //IOS date, no need to convert again to date object, just parse it as is
                    //issue when passing it into Date object, the output date is inconsistent across from browsers
@@ -3977,9 +4331,9 @@ var tnthDates = {
                    year = dArray[0];
                    month = dArray[1];
                    day = dArray[2];
-                   hours = dArray[3];
-                   minutes = dArray[4];
-                   seconds = dArray[5];
+                   hours = dArray[3] || "0";
+                   minutes = dArray[4] || "0";
+                   seconds = dArray[5] || "0";
                 }
                 else {
                    day = d.getDate();
@@ -4154,7 +4508,76 @@ var tnthDates = {
 
        //console.log("locale? " + locale)
        return locale ? locale : "en-us";
+    },
+    getDateWithTimeZone: function(dObj) {
+        /*
+         * param is a date object
+         * calculating UTC date using Date object's timezoneOffset method
+         * the method return offset in minutes, so need to convert it to miliseconds
+         * adding the resulting offset will be the UTC date/time
+         */
+        var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
+        //I believe this is a valid python date format, will save it as GMT date/time
+        //NOTE, conversion already occurred, so there will be no need for backend to convert it again
+        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
+    },
+    /*
+     * return object containing today's date/time information
+     */
+    getTodayDateObj: function() {
+        var today = new Date();
+        var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
+        var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+        var gmtToday = this.getDateWithTimeZone(this.getDateObj(ty,tm,td,th,tmi,ts));
+
+        return {
+            date: today,
+            day: td,
+            month: tm,
+            year: ty,
+            hour: th,
+            minute: tmi,
+            second: ts,
+            displayDay: pad(td),
+            displayMonth: pad(tm),
+            displayYear: pad(ty),
+            displayHour: pad(th),
+            displayMinute: pad(tmi),
+            displaySecond: pad(ts),
+            gmtDate: gmtToday
+        }
+    },
+    /*
+     * parameters: day, month and year values in numeric
+     * boolean value for restrictToPresent, true if the date needs to be before today, false is the default
+     */
+    dateValidator: function(day, month, year, restrictToPresent) {
+        var errorMessage = "";
+        if (hasValue(day) && hasValue(month) && hasValue(year)) {
+            // Check to see if this is a real date
+            var iy = parseInt(year), im = parseInt(month), iid=parseInt(day);
+            var date = new Date(iy,im-1,iid);
+
+            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                if (iy < 1900) {
+                    errorMessage = i18next.t("Year must be after 1900");
+                };
+                // Only allow if date is before today
+                if (restrictToPresent) {
+                    var today = new Date();
+                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorMessage = i18next.t("The date must not be in the future.");
+                    };
+                };
+            } else {
+                errorMessage = i18next.t("Invalid Date. Please enter a valid date.");
+            };
+        } else {
+            errorMessage = i18next.t("Missing value.");
+        };
+        return errorMessage;
     }
+
 };
 /***
  * Bootstrap datatables functions
@@ -4222,6 +4645,15 @@ var tnthTables = {
         if (isNaN(b_d)) b_d = 0;
 
         return  b_d - a_d;
+    },
+    /***
+     * sorting alpha numeric string
+     */
+     "alphanumericSorter": function (a, b) {
+        /*
+         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
+         */
+        return alphanum(a, b);
     }
 };
 /**

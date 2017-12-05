@@ -12,8 +12,10 @@
         {{ form.hidden_tag() }}
 
         {{ render_field(form.timeout, tabindex=5) }}
+        {{ render_field(form.import_orgs, tabindex=7) }}
 
-        <button type="submit" class="btn btn-tnth-primary">Save Settings</button>
+        {{ trace_data }}
+        <button type="submit" class="btn btn-tnth-primary">Submit</button>
     </form>
 
 

@@ -4,9 +4,9 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
+from flask import current_app, url_for, abort
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask import current_app, url_for
 from werkzeug.exceptions import Unauthorized
 
 import address
@@ -14,10 +14,12 @@ from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource, UnversionedResource
 from ..database import db
 from ..date_tools import FHIR_datetime
-from .extension import CCExtension
+from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
+from .research_protocol import ResearchProtocol
 from .role import Role, ROLE
+from ..system_uri import SHORTNAME_ID, TRUENTH_RP_EXTENSION
 from .telecom import ContactPoint, Telecom
 
 
@@ -49,6 +51,8 @@ class Organization(db.Model):
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
     coding_options = db.Column(db.Integer, nullable=False, default=0)
     default_locale_id = db.Column(db.ForeignKey('codings.id'))
+    _timezone = db.Column('timezone', db.String(20))
+    research_protocol_id = db.Column(db.ForeignKey('research_protocols.id'))
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
@@ -168,6 +172,42 @@ class Organization(db.Model):
         if coding:
             self.default_locale_id = coding.id
 
+    @property
+    def shortname(self):
+        """Return shortname identifier if found, else the org name"""
+        shortnames = [
+            id for id in self.identifiers if id.system == SHORTNAME_ID]
+        if len(shortnames) > 1:
+            raise ValueError(
+                "multiple shortname identifiers found for {}".format(self))
+        return shortnames[0].value if shortnames else self.name
+
+    @property
+    def timezone(self):
+        org = self
+        if org._timezone:
+            return org._timezone
+        while org.partOf_id:
+            org = Organization.query.get(org.partOf_id)
+            if org._timezone:
+                return org._timezone
+        # return 'UTC' if no parent inheritances found
+        return 'UTC'
+
+    @timezone.setter
+    def timezone(self, value):
+        self._timezone = value
+
+    @property
+    def research_protocol(self):
+        org = self
+        if org.research_protocol_id:
+            return ResearchProtocol.query.get(org.research_protocol_id)
+        while org.partOf_id:
+            org = Organization.query.get(org.partOf_id)
+            if org.research_protocol_id:
+                return ResearchProtocol.query.get(org.research_protocol_id)
+
     @classmethod
     def from_fhir(cls, data):
         org = cls()
@@ -202,10 +242,16 @@ class Organization(db.Model):
                 instance = org_extension_map(self, e)
                 instance.apply_fhir()
         if 'identifier' in data:
+            # track current identifiers - must remove any not requested
+            remove_if_not_requested = [i for i in self.identifiers]
             for id in data['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
+                else:
+                    remove_if_not_requested.remove(identifier)
+            for obsolete in remove_if_not_requested:
+                self.identifiers.remove(obsolete)
         if 'language' in data:
             self.default_locale = data['language']
         return self
@@ -301,10 +347,11 @@ class Organization(db.Model):
                 # the dummy template
                 url = url_for('portal.stock_consent', org_name=org.name,
                               _external=True)
-                asset = stock_consent(org_name=org.name)
+                asset = stock_consent(org_name=org.shortname)
                 resource = UnversionedResource(url=url, asset=asset)
 
             resource.organization_name = org.name
+            resource.organization_shortname = org.shortname
             agreements[org.id] = resource
         return agreements
 
@@ -331,7 +378,36 @@ class LocaleExtension(CCExtension):
         return self.organization.locales
 
 
-org_extension_classes = (LocaleExtension,)
+class ResearchProtocolExtension(CCExtension):
+    def __init__(self, organization, extension):
+        self.organization, self.extension = organization, extension
+
+    extension_url = TRUENTH_RP_EXTENSION
+
+    def as_fhir(self):
+        rp = self.organization.research_protocol
+        if rp:
+            return {'url': self.extension_url,
+                    'research_protocol': rp.name}
+
+    def apply_fhir(self):
+        if self.extension['url'] != self.extension_url:
+            raise ValueError('invalid url for ResearchProtocolExtension')
+        if 'research_protocol' not in self.extension:
+            abort(400, "Extension missing 'research_protocol' field")
+        name = self.extension['research_protocol']
+        rp = ResearchProtocol.query.filter_by(name=name).first()
+        if not rp:
+            abort(404, "ResearchProtocol with name {} not found".format(name))
+        self.organization.research_protocol_id = rp.id
+
+    @property
+    def children(self):
+        raise NotImplementedError
+
+
+org_extension_classes = (LocaleExtension, TimezoneExtension,
+                         ResearchProtocolExtension)
 
 
 def org_extension_map(organization, extension):

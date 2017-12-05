@@ -108,30 +108,45 @@ Write to the respective GOOGLE\_CONSUMER\_KEY and
 GOOGLE\_CONSUMER\_SECRET variables in the same ``application.cfg``
 configuration file.
 
-Install the Lastest Package (and Dependencies)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install the Lastest Package and Dependencies (by hand)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instruct ``pip`` to install the correct version of all dependencies into the
+virtual environment. This idempotent step can be run anytime to confirm the
+correct libraries are installed:
+
+.. code:: bash
+
+    pip install -r requirements.txt
+
+Sync Database and Config Files (by hand)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The idempotent ``sync`` function takes necessary steps to build tables,
+upgrade the database schema and run ``seed`` to populate with static data.
+Safe to run on existing or brand new databases.
+
+.. code:: bash
+
+    FLASK_APP=manage.py flask sync
+
+Install the Lastest Package, Dependencies and Syncronize DB (via script)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To update your Shared Services installation run the ``deploy.sh`` script
-as described below.
+(this step replaces the two previous hand run steps).
 
-This script will: \* Update the project with the latest code \* Install
-any dependencies, if necessary \* Perform any database migrations, if
-necessary \* Seed any new data to the database, if necessary \* Restart
-apache, if served by apache
+This script will:
 
-.. code:: bash
-
-    $ cd $PROJECT_HOME
-    $ ./bin/deploy.sh -fv # -f to force a run, -v for verbose output
-
-When running deploy.sh for the first time, add the -i flag to initialize
-the database. Do not add this flag when running deploy.sh on a working
-database.
+* Update the project with the latest code
+* Install any dependencies, if necessary
+* Perform any database migrations, if necessary
+* Seed any new data to the database, if necessary
 
 .. code:: bash
 
     $ cd $PROJECT_HOME
-    $ ./bin/deploy.sh -fvi # -i to initialize the database
+    $ ./bin/deploy.sh
 
 To see all available options run:
 

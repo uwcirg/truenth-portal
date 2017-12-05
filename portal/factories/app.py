@@ -10,10 +10,10 @@ import redis
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from ..audit import configure_audit_log
-from ..config import DefaultConfig
+from ..config.config import DefaultConfig, SITE_CFG
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
 from ..models.app_text import app_text
@@ -36,11 +36,12 @@ from ..views.procedure import procedure_api
 from ..views.portal import portal
 from ..views.organization import org_api
 from ..views.scheduled_job import scheduled_job_api
+from ..views.staff import staff
 from ..views.tou import tou_api
 from ..views.truenth import truenth_api
 from ..views.user import user_api
 
-SITE_CFG = 'site.cfg'
+
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
     audit_api,
@@ -59,6 +60,7 @@ DEFAULT_BLUEPRINTS = (
     procedure_api,
     portal,
     scheduled_job_api,
+    staff,
     truenth_api,
     tou_api,
     user_api,)

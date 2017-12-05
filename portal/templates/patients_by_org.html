@@ -48,7 +48,7 @@
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                   <!-- need to hide the ID column specifically for EPROMs -->
-                  <th data-field="userid" data-sortable="true" data-class="id-field" data-sorter="tnthTables.stripLinksSorter" data-width="1%" {%if config.HIDE_TRUENTH_ID_FIELD%}data-visible="false"{%endif%}>TrueNTH ID</th>
+                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%" {%if config.HIDE_TRUENTH_ID_FIELD%}data-visible="false"{%endif%}>{{_("TrueNTH ID")}}</th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
@@ -60,17 +60,17 @@
                   <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
                   {% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.stripLinksTextSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
-          <tbody id="admin-table-body" data-link="row" class="rowlink">
+          <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="id_row_{{patient.id}}">
+                  <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">
                       <td>{{patient.id}}</td>
-                      <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
-                      <td id="{{patient.id}}_username">{{ patient.username }}</td>
+                      <td>{{ patient.id }}</td>
+                      <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
@@ -85,7 +85,7 @@
                       <td>{{patient.assessment_status if patient.assessment_status}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
                       {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{%if patient.external_study_id%}<a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.external_study_id }}</a>{%endif%}</a></td>
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
@@ -93,7 +93,7 @@
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
-                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
+                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                   </tr>
                {% endfor %}
           </tbody>
@@ -131,9 +131,12 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-
-var AT = new AdminTool({{user.id}});
-var sortObj = AT.getTablePreference({{user.id}}, "patientList");
+var AT = new window.portal.AdminTool({{user.id}}, "patientList", {
+  "tnthAjax": tnthAjax,
+  "i18next": i18next,
+  "tnthDates": tnthDates
+});
+var sortObj = AT.getTablePreference({{user.id}});
 /*
 * initializing bootstrapTable
 */
@@ -153,53 +156,42 @@ $("#adminTable").bootstrapTable({
 });
 
 $(document).ready(function() {
-  /*
-   *  scroll to the top of page on each page change
-   */
-  $("#adminTable").on("page-change.bs.table", function() {
-      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
-  }).on("sort.bs.table", function(e, name, order) {
-      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList", name, order); }, 10);
-  }).on("column-search.bs.table", function(e, name, text) {
-      setTimeout(function() { AT.setTablePreference({{user.id}}, "patientList"); }, 10);
+	/*
+	*  scroll to the top of page on each page change
+	*/
+ 	$("#adminTable").on("page-change.bs.table", function() {
+    	if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+ 	}).on("sort.bs.table", function(e, name, order) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}, AT.tableIdentifier, name, order); }, 10);
+ 	}).on("column-search.bs.table", function(e, name, text) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
+	}).on("column-switch.bs.table", function(e, field, checked) {
+    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
+	});
+
+  AT.init(function() {
+    /*
+     *  hide checkbox for hidden id field from side menu
+     */
+    $("input[data-field='id']:checkbox").hide();
+     /*
+      * add placeholder text for filter controls
+      */
+    (function() {
+       function addFilterPlaceHolders() {
+         $("#adminTable .filterControl input").attr("placeholder", "{{_('Enter Text')}}");
+         $("#adminTable .filterControl select option[value='']").text("Select");
+       }
+       $("#adminTable").on("reset-view.bs.table", function() {
+          addFilterPlaceHolders();
+       });
+       addFilterPlaceHolders();
+    })();
+    AT.rowLinkEvent();
+    AT.setColumnSelections();
+    AT.initOrgsList(false, "patients");
+    setTimeout(function() { AT.fadeLoader(); }, 2500);
   });
-
-  /*
-   * add placeholder text for filter controls
-   */
-   (function() {
-     function addFilterPlaceHolders() {
-       $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
-       $("#adminTable .filterControl select option[value='']").text("Select");
-     }
-     $("#adminTable").on("reset-view.bs.table", function() {
-        addFilterPlaceHolders();
-     });
-     addFilterPlaceHolders();
-   })();
-
-  /*
-   * fade loading spinner on page load
-   */
-  DELAY_LOADING = true;
-  setTimeout(function() { AT.fadeLoader(); }, 150);
-
-  /*
-   *  hide checkbox for hidden id field from side menu
-   */
-  $("input[data-field='id']:checkbox").hide();
-
-  /*
-   * variable passed into orgs dropdown to check selected org(s)
-   */
-  var org_list = {};
-  {% if org_list %}
-    {% for org in org_list %}
-        org_list[{{org}}] = true;
-    {% endfor %}
-  {% endif %}
-  
-  AT.initOrgsList(org_list, 'patients');
 
   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
     $("#patientReportLoader").html( __getLoaderHTML());

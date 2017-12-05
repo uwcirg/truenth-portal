@@ -105,6 +105,8 @@ def home():
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER):
         return redirect(url_for('.research_dashboard'))
+    if user.has_role(ROLE.STAFF_ADMIN):
+        return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
@@ -190,9 +192,18 @@ def privacy():
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     user = current_user()
-    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-    return render_template(
-        'gil/terms.html', content=terms.asset, editorUrl=terms.editor_url, user=user)
+    if user:
+        role = None
+        if any(user.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)):
+            role = ROLE.STAFF
+        elif user.has_role(ROLE.PATIENT):
+            role = ROLE.PATIENT
+        terms = VersionedResource(app_text(Terms_ATMA.name_key(
+            role=role)))
+    else:
+        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    return render_template('gil/terms.html', content=terms.asset,
+                           editorUrl=terms.editor_url, user=user)
 
 
 @gil.route('/about')

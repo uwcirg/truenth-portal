@@ -3,9 +3,9 @@ from collections import OrderedDict
 from datetime import datetime
 from flask import current_app
 
-from ..dogpile import dogpile_cache
+from ..dogpile_cache import dogpile_cache
 from .fhir import QuestionnaireResponse
-from .organization import Organization
+from .organization import Organization, OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from ..trace import trace
 from .user import User
@@ -40,7 +40,7 @@ def recent_qnr_status(user, questionnaire_name):
     return results
 
 
-def status_from_recents(recents, start, overdue, expired):
+def status_from_recents(recents, start, overdue, expired, as_of_date):
     """Returns dict defining available values from recents
 
     Return dict will only define values which make sense.  i.e.
@@ -57,23 +57,23 @@ def status_from_recents(recents, start, overdue, expired):
     if 'in-progress' in recents:
         results['status'] = 'In Progress'
         results['in-progress'] = recents['in-progress']
-    now = datetime.utcnow()
-    if now < start:
+    as_of_date = as_of_date or datetime.utcnow()
+    if as_of_date < start:
         raise ValueError(
             "unexpected call for status on unstarted Questionnaire")
 
-    if (overdue and now < overdue) or (not overdue and now < expired):
+    if (overdue and as_of_date < overdue) or (not overdue and as_of_date < expired):
         tmp = {
             'status': 'Due',
             'by_date': overdue if overdue else expired
-           }
+        }
         tmp.update(results)
         return tmp
-    if overdue and now < expired:
+    if overdue and as_of_date < expired:
         tmp = {
             'status': 'Overdue',
             'by_date': expired
-           }
+        }
         tmp.update(results)
         return tmp
     tmp = {'status': 'Expired'}
@@ -81,7 +81,7 @@ def status_from_recents(recents, start, overdue, expired):
     return tmp
 
 
-def qb_status_dict(user, questionnaire_bank):
+def qb_status_dict(user, questionnaire_bank, as_of_date):
     """Gather status details for a user on a given QB"""
     d = OrderedDict()
     if not questionnaire_bank:
@@ -89,13 +89,16 @@ def qb_status_dict(user, questionnaire_bank):
     trigger_date = questionnaire_bank.trigger_date(user)
     if not trigger_date:
         return d
-    start = questionnaire_bank.calculated_start(trigger_date).relative_start
-    overdue = questionnaire_bank.calculated_overdue(trigger_date)
-    expired = questionnaire_bank.calculated_expiry(trigger_date)
+    start = questionnaire_bank.calculated_start(
+        trigger_date, as_of_date=as_of_date).relative_start
+    overdue = questionnaire_bank.calculated_overdue(
+        trigger_date, as_of_date=as_of_date)
+    expired = questionnaire_bank.calculated_expiry(
+        trigger_date, as_of_date=as_of_date)
     for q in questionnaire_bank.questionnaires:
         recents = recent_qnr_status(user, q.name)
         d[q.name] = status_from_recents(
-            recents, start, overdue, expired)
+            recents, start, overdue, expired, as_of_date=as_of_date)
     trace("QuestionnaireBank status for {}:".format(questionnaire_bank.name))
     for k, v in d.items():
         trace("  {}:{}".format(k, v))
@@ -109,11 +112,18 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
-    def __init__(self, user):
+    def __init__(self, user, as_of_date):
+        """ Initialize and lookup status for respective questionnaires
+
+        :param user: subject for details
+        :param as_of_date: None value implies now
+
+        """
         self.user = user
-        self.qb = QuestionnaireBank.most_current_qb(user).questionnaire_bank
-        self.status_by_q = qb_status_dict(user=user,
-                                          questionnaire_bank=self.qb)
+        self.qb = QuestionnaireBank.most_current_qb(
+            user, as_of_date=as_of_date).questionnaire_bank
+        self.status_by_q = qb_status_dict(
+            user=user, questionnaire_bank=self.qb, as_of_date=as_of_date)
 
     def completed_date(self):
         """Returns timestamp from most recent completed assessment"""
@@ -162,14 +172,16 @@ class AssessmentStatus(object):
 
     """
 
-    def __init__(self, user):
+    def __init__(self, user, as_of_date):
         """Initialize assessment status object for given user/consent
 
         :param user: The user in question - patient on whom to check status
+        :param as_of_date: Use to override default of `now` for status calc
 
         """
         self.user = user
-        self.qb_data = QuestionnaireBankDetails(user)
+        self.as_of_date = as_of_date
+        self.qb_data = QuestionnaireBankDetails(user, as_of_date=as_of_date)
 
     def __str__(self):
         """Present friendly format for logging, etc."""
@@ -196,9 +208,21 @@ class AssessmentStatus(object):
     @property
     def organization(self):
         """Returns the organization associated with users's QB or None"""
-        org_id = self.qb_data.qb.organization_id
-        if org_id:
-            return Organization.query.get(org_id)
+        rp_id = self.qb_data.qb.research_protocol_id
+        for org in self.user.organizations:
+            if org.research_protocol and (org.research_protocol.id == rp_id):
+                return org
+        return None
+
+    @property
+    def top_organization(self):
+        """Returns the top-level organization for the established A_S org"""
+        org = self.organization
+        if org:
+            OT = OrgTree()
+            top = OT.find_top_level_org([org])
+            if top:
+                return top[0]
         return None
 
     def enrolled_in_classification(self, classification):
@@ -216,7 +240,7 @@ class AssessmentStatus(object):
             qb = QuestionnaireBank.qbs_for_user(self.user, 'indefinite')
             if qb:
                 assert len(qb) == 1
-                results.update(qb_status_dict(self.user, qb[0]))
+                results.update(qb_status_dict(self.user, qb[0], as_of_date=self.as_of_date))
         return results
 
     def instruments_needing_full_assessment(self, classification=None):
@@ -322,6 +346,7 @@ def overall_assessment_status(user_id):
     user = User.query.get(user_id)
     current_app.logger.debug("CACHE MISS: {} {}".format(
         __name__, user_id))
-    a_s = AssessmentStatus(user)
-    qbd = QuestionnaireBank.most_current_qb(user)
+    now = datetime.utcnow()
+    a_s = AssessmentStatus(user, as_of_date=now)
+    qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)
     return (a_s.overall_status, qbd)
