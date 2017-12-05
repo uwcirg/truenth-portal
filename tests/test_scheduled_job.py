@@ -111,7 +111,7 @@ class TestScheduledJob(TestCase):
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
 
         self.assert200(resp)
-        self.assertEquals(resp.json['message'], 'Test task complete.')
+        self.assertEquals(resp.json['message'].split()[-1], 'Test')
 
         # test task w/ args + kwargs
         alist = ["arg1", "arg2", "arg3"]
@@ -125,11 +125,12 @@ class TestScheduledJob(TestCase):
         job = db.session.merge(job)
 
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
-
         self.assert200(resp)
-        msg = resp.json['message'].split(" - ")
-        self.assertEquals(msg[0], 'Test task complete.')
-        self.assertEquals(msg[1].split(","), alist)
-        self.assertEquals(json.loads(msg[2]), kdict)
+
+        msg = resp.json['message'].split(". ")[1].split("|")
+        self.assertEquals(msg[0].split(","), alist)
+        kdict['manual_run'] = True
+        kdict['job_id'] = job.id
+        self.assertEquals(json.loads(msg[1]), kdict)
 
         db.session.close_all()
