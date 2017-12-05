@@ -54,20 +54,27 @@ function showMain() {
                         });
 
 }
+function hideLoader(delay, time ) {
+    if (delay) {
+        $("#loadingIndicator").hide();
+    } else {
+        setTimeout(function() { $("#loadingIndicator").fadeOut();}, time||200);
+    };
+}
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
 	//landing page
 	if ($("#fullSizeContainer").length > 0) {
-		$("#loadingIndicator").hide();
-		showMain();
-		return false;
+        hideLoader();
+        showMain();
+        return false;
 	};
 	if (show) {
-		$("#loadingIndicator").show();
+        $("#loadingIndicator").show();
 	} else {
     	if (!DELAY_LOADING) {
-        	setTimeout("showMain();", 100);
-        	setTimeout('$("#loadingIndicator").fadeOut();', 200);
+            setTimeout("showMain();", 100);
+            hideLoader(true);
         };
     };
 };
@@ -2119,7 +2126,7 @@ OrgTool.prototype.getDefaultModal = function(o) {
         };
         var self = this;
         var orgsList = self.getOrgsList();
-        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
+        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : ($(o).attr("data-parent-name") || $(o).closest("label").text());
         var title = i18next.t("Consent to share information");
         var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length === 0) {
@@ -2557,7 +2564,7 @@ var tnthAjax = {
     },
     "getRequiredCoreData": function(userId, sync, callback) {
         if (!hasValue(userId)) return false;
-        this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache:false}, function(data) {
+        this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache: true}, function(data) {
         	if (data) {
         		if (!data.error) {
         			if (data.required) {

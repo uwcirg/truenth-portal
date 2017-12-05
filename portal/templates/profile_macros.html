@@ -863,16 +863,18 @@
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
-        <div class="form-group profile-section standard" id="userOrgs">
-            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{ _("Main clinic for prostate cancer care") }}</p>{%else%}
-            <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
-            <div class="indent">
-            <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
-            <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-            <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+        <div id="clinics">
+            <div class="form-group profile-section standard" id="userOrgs">
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
+                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
+                <div class="indent">
+                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
+                <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                </div>
+                {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+                <div class="help-block with-errors"></div>
             </div>
-            {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
-            <div class="help-block with-errors"></div>
         </div>
     </div>
     <div class="get-orgs-error error-message"></div>
@@ -903,12 +905,13 @@
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
             setTimeout(function() { tnthAjax.getConsent({{ person.id if person }});}, 500);
+            $("#clinics").attr("loaded", true);
         };
     </script>
 {%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
-        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal" class="consent-modal">
+        <div class="modal fade consent-modal" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1886,7 +1889,7 @@
                 }, 2000);
 
                 setTimeout(function() { window.location = winLocation;}, 100);
-                
+
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
             };
@@ -2081,7 +2084,7 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-    
+
                                 /*
                                  * retrieve instrument ids from present questionnaire bank
                                  * only if the date is backdated, i.e. before today's date

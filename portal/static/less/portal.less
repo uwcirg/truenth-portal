@@ -555,7 +555,7 @@ div.right-panel {
 #aboutForm {
   max-width: 100%;
   padding: 1em;
-  margin: 2em 0;
+  margin: 2em auto;
   min-height: 20vh;
 
   .view-container {
@@ -564,9 +564,18 @@ div.right-panel {
   .reg-complete-container {
     width: 350px;
     max-width: 100%;
-    margin: 1em 0;
+    margin: 1em auto;
     padding: 0.5em 0;
     display: none;
+  }
+  #buttonsContainer {
+    width: 350px;
+    max-width: 100%;
+    margin: 1em 0;
+    position: relative;
+  }
+  #buttonsContainer.continue {
+    margin: 1em auto;
   }
   .iq-container {
     width: 100%;
@@ -626,12 +635,6 @@ div.right-panel {
   }
   .bd-optional {
     display: none;
-  }
-  #buttonsContainer {
-    width: 150px;
-    max-width: 100%;
-    margin: 1em 0;
-    position: relative;
   }
   #next,  #updateProfile {
     opacity: 0;
@@ -2385,6 +2388,9 @@ color: @labelColor
   a:hover {
   color: @linkHover;
   }
+  .terms-container * {
+    font-size: @baseMobileFontSize;
+  }
 }
 .consent-checkbox {
   margin-left:-2px;
@@ -2878,6 +2884,11 @@ div.timezone-warning.text-warning {
       flex-wrap: nowrap;
     }
   }
+  #consentContainer {
+    .terms-container * {
+      font-size: @baseFontSize;
+    }
+  }
 }
 
 @media (min-width: 726px) {
@@ -3024,7 +3035,10 @@ div.timezone-warning.text-warning {
     }
   }
   #aboutForm {
-    max-width: 65%;
+    max-width: 750px;
+  }
+  #aboutForm.full-size {
+    max-width: 100%;
   }
   #aboutForm .iq-container {
     margin-top: 5%;
