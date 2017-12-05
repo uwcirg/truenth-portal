@@ -865,12 +865,12 @@
     <div class="edit-container">
         <div id="clinics">
             <div class="form-group profile-section standard" id="userOrgs">
-                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{ _("Main clinic for prostate cancer care") }}</p>{%else%}
-                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
+                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
                 <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-                <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+                <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
                 </div>
                 {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
                 <div class="help-block with-errors"></div>
