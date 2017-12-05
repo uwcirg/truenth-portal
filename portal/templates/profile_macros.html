@@ -753,69 +753,93 @@
                     * we render legend for it.  This will prevent the organization from being selected by the user.
                     * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
                     */
-                    entry.forEach(function(item) {
-                        if (parseInt(item.id) !== 0 && !item.partOf) {
-                            var state = orgsList[item.id].state;
-                            if ($("#" + state + "_container").length > 0) {
-                                var oo = orgsList[item.id];
-                                if (oo.children.length > 0) {
-                                    contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
-                                    contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
-                                    contentHTML += " id='{orgId}_org' value='{orgId}' />";
-                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                            .replace(/\{orgName\}/g, item.name)
-                                                            .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                } else {
-                                    /*
-                                     * also need to check for top level orgs that do not have children and render those
-                                     */
-                                    contentHTML = "<div class='radio'>" +
-                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
-                                            "</div>";
-                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                        .replace(/\{state\}/g, state)
+                    var parentOrgs = $.grep(entry, function(item) {
+                        return parseInt(item.id) !== 0 && !item.partOf;
+                    });
+
+                    /*
+                     * sort parent orgs so ones with children displayed first
+                     */
+                    parentOrgs = parentOrgs.sort(function(a, b) {
+                        var oo_1 = orgsList[a.id];
+                        var oo_2 = orgsList[b.id];
+                        if (oo_1 && oo_2) {
+                            if (oo_1.children.length > 0 && oo_2.children.length > 0) return 0;
+                            if (oo_1.children.length > 0 && oo_2.children.length == 0) return -1;
+                            if (oo_2.children.length > 0 && oo_1.children.length == 0) return 1;
+                        } else return 0;
+                    });
+
+                    parentOrgs.forEach(function(item) {
+                        var state = orgsList[item.id].state;
+                        if ($("#" + state + "_container").length > 0) {
+                            var oo = orgsList[item.id];
+                            if (oo.children.length > 0) {
+                                contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
+                                contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
+                                contentHTML += " id='{orgId}_org' value='{orgId}' />";
+                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
                                                         .replace(/\{orgName\}/g, item.name)
                                                         .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                };
-                                $("#" + state + "_container").append(contentHTML);
+                            } else {
+                                /*
+                                 * also need to check for top level orgs that do not have children and render those
+                                 */
+                                contentHTML = "<div class='radio'>" +
+                                        "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
+                                        "</div>";
+                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                    .replace(/\{state\}/g, state)
+                                                    .replace(/\{orgName\}/g, item.name)
+                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
                             };
+                            $("#" + state + "_container").append(contentHTML);
                         };
                     });
 
                     /**** draw input element(s) that belongs to each state based on parent organization id ***/
-                    entry.forEach(function(item) {
-                        if (parseInt(item.id) != 0 && item.partOf) {
-                            var parentId = (item.partOf.reference).split("/")[2];
-                            if (parentId) {
-                                var parentState = (function(o) {
-                                    var s = "", found = false;
-                                    for (var state in states) {
-                                        if (!found) {
-                                            (states[state]).forEach(function(i) {
-                                                if (i == o) {
-                                                   s = state;
-                                                   found = true;
-                                                };
-                                            });
-                                        };
+                    var childOrgs = $.grep(entry, function(item) {
+                        return parseInt(item.id) !== 0 && item.partOf;
+                    });
+
+                    // sort child clinics in alphabetical order
+                    childOrgs = childOrgs.sort(function(a,b){
+                        if (a.name < b.name) return 1;
+                        if (a.name > b.name) return -1;
+                        return 0;
+                    });
+
+                    childOrgs.forEach(function(item) {
+                        var parentId = (item.partOf.reference).split("/")[2];
+                        if (parentId) {
+                            var parentState = (function(o) {
+                                var s = "", found = false;
+                                for (var state in states) {
+                                    if (!found) {
+                                        (states[state]).forEach(function(i) {
+                                            if (i == o) {
+                                               s = state;
+                                               found = true;
+                                            };
+                                        });
                                     };
-                                    return s;
-                                })(parentId);
-
-                                contentHTML = "<div class='radio'>" +
-                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
-                                            "</div>";
-                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                        .replace(/\{state\}/g, parentState)
-                                                        .replace(/\{parentOrgName\}/g, item.name)
-                                                        .replace(/\{parentOrgId\}/g, parentId)
-                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-
-                                if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
-                                    $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
-                                } else {
-                                    $("#" + parentState + "_container").append(contentHTML);
                                 };
+                                return s;
+                            })(parentId);
+
+                            contentHTML = "<div class='radio'>" +
+                                        "<label class='indent'><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
+                                        "</div>";
+                            contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                    .replace(/\{state\}/g, parentState)
+                                                    .replace(/\{parentOrgName\}/g, item.name)
+                                                    .replace(/\{parentOrgId\}/g, parentId)
+                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+
+                            if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
+                                $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
+                            } else {
+                                $("#" + parentState + "_container").append(contentHTML);
                             };
                         };
                       });
