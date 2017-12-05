@@ -42,7 +42,7 @@ from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, User
 from ..system_uri import SHORTCUT_ALIAS
-from ..trace import establish_trace, dump_trace
+from ..trace import establish_trace, dump_trace, trace
 
 
 portal = Blueprint('portal', __name__)
@@ -605,7 +605,6 @@ def settings():
             wide_container="true")
 
     if form.import_orgs.data:
-        from ..trace import dump_trace, establish_trace, trace
         from ..config.model_persistence import ModelPersistence
         establish_trace("Initiate import...")
         try:
