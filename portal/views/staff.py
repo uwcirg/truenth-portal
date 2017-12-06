@@ -122,8 +122,12 @@ def staff_index():
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
-    staff_list = staff_list.union(org_staff)
+    staff_list = staff_list.union(org_staff).all()
+
+    # only show test users to admins
+    if not user.has_role(ROLE.ADMIN):
+        staff_list = [staff for staff in staff_list if not staff.has_role(ROLE.TEST)]
 
     return render_template(
-        'staff_by_org.html', staff_list=staff_list.all(),
+        'staff_by_org.html', staff_list=staff_list,
         user=user, wide_container="true")
