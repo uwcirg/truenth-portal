@@ -2052,38 +2052,38 @@ OrgTool.prototype.getShortName = function (orgId) {
 OrgTool.prototype.populateUI = function() {
     var topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
-    	var s = "", found = false;
-    	if (item.identifier) {
-        	(item.identifier).forEach(function(i) {
-        		if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
-                	s = (i.value).split(":")[1];
-                	found = true;
+        var s = "", found = false;
+        if (item.identifier) {
+            (item.identifier).forEach(function(i) {
+                if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                    s = (i.value).split(":")[1];
+                    found = true;
                 };
             });
-		};
-		return s;
-	};
+        };
+        return s;
+    };
 
-	for (org in orgsList) {
+    for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                	parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>"
-                	               + "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
-                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                	container.append(parentContent);
+                    parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>"
+                                   + "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
+                    parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                    container.append(parentContent);
                 };
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                	parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
-                					+ "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
-                					+ "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
-                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                	container.append(parentContent);
+                    parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
+                                    + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
+                                    + "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
+                    parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                    container.append(parentContent);
                 };
             };
         };
@@ -2103,32 +2103,32 @@ OrgTool.prototype.populateUI = function() {
                 var state = getState(orgsList[_parentOrgId]);
 
                 if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
-                	return true;
+                    return true;
                 };
 
                 childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container {{containerClass}}'>"
-          					+ "<label id='org-label-{{itemId}}' class='org-label {{textClasses}}'>"
-                			+ "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
-                			+ "<span>{{itemName}}</span>"
-                			+ "</label>";
-                			+ "</div>";
+                            + "<label id='org-label-{{itemId}}' class='org-label {{textClasses}}'>"
+                            + "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
+                            + "<span>{{itemName}}</span>"
+                            + "</label>";
+                            + "</div>";
                 childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
-                						.replace(/\{\{itemName\}\}/g, item.name)
-                						.replace(/\{\{state\}\}/g, hasValue(state)?state:"")
-                						.replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
-                						.replace("{{containerClass}}", (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "sub-org-container": ""): ""))
+                                        .replace(/\{\{itemName\}\}/g, item.name)
+                                        .replace(/\{\{state\}\}/g, hasValue(state)?state:"")
+                                        .replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
+                                        .replace("{{containerClass}}", (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "sub-org-container": ""): ""))
                                         .replace(/\{\{textClasses\}\}/g, (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "text-muted": "text-muter"): ""))
 
                 if ($("#" + _parentOrgId + "_container").length > 0) {
-                	$("#" + _parentOrgId + "_container").append(childClinic);
+                    $("#" + _parentOrgId + "_container").append(childClinic);
                 } else {
-                	container.append(childClinic);
+                    container.append(childClinic);
                 };
             });
         };
     };
     if (!hasValue(container.text())) {
-    	container.html(i18next.t("No organizations available"));
+        container.html(i18next.t("No organizations available"));
     };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
