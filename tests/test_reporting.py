@@ -7,6 +7,7 @@ from re import search
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
 from portal.models.encounter import Encounter
+from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -31,6 +32,8 @@ class TestReporting(TestCase):
             db.session.add(org)
             user1.organizations.append(org)
             user2.organizations.append(org)
+            user2.interventions.append(INTERVENTION.COMMUNITY_OF_WELLNESS)
+            user3.interventions.append(INTERVENTION.DECISION_SUPPORT_P3P)
             map(db.session.add, (user1, user2, user3))
             db.session.commit()
         user1, user2, user3, org = map(db.session.merge,
@@ -56,6 +59,9 @@ class TestReporting(TestCase):
         # invalidate cache before testing
         dogpile_cache.invalidate(get_reporting_stats)
         stats = get_reporting_stats()
+
+        self.assertTrue('Decision Support P3P' not in stats['interventions'])
+        self.assertEqual(stats['interventions']['Community of Wellness'], 1)
 
         self.assertEqual(stats['organizations']['testorg'], 2)
         self.assertEqual(stats['organizations']['Unspecified'], 2)
