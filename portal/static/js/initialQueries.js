@@ -592,7 +592,7 @@
 
   FieldsChecker.prototype.termsCheckboxEvent = function(fields) {
     var __self = this;
-    var userId = self.userId;
+    var userId = __self.userId;
     var tnthAjax = this.__getDependency("tnthAjax");
     var orgTool = this.__getDependency("orgTool");
 

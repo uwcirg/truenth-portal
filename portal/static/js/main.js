@@ -2064,29 +2064,57 @@ OrgTool.prototype.populateUI = function() {
         return s;
     };
 
-    for (org in orgsList) {
+    var keys = Object.keys(orgsList);
+    keys = keys.sort();
+
+    /*
+     * draw parent orgs first
+     */
+    var parentOrgsArray = [];
+
+    keys.forEach(function(org) {
         if (orgsList[org].isTopLevel) {
-            if (orgsList[org].children.length > 0) {
-                if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                    parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>"
-                                   + "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
-                    parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                    container.append(parentContent);
-                };
-            } else {
-                if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                    parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
-                                    + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
-                                    + "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
-                    parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                    container.append(parentContent);
-                };
+            parentOrgsArray.push(org);
+        };
+    });
+
+    /*
+     * sort parent orgs by name
+     */
+    parentOrgsArray = parentOrgsArray.sort(function(a, b) {
+        var orgA = orgsList[a], orgB = orgsList[b];
+        if (orgA.name < orgB.name) return -1;
+        if (orgA.name > orgB.name) return 1;
+        return 0;
+    });
+
+    parentOrgsArray.forEach(function(org) {
+        if (orgsList[org].children.length > 0) {
+            if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>"
+                               + "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
+                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                container.append(parentContent);
+            };
+        } else {
+            if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
+                                + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
+                                + "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
+                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                container.append(parentContent);
             };
         };
+    });
+
+    /*
+     * draw child orgs 
+     */
+    keys.forEach(function(org) {
         // Fill in each child clinic
         if (orgsList[org].children.length > 0) {
             var childClinic = "";
@@ -2126,7 +2154,7 @@ OrgTool.prototype.populateUI = function() {
                 };
             });
         };
-    };
+    });
     if (!hasValue(container.text())) {
         container.html(i18next.t("No organizations available"));
     };
