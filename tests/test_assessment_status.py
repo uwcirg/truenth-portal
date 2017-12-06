@@ -35,14 +35,14 @@ def mock_qr(
             "display": "Additional questions",
             "reference":
             "https://{}/api/questionnaires/{}".format(
-                'SERVER_NAME', instrument_id),
-            "identifier": {
-                "use": "official",
-                "label": "cPRO survey session ID",
-                "value": doc_id,
-                "system": "https://stg-ae.us.truenth.org/eproms-demo"}
-        }
+                'SERVER_NAME', instrument_id)},
+        "identifier": {
+            "use": "official",
+            "label": "cPRO survey session ID",
+            "value": doc_id,
+            "system": "https://stg-ae.us.truenth.org/eproms-demo"}
     }
+
     enc = Encounter(status='planned', auth_method='url_authenticated',
                     user_id=TEST_USER_ID, start_time=timestamp)
     with SessionScope(db):
