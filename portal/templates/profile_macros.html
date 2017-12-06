@@ -2091,8 +2091,6 @@
                                 var y = $("#qCompletionYear").val();
                                 var todayObj = tnthDates.getTodayDateObj();
                                 var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
-
-                                var instruments_string = "";
                                 var linkUrl = "";
 
                                 if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
@@ -2118,7 +2116,8 @@
 
             tnthAjax.assessmentStatus({{person.id}}, function(data) {
                 if (!data.error) {
-                    if ((data.assessment_status).toUpperCase() == "COMPLETED") {
+                    if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
+                        (! data.outstanding_indefinte_work)) {
                         $("#assessmentLink").attr("disabled", true);
                         $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
                     };
