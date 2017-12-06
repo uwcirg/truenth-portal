@@ -1693,7 +1693,17 @@ def patient_assessment_status(patient_id):
         assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
                 None)
-        return jsonify(assessment_status=assessment_overall_status)
+
+        # indefinite assessments don't affect overall status, but need to
+        # be available if unfinished
+        outstanding_indefinite_work = len(
+            assessment_status.instruments_needing_full_assessment(
+                classification='indefinite') +
+            assessment_status.instruments_in_progress(
+                classification='indefinite'))
+
+        return jsonify(assessment_status=assessment_overall_status,
+                       outstanding_indefinite_work=outstanding_indefinite_work)
     else:
         abort(400, "invalid patient id")
 

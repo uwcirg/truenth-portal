@@ -528,10 +528,41 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             set(a_s.instruments_needing_full_assessment()),
             metastatic_3)
 
+    def test_initial_recur_baseline_done(self):
+        # backdate to be within the first recurrence window
+
+        self.bless_with_basics(backdate=relativedelta(months=3, days=2))
+        self.mark_metastatic()
+
+        # add baseline QNRs, as if submitted nearly 3 months ago, during
+        # baseline window
+        backdated = datetime.utcnow() - relativedelta(months=2, days=25)
+        baseline = QuestionnaireBank.query.filter_by(
+            name='metastatic').one()
+        for instrument in metastatic_baseline_instruments:
+            mock_qr(instrument, qb=baseline, timestamp=backdated)
+
+        self.test_user = db.session.merge(self.test_user)
+        # Check status during baseline window
+        a_s_baseline = AssessmentStatus(
+            user=self.test_user, as_of_date=backdated)
+        self.assertEquals(a_s_baseline.overall_status, "Completed")
+        self.assertFalse(a_s_baseline.instruments_needing_full_assessment())
+
+        # Whereas "current" status for the initial recurrence show due.
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
+        self.assertEquals(a_s.overall_status, "Due")
+
+        # in the initial window w/ no questionnaires submitted
+        # should include all from initial recur
+        self.assertEquals(
+            set(a_s.instruments_needing_full_assessment()),
+            metastatic_3)
+
     def test_secondary_recur_due(self):
 
         # backdate so baseline q's have expired, and we are within the
-        # second recurrance window
+        # second recurrence window
         self.bless_with_basics(backdate=relativedelta(months=6))
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
