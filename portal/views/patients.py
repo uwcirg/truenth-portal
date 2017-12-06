@@ -107,6 +107,10 @@ def patients_root():
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
+    # only show test users to admins
+    if not user.has_role(ROLE.ADMIN):
+        patients = [patient for patient in patients if not patient.has_role(ROLE.TEST)]
+
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
