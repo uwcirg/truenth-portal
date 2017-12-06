@@ -7,9 +7,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    
+
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet">
-<!--     <link rel="stylesheet" type="text/css" href="https://demo.us.truenth.org/gil/static/css/gil.css" rel="stylesheet"> -->
     <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/uwcirg/true_nth_usa_portal/develop/portal/static/css/topnav.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -27,20 +26,12 @@
         <div class="container-fluid">
             
             <div class="navbar-header">
-                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">{% trans %}Show TrueNTH USA Exercise and Diet Links{% endtrans %}</button>
+                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
 
-<!--
-                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="button">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-				</button>
--->
-            
             </div>
             <div class="navbar-collapse collapse" id="mainNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="introduction"><a href="url_for('.introduction')">{% trans %}Home{% endtrans %}</a></li>
+                    <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
                     <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
                     <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
                     <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
@@ -49,53 +40,6 @@
         </div>
     </nav>
 </div>
-
-<!--
-    <div class="hidden-md hidden-lg">
-
-        <nav class="navbar">
-            <div class="container" id="smNavContainer">
-                <div class="sm-nav-text text-muted">
-                    Home <span id="interventionCurrentText"></span>
-                </div>
-                <div class="sm-nav-text pull-right">
-                    <a href="#" id="smNavToggle" data-toggle="collapse" data-target="#smallNavDetails">
-                        <i class="fa fa-caret-square-o"></i>
-                        <span id="smNavToggleText">Show</span> TrueNTH USA Exercise and Diet Links
-                    </a>
-                </div>
-
-                <div id="smallNavDetails" class="navbar-collapse collapse sm-nav-dropdown" aria-expanded="true">
-                    <ul class="nav navbar-nav">
-                        <li class="active dropdown "><a href="" class="">Home</a></li>
-                        <li class=""><a href="/ProReports/graphs/g/0" class="">Exercise</a></li>
-                        <li class=""><a href="/ProReports/graphs/g/1" class="">Diet</a></li>
-                        <li class=""><a href="/ProReports/graphs/g/3" class="">Recipes & Tips</a></li>
-                        
-                        <li><span class="pull-right sm-nav-close" id="smNavCloseLink" data-toggle="collapse" data-target="#smallNavDetails">
-                        <i class="fa fa-angle-double-up"></i> Close</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-    </div>
--->
-<!--
-    <script>
-        $(document).ready(function(){
-            $("[data-target='#smallNavDetails']").on('shown.bs.collapse', function () {
-                $("#smallNavToggleText").text("Hide");
-            });
-
-            $("[data-target='#smallNavDetails']").on('hidden.bs.collapse', function () {
-                $("#smallNavToggleText").text("Show");
-            });
-        })
-    </script>
--->
-
 
 {% block body %}
 <div id="page-content"></div>
