@@ -27,13 +27,19 @@ class TestReporting(TestCase):
         user2 = self.add_user('test2')
         user3 = self.add_user('test3')
         org = Organization(name='testorg')
+        interv1 = INTERVENTION.COMMUNITY_OF_WELLNESS
+        interv2 = INTERVENTION.DECISION_SUPPORT_P3P
+        interv1.public_access = False
+        interv2.public_access = True
 
         with SessionScope(db):
             db.session.add(org)
+            db.session.add(interv1)
+            db.session.add(interv2)
             user1.organizations.append(org)
             user2.organizations.append(org)
-            user2.interventions.append(INTERVENTION.COMMUNITY_OF_WELLNESS)
-            user3.interventions.append(INTERVENTION.DECISION_SUPPORT_P3P)
+            user2.interventions.append(interv1)
+            user3.interventions.append(interv2)
             map(db.session.add, (user1, user2, user3))
             db.session.commit()
         user1, user2, user3, org = map(db.session.merge,
