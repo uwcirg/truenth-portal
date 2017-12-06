@@ -447,6 +447,7 @@
   };
 
   FieldsChecker.prototype.stopContinue = function(sectionId) {
+    $("#buttonsContainer").removeClass("continue");
     $("#updateProfile").attr("disabled", true).removeClass("open");
     $("div.reg-complete-container").fadeOut();
     $("#next").attr("disabled", true).addClass("open");
@@ -455,6 +456,7 @@
 
   FieldsChecker.prototype.continueToNext = function(sectionId) {
     this.setProgressBar(sectionId);
+    $("#buttonsContainer").removeClass("continue");
     $("div.reg-complete-container").fadeOut();
     $("#next").removeAttr("disabled").addClass("open");
     if (!$("#next").isOnScreen()) {
