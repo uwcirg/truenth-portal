@@ -49,4 +49,4 @@ def setup_periodic_tasks(sender, **kwargs):
                 sender.add_periodic_task(job.crontab_schedule(),
                                          task.s(*args_in, **kwargs_in))
             except Exception as exc:
-                logger.info(exc)
+                logger.error(exc)

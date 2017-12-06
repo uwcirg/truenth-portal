@@ -3,9 +3,9 @@
 
 
 
-    <h1 class="tnth-headline">{{ _("Scheduled Jobs") }}</h1>
+    <h1 class="tnth-headline">Scheduled Jobs</h1>
 
-    <h4>{{ _("Current Jobs") }}</h4>
+    <h4>Current Jobs</h4>
     {% if jobs %}
     <ul>
         {% for job in jobs %}
@@ -15,17 +15,17 @@
                     <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
                     <b>{{ job.name }}</b>
                     <div id="activeText_{{job.id}}" class="{{'text-info' if job.active else 'text-danger'}}">{{ "Active" if job.active else "Inactive" }}</div>
-                    {{ _("Task") }}: {{ job.task }}
+                    Task: {{ job.task }}
                     {% if job.args %}
-                    <br />{{ _("Args") }}: {{ job.args }}
+                    <br />Args: {{ job.args }}
                     {% endif %}
                     {% if job.kwargs %}
-                    <br />{{ _("Kwargs") }}: {{ job.kwargs }}
+                    <br />Kwargs: {{ job.kwargs }}
                     {% endif %}
-                    <br />{{ _("Schedule") }}: {{ job.schedule }}
-                    <br />{{ _("Last Runtime") }}:
+                    <br />Schedule: {{ job.schedule }}
+                    <br />Last Runtime:
                     <div id="lastRuntime_{{job.id}}" class="text-info">{{ job.last_runtime }}</div>
-                    {{ _("Last Status") }}:
+                    Last Status:
                     <div id="lastStatus_{{job.id}}" class="text-info">{{ job.last_status }}</div>
                     <br />
                 </div>
@@ -119,7 +119,7 @@ function toggleJob(event, jobId) {
                 $(current_job).fadeTo('fast',1);
                 $(current_job).children().prop('disabled',false);
             } else {
-                $(current_status).text("{{_('No response received')}}");
+                $(current_status).text("No response received");
                 $(current_status).removeClass("text-info")
                 $(current_status).addClass("text-danger");
             }
