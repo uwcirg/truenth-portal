@@ -5,7 +5,7 @@ import json
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob
-from portal.tasks import test
+from portal.tasks import test as test_task
 from tests import TestCase
 
 
@@ -95,6 +95,42 @@ class TestScheduledJob(TestCase):
 
         resp = self.client.delete('/api/scheduled_job/999')
         self.assert404(resp)
+
+    def test_active_check(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        # test standard scheduler job run of active job
+        job = ScheduledJob(name="test_active", task="test",
+                           schedule="0 0 * * *")
+        with SessionScope(db):
+            db.session.add(job)
+            db.session.commit()
+        job = db.session.merge(job)
+
+        kdict = {"job_id": job.id}
+        resp = test_task(**kdict)
+        self.assertEquals(len(resp.split()), 6)
+        self.assertEquals(resp.split()[-1], 'Test')
+
+        # test standard scheduler job run of inactive job
+        job = ScheduledJob(id=999, name="test_inactive", active=False,
+                           task="test", schedule="0 0 * * *")
+        with SessionScope(db):
+            db.session.add(job)
+            db.session.commit()
+        job = db.session.merge(job)
+
+        kdict = {"job_id": job.id}
+        resp = test_task(**kdict)
+        self.assertEquals(len(resp.split()), 4)
+        self.assertEquals(resp.split()[-1], 'inactive.')
+
+        # test manual override run of inactive job
+        kdict['manual_run'] = True
+        resp = test_task(**kdict)
+        self.assertEquals(len(resp.split()), 6)
+        self.assertEquals(resp.split()[-1], 'Test')
 
     def test_job_trigger(self):
         self.promote_user(role_name=ROLE.ADMIN)
