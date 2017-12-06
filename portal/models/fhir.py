@@ -574,13 +574,13 @@ def aggregate_responses(instrument_ids, current_user):
 
 
 def qnr_document_id(
-        subject_id, questionniare_bank_id, questionnaire_name, status):
+        subject_id, questionnaire_bank_id, questionnaire_name, status):
     """Return document['identifier'] for matching QuestionnaireResponse
 
     Using the given filter data to look for a matching QuestionnaireResponse.
     Expecting to find exactly one, or raises NoResultFound
 
-    :return: the document identifier
+    :return: the document identifier value, typically a string
 
     """
     qnr = QuestionnaireResponse.query.filter(
@@ -590,9 +590,9 @@ def qnr_document_id(
             ('questionnaire', 'reference')
         ].astext.endswith(questionnaire_name)).filter(
         QuestionnaireResponse.questionnaire_bank_id ==
-        questionniare_bank_id).with_entities(
+        questionnaire_bank_id).with_entities(
         QuestionnaireResponse.document[(
-            'questionnaire', 'identifier', 'value')]).one()
+            'identifier', 'value')]).one()
     return qnr[0]
 
 

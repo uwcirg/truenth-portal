@@ -1374,11 +1374,11 @@ def present_needed():
     # when generating reports and reminders.
     resume_ids = []
     for questionnaire_name in assessment_status.instruments_in_progress(
-            classification=all):
+            classification='all'):
         resume_ids.append(
             qnr_document_id(
                 subject_id=subject_id,
-                questionniare_bank_id=assessment_status.qb_data.qb.id,
+                questionnaire_bank_id=assessment_status.qb_data.qb.id,
                 questionnaire_name=questionnaire_name,
                 status='in-progress'))
 
