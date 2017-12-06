@@ -64,7 +64,8 @@ def get_reporting_stats():
                     desc = 'Community of Wellness'
                 if interv.quick_access_check(user):
                     stats['intervention_access'][desc] += 1
-                if interv in user.interventions:
+                if ((interv in user.interventions) and
+                        (interv.name != 'decision_support_p3p')):
                     stats['interventions'][desc] += 1
                 if (any(doc.intervention == interv for doc in user.documents)):
                     stats['intervention_reports'][desc] += 1
