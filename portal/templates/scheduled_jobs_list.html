@@ -33,10 +33,10 @@
         {% endfor %}
     </ul>
     {% else %}
-    <p>{{ _("No jobs found.") }}</p>
+    <p>No jobs found.</p>
     {% endif %}
 
-    <h4>{{ _("Available Tasks") }}</h4>
+    <h4>Available Tasks</h4>
     {% if tasks %}
     <ul>
         {% for task in tasks %}
@@ -44,7 +44,7 @@
         {% endfor %}
     </ul>
     {% else %}
-    <p>{{ _("No tasks found.") }}</p>
+    <p>No tasks found.</p>
     {% endif %}
 
 
@@ -71,7 +71,7 @@ function triggerJob(event, jobId) {
                 $(current_job).fadeTo('fast',1);
                 $(current_job).children().prop('disabled',false);
             } else {
-                $(current_status).text("{{_('No response received')}}");
+                $(current_status).text("No response received");
                 $(current_status).removeClass("text-info")
                 $(current_status).addClass("text-danger");
             }
