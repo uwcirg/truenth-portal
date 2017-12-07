@@ -1885,7 +1885,7 @@
                 }, 2000);
 
                 setTimeout(function() { window.location = winLocation;}, 100);
-                
+
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
             };
@@ -2049,9 +2049,11 @@
 
             var method = $("input[name='entryMethod']:checked").val();
             var completionDate = $("#qCompletionDate").val();
+            var linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
 
             if (method != "") {
                 $("#manualEntryMessageContainer").text("");
+
                 if (method === "paper") {
 
                     /*
@@ -2080,14 +2082,13 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-                                var linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
                                 continueToAssessment(method, completionDate, linkUrl);
                             };
 
                         };
                     });
                 } else {
-                    continueToAssessment(method);
+                    continueToAssessment(method, completionDate, linkUrl);
                 };
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
