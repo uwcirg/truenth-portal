@@ -10,6 +10,7 @@ from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
+from .portal import check_int
 
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
@@ -27,7 +28,8 @@ def jobs_list():
     """
     celery = create_celery(current_app)
     jobs = ScheduledJob.query.filter(
-        ScheduledJob.name != "__test_celery__").all()
+        ScheduledJob.name != "__test_celery__").order_by(
+            ScheduledJob.id.asc()).all()
     tasks = []
     for task in celery.tasks.keys():
         path = task.split('.')
@@ -59,17 +61,19 @@ def create_job():
     return jsonify(job.as_json())
 
 
-@scheduled_job_api.route('/api/scheduled_job', methods=('PUT',))
+@scheduled_job_api.route('/api/scheduled_job/<int:job_id>', methods=('PUT',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
-def update_job():
+def update_job(job_id):
+    check_int(job_id)
+    job = ScheduledJob.query.get(job_id)
+    if not job:
+        abort(404, 'job ID {} not found'.format(job_id))
     try:
-        name = request.json.get('name')
-        job = ScheduledJob.query.filter(
-            ScheduledJob.name == name).first()
-        if not job:
-            abort (404, "{} not found - new should POST".format(name))
-        job.update_from_json(request.json)
+        job_data = job.as_json()
+        for field in request.json:
+            job_data[field] = request.json[field]
+        job.update_from_json(job_data)
     except ValueError as e:
         abort(400, str(e))
     db.session.commit()
@@ -87,7 +91,7 @@ def update_job():
 def get_job(job_id):
     job = ScheduledJob.query.get(job_id)
     if not job:
-        abort(404, 'job ID not found')
+        abort(404, 'job ID {} not found'.format(job_id))
     return jsonify(job.as_json())
 
 
@@ -117,4 +121,5 @@ def trigger_job(job_id):
     if not job:
         abort(404, 'job ID not found')
     msg = job.trigger()
-    return jsonify(message=msg)
+    last_run = ScheduledJob.query.get(job_id).last_runtime
+    return jsonify(message=msg, runtime=last_run)
