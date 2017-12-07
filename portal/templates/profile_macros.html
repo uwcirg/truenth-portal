@@ -1849,11 +1849,7 @@
     };
     $(document).ready(function() {
 
-        var continueToAssessment = function(method, completionDate, linkUrl) {
-            /*
-             * note the linkUrl is present will override the existing asssessment link
-             */
-            var assessment_url = linkUrl || {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+        var continueToAssessment = function(method, completionDate, assessment_url) {
             if (hasValue(assessment_url)) {
                 var still_needed = false;
 
@@ -1886,7 +1882,7 @@
                 }, 2000);
 
                 setTimeout(function() { window.location = winLocation;}, 100);
-                
+
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
             };
@@ -2050,9 +2046,11 @@
 
             var method = $("input[name='entryMethod']:checked").val();
             var completionDate = $("#qCompletionDate").val();
+            var linkUrl = "{{url_for('assessment_engine_api.present_needed', subject_id=person.id)}}";
 
             if (method != "") {
                 $("#manualEntryMessageContainer").text("");
+
                 if (method === "paper") {
 
                     /*
@@ -2081,33 +2079,13 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-    
-                                /*
-                                 * retrieve instrument ids from present questionnaire bank
-                                 * only if the date is backdated, i.e. before today's date
-                                 */
-                                var d = $("#qCompletionDay").val();
-                                var m = $("#qCompletionMonth").val();
-                                var y = $("#qCompletionYear").val();
-                                var todayObj = tnthDates.getTodayDateObj();
-                                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
-
-                                var instruments_string = "";
-                                var linkUrl = "";
-
-                                if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
-                                    /*
-                                     * note the API will redirect to AE with the necessary instruments information
-                                     */
-                                    linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
-                                };
                                 continueToAssessment(method, completionDate, linkUrl);
                             };
 
                         };
                     });
                 } else {
-                    continueToAssessment(method);
+                    continueToAssessment(method, completionDate, linkUrl);
                 };
             } else {
                 $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
@@ -2118,7 +2096,8 @@
 
             tnthAjax.assessmentStatus({{person.id}}, function(data) {
                 if (!data.error) {
-                    if ((data.assessment_status).toUpperCase() == "COMPLETED") {
+                    if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
+                        (parseInt(data.outstanding_indefinite_work) === 0)) {
                         $("#assessmentLink").attr("disabled", true);
                         $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
                     };

@@ -16,6 +16,7 @@ from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
+from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
@@ -402,8 +403,10 @@ class TestIntervention(TestCase):
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         # Add a fake assessments and see a change
         for i in metastatic_baseline_instruments:
-            mock_qr(user_id=TEST_USER_ID, instrument_id=i, timestamp=dt)
-        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog', timestamp=dt)
+            mock_qr(instrument_id=i, timestamp=dt)
+        mi_qb = QuestionnaireBank.query.filter_by(
+            name='metastatic_indefinite').first()
+        mock_qr(instrument_id='irondemog', timestamp=dt, qb=mi_qb)
 
         user, ae = map(db.session.merge, (self.test_user, ae))
 
