@@ -1849,11 +1849,10 @@
     };
     $(document).ready(function() {
 
-        var continueToAssessment = function(method, completionDate, linkUrl) {
+        var continueToAssessment = function(method, completionDate, assessment_url) {
             /*
              * note the linkUrl is present will override the existing asssessment link
              */
-            var assessment_url = linkUrl || {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
             if (hasValue(assessment_url)) {
                 var still_needed = false;
 
@@ -2081,24 +2080,7 @@
                             };
 
                             if (!hasValue(errorMsg)) {
-    
-                                /*
-                                 * retrieve instrument ids from present questionnaire bank
-                                 * only if the date is backdated, i.e. before today's date
-                                 */
-                                var d = $("#qCompletionDay").val();
-                                var m = $("#qCompletionMonth").val();
-                                var y = $("#qCompletionYear").val();
-                                var todayObj = tnthDates.getTodayDateObj();
-                                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
-                                var linkUrl = "";
-
-                                if (td+tm+ty != (pad(d)+pad(m)+pad(y))) {
-                                    /*
-                                     * note the API will redirect to AE with the necessary instruments information
-                                     */
-                                    linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
-                                };
+                                var linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
                                 continueToAssessment(method, completionDate, linkUrl);
                             };
 
