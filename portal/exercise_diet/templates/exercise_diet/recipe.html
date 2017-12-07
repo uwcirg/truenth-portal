@@ -1,12 +1,12 @@
 {% block body %}
     {{ asset|safe }}
     <div class="modal-nav">
-        <span>
-            <a href="javascript:show_recipe('{{ prev_heading }}','{{ prev_item_index }}');">{{ prev_asset_title|safe }}</a>
+        <span class=" left-button">
+            <a href="javascript:show_recipe('{{ prev_heading }}','{{ prev_item_index }}','{{ prev_asset_recipe_type }}');">{{ prev_asset_title|safe }}</a>
         </span>
         &nbsp;|&nbsp;
-        <span>
-            <a href="javascript:show_recipe('{{ next_heading }}','{{ next_item_index }}');">{{ next_asset_title|safe }}</a>
+        <span class="right-button">
+            <a href="javascript:show_recipe('{{ next_heading }}','{{ next_item_index }}','{{ next_asset_recipe_type }}');">{{ next_asset_title|safe }}</a>
         </span>
     </div>
 {% endblock %}
