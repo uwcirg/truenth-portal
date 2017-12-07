@@ -2046,7 +2046,7 @@
 
             var method = $("input[name='entryMethod']:checked").val();
             var completionDate = $("#qCompletionDate").val();
-            var linkUrl = "{{url_for('assessment_engine_api.present_needed')}}" + "?subject_id={{person.id}}";
+            var linkUrl = "{{url_for('assessment_engine_api.present_needed', subject_id=person.id)}}";
 
             if (method != "") {
                 $("#manualEntryMessageContainer").text("");
