@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-11-08T19:53:32.557Z\n"
-"PO-Revision-Date: 2017-11-08T19:53:32.557Z\n"
+"POT-Creation-Date: 2017-12-01T04:08:14.901Z\n"
+"PO-Revision-Date: 2017-12-01T04:08:14.901Z\n"
 
 msgid "Server error occurred updating data."
 msgstr ""
@@ -83,6 +83,12 @@ msgstr ""
 msgid "Error occurred retrieving patient report"
 msgstr ""
 
+msgid "Are you sure you want to deactivate this user?"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
 msgid "Error retrieving demographics information for user."
 msgstr ""
 
@@ -99,6 +105,23 @@ msgid "Symptom Tracker"
 msgstr ""
 
 msgid "Edit in Liferay"
+msgstr ""
+
+msgid "terms"
+msgstr ""
+
+msgid ""
+"You must agree to the terms and conditions by checking the provided "
+"checkboxes."
+msgstr ""
+
+msgid "your information"
+msgstr ""
+
+msgid "your clinical profile"
+msgstr ""
+
+msgid "your clinic"
 msgstr ""
 
 msgid "Organization"
@@ -224,6 +247,9 @@ msgstr ""
 msgid "You do not have permission to edit this patient record."
 msgstr ""
 
+msgid "Select"
+msgstr ""
+
 msgid "You haven't entered any management option yet."
 msgstr ""
 
@@ -266,10 +292,34 @@ msgstr ""
 msgid "No audit entry found."
 msgstr ""
 
-msgid "Consent to share information"
+msgid "Click to view report"
 msgstr ""
 
-msgid "I consent to sharing information with"
+msgid "No questionnaire data found."
+msgstr ""
+
+msgid "Problem retrieving session data from server."
+msgstr ""
+
+msgid "Last Updated - {date}"
+msgstr ""
+
+msgid "GMT, Y-M-D"
+msgstr ""
+
+msgid "Question"
+msgstr ""
+
+msgid "Response"
+msgstr ""
+
+msgid "Server Error occurred retrieving report data"
+msgstr ""
+
+msgid "No organizations available"
+msgstr ""
+
+msgid "Consent to share information"
 msgstr ""
 
 msgid "Cannot ununcheck.  A staff member must be associated with an organization"
@@ -299,10 +349,10 @@ msgstr ""
 msgid "Server error occurred retrieving organization/clinic information."
 msgstr ""
 
-msgid "Problem retrieving data from server."
+msgid "Server error occurred retrieving consent information."
 msgstr ""
 
-msgid "Server error occurred retrieving consent information."
+msgid "Problem retrieving data from server."
 msgstr ""
 
 msgid "Server error occurred setting consent status."
@@ -312,6 +362,15 @@ msgid "Unable to set default consent agreement"
 msgstr ""
 
 msgid "Server error occurred removing consent."
+msgstr ""
+
+msgid "User id is required."
+msgstr ""
+
+msgid "Organization id is required."
+msgstr ""
+
+msgid "Error occurred setting consent status."
 msgstr ""
 
 msgid "Server error occurred retrieving demographics information."
@@ -377,10 +436,16 @@ msgstr ""
 msgid "Error occurred retrieving assessment status."
 msgstr ""
 
+msgid "Response data to be update is required."
+msgstr ""
+
 msgid "Error occurred retrieving assessment list."
 msgstr ""
 
 msgid "Error occurred retrieving assessment report."
+msgstr ""
+
+msgid "Error occurred retrieving current questionnaire bank for user."
 msgstr ""
 
 msgid "Error occurred retrieving patient report."
@@ -399,6 +464,15 @@ msgid "configuration key is required."
 msgstr ""
 
 msgid "Error occurred retrieving content for configuration key."
+msgstr ""
+
+msgid "User id is required"
+msgstr ""
+
+msgid "Error occurred deleting user."
+msgstr ""
+
+msgid "Error occurred retrieving treatment options."
 msgstr ""
 
 msgid "not provided"
@@ -445,5 +519,35 @@ msgstr ""
 msgid "Error occurred when converting timezone: "
 msgstr ""
 
+msgid "Year must be after 1900"
+msgstr ""
+
+msgid "The date must not be in the future."
+msgstr ""
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr ""
+
+msgid "Missing value."
+msgstr ""
+
 msgid "REMOVE"
+msgstr ""
+
+msgid "The procedure date must be valid and in required format."
+msgstr ""
+
+msgid "The procedure date must be in the past."
+msgstr ""
+
+msgid "Completion date cannot be before consent date."
+msgstr ""
+
+msgid "Completion date cannot be in the future."
+msgstr ""
+
+msgid "Completion date must be valid."
+msgstr ""
+
+msgid "Invalid completion date. Date of completion is outside the days allowed."
 msgstr ""
