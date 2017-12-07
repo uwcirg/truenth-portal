@@ -26,10 +26,10 @@
                     <div id="lastStatus_{{job.id}}" class="text-info">{{ job.last_status }}</div>
                     <br />
                 </div>
-                <script src="{{ url_for('static', filename='js/scheduledJobs.js') }}"></script>
             </li>
         {% endfor %}
     </ul>
+     <script src="{{ url_for('static', filename='js/scheduledJobs.js') }}"></script>
     {% else %}
     <p>No jobs found.</p>
     {% endif %}
