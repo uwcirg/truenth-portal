@@ -12,7 +12,9 @@
         {{ form.hidden_tag() }}
 
         {{ render_field(form.timeout, tabindex=5) }}
-        {{ render_field(form.import_orgs, tabindex=7) }}
+        {{ render_field(form.patient_id, tabindex=6) }}
+        {{ render_field(form.timestamp, tabindex=7) }}
+        {{ render_field(form.import_orgs, tabindex=8) }}
 
         {{ trace_data }}
         <button type="submit" class="btn btn-tnth-primary">Submit</button>

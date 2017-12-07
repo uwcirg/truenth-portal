@@ -18,6 +18,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..factories.celery import create_celery
 from ..extensions import oauth, user_manager
 from ..models.app_text import (
@@ -30,9 +31,11 @@ from ..models.app_text import (
     UserInviteEmail_ATMA,
     VersionedResource
 )
+from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.auth import validate_origin
 from ..models.communication import load_template_args, Communication
 from ..models.coredata import Coredata
+from ..models.fhir import QuestionnaireResponse
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.message import EmailMessage
@@ -572,6 +575,8 @@ def contact_sent(message_id):
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
                            validators=[validators.DataRequired()])
+    patient_id = IntegerField('Patient to edit', validators=[validators.optional()])
+    timestamp = StringField("Datetime string for patient's questionnaire_responses, format YYYY-MM-DD")
     import_orgs = BooleanField('Import Organizations from Site Persistence')
 
 
@@ -618,6 +623,26 @@ def settings():
         # Purge cached data and reload.
         OrgTree().invalidate_cache()
         organization_consents = Organization.consent_agreements()
+
+    if form.patient_id.data and form.timestamp.data:
+        patient = get_user(form.patient_id.data)
+        if not patient:
+            trace("Patient Not found {}".format(form.patient_id.data))
+        try:
+            dt = FHIR_datetime.parse(form.timestamp.data)
+            for qnr in QuestionnaireResponse.query.filter_by(subject_id=patient.id):
+                qnr.authored = dt
+                document = qnr.document
+                document['authored'] = FHIR_datetime.as_fhir(dt)
+                # Due to the infancy of JSON support in POSTGRES and SQLAlchemy
+                # one must force the update to get a JSON field change to stick
+                db.session.query(QuestionnaireResponse).filter(
+                    QuestionnaireResponse.id == qnr.id).update({"document": document})
+            db.session.commit()
+            invalidate_assessment_status_cache(patient.id)
+        except ValueError as e:
+            trace("Invalid date format {}".format(form.timestamp.data))
+            trace("ERROR: {}".format(e))
 
     # make max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5

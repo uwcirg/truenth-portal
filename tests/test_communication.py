@@ -161,12 +161,9 @@ class TestCommunication(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=timedelta(days=13))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb',
-                status='in-progress')
+        mock_qr(instrument_id='eproms_add', status='in-progress')
+        mock_qr(instrument_id='epic26', status='in-progress')
+        mock_qr(instrument_id='comorb', status='in-progress')
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -184,12 +181,9 @@ class TestCommunication(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=timedelta(days=14))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
-                status='in-progress')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb',
-                status='in-progress')
+        mock_qr(instrument_id='eproms_add', status='in-progress')
+        mock_qr(instrument_id='epic26', status='in-progress')
+        mock_qr(instrument_id='comorb', status='in-progress')
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -259,9 +253,9 @@ class TestCommunication(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=timedelta(days=14))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
-        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
-        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb')
+        mock_qr(instrument_id='eproms_add')
+        mock_qr(instrument_id='epic26')
+        mock_qr(instrument_id='comorb')
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -350,7 +344,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
 
         for instrument in symptom_tracker_instruments:
-            mock_qr(user_id=TEST_USER_ID, instrument_id=instrument)
+            mock_qr(instrument_id=instrument)
 
         # With all q's done, shouldn't generate a message
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -371,7 +365,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
 
         # With most q's undone, should generate a message
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
+        mock_qr(instrument_id='epic26')
         a_s, _ = overall_assessment_status(TEST_USER_ID)
         self.assertEquals('In Progress', a_s)
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -395,7 +389,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
 
         # shouldn't generate a message either
-        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
+        mock_qr(instrument_id='epic26')
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertFalse(expected)
