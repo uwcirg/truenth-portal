@@ -21,8 +21,7 @@ def recent_qnr_status(user, questionnaire_name, qb):
         QuestionnaireResponse keyed by status found
 
     """
-    query = QuestionnaireResponse.query.distinct(
-        QuestionnaireResponse.status).filter(
+    query = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == user.id
         ).filter(
             QuestionnaireResponse.document[
@@ -31,7 +30,7 @@ def recent_qnr_status(user, questionnaire_name, qb):
             QuestionnaireResponse.questionnaire_bank_id == qb.id
         ).order_by(
             QuestionnaireResponse.status,
-            QuestionnaireResponse.authored).limit(9).with_entities(
+            QuestionnaireResponse.authored.desc()).with_entities(
                 QuestionnaireResponse.status, QuestionnaireResponse.authored)
 
     results = {}
