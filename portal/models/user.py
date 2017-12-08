@@ -821,10 +821,11 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
+            # add audit for consent signed date
             audit = Audit(
                 user_id=acting_user.id,
                 subject_id=self.id,
-                comment="Adding consent agreement",
+                comment="Consent agreement signed",
                 context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
@@ -842,6 +843,21 @@ class User(db.Model, UserMixin):
 
             consent.audit = audit
             db.session.add(consent)
+            db.session.commit()
+            audit, consent = map(db.session.merge, (audit, consent))
+            # update consent signed audit with consent ID ref
+            audit.comment = "Consent agreement {} signed".format(consent.id)
+            # add audit for consent recorded date
+            recorded = Audit(
+                user_id=acting_user.id,
+                subject_id=self.id,
+                comment="Consent agreement {} recorded".format(consent.id),
+                context='consent',
+                timestamp=datetime.utcnow())
+            db.session.add(audit)
+            db.session.add(recorded)
+            db.session.commit()
+
         for replaced in delete_consents:
             replaced.deleted = Audit(
                 comment="new consent replacing existing",
