@@ -1,161 +1,146 @@
-{%- extends "layout.html" -%}
-{%- from "flask_user/_macros.html" import back_btn, back_link, linksHTML, logo -%}
-{%- from "profile_macros.html" import profile, user_profile, profileSaveBtn, profileImage -%}
-{%- block main -%}
-<form id="profileForm" class="form tnth-form to-validate" data-toggle="validator">
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12">
-      <br/>
-      <div class="right-panel">
-          <div class="flex">
-            <div id="profileHeader" class="profile-header">
-               <h4 class="tnth-headline">
-                {%- if user -%}
-                    {%- if providerPerspective == 'true' -%}
-                        {{ _("Patient Profile") }} -
-                        {%- if user.first_name and user.last_name -%}
-                          &nbsp;{{user.first_name}} {{user.last_name}}
-                        {%- elif user.first_name -%}
-                          &nbsp;{{user.first_name}}
-                        {%- elif user.last_name -%}
-                          &nbsp;{{user.last_name}}
-                        {%- elif user.email -%}
-                          &nbsp;{{ user.email }}
-                        {%- else -%}
-                          &nbsp;#{{ user.id}}
-                        {%-endif-%}
-                    {%- else -%}
-                        {%- if current_user.id != user.id -%}
-                            {%- if user.email -%}
-                            {% trans user_email=user.email %}Profile for {{ user_email }}{% endtrans %}
-                            {%- else -%}
-                            {% trans user_id=user.id %}Profile for #{{ user_id }}{% endtrans %}
-                            {%- endif -%}
-                        {%- else -%}
-                            {{ _("My TrueNTH Profile") }}
-                        {%- endif -%}
-                    {%- endif -%}
-                 {%- else -%}
-                    {{ _("TrueNTH Profile") }}
-                 {%- endif -%}
-                </h4>
-              </div>
-         </div>
-          {%- if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) and (current_user.id != user.id)) -%}
-            <nav id="indexNavBar">
-              <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Log in as this patient") }}</a></span>
-              <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="loginAsModalLabel">{{ _("Log in as this patient") }}</h4>
-                      </div>
-                      <div class="modal-body">
-                        <br/>
-                        <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
-                        <br/>
-                      </div>
-                      <div class="modal-footer">
-                        <button onclick="handleLoginAs(event);" type="button" class="btn btn-default">{{ _("OK") }}</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
-                      </div>
-                    </div>
-                  </div>
-              </div>
-            </nav>
-        {%- endif -%}
-        <br/>
-        {%- if user.id == current_user.id -%}
-          {{user_profile(user, current_user, consent_agreements, user_interventions)}}
-        {%- else -%}
-          {{profile(user, current_user, consent_agreements, user_interventions)}}
-        {%- endif -%}
-          <br/><br/>
-      </div>
-    </div>
-  </div>
-</form>
-<script>$("#mainDiv").addClass("profile");</script>
+{%- extends "profile_base.html" -%}
+{%- import "profile_macros.html" as profile_macro -%}
+{% block profile_title %}
+  {{_("My TrueNTH Profile")}}
 {% endblock %}
-{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
-{% block additional_scripts %}
-<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+{% block profile_content %}
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="profile-item-container editable" data-sections="demo">
+            <h4 id="patientInformationLoc" class="profile-item-title index-item">{{_("My Information") }}</h4>
+            <div class="view-container">
+               <table>
+                    <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                    <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                    <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                    <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                    <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
+               </table>
+            </div>
+            <div class="edit-container">
+                {{profile_macro.profileName(user)}}
+                {{profile_macro.profileBirthDate(user)}}
+                {{profile_macro.profileEmail(user)}}
+                {{profile_macro.profilePhone(user)}}
+                {{profile_macro.profileAltPhone(user)}}
+            </div>
+            <div class="get-demo-error error-message"></div>
+            <div class="put-demo-error error-message"></div>
+        </div>
+    </div>
+    </div>
+    {% if user and user.has_role(ROLE.PATIENT) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container patient-detail-container editable" data-sections="detail">
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{{ _("My Detail") }}</h4>
+                    <div class="view-container">
+                        <table>
+                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+                            <tr id="ethnicityViewRow" data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                            <tr id="raceViewRow" data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                            <tr id="indigenousViewRow" data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                       </table>
+                    </div>
+                    <div class="flex edit-container">
+                        {{profile_macro.profileGender(user)|show_macro('gender')}}
+                        {{profile_macro.profileEthnicity(user)|show_macro('ethnicity')}}
+                        {{profile_macro.profileRace(user)|show_macro('race')}}
+                        {{profile_macro.profileIndigenous(user)|show_macro('indigenous')}}
+                    </div>
+                    <div class="no-data-container"></div>
+                    <div class="get-demo-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="profileSessionListMainContainer">
+            <div class="col-md-12 col-xs-12">
+                <div  class="profile-item-container">
+                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("My Questionnaires") }}</h4>
+                    {{profile_macro.profileSessionList(user, current_user)}}
+                </div>
+            </div>
+        </div>
+        {%- if user and user.has_role(ROLE.PATIENT) %}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
+                        {{profile_macro.patientReports(user)}}
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
+        {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
+        {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
+        {%-if user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container editable" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                         {{profile_macro.profileOrgsSelector(user, current_user, consent_agreements)}}
+                    </div>
+                </div>
+            </div>
+        {%-else-%}
+             <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                        {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+                    </div>
+                </div>
+            </div>
+        {%-endif-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
+                    {{profile_macro.profileConsent(user, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
+                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                    {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div  class="profile-item-container editable" data-sections="locale, timezone">
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("My Locale / Time Zone")}}</h4>
+                <div class="view-container">
+                    <table>
+                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
+                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
+                    </table>
+                    <div class="get-demo-error get-locale-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
+                </div>
+                <div class="edit-container flex">
+                    {{profile_macro.profileLocale(user)|show_macro('language')}}
+                    {{profile_macro.profileTimeZone(user)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if user and user.has_role(ROLE.ADMIN) and not user.has_role(ROLE.SERVICE) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("My Roles") }}</h4>
+                    {{profile_macro.profileRole(user, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block document_ready %}
-{% if user.has_role(ROLE.PATIENT) and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
-function handleLoginAs(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    //sessionStorage does not work in private mode
-    try {
-      sessionStorage.setItem("loginAsPatient", "true");
-    } catch(e) {}
-    location.replace('/login-as/{{user.id}}');
-};
-$(document).ready(function(){
-    /********* Note, this attach loader indicator to element with the class data-loader-container,
-              in order for this to work, the element needs to have an id attribute
-    ***********/
-    setTimeout(function() {
-      $("#profileForm [data-loader-container]").each(function() {
-          /** see main.js **/
-          var attachId = $(this).attr("id");
-          if (!hasValue(attachId)) return false;
-          getSaveLoaderDiv("profileForm", attachId);
-          var targetFields = $(this).find("input, select");
-          if (targetFields.length > 0) {
-            targetFields.each(function() {
-                if ($(this).attr("type") == "hidden") return false;
-                $(this).attr("data-save-container-id", attachId);
-                var triggerEvent = $(this).attr("data-trigger-event");
-                if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
-                $(this).on(triggerEvent, function(e) {
-                  e.stopPropagation();
-                  var valid = this.validity ? this.validity.valid : true;
-                  if (valid) {
-                    var hasError = false;
-                    if ($(this).attr("data-error-field")) {
-                      var customErrorField = $("#" + $(this).attr("data-error-field"));
-                      if (customErrorField.length > 0) {
-                        if (customErrorField.text() != "") hasError = true;
-                        else hasError = false;
-                      } else hasError = false;
-                    };
-                    if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo({{ user.id }},true, $(this));
-                  };
-                });
-            });
-          };
-      });
-
-      $("#profileForm .profile-item-container.editable").each(function() {
-          $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{{_('EDIT')}}" aria-label="{{_('Edit Button')}}"></button>');
-      });
-
-      $("#profileForm .profile-item-edit-btn").each(function() {
-          $(this).on("click", function(e) {
-            e.preventDefault();
-            var container = $(this).closest(".profile-item-container");
-            container.toggleClass("edit");
-            $(this).attr("data-text", container.hasClass("edit") ? "{{_('DONE')}}": "{{_('EDIT')}}");
-            if (!container.hasClass("edit")) {
-                var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
-                if (sections) {
-                    sections.forEach(function(sectionId) {
-                        var errorText = container.find(".error-icon").text();
-                        if (!hasValue(errorText) && fillViews[sectionId]) fillViews[sectionId]();
-                    });
-                }
-            };
-          });
-      });
-    }, 1000);
-    {% if user %}
-      tnthAjax.getDemo({{user.id}});
-    {% endif %}
-
-});
+    {{super()}}
 {% endblock %}
