@@ -1312,6 +1312,14 @@ def assessment_add(patient_id):
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
+        # if a valid qb wasn't found, try the indefinite option
+        if not qnr_qb:
+            qbd = QuestionnaireBank.indefinite_qb(
+                patient, as_of_date=authored)
+            qb = qbd.questionnaire_bank
+            if (qb and qn and (qn.id in [qbq.questionnaire.id
+                               for qbq in qb.questionnaires])):
+                qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
