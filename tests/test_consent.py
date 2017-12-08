@@ -1,4 +1,5 @@
 """Unit test module for user consent"""
+from datetime import datetime
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
@@ -100,10 +101,18 @@ class TestUserConsent(TestCase):
         self.assert200(rv)
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
-        self.assertEqual(self.test_user.valid_consents[0].organization_id,
-                         org1.id)
-        self.assertEqual(self.test_user.valid_consents[0].audit.timestamp,
+        # check for consent signed audit (timestamp of acceptance_date)
+        signed = self.test_user.valid_consents[0]
+        self.assertEqual(signed.organization_id, org1.id)
+        self.assertEqual(signed.audit.timestamp,
                          parser.parse(acceptance_date))
+        self.assertEqual(signed.audit.comment,
+                         "Consent agreement {} signed".format(signed.id))
+        # check for consent recorded audit (timestamp of a few seconds prior)
+        recorded = Audit.query.filter_by(
+            comment="Consent agreement {} recorded".format(signed.id)).first()
+        self.assertTrue(recorded)
+        self.assertTrue((datetime.utcnow() - recorded.timestamp).seconds < 30)
 
     def test_post_replace_user_consent(self):
         """second consent for same user,org should replace existing"""
