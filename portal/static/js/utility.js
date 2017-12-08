@@ -215,7 +215,7 @@ function __convertToNumericField(field) {
     };
 };
 function hasValue(val) {
-    return val && String(val) !== "null" && String(val) !== "" && String(val) !== "undefined";
+    return val != null && val != "" && val != "undefined";
 };
 function isString (obj) {
     return (Object.prototype.toString.call(obj) === '[object String]');

@@ -8,7 +8,7 @@
   {%- endif -%}
 {% endblock %}
 {% block profile_content %}
-  <!-- remember to add xs class to side when custom content is present -->
+
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and user and current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) -%}
             {{ profile_macro.profileCustomDetail(user) }}
