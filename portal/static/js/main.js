@@ -1967,6 +1967,65 @@ var assembleContent = {
  * helper Object for initializing profile sections
  */
 var Profile = function() {
+    this.onSectionsDidLoad = function() {
+        /*
+         * Note, this attach loader indicator to element with the class data-loader-container,
+         * in order for this to work, the element needs to have an id attribute
+         */
+        setTimeout(function() {
+          $("#profileForm [data-loader-container]").each(function() {
+              var attachId = $(this).attr("id");
+              if (!hasValue(attachId)) return false;
+              getSaveLoaderDiv("profileForm", attachId);
+              var targetFields = $(this).find("input, select");
+              if (targetFields.length > 0) {
+                targetFields.each(function() {
+                    if ($(this).attr("type") == "hidden") return false;
+                    $(this).attr("data-save-container-id", attachId);
+                    var triggerEvent = $(this).attr("data-trigger-event");
+                    if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+                    $(this).on(triggerEvent, function(e) {
+                      e.stopPropagation();
+                      var valid = this.validity ? this.validity.valid : true;
+                      if (valid) {
+                        var hasError = false;
+                        if ($(this).attr("data-error-field")) {
+                          var customErrorField = $("#" + $(this).attr("data-error-field"));
+                          if (customErrorField.length > 0) {
+                            if (customErrorField.text() != "") hasError = true;
+                            else hasError = false;
+                          } else hasError = false;
+                        };
+                        if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo($("#profileUserId").val(),true, $(this));
+                      };
+                    });
+                });
+              };
+          });
+
+          $("#profileForm .profile-item-container.editable").each(function() {
+              $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{edit}" aria-label="{editButton}"></button>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
+          });
+
+          $("#profileForm .profile-item-edit-btn").each(function() {
+              $(this).on("click", function(e) {
+                e.preventDefault();
+                var container = $(this).closest(".profile-item-container");
+                container.toggleClass("edit");
+                $(this).attr("data-text", container.hasClass("edit") ? i18next.t("Done"): i18next.t("Edit"));
+                if (!container.hasClass("edit")) {
+                    var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
+                    if (sections) {
+                        sections.forEach(function(sectionId) {
+                            var errorText = container.find(".error-icon").text();
+                            if (!hasValue(errorText) && fillViews[sectionId]) fillViews[sectionId]();
+                        });
+                    }
+                };
+              });
+          });
+        }, 1000);
+    }
     this.initSection = function(type) {
         switch(String(type).toLowerCase()) {
             case "birthday":

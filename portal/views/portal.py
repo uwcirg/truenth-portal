@@ -508,12 +508,12 @@ def invite_sent(message_id):
 def profile(user_id):
     """profile view function"""
     user = current_user()
-    #template file for user self's profile
+    # template file for user self's profile
     template_file = 'profile.html'
     if user_id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
-        #template file for view of other user's profile
+        # template file for view of other user's profile
         template_file = 'user_profile.html'
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
