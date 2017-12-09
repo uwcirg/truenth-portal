@@ -1059,25 +1059,6 @@
         <div class="put-roles-error error-message"></div>
         <div class="delete-roles-error error-message"></div>
     {% endif %}
-    {% if person %}
-    <script>
-    $(function () {
-        tnthAjax.getRoleList(function() {
-            tnthAjax.getRoles({{ person.id }}, true);
-            $("#rolesGroup input[name='user_type']").each(function() {
-                $(this).on("click", function() {
-                    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-                        return { name: $(this).val() };
-                    }).get();
-                    var toSend = {"roles": roles};
-                    tnthAjax.putRoles({{person.id}},toSend, $("#rolesLoadingContainer"));
-                 });
-            });
-        });
-    });
-    </script>
-    {% endif %}
-
 {%- endmacro %}
 
 {% macro profileSessionList(person, current_user) -%}
@@ -1113,111 +1094,6 @@
             </div>
         </div>
     </div>
-    <script>
-        function checkDiagnosis() {
-            var diag = $("#pca_diag_yes");
-
-            if (diag.is(":checked")) {
-              diag.parents(".pat-q").nextAll().fadeIn();
-            } else {
-              diag.parents(".pat-q").nextAll().fadeOut();
-            };
-            {% if person and current_user and (person.id != current_user.id) %}
-                if (!$("#patientQ input[type='radio']").is(":checked")) {
-                    $("#patientQContainer").append("<span class='text-muted'>{{ _('no answers provided') }}</span>");
-                };
-            {% endif %}
-            fillViews.clinical();
-
-        };
-        $(function () {
-            $("#patientQ").show();
-            //don't show treatment
-            $("#patTx").remove();
-
-            $("#patientQ hr").hide();
-            {% if person and current_user and person.id != current_user.id %}
-                $("#patientQ input[type='radio']").each(function() {
-                    $(this).attr("disabled", "disabled");
-                });
-                //$("#biopsyDate").attr("disabled", true);
-                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-                    $(this).attr("disabled", true);
-                });
-            {% endif %}
-
-            {% if person %}
-                $(".pat-q input:radio").on("click",function(){
-                      var thisItem = $(this);
-                      var toCall = thisItem.attr("name")
-                      // Get value from div - either true or false
-                      var toSend = thisItem.val();
-                      if (toCall != "biopsy") tnthAjax.postClinical({{person.id}},toCall,toSend, $(this).attr("data-status"), $(this));
-
-                      if (toSend == "true" || toCall ==  "pca_localized") {
-                        if (toCall == "biopsy") {
-                            if ($("#biopsyDate").val() == "") return true;
-                            else {
-                              //$("#biopsyDate").datepicker("hide").blur();
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
-                            };
-                        };
-                        thisItem.parents(".pat-q").nextAll().fadeIn();
-                      } else {
-                        if (toCall == "biopsy") {
-                            tnthAjax.postClinical({{person.id}}, toCall, "false", $(this).attr("data-status"), $(this));
-                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
-                                $("input[name='" + fieldName + "']").each(function() {
-                                    $(this).prop("checked", false);
-                                });
-                            });
-                            if ($("input[name='pca_diag']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
-                            };
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                            };
-                        } else if (toCall == "pca_diag") {
-                            ["pca_localized"].forEach(function(fieldName) {
-                              $("input[name='" + fieldName + "']").each(function() {
-                                  $(this).prop("checked", false);
-                              });
-                            });
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                            };
-                        }
-                        thisItem.parents(".pat-q").nextAll().fadeOut();
-                      };
-                  });
-             {% endif %}
-
-            [{
-                "fields": $("#patientQ input[name='biopsy']"),
-                "containerId": "patBiopsy"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_diag']"),
-                "containerId": "patDiag"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_localized']"),
-                "containerId": "patMeta"
-            }
-            ].forEach( function(item) {
-                item.fields.each(function() {
-                     getSaveLoaderDiv("profileForm", item.containerId);
-                    $(this).attr("data-save-container-id", item.containerId);
-                });
-            });
-
-            //wait for ajax calls to finish?
-            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-            setTimeout(function() { checkDiagnosis();}, 1000);
-
-
-        });
-    </script>
 {%- endmacro %}
 
 {% macro profileInterventionReports(person) -%}
@@ -1504,7 +1380,7 @@
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
-            handleLoginAs(e);
+            profileObj.handleLoginAs(e);
         });
         //fix for safari
         $(window).on("beforeunload", function() {

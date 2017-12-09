@@ -45,9 +45,13 @@
     {% if user and user.has_role(ROLE.PATIENT) -%}
       profileObj.initSection("patientreport");
       profileObj.initSection("assessmentlist");
+      profileObj.initSection("clinicalquestions");
     {%- endif %}
     {% if (user and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) -%}
       profileObj.initSection("auditlog");
+    {%- endif %}
+    {% if (user and current_user) and (current_user.has_role(ROLE.ADMIN)) -%}
+      profileObj.initSection("roleslist");
     {%- endif %}
     {% if user %}
       profileObj.onSectionsDidLoad();

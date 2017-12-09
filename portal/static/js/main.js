@@ -2057,11 +2057,29 @@ var Profile = function() {
                 break;
             case "assessmentlist":
                 this.initAssessmentListSection();
+            case "clinicalquestions":
+                this.initClinicalQuestionsSection();
+                break;
+            case "roleslist":
+                this.initRolesListSection();
             case "auditlog":
                 this.initAuditLogSection();
                 break;
         };
     };
+
+    this.handleLoginAs = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        };
+        //sessionStorage does not work in private mode
+        try {
+          sessionStorage.setItem("loginAsPatient", "true");
+        } catch(e) {}
+        location.replace("/login-as/" + $("#profileUserId").val());
+    };
+
     this.initBirthdaySection = function() {
         $("#month").on("change", function() {
             $(this).trigger("focusout");
@@ -2208,7 +2226,129 @@ var Profile = function() {
         tnthAjax.assessmentList($("#profileUserId").val(), function(data) {
             fillContent.assessmentList(data);
         });
-    }
+    };
+    this.checkDiagnosis = function() {
+        var diag = $("#pca_diag_yes");
+        if (diag.is(":checked")) {
+            diag.parents(".pat-q").nextAll().fadeIn();
+        } else {
+            diag.parents(".pat-q").nextAll().fadeOut();
+        };
+        if ($("#profileCurrentUserId").val() !== $("#profileUserId").val()) {
+            if (!$("#patientQ input[type='radio']").is(":checked")) {
+                $("#patientQContainer").append("<span class='text-muted'>" + i18next.t("no answers provided") + "</span>");
+            };
+        };
+    };
+    this.initClinicalQuestionsSection = function() {
+        $(function () {
+            $("#patientQ").show();
+            //don't show treatment
+            $("#patTx").remove();
+            $("#patientQ hr").hide();
+
+            if ($("#profileCurrentUserId").val() !== $("#profileUserId").val()) {
+                $("#patientQ input[type='radio']").each(function() {
+                    $(this).attr("disabled", "disabled");
+                });
+                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+                    $(this).attr("disabled", true);
+                });
+            };
+
+            if (hasValue($("#profileUserId").val())) {
+                $(".pat-q input:radio").on("click",function(){
+                    var thisItem = $(this);
+                    var toCall = thisItem.attr("name")
+                    // Get value from div - either true or false
+                    var toSend = thisItem.val();
+                    if (toCall != "biopsy") {
+                        tnthAjax.postClinical($("#profileUserId").val(),toCall,toSend, $(this).attr("data-status"), $(this));
+                    };
+                    if (toSend == "true" || toCall ==  "pca_localized") {
+                        if (toCall == "biopsy") {
+                            if ($("#biopsyDate").val() == "") {
+                                return true;
+                            }
+                            else {
+                              //$("#biopsyDate").datepicker("hide").blur();
+                              tnthAjax.postClinical($("#profileUserId").val(), toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
+                            };
+                        };
+                        thisItem.parents(".pat-q").nextAll().fadeIn();
+                    } else {
+                        if (toCall == "biopsy") {
+                            tnthAjax.postClinical($("#profileUserId").val(), toCall, "false", $(this).attr("data-status"), $(this));
+                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
+                                $("input[name='" + fieldName + "']").each(function() {
+                                    $(this).prop("checked", false);
+                                });
+                            });
+                            if ($("input[name='pca_diag']").length > 0) {
+                                tnthAjax.putClinical($("#profileUserId").val(),"pca_diag","false", $(this));
+                            };
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical($("#profileUserId").val(),"pca_localized","false", $(this));
+                            };
+                        } else if (toCall == "pca_diag") {
+                            ["pca_localized"].forEach(function(fieldName) {
+                              $("input[name='" + fieldName + "']").each(function() {
+                                  $(this).prop("checked", false);
+                              });
+                            });
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical($("#profileUserId").val(),"pca_localized","false", $(this));
+                            };
+                        }
+                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                    };
+                });
+            };
+
+            [{
+                "fields": $("#patientQ input[name='biopsy']"),
+                "containerId": "patBiopsy"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_diag']"),
+                "containerId": "patDiag"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_localized']"),
+                "containerId": "patMeta"
+            }
+            ].forEach( function(item) {
+                item.fields.each(function() {
+                     getSaveLoaderDiv("profileForm", item.containerId);
+                    $(this).attr("data-save-container-id", item.containerId);
+                });
+            });
+
+            //wait for ajax calls to finish?
+            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+            var self = this;
+            setTimeout(function() {
+                profileObj.checkDiagnosis();
+                fillViews.clinical();
+            }, 1000);
+
+
+        });
+    };
+    this.initRolesListSection = function() {
+        tnthAjax.getRoleList(function() {
+            tnthAjax.getRoles($("#profileUserId").val(), true);
+            $("#rolesGroup input[name='user_type']").each(function() {
+                $(this).on("click", function() {
+                    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                        return { name: $(this).val() };
+                    }).get();
+                    var toSend = {"roles": roles};
+                    tnthAjax.putRoles($("#profileUserId").val(),toSend, $("#rolesLoadingContainer"));
+                 });
+            });
+        });
+    };
     this.initAuditLogSection = function() {
         tnthAjax.auditLog($("#profileUserId").val(), function(data) {
             fillContent.auditLog(data);
