@@ -5,12 +5,14 @@ from flask import (
     Response,
     abort,
     current_app,
+    flash,
     jsonify,
     redirect,
     request,
     session,
     url_for,
 )
+from flask_babel import gettext as _
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
@@ -1403,6 +1405,7 @@ def present_needed():
         args['resume_identifier'] = resume_ids
 
     if not args.get('instrument_id') and not args.get('resume_identifier'):
+        flash(_('All available questionnaires have been completed'))
         current_app.logger.debug('no assessments needed, redirecting to /')
         return redirect('/')
 
