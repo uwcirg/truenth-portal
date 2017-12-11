@@ -1,7 +1,18 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
-from flask import session, url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    request,
+    session,
+    url_for,
+)
+from flask_babel import gettext as _
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
@@ -1393,8 +1404,13 @@ def present_needed():
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
+    if not args.get('instrument_id') and not args.get('resume_identifier'):
+        flash(_('All available questionnaires have been completed'))
+        current_app.logger.debug('no assessments needed, redirecting to /')
+        return redirect('/')
+
     url = url_for('.present_assessment', **args)
-    return redirect(url, code=303)
+    return redirect(url, code=302)
 
 
 @assessment_engine_api.route('/present-assessment')
