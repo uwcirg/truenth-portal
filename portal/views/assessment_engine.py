@@ -1393,6 +1393,10 @@ def present_needed():
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
+    if not args.get('instrument_id') and not args.get('resume_identifier'):
+        current_app.logger.debug('no assessments needed, redirecting to /')
+        return redirect('/')
+
     url = url_for('.present_assessment', **args)
     return redirect(url, code=302)
 
