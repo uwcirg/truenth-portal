@@ -17,15 +17,19 @@
                     </div>
                     {% if content[1] > 0 %}
                     <div class="modal-nav">
-                        <span>
-                            {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}<a href="javascript:show_exercise('{{ loop.previtem[0] }}','{{ id }}');">{{ loop.previtem[1][0]|safe }}</a>{% endif %}
+                        {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
+                        <span class="left-button">
+                            <a href="javascript:show_exercise('{{ loop.previtem[0] }}','{{ id }}');">&larr;&nbsp;{{ loop.previtem[1][0]|safe }}</a>
                         </span>
-                        &nbsp;|&nbsp;
-                        <span>
-                            {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}<a href="javascript:show_exercise('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}</a>{% endif %}
+                        {% endif %}
+                        {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}
+                        <span class="right-button">
+                            <a href="javascript:show_exercise('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}&nbsp;&rarr;</a>
                         </span>
+                        {% endif %}
                     </div>
                     {% endif %}
+                    
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>
@@ -36,23 +40,5 @@
         </div>
 
     {% endfor %}
-
-    <script type="text/javascript">
-
-        function show_exercise(new_item, current_item) {
-            $('#'+new_item).on('shown.bs.modal', function(e) {
-                $('body').addClass('modal-open');
-            })
-
-            $('#'+current_item).modal('hide');
-            $('#'+new_item).modal('show');
-        }
-
-        $('input[type=\'submit\']').on("click",function() {
-            var zipcode = $('input[name=\'zipcode\']').val();
-            window.open("https://www.livestrong.org/ymca-search?distance[postal_code]="+zipcode+"&distance[search_distance]=20&distance[search_units]=mile", '_blank')
-        });
-
-    </script>
 
 {% endblock %}

@@ -14,7 +14,9 @@
                     <tr>
                     {% for asset in recipe_assets['healthy_vegetable_fat'] %}
                         <td>
-                            <a href="javascript:show_recipe('healthy_vegetable_fat','{{ loop.index0 }}','{{ asset[2] }}');">{{ asset[0]|safe }}</a>
+                            <a href="javascript:show_recipe('healthy_vegetable_fat','{{ loop.index0 }}','{{ asset[3] }}');"><h6>{{ asset[0]|safe }}</h6>
+                                <img class="recipe-table-image" src="{{ asset[2] }}" alt="" />
+                            </a>
                         </td>
                         {% if loop.index % 3 == 0 %}
                             </tr><tr>
@@ -35,7 +37,9 @@
                     <tr>
                     {% for asset in recipe_assets['vegetables'] %}
                         <td>
-                            <a href="javascript:show_recipe('vegetables','{{ loop.index0 }}','{{ asset[2] }}');">{{ asset[0]|safe }}</a>
+                            <a href="javascript:show_recipe('vegetables','{{ loop.index0 }}','{{ asset[3] }}');"><h6>{{ asset[0]|safe }}</h6>
+                                <img class="recipe-table-image" src="{{ asset[2] }}" alt="" />
+                            </a>
                         </td>
                         {% if loop.index % 3 == 0 %}
                             </tr><tr>
@@ -56,7 +60,9 @@
                     <tr>
                     {% for asset in recipe_assets['tomatoes'] %}
                         <td>
-                            <a href="javascript:show_recipe('tomatoes','{{ loop.index0 }}','{{ asset[2] }}');">{{ asset[0]|safe }}</a>
+                            <a href="javascript:show_recipe('tomatoes','{{ loop.index0 }}','{{ asset[3] }}');"><h6>{{ asset[0]|safe }}</h6>
+                                <img class="recipe-table-image" src="{{ asset[2] }}" alt="" />
+                            </a>
                         </td>
                         {% if loop.index % 3 == 0 %}
                             </tr><tr>
@@ -77,7 +83,9 @@
                     <tr>
                     {% for asset in recipe_assets['fish'] %}
                         <td>
-                            <a href="javascript:show_recipe('fish','{{ loop.index0 }}','{{ asset[2] }}');">{{ asset[0]|safe }}</a>
+                            <a href="javascript:show_recipe('fish','{{ loop.index0 }}','{{ asset[3] }}');"><h6>{{ asset[0]|safe }}</h6>
+                                <img class="recipe-table-image" src="{{ asset[2] }}" alt="" />
+                            </a>
                         </td>
                         {% if loop.index % 3 == 0 %}
                             </tr><tr>
@@ -98,7 +106,9 @@
                     <tr>
                     {% for asset in recipe_assets['alternatives_to_processed_meats'] %}
                         <td>
-                            <a href="javascript:show_recipe('alternatives_to_processed_meats','{{ loop.index0 }}','{{ asset[2] }}');">{{ asset[0]|safe }}</a>
+                            <a href="javascript:show_recipe('alternatives_to_processed_meats','{{ loop.index0 }}','{{ asset[3] }}');"><h6>{{ asset[0]|safe }}</h6>
+                                <img class="recipe-table-image" src="{{ asset[2] }}" alt="" />
+                            </a>
                         </td>
                         {% if loop.index % 3 == 0 %}
                             </tr><tr>
@@ -113,43 +123,10 @@
     <div class="modal fade" id="recipe-modal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                {% trans %}<button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>{% endtrans %}
-                <div class="modal-body">{% trans %}Loading...{% endtrans %}
-                </div>
-                <div class="modal-footer">
-                        {% trans %}<button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>{% endtrans %}
+                <div class="modal-body">
                 </div>
             </div>
         </div>
     </div>
-
-    <script type="text/javascript">
-
-        function show_recipe(heading, item, recipe_type) {
-            if (recipe_type == 'tip') {
-                $('#recipe-modal').addClass('tip');
-            }
-            else {
-                $('#recipe-modal').removeClass('tip');
-            }
-            $('#recipe-modal').modal('show');
-            $( ".modal-body" ).load( "/recipe/" + heading + "/" + item );
-        }
-
-        $(function(){
-
-            $('td').on('mouseenter',function(){
-                $(this).addClass('cell-hover');
-                return false;
-            });
-
-            $('td').on('mouseleave',function(){
-                $(this).removeClass('cell-hover');
-                return false;
-            });
-
-        });
-
-    </script>
 
 {% endblock %}

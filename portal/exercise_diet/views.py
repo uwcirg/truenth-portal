@@ -12,7 +12,6 @@ exercise_diet = Blueprint(
 def get_asset(uuid):
     url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
         LR_ORIGIN=current_app.config.get("LR_ORIGIN"), uuid=uuid)
-
     data = requests.get(url).content
     return json.JSONDecoder().decode(data)['asset']
 
@@ -30,28 +29,28 @@ def get_all_recipes():
                      'alternatives_to_processed_meats': []}
     for asset in json.JSONDecoder().decode(recipe_data)['results']:
         if 'vegetables' in asset['tags']:
-            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], 'recipe'))
+            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
         if 'healthy_vegetable_fat' in asset['tags']:
-            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], 'recipe'))
+            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
         if 'tomatoes' in asset['tags']:
-            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], 'recipe'))
+            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
         if 'fish' in asset['tags']:
-            recipe_assets['fish'].append((asset['title'], asset['uuid'], 'recipe'))
+            recipe_assets['fish'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
         if 'alternatives_to_processed_meats' in asset['tags']:
-            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], 'recipe'))
+            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
 
     shopping_data = get_tag_data(anyTags="shopping_tips")
     for asset in json.JSONDecoder().decode(shopping_data)['results']:
         if 'vegetables' in asset['tags']:
-            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], 'tip'))
+            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
         if 'healthy_vegetable_fat' in asset['tags']:
-            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], 'tip'))
+            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
         if 'tomatoes' in asset['tags']:
-            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], 'tip'))
+            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
         if 'fish' in asset['tags']:
-            recipe_assets['fish'].append((asset['title'], asset['uuid'], 'tip'))
+            recipe_assets['fish'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
         if 'alternatives_to_processed_meats' in asset['tags']:
-            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], 'tip'))
+            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
 
     return recipe_assets
 
@@ -88,6 +87,11 @@ def diet():
     return render_template('exercise_diet/diet.html', assets=assets, modals=modals)
 
 
+@exercise_diet.route('/portal')
+def portal():
+    return render_template('exercise_diet/exercise-diet_portal.html')
+
+
 @exercise_diet.route('/exercise')
 def exercise():
     data = get_tag_data(anyTags="exercise")
@@ -103,16 +107,6 @@ def exercise():
         modals[tag[0]] = (modal['title'], modal['priority'], get_asset(modal['uuid']))
 
     return render_template('exercise_diet/exercise.html', assets=assets, modals=modals)
-
-
-@exercise_diet.route('/resources')
-def resources():
-    data = get_tag_data(anyTags="resources")
-    assets = []
-    for asset in json.JSONDecoder().decode(data)['results']:
-        assets.append(get_asset(asset['uuid']))
-
-    return render_template('exercise_diet/resources.html', assets=assets)
 
 
 @exercise_diet.route('/recipes')
@@ -143,30 +137,30 @@ def recipe(heading, item):
         if prev_heading_index >= 0:
             prev_heading = ordered_headings[prev_heading_index]
             prev_item_index = len(assets[prev_heading]) - 1
-            prev_asset_title = assets[prev_heading][prev_item_index][0]
+            prev_asset_title = '&larr;&nbsp;' + assets[prev_heading][prev_item_index][0]
             prev_asset_recipe_type = assets[prev_heading][prev_item_index][2]
         next_item_index = item + 1
         next_heading = heading
-        next_asset_title = assets[heading][item + 1][0]
+        next_asset_title = assets[heading][item + 1][0] + '&nbsp;&rarr;'
         next_asset_recipe_type = assets[heading][item + 1][2]
     elif item == current_heading_item_count - 1:
         if ordered_headings.index(heading) + 2 <= len(ordered_headings):
             next_item_index = 0
             next_heading_index = ordered_headings.index(heading) + 1
             next_heading = ordered_headings[next_heading_index]
-            next_asset_title = assets[next_heading][0][0]
+            next_asset_title = assets[next_heading][0][0] + '&nbsp;&rarr;'
             next_asset_recipe_type = assets[next_heading][0][2]
         prev_heading = heading
         prev_item_index = item - 1
-        prev_asset_title = assets[heading][item - 1][0]
+        prev_asset_title = '&larr;&nbsp;' + assets[heading][item - 1][0]
         prev_asset_recipe_type = assets[heading][item - 1][2]
     else:
         next_heading = heading
         prev_heading = heading
         prev_item_index = item - 1
         next_item_index = item + 1
-        prev_asset_title = assets[heading][prev_item_index][0]
-        next_asset_title = assets[heading][next_item_index][0]
+        prev_asset_title = '&larr;&nbsp;' + assets[heading][prev_item_index][0]
+        next_asset_title = assets[heading][next_item_index][0] + '&nbsp;&rarr;'
         next_asset_recipe_type = assets[heading][next_item_index][2]
         prev_asset_recipe_type = assets[heading][prev_item_index][2]
 

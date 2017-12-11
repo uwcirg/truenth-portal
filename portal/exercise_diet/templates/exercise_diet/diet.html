@@ -11,68 +11,37 @@
         <div class="modal fade" id={{ id }} aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
+					
 					<div class="modal-body">
                         <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>
                         {{ content[2]|safe }}
                     </div>
                     {% if content[1] > 0 %}
+                    
                     <div class="modal-nav">
-                        <span>
-                            {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}<a href="javascript:show_diet('{{ loop.previtem[0] }}','{{ id }}');">{{ loop.previtem[1][0]|safe }}</a>{% endif %}
+                        {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
+                        <span class="left-button">
+                            <a href="javascript:show_diet('{{ loop.previtem[0] }}','{{ id }}');">&larr;&nbsp;{{ loop.previtem[1][0]|safe }}</a>
                         </span>
-                        &nbsp;|&nbsp;
-                        <span>
-                            {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}<a href="javascript:show_diet('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}</a>{% endif %}
+                        {% endif %}
+                        {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}
+                        <span class="right-button">
+                            <a href="javascript:show_diet('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}&nbsp;&rarr;</a>
                         </span>
+                        {% endif %}
                     </div>
                     {% endif %}
+                    
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>
                         {% endtrans %}
                     </div>
+                
                 </div>
             </div>
         </div>
 
     {% endfor %}
-
-    <script type="text/javascript">
-
-        function show_diet(new_item, current_item) {
-            $('#'+new_item).on('shown.bs.modal', function(e) {
-                $('body').addClass('modal-open');
-            })
-
-            $('#'+current_item).modal('hide');
-            $('#'+new_item).modal('show');
-        }
-
-        $(function(){
-
-            $('#diet-table tr').on('mouseenter',function(){
-                $(this).addClass('row-hover');
-                return false;
-            });
-
-            $('#diet-table tr').on('mouseleave',function(){
-                $(this).removeClass('row-hover');
-                return false;
-            });
-
-            $('#avoid-foods-table td').on('mouseenter',function(){
-                $(this).addClass('cell-hover');
-                return false;
-            });
-
-            $('#avoid-foods-table td').on('mouseleave',function(){
-                $(this).removeClass('cell-hover');
-                return false;
-            });
-
-        });
-
-    </script>
-
 
 {% endblock %}

@@ -1,58 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    
-    <title>{% trans %}Exercise Diet{% endtrans %}</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% trans %}Exercise Diet{% endtrans %}</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/uwcirg/true_nth_usa_portal/develop/portal/static/css/topnav.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ url_for('.static', filename='css/styles.css') }}">
+        <script src="{{ url_for('.static', filename='js/exercise_diet.js') }}"></script>
+    </head>
+    <body>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <h1 align="center">{% trans %}TrueNTH Header Goes Here{% endtrans %}</h1>
 
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/uwcirg/true_nth_usa_portal/develop/portal/static/css/topnav.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/styles.css') }}">
+    <div class="container" id="mainNavContainer">
 
-</head>
-<body>
+        <nav class="navbar navbar-default" id="mainNav" role="navigation">
 
-<h1 align="center">{% trans %}TrueNTH Header Goes Here{% endtrans %}</h1>
+            <div class="container-fluid">
 
-<div class="container" id="mainNavContainer">
-    
-    <nav class="navbar navbar-default" id="mainNav" role="navigation">
-        
-        <div class="container-fluid">
-            
-            <div class="navbar-header">
-                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
 
+                </div>
+                <div class="navbar-collapse collapse" id="mainNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
+                        <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
+                        <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
+                        <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="navbar-collapse collapse" id="mainNavbar">
-                <ul class="nav navbar-nav">
-                    <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
-                    <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
-                    <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
-                    <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</div>
+        </nav>
+    </div>
 
-{% block body %}
-<div id="page-content"></div>
-{% endblock %}
+    {% block body %}
+        <div id="page-content"></div>
+    {% endblock %}
 
-    <script type="text/javascript">
 
-        $(document).ready(function(){
-            var pathname = $(location).attr('pathname').replace(/^\/+/g, '.');
-            $('#mainNavbar .nav '+pathname).addClass('active');
-        });
+    </body>
 
-    </script>
-
-</body>
 </html>
