@@ -6,7 +6,7 @@ $(document).ready(function(){
 function show_diet(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
-    })
+    });
 
     $('#'+current_item).modal('hide');
     $('#'+new_item).modal('show');
@@ -48,12 +48,13 @@ function show_exercise(new_item, current_item) {
 $(function(){
     $("input[type='submit']").on("click",function() {
         var zipcode = $("input[name='zipcode']").val();
-        window.open("https://www.livestrong.org/ymca-search?distance[postal_code]="+zipcode+"&distance[search_distance]=20&distance[search_units]=mile", '_blank')
+        url = "https://www.livestrong.org/ymca-search?distance[postal_code]="+zipcode+"&distance[search_distance]=20&distance[search_units]=mile";
+        window.open(url, '_blank');
     });
 });
 
 function show_recipe(heading, item, recipe_type) {
-    if (recipe_type == 'tip') {
+    if (recipe_type === 'tip') {
         $('#recipe-modal').addClass('tip');
     }
     else {

@@ -12,159 +12,403 @@
 	display: block;
 	margin: 0px auto;
 }
-
-/*
-.exercise-diet-portal-container {
+#Exercise-Diet-Portal h1 {
 	position: relative;
 	display: block;
-	margin: 0px auto;
-}
-*/
-
-
-#Exercise-Diet-Portal h2 {
-		position: relative;
-	display: block;
-	margin: 0px auto;
-
+	margin: 0px auto 25px;
     font-weight: 600;
-    
     color: #fff;
-	color: #57675b;
-
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 28px;
+    font-size: 35px;
+    line-height: 40px;
     text-align: center;
-    padding: 0px 0px 0px 0px;
-    
-    max-width: 768px;
-
+    padding: 100px 10px 0px;
+    max-width: 740px;
+    border: 0;
 }
-
 #Exercise-Diet-Portal h2 {
-		position: relative;
+	position: relative;
 	display: block;
-	margin: 0px auto;
-
+	margin: 0px auto 25px;
     font-weight: 600;
-    
     color: #fff;
-	color: #57675b;
-
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 28px;
+    font-size: 35px;
+    line-height: 40px;
     text-align: center;
-    padding: 0px 0px 0px 0px;
-    
-    max-width: 768px;
+    padding: 1px 10px 1px;
+    max-width: 740px;
+}
+hr.objective {
+	margin: 10px auto 30px; 
+	padding: 0px 0px 0px 0px; 
+	
+	background: rgba(255, 255, 255, 0.5);
+    display: block;
+    height: .05px;
+    width: 233px;
+}
+#Exercise-Diet-Portal .start-button-intro {
+	position: relative;
+    margin: 0px 0px 10px;
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    background: rgb(124, 149, 158);
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: 5px;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 25px;
+    width: 250px;
+    margin-top: 40px;
+}
 
+#Exercise-Diet-Portal .watch-button-video {
+    margin: 0px 0px 10px;
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    background: rgb(124, 149, 158);
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: 5px;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 25px;
+    width: 250px;
+    margin-top: 40px;
+    
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    margin-left: -109px;
+    margin-top: -36px;
 }
 
 #Exercise-Diet-Portal p {
 	position: relative;
 	display: block;
 	margin: 0px auto;
-
-    font-weight: 600;
-    
+    font-weight: 500;
     color: #fff;
-	color: #57675b;
-
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 18px;
+    font-size: 25px;
+    line-height: 32px;
+	letter-spacing: .03em;
     text-align: center;
-    padding: 0px 0px 0px 0px;
+    padding: 20px 0px;
+    max-width: 780px;
 }
 
+.objective-content p:last-child {
+	padding: 0px 0px 100px;
+}
+
+#Exercise-Diet-Portal h6.accent-heading {
+    color: rgb(169, 178, 183);
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    padding-bottom: 25px;
+    letter-spacing: 2.9px;
+    display: inline-block;
+    width: 100%;
+    clear: both;
+    margin: 50px auto 0;
+}
+
+.accent-heading em {
+    font-size: 9px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+
+#Exercise-Diet-Portal ul {
+	margin: 0px auto;
+	padding: 0px;
+	max-width: 768px;
+}
 #Exercise-Diet-Portal ul li {
 	position: relative;
 	display: block;
-	margin: 0px auto;
-
-    font-weight: 600;
-    
+    font-weight: 500;
     color: #fff;
-	color: #57675b;
-
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 18px;
-    text-align: left;
-    padding: 0px 0px 0px 0px;
+    font-size: 26px;
+    line-height: 1.3em;
+	letter-spacing: .03em;
+    text-align: left;    
+    background-image: url('../img/white-triangle-bullet.png');
+    background-repeat: no-repeat;
+    background-position: left 10px;
+	padding-left: 20px;
+    padding-bottom: 5px;
+    margin-left: 20px;
+    list-style-position: outside;
+    list-style-type: none;
 }
-
-
-
-
 #Exercise-Diet-Portal img {
 	margin: 0px auto;
 	width: 100%;
+	z-index: 0;
+	border: none;
+	border: 0;
 }
-
-#Exercise-Diet-Portal img.intro-intro  {
-    position: relative;
 /*
-    top: 0;
-    left: 0;
-*/
-/* 	margin: 0 auto; */
-    z-index: 0;
-    max-width: 100%;
-    height: auto;
+img.intro-intro  {
+    position: absolute;
     display: block;
-    
     background-image: url('../img/mountains.jpg');
-    background-image: url('img/mountains.jpg');
-    background-image: url('/img/mountains.jpg');
-
-
     background-repeat: no-repeat;
-    background-position: left top;
-	padding-left: 20px;
-    padding-bottom:5px;
-    margin-left: 0px;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+    height: 600px;
 }
-#Exercise-Diet-Portal img.video-hero {
-    position: relative;
-/*
-    left: 0;
-    top: 0;
-*/
-	margin: 0 auto;
-    z-index: 0;
-    max-width: 100%;
-    height: auto;
+img.video-testimonial-hero {
+    position: absolute;
     display: block;
-    
-    background-image: url('../img/video-hero.jpg');
+    background-image: url('../img/video-testimonial-hero.jpg');
     background-repeat: no-repeat;
-    background-position: left top;
-	padding-left: 20px;
-    padding-bottom:5px;
-    margin-left: 0px;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: center center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+    height: 600px;
+    top: 600px;
 }
-#Exercise-Diet-Portal img.objective-background  {
-    position: relative;
-/*
-    left: 0;
-    top: 0;
-*/
-	margin: 0 auto;
-    z-index: 0;
-    max-width: 100%;
-    height: auto;
+img.objective-background  {
+    position: absolute;
     display: block;
-    
     background-image: url('../img/objective-background.jpg');
     background-repeat: no-repeat;
-    background-position: left top;
-	padding-left: 20px;
-    padding-bottom:5px;
-    margin-left: 0px;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+    height: 600px;
+    top: 1200px;
 }
+*/
+
+
+
+
+.intro-module.intro-intro  {
+/*
+    position: absolute;
+    display: block;
+*/
+/*     background-image: url('../img/mountains.jpg'); */
+/*
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+*/
+/* 	width: 100%; */
+    height: 700px;
+}
+.video-module.video-testimonial-hero {
+/*
+    position: absolute;
+    display: block;
+*/
+/*     background-image: url('../img/video-testimonial-hero.jpg'); */
+/*
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: center center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+*/
+    height: 600px;
+    top: 700px;
+}
+
+img.video-testimonial-hero {
+    left: 20px;
+    width: calc(100% - 40px);
+    position: relative;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.objective-module.objective-background  {
+/*
+    position: absolute;
+    display: block;
+*/
+/*     background-image: url('../img/objective-background.jpg'); */
+/*
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+*/
+    height: 700px;
+    top: 1300px;
+}
+.intro-module, .video-module, .objective-module {
+	margin: 0px auto;
+	z-index: 0;
+	text-align: center;
+	
+	position: absolute;
+    display: block;
+/*     background-image: url('../img/objective-background.jpg'); */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 0px 0px;
+	width: 100%;
+}
+.intro-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.video-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.objective-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.toolbox {
+	position: relative;
+	max-width: 715px;
+	max-height: 137px;
+    background: rgba(57, 56, 51, 0.8);
+	padding: 10px;
+	margin: 10px auto;
+	display: flex;
+}
+.toolbox h6 {
+    color: rgb(169, 178, 183);
+    color: #7d959d;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+.toolbox h6 em {
+    font-size: 6px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+.toolbox h5 {
+    color: #fff;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: .05em;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+
+.toolbox h6 span {
+    color: rgb(169, 178, 183);
+    color: #bcc2a7;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    margin: 10px auto 10px;
+}
+
+.toolbox-start-button {
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    background: #8F9385;
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: 5px;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 25px;
+    width: 210px;
+    margin: 20px 10px 20px;
+    height: 70px;
+}
+
+.toolbox .icon-box {
+    background: #333638;
+    color: #fff;
+    display: block;
+    padding: 20px 20px 20px 135px;
+    margin: 0 10px 0 0;
+    position: relative;
+    min-height: 130px;
+    max-height: 100%;
+}
+
+.middle-content {
+	margin-right: 50px;
+}
+
+
+
+
+
+
+
+
+
+
+
 /*                					Intro page ul li										*/
 /* ======================================================================================== */
 /* ======================================================================================== */
@@ -190,14 +434,13 @@ ul.intro-li li {
     color: #404141;
     background-image: url('../img/green-triangle-bullet.png');
     background-repeat: no-repeat;
-    background-position: left 5px;
-	padding-left: 13px;
+    background-position: left 2px;
+    padding-left: 15px;
     padding-bottom: 5px;
-    margin-left: 0px;
+    margin-left: 20px;
     list-style-position: outside;
     list-style-type: none;
 }
-
 
 /*                						.modal buttons										*/
 /* ======================================================================================== */

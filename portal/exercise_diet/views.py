@@ -87,6 +87,11 @@ def diet():
     return render_template('exercise_diet/diet.html', assets=assets, modals=modals)
 
 
+@exercise_diet.route('/portal')
+def portal():
+    return render_template('exercise_diet/exercise-diet_portal.html')
+
+
 @exercise_diet.route('/exercise')
 def exercise():
     data = get_tag_data(anyTags="exercise")
