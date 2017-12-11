@@ -1,7 +1,16 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
-from flask import session, url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    jsonify,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
