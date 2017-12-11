@@ -1577,6 +1577,21 @@ def complete_assessment():
     if entry_method:
         current_app.logger.debug("assessment complete via %s", entry_method)
 
+    # Logout Assessment Engine after survey completion
+    for token in INTERVENTION.ASSESSMENT_ENGINE.client.tokens:
+        if token.user != current_user():
+            continue
+
+        current_app.logger.debug("assessment complete, logging out user: %s", token.user.id)
+        INTERVENTION.ASSESSMENT_ENGINE.client.notify({
+            'event': 'logout',
+            'user_id': token.user.id,
+            'refresh_token': token.refresh_token,
+            'info': 'complete-assessment',
+        })
+        db.session.delete(token)
+    db.session.commit()
+
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
 
