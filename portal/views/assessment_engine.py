@@ -1394,7 +1394,7 @@ def present_needed():
         args['resume_identifier'] = resume_ids
 
     url = url_for('.present_assessment', **args)
-    return redirect(url, code=303)
+    return redirect(url, code=302)
 
 
 @assessment_engine_api.route('/present-assessment')
