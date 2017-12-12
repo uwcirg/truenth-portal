@@ -1394,10 +1394,18 @@ def present_needed():
     resume_ids = []
     for questionnaire_name in assessment_status.instruments_in_progress(
             classification='all'):
+        questionnaire_bank = assessment_status.qb_data.qb
+        if questionnaire_name not in (
+                q.name for q in
+                assessment_status.qb_data.qb.questionnaires):
+            # This should only happen in the indefinite case
+            questionnaire_bank = QuestionnaireBank.query.filter(
+                QuestionnaireBank.classification == 'indefinite').one()
+
         resume_ids.append(
             qnr_document_id(
                 subject_id=subject_id,
-                questionnaire_bank_id=assessment_status.qb_data.qb.id,
+                questionnaire_bank_id=questionnaire_bank.id,
                 questionnaire_name=questionnaire_name,
                 status='in-progress'))
 
