@@ -1,6 +1,8 @@
-{% extends 'exercise_diet/layout.html' %}
+{% extends 'exercise_diet/base.html' %}
+{% from "flask_user/_macros.html" import back_btn, footer %}
+{% block main %}
+    {{ back_btn(PORTAL, _('Home')) }}
 
-{% block body %}
     {{ recipe_intro|safe }}
     <div id="Recipe-Accordions">
         <div class="healthy-fats-accordion">
@@ -129,4 +131,14 @@
         </div>
     </div>
 
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
+{% block document_ready %}
+    {% if request.args.get("disableLinks", "") %}
+    $("document").ready(function() {
+        setTimeout("disableHeaderFooterLinks();", 1000);
+    });
+    {% endif %}
 {% endblock %}

@@ -1,6 +1,7 @@
-{% extends 'exercise_diet/layout.html' %}
-
-{% block body %}
+{% extends 'exercise_diet/base.html' %}
+{% from "flask_user/_macros.html" import back_btn, footer %}
+{% block main %}
+    {{ back_btn(PORTAL, _('Home')) }}
 
     {% for asset in assets %}
         {{ asset|safe }}
@@ -41,4 +42,14 @@
 
     {% endfor %}
 
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
+{% block document_ready %}
+    {% if request.args.get("disableLinks", "") %}
+    $("document").ready(function() {
+        setTimeout("disableHeaderFooterLinks();", 1000);
+    });
+    {% endif %}
 {% endblock %}
