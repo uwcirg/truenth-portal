@@ -254,9 +254,8 @@ def update_card_html_on_completion():
                       {logout}
                     </a>
                   </div>
-                </div>""".format(
-                    greeting=greeting, confirm=confirm, reminder=reminder,
-                    logout=logout)
+                </div>""".format(greeting=greeting, confirm=confirm,
+                                 reminder=reminder, logout=logout)
 
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
@@ -519,7 +518,8 @@ def tx_begun(boolean_value):
     if boolean_value == 'true':
         check_func = known_treatment_started
     elif boolean_value == 'false':
-        def check_func(u): return not known_treatment_started(u)
+        def check_func(u):
+            return not known_treatment_started(u)
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 
