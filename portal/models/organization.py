@@ -236,12 +236,18 @@ class Organization(db.Model):
             self.partOf_id = Reference.parse(data['partOf']).id
         for attr in ('use_specific_codings','race_codings',
                     'ethnicity_codings','indigenous_codings'):
-            if attr in data:
-                setattr(self, attr, data.get(attr))
-        if 'extension' in data:
-            for e in data['extension']:
-                instance = org_extension_map(self, e)
-                instance.apply_fhir()
+            # set regardless of presence in data - thus clearing
+            # old values if not currently mentioned
+            setattr(self, attr, data.get(attr))
+
+        # regardless of presence, need to visit all extensions
+        # to avoid leaving behind stale data
+        by_extension_url = {ext['url']: ext for ext in data.get('extension', [])}
+        for kls in org_extension_classes:
+            args = by_extension_url.get(kls.extension_url, {'url': kls.extension_url})
+            instance = org_extension_map(self, args)
+            instance.apply_fhir()
+
         if 'identifier' in data:
             # track current identifiers - must remove any not requested
             remove_if_not_requested = [i for i in self.identifiers]
@@ -394,13 +400,12 @@ class ResearchProtocolExtension(CCExtension):
     def apply_fhir(self):
         if self.extension['url'] != self.extension_url:
             raise ValueError('invalid url for ResearchProtocolExtension')
-        if 'research_protocol' not in self.extension:
-            abort(400, "Extension missing 'research_protocol' field")
-        name = self.extension['research_protocol']
+
+        name = self.extension.get('research_protocol')
         rp = ResearchProtocol.query.filter_by(name=name).first()
-        if not rp:
+        if name and not rp:
             abort(404, "ResearchProtocol with name {} not found".format(name))
-        self.organization.research_protocol_id = rp.id
+        self.organization.research_protocol_id = rp.id if rp else None
 
     @property
     def children(self):

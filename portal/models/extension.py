@@ -40,15 +40,16 @@ class CCExtension(Extension):
         # track current concepts - must remove any not requested
         remove_if_not_requested = {e.code: e for e in self.children}
 
-        for coding in self.extension['valueCodeableConcept']['coding']:
-            concept = Coding.from_fhir(coding)
-            assert concept
-            if concept.code in remove_if_not_requested:
-                # The concept existed before and is to be retained
-                remove_if_not_requested.pop(concept.code)
-            else:
-                # Otherwise, it's new; add it
-                self.children.append(concept)
+        if 'valueCodeableConcept' in self.extension:
+            for coding in self.extension['valueCodeableConcept']['coding']:
+                concept = Coding.from_fhir(coding)
+                assert concept
+                if concept.code in remove_if_not_requested:
+                    # The concept existed before and is to be retained
+                    remove_if_not_requested.pop(concept.code)
+                else:
+                    # Otherwise, it's new; add it
+                    self.children.append(concept)
 
         # Remove the stale concepts that weren't requested again
         for concept in remove_if_not_requested.values():
@@ -72,15 +73,14 @@ class TimezoneExtension(CCExtension):
     def apply_fhir(self):
         if self.extension['url'] != self.extension_url:
             raise ValueError('invalid url for OrganizationTimezone')
-        if 'timezone' not in self.extension:
-            abort(400, "Extension missing 'timezone' field")
-        timezone = self.extension['timezone']
+        timezone = self.extension.get('timezone')
 
-        # Confirm it's a recognized timezone
-        try:
-            pytz.timezone(timezone)
-        except pytz.exceptions.UnknownTimeZoneError:
-            abort(400, "Unknown Timezone: '{}'".format(timezone))
+        if timezone is not None:
+            # Confirm it's a recognized timezone
+            try:
+                pytz.timezone(timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                abort(400, "Unknown Timezone: '{}'".format(timezone))
         self.source.timezone = timezone
 
     @property
