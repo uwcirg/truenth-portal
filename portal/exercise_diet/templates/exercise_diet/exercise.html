@@ -2,6 +2,8 @@
 {% block title %}{{super()}} {{_("Exercise and Diet")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
+<main class="main">
+    {{ super() }}
 
     {% for asset in assets %}
         {{ asset|safe }}
@@ -42,4 +44,5 @@
 
     {% endfor %}
 
+</main>
 {% endblock %}

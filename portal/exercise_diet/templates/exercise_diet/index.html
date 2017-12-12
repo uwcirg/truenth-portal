@@ -3,10 +3,10 @@
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
 <main class="main">
-      {{ super() }}
+    {{ super() }}
 
     {% for asset in assets %}
         {{ asset|safe }}
     {% endfor %}
-
+</main>
 {% endblock %}
