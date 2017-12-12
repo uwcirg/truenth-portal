@@ -3,6 +3,8 @@ import json
 from collections import OrderedDict
 from flask import Blueprint, current_app, render_template, redirect, url_for
 
+from ..models.user import current_user
+
 
 exercise_diet = Blueprint(
     'exercise_diet', __name__, template_folder='templates',
@@ -19,39 +21,63 @@ def get_asset(uuid):
 
 def get_tag_data(anyTags):
     url = (
-        "{LR_ORIGIN}/c/portal/truenth/asset/query?anyTags={anyTags}&sort=true&sortType=DESC".format(
+        "{LR_ORIGIN}/c/portal/truenth/asset/query?anyTags={anyTags}&sort=true"
+        "&sortType=DESC".format(
             LR_ORIGIN=current_app.config.get("LR_ORIGIN"), anyTags=anyTags))
     return requests.get(url).content
 
 
 def get_all_recipes():
     recipe_data = get_tag_data(anyTags="recipe")
-    recipe_assets = {'vegetables': [], 'healthy_vegetable_fat': [], 'tomatoes': [], 'fish': [],
+    recipe_assets = {'vegetables': [],
+                     'healthy_vegetable_fat': [],
+                     'tomatoes': [],
+                     'fish': [],
                      'alternatives_to_processed_meats': []}
     for asset in json.JSONDecoder().decode(recipe_data)['results']:
         if 'vegetables' in asset['tags']:
-            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
+            recipe_assets['vegetables'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'recipe'))
         if 'healthy_vegetable_fat' in asset['tags']:
-            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
+            recipe_assets['healthy_vegetable_fat'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'recipe'))
         if 'tomatoes' in asset['tags']:
-            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
+            recipe_assets['tomatoes'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'recipe'))
         if 'fish' in asset['tags']:
-            recipe_assets['fish'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
+            recipe_assets['fish'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'recipe'))
         if 'alternatives_to_processed_meats' in asset['tags']:
-            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], asset['small_image'], 'recipe'))
+            recipe_assets['alternatives_to_processed_meats'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'recipe'))
 
     shopping_data = get_tag_data(anyTags="shopping_tips")
     for asset in json.JSONDecoder().decode(shopping_data)['results']:
         if 'vegetables' in asset['tags']:
-            recipe_assets['vegetables'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
+            recipe_assets['vegetables'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'tip'))
         if 'healthy_vegetable_fat' in asset['tags']:
-            recipe_assets['healthy_vegetable_fat'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
+            recipe_assets['healthy_vegetable_fat'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'tip'))
         if 'tomatoes' in asset['tags']:
-            recipe_assets['tomatoes'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
+            recipe_assets['tomatoes'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'tip'))
         if 'fish' in asset['tags']:
-            recipe_assets['fish'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
+            recipe_assets['fish'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'tip'))
         if 'alternatives_to_processed_meats' in asset['tags']:
-            recipe_assets['alternatives_to_processed_meats'].append((asset['title'], asset['uuid'], asset['small_image'], 'tip'))
+            recipe_assets['alternatives_to_processed_meats'].append(
+                (asset['title'], asset['uuid'],
+                 asset['small_image'], 'tip'))
 
     return recipe_assets
 
@@ -68,7 +94,8 @@ def introduction():
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
-    return render_template('exercise_diet/index.html', assets=assets)
+    return render_template('exercise_diet/index.html', assets=assets,
+                           user=current_user())
 
 
 @exercise_diet.route('/diet')
@@ -83,9 +110,11 @@ def diet():
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
         tag.remove('diet-modal')
-        modals[tag[0]] = (modal['title'], modal['priority'], get_asset(modal['uuid']))
+        modals[tag[0]] = (modal['title'], modal['priority'],
+                          get_asset(modal['uuid']))
 
-    return render_template('exercise_diet/diet.html', assets=assets, modals=modals)
+    return render_template('exercise_diet/diet.html', assets=assets,
+                           modals=modals, user=current_user())
 
 
 @exercise_diet.route('/portal')
@@ -105,17 +134,23 @@ def exercise():
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
         tag.remove('exercise-modal')
-        modals[tag[0]] = (modal['title'], modal['priority'], get_asset(modal['uuid']))
+        modals[tag[0]] = (modal['title'], modal['priority'],
+                          get_asset(modal['uuid']))
 
-    return render_template('exercise_diet/exercise.html', assets=assets, modals=modals)
+    return render_template('exercise_diet/exercise.html', assets=assets,
+                           modals=modals, user=current_user())
 
 
 @exercise_diet.route('/recipes')
 def recipes():
     data = get_tag_data(anyTags="recipe-intro")
-    recipe_intro = get_asset(json.JSONDecoder().decode(data)['results'][0]['uuid'])
+    recipe_intro = get_asset(
+        json.JSONDecoder().decode(data)['results'][0]['uuid'])
     recipe_assets = get_all_recipes()
-    return render_template('exercise_diet/recipes.html', recipe_intro=recipe_intro, recipe_assets=recipe_assets)
+    return render_template('exercise_diet/recipes.html',
+                           recipe_intro=recipe_intro,
+                           recipe_assets=recipe_assets,
+                           user=current_user())
 
 
 @exercise_diet.route('/recipe/<heading>/<int:item>')
@@ -123,7 +158,8 @@ def recipe(heading, item):
     assets = get_all_recipes()
     asset = get_asset(assets[heading][item][1])
 
-    ordered_headings = ['healthy_vegetable_fat', 'vegetables', 'tomatoes', 'fish', 'alternatives_to_processed_meats']
+    ordered_headings = ['healthy_vegetable_fat', 'vegetables', 'tomatoes',
+                        'fish', 'alternatives_to_processed_meats']
     current_heading_item_count = len(assets[heading])
     prev_heading = ''
     next_heading = ''
@@ -138,7 +174,8 @@ def recipe(heading, item):
         if prev_heading_index >= 0:
             prev_heading = ordered_headings[prev_heading_index]
             prev_item_index = len(assets[prev_heading]) - 1
-            prev_asset_title = '&larr;&nbsp;' + assets[prev_heading][prev_item_index][0]
+            prev_asset_title = ('&larr;&nbsp;' +
+                                assets[prev_heading][prev_item_index][0])
             prev_asset_recipe_type = assets[prev_heading][prev_item_index][2]
         next_item_index = item + 1
         next_heading = heading
