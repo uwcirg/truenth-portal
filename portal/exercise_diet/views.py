@@ -6,7 +6,8 @@ from flask import Blueprint, current_app, render_template, redirect, url_for
 
 exercise_diet = Blueprint(
     'exercise_diet', __name__, template_folder='templates',
-    static_folder='static', static_url_path='/exercise_diet/static')
+    static_folder='static', static_url_path='/exercise_diet/static',
+    url_prefix='/exercise-and-diet')
 
 
 def get_asset(uuid):

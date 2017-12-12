@@ -1,5 +1,6 @@
 $(document).ready(function(){
-    var pathname = $(location).attr('pathname').replace(/^\/+/g, '.');
+    var fullpath = $(location).attr('pathname').split("/")
+    var pathname = "." + fullpath[fullpath.length-1]
     $('#mainNavbar .nav '+pathname).addClass('active');
 });
 
