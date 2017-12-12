@@ -62,7 +62,7 @@ function show_recipe(heading, item, recipe_type) {
         $('#recipe-modal').removeClass('tip');
     }
     $('#recipe-modal').modal('show');
-    $( ".modal-body" ).load( "/recipe/" + heading + "/" + item );
+    $( ".modal-body" ).load( "recipe/" + heading + "/" + item );
 }
 
 $(function(){
