@@ -249,7 +249,7 @@ class Token(db.Model):
         db.String(40), db.ForeignKey('clients.client_id', ondelete='CASCADE'),
         nullable=False,
     )
-    client = db.relationship('Client')
+    client = db.relationship('Client', backref='tokens')
 
     user_id = db.Column(
         db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'),
