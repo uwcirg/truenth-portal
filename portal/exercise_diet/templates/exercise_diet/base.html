@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{%- block title -%}{{_("TrueNTH")}}{%- endblock -%}</title>
+    <title>{%- block title -%}{{_("TrueNTH")}} {{_("Exercise and Diet")}}{%- endblock -%}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script>window.jQuery || document.write('<script src="../scripts/jquery.min.js"><\/script>')</script>
@@ -119,8 +119,7 @@
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
-  {% block main %}
-      {% block header %}
+  {% block header %}
         <header class="header {%if user%}no-banner{%endif%}">
           <div class="header__menu">
             <a class="menu button button--small button--white js-nav-menu-toggle">
@@ -132,20 +131,27 @@
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
           {% endif %}
         </header>
-        <div class="navbar-header">
-            <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
-
-        </div>
-        <div class="navbar-collapse collapse" id="mainNavbar">
-            <ul class="nav navbar-nav">
-                <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
-                <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
-                <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
-                <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
-            </ul>
-        </div>
-      {% endblock %}
   {% endblock %}
+    <main class="main">
+        <div class="page-intro">
+            <div class="page-intro__content">
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
+
+                </div>
+                <div class="navbar-collapse collapse" id="mainNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
+                        <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
+                        <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
+                        <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
+                    </ul>
+                </div>
+                {% block main %}
+                {% endblock %}
+            </div>
+        </div>
+    </main>
   {% block footnote %}
     <aside>
      <div class="module-wrap module-wrap--theme-gray">

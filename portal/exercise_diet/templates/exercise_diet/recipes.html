@@ -1,9 +1,5 @@
 {% extends "exercise_diet/base.html" %}
-{% block title %}{{super()}} {{_("Exercise and Diet")}}{% endblock %}
-{% block head %}{{super()}}{% endblock %}
 {% block main %}
-<main class="main">
-    {{ super() }}
 
     {{ recipe_intro|safe }}
     <div id="Recipe-Accordions">
@@ -132,5 +128,5 @@
             </div>
         </div>
     </div>
-</main>
+
 {% endblock %}
