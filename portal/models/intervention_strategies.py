@@ -269,20 +269,33 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
+                greeting = _(u"Hi {}").format(user.display_name)
+
                 qb = assessment_status.qb_data.qb
                 trigger_date = qb.trigger_date(user)
-                utc_due = qb.calculated_start(
+                utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start
-                utc_due = qb.calculated_due(
-                    trigger_date, as_of_date=now) or utc_due
-                due_date = localize_datetime(utc_due, user)
-                assert due_date
-                greeting = _(u"Hi {}").format(user.display_name)
-                reminder = _(
-                    u"Please complete your {} "
-                    "questionnaire by {}.").format(
-                        assessment_status.top_organization.name,
-                        due_date.strftime('%-d %b %Y'))
+
+                if assessment_status.overall_status == 'Overdue':
+                    utc_expired = qb.calculated_expiry(
+                        trigger_date, as_of_date=now) or utc_start
+                    expired_date = localize_datetime(utc_expired, user)
+                    reminder = _(
+                        u"Please complete your {} "
+                        "questionnaire as soon as possible. It will expire "
+                        "on {}.").format(
+                            assessment_status.top_organization.name,
+                            expired_date.strftime('%-d %b %Y'))
+                else:
+                    utc_due = qb.calculated_due(
+                        trigger_date, as_of_date=now) or utc_start
+                    due_date = localize_datetime(utc_due, user)
+                    reminder = _(
+                        u"Please complete your {} "
+                        "questionnaire by {}.").format(
+                            assessment_status.top_organization.name,
+                            due_date.strftime('%-d %b %Y'))
+
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
