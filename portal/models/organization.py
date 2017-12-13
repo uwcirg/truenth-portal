@@ -236,17 +236,13 @@ class Organization(db.Model):
             self.partOf_id = Reference.parse(data['partOf']).id
         for attr in ('use_specific_codings','race_codings',
                     'ethnicity_codings','indigenous_codings'):
-            # set regardless of presence in data - thus clearing
-            # old values if not currently mentioned
-            setattr(self, attr, data.get(attr))
+            if attr in data:
+                setattr(self, attr, data.get(attr))
 
-        # regardless of presence, need to visit all extensions
-        # to avoid leaving behind stale data
-        by_extension_url = {ext['url']: ext for ext in data.get('extension', [])}
-        for kls in org_extension_classes:
-            args = by_extension_url.get(kls.extension_url, {'url': kls.extension_url})
-            instance = org_extension_map(self, args)
-            instance.apply_fhir()
+        if 'extension' in data:
+            for e in data['extension']:
+                instance = org_extension_map(self, e)
+                instance.apply_fhir()
 
         if 'identifier' in data:
             # track current identifiers - must remove any not requested

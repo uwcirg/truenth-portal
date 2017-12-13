@@ -34,6 +34,8 @@ class CCExtension(Extension):
                 'valueCodeableConcept': {
                     'coding': [c.as_fhir() for c in self.children]}
             }
+        # Return valid empty if none are currently defined.
+        return {'url': self.extension_url}
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
