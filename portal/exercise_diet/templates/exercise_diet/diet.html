@@ -1,5 +1,7 @@
 {% extends "exercise_diet/base.html" %}
 {% block main %}
+<main class="main">
+    {{ super() }}
 
     {% for asset in assets %}
         {{ asset|safe }}
@@ -40,5 +42,5 @@
             </div>
         </div>
     {% endfor %}
-
+</main>
 {% endblock %}

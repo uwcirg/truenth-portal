@@ -1,5 +1,7 @@
 {% extends "exercise_diet/base.html" %}
 {% block main %}
+<main class="main">
+    {{ super() }}
 
     {{ recipe_intro|safe }}
     <div id="Recipe-Accordions">
@@ -129,4 +131,5 @@
         </div>
     </div>
 
+</main>
 {% endblock %}
