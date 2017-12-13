@@ -115,7 +115,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                       "status": i18next.t("Status"),
                       "agreement": i18next.t("Agreement"),
                       "consentDate": i18next.t("Date"),
-                      "registrationDate": i18next.t("Regiatration Date"),
+                      "registrationDate": i18next.t("Registration Date"),
                       "historyConsentDate": i18next.t("Consent Date"),
                       "locale": i18next.t("GMT"),
                       "lastUpdated": i18next.t("Last Updated") + "<br/><span class='smaller-text'>" + i18next.t("( GMT, Y-M-D )") + "</span>",
