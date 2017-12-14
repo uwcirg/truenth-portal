@@ -30,12 +30,12 @@ def upgrade():
 
     def needs_attention():
         query = (
-            "select count(*) as cnt, subject_id, "
+            "select count(*) as cnt, subject_id, questionnaire_bank_id, "
             " document->'questionnaire'->>'reference' as reference "
             "from questionnaire_responses "
-            "group by subject_id, reference;")
+            "group by subject_id, questionnaire_bank_id, reference;")
 
-        for cnt, subject_id, reference in session.execute(query):
+        for cnt, subject_id, qb_id, reference in session.execute(query):
             if cnt < 2:
                 continue
             else:
