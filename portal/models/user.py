@@ -882,6 +882,34 @@ class User(db.Model, UserMixin):
             db.session.add(replaced)
         db.session.commit()
 
+    def expire_consents(self, acting_user, org=None):
+        """ Mark user's current valid consents as expired
+
+        Marks the user's current valid consents as expired, by setting the
+        consent expiration date to now. User must reconsent upon next login.
+        If org provided, only expires consents for that org.
+        Called when the consent agreement language is updated.
+
+        :param org: organization for which to invalide consents (optional)
+        :param acting_user: user behind the request for permission checks
+
+        """
+        now = datetime.utcnow()
+
+        for consent in self.valid_consents:
+            if not org or (org == consent.organization):
+                consent.expires = now
+                audit = Audit(
+                    user_id=acting_user.id,
+                    subject_id=self.id,
+                    comment=("Consent agreement {} marked as expired "
+                             "(re-consent required)".format(consent.id)),
+                    context='consent',
+                    timestamp=now)
+                db.session.add(consent)
+                db.session.add(audit)
+        db.session.commit()
+
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
         """Update user's organizations
 
