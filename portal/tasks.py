@@ -319,7 +319,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 @celery.task
 @scheduled_task
-def deactive_tous(**kwargs):
+def deactivate_tous(**kwargs):
     "Require users to re-consent to their initial consent"
     types = kwargs.get('types')
     sys = User.query.filter_by(email='__system__').first()

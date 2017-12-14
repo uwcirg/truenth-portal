@@ -896,8 +896,9 @@ class User(db.Model, UserMixin):
         """
         from .tou import ToU
 
-        for tou in ToU.query.join(Audit).filter(
-                Audit.user_id == self.id):
+        for tou in ToU.query.join(Audit).filter(and_(
+                Audit.user_id == self.id,
+                ToU.active.is_(True))):
             if not types or (tou.type in types):
                 tou.active = False
                 audit = Audit(
@@ -906,7 +907,7 @@ class User(db.Model, UserMixin):
                     comment=("ToU agreement {} marked as "
                              "inactive".format(tou.id)),
                     context='tou',
-                    timestamp=now)
+                    timestamp=datetime.utcnow())
                 db.session.add(tou)
                 db.session.add(audit)
         db.session.commit()
