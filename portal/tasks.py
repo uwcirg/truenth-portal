@@ -319,15 +319,13 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 @celery.task
 @scheduled_task
-def retrigger_patient_consents(**kwargs):
+def deactive_tous(**kwargs):
     "Require users to re-consent to their initial consent"
-    org = kwargs.get('org')
+    types = kwargs.get('types')
     sys = User.query.filter_by(email='__system__').first()
 
     for user in User.query.filter(User.deleted_id.is_(None)):
-        # if user.id == 354:
-        #     import pdb; pdb.set_trace()
         if any((user.has_role(ROLE.PATIENT),
                 user.has_role(ROLE.STAFF),
                 user.has_role(ROLE.STAFF_ADMIN))):
-            user.expire_consents(acting_user=(sys or user), org=org)
+            user.deactivate_tous(acting_user=(sys or user), types=types)

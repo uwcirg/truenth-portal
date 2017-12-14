@@ -882,31 +882,32 @@ class User(db.Model, UserMixin):
             db.session.add(replaced)
         db.session.commit()
 
-    def expire_consents(self, acting_user, org=None):
-        """ Mark user's current valid consents as expired
+    def deactivate_tous(self, acting_user, types=None):
+        """ Mark user's current active ToU agreements as inactive
 
-        Marks the user's current valid consents as expired, by setting the
-        consent expiration date to now. User must reconsent upon next login.
-        If org provided, only expires consents for that org.
-        Called when the consent agreement language is updated.
+        Marks the user's current active ToU agreements as inactive.
+        User must agree to ToUs again upon next login (per CoreData logic).
+        If types provided, only deactivates agreements of that ToU type.
+        Called when the ToU agreement language is updated.
 
-        :param org: organization for which to invalide consents (optional)
         :param acting_user: user behind the request for permission checks
+        :param types: ToU types for which to invalide agreements (optional)
 
         """
-        now = datetime.utcnow()
+        from .tou import ToU
 
-        for consent in self.valid_consents:
-            if not org or (org == consent.organization):
-                consent.expires = now
+        for tou in ToU.query.join(Audit).filter(
+                Audit.user_id == self.id):
+            if not types or (tou.type in types):
+                tou.active = False
                 audit = Audit(
                     user_id=acting_user.id,
                     subject_id=self.id,
-                    comment=("Consent agreement {} marked as expired "
-                             "(re-consent required)".format(consent.id)),
-                    context='consent',
+                    comment=("ToU agreement {} marked as "
+                             "inactive".format(tou.id)),
+                    context='tou',
                     timestamp=now)
-                db.session.add(consent)
+                db.session.add(tou)
                 db.session.add(audit)
         db.session.commit()
 
