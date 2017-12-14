@@ -65,6 +65,17 @@
       "resourceType": "ScheduledJob",
       "schedule": "57 * * * *",
       "task": "cache_reporting_stats"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"]
+      },
+      "name": "Deactivate subject website consent agreements",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "deactivate_tous"
     }
   ],
   "id": "SitePersistence v0.2",
