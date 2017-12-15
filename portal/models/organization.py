@@ -239,10 +239,11 @@ class Organization(db.Model):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
-        if 'extension' in data:
-            for e in data['extension']:
-                instance = org_extension_map(self, e)
-                instance.apply_fhir()
+        by_extension_url = {ext['url']: ext for ext in data.get('extension', [])}
+        for kls in org_extension_classes:
+            args = by_extension_url.get(kls.extension_url, {'url': kls.extension_url})
+            instance = org_extension_map(self, args)
+            instance.apply_fhir()
 
         if 'identifier' in data:
             # track current identifiers - must remove any not requested

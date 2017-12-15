@@ -365,7 +365,12 @@ def organization_put(organization_id):
         abort(400, "Requires FHIR resourceType of 'Organization'")
     org = Organization.query.get_or_404(organization_id)
     try:
-        org.update_from_fhir(request.json)
+        # As we allow partial updates, first create an empty but
+        # well defined version of an org, and update with any
+        # provided elements
+        complete = org.as_fhir()
+        complete.update(request.json)
+        org.update_from_fhir(complete)
     except MissingReference, e:
         abort(400, str(e))
     db.session.commit()

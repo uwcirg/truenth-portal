@@ -1,5 +1,7 @@
+import json
 from tests import TestCase
 from flask_webtest import SessionScope
+import os
 from shutil import rmtree
 from tempfile import mkdtemp
 
@@ -123,6 +125,25 @@ class TestModelPersistence(TestCase):
             sequence_name='organizations_id_seq'
         )
         mp.export(self.tmpdir)
+
+        # Strip the empty extensions, as we'd expect in the real persistence file
+        with open(os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
+            data = json.load(pfile)
+            # Special handling of extensions - empties only have 'url' key
+
+        for i, entry in enumerate(data['entry']):
+            extensions = entry['extension']
+            keepers = []
+            for e in extensions:
+                if len(e.keys()) > 1:
+                    keepers.append(e)
+            data['entry'][i]['extension'] = keepers
+            empty_keys = [k for k, v in entry.items() if not v]
+            for k in empty_keys:
+                del data['entry'][i][k]
+
+        with open(os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
+            pfile.write(json.dumps(data))
 
         # Add an additional extension to the org, make sure
         # they are deleted when importing again from
