@@ -685,11 +685,14 @@ class AccessStrategy(db.Model):
         """Return self in JSON friendly dictionary"""
         d = {
             "name": self.name,
-            "function_details": json.loads(self.function_details),
             "resourceType": 'AccessStrategy'
         }
-        d['intervention_name'] = Intervention.query.get(
-            self.intervention_id).name
+        d["function_details"] = (
+            json.loads(self.function_details) if self.function_details
+            else None)
+        d['intervention_name'] = (
+            Intervention.query.get(self.intervention_id).name
+            if self.intervention_id else None)
         if self.id:
             d['id'] = self.id
         if self.rank:
