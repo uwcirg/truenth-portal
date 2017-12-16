@@ -1061,6 +1061,9 @@
       ],
       "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
+        "partOf": {
+        "reference": "api/organization/802"
+      },
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1289,6 +1292,9 @@
       ],
       "indigenous_codings": true,
       "name": "Memorial Sloan Kettering Cancer Center",
+      "partOf": {
+        "reference": "api/organization/1002"
+      },
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
@@ -1364,6 +1370,9 @@
       ],
       "indigenous_codings": true,
       "name": "Oregon Health & Science University",
+      "partOf": {
+        "reference": "api/organization/1102"
+      },
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
