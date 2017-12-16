@@ -1314,7 +1314,7 @@
         {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
-          "value": "state:NY"
+          "value": "state:OR"
         }
       ],
       "indigenous_codings": true,
