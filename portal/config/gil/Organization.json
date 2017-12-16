@@ -987,6 +987,41 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 802,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:FL"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Moffitt Cancer Center",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "timezone": "UTC",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1185,6 +1220,41 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1002,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NY"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Memorial Sloan Kettering",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "timezone": "UTC",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1219,6 +1289,36 @@
       ],
       "indigenous_codings": true,
       "name": "Memorial Sloan Kettering Cancer Center",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 1102,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:NY"
+        }
+      ],
+      "indigenous_codings": true,
+      "name": "Oregon Health & Science University",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
