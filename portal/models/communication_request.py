@@ -136,8 +136,10 @@ class CommunicationRequest(db.Model):
             d['identifier'].append(id.as_fhir())
         d['status'] = self.status
         d['notify_post_qb_start'] = self.notify_post_qb_start
-        d['questionnaire_bank'] = Reference.questionnaire_bank(
-            self.questionnaire_bank.name).as_fhir()
+        d['questionnaire_bank'] = (
+            Reference.questionnaire_bank(
+                self.questionnaire_bank.name).as_fhir() if
+            self.questionnaire_bank else None)
         if self.qb_iteration is not None:
             d['qb_iteration'] = self.qb_iteration
         d['lr_uuid'] = self.lr_uuid

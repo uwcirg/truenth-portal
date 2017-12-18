@@ -11,6 +11,7 @@ from portal.system_uri import (
     SHORTNAME_ID)
 from portal.models.coding import Coding
 from portal.models.identifier import Identifier
+from portal.models.locale import LocaleConstants
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
 from portal.models.role import ROLE
@@ -263,6 +264,50 @@ class TestOrganization(TestCase):
                           data['address'][1]['line'][0])
         self.assertEquals(org.name, data['name'])
         self.assertEquals(org.phone, "022-655 2300")
+
+    def test_organization_put_update(self):
+        # confirm unmentioned fields persist
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        en_AU = LocaleConstants().AustralianEnglish
+
+        # Populate db with complet org, and set many fields
+        org = Organization(
+            name='test', phone='800-800-5665', timezone='US/Pacific')
+        org.identifiers.append(Identifier(
+            value='state:NY', system=PRACTICE_REGION))
+        org.locales.append(en_AU)
+        org.default_locale = 'en_AU'
+
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        org_id = org.id
+        data = org.as_fhir()
+
+        # Now strip down the representation - confirm a post doesn't
+        # wipe unmentioned fields
+        del data['extension']
+        del data['telecom']
+        del data['language']
+
+        rv = self.client.put(
+            '/api/organization/{}'.format(org_id),
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+
+        # Pull the updated db entry
+        org = Organization.query.get(org_id)
+        en_AU = db.session.merge(en_AU)
+
+        # Confirm all the unmentioned entries survived
+        self.assertEquals(org.phone, '800-800-5665')
+        self.assertEquals(org.default_locale, 'en_AU')
+        self.assertEquals(org.locales[0], en_AU)
+        self.assertEquals(org.timezone, 'US/Pacific')
 
     def test_organization_post(self):
         with open(os.path.join(

@@ -115,7 +115,10 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
-        self.assertEquals(3, len(fhir['extension']))  # timezone added
+        # ignore added timezone and empty extensions
+        self.assertEquals(2, len(
+            [ext for ext in fhir['extension']
+             if 'valueCodeableConcept' in ext]))
         self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
