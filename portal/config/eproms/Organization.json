@@ -1561,6 +1561,262 @@
         }
       ],
       "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 23000,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "en_US",
+      "name": "Canada (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14700,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "147-00-PLACEHOLDER"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "en_US",
+      "name": "BC Cancer Agency",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14701,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "147-01-PLACEHOLDER"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "fr_CA",
+      "name": "CHU de Quebec - Universite Laval",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "sv_SE",
+                "display": "Swedish",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Stockholm",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 24000,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "sv_SE",
+      "name": "Sweden (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "Europe/Stockholm",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14702,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "147-02-PLACEHOLDER"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "sv_SE",
+      "name": "Skane University Hospital",
+      "partOf": {
+        "reference": "api/organization/24000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 25000,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "de_CH",
+      "name": "Switzerland (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14703,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "147-03-PLACEHOLDER"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "de_CH",
+      "name": "Kantonsspital Chur",
+      "partOf": {
+        "reference": "api/organization/25000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     }
   ],
   "id": "SitePersistence v0.2",
