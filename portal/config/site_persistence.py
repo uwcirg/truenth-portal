@@ -20,6 +20,7 @@ from .model_persistence import export_model, import_model
 # NB - order MATTERS, as any type depending on another must find
 # the dependent bits in place on import, such as the known:
 #   ResearchProtocols before Orgs (Orgs point to RPs)
+#   Coding before Orgs (Orgs reference language codings)
 #   Orgs before all else
 #   CommunicationRequest depends on QuestionnaireBanks
 
@@ -27,11 +28,11 @@ ModelDetails = namedtuple(
     'ModelDetails', ['cls', 'sequence_name', 'lookup_field'])
 models = (
     ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
+    ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(Organization, 'organizations_id_seq', 'id'),
     ModelDetails(Questionnaire, 'questionnaires_id_seq', 'name'),
     ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
     ModelDetails(Intervention, 'interventions_id_seq', 'name'),
-    ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),
     ModelDetails(CommunicationRequest, 'communication_requests_id_seq', 'identifier'),
     ModelDetails(AppText, 'apptext_id_seq', 'name'),
