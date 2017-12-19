@@ -324,8 +324,11 @@ def deactivate_tous(**kwargs):
     types = kwargs.get('types')
     sys = User.query.filter_by(email='__system__').first()
 
+    if not sys:
+        raise ValueError("No system user found")
+
     for user in User.query.filter(User.deleted_id.is_(None)):
         if any((user.has_role(ROLE.PATIENT),
                 user.has_role(ROLE.STAFF),
                 user.has_role(ROLE.STAFF_ADMIN))):
-            user.deactivate_tous(acting_user=(sys or user), types=types)
+            user.deactivate_tous(acting_user=sys, types=types)
