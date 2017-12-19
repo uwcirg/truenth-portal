@@ -106,6 +106,17 @@ var procYearReg = /(19|20)\d{2}/;
 
 $(document).ready(function() {
 
+    var subjectId = $("#profileProcSubjectId").val();
+    if (subjectId) {
+        tnthAjax.treatmentOptions(subjectId,null, function(data) {
+            if (!data.error) {
+                fillContent.treatmentOptions(data);
+            };
+        });
+
+        tnthAjax.getProc(subjectId, false);
+    };
+
     // Options for datepicker - prevent future dates, no default
     $('.event-element .input-group.date').each(function(){
         $(this).datepicker({

@@ -35,45 +35,6 @@
         <div class="help-block with-errors"></div>
         <span id="errorbirthday" class="help-block error-message"></span>
      </div>
-     <script>
-        $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
-            var currentBd = $("#birthday").val();
-            if (currentBd) {
-                var bdArray = currentBd.split("-");
-                $("#year").val(bdArray[0]);
-                $("#month").val(bdArray[1]);
-                $("#date").val(bdArray[2]);
-            };
-            $("#month").on("change", function() {
-                $(this).trigger("focusout");
-            });
-            $("#year", "#date").each(function() {
-                $(this).on("change", function() {
-                    $(this).trigger("blur");
-                });
-            });
-            ["year", "month", "date"].forEach(function(fn) {
-                var field = $("#" + fn);
-                var triggerEvent = hasValue(field.attr("data-trigger-event")) ? field.attr("data-trigger-event") : (field.attr("type") == "text" ? "blur" : "change");
-                field.on(triggerEvent, function() {
-                    var y = $("#year"), m = $("#month"), d = $("#date");
-                    if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {
-                        if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                            var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-                            if (isValid) {
-                                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                                $("#errorbirthday").html("");
-                            } else {
-                                $("#birthday").val("");
-                                return false;
-                            };
-                        };
-                    } else return false;
-                });
-            });
-           __convertToNumericField($("#date, #year"));
-        });
-     </script>
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
@@ -88,13 +49,6 @@
         <div class="get-demo-error get-locale-error error-message"></div>
         <div class="put-demo-error error-message"></div>
      </div>
-     <script>$(function () {
-        $('#locale').on('change', function() {
-            setTimeout(function(){
-                window.location.reload(true);
-            },1000);
-        });
-     });</script>
 {%- endmacro %}
 
 {% macro profileName(person, isFocus=False) -%}
@@ -140,35 +94,6 @@
 {% macro profileIndigenous(person) -%}
     {%- if person and person.org_coding_display_options.indigenous -%}
         <div id="userIndigenousStatusContainer" data-section-id="indigenous" class="flex-item"></div>
-        <script>
-        $(function () {
-            (function() {
-                $.ajax({
-                    type:"GET",
-                    url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
-                }).done(function(data) {
-                    var as = data["codeSystem"]["concept"];
-                    var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
-                    '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
-                    as.forEach(function(o) {
-                        html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
-                    });
-                    html += "</div></div>";
-                    $("#userIndigenousStatusContainer").html(html);
-                    getSaveLoaderDiv("profileForm", "userIndigenousStatus");
-                    $("#userIndigenousStatusContainer input[type='radio']").each(function() {
-                        $(this).attr("data-save-container-id", "userIndigenousStatus");
-                        $(this).on("click", function() {
-                            assembleContent.demo({{ person.id if person }},true, $(this));
-                        });
-                    });
-                }).fail(function(){
-                    console.log("Problem retrieiving indigenous statuses");
-                });
-            })();
-        });
-        </script>
     {%- endif -%}
 {%- endmacro %}
 
@@ -238,35 +163,7 @@
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT)%}data-optional="true"{% else %}required{% endif %} />
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
-    <script>
-    function checkEmail(email) {
-        if (hasValue(email)) {
-            $("#btnPasswordResetEmail").attr("disabled", false);
-            $("#btnProfileSendEmail").attr("disabled", false);
-            $('#btnProfileSendEmail').removeClass('disabled');
-        } else {
-            if ($("#email").get(0).validity.valid) {
-                $("#btnPasswordResetEmail").attr("disabled", true);
-                $("#btnProfileSendEmail").attr("disabled", true);
-                $('#btnProfileSendEmail').addClass('disabled');
-            };
-        };
-    };
-    $(function() {
-        checkEmail($("#email").val());
-        $("#email").on("blur, keyup", function() {
-            checkEmail($(this).val());
-            if ($(this).val() != "") $("#profileEmailSelect").attr("disabled", false);
-            else $("#profileEmailSelect").val("").attr("disabled", true);
-        });
-        //in profile email is validated and updated after ajax call to check unique email
-        {% if person %}
-            $("#email").attr("data-update-on-validated", "true").attr("data-user-id", '{{person.id}}');
-        {% endif %}
-        $("#btnProfileSendEmail").blur();
-    });</script>
 {%- endmacro %}
-
 {% macro profileEmailForm(person) -%}
     {%- if person -%}
     <div id="sendEmailForm">
@@ -590,7 +487,6 @@
         <div class="help-block with-errors"></div>
     </div>
     <div id="errorphone" class="error-message"></div>
-    <script>$(function() { __convertToNumericField($("#phone"))});</script>
 {%- endmacro %}
 
 {% macro profileAltPhone(person) -%}
@@ -600,7 +496,6 @@
         <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
     </div>
-    <script>$(function() { __convertToNumericField($("#altPhone"))});</script>
 {%- endmacro %}
 
 {% macro resetPassword(person) %}
@@ -608,28 +503,6 @@
         <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{ _("Send email") }}</button>
         <div id="passwordResetMessage" class="text-info"></div>
     </div>
-    <script>
-    {% if person %}
-    $(function() {
-        if (!hasValue($("#email").val())) $("#btnPasswordResetEmail").attr("disabled", true);
-        $('#btnPasswordResetEmail').on('click', function(event) {
-            event.preventDefault();
-            email = $('#email').val()
-            if (email) {
-                tnthAjax.passwordReset({{person.id}}, function(data) {
-                    if (!data.error) {
-                        $('#passwordResetMessage').text('{%trans%}Password reset email sent to {%endtrans%}' + email);
-                    } else {
-                        $('#passwordResetMessage').text('{%trans%}Unable to send email.{%endtrans%}')
-                    };
-                });
-            } else {
-                $('#passwordResetMessage').text('{%trans%}No email address found for user{%endtrans%}');
-            };
-        });
-    });
-    {% endif %}
-    </script>
 {%-endmacro %}
 
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
@@ -1076,84 +949,6 @@
     <a href="#profilePatientReportTable"></a>
     <table id="profilePatientReportTable"></table>
     <div id="patientReportErrorMessage" class="text-muted"></div>
-    <script>
-    $(function () {
-         var ww = $(window).width();
-         var prUserId = $("#pr_user_id").val();
-         tnthAjax.patientReport($("#pr_user_id").val(), function(data) {
-            if (!data.error) {
-                if (data["user_documents"] && data["user_documents"].length > 0 ) {
-                    var fData = [];
-                    data["user_documents"].forEach(function(item) {
-                        item["filename"] = escapeHtml(item["filename"]);
-                        item["document_type"] = escapeHtml(item["document_type"]);
-                        item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
-                        item["actions"] = '<a title="{{_('Download')}}" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
-                        fData.push(item);
-                    });
-
-                    $('#profilePatientReportTable').bootstrapTable( {
-                        data: fData,
-                        pagination: true,
-                        pageSize: 5,
-                        pageList: [5, 10, 25, 50, 100],
-                        classes: 'table table-responsive profile-patient-reports',
-                        sortName: 'uploaded_at',
-                        sortOrder: 'desc',
-                        search: true,
-                        smartDisplay: true,
-                        showToggle: true,
-                        showColumns: true,
-                        toolbar: "#prTableToolBar",
-                        rowStyle: function rowStyle(row, index) {
-                              return {
-                                css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
-                              };
-                        },
-                        undefinedText: '--',
-                        columns: [
-                            {
-                                field: 'contributor',
-                                title: '{{_("Type")}}',
-                                searchable: true,
-                                sortable: true
-                            },
-                            {
-                                field: 'filename',
-                                title: '{{_("Report Name")}}',
-                                searchable: true,
-                                sortable: true
-                            }, {
-                                field: 'uploaded_at',
-                                title: '{{_("Generated (GMT)")}}',
-                                sortable: true,
-                                searchable: true,
-                                width: '20%'
-                            }, {
-                                field: 'document_type',
-                                title: '{{_("Document Type")}}',
-                                sortable: true,
-                                visible: false
-                            },{
-                                field: 'actions',
-                                title: '{{_("Download")}}',
-                                sortable: false,
-                                searchable: false,
-                                visible: true,
-                                class: "text-center"
-                            }
-                        ]
-                    } );
-                } else {
-                    $("#patientReportErrorMessage").text("{%trans%}No reports available.{%endtrans%}").removeClass("error-message");
-                }
-
-            } else {
-                $("#profilePatientReportTable").closest("div.profile-item-container").hide();
-                $("#patientReportErrorMessage").text("{%trans%}Problem retrieving reports from server.{%endtrans%}").addClass("error-message");
-            };
-         });
-     });</script>
 {%- endmacro %}
 
 {% macro profileConsent(person, current_user) -%}
@@ -1247,98 +1042,6 @@
         <div id="auditTableToolBar"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
         <div id="profileAuditLogErrorMessage" class="error-message"></div>
-        <script>
-        function _showText(obj) {
-            if (obj) {
-                var f = $(obj).parent().find('.second');
-                f.toggleClass('hide');
-                $(obj).text($(obj).text() ==='{%trans%}More...{%endtrans%}' ? '{%trans%}Less{%endtrans%}...': '{%trans%}More{%endtrans%}...');
-            }
-        };
-        $(function () {
-             var ww = $(window).width();
-             var auditUserId = $("#audit_user_id").val();
-
-                tnthAjax.auditLog(auditUserId, function(data) {
-                    if (!data.error) {
-                        if (data["audits"] && data["audits"].length > 0 ) {
-                            var fData = [];
-                            data["audits"].forEach(function(item) {
-                                item["by"] = item["by"]["reference"];
-                                var r = /\d+/g;
-                                var m = r.exec(String(item["by"]));
-                                if (m) item["by"] = m[0]
-                                else item["by"] = "-";
-                                item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
-                                item["comment"] = escapeHtml(item["comment"]);
-                                var c = String(item["comment"]);
-                                var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
-
-                                item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>{%trans%}More{%endtrans%}}...</sub>") : item["comment"];
-                                fData.push(item);
-                            });
-
-                            $('#profileAuditLogTable').bootstrapTable( {
-                                data: fData,
-                                pagination: true,
-                                pageSize: 5,
-                                pageList: [5, 10, 25, 50, 100],
-                                classes: 'table table-responsive profile-audit-log',
-                                sortName: 'lastUpdated',
-                                sortOrder: 'desc',
-                                search: true,
-                                smartDisplay: true,
-                                showToggle: true,
-                                showColumns: true,
-                                toolbar: "#auditTableToolBar",
-                                rowStyle: function rowStyle(row, index) {
-                                      return {
-                                        css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
-                                      };
-                                },
-                                undefinedText: '--',
-                                columns: [
-                                    {
-                                        field: 'by',
-                                        title: 'User',
-                                        width: '5%',
-                                        sortable: true,
-                                        searchable: true
-                                    }, {
-                                        field: 'comment',
-                                        title: 'Comment',
-                                        searchable: true,
-                                        sortable: true
-                                    }, {
-                                        field: 'lastUpdated',
-                                        title: "{%trans%}Date/Time{%endtrans %} <span class='gmt'> {%trans%}(GMT), Y-M-D{%endtrans%}</span>",
-                                        sortable: true,
-                                        searchable: true,
-                                        /******
-                                        sorter: function(a, b) {
-                                            return new Date(b).getTime() - new Date(a).getTime();
-                                        },
-                                        ****/
-                                        width: '20%'
-                                    },
-                                    {
-                                        field: 'version',
-                                        title: 'Version',
-                                        sortable: true,
-                                        visible: false
-                                    }
-                                ]
-                            } );
-                        } else {
-                            $("#profileAuditLogErrorMessage").text("{%trans%}No audit log item found.{%endtrans%}");
-                        }
-
-                    } else {
-                        $("#profileAuditLogErrorMessage").text("{%trans%}Problem retrieving audit log from server.{%endtrans%}");
-                    };
-                });
-
-         });</script>
      {% endif %}
 {%- endmacro %}
 
@@ -1353,25 +1056,6 @@
         <div class="put-roles-error error-message"></div>
         <div class="delete-roles-error error-message"></div>
     {% endif %}
-    {% if person %}
-    <script>
-    $(function () {
-        tnthAjax.getRoleList(function() {
-            tnthAjax.getRoles({{ person.id }}, true);
-            $("#rolesGroup input[name='user_type']").each(function() {
-                $(this).on("click", function() {
-                    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-                        return { name: $(this).val() };
-                    }).get();
-                    var toSend = {"roles": roles};
-                    tnthAjax.putRoles({{person.id}},toSend, $("#rolesLoadingContainer"));
-                 });
-            });
-        });
-    });
-    </script>
-    {% endif %}
-
 {%- endmacro %}
 
 {% macro profileSessionList(person, current_user) -%}
@@ -1383,80 +1067,7 @@
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
-    {% if person %}
-        <script>
-            $(function () {
-                tnthAjax.assessmentList({{person.id}}, function(data) {
-                    fillContent.assessmentList(data);
-                });
-            });
-        </script>
-    {% endif %}
 {%- endmacro %}
-{% macro profileAssessment(person, instrument_id, authored_date) -%}
-        <div id="userSessionReportDetail" cellpadding="2">
-            <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
-            <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
-            <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" ></table><br />
-        </div>
-        {% if person %}
-            <script>
-            $(function () {
-                tnthAjax.assessmentReport("{{person.id}}", "{{instrument_id}}", function(data) {
-                    fillContent.assessmentReport(data);
-                });
-            });
-            </script>
-        {% endif %}
-{%- endmacro %}
-{% macro profileClinicalPCALocalized(person, current_user) -%}
-<!-- not currently being used -->
- <div class="row">
-        <div class="col-md-12">
-            <div class="profile-item-container">
-                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{{ _("Clinical Question") }}</h4>
-                <p class="text-muted">{{ _("Question asked of the patient at account creation") }}</p>
-                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
-                <div id="pcaLocalizedContainer" class="well" style="margin-top: 1em; padding: 0.7em 2em 1em 2em">
-                     <div id="patMeta" data-topic="pca_localized" class="pat-q">
-                      <br />
-                      <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
-                      <div class="form-group">
-                        <div class="radio">
-                          <label>
-                            <input type="radio" class="init-queries-field" data-save-container-id="pcaLocalizedContainer" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-                          </label>
-                        </div>
-                        <div class="radio">
-                          <label>
-                            <input type="radio" class="init-queries-field" data-save-container-id="pcaLocalizedContainer" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (the cancer is in other parts of my body, too)") }}
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-</div>
-<script>
-    {% if person %}
-        $(function () {
-            tnthAjax.getClinical({{ person.id }});
-            $("#pca_localized_yes").on("click", function() {
-                tnthAjax.putClinical({{person.id}},"pca_localized","true", $(this));
-                setTimeout(function() { adjustAssessmentInstrument();}, 1000);
-            });
-            $("#pca_localized_no").on("click", function() {
-                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                setTimeout(function() { adjustAssessmentInstrument();}, 1000);
-            });
-            getSaveLoaderDiv("profileForm", "pcaLocalizedContainer");
-        });
-    {% endif %}
-
-</script>
-{%- endmacro %}
-
 {% macro profileClinicalQuestions(person, current_user) -%}
     <div class="row">
         <div class="col-md-12">
@@ -1480,111 +1091,6 @@
             </div>
         </div>
     </div>
-    <script>
-        function checkDiagnosis() {
-            var diag = $("#pca_diag_yes");
-
-            if (diag.is(":checked")) {
-              diag.parents(".pat-q").nextAll().fadeIn();
-            } else {
-              diag.parents(".pat-q").nextAll().fadeOut();
-            };
-            {% if person and current_user and (person.id != current_user.id) %}
-                if (!$("#patientQ input[type='radio']").is(":checked")) {
-                    $("#patientQContainer").append("<span class='text-muted'>{{ _('no answers provided') }}</span>");
-                };
-            {% endif %}
-            fillViews.clinical();
-
-        };
-        $(function () {
-            $("#patientQ").show();
-            //don't show treatment
-            $("#patTx").remove();
-
-            $("#patientQ hr").hide();
-            {% if person and current_user and person.id != current_user.id %}
-                $("#patientQ input[type='radio']").each(function() {
-                    $(this).attr("disabled", "disabled");
-                });
-                //$("#biopsyDate").attr("disabled", true);
-                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-                    $(this).attr("disabled", true);
-                });
-            {% endif %}
-
-            {% if person %}
-                $(".pat-q input:radio").on("click",function(){
-                      var thisItem = $(this);
-                      var toCall = thisItem.attr("name")
-                      // Get value from div - either true or false
-                      var toSend = thisItem.val();
-                      if (toCall != "biopsy") tnthAjax.postClinical({{person.id}},toCall,toSend, $(this).attr("data-status"), $(this));
-
-                      if (toSend == "true" || toCall ==  "pca_localized") {
-                        if (toCall == "biopsy") {
-                            if ($("#biopsyDate").val() == "") return true;
-                            else {
-                              //$("#biopsyDate").datepicker("hide").blur();
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
-                            };
-                        };
-                        thisItem.parents(".pat-q").nextAll().fadeIn();
-                      } else {
-                        if (toCall == "biopsy") {
-                            tnthAjax.postClinical({{person.id}}, toCall, "false", $(this).attr("data-status"), $(this));
-                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
-                                $("input[name='" + fieldName + "']").each(function() {
-                                    $(this).prop("checked", false);
-                                });
-                            });
-                            if ($("input[name='pca_diag']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
-                            };
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                            };
-                        } else if (toCall == "pca_diag") {
-                            ["pca_localized"].forEach(function(fieldName) {
-                              $("input[name='" + fieldName + "']").each(function() {
-                                  $(this).prop("checked", false);
-                              });
-                            });
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                            };
-                        }
-                        thisItem.parents(".pat-q").nextAll().fadeOut();
-                      };
-                  });
-             {% endif %}
-
-            [{
-                "fields": $("#patientQ input[name='biopsy']"),
-                "containerId": "patBiopsy"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_diag']"),
-                "containerId": "patDiag"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_localized']"),
-                "containerId": "patMeta"
-            }
-            ].forEach( function(item) {
-                item.fields.each(function() {
-                     getSaveLoaderDiv("profileForm", item.containerId);
-                    $(this).attr("data-save-container-id", item.containerId);
-                });
-            });
-
-            //wait for ajax calls to finish?
-            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-            setTimeout(function() { checkDiagnosis();}, 1000);
-
-
-        });
-    </script>
 {%- endmacro %}
 
 {% macro profileInterventionReports(person) -%}
@@ -1637,19 +1143,6 @@
     </div>
     <div class="timezone-warning"></div>
     <div class="timezone-error"></div>
-    <script>
-    {% if person %}
-    $(function() {
-        getSaveLoaderDiv("profileForm", "profileTimeZoneGroup");
-        $('#profileTimeZone').on('change', function() {
-            $(".timezone-error").html("");
-            $(".timezone-warning").html("");
-            assembleContent.demo({{ person.id }},true, $(this), true);
-            fillViews.timezone();
-        });
-    });
-    {% endif %}
-    </script>
 {%-endmacro %}
 
 {% macro profileDeceased(person, current_user) -%}
@@ -1712,47 +1205,6 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(
-            function() {
-                __convertToNumericField($("#deathDay, #deathYear"));
-                getSaveLoaderDiv("profileForm", "boolDeathGroup");
-                $("#boolDeath").on("change", function() {
-                    if (!($(this).is(":checked"))) {
-                        $("#deathYear").val("");
-                        $("#deathDay").val("");
-                        $("#deathMonth").val("");
-                        $("#deathDate").val("");
-                    }
-                    assembleContent.demo({{person.id}}, true, $(this));
-                });
-
-                ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
-                    getSaveLoaderDiv("profileForm", $("#"+fn).attr("data-save-container-id"));
-                    var fd = $("#" + fn);
-                    var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
-                    fd.on(triggerEvent, function() {
-                         var d = $("#deathDay");
-                         var m = $("#deathMonth");
-                         var y = $("#deathYear");
-                         if (d.val() != "" && m.val() != "" && y.val() != "") {
-                            if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
-                                var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
-                                if (errorMsg === "") {
-                                    $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
-                                    $("#boolDeath").prop("checked", true);
-                                    $("#errorDeathDate").text("");
-                                    assembleContent.demo({{person.id}}, true, $(this));
-                                } else {
-                                    $("#errorDeathDate").text(errorMsg);
-                                };
-                            };
-                        };
-                    });
-                });
-            }
-        );
-    </script>
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
@@ -1925,7 +1377,7 @@
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
-            handleLoginAs(e);
+            profileObj.handleLoginAs(e);
         });
         //fix for safari
         $(window).on("beforeunload", function() {
@@ -2126,7 +1578,6 @@
           });
 
         {%- if person -%}
-
             tnthAjax.assessmentStatus({{person.id}}, function(data) {
                 if (!data.error) {
                     if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
@@ -2158,319 +1609,6 @@
             </div>
     </div>
 {%- endmacro %}
-
-{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
-     <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="demo">
-                <h4 id="patientInformationLoc" class="profile-item-title index-item">{{_("My Information") }}</h4>
-                <div class="view-container">
-                   <table>
-                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
-                   </table>
-                </div>
-                <div class="edit-container">
-                    {{profileName(person)}}
-                    {{profileBirthDate(person)}}
-                    {{profileEmail(person)}}
-                    {{profilePhone(person)}}
-                    {{profileAltPhone(person)}}
-                </div>
-                <div class="get-demo-error error-message"></div>
-                <div class="put-demo-error error-message"></div>
-            </div>
-        </div>
-    </div>
-    {% if person and person.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container patient-detail-container editable" data-sections="detail">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{{ _("My Detail") }}</h4>
-                    <div class="view-container">
-                        <table>
-                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr id="ethnicityViewRow" data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr id="raceViewRow" data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr id="indigenousViewRow" data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
-                       </table>
-                    </div>
-                    <div class="flex edit-container">
-                        {{profileGender(person)|show_macro('gender')}}
-                        {{profileEthnicity(person)|show_macro('ethnicity')}}
-                        {{profileRace(person)|show_macro('race')}}
-                        {{profileIndigenous(person)|show_macro('indigenous')}}
-                    </div>
-                    <div class="no-data-container"></div>
-                    <div class="get-demo-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-            </div>
-        </div>
-        <div class="row" id="profileSessionListMainContainer">
-            <div class="col-md-12 col-xs-12">
-                <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("My Questionnaires") }}</h4>
-                    {{profileSessionList(person, current_user)}}
-                </div>
-            </div>
-        </div>
-        {%- if person and person.has_role(ROLE.PATIENT) %}
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <div class="profile-item-container">
-                        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
-                        {{patientReports(person)}}
-                    </div>
-                </div>
-            </div>
-        {%- endif %}
-        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
-        {{profileProcedures(person, current_user) | show_macro('procedures')}}
-        {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <div class="profile-item-container editable" data-sections="org">
-                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
-                         {{profileOrgsSelector(person, current_user, consent_agreements)}}
-                    </div>
-                </div>
-            </div>
-        {%-else-%}
-             <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <div class="profile-item-container {% if person and person.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
-                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
-                        {{profileOrg(person,None,consent_agreements, current_user)}}
-                    </div>
-                </div>
-            </div>
-        {%-endif-%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
-                    {{profileConsent(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container {% if person and person.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
-                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
-                    {{profileOrg(person,None,consent_agreements, current_user)}}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-     <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div  class="profile-item-container editable" data-sections="locale, timezone">
-                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("My Locale / Time Zone")}}</h4>
-                <div class="view-container">
-                    <table>
-                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
-                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
-                    </table>
-                    <div class="get-demo-error get-locale-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-                <div class="edit-container flex">
-                    {{profileLocale(person)|show_macro('language')}}
-                    {{profileTimeZone(person)}}
-                </div>
-            </div>
-        </div>
-    </div>
-    {% if person and person.has_role(ROLE.ADMIN) and not person.has_role(ROLE.SERVICE) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("My Roles") }}</h4>
-                    {{profileRole(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{%- endmacro %}
-
-{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
-    <!-- remember to add xs class to side when custom content is present -->
-    {%- if config.CUSTOM_PATIENT_DETAIL -%}
-        {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
-            {{ profileCustomDetail(person) }}
-        {%- endif -%}
-    {%- endif -%}
-    {% if person and person.has_role(ROLE.PATIENT) -%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
-            </div>
-        </div>
-    {%- endif %}
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="demo">
-                <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                <div class="view-container">
-                   <table>
-                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
-                        {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
-                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
-                   </table>
-
-                </div>
-                <div class="edit-container">
-                    {{profileName(person)}}
-                    {{profileBirthDate(person)}}
-                    {{profileEmail(person)}}
-                    {% if person.has_role('patient') %} {{profileStudyID(current_user)}} {% endif %}
-                    {% if person.has_role('patient') %} {{profileSiteID(current_user)}} {% endif %}
-                    {{profilePhone(person)}}
-                    {{profileAltPhone(person)}}
-                </div>
-                <div class="get-demo-error error-message"></div>
-                <div class="put-demo-error error-message"></div>
-            </div>
-        </div>
-    </div>
-    {%-if person and person.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container patient-detail-container editable" data-sections="detail">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
-                    <div class="view-container">
-                         <table>
-                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
-                       </table>
-                    </div>
-                    <div class="flex edit-container">
-                        {{profileGender(person)|show_macro('gender')}}
-                        {{profileEthnicity(person)|show_macro('ethnicity')}}
-                        {{profileRace(person)|show_macro('race')}}
-                        {{profileIndigenous(person)|show_macro('indigenous')}}
-                    </div>
-                    <div class="no-data-container"></div>
-                    <div class="get-demo-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-
-    {{profileCommunications(person, current_user)}}
-
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
-                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
-                {{profileOrg(person,None,consent_agreements, current_user)}}
-            </div>
-        </div>
-    </div>
-    {%- if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-
-    {%- if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
-        {{profileInterventions(user_interventions) | show_macro('interventions')}}
-    {%- endif %}
-
-    {%- if person and person.has_role(ROLE.PATIENT)%}
-        <div class="row" id="profileSessionListMainContainer">
-            <div class="col-md-12 col-xs-12">
-                <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{% if current_user and current_user.has_role(ROLE.PATIENT) %}{{ _("My Questionnaires") }}{% else %}{{ _("PRO Questionnaires") }}{% endif %}</h4>
-                    {{profileSessionList(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-
-    {%- if person and person.has_role(ROLE.PATIENT) %}
-        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
-    {%- endif %}
-
-    {%- if person and person.has_role(ROLE.PATIENT) %}
-        {{profileProcedures(person, current_user) | show_macro('procedures')}}
-    {%- endif %}
-
-    {%- if person and person.has_role(ROLE.PATIENT) %}
-        {{profileInterventionReports(person) | show_macro('intervention_reports')}}
-    {%- endif %}
-
-    {%- if (person and current_user) and person.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
-                    {{patientReports(person)}}
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-    {%- if (person and current_user) and person.has_role(ROLE.PATIENT) %}
-        {{profileDeceased(person, current_user)}}
-    {%- endif %}
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div  class="profile-item-container editable" data-sections="locale,timezone">
-                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("Locale / Time Zone")}}</h4>
-                <div class="view-container">
-                    <table>
-                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
-                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
-                    </table>
-                    <div class="get-demo-error get-locale-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-                <div class="edit-container flex">
-                    {{profileLocale(person)|show_macro('language')}}
-                    {{profileTimeZone(person)}}
-                </div>
-            </div>
-        </div>
-    </div>
-    {%- if (person and current_user) and current_user.has_role(ROLE.ADMIN) and not person.has_role(ROLE.SERVICE) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("User Roles") }}</h4>{{profileRole(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-
-    {%- if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="auditLogLoc" class="profile-item-title index-item">{{ _("Audit Log") }}</h4>
-                    {{profileAuditLog(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {%- endif %}
-{%- endmacro %}
-
 {% macro profileProcedures(person, current_user) -%}
     {% set top_org = current_user.first_top_organization() if current_user else False %}
     <div class="row">
@@ -2557,16 +1695,6 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function(){
-            tnthAjax.treatmentOptions("{{person.id if person}}",null, function(data) {
-                if (!data.error) {
-                    fillContent.treatmentOptions(data);
-                };
-            });
-            {% if person %} tnthAjax.getProc('{{person.id}}', false); {% endif %}
-        });
-    </script>
 {%- endmacro %}
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>{{ _("You have updated your profile. Click the Save button to submit your changes.") }} {{ _("Or") }} <a href="">{{ _("cancel") }}</a>.</small></p>

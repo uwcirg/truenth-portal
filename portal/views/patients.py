@@ -171,9 +171,8 @@ def patient_profile(patient_id):
             user_interventions.append({"name": intervention.name})
 
     return render_template(
-        'profile.html', user=patient,
+        'patient_profile.html', user=patient,
         current_user=user,
-        providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
 

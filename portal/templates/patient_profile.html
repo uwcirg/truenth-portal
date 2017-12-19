@@ -1,0 +1,187 @@
+{%- extends "profile_base.html" -%}
+{%- import "profile_macros.html" as profile_macro -%}
+{% block profile_title %}
+  {{ _("Patient Profile") }} -
+  {%- if user.first_name and user.last_name -%}
+    &nbsp;{{user.first_name}} {{user.last_name}}
+  {%- elif user.first_name -%}
+    &nbsp;{{user.first_name}}
+  {%- elif user.last_name -%}
+    &nbsp;{{user.last_name}}
+  {%- elif user.email -%}
+    &nbsp;{{ user.email }}
+  {%- else -%}
+    &nbsp;#{{ user.id}}
+  {%-endif-%}
+{% endblock %}
+{% block profile_content %}
+  <nav id="indexNavBar">
+    <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Log in as this patient") }}</a></span>
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="loginAsModalLabel">{{ _("Log in as this patient") }}</h4>
+            </div>
+            <div class="modal-body">
+              <br/>
+              <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
+              <br/>
+            </div>
+            <div class="modal-footer">
+              <button onclick="profileObj.handleLoginAs(event);" type="button" class="btn btn-default">{{ _("OK") }}</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+            </div>
+          </div>
+        </div>
+    </div>
+  </nav>
+  {%- if config.CUSTOM_PATIENT_DETAIL -%}
+    {{ profile_macro.profileCustomDetail(user) }}
+  {%- endif -%}
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="profile-item-container editable" data-sections="demo">
+            <h4 id="patientInformationLoc" class="profile-item-title index-item">{{_("Patient Information")}}</h4>
+            <div class="view-container">
+               <table>
+                  <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                  <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                  <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                  <tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>
+                  <tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>
+                  <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                  <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
+               </table>
+            </div>
+            <div class="edit-container">
+                {{profile_macro.profileName(user)}}
+                {{profile_macro.profileBirthDate(user)}}
+                {{profile_macro.profileEmail(user)}}
+                {{profile_macro.profileStudyID(current_user)}}
+                {{profile_macro.profileSiteID(current_user)}}
+                {{profile_macro.profilePhone(user)}}
+                {{profile_macro.profileAltPhone(user)}}
+            </div>
+            <div class="get-demo-error error-message"></div>
+            <div class="put-demo-error error-message"></div>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="profile-item-container patient-detail-container editable" data-sections="detail">
+          <h4 id="patientDetailLoc" class="profile-item-title index-item">{{_("Patient Detail")}}</h4>
+          <div class="view-container">
+            <table>
+              <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+              <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+              <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+              <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+             </table>
+          </div>
+          <div class="flex edit-container">
+              {{profile_macro.profileGender(user)|show_macro('gender')}}
+              {{profile_macro.profileEthnicity(user)|show_macro('ethnicity')}}
+              {{profile_macro.profileRace(user)|show_macro('race')}}
+              {{profile_macro.profileIndigenous(user)|show_macro('indigenous')}}
+          </div>
+          <div class="no-data-container"></div>
+          <div class="get-demo-error error-message"></div>
+          <div class="put-demo-error error-message"></div>
+      </div>
+    </div>
+  </div>
+  {{profile_macro.profileCommunications(user, current_user)}}
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (user and user.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
+        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
+        {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="profile-item-container">
+        <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+        {{profile_macro.profileConsent(user, current_user)}}
+      </div>
+    </div>
+  </div>
+  {%- if current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
+      {{profile_macro.profileInterventions(user_interventions) | show_macro('interventions')}}
+  {%- endif %}
+  <div class="row" id="profileSessionListMainContainer">
+      <div class="col-md-12 col-xs-12">
+        <div class="profile-item-container">
+             <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("PRO Questionnaires") }}</h4>
+            {{profile_macro.profileSessionList(user, current_user)}}
+        </div>
+      </div>
+  </div>
+
+  {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
+
+  {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
+
+  {{profile_macro.profileInterventionReports(user) | show_macro('intervention_reports')}}
+
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="profile-item-container">
+        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
+        {{profile_macro.patientReports(user)}}
+      </div>
+    </div>
+  </div>
+  {{profile_macro.profileDeceased(user, current_user)}}
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div  class="profile-item-container editable" data-sections="locale,timezone">
+        <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("Locale / Time Zone")}}</h4>
+        <div class="view-container">
+            <table>
+                <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
+                <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
+            </table>
+            <div class="get-demo-error get-locale-error error-message"></div>
+            <div class="put-demo-error error-message"></div>
+        </div>
+        <div class="edit-container flex">
+            {{profile_macro.profileLocale(user)|show_macro('language')}}
+            {{profile_macro.profileTimeZone(user)}}
+        </div>
+      </div>
+    </div>
+  </div>
+  {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN) and not user.has_role(ROLE.SERVICE) %}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container">
+                 <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("User Roles") }}</h4>
+                 {{profile_macro.profileRole(user, current_user)}}
+            </div>
+        </div>
+    </div>
+  {%- endif %}
+  {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
+      <div class="row">
+          <div class="col-md-12 col-xs-12">
+              <div class="profile-item-container">
+                  <h4 id="auditLogLoc" class="profile-item-title index-item">{{ _("Audit Log") }}</h4>
+                  {{profile_macro.profileAuditLog(user, current_user)}}
+              </div>
+          </div>
+      </div>
+  {%- endif %}
+{% endblock %}
+{% block document_ready %}
+  {{super()}}
+{% endblock %}

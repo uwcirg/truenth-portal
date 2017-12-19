@@ -99,6 +99,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.min.js" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 <script src="https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js"></script>
+<script src="{{ url_for('static', filename='js/utility.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
 {%block table_export_filter_script %}
@@ -134,13 +135,13 @@ var __CRSF_TOKEN_HEADER = {
     "X-CSRFToken": __CRSF_TOKEN
 };
  __i18next.init({
-  "debug": false, 
+  "debug": false,
   "initImmediate": false,
   "ns": ["translation", "custom"]
   });
 
 $("#homeFooter .logo-link").each(function() {
-  if (! hasValue($.trim($(this).attr("href")))) {
+  if (! $.trim($(this).attr("href"))) {
       $(this).removeAttr("target");
       $(this).on("click", function(e) {
         e.preventDefault();
@@ -148,6 +149,7 @@ $("#homeFooter .logo-link").each(function() {
       });
   };
 });
+
 {% block document_ready -%}
 {%- endblock %}
 </script>
