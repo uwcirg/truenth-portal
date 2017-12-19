@@ -530,20 +530,30 @@ class User(db.Model, UserMixin):
     def locale_display_options(self):
         """Collates all the locale options from the user's orgs
         to establish which should be visible to the user"""
-        locale_options = set()
+
+        def locale_name_from_code(locale_code):
+            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=locale_code).first()
+            return coding.display
+
+        locale_options = {}
         if self.locale_code:
-            locale_options.add(self.locale_code)
+            locale_options[self.locale_code] = self.locale_name
         for org in self.organizations:
             for locale in org.locales:
-                locale_options.add(locale.code)
-            if org.default_locale:
-                locale_options.add(org.default_locale)
+                locale_options[locale.code] = locale.display
+            if org.default_locale and org.default_locale not in locale_options:
+                locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
             while org.partOf_id:
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
-                    locale_options.add(locale.code)
-                if org.default_locale:
-                    locale_options.add(org.default_locale)
+                    locale_options[locale.code] = locale.display
+                if org.default_locale and org.default_locale not in locale_options:
+                    locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
+
+        default_locale = current_app.config.get('DEFAULT_LOCALE')
+        if default_locale and default_locale not in locale_options:
+            locale_options[default_locale] = locale_name_from_code(default_locale)
+
         return locale_options
 
     def add_organization(self, organization_name):
