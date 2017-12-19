@@ -1,4 +1,5 @@
 """Module for additional dictionary tools/utilities"""
+import numbers
 
 
 def dict_compare(d1, d2):
@@ -48,3 +49,29 @@ def dict_match(newd, oldd, diff_stream):
                         {k:oldd.get(k)},{k:newd.get(k)}))
         return False
 
+
+def strip_empties(d):
+    """Returns a like data structure without empty values
+
+    All empty values including empty lists, empty strings and
+    empty dictionaries and their associated keys are removed at
+    any nesting level.
+
+    The boolean value False and numeric values of 0 are exceptions
+    to the default python `if value` check - both are retained.
+
+    """
+    def has_value(value):
+        """Need to retain 'False' booleans and numeric 0 values"""
+        if isinstance(value, (bool, numbers.Number)):
+            return True
+        return value
+
+    if not isinstance(d, (dict, list)):
+        return d
+
+    if isinstance(d, list):
+        return [v for v in (strip_empties(v) for v in d) if has_value(v)]
+
+    return {k: v for k, v in (
+        (k, strip_empties(v)) for k, v in d.items()) if has_value(v)}
