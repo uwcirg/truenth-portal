@@ -1038,7 +1038,9 @@ var fillContent = {
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["ethnicity"]) {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["ethnicity"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 //console.log(item)
                 item.valueCodeableConcept.coding.forEach(function(val){
                     $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
@@ -1054,7 +1056,10 @@ var fillContent = {
     "race": function(data) {
         // Get Races
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["race"]) {
+            if (
+                item.url === SYSTEM_IDENTIFIER_ENUM["race"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
@@ -1073,7 +1078,9 @@ var fillContent = {
     },
     "indigenous": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["indigenous"]) {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["indigenous"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userIndigenousStatus input[type='radio'][value="+val.code+"]").prop('checked', true);
