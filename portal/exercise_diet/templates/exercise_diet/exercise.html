@@ -3,10 +3,11 @@
 <main class="main">
     {{ super() }}
 
-    {% for asset in assets %}
-        {{ asset|safe }}
-    {% endfor %}
-
+    <div class="module-assets">
+        {% for asset in assets %}
+            {{ asset|safe }}
+        {% endfor %}
+    </div>
         {% for id, content in modals.iteritems() %}
         <!-- Modal -->
         <div class="modal fade" id={{ id }} aria-hidden="true">
@@ -30,7 +31,7 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>

@@ -2,10 +2,10 @@
 {% block main %}
 <main class="main">
     {{ super() }}
-
-    {% for asset in assets %}
-        {{ asset|safe }}
-    {% endfor %}
-
+    <div class="module-assets">
+        {% for asset in assets %}
+            {{ asset|safe }}
+        {% endfor %}
+    </div>
 </main>
 {% endblock %}

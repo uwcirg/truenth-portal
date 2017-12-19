@@ -8,7 +8,7 @@ function show_diet(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
     });
-
+    console.log("WTF??")
     $('#'+current_item).modal('hide');
     $('#'+new_item).modal('show');
 }

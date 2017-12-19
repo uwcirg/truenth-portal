@@ -1,24 +1,28 @@
 {% extends "exercise_diet/base.html" %}
 {% block main %}
-<main class="main">
-    {{ super() }}
-
-    {% for asset in assets %}
-        {{ asset|safe }}
-    {% endfor %}
-
+    <main class="main">
+        {{ super() }}
+        <div class="module-assets">
+            {% for asset in assets %}
+                {{ asset|safe }}
+            {% endfor %}
+        </div>
+    </main>
+{% endblock %}
+{% block modal %}
+    {{super()}}
     {% for id, content in modals.iteritems() %}
         <!-- Modal -->
-        <div class="modal fade" id={{ id }} aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="{{ id }}" role="dialog" tabindex="-1" aria-labelledby="{{id}}Label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
-					
-					<div class="modal-body">
+
+                    <div class="modal-body">
                         <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>
                         {{ content[2]|safe }}
                     </div>
                     {% if content[1] > 0 %}
-                    
+
                     <div class="modal-nav">
                         {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
                         <span class="left-button">
@@ -32,7 +36,7 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>
@@ -42,5 +46,4 @@
             </div>
         </div>
     {% endfor %}
-</main>
 {% endblock %}
