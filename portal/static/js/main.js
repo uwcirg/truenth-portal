@@ -2119,7 +2119,7 @@ OrgTool.prototype.populateUI = function() {
     });
 
     /*
-     * draw child orgs 
+     * draw child orgs
      */
     keys.forEach(function(org) {
         // Fill in each child clinic
