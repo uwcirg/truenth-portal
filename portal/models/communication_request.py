@@ -112,10 +112,16 @@ class CommunicationRequest(db.Model):
 
     def update_from_fhir(self, data):
         if 'identifier' in data:
+            # track current identifiers - must remove any not requested
+            remove_if_not_requested = [i for i in self.identifiers]
             for id in data['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
+                else:
+                    remove_if_not_requested.remove(identifier)
+            for obsolete in remove_if_not_requested:
+                self.identifiers.remove(obsolete)
         self.status = data['status']
         self.notify_post_qb_start = data['notify_post_qb_start']
         RelativeDelta.validate(self.notify_post_qb_start)
