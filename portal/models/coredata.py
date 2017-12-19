@@ -372,7 +372,7 @@ class TOU_core(CoredataPoint):
 
     def hasdata(self, user, **kwargs):
         return ToU.query.join(Audit).filter(
-            Audit.user_id == user.id,
+            Audit.subject_id == user.id,
             ToU.type == self.tou_type,
             ToU.active.is_(True)).count() > 0
 

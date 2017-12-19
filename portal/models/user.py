@@ -137,7 +137,7 @@ def permanently_delete_user(
         UserRelationship.query.filter(
             or_(UserRelationship.user_id == user.id,
                 UserRelationship.other_user_id == user.id)).delete()
-        tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
+        tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
 
@@ -897,7 +897,7 @@ class User(db.Model, UserMixin):
         from .tou import ToU
 
         for tou in ToU.query.join(Audit).filter(and_(
-                Audit.user_id == self.id,
+                Audit.subject_id == self.id,
                 ToU.active.is_(True))):
             if not types or (tou.type in types):
                 tou.active = False

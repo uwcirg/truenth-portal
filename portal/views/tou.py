@@ -95,7 +95,7 @@ def get_tou(user_id):
     current_user().check_role(permission='view', other_id=user_id)
 
     tous = ToU.query.join(Audit).filter(
-        and_(Audit.user_id == user_id,
+        and_(Audit.subject_id == user_id,
              ToU.active.is_(True)))
 
     return jsonify(tous=[d.as_json() for d in tous])
@@ -167,7 +167,7 @@ def get_tou_by_type(user_id, tou_type):
 
     try:
         tou = ToU.query.join(Audit).filter(and_(
-            Audit.user_id == user_id,
+            Audit.subject_id == user_id,
             ToU.type == tou_type,
             ToU.active.is_(True))).first()
     except DataError:
