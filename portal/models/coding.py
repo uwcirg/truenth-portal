@@ -33,10 +33,6 @@ class Coding(db.Model):
         """Return self in JSON FHIR formatted string"""
         d = {}
         d['resourceType'] = 'Coding'
-        if not (self.system and self.code):
-            current_app.logger.error(
-                "Ill defined coding {} - requires system and code".format(
-                    self))
 
         for i in ("system", "code", "display"):
             if getattr(self, i) is not None:
