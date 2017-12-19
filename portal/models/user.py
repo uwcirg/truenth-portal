@@ -18,7 +18,7 @@ import time
 from .audit import Audit
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from ..dict_tools import dict_match
+from ..dict_tools import dict_match, strip_empties
 from .encounter import Encounter
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
@@ -764,7 +764,14 @@ class User(db.Model, UserMixin):
             fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
+        """Return JSON representation of user
+
+        :param include_empties: if True, returns entire object definition;
+            if False, empty elements are removed from the result
+        :return: JSON representation of a FHIR Patient resource
+
+        """
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
@@ -790,18 +797,14 @@ class User(db.Model, UserMixin):
         d['resourceType'] = "Patient"
         d['identifier'] = [id.as_fhir() for id in self.identifiers]
         d['name'] = {}
-        if self.first_name:
-            d['name']['given'] = self.first_name
-        if self.last_name:
-            d['name']['family'] = self.last_name
-        if self.birthdate:
-            d['birthDate'] = as_fhir(self.birthdate)
+        d['name']['given'] = self.first_name
+        d['name']['family'] = self.last_name
+        d['birthDate'] = as_fhir(self.birthdate) if self.birthdate else None
         d.update(deceased())
-        if self.gender:
-            d['gender'] = self.gender
+        d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
-        if self._locale:
-            d['communication'] = [{"language": self._locale.as_fhir()}]
+        d['communication'] = (
+            [{"language": self._locale.as_fhir()}] if self._locale else None)
         telecom = Telecom(email=self.email,
                           contact_points=[self._phone, self._alt_phone])
         d['telecom'] = telecom.as_fhir()
@@ -811,14 +814,16 @@ class User(db.Model, UserMixin):
         extensions = []
         for kls in user_extension_classes:
             instance = user_extension_map(self, {'url': kls.extension_url})
-            data = instance.as_fhir()
+            data = instance.as_fhir(include_empties)
             if data:
                 extensions.append(data)
-        if extensions:
-            d['extension'] = extensions
+        d['extension'] = extensions
         d['careProvider'] = careProviders()
-        if self.deleted_id:
-            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
+        d['deleted'] = (
+            FHIR_datetime.as_fhir(self.deleted.timestamp)
+            if self.deleted_id else None)
+        if not include_empties:
+            return strip_empties(d)
         return d
 
     def update_consents(self, consent_list, acting_user):

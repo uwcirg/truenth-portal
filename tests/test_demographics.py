@@ -30,6 +30,9 @@ class TestDemographics(TestCase):
         self.assertEquals('UTC', tz[0]['timezone'])
         self.assertEquals(False, fhir['deceasedBoolean'])
 
+        # confirm empties aren't present in extension; i.e. only 'url' key
+        self.assertFalse([e for e in fhir['extension'] if len(e.keys()) == 1])
+
     def test_demographics404(self):
         self.login()
         self.promote_user(role_name=ROLE.ADMIN)

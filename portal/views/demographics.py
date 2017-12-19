@@ -34,6 +34,10 @@ def demographics(patient_id):
     FHIR patient resource type.  This API has no effect on the user's roles.
     Use the /api/roles endpoints for that purpose.
 
+    NB - all `empty` values are stripped from the return data.  For example,
+    if a user doesn't have a `first_name`, the ['name']['given'] field will
+    not be present in the return structure.
+
     ---
     tags:
       - Demographics
@@ -69,7 +73,7 @@ def demographics(patient_id):
         abort(404, "Patient {} not found!".format(patient_id))
     if patient.deleted:
         abort(400, "deleted user - operation not permitted")
-    return jsonify(patient.as_fhir())
+    return jsonify(patient.as_fhir(include_empties=False))
 
 
 @demographics_api.route('/demographics/<int:patient_id>', methods=('PUT',))

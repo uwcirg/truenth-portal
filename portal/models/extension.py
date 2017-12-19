@@ -11,7 +11,7 @@ class Extension:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
         pass
 
     @abstractmethod
@@ -27,15 +27,17 @@ class CCExtension(Extension):
     def children(self):  # pragma: no cover
         pass
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
         if self.children.count():
             return {
                 'url': self.extension_url,
                 'valueCodeableConcept': {
                     'coding': [c.as_fhir() for c in self.children]}
             }
-        # Return valid empty if none are currently defined.
-        return {'url': self.extension_url}
+        # Return valid empty if none are currently defined and requested
+        if include_empties:
+            return {'url': self.extension_url}
+        return None
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
@@ -65,7 +67,7 @@ class TimezoneExtension(CCExtension):
     extension_url =\
         "http://hl7.org/fhir/StructureDefinition/user-timezone"
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
         timezone = self.source.timezone
         if not timezone or timezone == 'None':
             timezone = 'UTC'
