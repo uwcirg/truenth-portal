@@ -6,11 +6,13 @@ def test_shallow_empty():
     expected = {k: v for k, v in d.items() if v}
     assert expected == strip_empties(d)
 
+
 def test_nested_empty_dict():
     d = {'one': 1, 'two': {'nested one': 1, 'empty list': [
         {'empty key': None}]}}
     expected = {'one': 1, 'two': {'nested one': 1}}
     assert expected == strip_empties(d)
+
 
 def test_false_values():
     # need to retain boolean False, as it's not "empty"
