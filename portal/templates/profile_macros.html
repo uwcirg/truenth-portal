@@ -731,10 +731,10 @@
                                         $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
                                         states[__state] = [item.id];
                                     } else {
-                                        if ($("#stateSelector option[value='" + __state + "']").length === 0) {
-                                            $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                        };
                                         (states[__state]).push(item.id);
+                                    };
+                                    if ($("#stateSelector option[value='" + __state + "']").length === 0) {
+                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
                                     };
                                     /*
                                     * assign state for each item
@@ -1472,7 +1472,7 @@
                    </table>
                 </div>
                 <div id="patientQContainer" class="edit-container">
-                    {{patientQGroup(current_user)}}
+                    {{patientQGroup(person)}}
                 </div>
                 <div class="get-clinical-error error-message"></div>
                 <div class="put-clinical-error error-message"></div>
