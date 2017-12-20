@@ -101,7 +101,7 @@ waitress==1.1.0
 wcwidth==0.1.7
 WebOb==1.7.3
 WebTest==2.0.29
-Werkzeug==0.12.2
+Werkzeug==0.13
 WTForms==2.1
 xvfbwrapper==0.2.9
 -e .
