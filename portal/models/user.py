@@ -137,7 +137,7 @@ def permanently_delete_user(
         UserRelationship.query.filter(
             or_(UserRelationship.user_id == user.id,
                 UserRelationship.other_user_id == user.id)).delete()
-        tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
+        tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
 
@@ -880,6 +880,36 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='consent')
             replaced.status = "deleted"
             db.session.add(replaced)
+        db.session.commit()
+
+    def deactivate_tous(self, acting_user, types=None):
+        """ Mark user's current active ToU agreements as inactive
+
+        Marks the user's current active ToU agreements as inactive.
+        User must agree to ToUs again upon next login (per CoreData logic).
+        If types provided, only deactivates agreements of that ToU type.
+        Called when the ToU agreement language is updated.
+
+        :param acting_user: user behind the request for permission checks
+        :param types: ToU types for which to invalide agreements (optional)
+
+        """
+        from .tou import ToU
+
+        for tou in ToU.query.join(Audit).filter(and_(
+                Audit.subject_id == self.id,
+                ToU.active.is_(True))):
+            if not types or (tou.type in types):
+                tou.active = False
+                audit = Audit(
+                    user_id=acting_user.id,
+                    subject_id=self.id,
+                    comment=("ToU agreement {} marked as "
+                             "inactive".format(tou.id)),
+                    context='tou',
+                    timestamp=datetime.utcnow())
+                db.session.add(tou)
+                db.session.add(audit)
         db.session.commit()
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):

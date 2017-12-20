@@ -101,3 +101,34 @@ class TestTou(TestCase):
         self.assertEquals(rv.json['accepted'],
                           timestamp.strftime("%Y-%m-%dT%H:%M:%S"))
         self.assertEquals(rv.json['type'], 'privacy policy')
+
+    def test_deactivate_tous(self):
+        timestamp = datetime.utcnow()
+
+        pptou_audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+                            timestamp=timestamp)
+        pptou = ToU(audit=pptou_audit, agreement_url=tou_url,
+                    type='privacy policy')
+
+        wtou_audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        wtou = ToU(audit=wtou_audit, agreement_url=tou_url,
+                   type='website terms of use')
+
+        with SessionScope(db):
+            db.session.add(pptou)
+            db.session.add(wtou)
+            db.session.commit()
+        self.test_user, pptou, wtou = map(
+            db.session.merge, (self.test_user, pptou, wtou))
+
+        # confirm active
+        self.assertTrue(all((pptou.active, wtou.active)))
+
+        # test deactivating single type
+        self.test_user.deactivate_tous(self.test_user, ['privacy policy'])
+        self.assertFalse(pptou.active)
+        self.assertTrue(wtou.active)
+
+        # test deactivating all types
+        self.test_user.deactivate_tous(self.test_user)
+        self.assertFalse(all((pptou.active, wtou.active)))

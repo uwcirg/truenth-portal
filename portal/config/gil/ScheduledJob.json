@@ -39,6 +39,17 @@
       "resourceType": "ScheduledJob",
       "schedule": "48 * * * *",
       "task": "cache_reporting_stats"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["website terms of use"]
+      },
+      "name": "Deactivate website ToU agreements",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "deactivate_tous"
     }
   ],
   "id": "SitePersistence v0.2",
