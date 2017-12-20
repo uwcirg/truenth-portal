@@ -288,8 +288,8 @@ class Organization(db.Model):
         d['partOf'] = (
             Reference.organization(self.partOf_id).as_fhir() if
             self.partOf_id else None)
-        for attr in ('use_specific_codings','race_codings',
-                     'ethnicity_codings','indigenous_codings'):
+        for attr in ('use_specific_codings', 'race_codings',
+                     'ethnicity_codings', 'indigenous_codings'):
             if getattr(self, attr):
                 d[attr] = True
             else:
