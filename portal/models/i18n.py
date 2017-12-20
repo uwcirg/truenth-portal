@@ -228,7 +228,7 @@ def download_po_file(language, headers, project_id, uri, state):
         headers=headers,
         params={
             'retrievalType': state,
-            'fileUri': file_uri,
+            'fileUri': uri,
         },
     )
     if not resp.content:
@@ -238,7 +238,7 @@ def download_po_file(language, headers, project_id, uri, state):
     return resp.content
 
 
-def download_zip_file(headers, project_id, file_uri, state):
+def download_zip_file(headers, project_id, uri, state):
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
         project_id
     )
@@ -247,7 +247,7 @@ def download_zip_file(headers, project_id, file_uri, state):
         headers=headers,
         params={
             'retrievalType': state,
-            'fileUri': file_uri,
+            'fileUri': uri,
         },
     )
     if not resp.content:
