@@ -572,7 +572,7 @@ h2 a {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
     -webkit-transition: margin 200ms, padding 200ms;
-    transition: margin 200ms, padding: 200ms;
+    transition: margin 200ms, padding 200ms;
 }
 
 .collapse.in {
