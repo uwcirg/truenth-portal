@@ -573,8 +573,8 @@ h2 a {
 	border-top-right-radius: 0;
     -webkit-transition: margin 200ms, padding 200ms;
     transition: margin 200ms, padding: 200ms;
-
 }
+
 .collapse.in {
 	padding: 20px 20px 10px;
 	margin: 0px auto 10px;
