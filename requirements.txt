@@ -6,7 +6,7 @@ alabaster==0.7.10
 alembic==0.9.6
 amqp==2.2.2
 anyjson==0.3.3
-argcomplete==1.9.2
+argcomplete==1.9.3
 Authomatic==0.1.0.post1
 Babel==2.5.1
 backports.shutil-get-terminal-size==1.0.0
