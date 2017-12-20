@@ -423,9 +423,13 @@ class User(db.Model, UserMixin):
     @phone.setter
     def phone(self, val):
         if self._phone:
-            self._phone.value = val
-        else:
-            self._phone = ContactPoint(system='phone', use='mobile', value=val)
+            if val:
+                self._phone.value = val
+            else:
+                self._phone = None
+        elif val:
+            self._phone = ContactPoint(
+                system='phone', use='mobile', value=val)
 
     @property
     def alt_phone(self):
@@ -435,8 +439,11 @@ class User(db.Model, UserMixin):
     @alt_phone.setter
     def alt_phone(self, val):
         if self._alt_phone:
-            self._alt_phone.value = val
-        else:
+            if val:
+                self._alt_phone.value = val
+            else:
+                self._alt_phone = None
+        elif val:
             self._alt_phone = ContactPoint(
                 system='phone', use='home', value=val)
 
@@ -1055,29 +1062,28 @@ class User(db.Model, UserMixin):
                 fhir['name'].get('family')) or self.last_name
         if 'birthDate' in fhir:
             try:
-                fhir['birthDate'].strip()
+                bd = fhir['birthDate']
                 self.birthdate = datetime.strptime(
-                    fhir['birthDate'], '%Y-%m-%d')
+                    bd.strip(), '%Y-%m-%d') if bd else None
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
         update_deceased(fhir)
         update_identifiers(fhir)
-        if 'gender' in fhir and fhir['gender']:
-            self.gender = fhir['gender'].lower()
+        if 'gender' in fhir:
+            self.gender = fhir['gender'].lower() if fhir['gender'] else None
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
-            if not telecom.email:
-                abort(400, "no valid email address provided")
-            if ((telecom.email != self.email) and
-                    (User.query.filter_by(email=telecom.email).count() > 0)):
-                abort(400, "email address already in use")
-            self.email = telecom.email
+            if telecom.email:
+                if ((telecom.email != self.email) and
+                        (User.query.filter_by(email=telecom.email).count() > 0)):
+                    abort(400, "email address already in use")
+                self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'mobile')) \
                 or telecom_cps.get(('phone', None))
             self.alt_phone = telecom_cps.get(('phone', 'home'))
-        if 'communication' in fhir:
+        if fhir.get('communication'):
             for e in fhir['communication']:
                 if 'language' in e:
                     self._locale = CodeableConcept.from_fhir(e.get('language'))
@@ -1090,7 +1096,6 @@ class User(db.Model, UserMixin):
             org_list = [reference.Reference.parse(item) for item in
                         fhir['careProvider']]
             self.update_orgs(org_list, acting_user)
-        db.session.add(self)
 
     @classmethod
     def column_names(cls):
