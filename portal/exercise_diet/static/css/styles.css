@@ -1334,6 +1334,9 @@ h3 a:hover {
     border-radius: 0;
     text-align: right;
 }
+.box-modal.modal-content {
+    text-align: center;
+}
 .modal-body {
 	position: relative;
     border-radius: 0;
@@ -5104,7 +5107,10 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 
 :not(.is-scrolled) .theme--intro-light .logo {
     color: black;
-    background-image: url(../img/logo-base.png);
+    background-image: url(../../../../gil/static/img/logo-base.png);
+}
+.is-scrolled .header {
+    z-index: 12;
 }
 main .module-assets {
     overflow: auto;
@@ -5114,7 +5120,14 @@ h3.module__head {
     color: #FFF;
 }
 
+/*.modal-backdrop{
+    z-index: -1;
+    opacity: 0;
+}*/
 
+main [data-target] {
+    cursor: pointer;
+}
 #ED-Intro,
 #ED-Exercise,
 #ED-Diet {
@@ -5367,6 +5380,16 @@ table {
 
 .navbar-toggle {
     display: none;
+}
+
+.page-intro__content,
+.page-intro {
+    margin-top: -50px;
+    padding-top: 0;
+}
+
+.page-intro {
+    margin-top: -120px;
 }
 
 #mainNavbar > ul > li > a {
@@ -6045,6 +6068,14 @@ table {
 	max-width: 768px;
 }
 
+#ED-Exercise {
+    height: 150em;
+}
+
+#ED-Diet {
+    height: 175em;
+}
+
 #mainNavbar > ul > li > a {
     display: flex;
     color: #fff;
@@ -6121,6 +6152,11 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 10px;
+}
+
+#ED-Intro #Intro-content,
+#ED-Exercise #Intro-content {
+    padding: 0 2em;
 }
 
 }
