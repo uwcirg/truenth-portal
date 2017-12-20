@@ -172,20 +172,35 @@ def smartling_download(language=None):
     current_app.logger.debug("authenticated in smartling")
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
-    download_and_extract_po_file(language, 'messages', headers,
-                                 'portal/translations/messages.pot')
-    download_and_extract_po_file(language, 'frontend', headers,
-                                 'portal/translations/js/src/frontend.pot')
-
+    download_and_extract_po_file(
+        language=language,
+        fname='messages',
+        uri='portal/translations/messages.pot',
+        headers=headers,
+    )
+    download_and_extract_po_file(
+        language=language,
+        fname='frontend',
+        uri='portal/translations/js/src/frontend.pot',
+        headers=headers,
+    )
 
 def download_and_extract_po_file(language, fname, headers, uri):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if language:
-        response_content = download_po_file(language, headers,
-                                            project_id, uri)
+        response_content = download_po_file(
+            language=language,
+            project_id=project_id,
+            uri=uri,
+            headers=headers,
+        )
         extract_po_file(language, response_content, fname)
     else:
-        zfp = download_zip_file(headers, project_id, uri)
+        zfp = download_zip_file(
+            uri=uri,
+            project_id=project_id,
+            headers=headers,
+        )
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
             data = zfp.read(langfile)
