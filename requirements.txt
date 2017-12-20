@@ -67,7 +67,7 @@ prompt-toolkit==1.0.15
 psycopg2==2.7.3.2
 ptpython==0.41
 ptyprocess==0.5.2
-py==1.4.34
+py==1.5.2
 pycparser==2.18
 pycrypto==2.6.1
 pyflakes==1.6.0
