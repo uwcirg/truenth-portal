@@ -8,6 +8,9 @@ function show_diet(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
     });
+    $('#'+new_item).on('hide.bs.modal', function(e) {
+        $('body').removeClass('modal-open');
+    });
     $('#'+current_item).modal('hide');
     $('#'+new_item).modal('show');
 }
@@ -37,19 +40,22 @@ $(function(){
     $('[data-toggle=modal]').on('click touchend', function(e) {
       var target;
       e.preventDefault();
+      e.stopPropagation();
       target = $(this).attr('data-target');
-      __loader(true);
+      $(target).appendTo('body');
       return setTimeout(function() {
-        $(target).appendTo('body').modal('show');
-        __loader();
-      }, 500);
+        $(target).modal('show');
+      }, 150);
     });
-
 });
 
 function show_exercise(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
+    });
+
+    $('#'+new_item).on('hide.bs.modal', function(e) {
+        $('body').removeClass('modal-open');
     });
 
     $('#'+current_item).modal('hide');

@@ -571,6 +571,8 @@ h2 a {
 	border-bottom-right-radius: 3px;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+    -webkit-transition: margin 200ms, padding 200ms;
+    transition: margin 200ms, padding: 200ms;
 
 }
 .collapse.in {
@@ -5109,9 +5111,9 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
     color: black;
     background-image: url(../../../../gil/static/img/logo-base.png);
 }
-.is-scrolled .header {
+/*.is-scrolled .header {
     z-index: 12;
-}
+}*/
 main .module-assets {
     overflow: auto;
 }
@@ -5181,6 +5183,10 @@ main [data-target] {
 	max-width: 768px;
 }
 
+.page-intro__content {
+    padding-top: 170px;
+}
+
 #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
@@ -5225,6 +5231,10 @@ main [data-target] {
 
 .navbar-toggle {
     display: none;
+}
+
+main .module-assets {
+    margin-top: -2em;
 }
 
 #mainNavbar > ul > li > a {
@@ -6121,6 +6131,7 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 10px;
+    word-break: break-word;
 }
 
 #Resources h3 {
@@ -6152,11 +6163,6 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 10px;
-}
-
-#ED-Intro #Intro-content,
-#ED-Exercise #Intro-content {
-    padding: 0 2em;
 }
 
 }
@@ -6196,6 +6202,15 @@ table {
 	margin: 0 auto;
 	padding: 0;
 	max-width: 768px;
+}
+
+#ED-Intro #Intro-content,
+#ED-Exercise #Intro-content {
+    padding: 0 1em;
+}
+
+#ED-Diet {
+    padding: 0 1em;
 }
 
 #mainNavbar > ul > li > a {
