@@ -187,6 +187,7 @@ def smartling_download(state, language=None):
         headers=headers,
     )
 
+
 def download_and_extract_po_file(language, fname, headers, uri, state):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if language:
