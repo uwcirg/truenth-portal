@@ -186,4 +186,5 @@ def translation_download(language, state):
     if app.config['SYSTEM_TYPE'].lower() == 'production':
         default_state = 'published'
     state = state or default_state
+    click.echo('Downloading {state} translations from Smartling'.format(state=state))
     smartling_download(state=state, language=language)
