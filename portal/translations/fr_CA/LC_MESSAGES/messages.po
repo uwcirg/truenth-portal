@@ -5403,3 +5403,791 @@ msgstr ""
 "href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH"
 " ePROMs any time.</p><p>If you have any queries, please contact your "
 "representative at (clinic name).</p></body></html>"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L30
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/contact.html#L57
+msgid "Enquiry Type"
+msgstr "Enquiry Type"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L35
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/contact.html#L62
+msgid "Not sure"
+msgstr "Not sure"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/diet.html#L36
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/exercise.html#L34
+msgid ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>\n"
+"                        "
+msgstr ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>\n"
+"                        "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/exercise-diet_portal.html#L5
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/layout.html#L5
+msgid "Exercise Diet"
+msgstr "Exercise Diet"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/layout.html#L17
+msgid "TrueNTH Header Goes Here"
+msgstr "TrueNTH Header Goes Here"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/layout.html#L32
+msgid "Exercise"
+msgstr "Exercise"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/layout.html#L33
+msgid "Diet"
+msgstr "Diet"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/layout.html#L34
+msgid "Recipes &amp; Tips"
+msgstr "Recipes &amp; Tips"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipe.html#L2
+msgid ""
+"<button type=\"button\" class=\"btn btn-secondary-top\" data-"
+"dismiss=\"modal\"><b>close</b><span>X</span></button>"
+msgstr ""
+"<button type=\"button\" class=\"btn btn-secondary-top\" data-"
+"dismiss=\"modal\"><b>close</b><span>X</span></button>"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipe.html#L17
+msgid ""
+"<button type=\"button\" class=\"btn btn-secondary\" data-"
+"dismiss=\"modal\"><b>close</b><span>X</span></button>"
+msgstr ""
+"<button type=\"button\" class=\"btn btn-secondary\" data-"
+"dismiss=\"modal\"><b>close</b><span>X</span></button>"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipes.html#L8
+msgid "Healthy Fats from Oils and Nuts"
+msgstr "Healthy Fats from Oils and Nuts"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipes.html#L31
+msgid "Vegetables"
+msgstr "Vegetables"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipes.html#L54
+msgid "Cooked tomatoes"
+msgstr "Cooked tomatoes"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipes.html#L77
+msgid "Fish"
+msgstr "Fish"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/exercise_diet/templates/exercise_diet/recipes.html#L100
+msgid "Alternatives to Processed Meats"
+msgstr "Alternatives to Processed Meats"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/base.html#L290
+msgid "Consent checkbox"
+msgstr "Consent checkbox"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/index.html#L43
+msgid "1 in 8 men will be diagnosed with prostate cancer in their lifetime."
+msgstr "1 in 8 men will be diagnosed with prostate cancer in their lifetime."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/index.html#L44
+msgid ""
+"In 2015, approximately 220,800 men were diagnosed with prostate cancer in "
+"the USA."
+msgstr ""
+"In 2015, approximately 220,800 men were diagnosed with prostate cancer in "
+"the USA."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/what-is-prostate-cancer.html#L22
+msgid ""
+"Prostate cancer is the most common non-skin cancer in the United States, "
+"affecting 1 in 8 men."
+msgstr ""
+"Prostate cancer is the most common non-skin cancer in the United States, "
+"affecting 1 in 8 men."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/gil/templates/gil/what-is-prostate-cancer.html#L27
+msgid ""
+"In 2015, approximately 220,800 men were diagnosed with prostate cancer, and "
+"more than 27,540 men died from the disease."
+msgstr ""
+"In 2015, approximately 220,800 men were diagnosed with prostate cancer, and "
+"more than 27,540 men died from the disease."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L236
+msgid "You've completed the {} questionnaire."
+msgstr "You've completed the {} questionnaire."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L282
+msgid ""
+"Please complete your {} questionnaire as soon as possible. It will expire on"
+" {}."
+msgstr ""
+"Please complete your {} questionnaire as soon as possible. It will expire on"
+" {}."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L292
+msgid "Please complete your {} questionnaire by {}."
+msgstr "Please complete your {} questionnaire by {}."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L311
+msgid "Please complete your {} questionnaire at your convenience."
+msgstr "Please complete your {} questionnaire at your convenience."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/reporting.py#L155
+msgid "TOTAL"
+msgstr "TOTAL"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L34
+msgid "Preview"
+msgstr "Preview"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L45
+msgid "Communication Detail"
+msgstr "Communication Detail"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L49
+msgid "Recipients:"
+msgstr "Recipients:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L50
+msgid "Subject:"
+msgstr "Subject:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L51
+msgid "Body:"
+msgstr "Body:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L63
+msgid "No communications found."
+msgstr "No communications found."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L89
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L90
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L91
+msgid "Not available"
+msgstr "Not available"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/communications.html#L111
+msgid "Unable to receive content"
+msgstr "Unable to receive content"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L24
+#, python-format
+msgid ""
+"\n"
+"                          <span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a\n"
+"                            href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a\n"
+"                            href=\"%(terms_url)s\" class=\"required-link\">terms</a></span>\n"
+"                        "
+msgstr ""
+"\n"
+"                          <span class=\"terms-tick-box-text\"> By checking this box, I confirm that I have read and accept the website <a\n"
+"                            href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a\n"
+"                            href=\"%(terms_url)s\" class=\"required-link\">terms</a></span>\n"
+"                        "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L56
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L89
+msgid ""
+"By checking this box, I confirm that I have read the information notice "
+"above and consent and agree to the processing of my personal information "
+"(including my health information) on the terms described in this Consent."
+msgstr ""
+"By checking this box, I confirm that I have read the information notice "
+"above and consent and agree to the processing of my personal information "
+"(including my health information) on the terms described in this Consent."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L61
+#, python-format
+msgid ""
+"\n"
+"                              <span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and\n"
+"                                <a href=\"%(terms_url)s\" class=\"required-link\">terms</a></span>\n"
+"                            "
+msgstr ""
+"\n"
+"                              <span class=\"terms-tick-box-text\"> By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and\n"
+"                                <a href=\"%(terms_url)s\" class=\"required-link\">terms</a></span>\n"
+"                            "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L100
+#, python-format
+msgid ""
+"\n"
+"                          <span>&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
+"                          "
+msgstr ""
+"\n"
+"                          <span> By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\"  class=\"required-link\">terms</a></span>\n"
+"                          "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L160
+msgid ""
+"By checking this box, I confirm that the patient has read the Website "
+"Consent and consents and agrees to the processing of their personal "
+"information (including their health information) on the terms described in "
+"this Consent and Terms and Conditions and a copy of this consent and "
+"information provided by the patient has been securely stored in accordance "
+"with my local site procedures."
+msgstr ""
+"By checking this box, I confirm that the patient has read the Website "
+"Consent and consents and agrees to the processing of their personal "
+"information (including their health information) on the terms described in "
+"this Consent and Terms and Conditions and a copy of this consent and "
+"information provided by the patient has been securely stored in accordance "
+"with my local site procedures."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L214
+msgid "View/print website declaration form"
+msgstr "View/print website declaration form"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L218
+msgid ""
+"By checking this box, I confirm that I have read the required information to"
+" the patient and provided the opportunity for the patient to ask questions. "
+"I have addressed the questions to the patient’s satisfaction and have "
+"created an electronic copy of this declaration and have stored this copy. "
+"The patient has provided oral consent to participate in the TrueNTH Global "
+"Registry on the terms set out above."
+msgstr ""
+"By checking this box, I confirm that I have read the required information to"
+" the patient and provided the opportunity for the patient to ask questions. "
+"I have addressed the questions to the patient’s satisfaction and have "
+"created an electronic copy of this declaration and have stored this copy. "
+"The patient has provided oral consent to participate in the TrueNTH Global "
+"Registry on the terms set out above."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+msgid ""
+"By checking this box, I confirm that I have read and/or gone through "
+"required information to the subject and have completed the required consent "
+"to the use of the TrueNTH website tool and have created an electronic copy "
+"of this declaration and have stored said copy."
+msgstr ""
+"By checking this box, I confirm that I have read and/or gone through "
+"required information to the subject and have completed the required consent "
+"to the use of the TrueNTH website tool and have created an electronic copy "
+"of this declaration and have stored said copy."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L241
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L105
+msgid "First name"
+msgstr "First name"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L248
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L112
+msgid "Last name"
+msgstr "Last name"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L290
+msgid "Birth date"
+msgstr "Birth date"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L293
+msgid "Birth month"
+msgstr "Birth month"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patient_profile_create.html#L28
+msgid "No email"
+msgstr "No email"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L51
+msgid "TrueNTH ID"
+msgstr "TrueNTH ID"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L61
+msgid "Visit"
+msgstr "Visit"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L81
+msgid "ST"
+msgstr "ST"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L81
+msgid "DS"
+msgstr "DS"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L110
+msgid "Patient Report"
+msgstr "Patient Report"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/patients_by_org.html#L182
+msgid "Enter Text"
+msgstr "Enter Text"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L67
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L121
+msgid "TrueNTH logo"
+msgstr "TrueNTH logo"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L70
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L124
+msgid "brand logo"
+msgstr "brand logo"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L105
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L119
+msgid "Profile image"
+msgstr "Profile image"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile.html#L135
+msgid "Edit Button"
+msgstr "Edit Button"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L15
+msgid "Birth Month"
+msgstr "Birth Month"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L32
+msgid "Birth Year"
+msgstr "Birth Year"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L372
+msgid "Email body content is missing."
+msgstr "Email body content is missing."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L373
+msgid "Email subject is missing."
+msgstr "Email subject is missing."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L374
+msgid "Email address is missing."
+msgstr "Email address is missing."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L501
+msgid "Email audit log"
+msgstr "Email audit log"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L520
+msgid "Send reset password email to user"
+msgstr "Send reset password email to user"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L564
+msgid "Email Message Content"
+msgstr "Email Message Content"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L643
+msgid "In what state is the patient currently receiving prostate cancer care?"
+msgstr ""
+"In what state is the patient currently receiving prostate cancer care?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L645
+msgid "In what state are you currently receiving prostate cancer care?"
+msgstr "In what state are you currently receiving prostate cancer care?"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L961
+#, python-format
+msgid ""
+"\n"
+"                                    I consent to sharing information with <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+msgstr ""
+"\n"
+"                                    I consent to sharing information with <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1091
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1139
+msgid "Download"
+msgstr "Download"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1117
+msgid "Type"
+msgstr "Type"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1123
+msgid "Report Name"
+msgstr "Report Name"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1128
+msgid "Generated (GMT)"
+msgstr "Generated (GMT)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1134
+msgid "Document Type"
+msgstr "Document Type"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1826
+msgid "Questionnaire completion date"
+msgstr "Questionnaire completion date"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1829
+msgid "Completion Day"
+msgstr "Completion Day"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L1849
+msgid "Completion Year"
+msgstr "Completion Year"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2481
+msgid "(Optional)"
+msgstr "(Optional)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile_macros.html#L2535
+msgid "Add"
+msgstr "Add"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L14
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L87
+msgid "User Statistics By Role"
+msgstr "User Statistics By Role"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L17
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L144
+msgid "User Statistics By Intervention"
+msgstr "User Statistics By Intervention"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+msgid "User Statistics By Patient Report"
+msgstr "User Statistics By Patient Report"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L23
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L211
+msgid "User Statistics By Intervention Access"
+msgstr "User Statistics By Intervention Access"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L37
+msgid ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions, and represent the number of users associated with that "
+"intervention who have logged in within the given timeframe (whether or not "
+"they accessed the intervention during that login session"
+msgstr ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions, and represent the number of users associated with that "
+"intervention who have logged in within the given timeframe (whether or not "
+"they accessed the intervention during that login session"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L50
+msgid "Source"
+msgstr "Source"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L113
+msgid "Patients - All"
+msgstr "Patients - All"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L117
+msgid "Patients - No Diagnosis"
+msgstr "Patients - No Diagnosis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L121
+msgid "Patients - Diagnosis, No Treatment"
+msgstr "Patients - Diagnosis, No Treatment"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L125
+msgid "Patients - Diagnosis and Treatment"
+msgstr "Patients - Diagnosis and Treatment"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L129
+msgid "Patients - Metastasis"
+msgstr "Patients - Metastasis"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L177
+msgid "User Statistics By Patient Reports"
+msgstr "User Statistics By Patient Reports"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L194
+msgid "Intervention (Reports)"
+msgstr "Intervention (Reports)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L214
+msgid ""
+"Intervention Access counts reflect the number of users who <i>could</i> "
+"access said intervention, regardless of whether or not they've actually "
+"accessed it."
+msgstr ""
+"Intervention Access counts reflect the number of users who <i>could</i> "
+"access said intervention, regardless of whether or not they've actually "
+"accessed it."
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L228
+msgid "Intervention (Access)"
+msgstr "Intervention (Access)"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L2
+msgid "Days Overdue"
+msgstr "Days Overdue"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L5
+msgid "Site"
+msgstr "Site"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L7
+msgid " Days"
+msgstr " Days"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L9
+msgid "Total"
+msgstr "Total"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L41
+msgid "Deactivate"
+msgstr "Deactivate"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/staff_by_org.html#L59
+msgid "Inactive"
+msgstr "Inactive"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L82
+msgid ""
+"We offer users the ability to create a unique account for TrueNTH or the "
+"option to use their Facebook or Google logins. Choosing to use Facebook or "
+"Google provides a few additional benefits to you:"
+msgstr ""
+"We offer users the ability to create a unique account for TrueNTH or the "
+"option to use their Facebook or Google logins. Choosing to use Facebook or "
+"Google provides a few additional benefits to you:"
+
+#: https//github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/assessment_engine.py#L1416
+msgid "All available questionnaires have been completed"
+msgstr "All available questionnaires have been completed"
+
+# apptext: IRONMAN website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+
+# apptext: IRONMAN organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=09bb5690"
+"-d49b-a10e-5339-e677353e694f&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=09bb5690"
+"-d49b-a10e-5339-e677353e694f&editorUrl=true"
+
+# apptext: IRONMAN staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+
+# apptext: About Movember URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
+
+# apptext: IRONMAN patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+
+# apptext: TrueNTH Global Registry website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+
+# apptext: profileSendEmail option invite
+msgid "TrueNTH Invite"
+msgstr "TrueNTH Invite"
+
+# apptext: TrueNTH Global Registry staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+
+# apptext: site summary email
+# apptext: site summary email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+
+# apptext: Terms and Conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true"
+
+# apptext: TrueNTH Global Registry staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+
+# apptext: TrueNTH Global Registry patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+
+# apptext: TrueNTH Global Registry organization website consent URL
+# apptext: TrueNTH Global Registry patient website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+
+# apptext: profileSendEmail invite email_body
+msgid ""
+"<p>(greeting),</p><p>This email was sent to you because you are a patient at"
+" (clinic name) and consented to participate in the Prostate Cancer Outcomes "
+"- (parent org) Registry Study.</p><p>This is an invitation to use the "
+"TrueNTH website, where you will report on your health. Your participation "
+"will help us collectively improve the care that men receive during their "
+"prostate cancer journey.</p><p>To complete your first questionnaire, please "
+"first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your"
+" account</a></div><p>You can also access the TrueNTH website with this "
+"link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can "
+"return to TrueNTH any time.</p><p>If you have any queries, please contact "
+"your representative at (clinic name).</p>"
+msgstr ""
+"<p>(greeting),</p><p>This email was sent to you because you are a patient at"
+" (clinic name) and consented to participate in the Prostate Cancer Outcomes "
+"- (parent org) Registry Study.</p><p>This is an invitation to use the "
+"TrueNTH website, where you will report on your health. Your participation "
+"will help us collectively improve the care that men receive during their "
+"prostate cancer journey.</p><p>To complete your first questionnaire, please "
+"first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your"
+" account</a></div><p>You can also access the TrueNTH website with this "
+"link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can "
+"return to TrueNTH any time.</p><p>If you have any queries, please contact "
+"your representative at (clinic name).</p>"
+
+# apptext: IRONMAN staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+
+# apptext: IRONMAN staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+
+# apptext: About TrueNTH URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+
+# apptext: profileSendEmail invite email TrueNTH Global Registry
+# apptext: profileSendEmail invite email
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+
+# apptext: Privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f2ea71f5"
+"-d47a-1a5c-130b-830b9bd785cf&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f2ea71f5"
+"-d47a-1a5c-130b-830b9bd785cf&editorUrl=true"
+
+# apptext: TrueNTH Global Registry staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+
+# apptext: IRONMAN patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+
+# apptext: layout title
+msgid "Movember TrueNTH"
+msgstr "Movember TrueNTH"
+
+# apptext: Initial Consent Terms URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=68af03b7"
+"-813c-d93e-06d1-9702686744c8&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=68af03b7"
+"-813c-d93e-06d1-9702686744c8&editorUrl=true"
+
+# apptext: IRONMAN staff website consent URL
+# apptext: TrueNTH Global Registry staff website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+
+# apptext: consent date label
+msgid "Study Consent Date"
+msgstr "Study Consent Date"
+
+# apptext: IRONMAN patient website consent URL
+# apptext: IRONMAN organization website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+
+# apptext: profileSendEmail reminder email_body
+msgid ""
+"<p>Hello,</p><p>This email was sent to you by (clinic name). This is where "
+"you report on your health along your prostate cancer journey. The "
+"information collected will be used to determine where improvements in "
+"Prostate Cancer Care can be made.</p><p>Login now to complete your "
+"questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and"
+" answer questionnaire now</a></div><p>Click the button above or use the link"
+" below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any"
+" questions or concerns, please contact (clinic name).</p><p><em>&mdash; This"
+" email was sent because you consented to participate in the TrueNTH registry"
+" project</em></p>"
+msgstr ""
+"<p>Hello,</p><p>This email was sent to you by (clinic name). This is where "
+"you report on your health along your prostate cancer journey. The "
+"information collected will be used to determine where improvements in "
+"Prostate Cancer Care can be made.</p><p>Login now to complete your "
+"questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and"
+" answer questionnaire now</a></div><p>Click the button above or use the link"
+" below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any"
+" questions or concerns, please contact (clinic name).</p><p><em>— This email"
+" was sent because you consented to participate in the TrueNTH registry "
+"project</em></p>"
+
+# apptext: TrueNTH Global Registry patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+
+# apptext: site summary email TrueNTH Global Registry
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+
+# apptext: TrueNTH Global Registry organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
