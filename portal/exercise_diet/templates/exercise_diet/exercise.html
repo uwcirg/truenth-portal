@@ -1,12 +1,17 @@
-{% extends 'exercise_diet/layout.html' %}
-
-{% block body %}
-
-    {% for asset in assets %}
-        {{ asset|safe }}
-    {% endfor %}
-
-        {% for id, content in modals.iteritems() %}
+{% extends "exercise_diet/base.html" %}
+{% block main %}
+<main class="main">
+    {{ super() }}
+    <div class="module-assets">
+        {% for asset in assets %}
+            {{ asset|safe }}
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
+{% block modal %}
+    {{super()}}
+    {% for id, content in modals.iteritems() %}
         <!-- Modal -->
         <div class="modal fade" id={{ id }} aria-hidden="true">
             <div class="modal-dialog">
@@ -29,7 +34,7 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>
@@ -38,7 +43,5 @@
                 </div>
             </div>
         </div>
-
     {% endfor %}
-
 {% endblock %}

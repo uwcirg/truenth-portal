@@ -1,9 +1,11 @@
-{% extends 'exercise_diet/layout.html' %}
-
-{% block body %}
-
-    {% for asset in assets %}
-        {{ asset|safe }}
-    {% endfor %}
-
+{% extends "exercise_diet/base.html" %}
+{% block main %}
+<main class="main">
+    {{ super() }}
+    <div class="module-assets">
+        {% for asset in assets %}
+            {{ asset|safe }}
+        {% endfor %}
+    </div>
+</main>
 {% endblock %}

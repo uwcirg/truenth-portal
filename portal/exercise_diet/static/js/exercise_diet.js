@@ -1,5 +1,6 @@
 $(document).ready(function(){
-    var pathname = $(location).attr('pathname').replace(/^\/+/g, '.');
+    var fullpath = $(location).attr('pathname').split("/");
+    var pathname = "." + fullpath[fullpath.length-1];
     $('#mainNavbar .nav '+pathname).addClass('active');
 });
 
@@ -7,7 +8,9 @@ function show_diet(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
     });
-
+    $('#'+new_item).on('hide.bs.modal', function(e) {
+        $('body').removeClass('modal-open');
+    });
     $('#'+current_item).modal('hide');
     $('#'+new_item).modal('show');
 }
@@ -34,11 +37,25 @@ $(function(){
         return false;
     });
 
+    $('[data-toggle=modal]').on('click touchend', function(e) {
+      var target;
+      e.preventDefault();
+      e.stopPropagation();
+      target = $(this).attr('data-target');
+      $(target).appendTo('body');
+      return setTimeout(function() {
+        $(target).modal('show');
+      }, 150);
+    });
 });
 
 function show_exercise(new_item, current_item) {
     $('#'+new_item).on('shown.bs.modal', function(e) {
         $('body').addClass('modal-open');
+    });
+
+    $('#'+new_item).on('hide.bs.modal', function(e) {
+        $('body').removeClass('modal-open');
     });
 
     $('#'+current_item).modal('hide');
@@ -61,7 +78,7 @@ function show_recipe(heading, item, recipe_type) {
         $('#recipe-modal').removeClass('tip');
     }
     $('#recipe-modal').modal('show');
-    $( ".modal-body" ).load( "/recipe/" + heading + "/" + item );
+    $( ".modal-body" ).load( "recipe/" + heading + "/" + item );
 }
 
 $(function(){

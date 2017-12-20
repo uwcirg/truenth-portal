@@ -1,6 +1,8 @@
-{% extends 'exercise_diet/layout.html' %}
+{% extends "exercise_diet/base.html" %}
+{% block main %}
+<main class="main">
+    {{ super() }}
 
-{% block body %}
     {{ recipe_intro|safe }}
     <div id="Recipe-Accordions">
         <div class="healthy-fats-accordion">
@@ -118,7 +120,10 @@
             </table>
         </div><!-- END class="alternatives-accordion" -->
     </div><!-- END id="Recipe-Accordions"> -->
-
+</main>
+{% endblock %}
+{% block modal %}
+    {{super()}}
     <!-- Modal -->
     <div class="modal fade" id="recipe-modal" aria-hidden="true">
         <div class="modal-dialog">
@@ -128,5 +133,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

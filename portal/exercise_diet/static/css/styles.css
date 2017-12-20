@@ -42,9 +42,9 @@
     max-width: 740px;
 }
 hr.objective {
-	margin: 10px auto 30px; 
-	padding: 0px 0px 0px 0px; 
-	
+	margin: 10px auto 30px;
+	padding: 0px 0px 0px 0px;
+
 	background: rgba(255, 255, 255, 0.5);
     display: block;
     height: .05px;
@@ -85,7 +85,7 @@ hr.objective {
     padding: 25px;
     width: 250px;
     margin-top: 40px;
-    
+
     position: absolute;
     top: 75%;
     left: 50%;
@@ -153,7 +153,7 @@ hr.objective {
     font-size: 26px;
     line-height: 1.3em;
 	letter-spacing: .03em;
-    text-align: left;    
+    text-align: left;
     background-image: url('../img/white-triangle-bullet.png');
     background-repeat: no-repeat;
     background-position: left 10px;
@@ -283,7 +283,7 @@ img.video-testimonial-hero {
 	margin: 0px auto;
 	z-index: 0;
 	text-align: center;
-	
+
 	position: absolute;
     display: block;
 /*     background-image: url('../img/objective-background.jpg'); */
@@ -455,7 +455,7 @@ ul.intro-li li {
 	text-align: center;
 	display: flex;
 	flex-flow: row wrap;
-	justify-content: space-between;	
+	justify-content: space-between;
 }
 .modal-nav span {
 	height: auto;
@@ -515,8 +515,8 @@ h2 a {
 	position: relative;
 	margin: 20px auto 100px;
 	padding: 0px;
-	max-width: 628px; 
-}				
+	max-width: 628px;
+}
 
 .healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
 	position: relative;
@@ -571,8 +571,10 @@ h2 a {
 	border-bottom-right-radius: 3px;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
-	
+    -webkit-transition: margin 200ms, padding 200ms;
+    transition: margin 200ms, padding 200ms;
 }
+
 .collapse.in {
 	padding: 20px 20px 10px;
 	margin: 0px auto 10px;
@@ -594,7 +596,7 @@ h2 a {
     letter-spacing: .01em;
     font-style: normal;
     color: #5e7c38;
-    
+
     text-align: center;
     vertical-align: middle;
     margin: 0px 2px 3px;
@@ -610,7 +612,7 @@ h2 a {
     letter-spacing: .01em;
     font-style: normal;
     color: #5e7c38;
-    
+
     text-align: center;
     vertical-align: middle;
     margin: 0px 2px 3px;
@@ -1013,7 +1015,7 @@ body {
 	background-color: #fff;
 	font-family: Helvetica, Arial, sans-serif;
 }
-	
+
 .row-hover {
 	background-color: rgba(205, 229, 190, 0.2);
 }
@@ -1038,7 +1040,7 @@ a:hover, a:focus {
 	outline-offset: none;
 }
 */
-.container {    
+.container {
 	position: relative;
     max-width: 1000px;
     min-width: 320px;
@@ -1083,7 +1085,7 @@ a:hover, a:focus {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -1093,7 +1095,7 @@ b, strong {
 	font-weight: 600;
 	letter-spacing: .01em;
 }
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	padding: 0px;
     margin: 0px auto;
@@ -1300,7 +1302,7 @@ h3 a:hover {
     color: #fff;
     background: #5e7c38;
     border: none;
-    
+
     margin: 10px auto 20px;
 	height: 2.2em;
 	text-transform: uppercase;
@@ -1317,7 +1319,7 @@ h3 a:hover {
     color: #fff;
     background: #435928;
     border: none;
-    
+
     margin: 10px auto 20px;
 	height: 2.2em;
 	text-transform: uppercase;
@@ -1333,6 +1335,9 @@ h3 a:hover {
 .modal-content {
     border-radius: 0;
     text-align: right;
+}
+.box-modal.modal-content {
+    text-align: center;
 }
 .modal-body {
 	position: relative;
@@ -1469,7 +1474,7 @@ h3 a:hover {
 }
 #supplements .modal-footer .btn-secondary span {
     font-weight: 500;
-    color: #fff;               
+    color: #fff;
     background-color: #5f7783;
     border: none;
     border-radius: 15px;
@@ -2044,7 +2049,7 @@ h3 a:hover {
 	font-size: 13px;
 	padding: .3em .5em .2em;
 }
-	
+
 /*               		#fish .modal-body button.btn.btn-secondary-top b					*/
 /* ======================================================================================== */
 /* ======================================================================================== */
@@ -2763,7 +2768,7 @@ div#exercise-trainer.modal.fade.in h2 {
     padding: 5px 10px 5px;
     margin: -36px -15px 15px -15px;
     display: block;
-    min-height: 35px;	
+    min-height: 35px;
 }
 
 div#nutrition-resources.modal.fade.in h2 {
@@ -2778,7 +2783,7 @@ div#nutrition-resources.modal.fade.in h2 {
     margin: -36px -15px 15px -15px;
     display: block;
     min-height: 35px;
-    z-index: 0;	
+    z-index: 0;
 }
 
 
@@ -2802,7 +2807,7 @@ td {
 	padding: 4px 4px;
 	vertical-align: top;
 	border: 1px solid #5e7c38;
-	line-height: 1.3em; 
+	line-height: 1.3em;
 }
 
 tr {
@@ -5102,9 +5107,49 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 	padding: .3em .5em .2em;
 }
 
+:not(.is-scrolled) .theme--intro-light .logo {
+    color: black;
+    background-image: url(../../../../gil/static/img/logo-base.png);
+}
+/*.is-scrolled .header {
+    z-index: 12;
+}*/
+main .module-assets {
+    overflow: auto;
+}
+
+h3.module__head {
+    color: #FFF;
+}
+
+/*.modal-backdrop{
+    z-index: 0;
+    opacity: 0;
+}*/
+
+main [data-target] {
+    cursor: pointer;
+}
+#ED-Intro,
+#ED-Exercise,
+#ED-Diet {
+    overflow: hidden;
+}
+
+#ED-Intro {
+    height: 90em;
+}
+
+#ED-Exercise {
+    height: 140em;
+}
+
+#ED-Diet {
+    height: 135em;
+}
 
 
-/* Bootstrap breakpoints 
+/* Bootstrap breakpoints
 /* ======================================================================================== */
 /* ======================================================================================== */
 /* ======================================================================================== */
@@ -5118,7 +5163,7 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 	max-width: 768px;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5127,7 +5172,7 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 
 
 }
-/* Bootstrap breakpoint 
+/* Bootstrap breakpoint
 /* ======================================================================================== */
 /* ======================================================================================== */
 
@@ -5138,7 +5183,11 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 	max-width: 768px;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+.page-intro__content {
+    padding-top: 170px;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5147,7 +5196,7 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 
 }
 
-/* Bootstrap breakpoint 
+/* Bootstrap breakpoint
 /* ======================================================================================== */
 /* ======================================================================================== */
 
@@ -5160,15 +5209,32 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 	width: 100%;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
+    overflow: auto;
 /* 	max-width: 768px; */
+}
+
+#ED-Intro {
+    height: 90em;
+}
+
+#ED-Exercise {
+    height: 115em;
+}
+
+#ED-Diet {
+    height: 135em;
 }
 
 .navbar-toggle {
     display: none;
+}
+
+main .module-assets {
+    margin-top: -2em;
 }
 
 #mainNavbar > ul > li > a {
@@ -5204,8 +5270,8 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
-    display: block; 
+
+    display: block;
     margin-right: 0px;
     margin-left: 0px;
 }
@@ -5312,7 +5378,7 @@ table {
 	width: 100%;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5324,6 +5390,16 @@ table {
 
 .navbar-toggle {
     display: none;
+}
+
+.page-intro__content,
+.page-intro {
+    margin-top: -50px;
+    padding-top: 0;
+}
+
+.page-intro {
+    margin-top: -120px;
 }
 
 #mainNavbar > ul > li > a {
@@ -5360,7 +5436,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -5469,7 +5545,7 @@ table {
 	width: 100%;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5517,7 +5593,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -5622,7 +5698,7 @@ table {
 	width: 100%;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5644,7 +5720,7 @@ table {
     height: 50px;
     text-align: center;
     padding: 5px 25px 5px 25px;
-    
+
     align-items: center;
 }
 
@@ -5665,9 +5741,9 @@ table {
     padding-left: 0px;
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    
+
     -webkit-overflow-scrolling: touch;
-    display: block; 
+    display: block;
     margin-right: 0px;
     margin-left: 0px;
 }
@@ -5758,9 +5834,6 @@ table {
 
 }
 
-
-
-
 /* Breakpoints > (max-width: 640px) */
 /* ======================================================================================== */
 /* ======================================================================================== */
@@ -5778,7 +5851,7 @@ table {
     display: none;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -5819,7 +5892,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -5909,12 +5982,6 @@ table {
 }
 
 }
-
-
-
-
-
-
 
 /* MORE MEDIA QUERIES */
 /* ======================================================================================== */
@@ -6004,11 +6071,19 @@ table {
     text-shadow: 1px 1px #000;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 0.1em;
 	max-width: 768px;
+}
+
+#ED-Exercise {
+    height: 150em;
+}
+
+#ED-Diet {
+    height: 175em;
 }
 
 #mainNavbar > ul > li > a {
@@ -6045,7 +6120,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -6056,6 +6131,7 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 10px;
+    word-break: break-word;
 }
 
 #Resources h3 {
@@ -6121,11 +6197,20 @@ table {
     text-shadow: 1px 1px #000;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
 	max-width: 768px;
+}
+
+#ED-Intro #Intro-content,
+#ED-Exercise #Intro-content {
+    padding: 0 1em;
+}
+
+#ED-Diet {
+    padding: 0 1em;
 }
 
 #mainNavbar > ul > li > a {
@@ -6161,7 +6246,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
@@ -6218,7 +6303,7 @@ table {
     text-shadow: 1px 1px #000;
 }
 
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes { 
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
 	position: relative;
 	margin: 0 auto;
 	padding: 0;
@@ -6259,7 +6344,7 @@ table {
     border-top: 1px solid transparent;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     -webkit-overflow-scrolling: touch;
-    
+
     display: block; /* override bootstrap .collapse */
     margin-right: 0px;
     margin-left: 0px;
