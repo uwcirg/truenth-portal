@@ -99,7 +99,7 @@ vine==1.1.4
 virtualenv==15.1.0
 waitress==1.1.0
 wcwidth==0.1.7
-WebOb==1.7.3
+WebOb==1.7.4
 WebTest==2.0.29
 Werkzeug==0.12.2
 WTForms==2.1
