@@ -18,7 +18,9 @@
                 <div class="modal-content">
 
                     <div class="modal-body">
+                        {% trans %}
                         <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>
+                        {% endtrans %}
                         {{ content[2]|safe }}
                     </div>
                     {% if content[1] > 0 %}

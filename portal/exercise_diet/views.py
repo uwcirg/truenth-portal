@@ -14,7 +14,7 @@ exercise_diet = Blueprint(
 
 def get_asset(uuid):
     url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config.get("LR_ORIGIN"), uuid=uuid)
+        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
     data = requests.get(url).content
     return json.JSONDecoder().decode(data)['asset']
 
@@ -23,7 +23,7 @@ def get_tag_data(anyTags):
     url = (
         "{LR_ORIGIN}/c/portal/truenth/asset/query?anyTags={anyTags}&sort=true"
         "&sortType=DESC".format(
-            LR_ORIGIN=current_app.config.get("LR_ORIGIN"), anyTags=anyTags))
+            LR_ORIGIN=current_app.config["LR_ORIGIN"], anyTags=anyTags))
     return requests.get(url).content
 
 
