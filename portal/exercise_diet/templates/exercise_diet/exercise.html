@@ -2,13 +2,16 @@
 {% block main %}
 <main class="main">
     {{ super() }}
-
     <div class="module-assets">
         {% for asset in assets %}
             {{ asset|safe }}
         {% endfor %}
     </div>
-        {% for id, content in modals.iteritems() %}
+</main>
+{% endblock %}
+{% block modal %}
+    {{super()}}
+    {% for id, content in modals.iteritems() %}
         <!-- Modal -->
         <div class="modal fade" id={{ id }} aria-hidden="true">
             <div class="modal-dialog">
@@ -41,5 +44,4 @@
             </div>
         </div>
     {% endfor %}
-</main>
 {% endblock %}
