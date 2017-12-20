@@ -215,10 +215,18 @@ def download_po_file(language, headers, project_id, uri):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
     language_id = re.sub('_', '-', language)
-    url = 'https://api.smartling.com/files-api/v2/projects/' \
-          '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
-                                                 uri)
-    resp = requests.get(url, headers=headers)
+    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
+        project_id,
+        language_id,
+    )
+    resp = requests.get(
+        url,
+        headers=headers,
+        params={
+            'retrievalType': 'published',
+            'fileUri': file_uri,
+        },
+    )
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("{} po file downloaded "
@@ -227,10 +235,17 @@ def download_po_file(language, headers, project_id, uri):
 
 
 def download_zip_file(headers, project_id, file_uri):
-    url = 'https://api.smartling.com/files-api/v2/projects/' \
-          '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
-          'published'.format(project_id, file_uri)
-    resp = requests.get(url, headers=headers)
+    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
+        project_id
+    )
+    resp = requests.get(
+        url,
+        headers=headers,
+        params={
+            'retrievalType': 'published',
+            'fileUri': file_uri,
+        },
+    )
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("zip file downloaded from smartling")
