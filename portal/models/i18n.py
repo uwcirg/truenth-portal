@@ -165,7 +165,7 @@ def upload_pot_file(fpath, fname, uri):
                                 "not uploaded".format(fname))
 
 
-def smartling_download(language=None):
+def smartling_download(state, language=None):
     translation_fpath = os.path.join(current_app.root_path, "translations")
     # authenticate smartling
     auth = smartling_authenticate()
@@ -176,22 +176,25 @@ def smartling_download(language=None):
         language=language,
         fname='messages',
         uri='portal/translations/messages.pot',
+        state=state,
         headers=headers,
     )
     download_and_extract_po_file(
         language=language,
         fname='frontend',
         uri='portal/translations/js/src/frontend.pot',
+        state=state,
         headers=headers,
     )
 
-def download_and_extract_po_file(language, fname, headers, uri):
+def download_and_extract_po_file(language, fname, headers, uri, state):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if language:
         response_content = download_po_file(
             language=language,
             project_id=project_id,
             uri=uri,
+            state=state,
             headers=headers,
         )
         extract_po_file(language, response_content, fname)
@@ -199,6 +202,7 @@ def download_and_extract_po_file(language, fname, headers, uri):
         zfp = download_zip_file(
             uri=uri,
             project_id=project_id,
+            state=state,
             headers=headers,
         )
         for langfile in zfp.namelist():
@@ -211,7 +215,7 @@ def download_and_extract_po_file(language, fname, headers, uri):
             "{}.po files updated, mo files compiled".format(fname))
 
 
-def download_po_file(language, headers, project_id, uri):
+def download_po_file(language, headers, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
     language_id = re.sub('_', '-', language)
@@ -223,7 +227,7 @@ def download_po_file(language, headers, project_id, uri):
         url,
         headers=headers,
         params={
-            'retrievalType': 'published',
+            'retrievalType': state,
             'fileUri': file_uri,
         },
     )
@@ -234,7 +238,7 @@ def download_po_file(language, headers, project_id, uri):
     return resp.content
 
 
-def download_zip_file(headers, project_id, file_uri):
+def download_zip_file(headers, project_id, file_uri, state):
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
         project_id
     )
@@ -242,7 +246,7 @@ def download_zip_file(headers, project_id, file_uri):
         url,
         headers=headers,
         params={
-            'retrievalType': 'published',
+            'retrievalType': state,
             'fileUri': file_uri,
         },
     )
