@@ -557,10 +557,6 @@ class User(db.Model, UserMixin):
                 if org.default_locale and org.default_locale not in locale_options:
                     locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
 
-        default_locale = current_app.config.get('DEFAULT_LOCALE')
-        if default_locale and default_locale not in locale_options:
-            locale_options[default_locale] = locale_name_from_code(default_locale)
-
         return locale_options
 
     def add_organization(self, organization_name):
