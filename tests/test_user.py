@@ -1092,7 +1092,6 @@ class TestUser(TestCase):
         user.organizations.append(org)
         # test locale inheritance
         self.assertEquals(user.locale_display_options['en_AU'], 'Australian English')
-        self.assertIn(self.app.config['DEFAULT_LOCALE'], user.locale_display_options)
 
     def test_user_messages(self):
         msg1 = EmailMessage(subject='Test #1',
