@@ -1574,6 +1574,11 @@
                 "code": "en_US",
                 "display": "American English",
                 "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "fr_CA",
+                "display": "French Canadian",
+                "system": "urn:ietf:bcp:47"
               }
             ]
           }
