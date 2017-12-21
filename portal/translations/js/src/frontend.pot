@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-12-01T04:08:14.901Z\n"
-"PO-Revision-Date: 2017-12-01T04:08:14.901Z\n"
+"POT-Creation-Date: 2017-12-20T20:59:12.127Z\n"
+"PO-Revision-Date: 2017-12-20T20:59:12.127Z\n"
 
 msgid "Server error occurred updating data."
 msgstr ""
@@ -124,6 +124,11 @@ msgstr ""
 msgid "your clinic"
 msgstr ""
 
+msgid ""
+"There's a problem with your submission. Please check your answers, then try "
+"again.  Make sure all required fields are completed and valid."
+msgstr ""
+
 msgid "Organization"
 msgstr ""
 
@@ -139,7 +144,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-msgid "Regiatration Date"
+msgid "Registration Date"
 msgstr ""
 
 msgid "Consent Date"
@@ -205,7 +210,7 @@ msgstr ""
 msgid "Agreed to terms"
 msgstr ""
 
-msgid "TrueNTH USA Terms of Use"
+msgid "{project name} Terms of Use"
 msgstr ""
 
 msgid "Date must in the valid format."
@@ -322,7 +327,7 @@ msgstr ""
 msgid "Consent to share information"
 msgstr ""
 
-msgid "Cannot ununcheck.  A staff member must be associated with an organization"
+msgid "Cannot uncheck.  A staff member must be associated with an organization"
 msgstr ""
 
 msgid "unable to get needed core data"
@@ -436,7 +441,7 @@ msgstr ""
 msgid "Error occurred retrieving assessment status."
 msgstr ""
 
-msgid "Response data to be update is required."
+msgid "Questionnaire response data is required."
 msgstr ""
 
 msgid "Error occurred retrieving assessment list."
@@ -538,6 +543,11 @@ msgid "The procedure date must be valid and in required format."
 msgstr ""
 
 msgid "The procedure date must be in the past."
+msgstr ""
+
+msgid ""
+"<strong class='text-success'>{emailType} email sent to "
+"{emailAddress}</strong>"
 msgstr ""
 
 msgid "Completion date cannot be before consent date."

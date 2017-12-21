@@ -165,27 +165,47 @@ def upload_pot_file(fpath, fname, uri):
                                 "not uploaded".format(fname))
 
 
-def smartling_download(language=None):
+def smartling_download(state, language=None):
     translation_fpath = os.path.join(current_app.root_path, "translations")
     # authenticate smartling
     auth = smartling_authenticate()
     current_app.logger.debug("authenticated in smartling")
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
-    download_and_extract_po_file(language, 'messages', headers,
-                                 'portal/translations/messages.pot')
-    download_and_extract_po_file(language, 'frontend', headers,
-                                 'portal/translations/js/src/frontend.pot')
+    download_and_extract_po_file(
+        language=language,
+        fname='messages',
+        uri='portal/translations/messages.pot',
+        state=state,
+        headers=headers,
+    )
+    download_and_extract_po_file(
+        language=language,
+        fname='frontend',
+        uri='portal/translations/js/src/frontend.pot',
+        state=state,
+        headers=headers,
+    )
 
 
-def download_and_extract_po_file(language, fname, headers, uri):
+def download_and_extract_po_file(language, fname, headers, uri, state):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if language:
-        response_content = download_po_file(language, headers,
-                                            project_id, uri)
+        response_content = download_po_file(
+            language=language,
+            project_id=project_id,
+            uri=uri,
+            state=state,
+            headers=headers,
+        )
         extract_po_file(language, response_content, fname)
     else:
-        zfp = download_zip_file(headers, project_id, uri)
+        zfp = download_zip_file(
+            uri=uri,
+            project_id=project_id,
+            state=state,
+            headers=headers,
+        )
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
             data = zfp.read(langfile)
@@ -196,14 +216,22 @@ def download_and_extract_po_file(language, fname, headers, uri):
             "{}.po files updated, mo files compiled".format(fname))
 
 
-def download_po_file(language, headers, project_id, uri):
+def download_po_file(language, headers, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
     language_id = re.sub('_', '-', language)
-    url = 'https://api.smartling.com/files-api/v2/projects/' \
-          '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
-                                                 uri)
-    resp = requests.get(url, headers=headers)
+    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
+        project_id,
+        language_id,
+    )
+    resp = requests.get(
+        url,
+        headers=headers,
+        params={
+            'retrievalType': state,
+            'fileUri': uri,
+        },
+    )
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("{} po file downloaded "
@@ -211,11 +239,18 @@ def download_po_file(language, headers, project_id, uri):
     return resp.content
 
 
-def download_zip_file(headers, project_id, file_uri):
-    url = 'https://api.smartling.com/files-api/v2/projects/' \
-          '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
-          'published'.format(project_id, file_uri)
-    resp = requests.get(url, headers=headers)
+def download_zip_file(headers, project_id, uri, state):
+    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
+        project_id
+    )
+    resp = requests.get(
+        url,
+        headers=headers,
+        params={
+            'retrievalType': state,
+            'fileUri': uri,
+        },
+    )
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("zip file downloaded from smartling")
