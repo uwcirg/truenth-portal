@@ -87,7 +87,7 @@ def demographics_set(patient_id):
     If a field is provided, it must define the entire set of the respective
     field.  For example, if **careProvider** is included, and only mentions one
     of two clinics previously associated with the user, only the one provided
-    will be retained.
+    will be retained.  Consider calling GET first.
 
     For fields outside the defined patient resource
     (http://www.hl7.org/fhir/patient.html), include in the 'extension'
@@ -154,7 +154,11 @@ def demographics_set(patient_id):
         abort(400, "FHIR Patient Resource uses 'careProvider' "
               "for organizations")
     try:
-        patient.update_from_fhir(request.json, acting_user=current_user())
+        # As we allow partial updates, first create a full representation
+        # of this user, and update with any provided elements
+        complete = patient.as_fhir(include_empties=True)
+        complete.update(request.json)
+        patient.update_from_fhir(complete, acting_user=current_user())
     except MissingReference, e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))
@@ -165,5 +169,4 @@ def demographics_set(patient_id):
     auditable_event("updated demographics on user {0} from input {1}".format(
         patient_id, json.dumps(request.json)), user_id=current_user().id,
         subject_id=patient_id, context='user')
-    return jsonify(patient.as_fhir())
-
+    return jsonify(patient.as_fhir(include_empties=False))

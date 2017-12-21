@@ -16,6 +16,7 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from ..database import db
 from ..date_tools import FHIR_datetime
+from ..dict_tools import strip_empties
 from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
@@ -167,13 +168,16 @@ class Organization(db.Model):
 
     @default_locale.setter
     def default_locale(self, value):
-        coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=value).first()
-        if not coding:
-            raise ValueError(
-                "Can't find locale code {value} - constrained to "
-                "pre-existing values in the {system} system".format(
-                    value=value, system=IETF_LANGUAGE_TAG))
-        self.default_locale_id = coding.id
+        if not value:
+            self.default_locale_id = None
+        else:
+            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=value).first()
+            if not coding:
+                raise ValueError(
+                    "Can't find locale code {value} - constrained to "
+                    "pre-existing values in the {system} system".format(
+                        value=value, system=IETF_LANGUAGE_TAG))
+            self.default_locale_id = coding.id
 
     @property
     def shortname(self):
@@ -219,8 +223,7 @@ class Organization(db.Model):
     def update_from_fhir(self, data):
         if 'id' in data:
             self.id = data['id']
-        if 'name' in data:
-            self.name = data['name']
+        self.name = data.get('name')
         if 'telecom' in data:
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
@@ -228,12 +231,17 @@ class Organization(db.Model):
             self.phone = telecom_cps.get(('phone','work')) \
                 or telecom_cps.get(('phone',None))
         if 'address' in data:
+            if not data.get('address'):
+                for addr in self.addresses:
+                    self.addresses.remove(addr)
             for addr in data['address']:
                 self.addresses.append(address.Address.from_fhir(addr))
-        if 'type' in data:
-            self.type = CodeableConcept.from_fhir(data['type'])
-        if 'partOf' in data:
-            self.partOf_id = Reference.parse(data['partOf']).id
+        self.type = (
+            CodeableConcept.from_fhir(data['type']) if data.get('type')
+            else None)
+        self.partOf_id = (
+            Reference.parse(data['partOf']).id if data.get('partOf')
+            else None)
         for attr in ('use_specific_codings','race_codings',
                     'ethnicity_codings','indigenous_codings'):
             if attr in data:
@@ -256,62 +264,66 @@ class Organization(db.Model):
                     remove_if_not_requested.remove(identifier)
             for obsolete in remove_if_not_requested:
                 self.identifiers.remove(obsolete)
-        if 'language' in data:
-            self.default_locale = data['language']
+        self.default_locale = data.get('language')
         return self
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
+        """Return JSON representation of organization
+
+        :param include_empties: if True, returns entire object definition;
+            if False, empty elements are removed from the result
+        :return: JSON representation of a FHIR Organization resource
+
+        """
         d = {}
         d['resourceType'] = 'Organization'
         d['id'] = self.id
         d['name'] = self.name
         telecom = Telecom(email=self.email, contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
-        if self.addresses:
-            d['address'] = []
+        d['address'] = []
         for addr in self.addresses:
             d['address'].append(addr.as_fhir())
-        if self.type:
-            d['type'] = self.type.as_fhir()
-        if self.partOf_id:
-            d['partOf'] = Reference.organization(
-                self.partOf_id).as_fhir()
-        if self.coding_options:
-            for attr in ('use_specific_codings','race_codings',
-                         'ethnicity_codings','indigenous_codings'):
-                if getattr(self, attr):
-                    d[attr] = True
-                else:
-                    d[attr] = False
+        d['type'] = self.type.as_fhir() if self.type else None
+        d['partOf'] = (
+            Reference.organization(self.partOf_id).as_fhir() if
+            self.partOf_id else None)
+        for attr in ('use_specific_codings', 'race_codings',
+                     'ethnicity_codings', 'indigenous_codings'):
+            if getattr(self, attr):
+                d[attr] = True
+            else:
+                d[attr] = False
         extensions = []
         for kls in org_extension_classes:
             instance = org_extension_map(self, {'url': kls.extension_url})
-            data = instance.as_fhir()
+            data = instance.as_fhir(include_empties)
             if data:
                 extensions.append(data)
-        if extensions:
-            d['extension'] = extensions
-        if self.identifiers:
-            d['identifier'] = []
+        d['extension'] = extensions
+        d['identifier'] = []
         for id in self.identifiers:
             d['identifier'].append(id.as_fhir())
-        if self.default_locale:
-            d['language'] = self.default_locale
+        d['language'] = self.default_locale
+        if not include_empties:
+            return strip_empties(d)
         return d
 
     @classmethod
-    def generate_bundle(cls, limit_to_ids=None):
+    def generate_bundle(cls, limit_to_ids=None, include_empties=True):
         """Generate a FHIR bundle of existing orgs ordered by ID
 
-        If limit_to_ids is defined, only return the matching set, otherwise
-        all organizations found.
+        :param limit_to_ids: if defined, only return the matching set, otherwise
+          all organizations found
+        :param include_empties: set to include empty attributes
+        :return:
 
         """
         query = Organization.query.order_by(Organization.id)
         if limit_to_ids:
             query = query.filter(Organization.id.in_(limit_to_ids))
 
-        orgs = [o.as_fhir() for o in query]
+        orgs = [o.as_fhir(include_empties=include_empties) for o in query]
 
         bundle = {
             'resourceType':'Bundle',
@@ -388,11 +400,13 @@ class ResearchProtocolExtension(CCExtension):
 
     extension_url = TRUENTH_RP_EXTENSION
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
         rp = self.organization.research_protocol
         if rp:
             return {'url': self.extension_url,
                     'research_protocol': rp.name}
+        elif include_empties:
+            return {'url': self.extension_url}
 
     def apply_fhir(self):
         if self.extension['url'] != self.extension_url:
