@@ -274,8 +274,11 @@ def update_card_html_on_completion():
                 trigger_date = qb.trigger_date(user)
                 utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start
+                utc_due = qb.calculated_due(
+                    trigger_date, as_of_date=now) or utc_start
 
-                if assessment_status.overall_status == 'Overdue':
+                if ((assessment_status.overall_status == 'Overdue') or
+                        (utc_due < datetime.utcnow())):
                     utc_expired = qb.calculated_expiry(
                         trigger_date, as_of_date=now) or utc_start
                     expired_date = localize_datetime(utc_expired, user)
@@ -286,8 +289,6 @@ def update_card_html_on_completion():
                             assessment_status.top_organization.name,
                             expired_date.strftime('%-d %b %Y'))
                 else:
-                    utc_due = qb.calculated_due(
-                        trigger_date, as_of_date=now) or utc_start
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
                         u"Please complete your {} "
