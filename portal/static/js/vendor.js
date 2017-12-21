@@ -24,7 +24,7 @@
 
 ;(function(window, document, undefined){
   var tests = [];
-  
+
 
   /**
    *
@@ -73,7 +73,7 @@
     }
   };
 
-  
+
 
   // Fake some of Object.create so we can force non test results to be non "own" properties.
   var Modernizr = function() {};
@@ -83,10 +83,10 @@
   // Overwrite name so constructor name is nicer :D
   Modernizr = new Modernizr();
 
-  
+
 
   var classes = [];
-  
+
 
   /**
    * is returns a boolean if the typeof an obj is exactly type.
@@ -182,7 +182,7 @@
    */
 
   var docElement = document.documentElement;
-  
+
 
   /**
    * A convenience helper to check if the document we are running in is an SVG document
@@ -192,7 +192,7 @@
    */
 
   var isSVG = docElement.nodeName.toLowerCase() === 'svg';
-  
+
 
   /**
    * setClasses takes an array of class names and adds them to the root element
@@ -260,7 +260,7 @@
     }
   })();
 
-  
+
 
 
    // _l tracks listeners for async tests, as well as tests that execute after the initial run
@@ -470,7 +470,7 @@
     ModernizrProto.addTest = addTest;
   });
 
-  
+
 
 
 /**
@@ -1067,7 +1067,7 @@
     delete modElem.elem;
   });
 
-  
+
 
   var mStyle = {
     style: modElem.elem.style
@@ -1079,7 +1079,7 @@
     delete mStyle.style;
   });
 
-  
+
 
   /**
    * getBody returns the body of a document, or an element that can stand in for
@@ -1385,7 +1385,7 @@
   var testProp = ModernizrProto.testProp = function(prop, value, useValue) {
     return testProps([prop], undefined, value, useValue);
   };
-  
+
 
   /**
    * fnBind is a super small [bind](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) polyfill.
@@ -1442,7 +1442,7 @@
   // expose these for the plugin API. Look in the source for how to join() them against your input
   ModernizrProto._prefixes = prefixes;
 
-  
+
 
   /**
    * testStyles injects an element with style element and some CSS rules
@@ -1502,7 +1502,7 @@
    */
 
   var testStyles = ModernizrProto.testStyles = injectElementWithStyles;
-  
+
 /*!
 {
   "name": "Touch Events",
@@ -1573,7 +1573,7 @@ This test will also return `true` for Firefox 4 Multitouch support.
    */
 
   var omPrefixes = 'Moz O ms Webkit';
-  
+
 
   /**
    * List of JavaScript DOM values used for tests
@@ -1595,7 +1595,7 @@ This test will also return `true` for Firefox 4 Multitouch support.
 
   var domPrefixes = (ModernizrProto._config.usePrefixes ? omPrefixes.toLowerCase().split(' ') : []);
   ModernizrProto._domPrefixes = domPrefixes;
-  
+
 
   /**
    * Modernizr.hasEvent() detects support for a given event
@@ -1671,7 +1671,7 @@ This test will also return `true` for Firefox 4 Multitouch support.
 
 
   ModernizrProto.hasEvent = hasEvent;
-  
+
 /*!
 {
   "name": "DOM Pointer Events API",
@@ -1713,7 +1713,7 @@ Detects support for the DOM Pointer Events API, which provides a unified event i
 
   var cssomPrefixes = (ModernizrProto._config.usePrefixes ? omPrefixes.split(' ') : []);
   ModernizrProto._cssomPrefixes = cssomPrefixes;
-  
+
 
   /**
    * testDOMProps is a generic DOM property test; if a browser supports
@@ -1790,7 +1790,7 @@ Detects support for the DOM Pointer Events API, which provides a unified event i
   // Modernizr.testAllProps('boxSizing')
   ModernizrProto.testAllProps = testPropsAll;
 
-  
+
 
   /**
    * atRule returns a given CSS property at-rule (eg @keyframes), possibly in
@@ -1857,7 +1857,7 @@ Detects support for the DOM Pointer Events API, which provides a unified event i
 
   ModernizrProto.atRule = atRule;
 
-  
+
 
   /**
    * prefixed returns the prefixed or nonprefixed property name variant of your input
@@ -1941,7 +1941,7 @@ Detects support for the DOM Pointer Events API, which provides a unified event i
     }
   };
 
-  
+
 /*!
 {
   "name": "Force Touch Events",
@@ -2748,7 +2748,6 @@ var Modal = (function ($) {
 
   return Modal;
 })(jQuery);
-//# sourceMappingURL=modal.js.map
 
 /**
  * --------------------------------------------------------------------------
@@ -2906,7 +2905,6 @@ var Util = (function ($) {
 
   return Util;
 })(jQuery);
-//# sourceMappingURL=util.js.map
 
 'use strict';
 
@@ -3200,7 +3198,6 @@ var Dropdown = (function ($) {
 
   return Dropdown;
 })(jQuery);
-//# sourceMappingURL=dropdown.js.map
 
 /**
  * @license
