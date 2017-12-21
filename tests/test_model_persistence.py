@@ -1,10 +1,13 @@
+import json
 from tests import TestCase
 from flask_webtest import SessionScope
+import os
 from shutil import rmtree
 from tempfile import mkdtemp
 
 from portal.config.model_persistence import ModelPersistence
 from portal.database import db
+from portal.models.locale import LocaleConstants
 from portal.models.app_text import AppText
 from portal.models.communication_request import CommunicationRequest
 from portal.models.coding import Coding
@@ -109,3 +112,50 @@ class TestModelPersistence(TestCase):
         mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
         self.assertEquals(AppText.query.count(), 1)
         self.assertEquals(AppText.query.first().name, 'keep me')
+
+    def test_delete_extension(self):
+        org = Organization(name='testy')
+        org.timezone = 'Asia/Tokyo'  # stored in an extension
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        mp = ModelPersistence(
+            Organization, lookup_field='id',
+            sequence_name='organizations_id_seq'
+        )
+        mp.export(self.tmpdir)
+
+        # Strip the empty extensions, as we'd expect in the real persistence file
+        with open(os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
+            data = json.load(pfile)
+            # Special handling of extensions - empties only have 'url' key
+
+        for i, entry in enumerate(data['entry']):
+            extensions = entry['extension']
+            keepers = []
+            for e in extensions:
+                if len(e.keys()) > 1:
+                    keepers.append(e)
+            data['entry'][i]['extension'] = keepers
+            empty_keys = [k for k, v in entry.items() if not v]
+            for k in empty_keys:
+                del data['entry'][i][k]
+
+        with open(os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
+            pfile.write(json.dumps(data))
+
+        # Add an additional extension to the org, make sure
+        # they are deleted when importing again from
+        # persistence that doesn't include them
+
+        org.locales.append(LocaleConstants().AmericanEnglish)
+        with SessionScope(db):
+            db.session.commit()
+        org = db.session.merge(org)
+        self.assertTrue(len(org.as_fhir()['extension']) > 1)
+
+        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        org = Organization.query.filter(Organization.name == 'testy').one()
+        self.assertEquals(org.locales.count(), 0)
+        self.assertEquals(org.timezone, 'Asia/Tokyo')

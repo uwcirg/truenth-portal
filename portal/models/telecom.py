@@ -103,7 +103,9 @@ class Telecom(object):
                             'value': self.email})
         for cp in self.contact_points:
             if cp:
-                telecom.append(cp.as_fhir())
+                fhir = cp.as_fhir()
+                if 'value' in fhir:
+                    telecom.append(fhir)
         return telecom
 
     def cp_dict(self):

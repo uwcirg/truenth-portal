@@ -406,7 +406,7 @@
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"days\": 0}",
-      "qb_iteration": 1,
+      "qb_iteration": 0,
       "questionnaire_bank": {
         "display": "IRONMAN_recurring_6mo_pattern",
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
@@ -424,7 +424,7 @@
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 1}",
-      "qb_iteration": 1,
+      "qb_iteration": 0,
       "questionnaire_bank": {
         "display": "IRONMAN_recurring_6mo_pattern",
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
@@ -442,7 +442,7 @@
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 2}",
-      "qb_iteration": 1,
+      "qb_iteration": 0,
       "questionnaire_bank": {
         "display": "IRONMAN_recurring_6mo_pattern",
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
@@ -460,7 +460,7 @@
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 3}",
-      "qb_iteration": 1,
+      "qb_iteration": 0,
       "questionnaire_bank": {
         "display": "IRONMAN_recurring_6mo_pattern",
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
@@ -478,7 +478,7 @@
       ],
       "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
       "notify_post_qb_start": "{\"weeks\": 4}",
-      "qb_iteration": 1,
+      "qb_iteration": 0,
       "questionnaire_bank": {
         "display": "IRONMAN_recurring_6mo_pattern",
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"

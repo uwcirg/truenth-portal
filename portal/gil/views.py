@@ -285,7 +285,7 @@ def prostate_cancer_facts():
 
 @gil.route('/exercise-and-diet')
 def exercise_and_diet():
-    return render_template('gil/exercise-and-diet.html', user=current_user())
+    return redirect(url_for('exercise_diet.introduction'))
 
 
 @gil.route('/lived-experience')

@@ -109,7 +109,7 @@ def user_intervention_get(intervention_name, user_id):
         user_id=user_id, intervention_id=intervention.id).first()
     if not ui:
         ui = UserIntervention(user_id=user_id)
-    return jsonify(ui.as_json())
+    return jsonify(ui.as_json(include_empties=False))
 
 
 @intervention_api.route('/intervention/<string:intervention_name>',
@@ -119,9 +119,10 @@ def user_intervention_get(intervention_name, user_id):
 def user_intervention_set(intervention_name):
     """Update user settings on the named intervention
 
-    Submit a JSON doc with the user_id and other fields to set.  Keep
-    in mind the PUT defines the whole resource for the user_id on the
-    named intervention, calling GET first may be advisable.
+    Submit a JSON doc with the user_id and other fields to set.
+    Partial submissions are allowed, but must always include the **user_id**.
+    To clear a value, include the field set to 'null'.
+    Calling GET first may be advisable to review current settings.
 
     Only available as a service account API - the named intervention
     must be associated with the service account sponsor.
@@ -225,20 +226,27 @@ def user_intervention_set(intervention_name):
         ui = UserIntervention(user_id=user_id,
                               intervention_id=intervention.id)
         db.session.add(ui)
+
+    # validate particular types if included
     link = request.json.get('link_url')
     if link:
         try:
             validate_origin(link)
         except Unauthorized:
             abort(400, "link_url ill formed or origin not recognized")
-        ui.link_url = link
-    ui.access = request.json.get('access')
-    if ui.access and ui.access not in access_types:
+    access = request.json.get('access')
+    if access and access not in access_types:
         abort(400, "`access` value must be one of {}".format(access_types))
-    ui.card_html = request.json.get('card_html')
-    ui.link_label = request.json.get('link_label')
-    ui.status_text = request.json.get('status_text')
-    ui.staff_html = request.json.get('staff_html')
+
+    # Start with current, complete representation of the UI to update,
+    # replace with given data and update the object.
+    complete = ui.as_json(include_empties=True)
+    for attr in (
+            'link_url', 'access', 'card_html', 'link_label', 'status_text',
+            'staff_html'):
+        if attr in request.json:
+            complete[attr] = request.json.get(attr)
+    ui.update_from_json(complete)
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(
         intervention.description, json.dumps(request.json)),

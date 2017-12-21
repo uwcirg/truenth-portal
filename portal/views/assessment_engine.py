@@ -1,7 +1,18 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
-from flask import session, url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    request,
+    session,
+    url_for,
+)
+from flask_babel import gettext as _
 from flask_swagger import swagger
 from flask_user import roles_required
 import jsonschema
@@ -1312,6 +1323,14 @@ def assessment_add(patient_id):
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
+        # if a valid qb wasn't found, try the indefinite option
+        if not qnr_qb:
+            qbd = QuestionnaireBank.indefinite_qb(
+                patient, as_of_date=authored)
+            qb = qbd.questionnaire_bank
+            if (qb and qn and (qn.id in [qbq.questionnaire.id
+                               for qbq in qb.questionnaires])):
+                qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
@@ -1375,18 +1394,31 @@ def present_needed():
     resume_ids = []
     for questionnaire_name in assessment_status.instruments_in_progress(
             classification='all'):
+        questionnaire_bank = assessment_status.qb_data.qb
+        if questionnaire_name not in (
+                q.name for q in
+                assessment_status.qb_data.qb.questionnaires):
+            # This should only happen in the indefinite case
+            questionnaire_bank = QuestionnaireBank.query.filter(
+                QuestionnaireBank.classification == 'indefinite').one()
+
         resume_ids.append(
             qnr_document_id(
                 subject_id=subject_id,
-                questionnaire_bank_id=assessment_status.qb_data.qb.id,
+                questionnaire_bank_id=questionnaire_bank.id,
                 questionnaire_name=questionnaire_name,
                 status='in-progress'))
 
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
+    if not args.get('instrument_id') and not args.get('resume_identifier'):
+        flash(_('All available questionnaires have been completed'))
+        current_app.logger.debug('no assessments needed, redirecting to /')
+        return redirect('/')
+
     url = url_for('.present_assessment', **args)
-    return redirect(url, code=303)
+    return redirect(url, code=302)
 
 
 @assessment_engine_api.route('/present-assessment')
@@ -1568,6 +1600,21 @@ def complete_assessment():
     entry_method = session.pop("entry_method", None)
     if entry_method:
         current_app.logger.debug("assessment complete via %s", entry_method)
+
+    # Logout Assessment Engine after survey completion
+    for token in INTERVENTION.ASSESSMENT_ENGINE.client.tokens:
+        if token.user != current_user():
+            continue
+
+        current_app.logger.debug("assessment complete, logging out user: %s", token.user.id)
+        INTERVENTION.ASSESSMENT_ENGINE.client.notify({
+            'event': 'logout',
+            'user_id': token.user.id,
+            'refresh_token': token.refresh_token,
+            'info': 'complete-assessment',
+        })
+        db.session.delete(token)
+    db.session.commit()
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)

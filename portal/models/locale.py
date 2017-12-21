@@ -10,7 +10,6 @@ class LocaleConstants(object):
     within for easy access and testing
 
     """
-
     def __iter__(self):
         for attr in dir(self):
             if attr.startswith('_'):
@@ -19,12 +18,12 @@ class LocaleConstants(object):
 
     @lazyprop
     def AmericanEnglish(self):
-        Coding(
+        return Coding(
             system=IETF_LANGUAGE_TAG, code='en_US',
             display='American English').add_if_not_found(True)
 
     @lazyprop
     def AustralianEnglish(self):
-        Coding(
+        return Coding(
             system=IETF_LANGUAGE_TAG, code='en_AU',
             display='Australian English').add_if_not_found(True)

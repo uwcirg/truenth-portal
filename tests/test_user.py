@@ -1091,7 +1091,7 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         user.organizations.append(org)
         # test locale inheritance
-        self.assertEquals(user.locale_display_options,set(['en_AU']))
+        self.assertEquals(user.locale_display_options['en_AU'], 'Australian English')
 
     def test_user_messages(self):
         msg1 = EmailMessage(subject='Test #1',

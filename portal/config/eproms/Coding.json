@@ -6059,6 +6059,30 @@
       "display": "American English",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "de_CH",
+      "display": "Swiss German",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "es_US",
+      "display": "American Spanish",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "fr_CA",
+      "display": "Canadian French",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "sv_SE",
+      "display": "Swedish",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
     }
   ],
   "id": "SitePersistence v0.2",

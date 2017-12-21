@@ -315,3 +315,20 @@ def generate_and_send_summaries(cutoff_days, org_id):
                     error_emails.add(email)
 
     return error_emails or None
+
+
+@celery.task
+@scheduled_task
+def deactivate_tous(**kwargs):
+    "Require users to re-consent to their initial consent"
+    types = kwargs.get('types')
+    sys = User.query.filter_by(email='__system__').first()
+
+    if not sys:
+        raise ValueError("No system user found")
+
+    for user in User.query.filter(User.deleted_id.is_(None)):
+        if any((user.has_role(ROLE.PATIENT),
+                user.has_role(ROLE.STAFF),
+                user.has_role(ROLE.STAFF_ADMIN))):
+            user.deactivate_tous(acting_user=sys, types=types)

@@ -19,6 +19,7 @@ class ToU(db.Model):
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     organization_id = db.Column(db.ForeignKey('organizations.id'))
     type = db.Column('type', tou_types, nullable=False)
+    active = db.Column(db.Boolean(), nullable=False, server_default='1')
 
     audit = db.relationship('Audit', cascade="save-update", lazy='joined')
     """tracks when and by whom the terms were agreed to"""
@@ -34,4 +35,5 @@ class ToU(db.Model):
         d['type'] = self.type
         if self.organization_id:
             d['organization_id'] = self.organization_id
+        d['active'] = self.active
         return d

@@ -291,7 +291,7 @@ class QuestionnaireBank(db.Model):
         expired.
 
         NB the `indefinite` classification is outside the scope of this method,
-        and should be treated independently
+        and should be treated independently - see `indefinite_qb`
 
         """
         as_of_date = as_of_date or datetime.utcnow()
@@ -321,6 +321,30 @@ class QuestionnaireBank(db.Model):
                 if qbd.relative_start <= as_of_date and as_of_date < expiry:
                     return last_found
         return last_found
+
+    @staticmethod
+    def indefinite_qb(user, as_of_date):
+        """Return namedtuple (QBD) for user representing their indefinite QB
+
+        The `indefinite` case is special.  Static method for this special case
+        as `most_current_qb()` handles all others.  Same return type, a QBD
+        named tuple.
+
+        :returns QBD: with values only if the user has an indefinite qb
+
+        """
+        indefinite_qb = QuestionnaireBank.qbs_for_user(user, 'indefinite')
+        if not indefinite_qb:
+            return QBD(None, None, None, None)
+
+        if len(indefinite_qb) > 1:
+            raise ValueError("only supporting single indefinite QB")
+
+        as_of_date = as_of_date or datetime.utcnow()
+        trigger_date = indefinite_qb[0].trigger_date(user)
+        return indefinite_qb[0].calculated_start(
+                trigger_date=trigger_date, as_of_date=as_of_date)
+
 
     def calculated_start(self, trigger_date, as_of_date):
         """Return namedtuple (QBD) for QB
