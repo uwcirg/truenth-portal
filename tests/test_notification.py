@@ -53,7 +53,10 @@ class TestNotification(TestCase):
             '/api/user/{}/notification/{}'.format(TEST_USER_ID, notif_id))
         self.assert200(resp)
 
+        # confirm the UserNotification was deleted
         self.assertFalse(notif in self.test_user.notifications)
-        deleted = UserNotification.query.filter_by(
-            user_id=TEST_USER_ID, notification_id=notif_id).first()
-        self.assertFalse(deleted)
+        self.assertFalse(UserNotification.query.filter_by(
+            user_id=TEST_USER_ID, notification_id=notif_id).first())
+
+        # confirm the Notification was NOT deleted
+        self.assertTrue(Notification.query.filter_by(name="test").first())
