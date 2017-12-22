@@ -438,7 +438,7 @@
     this.setProgressBar();
     $("#buttonsContainer").addClass("continue");
     $("div.reg-complete-container").fadeIn();
-    $("html, body").animate({
+    $("html, body").stop().animate({
       scrollTop: $("div.reg-complete-container").offset().top
     }, 2000);
     $("#next").attr("disabled", true).removeClass("open");
@@ -461,7 +461,7 @@
     $("#next").removeAttr("disabled").addClass("open");
     if (!$("#next").isOnScreen()) {
       setTimeout(function() {
-        $("html, body").animate({
+        $("html, body").stop().animate({
           scrollTop: $("#next").offset().top
         }, 1500);
       }(), 500);
