@@ -70,7 +70,7 @@ env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 echo "Synchronizing database"
 flask sync
 
-echo "Downloading latest translations from Smartling"
+echo "Downloading translations from Smartling"
 flask translation_download
 
 echo "Updating package metadata"
