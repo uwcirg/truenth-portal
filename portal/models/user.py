@@ -27,6 +27,7 @@ from .fhir import Observation, UserObservation
 from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
+from .notification import UserNotification
 from .performer import Performer
 from .organization import Organization, OrgTree
 import reference
@@ -289,6 +290,9 @@ class User(db.Model, UserMixin):
                              cascade="save-update, delete")
     _alt_phone = db.relationship('ContactPoint', foreign_keys=alt_phone_id,
                                  cascade="save-update, delete")
+    notifications = db.relationship(
+        'Notification', secondary='user_notifications',
+        backref=db.backref('users', lazy='dynamic'))
 
     ###
     # PLEASE maintain merge_with() as user model changes #
