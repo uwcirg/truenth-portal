@@ -1,59 +1,12 @@
-{%- extends "profile_base.html" -%}
-{%- import "profile_macros.html" as profile_macro -%}
+{%- extends "profile/profile_base.html" -%}
+{%- import "profile/profile_macros.html" as profile_macro -%}
 {% block profile_title %}
   {{_("My TrueNTH Profile")}}
 {% endblock %}
 {% block profile_content %}
-  <div class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="profile-item-container editable" data-sections="demo">
-            <h4 id="patientInformationLoc" class="profile-item-title index-item">{{_("My Information") }}</h4>
-            <div class="view-container">
-               <table>
-                    <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
-                    <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                    <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                    <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
-                    <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
-               </table>
-            </div>
-            <div class="edit-container">
-                {{profile_macro.profileName(user)}}
-                {{profile_macro.profileBirthDate(user)}}
-                {{profile_macro.profileEmail(user)}}
-                {{profile_macro.profilePhone(user)}}
-                {{profile_macro.profileAltPhone(user)}}
-            </div>
-            <div class="get-demo-error error-message"></div>
-            <div class="put-demo-error error-message"></div>
-        </div>
-    </div>
-    </div>
+    {{profile_macro.profileDemo(user, current_user)}}
     {% if user and user.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container patient-detail-container editable" data-sections="detail">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{{ _("My Detail") }}</h4>
-                    <div class="view-container">
-                        <table>
-                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr id="ethnicityViewRow" data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr id="raceViewRow" data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr id="indigenousViewRow" data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
-                       </table>
-                    </div>
-                    <div class="flex edit-container">
-                        {{profile_macro.profileGender(user)|show_macro('gender')}}
-                        {{profile_macro.profileEthnicity(user)|show_macro('ethnicity')}}
-                        {{profile_macro.profileRace(user)|show_macro('race')}}
-                        {{profile_macro.profileIndigenous(user)|show_macro('indigenous')}}
-                    </div>
-                    <div class="no-data-container"></div>
-                    <div class="get-demo-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-            </div>
-        </div>
+        {{profile_macro.profileDemoDetail(user, current_user)}}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
@@ -79,7 +32,7 @@
                 <div class="col-md-12 col-xs-12">
                     <div class="profile-item-container editable" data-sections="org">
                         <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
-                         {{profile_macro.profileOrgsSelector(user, current_user, consent_agreements)}}
+                        {{profile_macro.profileOrgsSelector(user, current_user)}}
                     </div>
                 </div>
             </div>

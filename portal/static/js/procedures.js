@@ -107,13 +107,14 @@ var procYearReg = /(19|20)\d{2}/;
 $(document).ready(function() {
 
     var subjectId = $("#profileProcSubjectId").val();
-    if (subjectId) {
-        tnthAjax.treatmentOptions(subjectId,null, function(data) {
-            if (!data.error) {
-                fillContent.treatmentOptions(data);
-            };
-        });
 
+    tnthAjax.treatmentOptions(subjectId,null, function(data) {
+        if (!data.error) {
+            fillContent.treatmentOptions(data);
+        };
+    });
+
+    if (subjectId) {
         tnthAjax.getProc(subjectId, false);
     };
 

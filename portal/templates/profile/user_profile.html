@@ -1,5 +1,5 @@
-{%- extends "profile_base.html" -%}
-{%- import "profile_macros.html" as profile_macro -%}
+{%- extends "profile/profile_base.html" -%}
+{%- import "profile/profile_macros.html" as profile_macro -%}
 {% block profile_title %}
   {%- if user.email -%}
     {% trans user_email=user.email %}Profile for {{ user_email }}{% endtrans %}
@@ -8,80 +8,19 @@
   {%- endif -%}
 {% endblock %}
 {% block profile_content %}
-
-    {%- if config.CUSTOM_PATIENT_DETAIL -%}
-        {%- if current_user and user and current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) -%}
-            {{ profile_macro.profileCustomDetail(user) }}
-        {%- endif -%}
-    {%- endif -%}
-    {% if user and user.has_role(ROLE.PATIENT) -%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
-            </div>
-        </div>
-    {%- endif %}
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="demo">
-                <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if user.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                <div class="view-container">
-                   <table>
-                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if user.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
-                        {% if user.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
-                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
-                   </table>
-                </div>
-                <div class="edit-container">
-                    {{profile_macro.profileName(user)}}
-                    {{profile_macro.profileBirthDate(user)}}
-                    {{profile_macro.profileEmail(user)}}
-                    {% if user.has_role('patient') %} {{profile_macro.profileStudyID(current_user)}} {% endif %}
-                    {% if user.has_role('patient') %} {{profile_macro.profileSiteID(current_user)}} {% endif %}
-                    {{profile_macro.profilePhone(user)}}
-                    {{profile_macro.profileAltPhone(user)}}
-                </div>
-                <div class="get-demo-error error-message"></div>
-                <div class="put-demo-error error-message"></div>
-            </div>
-        </div>
-    </div>
+    <!--
+        profile view for user via admin page
+        vieweable only by admin staff
+    -->
+    {{profile_macro.profileDemo(user, current_user)}}
     {%-if user and user.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container patient-detail-container editable" data-sections="detail">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if user.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
-                    <div class="view-container">
-                         <table>
-                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
-                       </table>
-                    </div>
-                    <div class="flex edit-container">
-                        {{profile_macro.profileGender(user)|show_macro('gender')}}
-                        {{profile_macro.profileEthnicity(user)|show_macro('ethnicity')}}
-                        {{profile_macro.profileRace(user)|show_macro('race')}}
-                        {{profile_macro.profileIndigenous(user)|show_macro('indigenous')}}
-                    </div>
-                    <div class="no-data-container"></div>
-                    <div class="get-demo-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-            </div>
-        </div>
+        {{profile_macro.profileDemoDetail(user, current_user)}}
     {%- endif %}
-
     {{profile_macro.profileCommunications(user, current_user)}}
 
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (user and user.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container editable" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
             </div>

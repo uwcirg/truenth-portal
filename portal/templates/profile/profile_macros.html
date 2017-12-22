@@ -4,6 +4,82 @@
     {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
 {%- endmacro %}
 
+{% macro profileDemo(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="profile-item-container editable" data-sections="demo">
+                <h4 id="patientInformationLoc" class="profile-item-title index-item">
+                    {% if person.id == current_user.id -%}
+                        {{_("My Information")}}
+                    {% else %}
+                        {% if person.has_role(ROLE.PATIENT) -%}
+                            {{_("Patient Information") }}
+                        {%- else%}
+                            {{_("User Information") }}
+                        {%- endif%}
+                    {% endif %}
+                </h4>
+                <div class="view-container">
+                   <table>
+                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
+                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
+                   </table>
+                </div>
+                <div class="edit-container">
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
+                    {{profileEmail(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(current_user)}} {% endif %}
+                    {% if person.has_role('patient') %} {{profileSiteID(current_user)}} {% endif %}
+                    {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
+                </div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileDemoDetail(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+          <div class="profile-item-container patient-detail-container editable" data-sections="detail">
+                <h4 id="patientDetailLoc" class="profile-item-title index-item">
+                    {% if person.id == current_user.id -%}
+                        {{_("My Detail")}}
+                    {%- else %}
+                        {% if person.has_role('patient') %}
+                            {{_("Patient Detail")}}
+                        {%else%}
+                            {{_("User Detail")}}
+                        {%endif%}
+                    {%- endif %}
+                </h4>
+                <div class="view-container">
+                    <table>
+                        <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+                        <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                        <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                        <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                     </table>
+                </div>
+                <div class="flex edit-container">
+                    {{profileGender(person)|show_macro('gender')}}
+                    {{profileEthnicity(person)|show_macro('ethnicity')}}
+                    {{profileRace(person)|show_macro('race')}}
+                </div>
+                <div class="no-data-container"></div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}" />
     <div class="form-group profile-section" id="bdGroup">
@@ -33,7 +109,7 @@
             </div>
         </div>
         <div class="help-block with-errors"></div>
-        <span id="errorbirthday" class="help-block error-message"></span>
+        <div id="errorbirthday" class="error-message"></div>
      </div>
 {%- endmacro %}
 
@@ -41,9 +117,9 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
-          {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
-          <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
-          {%- endfor -%}
+            {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
+                <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
+            {%- endfor -%}
         </select>
         <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
         <div class="get-demo-error get-locale-error error-message"></div>
@@ -159,120 +235,35 @@
 
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail" data-loader-container="true">
-        <label for="email">{{ _("Email Address") }}</label>
+        <label for="email">{{_("Email Address")}}</label>
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT)%}data-optional="true"{% else %}required{% endif %} />
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
 {% macro profileEmailForm(person) -%}
     {%- if person -%}
-    <div id="sendEmailForm">
-        <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-        <div class="registration-status-container">
-            <span class="text-muted">{{_('Registration status:')}}</span>
-            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
-            {%- else -%}
-            <h4 class="text-success registration-label">{{_('registered')}}</h4>
-            {%- endif -%}
+        <div id="sendEmailForm">
+            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+            <div class="registration-status-container">
+                <span class="text-muted">{{_('Registration status:')}}</span>
+                {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
+                {%- else -%}
+                <h4 class="text-success registration-label">{{_('registered')}}</h4>
+                {%- endif -%}
+            </div>
+            <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
+            <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
+                <option value="">{{ _("Select Email...") }}</option>
+                {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
+                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+            </select>
+            <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
+            <div id="profileEmailMessage" class="text-info"></div>
+            <div id="profileEmailErrorMessage" class="text-danger"></div>
+            <input type="hidden" id="patientRegistrationInviteEmailUrl" value="{{url_for('portal.patient_invite_email', user_id=person.id)}}" />
+            <div id="patientReminderEmailBody" class="tnth-hide">{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}</div>
+            <div id="patientReminderEmailSubject" class="tnth-hide">{{ app_text('profileSendEmail reminder email_subject') }}</div>
         </div>
-        <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
-        <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
-            <option value="">{{ _("Select Email...") }}</option>
-            {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
-            <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
-        </select>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
-        <div id="profileEmailMessage" class="text-info"></div>
-        <div id="profileEmailErrorMessage" class="text-danger"></div>
-    </div>
-    <script>$(function () {
-        {% if person and person.has_role("write_only") %}$("#lbPatientRegEmail").addClass("active");{% endif %}
-        function getAccessUrl() {
-            var url = '';
-            tnthAjax.accessUrl( $("#_userId").val(), true, function(data) {
-                if (!data.error) {
-                    url = data.url;
-                    $("#profileEmailErrorMessage").text("");
-                } else {
-                    $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
-                }
-            });
-            return url;
-        };
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
-
-        $('#profileEmailSelect').on('change', function() {
-            var message = '';
-            if (this.value != '' && $("#email").val() != "" && $("#erroremail").text() == "") {
-                message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
-                $('#profileEmailMessage').html(message);
-                $('#btnProfileSendEmail').removeClass('disabled');
-            } else {
-                $('#profileEmailMessage').text('');
-                $('#btnProfileSendEmail').addClass('disabled');
-            }
-        });
-
-        $('#btnProfileSendEmail').on('click', function(event) {
-            event.preventDefault();
-            var emailTypeElem = $('#profileEmailSelect');
-            var selectedOption = emailTypeElem.children('option:selected');
-            var email = $('#email').val();
-
-            if (selectedOption.val() != '') {
-                var subject = '';
-                var body = '';
-                var return_url = '';
-                var clinicName = (function() {
-                    var cn = "";
-                    var selectedOrg = $("#userOrgs input[name='organization']:checked");
-                    if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
-                    if (!hasValue(cn)) cn = "{%trans%}your clinic{%endtrans%}";
-                    return cn;
-                })();
-                if (selectedOption.val() == 'invite'){
-                    return_url = getAccessUrl();
-                    if (hasValue(return_url)) {
-                        $.ajax ({
-                            type: "GET",
-                            url: "{{url_for('portal.patient_invite_email', user_id=person.id)}}",
-                            cache: false,
-                            async: false
-                        }).done(function(data) {
-                            if (hasValue(data)) {
-                                subject = data["subject"];
-                                body = data["body"];
-                            };
-                        }).fail(function(xhr) {
-
-                        });
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                    };
-                }
-                else { // reminder
-                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
-                    subject = '{{ app_text('profileSendEmail reminder email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
-                }
-                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
-                    tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
-                        if (!data.error) {
-                            $('#profileEmailMessage').html(i18next.t("<strong class='text-success'>{emailType} email sent to {emailAddress}</strong>").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email));
-                            $('#profileEmailSelect').val("");
-                            $('#btnProfileSendEmail').addClass('disabled');
-
-                        } else {
-                            $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
-                        };
-                    });
-                } else  {
-                    $('#profileEmailMessage').text('{{_("Unable to send email.")}}');
-                    if (!hasValue(body)) $('#profileEmailMessage').append('<div>' + '{{_("Email body content is missing.")}}' + '</div>');
-                    if (!hasValue(subject)) $('#profileEmailMessage').append('<div>' + '{{_("Email subject is missing.")}}' + '</div>');
-                    if (!hasValue(email)) $('#profileEmailMessage').append('<div>' + '{{_("Email address is missing.")}}' + '</div>');
-                };
-            } else $('#profileEmailMessage').text('{%trans%}You must select a email type.{%endtrans%}');
-        });
-     });</script>
     {%- endif -%}
 {%- endmacro %}
 {% macro profileSendEmail(person) -%}
@@ -294,79 +285,8 @@
         <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn disabled">{{ _("Send registration email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
+        <input type="hidden" id="staffRegistrationEmailUrl" value="{{url_for('staff.staff_registration_email', user_id=person.id)}}" />
     </div>
-    <script>$(function () {
-        {% if person and person.has_role("write_only") %}$("#lbStaffRegEmail").addClass("active");{% endif %}
-        function getAccessUrl() {
-            var url = '';
-            tnthAjax.accessUrl( $("#_userId").val(), true, function(data) {
-                if (!data.error) {
-                    url = data.url;
-                    $("#profileEmailErrorMessage").text("");
-                } else {
-                    $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
-                }
-            });
-            return url;
-        };
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
-
-        $('#btnProfileSendEmail').on('click', function(event) {
-            event.preventDefault();
-            var email = $('#email').val();
-            var subject = '';
-            var body = '';
-            var return_url = '';
-            var clinicName = (function() {
-                var orgs = $("#userOrgs input[name='organization']:checked");
-                var parentName = "";
-                if (orgs.length > 0 ) {
-                    orgs.each(function() {
-                        if (!parentName) {
-                            parentName = $(this).attr("data-parent-name");
-                            if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
-                        };
-                    });
-                };
-                var cn = parentName ? parentName: "{%trans%}your clinic{%endtrans%}";
-                return cn;
-            })();
-            $.ajax ({
-                type: "GET",
-                url: "{{url_for('staff.staff_registration_email', user_id=person.id)}}",
-                cache: false,
-                async: false
-            }).done(function(data) {
-                if (hasValue(data)) {
-                    subject = data["subject"];
-                    body = data["body"];
-                };
-            }).fail(function(xhr) {
-
-            });
-
-            //provide default body content if no body content was returned from ajax call
-            if (!hasValue(body)) {
-                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                return_url = getAccessUrl()
-                if (hasValue(return_url)) {
-                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
-                }
-            };
-            if (!hasValue(subject)) {
-                subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
-            };
-
-            tnthAjax.invite({{person.id}},{'subject': subject, 'recipients': email, 'body': body}, function(data) {
-                if (!data.error) {
-                    $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
-                    $('#btnProfileSendEmail').attr("disabled", true);
-                } else {
-                    if (data.error) $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
-                };
-            });
-        });
-     });</script>
     {%- endif -%}
 {%- endmacro %}
 {% macro profileCommunications(person, current_user) -%}
@@ -386,7 +306,7 @@
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
                         <div class="tab">
                           <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label id="lbPatientRegEmail" for="tab-two" class="tab-label">{{_("Send registration email to patient")}}</label>
+                          <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send registration email to patient")}}</label>
                           <div class="tab-content">
                             <div id="registrationEmailContainer">{{profileSendEmail(person)}}</div>
                           </div>
@@ -421,7 +341,7 @@
                             </div>
                             <div class="tab">
                                 <input id="tab-five" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
-                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label">{{_("Send registration email to user")}}</label>
+                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label {% if person and person.has_role('write_only') %}active{% endif %}">{{_("Send registration email to user")}}</label>
                                 <div class="tab-content">
                                     {{profileStaffRegistrationEmail(person)}}
                                 </div>
@@ -439,18 +359,10 @@
             </div>
         </div>
     {%- endif -%}
-    <script>
-        $(function() {
-            $("#communicationsContainer .tab-label").on("click", function() {
-              $("#communicationsContainer .tab-label").removeClass("active");
-              $(this).addClass("active");
-            });
-        });
-    </script>
 {%- endmacro %}
 {% macro profileEmailLog(person) -%}
     <div id="emailLogContainer">
-        <div id="emailLogContent"></div>
+        <div id="emailLogContent"><span class="text-muted">{{_("None available")}}</span></div>
         <div id="emailLogMessage" class="error-message"></div>
     </div>
     <div class="modal fade" id="emailBodyModal" tabindex="-1" role="dialog">
@@ -458,31 +370,22 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <div class="modal-header-title">{{ _("Email Message Content") }}</div>
+              <div class="modal-header-title">{{_("Email Message Content")}}</div>
             </div>
             <div class="modal-body">
                 <div class="body-content"></div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
             </div>
           </div>
         </div>
     </div>
-    <script>
-        {% if person %}
-            $(function() {
-                $("#emailBodyModal").modal({"show": false});
-                    tnthAjax.emailLog({{person.id}}, function(data) {setTimeout(function() { fillContent.emailLog({{person.id}}, data);}, 100);
-                });
-            });
-        {% endif %}
-    </script>
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
-        <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
         <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone"/>
         <div class="help-block with-errors"></div>
     </div>
@@ -491,7 +394,7 @@
 
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
-        <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
         <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone"/>
         <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
@@ -500,7 +403,7 @@
 
 {% macro resetPassword(person) %}
     <div id="resetPasswordGroup" class="form-group profile-section flex-item">
-        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{ _("Send email") }}</button>
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{_("Send email")}}</button>
         <div id="passwordResetMessage" class="text-info"></div>
     </div>
 {%-endmacro %}
@@ -508,7 +411,7 @@
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
-        <div id="clinics">
+        <div id="clinics" data-loader-container="true">
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
                <p class="prompt text-muted">
@@ -520,14 +423,14 @@
                </p>
                <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
                <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-                   <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+                   <p class="clinic-prompt prompt selector-show">{{_("What is your main clinic for prostate cancer care?")}}</p>
                    <div class="main-state-container selector-show">
                    </div>
                </div>
                 <div class="noOrg-container" style="display: none">
                     <label>
                         <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
-                        <span>{{ _("None of the Above") }}</span>
+                        <span>{{_("None of the Above")}}</span>
                     </label>
                 </div>
                <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
@@ -539,227 +442,6 @@
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
-    <script>
-        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-        var stateDict={AL:'{{_("Alabama")}}',AK:'{{_("Alaska")}}',AS:'{{_("American Samoa")}}',AZ:'{{_("Arizona")}}',AR:'{{_("Arkansas")}}',CA:'{{_("California")}}',CO:'{{_("Colorado")}}',CT:'{{_("Connecticut")}}',DE:'{{_("Delaware")}}',DC:'{{_("District Of Columbia")}}',FM:'{{_("Federated States Of Micronesia")}}',FL:'{{_("Florida")}}',GA:'{{_("Georgia")}}',GU:'{{_("Guam")}}',HI:'{{_("Hawaii")}}',ID:'{{_("Idaho")}}',IL:'{{_("Illinois")}}',IN:'{{_("Indiana")}}',IA:'{{_("Iowa")}}',KS:'{{_("Kansas")}}',KY:'{{_("Kentucky")}}',LA:'{{_("Louisiana")}}',ME:'{{_("Maine")}}',MH:'{{_("Marshall Islands")}}',MD:'{{_("Maryland")}}',MA:'{{_("Massachusetts")}}',MI:'{{_("Michigan")}}',MN:'{{_("Minnesota")}}',MS:'{{_("Mississippi")}}',MO:'{{_("Missouri")}}',MT:'{{_("Montana")}}',NE:'{{_("Nebraska")}}',NV:'{{_("Nevada")}}',NH:'{{_("New Hampshire")}}',NJ:'{{_("New Jersey")}}',NM:'{{_("New Mexico")}}',NY:'{{_("New York")}}',NC:'{{_("North Carolina")}}',ND:'{{_("North Dakota")}}',MP:'{{_("Northern Mariana Islands")}}',OH:'{{_("Ohio")}}',OK:'{{_("Oklahoma")}}',OR:'{{_("Oregon")}}',PW:'{{_("Palau")}}',PA:'{{_("Pennsylvania")}}',PR:'{{_("Puerto Rico")}}',RI:'{{_("Rhode Island")}}',SC:'{{_("South Carolina")}}',SD:'{{_("South Dakota")}}',TN:'{{_("Tennessee")}}',TX:'{{_("Texas")}}',UT:'{{_("Utah")}}',VT:'{{_("Vermont")}}',VI:'{{_("Virgin Islands")}}',VA:'{{_("Virginia")}}',WA:'{{_("Washington")}}',WV:'{{_("West Virginia")}}',WI:'{{_("Wisconsin")}}',WY:'{{_("Wyoming")}}'};
-
-        function handleCheckedItem() {
-            var o = $("#userOrgs input[name='organization']:checked");
-            if (o.length > 0 && o.val() != 0) {
-                o.closest(".state-container").show();
-                $(".clinic-prompt").show();
-            };
-        };
-        $(function () {
-            $("#stateSelector").on("change", function() {
-                var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
-                var defaultPrompt = "What is your main clinic for prostate cancer care";
-                $("#userOrgsInfo").hide();
-                if (selectedState.val() != "") {
-                    if (selectedState.val() == "none") {
-                        $(".state-container, .noOrg-container").hide();
-                        $(".clinic-prompt").text("").hide();
-                        $("#noOrgs").prop("checked", true).trigger("click");
-                        //send of ajax to update org to 0 here
-                    } else {
-                        if (container.length > 0) {
-                            $(".state-container").hide();
-                            $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text() + "?").show();
-                            $(".noOrg-container").show();
-                            $("#noOrgs").prop("checked", false);
-                            container.show();
-                        } else {
-                            $(".state-container, .clinic-prompt, .noOrg-container").hide();
-                            $("#userOrgsInfo").show();
-                        };
-                    };
-                } else {
-                    $(".state-container, .noOrg-container").hide();
-                    $(".clinic-prompt").text("").hide();
-                };
-            });
-            $.ajax ({
-                type: "GET",
-                url: '/api/organization',
-                async: false
-            }).done(function(data) {
-                if (data && data.entry) {
-                    var entry = data.entry, states = {}, contentHTML = "";
-                    /*
-                    * populate orgs list object
-                    */
-                    OT.populateOrgsList(entry);
-                    var orgsList = OT.getOrgsList();
-
-                    /**** draw state select element first to gather all states
-                        assign orgs to each state in array
-                    ***/
-                    entry.forEach(function(item) {
-                        var __state = "";
-                        if (item.identifier) {
-                            (item.identifier).forEach(function(region) {
-                                if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
-                                    __state = (region.value).split(":")[1];
-                                    if (!states[__state]) {
-                                        $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                        states[__state] = [item.id];
-                                    } else {
-                                        (states[__state]).push(item.id);
-                                    };
-                                    if ($("#stateSelector option[value='" + __state + "']").length === 0) {
-                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                    };
-                                    /*
-                                    * assign state for each item
-                                    */
-                                    orgsList[item.id].state = __state;
-                                };
-                            });
-                        };
-                    });
-
-                    /*
-                    * If an organization is a top level org and has child orgs,
-                    * we render legend for it.  This will prevent the organization from being selected by the user.
-                    * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
-                    */
-                    var parentOrgs = $.grep(entry, function(item) {
-                        return parseInt(item.id) !== 0 && !item.partOf;
-                    });
-
-                    /*
-                     * sort parent orgs so ones with children displayed first
-                     */
-                    parentOrgs = parentOrgs.sort(function(a, b) {
-                        var oo_1 = orgsList[a.id];
-                        var oo_2 = orgsList[b.id];
-                        if (oo_1 && oo_2) {
-                            if (oo_1.children.length > 0 && oo_2.children.length > 0) {
-                                if (a.name < b.name) return -1;
-                                if (a.name > b.name) return 1;
-                                return 0;
-                            }
-                            else if (oo_1.children.length > 0 && oo_2.children.length == 0) return -1;
-                            else if (oo_2.children.length > 0 && oo_1.children.length == 0) return 1;
-                            else {
-                                if (a.name < b.name) return -1;
-                                if (a.name > b.name) return 1;
-                                return 0;
-                            };
-                        } else return 0;
-                    });
-
-                    parentOrgs.forEach(function(item) {
-                        var state = orgsList[item.id].state;
-                        if ($("#" + state + "_container").length > 0) {
-                            var oo = orgsList[item.id];
-                            if (oo.children.length > 0) {
-                                contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
-                                contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
-                                contentHTML += " id='{orgId}_org' value='{orgId}' />";
-                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                        .replace(/\{orgName\}/g, item.name)
-                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                            } else {
-                                /*
-                                 * also need to check for top level orgs that do not have children and render those
-                                 */
-                                contentHTML = "<div class='radio'>" +
-                                        "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
-                                        "</div>";
-                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                    .replace(/\{state\}/g, state)
-                                                    .replace(/\{orgName\}/g, item.name)
-                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                            };
-                            $("#" + state + "_container").append(contentHTML);
-                        };
-                    });
-
-                    /**** draw input element(s) that belongs to each state based on parent organization id ***/
-                    var childOrgs = $.grep(entry, function(item) {
-                        return parseInt(item.id) !== 0 && item.partOf;
-                    });
-
-                    // sort child clinics in alphabetical order
-                    childOrgs = childOrgs.sort(function(a,b){
-                        if (a.name < b.name) return 1;
-                        if (a.name > b.name) return -1;
-                        return 0;
-                    });
-
-                    childOrgs.forEach(function(item) {
-                        var parentId = (item.partOf.reference).split("/")[2];
-                        if (parentId) {
-                            var parentState = (function(o) {
-                                var s = "", found = false;
-                                for (var state in states) {
-                                    if (!found) {
-                                        (states[state]).forEach(function(i) {
-                                            if (i == o) {
-                                               s = state;
-                                               found = true;
-                                            };
-                                        });
-                                    };
-                                };
-                                return s;
-                            })(parentId);
-
-                            contentHTML = "<div class='radio'>" +
-                                        "<label class='indent'><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
-                                        "</div>";
-                            contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                    .replace(/\{state\}/g, parentState)
-                                                    .replace(/\{parentOrgName\}/g, item.name)
-                                                    .replace(/\{parentOrgId\}/g, parentId)
-                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-
-                            if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
-                                $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
-                            } else {
-                                $("#" + parentState + "_container").append(contentHTML);
-                            };
-                        };
-                      });
-
-                    var selectOptions = $("#stateSelector").sortOptions();
-                    if (selectOptions.length > 0) {
-                        $("#stateSelector").empty().append(selectOptions)
-                          .append("<option value='none'>{{_('Other')}}</option>")
-                          .prepend("<option value='' selected>{{_('Select')}}</option>")
-                          .val("");
-                        $(".state-container, .clinic-prompt").hide();
-                        setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
-                        //case of pre-selected clinic, need to check if any clinic has prechecked
-                        setTimeout(function() { handleCheckedItem();}, 500);
-                        $("#userOrgs input[name='organization']").each(function() {
-                            if (parseInt($(this).val()) !== 0) OT.getDefaultModal(this);
-                        });
-
-                        {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                        OT.handleEvent();
-                    } else { // if no states found, then need to draw the orgs UI
-                        $("#userOrgs .selector-show").hide();
-                        setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
-                            OT.filterOrgs(OT.getHereBelowOrgs());
-                            OT.morphPatientOrgs();
-                            $(".noOrg-container, .noOrg-container *").show();
-                        }); }, 500);
-                    };
-
-                    if ($("#mainDiv.profile").length > 0) {
-                        setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
-                    };
-
-                    $("#clinics").attr("loaded", true);
-                };
-
-            }).fail(function(xhr) {
-                tnthAjax.sendError(xhr, "/api/organization", {{person.id if person}})
-            });
-        });
-    </script>
 {%- endmacro %}
 
 <!--this has an ajax call to fill in the content-->
@@ -773,8 +455,13 @@
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
                 <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-                <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
+                    <!-- nothing to do -->
+                {%- else -%}
+                    <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                {%- endif -%}
                 </div>
+                <div id="defaultConsentContainer"></div>
                 {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
                 <div class="help-block with-errors"></div>
             </div>
@@ -783,34 +470,11 @@
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
-    <script>
-        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-        var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var leafOrgs = false;
-        {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
-            leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
-        {% endif %}
-        $(function () {
-            setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false,
-                function() {
-                    tnthAjax.getDemo({{ person.id if person }}, false, false, _handleOrgs);
-                });}, 500);
-        });
-
-        function _handleOrgs() {
-            if (leafOrgs) OT.filterOrgs(leafOrgs);
-            {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
+    {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-               OT.morphPatientOrgs();
-            {%- endif -%}
-            {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
-                $("#userOrgs .noOrg-container").hide();
-            {%- endif -%}
-            setTimeout(function() { tnthAjax.getConsent({{ person.id if person }});}, 500);
-            $("#clinics").attr("loaded", true);
-        };
-    </script>
+    <input type="hidden" id="requireMorph" value="true" />
+    {%- endif -%}
 {%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
@@ -857,14 +521,6 @@
                 </div>
             </div>
         </div>
-        <script>
-            $(function() {
-                (function() {
-                    var agreement_url = "{{consent_agreement.url}}";
-                    if (/stock\-org\-consent/.test(agreement_url)) $(".terms-wrapper").hide();
-                })();
-            });
-        </script>
     {%- endif -%}
 {%- endmacro %}
 {% macro consent(person, consent_agreements, current_user, includeModal) -%}
@@ -880,69 +536,8 @@
             {%- endif -%}
             <div class="get-consent-error error-message"></div>
         </div>
-        <script>
-            $(function() {
-                $("#consentContainer input[name='toConsent']").each(function() {
-                    $(this).on("click", function(e) {
-                        e.stopPropagation();
-                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true);
-                        var orgId = $(this).attr("data-org");
-                        $("#" + orgId + "_loader").show();
-                        if ($(this).val() == "yes") {
-                            (function(orgId) {
-                                var params = CONSENT_ENUM["consented"];
-                                params.org = orgId;
-                                params.agreementUrl = $("#" + orgId + "_agreement_url").val();
-                                setTimeout(function() { tnthAjax.setConsent({{person.id}}, params);}, 10);
-                                setTimeout(function() { tnthAjax.removeObsoleteConsent();}, 100);
-                            })(orgId);
-                        }
-                        else {
-                            tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
-                            setTimeout(function() { tnthAjax.removeObsoleteConsent();}, 100);
-                        };
-                        if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
-                        setTimeout('$(".modal").modal("hide");', 250);
-                    });
-                });
-                $(document).delegate("#consentContainer button[data-dismiss]", "click", function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setTimeout(function() { location.reload();}, 10);
-                });
-                $("#consentContainer .modal").each(function() {
-                    $(this).on("hidden.bs.modal", function() {
-                        if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
-                            var userId = $("#fillOrgs").attr("userId");
-                            assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
-                        };
-                    });
-                    $(this).on("show.bs.modal", function() {
-                        $("#consentContainer .loading-message-indicator").hide();
-                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
-                        var checkedOrg = $("#userOrgs input[name='organization']:checked");
-                        var shortName = OT.getShortName(checkedOrg.val());
-                        if (hasValue(shortName)) {
-                            $(this).find(".consent-clinic-name").text(i18next.t(shortName));
-                        };
-                        $("#consentContainer input[name='toConsent']").each(function(){
-                            $(this).prop("checked", false);
-                        });
-                        var agreement_url = $(this).find(".agreement-url").val();
-                        if (/stock\-org\-consent/.test(agreement_url)) {
-                            $(".terms-container").hide();
-                        };
-                        var self = $(this);
-                        $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
-                            self.find(".main-content").removeClass("tnth-hide");
-                        });
-                    });
-                });
-            });
-        </script>
     {%- endif -%}
 {%- endmacro %}
-
 {% macro patientReports(person) -%}
     <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
     <div id="prTableToolBar"><span id="tableCount"></span></div>
@@ -953,52 +548,26 @@
 
 {% macro profileConsent(person, current_user) -%}
     {% if person %}
-    <div id="profileConsentList">{{_("No information available.")}}</div>
-    <div id="profileConsentHistory">
-        <div class="modal fade" id="consentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="consentHistoryModal">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">{{ _("Consent History") }}</h4>
+        <div id="profileConsentList">{{_("No information available.")}}</div>
+        <div id="profileConsentHistory">
+            <div class="modal fade" id="consentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="consentHistoryModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">{{_("Consent History")}}</h4>
+                        </div>
+                        <div class="modal-body"></div>
+                         <div class="modal-footer">
+                            <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{_("Close")}}</button>
+                         </div>
                     </div>
-                    <div class="modal-body"></div>
-                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
-                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="get-consent-error error-message"></div>
-    <div class="set-consent-error error-message"></div>
-    <div class="delete-consent-error error-message"></div>
-    <script>
-        var CONSENT_DATE_LABEL = "{{ app_text('consent date label') }}";
-        var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
-        var isTestPatient = {% if current_user and not current_user.has_role(ROLE.PATIENT) %}'{{config.get("SYSTEM.TYPE")}}'.toUpperCase() != "PRODUCTION"{% else %}false{% endif %};
-        var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
-        /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
-        function reloadConsentList() {
-            var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
-            $("#profileConsentList").animate({opacity: 0}, function() {
-                    $(this).html(eventLoading).css('opacity',1);
-                    // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
-                    // more obvious when the updated list loads
-                    setTimeout(function(){
-                        tnthAjax.getConsent({{person.id}}, true);
-                    },1500);
-
-            });
-        };
-        $("#consentHistoryModal").modal({"show": false});
-        /*******  NOTE, this call is already made when getting the organizations
-        $(function () {
-            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 1000);
-        });
-        *******/
-    </script>
+        <div class="get-consent-error error-message"></div>
+        <div class="set-consent-error error-message"></div>
+        <div class="delete-consent-error error-message"></div>
     {% endif %}
 {%- endmacro %}
 {% macro profileConsentDate() -%}
@@ -1062,8 +631,8 @@
     <div id="userSessionsListContainer">
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
-            <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT, Y-M-D") }} )</small></th></tr>
+            <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{_("click each row to review report")}})</span></caption>
+            <tr><th>{{_("Questionnaire Name")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></tr>
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
@@ -1242,6 +811,8 @@
                 </div>
                  <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
+                    <input type="hidden" id="websiteConsentScriptUrl" value="{{url_for('eproms.website_consent_script', patient_id=person.id)}}" />
+                    <input type="hidden" id="presentNeededUrl" value="{{url_for('assessment_engine_api.present_needed', subject_id=person.id)}}" />
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
                     <div id="enterManualInfoContainer" class="text-info"></div>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
@@ -1282,19 +853,19 @@
                                                 </div>
                                                 <div class="flex-item" id="qCompletionMonthContainer">
                                                     <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" required>
-                                                        <option value="">{{ _("Month") }}...</option>
-                                                        <option value="01">{{ _("January") }}</option>
-                                                        <option value="02">{{ _("February") }}</option>
-                                                        <option value="03">{{ _("March") }}</option>
-                                                        <option value="04">{{ _("April") }}</option>
-                                                        <option value="05">{{ _("May") }}</option>
-                                                        <option value="06">{{ _("June") }}</option>
-                                                        <option value="07">{{ _("July") }}</option>
-                                                        <option value="08">{{ _("August") }}</option>
-                                                        <option value="09">{{ _("September") }}</option>
-                                                        <option value="10">{{ _("October") }}</option>
-                                                        <option value="11">{{ _("November") }}</option>
-                                                        <option value="12">{{ _("December") }}</option>
+                                                        <option value="">{{_("Month")}}...</option>
+                                                        <option value="01">{{_("January")}}</option>
+                                                        <option value="02">{{_("February")}}</option>
+                                                        <option value="03">{{_("March")}}</option>
+                                                        <option value="04">{{_("April")}}</option>
+                                                        <option value="05">{{_("May")}}</option>
+                                                        <option value="06">{{_("June")}}</option>
+                                                        <option value="07">{{_("July")}}</option>
+                                                        <option value="08">{{_("August")}}</option>
+                                                        <option value="09">{{_("September")}}</option>
+                                                        <option value="10">{{_("October")}}</option>
+                                                        <option value="11">{{_("November")}}</option>
+                                                        <option value="12">{{_("December")}}</option>
                                                     </select>
                                                 </div>
                                                 <div class="flex-item" id="qCompletionYearContainer">
@@ -1311,8 +882,8 @@
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
                                     <div id="manualEntryButtonsContainer">
-                                        <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                        <a href="#" id="meSubmit" class="btn btn-default">{{_("OK")}}</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
                                     </div>
                                 </div>
                             </div>
@@ -1322,274 +893,6 @@
             </div>
         </div>
     </div>
-    <script>
-    var manualEntryModalVis = function(hide) {
-        if (hide) {
-            $("#manualEntryButtonsContainer").hide();
-            $("#manualEntryLoader").show();
-        } else {
-            $("#manualEntryButtonsContainer").show();
-            $("#manualEntryLoader").hide();
-        };
-    };
-    $(document).ready(function() {
-
-        var continueToAssessment = function(method, completionDate, assessment_url) {
-            if (hasValue(assessment_url)) {
-                var still_needed = false;
-
-                tnthAjax.getStillNeededCoreData("{{person.id if person}}", true, function(data) {
-                    if (data && ! data.error && data.length > 0) {
-                        still_needed = true;
-                    };
-                }, method);
-
-                /*
-                 * passing additional query params
-                 */
-                if (/\?/.test(assessment_url)) {
-                    assessment_url += "&entry_method=" + method;
-                }
-                else{
-                    assessment_url += "?entry_method=" + method;
-                };
-
-                if (method === "paper") {
-                    assessment_url += "&authored=" + completionDate;
-                };
-
-                var winLocation = !still_needed ? assessment_url : "{{url_for('eproms.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
-
-                manualEntryModalVis(true);
-
-                setTimeout(function() {
-                    manualEntryModalVis();
-                }, 2000);
-
-                setTimeout(function() { window.location = winLocation;}, 100);
-
-            } else {
-                $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
-            };
-        };
-
-        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false)
-        $("#loginAsButton").on("click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            profileObj.handleLoginAs(e);
-        });
-        //fix for safari
-        $(window).on("beforeunload", function() {
-            $("#manualEntryButtonsContainer").show();
-            $("#manualEntryLoader").hide();
-            $("#manualEntryModal").modal("hide");
-        });
-
-        $("#manualEntryModal").on("show.bs.modal", function() {
-            $("#manualEntryBodyLoader").show();
-            $("#manualEntryMain").hide();
-        });
-        $("#manualEntryModal").on("shown.bs.modal", function() {
-
-            $("#manualEntryMessageContainer").text("");
-            $("#errorCompletionDate").text("");
-            $("#meSubmit").attr("disabled", false);
-            /*
-            * get GMT date/time for today
-            */
-            var todayObj = tnthDates.getTodayDateObj();
-            $("#qCompletionDay").val(todayObj.displayDay);
-            $("#qCompletionMonth").val(todayObj.displayMonth);
-            $("#qCompletionYear").val(todayObj.displayYear);
-            $("#qCompletionDate").val(todayObj.gmtDate);
-            $("#qToday").val(todayObj.gmtDate);
-
-            if ($("#paper").is(":checked")) {
-                $("#manualEntryCompletionDateContainer").show();
-            };
-            //get consent date
-            tnthAjax.getConsent("{{person.id}}", true, function(data) {
-                var dataArray = [];
-                if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
-                    dataArray = data["consent_agreements"].sort(function(a,b){
-                         return new Date(b.signed) - new Date(a.signed);
-                    });
-                };
-                if (dataArray.length > 0) {
-                    /*
-                     * filtered out non-deleted items from all consents
-                     */
-                    var items = $.grep(dataArray, function(item) {
-                        return !item.deleted && item.status == "consented";
-                    });
-                    /*
-                     * consent date in GMT
-                     */
-                    if (items.length > 0) {
-                        $("#manualEntryConsentDate").val(items[0].signed);
-                    };
-                };
-            });
-
-            setTimeout(function() {
-                $("#manualEntryBodyLoader").hide();
-                $("#manualEntryMain").show();
-
-            }, 10);
-        });
-
-        $("input[name='entryMethod']").on("click", function() {
-            if ($(this).is(":checked")) {
-                $("#manualEntryModal .error-message").text("");
-                $("#meSubmit").attr("disabled", false);
-                if ($(this).val() == "interview_assisted") {
-                    /*
-                    * if method is interview assisted,
-                    * reset completion date to GMT date/time for today
-                    */
-                    var todayObj = tnthDates.getTodayDateObj();
-                    $("#qCompletionDay").val(todayObj.displayDay);
-                    $("#qCompletionMonth").val(todayObj.displayMonth);
-                    $("#qCompletionYear").val(todayObj.displayYear);
-                    $("#qCompletionDate").val(todayObj.gmtDate);
-                };
-            };
-        });
-        $("#paper").on("click", function() {
-            $("#manualEntryCompletionDateContainer").show();
-        });
-        $("#interviewAssisted").on("click", function() {
-            $("#manualEntryCompletionDateContainer").hide();
-        });
-
-         __convertToNumericField($("#qCompletionDay, #qCompletionYear"));
-
-
-        ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
-            var fd = $("#" + fn);
-            fd.on("change", function() {
-                var d = $("#qCompletionDay");
-                var m = $("#qCompletionMonth");
-                var y = $("#qCompletionYear");
-                var todayObj = tnthDates.getTodayDateObj();
-                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
-
-                if (d.val() != "" && m.val() != "" && y.val() != "") {
-                    if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
-                        var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
-                        var consentDate = $("#manualEntryConsentDate").val();
-                        if (!hasValue(errorMsg) && hasValue(consentDate)) {
-                             /*
-                             * check if date entered is today, if so use today's date/time
-                             */
-                            if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
-                                $("#qCompletionDate").val(todayObj.gmtDate);
-                            } else {
-                                var gmtDateObj = tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0);
-                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(gmtDateObj));
-                            };
-                            /*
-                             * all date/time should be in GMT date/time
-                             */
-                            var completionDate = new Date($("#qCompletionDate").val());
-                            var cConsentDate = new Date(consentDate);
-                            var cToday = new Date($("#qToday").val());
-                            var nCompletionDate = completionDate.setHours(0,0,0,0);
-                            var nConsentDate = cConsentDate.setHours(0,0,0,0);
-                            var nToday = cToday.setHours(0,0,0,0);
-                            if (nCompletionDate < nConsentDate) {
-                                errorMsg = i18next.t("Completion date cannot be before consent date.");
-                            };
-                            if (nConsentDate >= nToday) {
-                                if (nCompletionDate > nConsentDate) {
-                                    errorMsg = i18next.t("Completion date cannot be in the future.");
-                                };
-                            } else {
-                                if (nCompletionDate > nToday) {
-                                    errorMsg = i18next.t("Completion date cannot be in the future.");
-                                };
-                            };
-                        };
-                        if (errorMsg === "") {
-                            $("#errorCompletionDate").text("");
-                            $("#meSubmit").attr("disabled", false);
-                        } else {
-                            $("#errorCompletionDate").text(errorMsg);
-                            $("#meSubmit").attr("disabled", true);
-                        };
-                    } else {
-                        $("#meSubmit").attr("disabled", true);
-                    };
-                } else {
-                    $("#errorCompletionDate").text(i18next.t("Completion date must be valid."));
-                    $("#meSubmit").attr("disabled", true);
-                };
-            });
-        });
-        $(document).delegate("#meSubmit", "click", function(event){
-
-            var method = $("input[name='entryMethod']:checked").val();
-            var completionDate = $("#qCompletionDate").val();
-            var linkUrl = "{{url_for('assessment_engine_api.present_needed', subject_id=person.id)}}";
-
-            if (method != "") {
-                $("#manualEntryMessageContainer").text("");
-
-                if (method === "paper") {
-
-                    /*
-                     * check questionnaire time windows
-                     * disallow user to continue if the completion date is not in windows?
-                     * but display warning
-                     */
-
-                    manualEntryModalVis(true);
-
-                    var errorMsg = "";
-
-                    tnthAjax.getCurrentQB("{{person.id}}", tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
-                        if (!data.error) {
-                            if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
-                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
-                            };
-
-                            if (hasValue(errorMsg)) {
-                                $("#errorCompletionDate").text(errorMsg);
-                                $("#meSubmit").attr("disabled", true);
-                                manualEntryModalVis();
-                            } else {
-                                $("#errorCompletionDate").text("");
-                                $("#meSubmit").attr("disabled", false);
-                            };
-
-                            if (!hasValue(errorMsg)) {
-                                continueToAssessment(method, completionDate, linkUrl);
-                            };
-
-                        };
-                    });
-                } else {
-                    continueToAssessment(method, completionDate, linkUrl);
-                };
-            } else {
-                $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
-            };
-          });
-
-        {%- if person -%}
-            tnthAjax.assessmentStatus({{person.id}}, function(data) {
-                if (!data.error) {
-                    if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
-                        (parseInt(data.outstanding_indefinite_work) === 0)) {
-                        $("#assessmentLink").attr("disabled", true);
-                        $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
-                    };
-                };
-            });
-        {%- endif -%}
-        });
-        </script>
 {%- endmacro %}
 {% macro profileInterventions(user_interventions) -%}
   <div class="row">
@@ -1649,19 +952,19 @@
                                     </div>
                                     <div class="flex-item">
                                         <select class="form-control" name="procMonth" id="procMonth" data-error="{{_('Date must be valid and in the required format.')}}">
-                                            <option value="">{{ _("Month") }}...</option>
-                                            <option value="01">{{ _("January") }}</option>
-                                            <option value="02">{{ _("February") }}</option>
-                                            <option value="03">{{ _("March") }}</option>
-                                            <option value="04">{{ _("April") }}</option>
-                                            <option value="05">{{ _("May") }}</option>
-                                            <option value="06">{{ _("June") }}</option>
-                                            <option value="07">{{ _("July") }}</option>
-                                            <option value="08">{{ _("August") }}</option>
-                                            <option value="09">{{ _("September") }}</option>
-                                            <option value="10">{{ _("October") }}</option>
-                                            <option value="11">{{ _("November") }}</option>
-                                            <option value="12">{{ _("December") }}</option>
+                                            <option value="">{{_("Month")}}...</option>
+                                            <option value="01">{{_("January")}}</option>
+                                            <option value="02">{{_("February")}}</option>
+                                            <option value="03">{{_("March")}}</option>
+                                            <option value="04">{{_("April")}}</option>
+                                            <option value="05">{{_("May")}}</option>
+                                            <option value="06">{{_("June")}}</option>
+                                            <option value="07">{{_("July")}}</option>
+                                            <option value="08">{{_("August")}}</option>
+                                            <option value="09">{{_("September")}}</option>
+                                            <option value="10">{{_("October")}}</option>
+                                            <option value="11">{{_("November")}}</option>
+                                            <option value="12">{{_("December")}}</option>
                                         </select>
                                     </div>
                                     <div class="flex-item">
@@ -1674,6 +977,7 @@
                                 </div>
                             </div>
                             {% if person %}
+                                <br />
                                 <br />
                                 <div id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
                                 <div id="pastTreatmentsContainer" class="inner">

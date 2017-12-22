@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {%- from "flask_user/_macros.html" import back_btn, footer -%}
 {% block main %}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
+{%- from "profile/profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
@@ -79,6 +79,8 @@ var aco = new AccountCreationObj(
 'OrgTool': OT,
 'leafOrgs': leafOrgs
 });
+var profileObj = new Profile("", "{{user.id}}");
+profileObj.initSection("demo");
 $(function() {
     /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
     aco.getOrgs(aco.populatePatientOrgs);

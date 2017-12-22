@@ -5,9 +5,13 @@ from sqlalchemy import and_
 from ..extensions import oauth
 from ..models.app_text import (
     app_text,
+    AppText,
+    get_terms,
+    InitialConsent_ATMA,
     MailResource,
     StaffRegistrationEmail_ATMA,
     UndefinedAppText,
+    VersionedResource
 )
 from ..models.communication import load_template_args
 from ..models.organization import Organization, OrgTree, UserOrganization
@@ -62,6 +66,33 @@ def staff_profile_create():
         "staff_profile_create.html", user=user,
         consent_agreements=consent_agreements,
         org_list=list(org_list))
+
+@staff.route('/staff_profile/<int:user_id>')
+@roles_required(ROLE.STAFF_ADMIN)
+@oauth.require_oauth()
+def staff_profile(user_id):
+    """staff profile view function"""
+    user = current_user()
+    if user_id:
+        user.check_role("edit", other_id=user_id)
+        user = get_user(user_id)
+    else:
+        abort(400, "user id is required")
+    consent_agreements = Organization.consent_agreements()
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    #compiling org list for staff admin user
+    #org list should include all orgs under the current user's org(s)
+    OT = OrgTree()
+    org_list = set()
+    for org in current_user().organizations:
+        if org.id == 0:  # None of the above doesn't count
+            continue
+        org_list.update(OT.here_and_below_id(org.id))
+
+    return render_template('profile/staff_profile.html', user=user, terms=terms,
+                           current_user=current_user(),
+                           org_list=list(org_list),
+                           consent_agreements=consent_agreements)
 
 
 @staff.route('/staff')

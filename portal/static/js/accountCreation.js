@@ -123,7 +123,9 @@ var AccountCreationObj = function (roles, dependencies) {
                 "given": $.trim($("input[name=firstname]").val()),
                 "family":$.trim($("input[name=lastname]").val())
             };
-            _demoArray["birthDate"] = $("input[name=birthDate]").val();
+
+            var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+            _demoArray["birthDate"] = y + "-" + m + "-" + d;
 
             _demoArray["telecom"] = [];
 
@@ -304,7 +306,7 @@ var AccountCreationObj = function (roles, dependencies) {
             if (isPatient) {
                 $("#redirectLink").attr("href", "/patients/patient_profile/" + this.userId);
             } else {
-                $("#redirectLink").attr("href", "/profile/" + this.userId);
+                $("#redirectLink").attr("href", "/staff_profile/" + this.userId);
             };
             $("#redirectLink")[0].click();
         };
