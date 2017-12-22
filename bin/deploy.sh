@@ -21,6 +21,7 @@ update_repo(){
 
     # Change current branch, if specified
     if [ -n "$BRANCH" ] && [ "$BRANCH" != "$repo_branch" ]; then
+        echo "Switching current branch to $BRANCH"
         git checkout "$BRANCH"
         repo_branch="$BRANCH"
     fi
@@ -65,6 +66,8 @@ echo "Activating virtualenv"
 
 echo "Updating python dependancies"
 cd "${GIT_WORK_TREE}"
+# Do not pass GIT_WORK_TREE environment variable
+# Dependencies installed in "editable mode" (-e) with git will not install correctly
 env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 
 echo "Synchronizing database"
