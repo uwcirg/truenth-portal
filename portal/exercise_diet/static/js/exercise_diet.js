@@ -63,7 +63,7 @@ function show_exercise(new_item, current_item) {
 }
 
 $(function(){
-    $("input[type='submit']").on("click",function() {
+    $("#Resources input[type='submit']").on("click",function() {
         var zipcode = $("input[name='zipcode']").val();
         var url = "https://www.livestrong.org/ymca-search?distance[postal_code]="+zipcode+"&distance[search_distance]=20&distance[search_units]=mile";
         window.open(url, '_blank');
