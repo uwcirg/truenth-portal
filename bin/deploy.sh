@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-cmdname=$(basename $0)
+cmdname="$(basename "$0")"
 
 usage() {
     cat << USAGE >&2
@@ -57,7 +57,7 @@ export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
 # Assign branch in the following precedence:
 # BRANCH envvar, branch specified by option (-b)
-BRANCH=${BRANCH:-${branch}}
+BRANCH="${BRANCH:-${branch}}"
 update_repo
 
 echo "Activating virtualenv"
