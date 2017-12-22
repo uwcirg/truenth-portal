@@ -19,14 +19,17 @@ update_repo(){
     git fetch origin
     git fetch --tags
 
-    if [ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
+    # Change current branch, if specified
+    if [ -n "$BRANCH" ] && [ "$BRANCH" != "$repo_branch" ]; then
         git checkout "$BRANCH"
+        repo_branch="$BRANCH"
     fi
 
-    git pull origin "$BRANCH"
+    git reset --hard "origin/$repo_branch"
 }
 
-repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
+repo_path="$(cd $(dirname $0) ; git rev-parse --show-toplevel)"
+repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 while getopts ":b:p:" option; do
     case "${option}" in
@@ -53,9 +56,8 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
 # Assign branch in the following precedence:
-# BRANCH envvar, branch specified by option (-b), "develop"
-BRANCH=${BRANCH:-${branch:-develop}}
-
+# BRANCH envvar, branch specified by option (-b)
+BRANCH=${BRANCH:-${branch}}
 update_repo
 
 echo "Activating virtualenv"
