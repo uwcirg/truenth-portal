@@ -67,6 +67,7 @@ def staff_profile_create():
         consent_agreements=consent_agreements,
         org_list=list(org_list))
 
+
 @staff.route('/staff_profile/<int:user_id>')
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
@@ -80,8 +81,9 @@ def staff_profile(user_id):
         abort(400, "user id is required")
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    #compiling org list for staff admin user
-    #org list should include all orgs under the current user's org(s)
+
+    # compiling org list for staff admin user
+    # org list should include all orgs under the current user's org(s)
     OT = OrgTree()
     org_list = set()
     for org in current_user().organizations:
