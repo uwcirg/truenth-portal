@@ -33,14 +33,6 @@ function xhr_function(){
     // pass it on to jQuery
     return xhr;
 }
-// populate portal banner content
-function embed_page(data){
-    $("#mainNav")
-        // Embed data returned by AJAX call into container element
-        .html(data);
-        loader();
-}
-
 function showMain() {
     $("#mainHolder").css({
                           "visibility" : "visible",
@@ -77,6 +69,14 @@ var loader = function(show) {
     };
 };
 
+// populate portal banner content
+function embed_page(data){
+    $("#mainNav")
+        // Embed data returned by AJAX call into container element
+        .html(data);
+        loader();
+}
+
 function getIEVersion() {
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
     return match ? parseInt(match[1]) : undefined;
@@ -90,7 +90,7 @@ function newHttpRequest(url,callBack, noCache)
     if (window.XDomainRequest)
     {
         xmlhttp=new XDomainRequest();
-        xmlhttp.onload = function(){callBack(xmlhttp.responseText)};
+        xmlhttp.onload = function(){callBack(xmlhttp.responseText);};
     } else if (window.XMLHttpRequest) {
         xmlhttp=new XMLHttpRequest();
     }
@@ -121,30 +121,32 @@ function newHttpRequest(url,callBack, noCache)
     xmlhttp.send();
 };
 
-funcWrapper = function() {
-    request_attempts++;
-    $.ajax({
-        url: PORTAL_NAV_PAGE,
-        type:"GET",
-        contentType:"text/plain",
-        timeout: 5000,
-        cache: (getIEVersion() ? false : true)
-    }, "html")
-    .done(function(data) {
-        embed_page(data);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-        if (request_attempts < 3) {
-            setTimeout ( function(){ funcWrapper( ) }, 3000 );
-        } else {
+funcWrapper = function(PORTAL_NAV_PAGE) {
+    if (PORTAL_NAV_PAGE) {
+        request_attempts++;
+        $.ajax({
+            url: PORTAL_NAV_PAGE,
+            type:"GET",
+            contentType:"text/plain",
+            timeout: 5000,
+            cache: (getIEVersion() ? false : true)
+        }, "html")
+        .done(function(data) {
+            embed_page(data);
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+            if (request_attempts < 3) {
+                setTimeout ( function(){ funcWrapper( ) }, 3000 );
+            } else {
+                loader();
+            };
+        })
+        .always(function() {
             loader();
-        };
-    })
-    .always(function() {
-        loader();
-        request_attempts = 0;
-    });
+            request_attempts = 0;
+        });
+    };
 };
 
 function LRKeyEvent() {
@@ -242,11 +244,18 @@ $.fn.isOnScreen = function(){
     return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
 };
 $.fn.sortOptions = function() {
-      var selectOptions = $(this).find("option");
-      selectOptions.sort(function(a, b) {
-            if (a.text > b.text) return 1;
-            else if (a.text < b.text) return -1;
-            else return 0; });
+    var selectOptions = $(this).find("option");
+    selectOptions.sort(function(a, b) {
+        if (a.text > b.text) {
+            return 1;
+        }
+        else if (a.text < b.text) {
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    });
       return selectOptions;
 };
 // Extend an object with an extension
@@ -333,9 +342,9 @@ function extend( obj, extension ){
 +function($){"use strict";var Rowlink=function(element,options){this.$element=$(element)
 this.options=$.extend({},Rowlink.DEFAULTS,options)
 this.$element.on('click.bs.rowlink','td:not(.rowlink-skip)',$.proxy(this.click,this))}
-Rowlink.DEFAULTS={target:"a"}
+Rowlink.DEFAULTS={target:"a"};
 Rowlink.prototype.click=function(e){var target=$(e.currentTarget).closest('tr').find(this.options.target)[0]
-if($(e.target)[0]===target)return
+if($(e.target)[0]===target)return;
 e.preventDefault();if(target.click){target.click()}else if(document.createEvent){var evt=document.createEvent("MouseEvents");evt.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);target.dispatchEvent(evt);}}
 var old=$.fn.rowlink
 $.fn.rowlink=function(options){return this.each(function(){var $this=$(this)

@@ -5109,7 +5109,7 @@ $(document).ready(function() {
         if (isIE) {
             newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
         } else {
-            funcWrapper();
+            funcWrapper(PORTAL_NAV_PAGE);
         };
     } else loader();
 
