@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-cmdname=$(basename $0)
+cmdname="$(basename "$0")"
 
 usage() {
     cat << USAGE >&2
@@ -19,14 +19,18 @@ update_repo(){
     git fetch origin
     git fetch --tags
 
-    if [ "$BRANCH" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
+    # Change current branch, if specified
+    if [ -n "$BRANCH" ] && [ "$BRANCH" != "$repo_branch" ]; then
+        echo "Switching current branch to $BRANCH"
         git checkout "$BRANCH"
+        repo_branch="$BRANCH"
     fi
 
-    git pull origin "$BRANCH"
+    git reset --hard "origin/$repo_branch"
 }
 
-repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
+repo_path="$(cd $(dirname $0) ; git rev-parse --show-toplevel)"
+repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 while getopts ":b:p:" option; do
     case "${option}" in
@@ -53,9 +57,8 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
 # Assign branch in the following precedence:
-# BRANCH envvar, branch specified by option (-b), "develop"
-BRANCH=${BRANCH:-${branch:-develop}}
-
+# BRANCH envvar, branch specified by option (-b)
+BRANCH="${BRANCH:-${branch}}"
 update_repo
 
 echo "Activating virtualenv"
@@ -63,12 +66,14 @@ echo "Activating virtualenv"
 
 echo "Updating python dependancies"
 cd "${GIT_WORK_TREE}"
+# Do not pass GIT_WORK_TREE environment variable
+# Dependencies installed in "editable mode" (-e) with git will not install correctly
 env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 
 echo "Synchronizing database"
 flask sync
 
-echo "Downloading latest translations from Smartling"
+echo "Downloading translations from Smartling"
 flask translation_download
 
 echo "Updating package metadata"
