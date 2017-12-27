@@ -80,12 +80,9 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
-          {%- if (person and ("en_US" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_US" -%}
-          <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
-          {%- endif -%}
-          {%- if (person and ("en_AU" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_AU" -%}
-          <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
-          {%- endif -%}
+          {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
+          <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
+          {%- endfor -%}
         </select>
         <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
         <div class="get-demo-error get-locale-error error-message"></div>
@@ -362,7 +359,7 @@
                 if (hasValue(body) && hasValue(subject) && hasValue(email)) {
                     tnthAjax.invite({{person.id}}, {'subject': subject, 'recipients': email, 'body': body}, function(data) {
                         if (!data.error) {
-                            $('#profileEmailMessage').html("<strong class='text-success'>{% trans %}" + selectedOption.text() + ' email sent to ' + email + "{%endtrans%}</strong>");
+                            $('#profileEmailMessage').html(i18next.t("<strong class='text-success'>{emailType} email sent to {emailAddress}</strong>").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email));
                             $('#profileEmailSelect').val("");
                             $('#btnProfileSendEmail').addClass('disabled');
 
@@ -734,10 +731,10 @@
                                         $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
                                         states[__state] = [item.id];
                                     } else {
-                                        if ($("#stateSelector option[value='" + __state + "']").length === 0) {
-                                            $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                        };
                                         (states[__state]).push(item.id);
+                                    };
+                                    if ($("#stateSelector option[value='" + __state + "']").length === 0) {
+                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
                                     };
                                     /*
                                     * assign state for each item
@@ -753,69 +750,102 @@
                     * we render legend for it.  This will prevent the organization from being selected by the user.
                     * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
                     */
-                    entry.forEach(function(item) {
-                        if (parseInt(item.id) !== 0 && !item.partOf) {
-                            var state = orgsList[item.id].state;
-                            if ($("#" + state + "_container").length > 0) {
-                                var oo = orgsList[item.id];
-                                if (oo.children.length > 0) {
-                                    contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
-                                    contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
-                                    contentHTML += " id='{orgId}_org' value='{orgId}' />";
-                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                            .replace(/\{orgName\}/g, item.name)
-                                                            .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                } else {
-                                    /*
-                                     * also need to check for top level orgs that do not have children and render those
-                                     */
-                                    contentHTML = "<div class='radio'>" +
-                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
-                                            "</div>";
-                                    contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                        .replace(/\{state\}/g, state)
+                    var parentOrgs = $.grep(entry, function(item) {
+                        return parseInt(item.id) !== 0 && !item.partOf;
+                    });
+
+                    /*
+                     * sort parent orgs so ones with children displayed first
+                     */
+                    parentOrgs = parentOrgs.sort(function(a, b) {
+                        var oo_1 = orgsList[a.id];
+                        var oo_2 = orgsList[b.id];
+                        if (oo_1 && oo_2) {
+                            if (oo_1.children.length > 0 && oo_2.children.length > 0) {
+                                if (a.name < b.name) return -1;
+                                if (a.name > b.name) return 1;
+                                return 0;
+                            }
+                            else if (oo_1.children.length > 0 && oo_2.children.length == 0) return -1;
+                            else if (oo_2.children.length > 0 && oo_1.children.length == 0) return 1;
+                            else {
+                                if (a.name < b.name) return -1;
+                                if (a.name > b.name) return 1;
+                                return 0;
+                            };
+                        } else return 0;
+                    });
+
+                    parentOrgs.forEach(function(item) {
+                        var state = orgsList[item.id].state;
+                        if ($("#" + state + "_container").length > 0) {
+                            var oo = orgsList[item.id];
+                            if (oo.children.length > 0) {
+                                contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
+                                contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
+                                contentHTML += " id='{orgId}_org' value='{orgId}' />";
+                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
                                                         .replace(/\{orgName\}/g, item.name)
                                                         .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-                                };
-                                $("#" + state + "_container").append(contentHTML);
+                            } else {
+                                /*
+                                 * also need to check for top level orgs that do not have children and render those
+                                 */
+                                contentHTML = "<div class='radio'>" +
+                                        "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
+                                        "</div>";
+                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                    .replace(/\{state\}/g, state)
+                                                    .replace(/\{orgName\}/g, item.name)
+                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
                             };
+                            $("#" + state + "_container").append(contentHTML);
                         };
                     });
 
                     /**** draw input element(s) that belongs to each state based on parent organization id ***/
-                    entry.forEach(function(item) {
-                        if (parseInt(item.id) != 0 && item.partOf) {
-                            var parentId = (item.partOf.reference).split("/")[2];
-                            if (parentId) {
-                                var parentState = (function(o) {
-                                    var s = "", found = false;
-                                    for (var state in states) {
-                                        if (!found) {
-                                            (states[state]).forEach(function(i) {
-                                                if (i == o) {
-                                                   s = state;
-                                                   found = true;
-                                                };
-                                            });
-                                        };
+                    var childOrgs = $.grep(entry, function(item) {
+                        return parseInt(item.id) !== 0 && item.partOf;
+                    });
+
+                    // sort child clinics in alphabetical order
+                    childOrgs = childOrgs.sort(function(a,b){
+                        if (a.name < b.name) return 1;
+                        if (a.name > b.name) return -1;
+                        return 0;
+                    });
+
+                    childOrgs.forEach(function(item) {
+                        var parentId = (item.partOf.reference).split("/")[2];
+                        if (parentId) {
+                            var parentState = (function(o) {
+                                var s = "", found = false;
+                                for (var state in states) {
+                                    if (!found) {
+                                        (states[state]).forEach(function(i) {
+                                            if (i == o) {
+                                               s = state;
+                                               found = true;
+                                            };
+                                        });
                                     };
-                                    return s;
-                                })(parentId);
-
-                                contentHTML = "<div class='radio'>" +
-                                            "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
-                                            "</div>";
-                                contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
-                                                        .replace(/\{state\}/g, parentState)
-                                                        .replace(/\{parentOrgName\}/g, item.name)
-                                                        .replace(/\{parentOrgId\}/g, parentId)
-                                                        .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
-
-                                if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
-                                    $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
-                                } else {
-                                    $("#" + parentState + "_container").append(contentHTML);
                                 };
+                                return s;
+                            })(parentId);
+
+                            contentHTML = "<div class='radio'>" +
+                                        "<label class='indent'><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
+                                        "</div>";
+                            contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                    .replace(/\{state\}/g, parentState)
+                                                    .replace(/\{parentOrgName\}/g, item.name)
+                                                    .replace(/\{parentOrgId\}/g, parentId)
+                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+
+                            if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
+                                $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
+                            } else {
+                                $("#" + parentState + "_container").append(contentHTML);
                             };
                         };
                       });
@@ -863,16 +893,18 @@
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
-        <div class="form-group profile-section standard" id="userOrgs">
-            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{ _("Main clinic for prostate cancer care") }}</p>{%else%}
-            <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
-            <div class="indent">
-            <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
-            <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-            <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+        <div id="clinics">
+            <div class="form-group profile-section standard" id="userOrgs">
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
+                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
+                <div class="indent">
+                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
+                <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                </div>
+                {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+                <div class="help-block with-errors"></div>
             </div>
-            {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
-            <div class="help-block with-errors"></div>
         </div>
     </div>
     <div class="get-orgs-error error-message"></div>
@@ -903,12 +935,13 @@
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
             setTimeout(function() { tnthAjax.getConsent({{ person.id if person }});}, 500);
+            $("#clinics").attr("loaded", true);
         };
     </script>
 {%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
-        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal" class="consent-modal">
+        <div class="modal fade consent-modal" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1439,7 +1472,7 @@
                    </table>
                 </div>
                 <div id="patientQContainer" class="edit-container">
-                    {{patientQGroup(current_user)}}
+                    {{patientQGroup(person)}}
                 </div>
                 <div class="get-clinical-error error-message"></div>
                 <div class="put-clinical-error error-message"></div>

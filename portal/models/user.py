@@ -16,13 +16,15 @@ import regex
 import time
 
 from .audit import Audit
-from ..dict_tools import dict_match
+from .codeable_concept import CodeableConcept
+from .coding import Coding
+from ..dict_tools import dict_match, strip_empties
 from .encounter import Encounter
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .extension import CCExtension, TimezoneExtension
 from .fhir import Observation, UserObservation
-from .fhir import Coding, CodeableConcept, ValueQuantity
+from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .performer import Performer
@@ -30,10 +32,13 @@ from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
-from ..system_uri import TRUENTH_PROVIDER_SYSTEMS
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
-from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
+from ..system_uri import (
+    IETF_LANGUAGE_TAG,
+    TRUENTH_EXTENSTION_NHHD_291036,
+    TRUENTH_EXTERNAL_STUDY_SYSTEM,
+    TRUENTH_ID,
+    TRUENTH_PROVIDER_SYSTEMS,
+    TRUENTH_USERNAME)
 from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
@@ -132,7 +137,7 @@ def permanently_delete_user(
         UserRelationship.query.filter(
             or_(UserRelationship.user_id == user.id,
                 UserRelationship.other_user_id == user.id)).delete()
-        tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
+        tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
 
@@ -370,7 +375,7 @@ class User(db.Model, UserMixin):
         # IETF BCP 47 standard uses hyphens, but we instead store w/
         # underscores, to better integrate with babel/LR URLs/etc
         data = {"coding": [{'code': lang_info[0], 'display': lang_info[1],
-                            'system': "urn:ietf:bcp:47"}]}
+                            'system': IETF_LANGUAGE_TAG}]}
         self._locale = CodeableConcept.from_fhir(data)
 
     @hybrid_property
@@ -418,9 +423,13 @@ class User(db.Model, UserMixin):
     @phone.setter
     def phone(self, val):
         if self._phone:
-            self._phone.value = val
-        else:
-            self._phone = ContactPoint(system='phone', use='mobile', value=val)
+            if val:
+                self._phone.value = val
+            else:
+                self._phone = None
+        elif val:
+            self._phone = ContactPoint(
+                system='phone', use='mobile', value=val)
 
     @property
     def alt_phone(self):
@@ -430,8 +439,11 @@ class User(db.Model, UserMixin):
     @alt_phone.setter
     def alt_phone(self, val):
         if self._alt_phone:
-            self._alt_phone.value = val
-        else:
+            if val:
+                self._alt_phone.value = val
+            else:
+                self._alt_phone = None
+        elif val:
             self._alt_phone = ContactPoint(
                 system='phone', use='home', value=val)
 
@@ -525,20 +537,26 @@ class User(db.Model, UserMixin):
     def locale_display_options(self):
         """Collates all the locale options from the user's orgs
         to establish which should be visible to the user"""
-        locale_options = set()
+
+        def locale_name_from_code(locale_code):
+            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=locale_code).first()
+            return coding.display
+
+        locale_options = {}
         if self.locale_code:
-            locale_options.add(self.locale_code)
+            locale_options[self.locale_code] = self.locale_name
         for org in self.organizations:
             for locale in org.locales:
-                locale_options.add(locale.code)
-            if org.default_locale:
-                locale_options.add(org.default_locale)
+                locale_options[locale.code] = locale.display
+            if org.default_locale and org.default_locale not in locale_options:
+                locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
             while org.partOf_id:
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
-                    locale_options.add(locale.code)
-                if org.default_locale:
-                    locale_options.add(org.default_locale)
+                    locale_options[locale.code] = locale.display
+                if org.default_locale and org.default_locale not in locale_options:
+                    locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
+
         return locale_options
 
     def add_organization(self, organization_name):
@@ -749,7 +767,14 @@ class User(db.Model, UserMixin):
             fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
-    def as_fhir(self):
+    def as_fhir(self, include_empties=True):
+        """Return JSON representation of user
+
+        :param include_empties: if True, returns entire object definition;
+            if False, empty elements are removed from the result
+        :return: JSON representation of a FHIR Patient resource
+
+        """
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
@@ -775,18 +800,14 @@ class User(db.Model, UserMixin):
         d['resourceType'] = "Patient"
         d['identifier'] = [id.as_fhir() for id in self.identifiers]
         d['name'] = {}
-        if self.first_name:
-            d['name']['given'] = self.first_name
-        if self.last_name:
-            d['name']['family'] = self.last_name
-        if self.birthdate:
-            d['birthDate'] = as_fhir(self.birthdate)
+        d['name']['given'] = self.first_name
+        d['name']['family'] = self.last_name
+        d['birthDate'] = as_fhir(self.birthdate) if self.birthdate else None
         d.update(deceased())
-        if self.gender:
-            d['gender'] = self.gender
+        d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
-        if self._locale:
-            d['communication'] = [{"language": self._locale.as_fhir()}]
+        d['communication'] = (
+            [{"language": self._locale.as_fhir()}] if self._locale else None)
         telecom = Telecom(email=self.email,
                           contact_points=[self._phone, self._alt_phone])
         d['telecom'] = telecom.as_fhir()
@@ -796,14 +817,16 @@ class User(db.Model, UserMixin):
         extensions = []
         for kls in user_extension_classes:
             instance = user_extension_map(self, {'url': kls.extension_url})
-            data = instance.as_fhir()
+            data = instance.as_fhir(include_empties)
             if data:
                 extensions.append(data)
-        if extensions:
-            d['extension'] = extensions
+        d['extension'] = extensions
         d['careProvider'] = careProviders()
-        if self.deleted_id:
-            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
+        d['deleted'] = (
+            FHIR_datetime.as_fhir(self.deleted.timestamp)
+            if self.deleted_id else None)
+        if not include_empties:
+            return strip_empties(d)
         return d
 
     def update_consents(self, consent_list, acting_user):
@@ -816,10 +839,11 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
+            # add audit for consent signed date
             audit = Audit(
                 user_id=acting_user.id,
                 subject_id=self.id,
-                comment="Adding consent agreement",
+                comment="Consent agreement signed",
                 context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
@@ -837,6 +861,21 @@ class User(db.Model, UserMixin):
 
             consent.audit = audit
             db.session.add(consent)
+            db.session.commit()
+            audit, consent = map(db.session.merge, (audit, consent))
+            # update consent signed audit with consent ID ref
+            audit.comment = "Consent agreement {} signed".format(consent.id)
+            # add audit for consent recorded date
+            recorded = Audit(
+                user_id=acting_user.id,
+                subject_id=self.id,
+                comment="Consent agreement {} recorded".format(consent.id),
+                context='consent',
+                timestamp=datetime.utcnow())
+            db.session.add(audit)
+            db.session.add(recorded)
+            db.session.commit()
+
         for replaced in delete_consents:
             replaced.deleted = Audit(
                 comment="new consent replacing existing",
@@ -844,6 +883,36 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='consent')
             replaced.status = "deleted"
             db.session.add(replaced)
+        db.session.commit()
+
+    def deactivate_tous(self, acting_user, types=None):
+        """ Mark user's current active ToU agreements as inactive
+
+        Marks the user's current active ToU agreements as inactive.
+        User must agree to ToUs again upon next login (per CoreData logic).
+        If types provided, only deactivates agreements of that ToU type.
+        Called when the ToU agreement language is updated.
+
+        :param acting_user: user behind the request for permission checks
+        :param types: ToU types for which to invalide agreements (optional)
+
+        """
+        from .tou import ToU
+
+        for tou in ToU.query.join(Audit).filter(and_(
+                Audit.subject_id == self.id,
+                ToU.active.is_(True))):
+            if not types or (tou.type in types):
+                tou.active = False
+                audit = Audit(
+                    user_id=acting_user.id,
+                    subject_id=self.id,
+                    comment=("ToU agreement {} marked as "
+                             "inactive".format(tou.id)),
+                    context='tou',
+                    timestamp=datetime.utcnow())
+                db.session.add(tou)
+                db.session.add(audit)
         db.session.commit()
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
@@ -1019,29 +1088,28 @@ class User(db.Model, UserMixin):
                 fhir['name'].get('family')) or self.last_name
         if 'birthDate' in fhir:
             try:
-                fhir['birthDate'].strip()
+                bd = fhir['birthDate']
                 self.birthdate = datetime.strptime(
-                    fhir['birthDate'], '%Y-%m-%d')
+                    bd.strip(), '%Y-%m-%d') if bd else None
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
         update_deceased(fhir)
         update_identifiers(fhir)
-        if 'gender' in fhir and fhir['gender']:
-            self.gender = fhir['gender'].lower()
+        if 'gender' in fhir:
+            self.gender = fhir['gender'].lower() if fhir['gender'] else None
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
-            if not telecom.email:
-                abort(400, "no valid email address provided")
-            if ((telecom.email != self.email) and
-                    (User.query.filter_by(email=telecom.email).count() > 0)):
-                abort(400, "email address already in use")
-            self.email = telecom.email
+            if telecom.email:
+                if ((telecom.email != self.email) and
+                        (User.query.filter_by(email=telecom.email).count() > 0)):
+                    abort(400, "email address already in use")
+                self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'mobile')) \
                 or telecom_cps.get(('phone', None))
             self.alt_phone = telecom_cps.get(('phone', 'home'))
-        if 'communication' in fhir:
+        if fhir.get('communication'):
             for e in fhir['communication']:
                 if 'language' in e:
                     self._locale = CodeableConcept.from_fhir(e.get('language'))
@@ -1054,7 +1122,6 @@ class User(db.Model, UserMixin):
             org_list = [reference.Reference.parse(item) for item in
                         fhir['careProvider']]
             self.update_orgs(org_list, acting_user)
-        db.session.add(self)
 
     @classmethod
     def column_names(cls):

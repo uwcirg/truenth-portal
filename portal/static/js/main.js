@@ -54,20 +54,27 @@ function showMain() {
                         });
 
 }
+function hideLoader(delay, time ) {
+    if (delay) {
+        $("#loadingIndicator").hide();
+    } else {
+        setTimeout(function() { $("#loadingIndicator").fadeOut();}, time||200);
+    };
+}
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
 	//landing page
 	if ($("#fullSizeContainer").length > 0) {
-		$("#loadingIndicator").hide();
-		showMain();
-		return false;
+        hideLoader();
+        showMain();
+        return false;
 	};
 	if (show) {
-		$("#loadingIndicator").show();
+        $("#loadingIndicator").show();
 	} else {
     	if (!DELAY_LOADING) {
-        	setTimeout("showMain();", 100);
-        	setTimeout('$("#loadingIndicator").fadeOut();', 200);
+            setTimeout("showMain();", 100);
+            hideLoader(true);
         };
     };
 };
@@ -405,8 +412,11 @@ var ConsentUIHelper = function(consentItems, userId) {
             var org = OT.orgsList[item.organization_id];
             touContent += "<tr data-tou-type='" + item.type + "'>";
             touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? i18next.t(org.name) : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+            /*
+             * note terms of use text is hidden/unhidden using respective project's stylesheet
+             */
             touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + capitalize(item.display_type)) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + i18next.t("TrueNTH USA Terms of Use") + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{project name} Terms of Use").replace("{project name}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
         return touContent;
@@ -1028,7 +1038,9 @@ var fillContent = {
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["ethnicity"]) {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["ethnicity"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 //console.log(item)
                 item.valueCodeableConcept.coding.forEach(function(val){
                     $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
@@ -1044,7 +1056,10 @@ var fillContent = {
     "race": function(data) {
         // Get Races
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["race"]) {
+            if (
+                item.url === SYSTEM_IDENTIFIER_ENUM["race"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
@@ -1063,7 +1078,9 @@ var fillContent = {
     },
     "indigenous": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["indigenous"]) {
+            if (item.url === SYSTEM_IDENTIFIER_ENUM["indigenous"] &&
+                item.hasOwnProperty("valueCodeableConcept")
+            ) {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
                     $("#userIndigenousStatus input[type='radio'][value="+val.code+"]").prop('checked', true);
@@ -1923,10 +1940,15 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
     $("input[name='organization']").each(function() {
         if (! self.inArray($(this).val(), leafOrgs)) {
             $(this).hide();
-            if (self.orgsList[$(this).val()] && self.orgsList[$(this).val()].children.length == 0) {
-                var l = $(this).closest("label");
-                l.hide();
-                l.next(".divider").hide();
+            if (self.orgsList[$(this).val()]) {
+                if (self.orgsList[$(this).val()].children.length === 0) {
+                    var l = $(this).closest("label");
+                    l.hide();
+                } else {
+                    var l = $(this).closest("label");
+                    l.addClass("data-display-only");
+                };
+
             };
         };
     });
@@ -2035,82 +2057,113 @@ OrgTool.prototype.getShortName = function (orgId) {
     return shortName;
 };
 OrgTool.prototype.populateUI = function() {
-    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
+    var topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
-    	var s = "", found = false;
-    	if (item.identifier) {
-        	(item.identifier).forEach(function(i) {
-        		if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
-                	s = (i.value).split(":")[1];
-                	found = true;
+        var s = "", found = false;
+        if (item.identifier) {
+            (item.identifier).forEach(function(i) {
+                if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                    s = (i.value).split(":")[1];
+                    found = true;
                 };
             });
-		};
-		return s;
-	};
-	for (org in orgsList) {
+        };
+        return s;
+    };
+
+    var keys = Object.keys(orgsList);
+    keys = keys.sort();
+
+    /*
+     * draw parent orgs first
+     */
+    var parentOrgsArray = [];
+
+    keys.forEach(function(org) {
         if (orgsList[org].isTopLevel) {
-            if (orgsList[org].children.length > 0) {
-                if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
-                	parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>"
-                					+ "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' />";
-                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                	container.append(parentContent);
-                    parentOrgsCt++;
-                };
-            } else {
-                if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                	parentContent = "<label id='org-label-{{orgId}}' class='org-label'>"
-                					+ "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
-                					+ "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label>";
-                	parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                					.replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                					.replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                	container.append(parentContent);
-                };
+            parentOrgsArray.push(org);
+        };
+    });
+
+    /*
+     * sort parent orgs by name
+     */
+    parentOrgsArray = parentOrgsArray.sort(function(a, b) {
+        var orgA = orgsList[a], orgB = orgsList[b];
+        if (orgA.name < orgB.name) return -1;
+        if (orgA.name > orgB.name) return 1;
+        return 0;
+    });
+
+    parentOrgsArray.forEach(function(org) {
+        if (orgsList[org].children.length > 0) {
+            if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>"
+                               + "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{{orgName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
+                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                container.append(parentContent);
+            };
+        } else {
+            if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
+                                + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
+                                + "data-parent-id='{{orgId}}'  data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
+                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                                .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                                .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+                container.append(parentContent);
             };
         };
+    });
+
+    /*
+     * draw child orgs
+     */
+    keys.forEach(function(org) {
         // Fill in each child clinic
         if (orgsList[org].children.length > 0) {
             var childClinic = "";
-            orgsList[org].children.forEach(function(item, index) {
+            // sort child clinic in alphabetical order
+            var items = orgsList[org].children.sort(function(a,b){
+                    if (a.name < b.name) return -1;
+                    if (a.name > b.name) return 1;
+                    return 0;
+                });
+            items.forEach(function(item, index) {
                 var _parentOrgId = item.parentOrgId;
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
 
                 if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
-                	return true;
+                    return true;
                 };
 
-                childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container'>"
-          					+ "<label id='org-label-{{itemId}}' class='org-label {{classes}}'>"
-                			+ "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
-                			+ "<span>{{itemName}}</span>"
-                			+ "</label>";
-                			+ "</div>";
+                childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container {{containerClass}}'>"
+                            + "<label id='org-label-{{itemId}}' class='org-label {{textClasses}}'>"
+                            + "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
+                            + "<span>{{itemName}}</span>"
+                            + "</label>";
+                            + "</div>";
                 childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
-                						.replace(/\{\{itemName\}\}/g, item.name)
-                						.replace(/\{\{state\}\}/g, hasValue(state)?state:"")
-                						.replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
-                						.replace(/\{\{classes\}\}/g, (orgsList[item.id].children.length > 0 ? (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter"): ""))
+                                        .replace(/\{\{itemName\}\}/g, item.name)
+                                        .replace(/\{\{state\}\}/g, hasValue(state)?state:"")
+                                        .replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : ""))
+                                        .replace("{{containerClass}}", (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "sub-org-container": ""): ""))
+                                        .replace(/\{\{textClasses\}\}/g, (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "text-muted": "text-muter"): ""))
 
                 if ($("#" + _parentOrgId + "_container").length > 0) {
-                	$("#" + _parentOrgId + "_container").append(childClinic);
+                    $("#" + _parentOrgId + "_container").append(childClinic);
                 } else {
-                	container.append(childClinic);
+                    container.append(childClinic);
                 };
-
             });
         };
-        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) {
-        	container.append("<span class='divider'>&nbsp;</span>");
-        };
-    };
+    });
     if (!hasValue(container.text())) {
-    	container.html(i18next.t("No organizations available"));
+        container.html(i18next.t("No organizations available"));
     };
 };
 OrgTool.prototype.getDefaultModal = function(o) {
@@ -2119,7 +2172,7 @@ OrgTool.prototype.getDefaultModal = function(o) {
         };
         var self = this;
         var orgsList = self.getOrgsList();
-        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : $(o).attr("data-parent-name");
+        var orgId = self.getElementParentOrg(o), orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : ($(o).attr("data-parent-name") || $(o).closest("label").text());
         var title = i18next.t("Consent to share information");
         var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length === 0) {
@@ -2288,7 +2341,7 @@ OrgTool.prototype.handleEvent = function() {
                     var isStaff = false;
                      $("#rolesGroup input[name='user_type']").each(function() {
                         if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
-                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot ununcheck.  A staff member must be associated with an organization"));
+                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot uncheck.  A staff member must be associated with an organization"));
                             isStaff = true;
                         };
                      });
@@ -2557,7 +2610,7 @@ var tnthAjax = {
     },
     "getRequiredCoreData": function(userId, sync, callback) {
         if (!hasValue(userId)) return false;
-        this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache:false}, function(data) {
+        this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache: true}, function(data) {
         	if (data) {
         		if (!data.error) {
         			if (data.required) {
@@ -3541,7 +3594,7 @@ var tnthAjax = {
         };
         if (!hasValue(data)) {
             if (callback) {
-                callback({"error": i18next.t("Response data to be update is required.")})
+                callback({"error": i18next.t("Questionnaire response data is required.")})
             };
         };
         this.sendRequest('/api/patient/'+userId+'/assessment', 'PUT', userId, {data: JSON.stringify(data)}, function(data) {

@@ -14,7 +14,8 @@
     <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
     <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/gil.css') }}"><!--[if lte IE 6]>
+    <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
+    <!--[if lte IE 6]>
     <style>#top, #bottom, #left, #right { display: none; }</style>
     <![endif]-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -484,7 +485,7 @@
                       function(data) {
                         if (data) {
                           if (data.name) {
-                            $("#access_code_info").html("{%trans%}Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration . . .{%endtrans%}");
+                            $("#access_code_info").html(i18next.t("Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ...").replace("{shortcut_alias}", "<b>"+$("#shortcut_alias").val()+"</b>").replace("{org_name}", "<b>"+data.name+"</b>"));
                             $("#access_code_error").text("");
 
                           } else {

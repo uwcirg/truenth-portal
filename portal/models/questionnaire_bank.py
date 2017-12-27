@@ -418,19 +418,20 @@ class QuestionnaireBank(db.Model):
         """
         if hasattr(self, '__trigger_date'):
             return self.__trigger_date
-        # use the patient's last treatment date, if possible
         # TODO: business rule details like the following should
         # move to site persistence for QB to user mappings.
-        tx_date = latest_treatment_started_date(user)
-        if tx_date:
-            trace(
-                "found latest treatment date {} for trigger_date".format(
-                    tx_date))
-            self.__trigger_date = tx_date
-            return self.__trigger_date
         elif self.research_protocol_id:
-            # When linked via research protocol, use the common
-            # top level consent date as `trigger` date.
+            # if recurring QB, use the patient's last treatment date, if found
+            if self.recurs:
+                tx_date = latest_treatment_started_date(user)
+                if tx_date:
+                    trace(
+                        "found latest treatment date {} "
+                        "for trigger_date".format(
+                            tx_date))
+                    self.__trigger_date = tx_date
+                    return self.__trigger_date
+            # otherwise, use the common top level consent date
             if user.valid_consents and user.valid_consents.count() > 0:
                 self.__trigger_date = user.valid_consents[0].audit.timestamp
                 trace(
@@ -444,11 +445,16 @@ class QuestionnaireBank(db.Model):
                         self.research_protocol))
                 self.__trigger_date = None
                 return self.__trigger_date
-        else:
-            if not self.intervention_id:
-                raise ValueError(
-                    "Can't compute trigger_date on QuestionnaireBank with "
-                    "neither research protocol nor intervention associated")
+        elif self.intervention_id:
+            # use the patient's last treatment date, if found
+            tx_date = latest_treatment_started_date(user)
+            if tx_date:
+                trace(
+                    "found latest treatment date {} for trigger_date".format(
+                        tx_date))
+                self.__trigger_date = tx_date
+                return self.__trigger_date
+            # otherwise, use the patient's biopsy date
             self.__trigger_date = user.fetch_datetime_for_concept(
                 CC.BIOPSY)
             if self.__trigger_date:
@@ -459,6 +465,10 @@ class QuestionnaireBank(db.Model):
             else:
                 trace("no treatment or biopsy date, no trigger_date")
                 return self.__trigger_date
+        else:
+            raise ValueError(
+                "Can't compute trigger_date on QuestionnaireBank with "
+                "neither research protocol nor intervention associated")
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

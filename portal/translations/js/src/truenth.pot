@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2017-12-01T04:08:05.143Z\n"
+"PO-Revision-Date: 2017-12-01T04:08:05.143Z\n"
+
+msgid "Your session will expire in approximately {time} seconds due to inactivity."
+msgstr ""
+
+msgctxt "name}. Proceeding to registration ..."
+msgid ""
+"Thank you, your access code {shortcut_alias} indicates you are located at "
+"the {org"
+msgstr ""

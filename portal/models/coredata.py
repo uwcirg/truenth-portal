@@ -372,8 +372,9 @@ class TOU_core(CoredataPoint):
 
     def hasdata(self, user, **kwargs):
         return ToU.query.join(Audit).filter(
-            Audit.user_id == user.id,
-            ToU.type == self.tou_type).count() > 0
+            Audit.subject_id == user.id,
+            ToU.type == self.tou_type,
+            ToU.active.is_(True)).count() > 0
 
 
 class Website_Terms_Of_UseData(TOU_core):

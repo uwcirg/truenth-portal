@@ -555,7 +555,7 @@ div.right-panel {
 #aboutForm {
   max-width: 100%;
   padding: 1em;
-  margin: 2em 0;
+  margin: 2em auto;
   min-height: 20vh;
 
   .view-container {
@@ -564,9 +564,18 @@ div.right-panel {
   .reg-complete-container {
     width: 350px;
     max-width: 100%;
-    margin: 1em 0;
+    margin: 1em auto;
     padding: 0.5em 0;
     display: none;
+  }
+  #buttonsContainer {
+    width: 350px;
+    max-width: 100%;
+    margin: 1em 0;
+    position: relative;
+  }
+  #buttonsContainer.continue {
+    margin: 1em auto;
   }
   .iq-container {
     width: 100%;
@@ -617,6 +626,12 @@ div.right-panel {
     font-weight: normal;
     font-size: @subSmallHeadSize;
   }
+
+  #userOrgs {
+    label {
+      font-size: @mobileOrgSize;
+    }
+  }
   .prompt {
     color: @labelColor;
   }
@@ -626,12 +641,6 @@ div.right-panel {
   }
   .bd-optional {
     display: none;
-  }
-  #buttonsContainer {
-    width: 150px;
-    max-width: 100%;
-    margin: 1em 0;
-    position: relative;
   }
   #next,  #updateProfile {
     opacity: 0;
@@ -677,6 +686,9 @@ div.right-panel {
     border-top: 1px solid rgba(203, 210, 217, 0.2);
     border-left: 1px solid rgba(203, 210, 217, 0.2);
     font-size: @subheadSize;
+  }
+  .iq-container .noOrg-container {
+    margin-left: 0.8em;
   }
 }
 #iqFooterWrapper.footerWrapper {
@@ -875,6 +887,8 @@ div.pull-right {
 #adminTableToolbar {
   div.orglist-selector {
     display: inline-block;
+    width: 400px;
+    max-width: 100%;
     .indent {
       padding: 0 0.4em;
     }
@@ -901,6 +915,8 @@ div.pull-right {
         span {
           display: inline-block;
           line-height: 1.6em;
+          vertical-align: middle;
+          max-width: 300px;
           font-size: @baseMobileFontSize;
         }
         .divider + label {
@@ -1807,6 +1823,14 @@ div.main-state-container .noOrg-container {
   padding: 0 1em;
 }
 
+.state-container {
+  margin-bottom: 0.5em;
+  .radio {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
 #userOrgs {
   .prompt {
     line-height: 2em;
@@ -1839,19 +1863,25 @@ div.main-state-container .noOrg-container {
     margin-left: 0.5em;
   }
   label.org-label {
-    padding: 0 1em;
+    padding: 0 0.5em;
   }
   input[type="checkbox"] {
     position: relative;
-    right: 2px;
   }
   input.clinic {
     margin-top: 6px;
   }
   legend {
     color: @legendColor;
-    margin-bottom: 0;
-    margin-left: 1em;
+    /*margin-bottom: 0;
+    margin-left: 1em;*/
+    margin: 0.5em 0 0.1em 0;
+  }
+  .parent-org-container {
+    margin: 0.4em 0 0.1em;
+    label.org-label{
+      padding: 0 0.3em;
+    }
   }
   label.org-label input[type="radio"] {
     position: relative;
@@ -1860,16 +1890,16 @@ div.main-state-container .noOrg-container {
   }
   .divider {
     display: block;
-    height: 0.25em;
-    margin-bottom: 0.15em;
-  }
-  .divider {
-    display: block;
-    height: 0.27em;
-    margin-bottom: 0.15em;
+    height: 0.3em;
   }
   div.org-container label.org-label {
     margin: 0.2em 0;
+  }
+}
+
+#createProfileForm {
+  #fillOrgs {
+    margin-left: 0.2em;
   }
 }
 
@@ -2385,6 +2415,9 @@ color: @labelColor
   a:hover {
   color: @linkHover;
   }
+  .terms-container * {
+    font-size: @baseMobileFontSize;
+  }
 }
 .consent-checkbox {
   margin-left:-2px;
@@ -2467,7 +2500,7 @@ div.org-container {
   input[type="checkbox"] {
     position:relative;
     top:-1px;
-    right:4px;
+    right:2px;
   }
 }
 
@@ -2751,7 +2784,7 @@ div.timezone-warning.text-warning {
     top: -1px;
   }
   .indent {
-    padding: 0 1em;
+    padding: 0 0.5em;
   }
   #homeFooter {
     font-size: @footerSize;
@@ -2799,7 +2832,7 @@ div.timezone-warning.text-warning {
         width: 400px;
         max-width: 400px;
         #userOrgs {
-          margin: 0 0.5em;
+          margin: 0 1em;
         }
         div.org-container
         {
@@ -2853,7 +2886,7 @@ div.timezone-warning.text-warning {
 
   #fillOrgs *,
   .noOrg-container *  {
-    font-size: @baseFontSize * 0.9;
+    font-size: @baseFontSize * 0.95;
   }
 
   #adminTableToolbar {
@@ -2864,8 +2897,19 @@ div.timezone-warning.text-warning {
     }
   }
 
+  #aboutForm {
+    #userOrgs {
+      label {
+        font-size: @orgSize;
+      }
+      label.indent {
+        margin-left: 0.5em;
+      }
+    }
+  }
+
   .iq-container .noOrg-container *  {
-    font-size: @baseFontSize;
+    font-size: @baseFontSize * 0.95;
   }
 
 
@@ -2876,6 +2920,11 @@ div.timezone-warning.text-warning {
   #createProfileForm {
     #bdGroup .flex {
       flex-wrap: nowrap;
+    }
+  }
+  #consentContainer {
+    .terms-container * {
+      font-size: @baseFontSize;
     }
   }
 }
@@ -3024,7 +3073,10 @@ div.timezone-warning.text-warning {
     }
   }
   #aboutForm {
-    max-width: 65%;
+    max-width: 750px;
+  }
+  #aboutForm.full-size {
+    max-width: 100%;
   }
   #aboutForm .iq-container {
     margin-top: 5%;

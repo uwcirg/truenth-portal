@@ -106,7 +106,7 @@ def organization_search():
         else:
             matching_orgs |= set(ot.here_and_below_id(org))
 
-    bundle = Organization.generate_bundle(matching_orgs)
+    bundle = Organization.generate_bundle(matching_orgs, include_empties=False)
     return jsonify(bundle)
 
 
@@ -140,7 +140,7 @@ def organization_get(organization_id):
 
     """
     org = Organization.query.get_or_404(organization_id)
-    return jsonify(org.as_fhir())
+    return jsonify(org.as_fhir(include_empties=False))
 
 
 @org_api.route('/organization/<string:id_system>/<string:id_value>')
@@ -185,7 +185,7 @@ def organization_get_by_identifier(id_system, id_value):
     if query.count() > 1:
         abort(400,'Multiple organizations found for identifier system/value')
     org = query.first_or_404()
-    return jsonify(org.as_fhir())
+    return jsonify(org.as_fhir(include_empties=False))
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
@@ -303,7 +303,7 @@ def organization_post():
                     user_id=current_user().id, subject_id=current_user().id,
                     context='organization')
     OrgTree.invalidate_cache()
-    return jsonify(org.as_fhir())
+    return jsonify(org.as_fhir(include_empties=False))
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
@@ -313,12 +313,14 @@ def organization_put(organization_id):
     """Update organization via FHIR Resource Organization. New should POST
 
     Submit JSON format [Organization
-    Resource](https://www.hl7.org/fhir/organization.html) to update an existing
-    organization.
+    Resource](https://www.hl7.org/fhir/organization.html) to update an
+    existing organization.
 
     Include an **identifier** with system of
     http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
-    alias for the organization, useful at `/go/<alias>`.
+    alias for the organization, useful at `/go/<alias>`.  NB, including a
+    partial list of identifiers will result in the non mentioned identifiers
+    being deleted.  Consider calling GET first.
 
     A resource mentioned as partOf the given organization must exist as a
     prerequisit or a 400 will result.
@@ -365,7 +367,11 @@ def organization_put(organization_id):
         abort(400, "Requires FHIR resourceType of 'Organization'")
     org = Organization.query.get_or_404(organization_id)
     try:
-        org.update_from_fhir(request.json)
+        # As we allow partial updates, first obtain a full representation
+        # of this org, and update with any provided elements
+        complete = org.as_fhir(include_empties=True)
+        complete.update(request.json)
+        org.update_from_fhir(complete)
     except MissingReference, e:
         abort(400, str(e))
     db.session.commit()
@@ -373,4 +379,4 @@ def organization_put(organization_id):
         json.dumps(request.json)), user_id=current_user().id,
         subject_id=current_user().id, context='organization')
     OrgTree.invalidate_cache()
-    return jsonify(org.as_fhir())
+    return jsonify(org.as_fhir(include_empties=False))

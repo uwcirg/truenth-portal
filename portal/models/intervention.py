@@ -4,7 +4,9 @@ from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
+from ..dict_tools import strip_empties
 from .lazy import query_by_name
+
 
 class DisplayDetails(object):
     """Simple abstraction to communicate display details to front end
@@ -75,7 +77,7 @@ class Intervention(db.Model):
         return intervention.update_from_json(data)
 
     def update_from_json(self, data):
-        if not 'name' in data:
+        if 'name' not in data:
             raise ValueError("required 'name' field not found")
 
         for attr in ('name', 'description', 'card_html', 'link_label',
@@ -146,8 +148,8 @@ class Intervention(db.Model):
         if self.public_access:
             access = True
 
-        return DisplayDetails(access=access, intervention=self,
-                user_intervention=ui)
+        return DisplayDetails(
+            access=access, intervention=self, user_intervention=ui)
 
     def quick_access_check(self, user):
         """Return boolean representing given user's access to intervention
@@ -184,7 +186,6 @@ class Intervention(db.Model):
 
         return False
 
-
     def __str__(self):
         """print details needed in audit logs"""
         if self.name == INTERVENTION.DEFAULT.name:
@@ -213,13 +214,18 @@ class UserIntervention(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     intervention_id = db.Column(db.ForeignKey('interventions.id'), nullable=False)
 
-    def as_json(self):
+    def as_json(self, include_empties=True):
         d = {'user_id': self.user_id}
         for field in ('access', 'card_html', 'staff_html',
                       'link_label', 'link_url', 'status_text'):
-            if getattr(self, field):
-                d[field] = getattr(self, field)
+            d[field] = getattr(self, field)
+        if not include_empties:
+            return strip_empties(d)
         return d
+
+    def update_from_json(self, data):
+        for attr in data:
+            setattr(self, attr, data[attr])
 
     @classmethod
     def user_access_granted(cls, intervention_id, user_id):
