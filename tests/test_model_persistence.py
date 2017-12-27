@@ -3,6 +3,7 @@ from tests import TestCase
 from flask_webtest import SessionScope
 import os
 from shutil import rmtree
+from sqlalchemy.orm.exc import NoResultFound
 from tempfile import mkdtemp
 
 from portal.config.model_persistence import ModelPersistence
@@ -26,7 +27,8 @@ class TestModelPersistence(TestCase):
         rmtree(self.tmpdir)
 
     def test_adjust_sequence(self):
-        mp = ModelPersistence(Organization, sequence_name='organizations_id_seq')
+        mp = ModelPersistence(
+            Organization, sequence_name='organizations_id_seq')
         # Insert dummy row w/ large id, confirm
         # the sequence becomes greater
         id = 10000
@@ -59,26 +61,31 @@ class TestModelPersistence(TestCase):
 
         data = cr.as_fhir()
         mp = ModelPersistence(
-            CommunicationRequest, sequence_name='communication_requests_id_seq',
+            CommunicationRequest,
+            sequence_name='communication_requests_id_seq',
             lookup_field='identifier')
         new_obj = CommunicationRequest.from_fhir(data)
-        match, field_description = mp.lookup_existing(new_obj=new_obj, new_data=data)
+        match, field_description = mp.lookup_existing(
+            new_obj=new_obj, new_data=data)
         self.assertEquals(match.name, cr.name)
 
     def test_composite_key(self):
         known_coding =  Coding(
             system=SNOMED, code='26294005',
-            display='Radical prostatectomy (nerve-sparing)').add_if_not_found(True)
+            display='Radical prostatectomy (nerve-sparing)').add_if_not_found(
+            True)
 
         mp = ModelPersistence(
-            Coding, sequence_name='codings_id_seq', lookup_field=('system', 'code'))
+            Coding, sequence_name='codings_id_seq',
+            lookup_field=('system', 'code'))
         data = known_coding.as_fhir()
 
         # Modify only the `display` - composite keys should still match
         modified_data = data.copy()
         modified_data['display'] = 'Radical prostatectomy'
         modified = Coding.from_fhir(data)
-        match, _ = mp.lookup_existing(new_obj=modified, new_data=modified_data)
+        match, _ = mp.lookup_existing(
+            new_obj=modified, new_data=modified_data)
         self.assertEquals(data, match.as_fhir())
 
         # Import and see the change
@@ -126,8 +133,9 @@ class TestModelPersistence(TestCase):
         )
         mp.export(self.tmpdir)
 
-        # Strip the empty extensions, as we'd expect in the real persistence file
-        with open(os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
+        # Strip the empty extensions, as expected in the real persistence file
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
             data = json.load(pfile)
             # Special handling of extensions - empties only have 'url' key
 
@@ -142,7 +150,8 @@ class TestModelPersistence(TestCase):
             for k in empty_keys:
                 del data['entry'][i][k]
 
-        with open(os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
             pfile.write(json.dumps(data))
 
         # Add an additional extension to the org, make sure
@@ -159,3 +168,47 @@ class TestModelPersistence(TestCase):
         org = Organization.query.filter(Organization.name == 'testy').one()
         self.assertEquals(org.locales.count(), 0)
         self.assertEquals(org.timezone, 'Asia/Tokyo')
+
+    def test_delete_identifier(self):
+        # orgs losing identifiers should delete the orphans
+        from portal.system_uri import SHORTCUT_ALIAS, TRUENTH_CR_NAME
+        from portal.models.identifier import Identifier
+
+        org = Organization(name='testy')
+        org.identifiers.append(Identifier(
+            value='2 week ST', system=TRUENTH_CR_NAME))
+        org.identifiers.append(Identifier(
+            value='ohsu', system=SHORTCUT_ALIAS))
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        mp = ModelPersistence(
+            Organization, lookup_field='id',
+            sequence_name='organizations_id_seq'
+        )
+        mp.export(self.tmpdir)
+
+        # Reduce identifiers to one - make sure the other identifier goes away
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
+            data = json.load(pfile)
+
+        for i, entry in enumerate(data['entry']):
+            identifiers = entry['identifier']
+            keepers = [
+                identifier for identifier in identifiers
+                if identifier['system'] == SHORTCUT_ALIAS]
+            data['entry'][i]['identifier'] = keepers
+
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
+            pfile.write(json.dumps(data))
+
+        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        org = Organization.query.filter(Organization.name == 'testy').one()
+        self.assertEquals(org.identifiers.count(), 1)
+
+        # Make sure we cleared out the orphan
+        with self.assertRaises(NoResultFound):
+            Identifier.query.filter_by(
+                value='2 week ST', system=TRUENTH_CR_NAME).one()
