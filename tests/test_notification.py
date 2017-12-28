@@ -20,16 +20,26 @@ class TestNotification(TestCase):
         self.assertTrue(notif.id)
         self.assertTrue(notif.created_at)
 
-    def test_notification_as_json(self):
+    def test_notification_get(self):
         notif = Notification(name="test", content="Test Alert!")
         with SessionScope(db):
             db.session.add(notif)
             db.session.commit()
         notif = db.session.merge(notif)
 
-        data = notif.as_json()
-        self.assertEquals(data['name'], 'test')
-        self.assertTrue(data['created_at'])
+        un = UserNotification(user_id=TEST_USER_ID, notification_id=notif.id)
+        with SessionScope(db):
+            db.session.add(un)
+            db.session.commit()
+
+        self.login()
+        resp = self.client.get(
+            '/api/user/{}/notification'.format(TEST_USER_ID))
+        self.assert200(resp)
+
+        self.assertEquals(len(resp.json['notifications']), 1)
+        self.assertEquals(resp.json['notifications'][0]['name'], 'test')
+        self.assertTrue(resp.json['notifications'][0]['created_at'])
 
     def test_usernotification_delete(self):
         notif = Notification(name="test", content="Test Alert!")
