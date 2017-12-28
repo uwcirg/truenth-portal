@@ -5,6 +5,7 @@ FLASK_APP=manage.py flask --help
 """
 import os
 import click
+import json
 import redis
 
 import alembic.config
@@ -188,3 +189,18 @@ def translation_download(language, state):
     state = state or default_state
     click.echo('Downloading {state} translations from Smartling'.format(state=state))
     smartling_download(state=state, language=language)
+
+@click.option('--config_key', '-c', help='Return only a single config value')
+@app.cli.command()
+def config(config_key):
+    """List current flask configuration values in JSON"""
+
+    if config_key:
+        print(app.config.get(config_key, ''))
+        return
+
+    print(json.dumps(
+        # Skip un-serializable values
+        {k:v for k,v in app.config.items() if isinstance(v, basestring)},
+        indent=2,
+    ))
