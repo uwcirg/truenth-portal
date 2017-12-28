@@ -154,6 +154,7 @@ funcWrapper = function(PORTAL_NAV_PAGE) {
 };
 
 function LRKeyEvent() {
+    var LR_INVOKE_KEYCODE = 187;
     if ($(".button--LR").length > 0) {
         $("html").on("keydown", function(e) {
             if (parseInt(e.keyCode) === parseInt(LR_INVOKE_KEYCODE)) {
