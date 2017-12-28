@@ -73,8 +73,10 @@ env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 echo "Synchronizing database"
 flask sync
 
-echo "Downloading translations from Smartling"
-flask translation_download
+if [ -n "$(flask config --config_key SMARTLING_USER_SECRET)" ]; then
+    echo "Downloading translations from Smartling"
+    flask translation_download
+fi
 
 echo "Updating package metadata"
 python setup.py egg_info --quiet
