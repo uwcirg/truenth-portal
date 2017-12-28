@@ -23,7 +23,8 @@ down_revision = '8ecdd6381235'
 
 def upgrade():
     conn = op.get_bind()
-    query = ("select identifiers.id, value, system from identifiers "
+    query = (
+        "select identifiers.id, value, system from identifiers "
         "where system = :identifier and identifiers.id "
         "not in (select identifier_id from organization_identifiers)")
 

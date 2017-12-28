@@ -342,7 +342,7 @@ class TestOrganization(TestCase):
 
         # Replace locale extension with null value, copy
         # over others.
-        input['extension'] =[
+        input['extension'] = [
             e for e in data['extension']
             if e['url'] != LocaleExtension.extension_url]
         input['extension'].append({'url': LocaleExtension.extension_url})
