@@ -2041,7 +2041,6 @@ var Profile = function(subjectId, currentUserId) {
     this.initSections = function() {
         var self = this;
         $("#profileForm [data-profile-section-id]").each(function() {
-            console.log("sectionid: ", $(this).attr("data-profile-section-id"));
             self.initSection($(this).attr("data-profile-section-id"));
         });
     };
