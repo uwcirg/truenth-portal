@@ -27,7 +27,6 @@ from .fhir import Observation, UserObservation
 from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
-from .notification import UserNotification
 from .performer import Performer
 from .organization import Organization, OrgTree
 import reference

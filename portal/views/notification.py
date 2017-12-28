@@ -1,6 +1,5 @@
 """Views for UserNotifications"""
 from flask import abort, jsonify, Blueprint, current_app
-from sqlalchemy.exc import DataError
 
 from ..database import db
 from ..extensions import oauth
