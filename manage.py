@@ -196,7 +196,8 @@ def config(config_key):
     """List current flask configuration values in JSON"""
 
     if config_key:
-        print(app.config.get(config_key, ''))
+        # Remap None values to an empty string
+        print(app.config.get(config_key, '') or '')
         return
 
     print(json.dumps(
