@@ -1,3 +1,6 @@
+function hasValue(val) {
+    return val != null && val != "" && val != "undefined";
+};
 function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
@@ -62,7 +65,7 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        if (!DELAY_LOADING) {
+        if ((typeof DELAY_LOADING !== "undefined") && !DELAY_LOADING) {
             setTimeout(function() { showMain(); }, 100);
             hideLoader(true);
         }
@@ -193,9 +196,6 @@ function __convertToNumericField(field) {
             field.each(function() {$(this).prop("type", "tel");});
         };
     };
-};
-function hasValue(val) {
-    return val != null && val != "" && val != "undefined";
 };
 function isString (obj) {
     return (Object.prototype.toString.call(obj) === '[object String]');
