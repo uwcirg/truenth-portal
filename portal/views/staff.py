@@ -73,12 +73,7 @@ def staff_profile_create():
 @oauth.require_oauth()
 def staff_profile(user_id):
     """staff profile view function"""
-    user = current_user()
-    if user_id:
-        user.check_role("edit", other_id=user_id)
-        user = get_user(user_id)
-    else:
-        abort(400, "user id is required")
+    user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 

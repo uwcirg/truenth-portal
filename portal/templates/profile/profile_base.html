@@ -42,29 +42,7 @@
   {% if user and user.has_role(ROLE.PATIENT) %}var patientId = {{user.id}};{% endif %}
   profileObj.onBeforeSectionsLoad();
   $(document).ready(function(){
-    profileObj.initSection("demo");
-    profileObj.initSection("locale");
-    profileObj.initSection("timezone");
-    {% if user.id != current_user.id %}
-      profileObj.initSection("communication");
-    {% endif %}
-    {% if user and user.has_role(ROLE.PATIENT) -%}
-      profileObj.initSection("patientonly");
-    {% endif -%}
-    {%-if user.id == current_user.id and user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
-      profileObj.initSection("orgsstateselector");
-    {% else %}
-      profileObj.initSection("orgs");
-    {% endif -%}
-    {% if user and user.has_role(ROLE.STAFF) -%}
-      profileObj.initSection("staffemailform");
-    {%- endif %}
-    {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) -%}
-      profileObj.initSection("auditlog");
-    {%- endif %}
-    {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN)) -%}
-      profileObj.initSection("roleslist");
-    {%- endif %}
+    profileObj.initSections();
     {%- if user %}
       profileObj.onSectionsDidLoad();
       tnthAjax.getDemo({{user.id}});

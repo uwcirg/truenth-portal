@@ -2038,6 +2038,13 @@ var Profile = function(subjectId, currentUserId) {
           });
         }, 1000);
     }
+    this.initSections = function() {
+        var self = this;
+        $("#profileForm [data-profile-section-id]").each(function() {
+            console.log("sectionid: ", $(this).attr("data-profile-section-id"));
+            self.initSection($(this).attr("data-profile-section-id"));
+        });
+    };
     this.initSection = function(type) {
         switch(String(type).toLowerCase()) {
             case "demo":
@@ -2126,7 +2133,12 @@ var Profile = function(subjectId, currentUserId) {
         //sessionStorage does not work in private mode
         try {
           sessionStorage.setItem("loginAsPatient", "true");
-        } catch(e) {}
+        } catch(e) {
+            /*
+             * alert user if this is not set properly
+             */
+             alert(i18next.t("Unable to properly set session storage variable for login-as."));
+        }
         location.replace("/login-as/" + this.subjectId);
     };
 
@@ -2296,7 +2308,7 @@ var Profile = function(subjectId, currentUserId) {
                 if (hasValue(body) && hasValue(subject) && hasValue(email)) {
                     tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
                         if (!data.error) {
-                            $("#profileEmailMessage").html(i18next.t("<strong class='text-success'>{emailType} email sent to {emailAddress}</strong>").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email));
+                            $("#profileEmailMessage").html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
                             $("#profileEmailSelect").val("");
                             $("#btnProfileSendEmail").addClass("disabled");
 
@@ -2922,7 +2934,7 @@ var Profile = function(subjectId, currentUserId) {
                 assessment_url += "&authored=" + completionDate;
             };
 
-            var winLocation = !still_needed ? assessment_url : $("#websiteConsentScriptUrl").val() + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
 
             self.manualEntryModalVis(true);
 
@@ -3099,7 +3111,7 @@ var Profile = function(subjectId, currentUserId) {
 
             var method = $("input[name='entryMethod']:checked").val();
             var completionDate = $("#qCompletionDate").val();
-            var linkUrl = $("#presentNeededUrl").val();
+            var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
 
             if (method != "") {
                 $("#manualEntryMessageContainer").text("");
@@ -3158,7 +3170,6 @@ var Profile = function(subjectId, currentUserId) {
     this.initRolesListSection = function() {
         var self = this;
         tnthAjax.getRoleList(function() {
-            console.log("subject: ", self.subjectId)
             tnthAjax.getRoles(self.subjectId, true);
             $("#rolesGroup input[name='user_type']").each(function() {
                 $(this).on("click", function() {

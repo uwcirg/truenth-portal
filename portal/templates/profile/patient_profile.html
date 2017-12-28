@@ -135,9 +135,4 @@
 {% block document_ready %}
   var leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false{% endif %};
   {{super()}}
-  {% if config.CUSTOM_PATIENT_DETAIL -%}
-    $(document).ready(function(){
-      profileObj.initSection("custompatientdetail");
-    });
-  {% endif %}
 {% endblock %}

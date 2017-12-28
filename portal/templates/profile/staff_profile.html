@@ -61,6 +61,5 @@
 {% endblock %}
 {% block document_ready %}
     var leafOrgs = {% if org_list %}{{org_list | safe}}{% else %}false{% endif%};
-    console.log({{org_list}})
     {{super()}}
 {% endblock %}

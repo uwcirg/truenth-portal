@@ -6,6 +6,7 @@
 <br/>
 <form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
+    <input type="hidden" id="currentStaffUserId" value="{{user.id}}" />
     <div class="row">
         <div class="col-md-11">
             <div class="row">
@@ -79,7 +80,7 @@ var aco = new AccountCreationObj(
 'OrgTool': OT,
 'leafOrgs': leafOrgs
 });
-var profileObj = new Profile("", "{{user.id}}");
+var profileObj = new Profile("", $("#currentStaffUserId").val());
 profileObj.initSection("demo");
 $(function() {
     /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
