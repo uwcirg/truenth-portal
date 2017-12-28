@@ -191,7 +191,7 @@ def translation_download(language, state):
     smartling_download(state=state, language=language)
 
 
-@click.option('--config_key', '-c', help='Return only a single config value')
+@click.option('--config_key', '-c', help='Return a single config value, or empty string if value is None')
 @app.cli.command()
 def config(config_key):
     """List current flask configuration values in JSON"""
