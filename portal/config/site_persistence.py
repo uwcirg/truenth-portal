@@ -9,6 +9,7 @@ from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.intervention_strategies import AccessStrategy
+from ..models.notification import Notification
 from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
@@ -34,8 +35,10 @@ models = (
     ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
     ModelDetails(Intervention, 'interventions_id_seq', 'name'),
     ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),
-    ModelDetails(CommunicationRequest, 'communication_requests_id_seq', 'identifier'),
+    ModelDetails(CommunicationRequest, 'communication_requests_id_seq',
+                 'identifier'),
     ModelDetails(AppText, 'apptext_id_seq', 'name'),
+    ModelDetails(Notification, 'notifications_id_seq', 'name'),
     ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
 
 
@@ -47,7 +50,7 @@ class SitePersistence(object):
     def export(self, dir):
         """Generate JSON files defining dynamic site objects
 
-        :param dir: used to name a non-default target directory for export files
+        :param dir: used to name non-default target directory for export files
 
         Export dynamic data, such as Organizations and Access Strategies for
         import into other sites.  This does NOT export values expected
@@ -59,7 +62,8 @@ class SitePersistence(object):
 
         # The following model classes write to independent files
         for model in models:
-            export_model(cls=model.cls, lookup_field=model.lookup_field, target_dir=dir)
+            export_model(cls=model.cls, lookup_field=model.lookup_field,
+                         target_dir=dir)
 
         # Add site.cfg
         export_config(target_dir=dir)
