@@ -3,7 +3,7 @@ from flask import abort, jsonify, Blueprint, current_app
 from ..database import db
 from ..extensions import oauth
 from ..models.notification import UserNotification
-from ..models.user import current_user
+from ..models.user import current_user, get_user
 from .portal import check_int
 
 

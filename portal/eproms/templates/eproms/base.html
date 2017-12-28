@@ -29,6 +29,13 @@
     {%- set wideContainer = true -%}
 {%- endif -%}
 <body>
+    {% if user and not user.has_role(ROLE.WRITE_ONLY) %}
+      <div id="notificationBanner">
+        <input type="hidden" id="notificationUserId" value="{{user.id}}" />
+        <span class="content"></span>
+        <span class="close">X</span>
+      </div>
+    {% endif %}
     <div id="loadingIndicator" class="loading-indicator">Loading...</div>
     {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
     <div id="mainNav" {% if splashView %}class="hidden"{% endif %}></div>

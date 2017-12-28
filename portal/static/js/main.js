@@ -1358,6 +1358,70 @@ var fillContent = {
             });
         };
     },
+    "privacyTermsNotifications": function(data) {
+        if (data && data.notifications) {
+            var notifications = [];
+            var notificationText = "";
+            (data.notifications).forEach(function(notice) {
+                var nName = notice.name.toLowerCase();
+                var isPrivacy = /privacy/i.test(nName);
+                var isTerms = /terms/i.test(nName);
+                if (isPrivacy || isTerms) {
+                    notice.url = (isPrivacy? "/privacy": "/terms");
+                    notice.type = (isPrivacy? "privacy": "terms");
+                    notice.displayName = (isPrivacy? i18next.t("privacy policy"): i18next.t("terms"));
+                    notifications.push("<a href='{referenceUrl}' target='_blank' data-id='{data-notification-id}'>{name}</a>"
+                                        .replace("{referenceUrl}", notice.url)
+                                        .replace("{name}", notice.displayName)
+                                        .replace("{data-notification-id}", notice.id));
+                }
+            });
+
+            if (notifications.length > 0) {
+                if (notifications.length > 1) {
+                    notificationText = i18next.t("The {notices} have been updated.");
+                } else {
+                    notificationText = i18next.t("The {notices} has been updated.");
+                }
+                notificationText = notificationText.replace("{notices}", notifications.join(i18next.t(" and ")));
+
+                if (hasValue(notificationText)) {
+                    $("#notificationBanner .content").html(notificationText);
+                    $("#notificationBanner").show();
+                };
+
+                $("#notificationBanner [data-id]").each(function() {
+                    $(this).on("click", function() {
+                        $(this).attr("data-visited", "true");
+                        tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        /*
+                         * check if all links have been visited
+                         */
+                        var allVisited = true;
+                        $("#notificationBanner [data-id]").each(function() {
+                            if (allVisited && !$(this).attr("data-visited")) {
+                                allVisited = false;
+                            };
+                        });
+                        if (allVisited) {
+                            $("#notificationBanner").hide();
+                        };
+
+                    });
+                });
+
+                $("#notificationBanner .close").on("click", function(e) {
+                    e.stopPropagation();
+                    var dataIds = $(this).parent().find("[data-id]");
+                    dataIds.each(function() {
+                        //delete entry
+                        tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                    })
+                    $(this).parent().hide();
+                });
+            };
+        };
+    },
     "emailContent": function(userId, messageId) {
         tnthAjax.emailLog(userId, function(data) {
             if (data.messages) {
@@ -3707,6 +3771,53 @@ var tnthAjax = {
             };
         });
     },
+    "getNotification": function(userId, params, callback) {
+        if (hasValue(userId)) {
+            if (!params) params = {};
+            this.sendRequest('/api/user/'+userId+'/notification', 'GET', userId, {"sync":params.sync}, function(data) {
+                if (data) {
+                    if (!data.error) {
+                        if (callback) callback(data);
+                    } else {
+                        if (callback) callback({"error": i18next.t("Error occurred retrieving notification.")});
+                    };
+                } else {
+                    if (callback) callback({"error": i18next.t("no data returned")});
+                };
+            });
+
+        } else {
+            if (callback) {
+                callback({"error": i18next.t("User id is required")});
+            }
+        }
+    },
+    "deleteNotification": function(userId, notificationId, params, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": i18next.t("User Id is required")});
+            };
+            return false;
+        };
+        if (!hasValue(notificationId)) {
+            if (callback) {
+                callback({"error": i18next.t("Notification id is required.")});
+            };
+        };
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred deleting notification.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+
+    },
     "emailLog": function(userId, callback) {
         if (!userId) return false;
         this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
@@ -3864,6 +3975,12 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     tnthAjax.beforeSend();
+
+
+    //ajax to get privacy and terms notifications information
+    tnthAjax.getNotification($("#notificationUserId").val(), false, function(data) {
+        fillContent.privacyTermsNotifications(data);
+    });
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
