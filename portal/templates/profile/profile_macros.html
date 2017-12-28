@@ -251,7 +251,13 @@
                 <h4 class="text-success registration-label">{{_('registered')}}</h4>
                 {%- endif -%}
             </div>
-            <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
+            <label id="sendEmailLabel" class="text-muted">
+                {%-if person and person.has_role(ROLE.PATIENT)-%}
+                    {{_("Send email to patient")}}
+                {%-else-%}
+                    {{_("Send email to user")}}
+                {%-endif-%}
+            </label>
             <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
                 <option value="">{{ _("Select Email...") }}</option>
                 {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
