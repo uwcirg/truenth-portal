@@ -49,7 +49,7 @@ function hideLoader(delay, time ) {
         $("#loadingIndicator").hide();
     } else {
         setTimeout(function() { $("#loadingIndicator").fadeOut();}, time||200);
-    };
+    }
 }
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
@@ -58,15 +58,15 @@ var loader = function(show) {
         hideLoader();
         showMain();
         return false;
-    };
+    }
     if (show) {
         $("#loadingIndicator").show();
     } else {
         if (!DELAY_LOADING) {
             setTimeout(function() { showMain(); }, 100);
             hideLoader(true);
-        };
-    };
+        }
+    }
 };
 
 // populate portal banner content
