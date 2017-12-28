@@ -190,6 +190,7 @@ def translation_download(language, state):
     click.echo('Downloading {state} translations from Smartling'.format(state=state))
     smartling_download(state=state, language=language)
 
+
 @click.option('--config_key', '-c', help='Return only a single config value')
 @app.cli.command()
 def config(config_key):
@@ -202,6 +203,6 @@ def config(config_key):
 
     print(json.dumps(
         # Skip un-serializable values
-        {k:v for k,v in app.config.items() if isinstance(v, basestring)},
+        {k: v for k, v in app.config.items() if isinstance(v, basestring)},
         indent=2,
     ))
