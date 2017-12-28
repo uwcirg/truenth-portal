@@ -12,6 +12,82 @@ from .portal import check_int
 notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 
 
+@notification_api.route('/user/<int:user_id>/notification')
+@oauth.require_oauth()
+def get_user_notification(user_id):
+    """Retrieve Notifications for the given User
+    ---
+    tags:
+      - Notification
+      - User
+    operationId: getUserNotification
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: user_notifications
+          properties:
+            notifications:
+              type: array
+              items:
+                type: object
+                required:
+                  - id
+                  - resourceType
+                  - name
+                  - content
+                  - created_at
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: identifier for the Notification
+                  resourceType:
+                    type: string
+                    description: JSON object resource type
+                  name:
+                    type: string
+                    description: identifying name of the Notification
+                  content:
+                    type: string
+                    description: content to be displayed
+                  created_at:
+                    type: string
+                    description:
+                      original UTC date-time of the Notification creation
+      400:
+        description: if the request includes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id don't exist
+
+    """
+    check_int(user_id)
+
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    notifs = [notif.as_json() for notif in user.notifications]
+
+    return jsonify(notifications=notifs)
+
+
 @notification_api.route(
     '/user/<int:user_id>/notification/<int:notification_id>',
     methods=('DELETE',))
