@@ -78,6 +78,7 @@
 @labelColor: #777;
 @inputHeight: 2.5em;
 @wellColor: #F7F7F7;
+@notificationBgColor: #7c959d;
 
 
 /**
@@ -527,23 +528,56 @@ select:not([multiple]) {
   position: absolute;
   left: 0;
   z-index: 2000;
-  background-color: #7c959d;
+  background-color: @notificationBgColor;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.2);
   right: 0;
   padding: 0;
-  text-align: center;
   color: #FFF;
+  .content {
+    width: 500px;
+    max-width: 100%;
+    background-color: @notificationBgColor;
+    margin: auto;
+    text-align: center;
+  }
+  .fa-info-circle {
+    margin-right: 4px;
+  }
+  .notification-info {
+    cursor: pointer;
+    letter-spacing: 1px;
+    &:hover {
+      color: @linkHover;
+    }
+  }
+  .notification {
+    display: none;
+    max-width: 100%;
+    padding: 2px;
+    p {
+      margin: 0;
+    }
+  }
+  .notification.active {
+    display: block;
+  }
   a {
     color: #FFF;
     text-decoration:underline;
+    &:hover {
+      color: @linkHover;
+    }
   }
   &, span {
     font-size: 7pt;
   }
   .close {
     color: #000;
-    position: absolute;
+    position: fixed;
     z-index: 2001;
     right: 0;
+    top: 0;
+    margin-top: 4px;
     margin-right: 1em;
   }
 }

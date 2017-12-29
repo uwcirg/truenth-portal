@@ -894,6 +894,21 @@ var fillViews = {
     }
 };
 var fillContent = {
+    "initPortalWrapper": function() {
+        var isIE = getIEVersion();
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, function() {
+                embed_page();
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            }, true);
+        } else {
+            funcWrapper(function() {
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            });
+        };
+    },
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
@@ -1358,42 +1373,36 @@ var fillContent = {
             });
         };
     },
-    "privacyTermsNotifications": function(data) {
+    "notifications": function(data) {
         if (data && data.notifications) {
             var notifications = [];
             var notificationText = "";
             (data.notifications).forEach(function(notice) {
-                var nName = notice.name.toLowerCase();
-                var isPrivacy = /privacy/i.test(nName);
-                var isTerms = /terms/i.test(nName);
-                if (isPrivacy || isTerms) {
-                    notice.url = (isPrivacy? "/privacy": "/terms");
-                    notice.type = (isPrivacy? "privacy": "terms");
-                    notice.displayName = (isPrivacy? i18next.t("privacy policy"): i18next.t("terms"));
-                    notifications.push("<a href='{referenceUrl}' target='_blank' data-id='{data-notification-id}'>{name}</a>"
-                                        .replace("{referenceUrl}", notice.url)
-                                        .replace("{name}", notice.displayName)
-                                        .replace("{data-notification-id}", notice.id));
-                }
+                notificationText += "<div class='notification' data-id='" + notice.id + "'>" + i18next.t(notice.content) + "</div>";
             });
+            if (hasValue(notificationText)) {
 
-            if (notifications.length > 0) {
-                if (notifications.length > 1) {
-                    notificationText = i18next.t("The {notices} have been updated.");
+                var infoText = "<div class='notification-info'><i class='fa fa-info-circle' aria-hidden='true'></i>";
+
+                if (data.notifications.length > 1) {
+                    infoText += i18next.t("Pending notifications requiring your attention");
                 } else {
-                    notificationText = i18next.t("The {notices} has been updated.");
-                }
-                notificationText = notificationText.replace("{notices}", notifications.join(i18next.t(" and ")));
-
-                if (hasValue(notificationText)) {
-                    $("#notificationBanner .content").html(notificationText);
-                    $("#notificationBanner").show();
+                    infoText += i18next.t("Pending notification requiring your attention");
                 };
 
+                infoText += "</div>";
+
+                $("#notificationBanner .content").html(infoText + notificationText);
+                $("#notificationBanner").show();
+                $("#notificationBanner .notification-info").on("click", function() {
+                    $("#notificationBanner .notification").toggleClass("active");
+                });
                 $("#notificationBanner [data-id]").each(function() {
                     $(this).on("click", function() {
-                        $(this).attr("data-visited", "true");
-                        tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", "true");
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
                         /*
                          * check if all links have been visited
                          */
@@ -1405,7 +1414,8 @@ var fillContent = {
                         });
                         if (allVisited) {
                             $("#notificationBanner").hide();
-                        };
+                        }
+                        $(this).hide();
 
                     });
                 });
@@ -1415,12 +1425,23 @@ var fillContent = {
                     var dataIds = $(this).parent().find("[data-id]");
                     dataIds.each(function() {
                         //delete entry
-                        tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", true);
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
                     })
                     $(this).parent().hide();
                 });
-            };
-        };
+
+                $(window).on("beforeunload focus", function() {
+                    tnthAjax.initNotifications();
+                });
+            } else {
+                $("#notificationBanner").hide();
+            }
+        } else {
+            $("#notificationBanner").hide();
+        }
     },
     "emailContent": function(userId, messageId) {
         tnthAjax.emailLog(userId, function(data) {
@@ -3771,6 +3792,11 @@ var tnthAjax = {
             };
         });
     },
+    "initNotifications": function() {
+        this.getNotification($("#notificationUserId").val(), false, function(data) {
+            fillContent.notifications(data);
+        });
+    },
     "getNotification": function(userId, params, callback) {
         if (hasValue(userId)) {
             if (!params) params = {};
@@ -3932,7 +3958,7 @@ function newHttpRequest(url,callBack, noCache)
 
 var attempts = 0;
 
-funcWrapper = function() {
+funcWrapper = function(callback) {
     attempts++;
     $.ajax({
         url: PORTAL_NAV_PAGE,
@@ -3954,21 +3980,17 @@ funcWrapper = function() {
     .always(function() {
         loader();
         attempts = 0;
+        if (callback) {
+            callback();
+        }
     });
 };
 
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
-
         loader(true);
-
-        var isIE = getIEVersion();
-        if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
-        } else {
-            funcWrapper();
-        };
+        fillContent.initPortalWrapper();
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
@@ -3976,11 +3998,6 @@ $(document).ready(function() {
 
     tnthAjax.beforeSend();
 
-
-    //ajax to get privacy and terms notifications information
-    tnthAjax.getNotification($("#notificationUserId").val(), false, function(data) {
-        fillContent.privacyTermsNotifications(data);
-    });
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
