@@ -30,7 +30,6 @@ update_repo(){
 }
 
 repo_path="$(cd $(dirname $0) ; git rev-parse --show-toplevel)"
-repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 while getopts ":b:p:" option; do
     case "${option}" in
@@ -55,6 +54,8 @@ fi
 export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
+
+repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 # Assign branch in the following precedence:
 # BRANCH envvar, branch specified by option (-b)
