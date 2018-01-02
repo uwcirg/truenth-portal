@@ -81,7 +81,7 @@ var aco = new AccountCreationObj(
 'leafOrgs': leafOrgs
 });
 var profileObj = new Profile("", $("#currentStaffUserId").val());
-profileObj.initSection("demo");
+profileObj.initSections();
 $(function() {
     /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
     aco.getOrgs(aco.populatePatientOrgs);

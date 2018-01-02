@@ -1,6 +1,6 @@
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
-};
+}
 function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
@@ -82,8 +82,8 @@ function embed_page(data){
 
 function getIEVersion() {
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
-    return match ? parseInt(match[1]) : undefined;
-};
+    return match ? parseInt(match[1]) : false;
+}
 
 var request_attempts = 0;
 /*
@@ -144,7 +144,7 @@ funcWrapper = function(PORTAL_NAV_PAGE) {
         .fail(function(jqXHR, textStatus, errorThrown) {
           //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
             if (request_attempts < 3) {
-                setTimeout ( function(){ funcWrapper( ) }, 3000 );
+                setTimeout ( function(){ funcWrapper(); }, 3000 );
             } else {
                 loader();
             };
@@ -279,7 +279,7 @@ function extend( obj, extension ){
     var noop = function () {};
     var log = console.log || noop;
     var start = function(name) { return function(param) { log("Start " + name + ": " + param); } };
-    var end = function(name) { return function(param) { log("End " + name + ": " + param); } };
+    var end = function(name) { return function(param) { log("End " + name + ": " + param); }; };
 
     var methods = {
         // Internet Explorer (IE 10): http://msdn.microsoft.com/en-us/library/ie/hh772169(v=vs.85).aspx#methods

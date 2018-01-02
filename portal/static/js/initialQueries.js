@@ -717,25 +717,17 @@
         var d = $("#date");
         var m = $("#month");
         var y = $("#year");
-        if (d.val() !== "" && m.val() !== "" && y.val() !== "") {
-          if (this.validity.valid) {
-              var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-              if (isValid) {
-                $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
-                $("#errorbirthday").text("").hide();
-                assembleContent.demo($("#iq_userId").val());
-                if (self.allFieldsCompleted()) {
-                   self.continueToFinish();
-                } else {
-                  if (self.sectionCompleted("demographicsContainer")) {
-                    self.continueToNext("demographicsContainer");
-                  };
-                };
-              } else {
-                self.stopContinue("demographicsContainer");
-              };
+        var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+        if (isValid) {
+          $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
+          $("#errorbirthday").text("").hide();
+          assembleContent.demo($("#iq_userId").val());
+          if (self.allFieldsCompleted()) {
+             self.continueToFinish();
           } else {
-            self.stopContinue("demographicsContainer");
+            if (self.sectionCompleted("demographicsContainer")) {
+              self.continueToNext("demographicsContainer");
+            };
           };
         } else {
           self.stopContinue("demographicsContainer");

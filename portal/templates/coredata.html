@@ -106,6 +106,8 @@ $(document).ready(function(){
     {% endif %}
     {% if 'procedure' in require %}
     tnthAjax.getProc({{ user.id }}, false);
+    var profileObj = new Profile("{{user.id}}", "{{user.id}}");
+    profileObj.initSection("procedure");
     {% endif %}
 
     {% if ('race' in require) or ('ethnicity' in require) %}

@@ -2040,7 +2040,7 @@ var Profile = function(subjectId, currentUserId) {
     }
     this.initSections = function() {
         var self = this;
-        $("#profileForm [data-profile-section-id]").each(function() {
+        $("[data-profile-section-id]").each(function() {
             self.initSection($(this).attr("data-profile-section-id"));
         });
     };
@@ -2121,6 +2121,9 @@ var Profile = function(subjectId, currentUserId) {
             case "auditlog":
                 this.initAuditLogSection();
                 break;
+            case "procedure":
+                this.initProcedureSection();
+                break;
         };
     };
 
@@ -2184,18 +2187,15 @@ var Profile = function(subjectId, currentUserId) {
             var triggerEvent = hasValue(field.attr("data-trigger-event")) ? field.attr("data-trigger-event") : (field.attr("type") == "text" ? "blur" : "change");
             field.on(triggerEvent, function() {
                 var y = $("#year"), m = $("#month"), d = $("#date");
-                if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {
-                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-                        if (isValid) {
-                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                            $("#errorbirthday").html("");
-                        } else {
-                            $("#birthday").val("");
-                            return false;
-                        };
-                    };
-                } else return false;
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+                if (isValid) {
+                    $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                    $("#errorbirthday").html("");
+                } else {
+                    $("#birthday").val("");
+                    return false;
+                };
+                   
             });
         });
         this.__convertToNumericField($("#date, #year"));
@@ -2807,6 +2807,18 @@ var Profile = function(subjectId, currentUserId) {
             };
         };
     };
+    this.initProcedureSection = function() {
+        var subjectId = $("#profileProcSubjectId").val();
+        tnthAjax.treatmentOptions(subjectId,null, function(data) {
+            if (!data.error) {
+                fillContent.treatmentOptions(data);
+            };
+        });
+
+        if (subjectId) {
+            tnthAjax.getProc(subjectId, false);
+        };
+    };
     this.initClinicalQuestionsSection = function() {
             $("#patientQ").show();
             //don't show treatment
@@ -2961,9 +2973,11 @@ var Profile = function(subjectId, currentUserId) {
 
         //fix for safari
         $(window).on("beforeunload", function() {
-            $("#manualEntryButtonsContainer").show();
-            $("#manualEntryLoader").hide();
-            $("#manualEntryModal").modal("hide");
+            if (navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
+                $("#manualEntryButtonsContainer").show();
+                $("#manualEntryLoader").hide();
+                $("#manualEntryModal").modal("hide");
+            }
         });
 
         $("#manualEntryModal").on("show.bs.modal", function() {
@@ -5234,39 +5248,45 @@ $(document).ready(function() {
 
 var tnthDates = {
     /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
-     ** params: month, day and year values and error field ID
+     ** params: month, day and year fields and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateDateInputFields": function(m, d, y, errorFieldId) {
+    "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
+        var m = $(monthField).val();
+        var d = $(dayField).val();
+        var y = $(yearField).val();
         if (hasValue(m) && hasValue(d) && hasValue(y)) {
+            if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
+                m = parseInt(m);
+                d = parseInt(d);
+                y = parseInt(y);
+                var errorField = $("#" + errorFieldId);
 
-            var m = parseInt(m);
-            var d = parseInt(d);
-            var y = parseInt(y);
-            var errorField = $("#" + errorFieldId);
+                if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+                    var today = new Date();
+                    // Check to see if this is a real date
+                    var date = new Date(y,m-1,d);
+                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                        errorField.html(i18next.t("Invalid date. Please try again.")).show();
+                        return false;
+                    }
+                    else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
+                        return false; //shouldn't be in the future
+                    }
+                    else if (y < 1900) {
+                        errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
+                        return false;
+                    };
 
-            if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
-                var today = new Date();
-                // Check to see if this is a real date
-                var date = new Date(y,m-1,d);
-                if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    errorField.html(i18next.t("Invalid date. Please try again.")).show();
-                    return false;
-                }
-                else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                    errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
-                    return false; //shouldn't be in the future
-                }
-                else if (y < 1900) {
-                    errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
-                    return false;
-                };
+                    errorField.html("").hide();
 
-                errorField.html("").hide();
+                    return true;
 
-                return true;
-
-            } else return false;
+                } else return false;
+            } else {
+                return false;
+            }
 
         } else {
             return false;

@@ -108,16 +108,6 @@ $(document).ready(function() {
 
     var subjectId = $("#profileProcSubjectId").val();
 
-    tnthAjax.treatmentOptions(subjectId,null, function(data) {
-        if (!data.error) {
-            fillContent.treatmentOptions(data);
-        };
-    });
-
-    if (subjectId) {
-        tnthAjax.getProc(subjectId, false);
-    };
-
     // Options for datepicker - prevent future dates, no default
     $('.event-element .input-group.date').each(function(){
         $(this).datepicker({
