@@ -278,7 +278,7 @@ function extend( obj, extension ){
     var console = (window.console = window.console || {});
     var noop = function () {};
     var log = console.log || noop;
-    var start = function(name) { return function(param) { log("Start " + name + ": " + param); } };
+    var start = function(name) { return function(param) { log("Start " + name + ": " + param); }; };
     var end = function(name) { return function(param) { log("End " + name + ": " + param); }; };
 
     var methods = {
