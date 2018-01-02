@@ -144,7 +144,7 @@ funcWrapper = function(PORTAL_NAV_PAGE, callback) {
         .fail(function(jqXHR, textStatus, errorThrown) {
           //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
             if (request_attempts < 3) {
-                setTimeout ( function(){ funcWrapper(); }, 3000 );
+                setTimeout ( function(){ funcWrapper(PORTAL_NAV_PAGE, callback); }, 3000 );
             } else {
                 loader();
             };

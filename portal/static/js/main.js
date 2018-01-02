@@ -816,16 +816,17 @@ var fillViews = {
     }
 };
 var fillContent = {
-    "initPortalWrapper": function() {
+    "initPortalWrapper": function(PORTAL_NAV_PAGE) {
         var isIE = getIEVersion();
         if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, function() {
-                embed_page();
+            newHttpRequest(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
                 //ajax to get notifications information
                 tnthAjax.initNotifications();
             }, true);
         } else {
-            funcWrapper(PORTAL_NAV_PAGE, function() {
+            funcWrapper(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
                 //ajax to get notifications information
                 tnthAjax.initNotifications();
             });
@@ -5264,7 +5265,7 @@ $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
         loader(true);
-        fillContent.initPortalWrapper();
+        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
