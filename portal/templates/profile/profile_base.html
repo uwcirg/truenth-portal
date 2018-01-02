@@ -1,0 +1,51 @@
+{%- extends "layout.html" -%}
+{%- from "flask_user/_macros.html" import linksHTML, logo -%}
+{%- block main -%}
+<form id="profileForm" class="form tnth-form to-validate" data-toggle="validator">
+  <input type="hidden" id="profileUserId" value="{{user.id if user}}" />
+  <input type="hidden" id="profileCurrentUserId" value="{{current_user.id if current_user}}" />
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <br/>
+      <div class="right-panel">
+        <div class="flex">
+          <div id="profileHeader" class="profile-header">
+            <h4 class="tnth-headline">
+              {% block profile_title %}
+              {{_("TrueNTH Profile")}}
+              {% endblock %}
+            </h4>
+          </div>
+        </div>
+        {% block profile_content %}
+        {% endblock %}
+        <br/><br/>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+{% endblock %}
+{% block document_ready %}
+  $("#mainDiv").addClass("profile");
+  var CONSENT_DATE_LABEL = "{{ app_text('consent date label') }}";
+  var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+  var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
+  var isTestPatient = {% if user.has_role(ROLE.PATIENT) and (current_user and not current_user.has_role(ROLE.PATIENT)) %}'{{config.get("SYSTEM.TYPE")}}'.toUpperCase() != "PRODUCTION"{% else %}false{% endif %};
+  var isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
+  var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+  var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+  var profileObj = new Profile("{{user.id}}", "{{current_user.id}}");
+  {% if user and user.has_role(ROLE.PATIENT) %}var patientId = {{user.id}};{% endif %}
+  profileObj.onBeforeSectionsLoad();
+  $(document).ready(function(){
+    profileObj.initSections();
+    {%- if user %}
+      profileObj.onSectionsDidLoad();
+      tnthAjax.getDemo({{user.id}});
+    {% endif -%}
+  });
+{% endblock %}

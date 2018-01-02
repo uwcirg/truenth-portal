@@ -3,7 +3,7 @@
 {% from "flask_user/_macros.html" import back_btn %}
 
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
-{% from "profile_macros.html" import profileOrgsSelector %}
+{% from "profile/profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
 {{tou(terms, user)}}
@@ -103,6 +103,8 @@ var fc = new window.FieldsChecker("{{user.id}}",
                              assembleContent: assembleContent,
                              tnthDates: tnthDates
                             });
+var profileObj = new Profile("{{user.id}}", "{{user.id}}");
+profileObj.initSection("orgsstateselector");
 
 $(document).ready(function(){
   /*
