@@ -49,7 +49,7 @@
                     {% if user.deleted %}
                     {{user.id}}
                     {% else %}
-                    <a href="{{ url_for('portal.profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a>
+                    <a href="{{ url_for('.staff_profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a>
                     {% endif %}
                   </td>
                   <td>{{ user.first_name if user.first_name }}</td>

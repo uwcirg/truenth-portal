@@ -30,7 +30,6 @@ update_repo(){
 }
 
 repo_path="$(cd $(dirname $0) ; git rev-parse --show-toplevel)"
-repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 
 while getopts ":b:p:" option; do
     case "${option}" in
@@ -56,6 +55,8 @@ export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 
+repo_branch="$(git rev-parse --abbrev-ref HEAD)"
+
 # Assign branch in the following precedence:
 # BRANCH envvar, branch specified by option (-b)
 BRANCH="${BRANCH:-${branch}}"
@@ -73,8 +74,10 @@ env --unset GIT_WORK_TREE pip install --quiet --requirement requirements.txt
 echo "Synchronizing database"
 flask sync
 
-echo "Downloading translations from Smartling"
-flask translation_download
+if [ -n "$(flask config --config_key SMARTLING_USER_SECRET)" ]; then
+    echo "Downloading translations from Smartling"
+    flask translation_download
+fi
 
 echo "Updating package metadata"
 python setup.py egg_info --quiet

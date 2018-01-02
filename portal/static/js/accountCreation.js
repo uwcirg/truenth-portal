@@ -123,7 +123,9 @@ var AccountCreationObj = function (roles, dependencies) {
                 "given": $.trim($("input[name=firstname]").val()),
                 "family":$.trim($("input[name=lastname]").val())
             };
-            _demoArray["birthDate"] = $("input[name=birthDate]").val();
+
+            var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+            _demoArray["birthDate"] = y + "-" + m + "-" + d;
 
             _demoArray["telecom"] = [];
 
@@ -304,7 +306,7 @@ var AccountCreationObj = function (roles, dependencies) {
             if (isPatient) {
                 $("#redirectLink").attr("href", "/patients/patient_profile/" + this.userId);
             } else {
-                $("#redirectLink").attr("href", "/profile/" + this.userId);
+                $("#redirectLink").attr("href", "/staff_profile/" + this.userId);
             };
             $("#redirectLink")[0].click();
         };
@@ -592,28 +594,25 @@ $(document).ready(function(){
                 var today = new Date();
                 var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
                 var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-              if (d.val() != "" && m.val() != "" && y.val() != "") {
-                  if (this.validity.valid) {
-                      var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorConsentDate");
-                      if (isValid) {
-                        /*
-                         * check if date entered is today, if so use today's date/time
-                         */
-                        if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
-                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
-                        } else {
-                            var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
-                            //saving the time at 12
-                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
-                        };
-                        $("#errorConsentDate").text("").hide();
-                        //success
-                      } else {
-                         //fail
-                        $("#consentDate").val("");
-                      };
-                  };
-              };
+             
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
+                if (isValid) {
+                /*
+                 * check if date entered is today, if so use today's date/time
+                 */
+                if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                    $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+                } else {
+                    var timezoneOffset = Math.floor(((new Date()).getTimezoneOffset())/60);
+                    //saving the time at 12
+                    $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
+                };
+                $("#errorConsentDate").text("").hide();
+                //success
+                } else {
+                 //fail
+                $("#consentDate").val("");
+                };
           });
         });
     };

@@ -470,19 +470,15 @@
                   var d = $("#biopsy_day");
                   var m = $("#biopsy_month");
                   var y = $("#biopsy_year");
-                  if (d.val() != "" && m.val() != "" && y.val() != "") {
-                      if (this.validity.valid) {
-                          var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "biopsyDateError");
-                          if (isValid) {
-                            $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
-                            $("#biopsyDateError").text("").hide();
-                            $("#biopsy_yes").trigger("click");
-                            //success
-                          } else {
-                             //fail
-                            $("#biopsyDate").val("");
-                          };
-                      };
+                  var isValid = tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                  if (isValid) {
+                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                    $("#biopsyDateError").text("").hide();
+                    $("#biopsy_yes").trigger("click");
+                    //success
+                  } else {
+                     //fail
+                    $("#biopsyDate").val("");
                   };
               });
           });
