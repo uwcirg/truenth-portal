@@ -2016,7 +2016,7 @@ var Profile = function(subjectId, currentUserId) {
           });
 
           $("#profileForm .profile-item-container.editable").each(function() {
-              $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{edit}" aria-label="{editButton}"></button>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
+              $(this).prepend('<input type="button" class="btn profile-item-edit-btn" value="{edit}" aria-label="{editButton}"></input>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
           });
 
           $("#profileForm .profile-item-edit-btn").each(function() {
@@ -2024,7 +2024,7 @@ var Profile = function(subjectId, currentUserId) {
                 e.preventDefault();
                 var container = $(this).closest(".profile-item-container");
                 container.toggleClass("edit");
-                $(this).attr("data-text", container.hasClass("edit") ? i18next.t("Done"): i18next.t("Edit"));
+                $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
                 if (!container.hasClass("edit")) {
                     var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
                     if (sections) {
@@ -5143,10 +5143,6 @@ $(document).ready(function() {
     tnthAjax.beforeSend();
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
-
-    $(window).on("beforeunload", function() {
-        $(".button-container .loading-message-indicator").hide();
-    });
 
     //setTimeout('LRKeyEvent();', 1500);
     // To validate a form, add class to <form> and validate by ID.
