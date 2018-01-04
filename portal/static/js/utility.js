@@ -128,7 +128,7 @@ function newHttpRequest(url,callBack, noCache)
     xmlhttp.send();
 };
 
-funcWrapper = function(PORTAL_NAV_PAGE) {
+funcWrapper = function(PORTAL_NAV_PAGE, callback) {
     if (PORTAL_NAV_PAGE) {
         request_attempts++;
         $.ajax({
@@ -144,7 +144,7 @@ funcWrapper = function(PORTAL_NAV_PAGE) {
         .fail(function(jqXHR, textStatus, errorThrown) {
           //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
             if (request_attempts < 3) {
-                setTimeout ( function(){ funcWrapper(); }, 3000 );
+                setTimeout ( function(){ funcWrapper(PORTAL_NAV_PAGE, callback); }, 3000 );
             } else {
                 loader();
             };
@@ -152,6 +152,9 @@ funcWrapper = function(PORTAL_NAV_PAGE) {
         .always(function() {
             loader();
             request_attempts = 0;
+            if (callback) {
+                callback();
+            }
         });
     };
 };

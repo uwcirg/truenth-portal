@@ -29,6 +29,7 @@ from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
 from .models.communication import Communication, load_template_args
 from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
+from .models.notification import Notification, UserNotification
 from .models.organization import Organization, OrgTree
 from .models.reporting import get_reporting_stats, overdue_stats_by_org
 from .models.reporting import generate_overdue_table_html
@@ -332,3 +333,25 @@ def deactivate_tous(**kwargs):
                 user.has_role(ROLE.STAFF),
                 user.has_role(ROLE.STAFF_ADMIN))):
             user.deactivate_tous(acting_user=sys, types=types)
+
+
+@celery.task
+@scheduled_task
+def notify_users(**kwargs):
+    "Create UserNotifications for a given Notification"
+    notif_name = kwargs.get('notification')
+    notif = Notification.query.filter_by(name=notif_name).first()
+    if not notif:
+        raise ValueError("Notification `{}` not found".format(notif_name))
+
+    roles = kwargs.get('roles')
+
+    for user in User.query.filter(User.deleted_id.is_(None)):
+        if set([role.name for role in user.roles]).isdisjoint(set(roles)):
+            continue
+        if not UserNotification.query.filter_by(
+                user_id=user.id, notification_id=notif.id).count():
+            un = UserNotification(user_id=user.id,
+                                  notification_id=notif.id)
+            db.session.add(un)
+    db.session.commit()

@@ -816,6 +816,22 @@ var fillViews = {
     }
 };
 var fillContent = {
+    "initPortalWrapper": function(PORTAL_NAV_PAGE) {
+        var isIE = getIEVersion();
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            }, true);
+        } else {
+            funcWrapper(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            });
+        };
+    },
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
@@ -1279,6 +1295,76 @@ var fillContent = {
                 };
             });
         };
+    },
+    "notifications": function(data) {
+        if (data && data.notifications) {
+            var notifications = [];
+            var notificationText = "";
+            (data.notifications).forEach(function(notice) {
+                notificationText += "<div class='notification' data-id='" + notice.id + "'>" + i18next.t(notice.content) + "</div>";
+            });
+            if (hasValue(notificationText)) {
+
+                var infoText = "<div class='notification-info'><i class='fa fa-info-circle' aria-hidden='true'></i>";
+
+                if (data.notifications.length > 1) {
+                    infoText += i18next.t("Pending notifications requiring your attention");
+                } else {
+                    infoText += i18next.t("Pending notification requiring your attention");
+                };
+
+                infoText += "</div>";
+
+                $("#notificationBanner .content").html(infoText + notificationText);
+                $("#notificationBanner").show();
+                $("#notificationBanner .notification-info").on("click", function() {
+                    $("#notificationBanner .notification").toggleClass("active");
+                });
+                $("#notificationBanner [data-id]").each(function() {
+                    $(this).on("click", function() {
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", "true");
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
+                        /*
+                         * check if all links have been visited
+                         */
+                        var allVisited = true;
+                        $("#notificationBanner [data-id]").each(function() {
+                            if (allVisited && !$(this).attr("data-visited")) {
+                                allVisited = false;
+                            };
+                        });
+                        if (allVisited) {
+                            $("#notificationBanner").hide();
+                        }
+                        $(this).hide();
+
+                    });
+                });
+
+                $("#notificationBanner .close").on("click", function(e) {
+                    e.stopPropagation();
+                    var dataIds = $(this).parent().find("[data-id]");
+                    dataIds.each(function() {
+                        //delete entry
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", true);
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
+                    })
+                    $(this).parent().hide();
+                });
+
+                $(window).on("beforeunload focus", function() {
+                    tnthAjax.initNotifications();
+                });
+            } else {
+                $("#notificationBanner").hide();
+            }
+        } else {
+            $("#notificationBanner").hide();
+        }
     },
     "emailContent": function(userId, messageId) {
         tnthAjax.emailLog(userId, function(data) {
@@ -5046,6 +5132,58 @@ var tnthAjax = {
             };
         });
     },
+    "initNotifications": function() {
+        this.getNotification($("#notificationUserId").val(), false, function(data) {
+            fillContent.notifications(data);
+        });
+    },
+    "getNotification": function(userId, params, callback) {
+        if (hasValue(userId)) {
+            if (!params) params = {};
+            this.sendRequest('/api/user/'+userId+'/notification', 'GET', userId, {"sync":params.sync}, function(data) {
+                if (data) {
+                    if (!data.error) {
+                        if (callback) callback(data);
+                    } else {
+                        if (callback) callback({"error": i18next.t("Error occurred retrieving notification.")});
+                    };
+                } else {
+                    if (callback) callback({"error": i18next.t("no data returned")});
+                };
+            });
+
+        } else {
+            if (callback) {
+                callback({"error": i18next.t("User id is required")});
+            }
+        }
+    },
+    "deleteNotification": function(userId, notificationId, params, callback) {
+        if (!hasValue(userId)) {
+            if (callback) {
+                callback({"error": i18next.t("User Id is required")});
+            };
+            return false;
+        };
+        if (!hasValue(notificationId)) {
+            if (callback) {
+                callback({"error": i18next.t("Notification id is required.")});
+            };
+        };
+        if (!params) params = {};
+        this.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred deleting notification.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
+
+    },
     "emailLog": function(userId, callback) {
         if (!userId) return false;
         this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
@@ -5131,21 +5269,15 @@ var tnthAjax = {
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
-
         loader(true);
-
-        var isIE = getIEVersion();
-        if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
-        } else {
-            funcWrapper(PORTAL_NAV_PAGE);
-        };
+        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
 
     tnthAjax.beforeSend();
+
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 

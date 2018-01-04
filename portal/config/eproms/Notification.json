@@ -1,0 +1,24 @@
+{
+  "entry": [
+    {
+      "resourceType": "Notification",
+      "name": "terms_update",
+      "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> has been updated.</p>"
+    },
+    {
+      "resourceType": "Notification",
+      "name": "privacy_update",
+      "content": "<p>The <a href=\"/privacy\" target=\"_blank\">privacy policy</a> has been updated.</p>"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2017-11-22T00:23:12.618942Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

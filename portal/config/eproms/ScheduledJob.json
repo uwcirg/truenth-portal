@@ -76,6 +76,30 @@
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "deactivate_tous"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "notification": "terms_update",
+        "roles": ["patient", "staff", "staff_admin"]
+      },
+      "name": "Terms update notification",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "notify_users"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "notification": "privacy_update",
+        "roles": ["patient", "staff", "staff_admin"]
+      },
+      "name": "PrivacyPolicy update notification",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "notify_users"
     }
   ],
   "id": "SitePersistence v0.2",
