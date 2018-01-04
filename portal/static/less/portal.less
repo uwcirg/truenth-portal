@@ -1628,7 +1628,9 @@ div.pull-right {
     margin-right: 1em;
     z-index: 10;
     height: 2.5em;
-    width: 70px;
+    width: auto;
+    outline: 0;
+    white-space: nowrap;
     padding: 0 0.7em;
     color: #FFF;
     background: @featureBtnBgColor;
@@ -1642,19 +1644,6 @@ div.pull-right {
     color: @featureBtnHoverColor;
     background-color: @linkHover;
   }
-  .profile-item-edit-btn::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0.5em;
-    left: 0;
-    bottom: 0;
-    right: 0;
-  }
-
-  .profile-item-container.edit .profile-item-edit-btn::before {
-    content: attr(data-text);
-  }
-
   .profile-item-container .edit-container {
     display: none;
     max-width: 100%;

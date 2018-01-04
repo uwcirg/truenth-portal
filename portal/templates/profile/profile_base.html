@@ -42,10 +42,11 @@
   {% if user and user.has_role(ROLE.PATIENT) %}var patientId = {{user.id}};{% endif %}
   profileObj.onBeforeSectionsLoad();
   $(document).ready(function(){
-    profileObj.initSections();
+    profileObj.initSections(function() {
+      tnthAjax.getDemo($("#profileUserId").val());
+    });
     {%- if user %}
       profileObj.onSectionsDidLoad();
-      tnthAjax.getDemo({{user.id}});
     {% endif -%}
   });
 {% endblock %}

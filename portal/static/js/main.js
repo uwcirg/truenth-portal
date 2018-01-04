@@ -1212,7 +1212,7 @@ var fillContent = {
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
+            if (String(item.url) === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
                 $("#profileTimeZone option").each(function() {
                     if ($.trim($(this).val()) == $.trim(item.timezone)) {
                         $(this).prop("selected", true);
@@ -2102,7 +2102,7 @@ var Profile = function(subjectId, currentUserId) {
           });
 
           $("#profileForm .profile-item-container.editable").each(function() {
-              $(this).prepend('<button class="btn profile-item-edit-btn" data-text="{edit}" aria-label="{editButton}"></button>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
+              $(this).prepend('<input type="button" class="btn profile-item-edit-btn" value="{edit}" aria-label="{editButton}"></input>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
           });
 
           $("#profileForm .profile-item-edit-btn").each(function() {
@@ -2110,7 +2110,7 @@ var Profile = function(subjectId, currentUserId) {
                 e.preventDefault();
                 var container = $(this).closest(".profile-item-container");
                 container.toggleClass("edit");
-                $(this).attr("data-text", container.hasClass("edit") ? i18next.t("Done"): i18next.t("Edit"));
+                $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
                 if (!container.hasClass("edit")) {
                     var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
                     if (sections) {
@@ -2124,11 +2124,16 @@ var Profile = function(subjectId, currentUserId) {
           });
         }, 1000);
     }
-    this.initSections = function() {
+    this.initSections = function(callback) {
         var self = this;
         $("[data-profile-section-id]").each(function() {
             self.initSection($(this).attr("data-profile-section-id"));
         });
+        if (callback) {
+            setTimeout(function() {
+                callback();
+            }, 300);
+        }
     };
     this.initSection = function(type) {
         switch(String(type).toLowerCase()) {
@@ -5275,10 +5280,6 @@ $(document).ready(function() {
 
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
-
-    $(window).on("beforeunload", function() {
-        $(".button-container .loading-message-indicator").hide();
-    });
 
     //setTimeout('LRKeyEvent();', 1500);
     // To validate a form, add class to <form> and validate by ID.
