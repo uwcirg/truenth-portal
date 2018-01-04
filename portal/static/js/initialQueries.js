@@ -440,7 +440,7 @@
     $("div.reg-complete-container").fadeIn();
     $("html, body").stop().animate({
       scrollTop: $("div.reg-complete-container").offset().top
-    }, 2000);
+    }, 1500);
     $("#next").attr("disabled", true).removeClass("open");
     $("#iqErrorMessage").text("");
     $("#updateProfile").removeAttr("disabled").addClass("open");
@@ -567,6 +567,12 @@
        $("html, body").animate({
           scrollTop: $(this).next("div.content-body").children().first().offset().top
        }, 1000);
+    });
+
+    $(window).scroll(function() {
+      if ($("html body").is(":animated")) {
+        $("html body").stop(true, true);
+      };
     });
 
     //if term of use form not present - need to show the form
