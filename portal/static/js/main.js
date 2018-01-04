@@ -1196,7 +1196,7 @@ var fillContent = {
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
+            if (String(item.url) === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
                 $("#profileTimeZone option").each(function() {
                     if ($.trim($(this).val()) == $.trim(item.timezone)) {
                         $(this).prop("selected", true);
@@ -2038,11 +2038,16 @@ var Profile = function(subjectId, currentUserId) {
           });
         }, 1000);
     }
-    this.initSections = function() {
+    this.initSections = function(callback) {
         var self = this;
         $("[data-profile-section-id]").each(function() {
             self.initSection($(this).attr("data-profile-section-id"));
         });
+        if (callback) {
+            setTimeout(function() {
+                callback();
+            }, 300);
+        }
     };
     this.initSection = function(type) {
         switch(String(type).toLowerCase()) {
