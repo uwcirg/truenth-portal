@@ -41,7 +41,9 @@ class Notification(db.Model):
         d['resourceType'] = 'Notification'
         d['name'] = self.name
         d['content'] = self.content
-        d['created_at'] = FHIR_datetime.as_fhir(self.created_at)
+        # Only include created_at if already saved
+        if self.created_at:
+            d['created_at'] = FHIR_datetime.as_fhir(self.created_at)
         return d
 
 
