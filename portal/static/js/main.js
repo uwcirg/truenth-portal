@@ -1342,7 +1342,6 @@ var fillContent = {
 
                     });
                 });
-
                 $("#notificationBanner .close").on("click", function(e) {
                     e.stopPropagation();
                     var dataIds = $(this).parent().find("[data-id]");
@@ -1354,10 +1353,6 @@ var fillContent = {
                         };
                     })
                     $(this).parent().hide();
-                });
-
-                $(window).on("beforeunload focus", function() {
-                    tnthAjax.initNotifications();
                 });
             } else {
                 $("#notificationBanner").hide();
