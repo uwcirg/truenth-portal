@@ -1356,9 +1356,9 @@ var fillContent = {
                     $(this).parent().hide();
                 });
 
-                $(window).on("beforeunload focus", function() {
-                    tnthAjax.initNotifications();
-                });
+               // $(window).on("beforeunload focus", function() {
+               //     tnthAjax.initNotifications();
+               // });
             } else {
                 $("#notificationBanner").hide();
             }
@@ -3951,7 +3951,7 @@ var tnthAjax = {
             } else {
                 params.attempts = 0;
                 if (callback) callback({"error": true});
-                self.sendError(xhr, url, userId);
+                //self.sendError(xhr, url, userId);
             };
         });
     },
