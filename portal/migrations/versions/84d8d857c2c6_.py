@@ -44,23 +44,24 @@ def upgrade():
     def keep_one(subject_id, reference):
         items = session.query(QuestionnaireResponse).filter(
             QuestionnaireResponse.subject_id == subject_id).filter(
-            QuestionnaireResponse.document[("questionnaire", "reference")
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
             ].astext == reference).order_by(QuestionnaireResponse.id)
         keeper = None
         for i in items:
             if keeper is None:
                 keeper = i
-                print ("Keep {}".format(keeper))
+                print("Keep {}".format(keeper))
                 continue
             # Confirm results are the same
             if keeper.document != i.document:
                 report = StringIO()
                 dict_match(keeper.document, i.document, report)
-                print (report.getvalue())
-                print ("ERROR different docs; skipping QNRs {} and {}".format(
+                print(report.getvalue())
+                print("ERROR different docs; skipping QNRs {} and {}".format(
                     keeper.id, i.id), file=sys.stderr)
                 continue
-            print ("  deleting {}".format(i))
+            print("  deleting {}".format(i))
             # direct delete of obj breaks due to fk w/ encounter
             session.execute(sa.text(
                 "DELETE FROM questionnaire_responses WHERE ID = :ID").params(
