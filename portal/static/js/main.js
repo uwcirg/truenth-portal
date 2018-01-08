@@ -5154,16 +5154,19 @@ var tnthAjax = {
         }
     },
     "deleteNotification": function(userId, notificationId, params, callback) {
+
+        if (!callback) {
+            callback = function(data) {
+                return data;
+            }
+        }
+        
         if (!hasValue(userId)) {
-            if (callback) {
-                callback({"error": i18next.t("User Id is required")});
-            };
+            callback({"error": i18next.t("User Id is required")});
             return false;
         };
         if (!hasValue(notificationId)) {
-            if (callback) {
-                callback({"error": i18next.t("Notification id is required.")});
-            };
+            callback({"error": i18next.t("Notification id is required.")});
         };
         if (!params) params = {};
 
@@ -5185,12 +5188,12 @@ var tnthAjax = {
                     self.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
                         if (data) {
                             if (!data.error) {
-                                if (callback) callback(data);
+                                callback(data);
                             } else {
-                                if (callback) callback({"error": i18next.t("Error occurred deleting notification.")});
+                                callback({"error": i18next.t("Error occurred deleting notification.")});
                             };
                         } else {
-                            if (callback) callback({"error": i18next.t("no data returned")});
+                            callback({"error": i18next.t("no data returned")});
                         };
                     });
                 };
