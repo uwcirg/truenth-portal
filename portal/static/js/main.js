@@ -5154,28 +5154,51 @@ var tnthAjax = {
         }
     },
     "deleteNotification": function(userId, notificationId, params, callback) {
+
+        if (!callback) {
+            callback = function(data) {
+                return data;
+            }
+        }
+        
         if (!hasValue(userId)) {
-            if (callback) {
-                callback({"error": i18next.t("User Id is required")});
-            };
+            callback({"error": i18next.t("User Id is required")});
             return false;
         };
         if (!hasValue(notificationId)) {
-            if (callback) {
-                callback({"error": i18next.t("Notification id is required.")});
-            };
+            callback({"error": i18next.t("Notification id is required.")});
         };
         if (!params) params = {};
-        this.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    if (callback) callback(data);
-                } else {
-                    if (callback) callback({"error": i18next.t("Error occurred deleting notification.")});
+
+        var self = this;
+
+        this.getNotification(userId, false, function(data) {
+            if (data.notifications) {
+                 /* 
+                 * check if there is notification for this id
+                 * dealing with use case where user deletes same notification in a separate open window
+                 */
+                var arrNotification = $.grep(data.notifications, function(notification) {
+                    return notification.id == notificationId;
+                });
+                if (arrNotification.length > 0) {
+                    /* 
+                     * delete notification only if it exists
+                     */
+                    self.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
+                        if (data) {
+                            if (!data.error) {
+                                callback(data);
+                            } else {
+                                callback({"error": i18next.t("Error occurred deleting notification.")});
+                            };
+                        } else {
+                            callback({"error": i18next.t("no data returned")});
+                        };
+                    });
                 };
-            } else {
-                if (callback) callback({"error": i18next.t("no data returned")});
             };
+
         });
 
     },
