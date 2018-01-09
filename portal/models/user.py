@@ -1066,9 +1066,13 @@ class User(db.Model, UserMixin):
             # ignore internal system identifiers
             pre_existing = [ident for ident in self._identifiers
                             if ident.system not in internal_identifier_systems]
+            seen = []
             for identifier in fhir['identifier']:
                 try:
                     new_id = Identifier.from_fhir(identifier)
+                    if new_id in seen:
+                        abort(400, 'Duplicate identifiers found, should be unique set')
+                    seen.append(new_id)
                 except KeyError as e:
                     abort(400, "{} field not found for identifier".format(e))
                 except TypeError as e:
