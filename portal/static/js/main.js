@@ -1032,16 +1032,6 @@ var fillContent = {
             $(this).prop("checked", false);
         });
 
-        var orgStates = [];
-
-        if (data.identifier) {
-            (data.identifier).forEach(function(item) {
-                if (item.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && hasValue(item.value)) {
-                    orgStates.push((item.value).split(":")[1]);
-                }
-            });
-        };
-
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
             if (orgID == "0") {
@@ -1049,16 +1039,17 @@ var fillContent = {
                 $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
             }
             else {
-                var ckOrg;
-                if (orgStates.length > 0 && $(".state-container").length > 0) {
-                    orgStates.forEach(function(state) {
-                        ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
-                        ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
-                    });
+                var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
+                if ($(".state-container").length > 0) {
+                    if (ckOrg.length > 0) {
+                        ckOrg.prop('checked', true);
+                        var state = ckOrg.attr("state");
+                        if (hasValue(state)) {
+                            $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
+                        }
+                    }
                     $(".noOrg-container").show();
                 } else {
-                    var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
                     if (ckOrg.length > 0) ckOrg.prop('checked', true);
                     else {
                         var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
@@ -1875,20 +1866,8 @@ var assembleContent = {
 
             var studyId = $("#profileStudyId").val();
             var siteId = $("#profileSiteId").val();
-            var states = [];
 
-            $("#userOrgs input[name='organization']").each(function() {
-                if ($(this).is(":checked")) {
-                    var state = $(this).attr("state");
-                    if (hasValue(state)
-                        && (states.indexOf(state) == -1)
-                        && parseInt($(this).val()) != 0) {
-                        states.push(state);
-                    };
-                };
-            });
-
-            if (hasValue(studyId) || hasValue(siteId) || states.length > 0) {
+            if (hasValue(studyId) || hasValue(siteId)) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
@@ -1938,15 +1917,6 @@ var assembleContent = {
                     };
                 };
 
-                if (states.length > 0) {
-                    states.forEach(function(state) {
-                        identifiers.push({
-                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
-                            use: "secondary",
-                            value: "state:" + state
-                        });
-                    });
-                };
                 demoArray["identifier"] = identifiers;
             };
 
