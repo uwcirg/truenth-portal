@@ -1879,7 +1879,12 @@ var assembleContent = {
 
             $("#userOrgs input[name='organization']").each(function() {
                 if ($(this).is(":checked")) {
-                    if (hasValue($(this).attr("state")) && parseInt($(this).val()) != 0) states.push($(this).attr("state"));
+                    var state = $(this).attr("state");
+                    if (hasValue(state)
+                        && (states.indexOf(state) == -1)
+                        && parseInt($(this).val()) != 0) {
+                        states.push(state);
+                    };
                 };
             });
 
