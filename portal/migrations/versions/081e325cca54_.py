@@ -1,5 +1,4 @@
 from alembic import op
-import sqlalchemy as sa
 
 
 """User Identifiers made unique
@@ -18,12 +17,14 @@ down_revision = 'f47410f58746'
 def upgrade():
     # First have to eliminate duplcates, or the addition of the constraint will fail
     # simply hold on to the lowest id from each duplicate (or non-duplicate)
-    query = ("DELETE FROM user_identifiers WHERE id NOT IN ("
+    query = (
+        "DELETE FROM user_identifiers WHERE id NOT IN ("
         "SELECT MIN(id) from user_identifiers GROUP BY user_id, identifier_id)")
     op.execute(query)
 
     # add missing constraint
-    op.create_unique_constraint('_user_identifier', 'user_identifiers', ['user_id', 'identifier_id'])
+    op.create_unique_constraint(
+        '_user_identifier', 'user_identifiers', ['user_id', 'identifier_id'])
 
 
 def downgrade():
