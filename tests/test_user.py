@@ -10,9 +10,11 @@ from tests import TestCase, TEST_USER_ID, TEST_USERNAME
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.codeable_concept import CodeableConcept
+from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import Coding, UserEthnicity, UserIndigenous
-from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import UserEthnicity, UserIndigenous
+from portal.models.fhir import ValueQuantity
 from portal.models.fhir import Observation, UserObservation
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrganizationLocale
@@ -1089,7 +1091,7 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         user.organizations.append(org)
         # test locale inheritance
-        self.assertEquals(user.locale_display_options,set(['en_AU']))
+        self.assertEquals(user.locale_display_options['en_AU'], 'Australian English')
 
     def test_user_messages(self):
         msg1 = EmailMessage(subject='Test #1',

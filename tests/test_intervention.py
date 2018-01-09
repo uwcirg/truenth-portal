@@ -67,6 +67,58 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.status_text, data['status_text'])
         self.assertEquals(ui.staff_html, data['staff_html'])
 
+    def test_intervention_partial_put(self):
+        client = self.add_client()
+        client.intervention = INTERVENTION.SEXUAL_RECOVERY
+        client.application_origins = 'http://safe.com'
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        # Create a full UserIntervention row to attempt
+        # a partial put on below
+        data = {
+            'user_id': TEST_USER_ID,
+            'access': "granted",
+            'card_html': "unique HTML set via API",
+            'link_label': 'link magic',
+            'link_url': 'http://safe.com',
+            'status_text': 'status example',
+            'staff_html': "unique HTML for /patients view"
+        }
+
+        ui = UserIntervention(
+            user_id=data['user_id'], access=data['access'],
+            card_html=data['card_html'], link_label=data['link_label'],
+            link_url=data['link_url'], status_text=data['status_text'],
+            staff_html=data['staff_html'],
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id)
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        # now just update a couple, but expect full data set (with
+        # merged updates) to be returned
+        update = {
+            'user_id': TEST_USER_ID,
+            'access': "forbidden",
+            'card_html': "no access for YOU"
+        }
+
+        rv = self.client.put(
+            '/api/intervention/sexual_recovery',
+            content_type='application/json',
+            data=json.dumps(update))
+        self.assert200(rv)
+
+        ui = UserIntervention.query.one()
+        self.assertEquals(ui.user_id, data['user_id'])
+        self.assertEquals(ui.access, update['access'])
+        self.assertEquals(ui.card_html, update['card_html'])
+        self.assertEquals(ui.link_label, data['link_label'])
+        self.assertEquals(ui.link_url, data['link_url'])
+        self.assertEquals(ui.status_text, data['status_text'])
+        self.assertEquals(ui.staff_html, data['staff_html'])
+
     def test_intervention_bad_access(self):
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY

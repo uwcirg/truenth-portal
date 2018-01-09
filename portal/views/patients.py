@@ -5,18 +5,15 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
-from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import overall_assessment_status
-from ..models.communication import load_template_args
-from ..models.fhir import Coding
+from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
-from ..models.questionnaire_bank import QuestionnaireBank, visit_name
+from ..models.questionnaire_bank import visit_name
 from ..models.role import Role, ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
-from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from .portal import check_int
 from datetime import datetime
 
@@ -109,6 +106,10 @@ def patients_root():
                  and_(UserIntervention.user_id==User.id,
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
+
+    # only show test users to admins
+    if not user.has_role(ROLE.ADMIN):
+        patients = [patient for patient in patients if not patient.has_role(ROLE.TEST)]
 
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):

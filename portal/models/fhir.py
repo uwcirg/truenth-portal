@@ -1,186 +1,25 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
-from flask import current_app
 from html.parser import HTMLParser
 import json
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
+from .locale import LocaleConstants
 from .organization import OrgTree
+from .performer import Performer
 from .reference import Reference
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 from ..system_uri import TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
-
-
-class CodeableConceptCoding(db.Model):
-    """Link table joining CodeableConcept with n Codings"""
-
-    __tablename__ = 'codeable_concept_codings'
-    id = db.Column(db.Integer, primary_key=True)
-    codeable_concept_id = db.Column(db.ForeignKey(
-        'codeable_concepts.id'), nullable=False)
-    coding_id =  db.Column(db.ForeignKey('codings.id'), nullable=False)
-
-    # Maintain a unique relationship between each codeable concept
-    # and it list of codings.  Therefore, a CodeableConcept always
-    # contains the superset of all codings given for the concept.
-    db.UniqueConstraint('codeable_concept_id', 'coding_id',
-                        name='unique_codeable_concept_coding')
-
-
-class CodeableConcept(db.Model):
-    __tablename__ = 'codeable_concepts'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text)
-    codings = db.relationship("Coding", secondary='codeable_concept_codings')
-
-    def __str__(self):
-        """Print friendly format for logging, etc."""
-        summary = "CodeableConcept {} [".format(
-            self.text if self.text else '')
-        summary += ','.join([str(coding) for coding in self.codings])
-        return summary + ']'
-
-    @classmethod
-    def from_fhir(cls, data):
-        cc = cls()
-        if 'text' in data:
-            cc.text = data['text']
-        for coding in data['coding']:
-            item = Coding.from_fhir(coding)
-            cc.codings.append(item)
-        return cc.add_if_not_found()
-
-    def as_fhir(self):
-        """Return self in JSON FHIR formatted string"""
-        d = {"coding": [coding.as_fhir() for coding in self.codings]}
-        if self.text:
-            d['text'] = self.text
-        return d
-
-    def add_if_not_found(self, commit_immediately=False):
-        """Add self to database, or return existing
-
-        Queries for similar, matching on the set of contained
-        codings alone.  Adds if no match is found.
-
-        @return: the new or matched CodeableConcept
-
-        """
-        # we're imposing a constraint, where any CodeableConcept pointing
-        # at a particular Coding will be the ONLY CodeableConcept for that
-        # particular Coding.
-        coding_ids = [c.id for c in self.codings if c.id]
-        if not coding_ids:
-            raise ValueError("Can't add CodeableConcept without any codings")
-        query = CodeableConceptCoding.query.filter(
-            CodeableConceptCoding.coding_id.in_(coding_ids)).distinct(
-                CodeableConceptCoding.codeable_concept_id)
-        if query.count() > 1:
-            raise ValueError(
-                "DB problem - multiple CodeableConcepts {} found for "
-                "codings: {}".format(
-                    [cc.codeable_concept_id for cc in query],
-                    [str(c) for c in self.codings]))
-        if not query.count():
-            # First time for this (set) of codes, add new rows
-            db.session.add(self)
-            if commit_immediately:
-                db.session.commit()
-        else:
-            # Build a union of all codings found, old and new
-            found = query.first()
-            old = CodeableConcept.query.get(found.codeable_concept_id)
-            self.text = self.text if self.text else old.text
-            self.codings = list(set(old.codings).union(set(self.codings)))
-            self.id = found.codeable_concept_id
-        self = db.session.merge(self)
-        return self
-
-
-class Coding(db.Model):
-    __tablename__ = 'codings'
-    id = db.Column(db.Integer, primary_key=True)
-    system = db.Column(db.String(255), nullable=False)
-    code = db.Column(db.String(80), nullable=False)
-    display = db.Column(db.Text, nullable=False)
-    __table_args__ = (UniqueConstraint('system', 'code',
-        name='_system_code'),)
-
-    def __str__(self):
-        """Print friendly format for logging, etc."""
-        return "Coding {0.code}, {0.display}, {0.system}".format(self)
-
-    def update_from_fhir(self, data):
-        for i in ("system", "code", "display"):
-            if i in data:
-                self.__setattr__(i, data[i])
-        return self.add_if_not_found(True)
-
-    @classmethod
-    def from_fhir(cls, data):
-        """Factory method to lookup or create instance from fhir"""
-        cc = cls()
-        return cc.update_from_fhir(data)
-
-    def as_fhir(self):
-        """Return self in JSON FHIR formatted string"""
-        d = {}
-        d['resourceType'] = 'Coding'
-        if not (self.system and self.code):
-            current_app.logger.warn(
-                "Ill defined coding {} - requires system and code".format(
-                    self))
-
-        for i in ("system", "code", "display"):
-            if getattr(self, i) is not None:
-                d[i] = getattr(self, i)
-        return d
-
-    def add_if_not_found(self, commit_immediately=False):
-        """Add self to database, or return existing
-
-        Queries for similar, existing CodeableConcept (matches on
-        system and code alone).  Populates self.id if found, adds
-        to database first if not.
-
-        """
-        if self.id:
-            return self
-
-        if not (self.system and self.code):
-            current_app.logger.warn(
-                "Ill defined coding {} - requires system and code"
-                "".format(self))
-
-        match = self.query.filter_by(
-            system=self.system, code=self.code).first()
-        if not match:
-            db.session.add(self)
-            if commit_immediately:
-                db.session.commit()
-        elif self is not match:
-            self = db.session.merge(match)
-        return self
-
-    @staticmethod
-    def display_lookup(code, system):
-        """Return display value for (code, system), if found"""
-        item = Coding.query.filter(
-            Coding.code==code,
-            Coding.system==system).first()
-        if not item:
-            raise ValueError(
-                "No coding found for ({system}, {code})".format(
-                    system=system, code=code))
-        return item.display
 
 
 """ TrueNTH Clinical Codes """
@@ -199,7 +38,7 @@ class ClinicalConstants(object):
             code='111',
             display='biopsy',
         ).add_if_not_found(True)
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
@@ -210,7 +49,7 @@ class ClinicalConstants(object):
             code='121',
             display='PCa diagnosis',
         ).add_if_not_found(True)
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
@@ -221,7 +60,7 @@ class ClinicalConstants(object):
             code='141',
             display='PCa localized diagnosis',
         ).add_if_not_found(True)
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
@@ -257,7 +96,7 @@ class EncounterConstants(object):
             code='paper',
             display='Information collected on paper',
         ).add_if_not_found(True)
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
@@ -268,7 +107,7 @@ class EncounterConstants(object):
             code='phone',
             display='Information collected over telephone system',
         ).add_if_not_found(True)
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
@@ -832,5 +671,6 @@ def add_static_concepts(only_quick=False):
         if not encounter_type in db.session():
             db.session.add(encounter_type)
 
+    for concept in LocaleConstants(): pass # looping is adequate
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate

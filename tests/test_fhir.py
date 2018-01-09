@@ -5,7 +5,9 @@ import pytz
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
-from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
+from portal.models.codeable_concept import CodeableConcept
+from portal.models.coding import Coding
+from portal.models.fhir import ValueQuantity
 from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
 from portal.system_uri import SNOMED
 

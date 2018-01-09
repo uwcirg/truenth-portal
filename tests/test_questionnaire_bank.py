@@ -51,12 +51,16 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(qb.trigger_date(self.test_user), now)
 
-        # user with consent and TX date should return TX date
+        # user with consent and TX date should return TX date (if qb.recurs)
         tx_date = datetime(2017, 6, 10, 20, 00, 00, 000000)
         self.add_procedure(code='7', display='Focal therapy',
                            system=ICHOM, setdate=tx_date)
         self.test_user = db.session.merge(self.test_user)
         qb.__trigger_date = None  # clear out stored trigger_date
+        recur = Recur(
+            start='{"months": 3}', cycle_length='{"months": 6}',
+            termination='{"months": 24}')
+        qb.recurs.append(recur)
         self.assertEquals(qb.trigger_date(self.test_user), tx_date)
 
     def test_intervention_trigger_date(self):

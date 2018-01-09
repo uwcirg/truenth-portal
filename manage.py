@@ -167,12 +167,24 @@ def translation_upload():
 
 
 @click.option('--language', '-l', help='language code (e.g. en_US).')
+@click.option('--state', '-s', help='Translation state', type=click.Choice([
+    'pseudo',
+    'pending',
+    'published',
+    'contextMatchingInstrumented',
+]))
 @app.cli.command()
-def translation_download(language):
+def translation_download(language, state):
     """Download .po file(s) from Smartling
 
     GETs the .po file for the specified language from Smartling via their API.
     If no language is specified, all available translations will be downloaded.
     After download, .po file(s) are compiled into .mo file(s) using pybabel
     """
-    smartling_download(language)
+
+    default_state = 'pending'
+    if app.config['SYSTEM_TYPE'].lower() == 'production':
+        default_state = 'published'
+    state = state or default_state
+    click.echo('Downloading {state} translations from Smartling'.format(state=state))
+    smartling_download(state=state, language=language)

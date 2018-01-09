@@ -650,6 +650,9 @@ div.footer-wrapper.right-panel {
     position: relative;
     text-align: center;
   }
+  #buttonsContainer.continue {
+    margin: 1em auto;
+  }
   #next {
     opacity: 0;
     position: absolute;
@@ -962,9 +965,12 @@ div.footer-wrapper.right-panel {
         display: inline-block;
         padding: 0 1em;
         line-height: 1.6em;
+        span {
+          max-width: 250px;
+        }
       }
       label.text-muted {
-        color: #6c7071;
+        color: #585a5a;
       }
       label span {
         display: inline-block;
@@ -975,9 +981,12 @@ div.footer-wrapper.right-panel {
       margin-left: 1em;
     }
 
-    label.text-muter ~ div.org-container {
-      margin-left: 1.5em;
+    label.text-muter {
+      & ~ div.org-container {
+        margin-left: 1.5em;
+      }
     }
+
     #orglist-footer-container {
       padding: 0.5em 1em;
       width: 250px;
@@ -2631,14 +2640,24 @@ div.org-container {
   legend {
     color: @legendColor;
   }
+  &.sub-org-container {
+    margin: 0.1em 0;
+  }
   label.org-label{
     margin: 0.2em 0;
   }
-  .text-muter {
+  label.text-muted {
+    border-bottom: solid 1px #e5e5e5;
+  }
+  label.org-label.text-muter {
     margin-bottom: 4px;
     margin-top:4px;
     font-size: @baseFontSize;
     color: #777474;
+  }
+  label.org-label.text-muter.data-display-only {
+    margin-left: -0.3em;
+    border-bottom: solid 1px #e5e5e5;
   }
   input[type="checkbox"] {
     position:relative;
@@ -2646,8 +2665,11 @@ div.org-container {
     right:4px;
   }
 }
+div.parent-org-container {
+  margin-bottom: 0.5em;
+}
 .indent {
-  padding: 0 1em;
+  padding: 0 1.2em;
 }
 .registration-status-container {
   margin:0 0 0.8em 0;
@@ -2851,9 +2873,12 @@ div.timezone-warning.text-warning {
       padding: 0;
     }
     div.orglist-selector {
+      #fillOrgs {
+        margin-left: 0.5em;
+      }
       div.dropdown-menu {
-        width: 375px;
-        max-width: 375px;
+        width: 400px;
+        max-width: 400px;
         #userOrgs {
           margin: 0 0.5em;
         }
@@ -3092,6 +3117,10 @@ div.timezone-warning.text-warning {
         font-size: @subheadSize;
       }
     }
+  }
+
+  #aboutForm.full-size {
+    max-width: 100%;
   }
 
   #profileConsentHistory {

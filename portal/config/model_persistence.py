@@ -158,19 +158,27 @@ class ModelPersistence(object):
             serialize = 'as_json'
 
         merged = None
-        new_obj = from_method(new_data)
+
+        # Generate an empty but complete serialized form of the object
+        # so that regardless of shorthand in the persistence file (say
+        # ignoring empty fields), a valid representation is available.
+        empty_instance = self.model()
+        complete_form = getattr(empty_instance, serialize)()
+        # Now overwrite any values present in persistence version
+        complete_form.update(new_data)
+        new_obj = from_method(complete_form)
         existing, id_description = self.lookup_existing(
-            new_obj=new_obj, new_data=new_data)
+            new_obj=new_obj, new_data=complete_form)
 
         if existing:
             details = StringIO()
-            if not dict_match(new_data, getattr(existing, serialize)(), details):
+            if not dict_match(complete_form, getattr(existing, serialize)(), details):
                 self._log(
                     "{type} {id} collision on import.  {details}".format(
                         type=self.model.__name__,
                         id=id_description,
                         details=details.getvalue()))
-                merged = getattr(existing, update)(new_data)
+                merged = getattr(existing, update)(complete_form)
         else:
             self._log("{type} {id} not found - importing".format(
                 type=self.model.__name__,

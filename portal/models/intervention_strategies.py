@@ -22,9 +22,11 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from ..database import db
 from ..date_tools import localize_datetime
-from .fhir import CC, Coding, CodeableConcept
+from .fhir import CC
 from .identifier import Identifier
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree, OrganizationIdentifier
@@ -252,9 +254,8 @@ def update_card_html_on_completion():
                       {logout}
                     </a>
                   </div>
-                </div>""".format(
-                    greeting=greeting, confirm=confirm, reminder=reminder,
-                    logout=logout)
+                </div>""".format(greeting=greeting, confirm=confirm,
+                                 reminder=reminder, logout=logout)
 
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
@@ -267,20 +268,34 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
+                greeting = _(u"Hi {}").format(user.display_name)
+
                 qb = assessment_status.qb_data.qb
                 trigger_date = qb.trigger_date(user)
-                utc_due = qb.calculated_start(
+                utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start
                 utc_due = qb.calculated_due(
-                    trigger_date, as_of_date=now) or utc_due
-                due_date = localize_datetime(utc_due, user)
-                assert due_date
-                greeting = _(u"Hi {}").format(user.display_name)
-                reminder = _(
-                    u"Please complete your {} "
-                    "questionnaire by {}.").format(
-                        assessment_status.top_organization.name,
-                        due_date.strftime('%-d %b %Y'))
+                    trigger_date, as_of_date=now) or utc_start
+
+                if ((assessment_status.overall_status == 'Overdue') or
+                        (utc_due < datetime.utcnow())):
+                    utc_expired = qb.calculated_expiry(
+                        trigger_date, as_of_date=now) or utc_start
+                    expired_date = localize_datetime(utc_expired, user)
+                    reminder = _(
+                        u"Please complete your {} "
+                        "questionnaire as soon as possible. It will expire "
+                        "on {}.").format(
+                            assessment_status.top_organization.name,
+                            expired_date.strftime('%-d %b %Y'))
+                else:
+                    due_date = localize_datetime(utc_due, user)
+                    reminder = _(
+                        u"Please complete your {} "
+                        "questionnaire by {}.").format(
+                            assessment_status.top_organization.name,
+                            due_date.strftime('%-d %b %Y'))
+
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -504,7 +519,8 @@ def tx_begun(boolean_value):
     if boolean_value == 'true':
         check_func = known_treatment_started
     elif boolean_value == 'false':
-        def check_func(u): return not known_treatment_started(u)
+        def check_func(u):
+            return not known_treatment_started(u)
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 
@@ -683,11 +699,14 @@ class AccessStrategy(db.Model):
         """Return self in JSON friendly dictionary"""
         d = {
             "name": self.name,
-            "function_details": json.loads(self.function_details),
             "resourceType": 'AccessStrategy'
         }
-        d['intervention_name'] = Intervention.query.get(
-            self.intervention_id).name
+        d["function_details"] = (
+            json.loads(self.function_details) if self.function_details
+            else None)
+        d['intervention_name'] = (
+            Intervention.query.get(self.intervention_id).name
+            if self.intervention_id else None)
         if self.id:
             d['id'] = self.id
         if self.rank:

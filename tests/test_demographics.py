@@ -1,6 +1,12 @@
 """Unit test module for Demographics API"""
 from flask_webtest import SessionScope
-from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
+from tests import (
+    TestCase,
+    IMAGE_URL,
+    LAST_NAME,
+    FIRST_NAME,
+    TEST_USERNAME,
+    TEST_USER_ID)
 import json
 
 from portal.extensions import db
@@ -29,6 +35,11 @@ class TestDemographics(TestCase):
               ext['url'].endswith('timezone')]
         self.assertEquals('UTC', tz[0]['timezone'])
         self.assertEquals(False, fhir['deceasedBoolean'])
+
+        # confirm empties aren't present in extension; i.e. only 'url' key
+        self.assertFalse([e for e in fhir['extension'] if len(e.keys()) == 1])
+        self.assertEquals(len(fhir['telecom']), 1)
+        self.assertTrue(fhir['telecom'][0]['value'], TEST_USERNAME)
 
     def test_demographics404(self):
         self.login()
@@ -115,7 +126,10 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
-        self.assertEquals(3, len(fhir['extension']))  # timezone added
+        # ignore added timezone and empty extensions
+        self.assertEquals(2, len(
+            [ext for ext in fhir['extension']
+             if 'valueCodeableConcept' in ext]))
         self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)

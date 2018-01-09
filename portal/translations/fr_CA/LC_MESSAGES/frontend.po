@@ -353,3 +353,261 @@ msgstr ""
 
 msgid "Error occurred when converting timezone: "
 msgstr "Error occurred when converting timezone: "
+
+msgid "Server error occurred updating data."
+msgstr "Server error occurred updating data."
+
+msgid "Invalid user id: %d"
+msgstr "Invalid user id: %d"
+
+msgid " Account created.  Redirecting to profile..."
+msgstr " Account created.  Redirecting to profile..."
+
+msgid "[Processing error] "
+msgstr "[Processing error] "
+
+msgid "Email is already in use."
+msgstr "Email is already in use."
+
+msgid "An organization must be selected."
+msgstr "An organization must be selected."
+
+msgid "Error occurred retrieving clinics data."
+msgstr "Error occurred retrieving clinics data."
+
+msgid "No clinics data available."
+msgstr "No clinics data available."
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Report Name"
+msgstr "Report Name"
+
+msgid "Generated (GMT)"
+msgstr "Generated (GMT)"
+
+msgid "Downloaded"
+msgstr "Downloaded"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "View All"
+msgstr "View All"
+
+msgid "Patient Reports"
+msgstr "Patient Reports"
+
+msgid "Patient Report"
+msgstr "Patient Report"
+
+msgid "No report data found."
+msgstr "No report data found."
+
+msgid "Error occurred retrieving patient report"
+msgstr "Error occurred retrieving patient report"
+
+msgid "Are you sure you want to deactivate this user?"
+msgstr "Are you sure you want to deactivate this user?"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "terms"
+msgstr "terms"
+
+msgid "your information"
+msgstr "your information"
+
+msgid "your clinical profile"
+msgstr "your clinical profile"
+
+msgid "your clinic"
+msgstr "your clinic"
+
+msgid ""
+"There's a problem with your submission. Please check your answers, then try "
+"again.  Make sure all required fields are completed and valid."
+msgstr ""
+"There's a problem with your submission. Please check your answers, then try "
+"again.  Make sure all required fields are completed and valid."
+
+msgid "Organization"
+msgstr "Organization"
+
+msgid "Registration Date"
+msgstr "Registration Date"
+
+msgid "Consent Date"
+msgstr "Consent Date"
+
+msgid "Last Updated"
+msgstr "Last Updated"
+
+msgid "( GMT, Y-M-D )"
+msgstr "( GMT, Y-M-D )"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "User"
+msgstr "User"
+
+msgid "{project name} Terms of Use"
+msgstr "{project name} Terms of Use"
+
+msgid "History"
+msgstr "History"
+
+msgid "Select"
+msgstr "Select"
+
+msgid "(date entered by %actor on %date)"
+msgstr "(date entered by %actor on %date)"
+
+msgid "Added!"
+msgstr "Added!"
+
+msgid "Date (GMT), Y-M-D"
+msgstr "Date (GMT), Y-M-D"
+
+msgid "Subject"
+msgstr "Subject"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "No audit entry found."
+msgstr "No audit entry found."
+
+msgid "Click to view report"
+msgstr "Click to view report"
+
+msgid "No questionnaire data found."
+msgstr "No questionnaire data found."
+
+msgid "Problem retrieving session data from server."
+msgstr "Problem retrieving session data from server."
+
+msgid "Last Updated - {date}"
+msgstr "Last Updated - {date}"
+
+msgid "GMT, Y-M-D"
+msgstr "GMT, Y-M-D"
+
+msgid "Question"
+msgstr "Question"
+
+msgid "Response"
+msgstr "Response"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Server Error occurred retrieving report data"
+
+msgid "No organizations available"
+msgstr "No organizations available"
+
+msgid ""
+"Cannot uncheck.  A staff member must be associated with an organization"
+msgstr ""
+"Cannot uncheck.  A staff member must be associated with an organization"
+
+msgid "User id is required."
+msgstr "User id is required."
+
+msgid "Organization id is required."
+msgstr "Organization id is required."
+
+msgid "Error occurred setting consent status."
+msgstr "Error occurred setting consent status."
+
+msgid "Error occurred retrieving access url."
+msgstr "Error occurred retrieving access url."
+
+msgid "Error occurred sending password reset request."
+msgstr "Error occurred sending password reset request."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Error occurred retrieving assessment status."
+
+msgid "Questionnaire response data is required."
+msgstr "Questionnaire response data is required."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Error occurred retrieving assessment list."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Error occurred retrieving assessment report."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Error occurred retrieving current questionnaire bank for user."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Error occurred retrieving patient report."
+
+msgid "Error occurred setting table preference."
+msgstr "Error occurred setting table preference."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "Error occurred retrieving email audit entries."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Error occurred retrieving audit log."
+
+msgid "configuration key is required."
+msgstr "configuration key is required."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Error occurred retrieving content for configuration key."
+
+msgid "User id is required"
+msgstr "User id is required"
+
+msgid "Error occurred deleting user."
+msgstr "Error occurred deleting user."
+
+msgid "Error occurred retrieving treatment options."
+msgstr "Error occurred retrieving treatment options."
+
+msgid "Year must be after 1900"
+msgstr "Year must be after 1900"
+
+msgid "The date must not be in the future."
+msgstr "The date must not be in the future."
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Invalid Date. Please enter a valid date."
+
+msgid "Missing value."
+msgstr "Missing value."
+
+msgid "REMOVE"
+msgstr "REMOVE"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "The procedure date must be valid and in required format."
+
+msgid "The procedure date must be in the past."
+msgstr "The procedure date must be in the past."
+
+msgid ""
+"<strong class='text-success'>{emailType} email sent to "
+"{emailAddress}</strong>"
+msgstr ""
+"<strong class='text-success'>{emailType} email sent to "
+"{emailAddress}</strong>"
+
+msgid "Completion date cannot be before consent date."
+msgstr "Completion date cannot be before consent date."
+
+msgid "Completion date cannot be in the future."
+msgstr "Completion date cannot be in the future."
+
+msgid "Completion date must be valid."
+msgstr "Completion date must be valid."
+
+msgid ""
+"Invalid completion date. Date of completion is outside the days allowed."
+msgstr ""
+"Invalid completion date. Date of completion is outside the days allowed."

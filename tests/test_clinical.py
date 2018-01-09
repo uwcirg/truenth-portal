@@ -8,9 +8,11 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.codeable_concept import CodeableConcept
 from portal.models.encounter import Encounter
 from portal.models.fhir import Observation, UserObservation
-from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
+from portal.models.fhir import ValueQuantity
+from portal.models.coding import Coding
 from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.user import User
