@@ -175,29 +175,7 @@ var AccountCreationObj = function (roles, dependencies) {
                 };
                 _demoArray["identifier"].push(siteIdObj);
             };
-
-
-            var states = [];
-            $("#userOrgs input[name='organization']").each(function() {
-                if ($(this).is(":checked")) {
-                    if (hasValue($(this).attr("state"))) {
-                        states.push($(this).attr("state"));
-                    };
-                };
-            });
-
-            if (states.length > 0) {
-                if (!_demoArray["identifier"]) {
-                    _demoArray["identifier"] = [];
-                };
-                states.forEach(function(state) {
-                    _demoArray["identifier"].push({
-                        system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
-                        use: "secondary",
-                        value: "state:" + state
-                    });
-                });
-            };
+            
             self.__request({"apiUrl":"/api/demographics/"+this.userId, "requestType": "PUT", "requestData": JSON.stringify(_demoArray), "sync": true, "callback":
                 function(data){
                     if (data.error) {
