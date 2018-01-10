@@ -89,12 +89,15 @@ def index():
 
 @exercise_diet.route('/introduction')
 def introduction():
-    data = get_tag_data(anyTags="introduction")
+    template = 'exercise_diet/exercise-diet_portal.html'
     assets = []
-    for asset in json.JSONDecoder().decode(data)['results']:
-        assets.append(get_asset(asset['uuid']))
+    if current_user():
+        data = get_tag_data(anyTags="introduction")
+        for asset in json.JSONDecoder().decode(data)['results']:
+            assets.append(get_asset(asset['uuid']))
+        template = 'exercise_diet/index.html'
 
-    return render_template('exercise_diet/index.html', assets=assets,
+    return render_template(template, assets=assets,
                            user=current_user())
 
 
