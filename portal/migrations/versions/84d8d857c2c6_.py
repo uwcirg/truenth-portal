@@ -38,14 +38,18 @@ def upgrade():
         )
 
         for subject_id, reference in session.execute(query):
-            yield subject_id, reference
+            yield {
+                'subject_id': subject_id,
+                'reference': reference,
+            }
 
-    def keep_one(subject_id, reference):
+    def keep_one(subject_id=None, reference=None):
         items = session.query(QuestionnaireResponse).filter(
             QuestionnaireResponse.subject_id == subject_id).filter(
             QuestionnaireResponse.document[
                 ("questionnaire", "reference")
             ].astext == reference).order_by(QuestionnaireResponse.id)
+
         keeper = None
         for i in items:
             if keeper is None:
@@ -66,8 +70,8 @@ def upgrade():
                 "DELETE FROM questionnaire_responses WHERE ID = :ID").params(
                 ID=i.id))
 
-    for subject_id, reference in needs_attention():
-        keep_one(subject_id, reference)
+    for data in needs_attention():
+        keep_one(**data)
 
 
 def downgrade():
