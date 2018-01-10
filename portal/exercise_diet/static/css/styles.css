@@ -6,6 +6,14 @@
 /* row hover: 20% of #cde5be; = rgba(205, 229, 190, 0.2) */
 /* cell hover: 10% of #5f7783; = rgba(95, 119, 131, 0.1) */
 
+.watermark {
+    top: 0;
+    padding: 0;
+    z-index: 3000;
+    width: 100%;
+    color: #000;
+    min-height: 20px;
+}
 
 #Exercise-Diet-Portal {
 	position: relative;
@@ -20,7 +28,7 @@
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 35px;
+    font-size: 28px;
     line-height: 40px;
     text-align: center;
     padding: 100px 10px 0px;
@@ -35,11 +43,67 @@
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 35px;
+    font-size: 28px;
     line-height: 40px;
     text-align: center;
     padding: 1px 10px 1px;
     max-width: 740px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: 30px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: 35px;
+    }
+}
+#Exercise-Diet-Portal .intro-content,
+#Exercise-Diet-Portal .objective-content,
+#Exercise-Diet-Portal .video-content
+ {
+    width: 780px;
+    max-width: 100%;
+    padding: 1em;
+}
+#Exercise-Diet-Portal .video-content iframe {
+    max-width: 100%;
+    width: 260px;
+    height: 100%;
+    position: relative;
+    top: 10em;
+}
+@media (min-width: 431px) {
+    #Exercise-Diet-Portal .video-content iframe {
+        width: 390px;
+        height: 222px;
+        top: 2em;
+    }
+}
+@media (min-width: 520px) {
+    #Exercise-Diet-Portal .video-content iframe {
+        width: 479px;
+        height: 272px;
+    }
+}
+@media (min-width: 669px) {
+    #Exercise-Diet-Portal .video-content iframe {
+        width: 630px;
+        height: 354px;
+    }
+}
+
+#Exercise-Diet-Portal .intro-content {
+    margin-top: -3em;
+}
+
+@media (min-width: 901px) {
+    #Exercise-Diet-Portal .intro-content {
+        margin-top: 5em;
+    }
 }
 hr.objective {
 	margin: 10px auto 30px;
@@ -58,7 +122,7 @@ hr.objective {
     background: rgb(124, 149, 158);
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 18px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
@@ -68,6 +132,16 @@ hr.objective {
     width: 250px;
     margin-top: 40px;
 }
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 22px;
+    }
+}
 
 #Exercise-Diet-Portal .watch-button-video {
     margin: 0px 0px 10px;
@@ -76,7 +150,7 @@ hr.objective {
     background: rgb(124, 149, 158);
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
@@ -85,12 +159,18 @@ hr.objective {
     padding: 25px;
     width: 250px;
     margin-top: 40px;
+    cursor: pointer;
 
     position: absolute;
     top: 75%;
     left: 50%;
     margin-left: -109px;
-    margin-top: -36px;
+    margin-top: 0.5em;
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal .watch-button-video {
+        font-size: 22px;
+    }
 }
 
 #Exercise-Diet-Portal p {
@@ -101,12 +181,21 @@ hr.objective {
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 25px;
+    font-size: 18px;
     line-height: 32px;
 	letter-spacing: .03em;
-    text-align: center;
-    padding: 20px 0px;
-    max-width: 780px;
+    text-align: left;
+    padding: 20px 12px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal p {
+        font-size: 20px;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal p {
+        font-size: 25px;
+    }
 }
 
 .objective-content p:last-child {
@@ -141,7 +230,8 @@ hr.objective {
 #Exercise-Diet-Portal ul {
 	margin: 0px auto;
 	padding: 0px;
-	max-width: 768px;
+	width: 768px;
+    max-width: 100%;
 }
 #Exercise-Diet-Portal ul li {
 	position: relative;
@@ -150,7 +240,7 @@ hr.objective {
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 26px;
+    font-size: 18px;
     line-height: 1.3em;
 	letter-spacing: .03em;
     text-align: left;
@@ -159,9 +249,24 @@ hr.objective {
     background-position: left 10px;
 	padding-left: 20px;
     padding-bottom: 5px;
-    margin-left: 20px;
+    margin-left: 0;
     list-style-position: outside;
     list-style-type: none;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: 20px;
+    }
+}
+@media (min-width: 558px) {
+    #Exercise-Diet-Portal ul li {
+        margin-left: 20px;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: 25px;
+    }
 }
 #Exercise-Diet-Portal img {
 	margin: 0px auto;
@@ -276,8 +381,28 @@ img.video-testimonial-hero {
     padding: 0px 0px 0px 0px;
 	width: 100%;
 */
-    height: 700px;
+    height: 781px;
     top: 1300px;
+}
+@media (min-width: 400px) {
+    .objective-module.objective-background  {
+        height: 749px;
+    }
+}
+@media (min-width: 406px) {
+    .objective-module.objective-background  {
+        height: 717px;
+    }
+}
+@media (min-width: 421px) {
+    .objective-module.objective-background  {
+        height: 697px;
+    }
+}
+@media (min-width: 444px) {
+    .objective-module.objective-background  {
+        height: 886px;
+    }
 }
 .intro-module, .video-module, .objective-module {
 	margin: 0px auto;
@@ -312,12 +437,18 @@ img.video-testimonial-hero {
 }
 .toolbox {
 	position: relative;
-	max-width: 715px;
-	max-height: 137px;
+	width: 715px;
+    max-width: 100%;
+	height: 12em;
     background: rgba(57, 56, 51, 0.8);
 	padding: 10px;
 	margin: 10px auto;
 	display: flex;
+}
+@media (min-width: 585px) {
+    .toolbox {
+        height: 9em;
+    }
 }
 .toolbox h6 {
     color: rgb(169, 178, 183);
@@ -372,16 +503,22 @@ img.video-testimonial-hero {
     background: #8F9385;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
     text-transform: uppercase;
     text-align: center;
-    padding: 25px;
+    padding: 6px;
     width: 210px;
     margin: 20px 10px 20px;
     height: 70px;
+}
+@media (min-width: 518px) {
+    .toolbox-start-button {
+        font-size: 22px;
+        padding: 25px;
+    }
 }
 
 .toolbox .icon-box {
@@ -664,7 +801,12 @@ td.collapse.in a:focus {
 }
 
 /*   new styling change id?  */
-
+img.recipe-table-image {
+    -webkit-transition: transform 300ms ease-in-out;
+    -o-transition: transform 300ms ease-in-out;
+    -moz-transition: transform 300ms ease-in-out;
+    transition: transform 300ms ease-in-out;
+}
 #healthy-fats.collapse.in img.recipe-table-image {
 	position: relative;
     border: 1px solid transparent;
