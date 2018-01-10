@@ -147,7 +147,7 @@ class TestOrganization(TestCase):
 
         # use api to obtain FHIR
         rv = self.client.get('/api/organization/{}/{}'.format(
-            quote_plus(org_id_system), org_id_value))
+            org_id_value, quote_plus(org_id_system)))
         self.assert200(rv)
 
     def test_organization_list(self):

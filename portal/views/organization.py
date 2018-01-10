@@ -143,7 +143,7 @@ def organization_get(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<path:id_system>/<string:id_value>')
+@org_api.route('/organization/<string:id_value>/<path:id_system>')
 @oauth.require_oauth()
 def organization_get_by_identifier(id_system, id_value):
     """Access to the requested organization as a FHIR resource
@@ -155,14 +155,14 @@ def organization_get_by_identifier(id_system, id_value):
     produces:
       - application/json
     parameters:
-      - name: id_system
-        in: path
-        description: TrueNTH organization identifier system
-        required: true
-        type: string
       - name: id_value
         in: path
         description: TrueNTH organization identifier value
+        required: true
+        type: string
+      - name: id_system
+        in: path
+        description: TrueNTH organization identifier system
         required: true
         type: string
     responses:
