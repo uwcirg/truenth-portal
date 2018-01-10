@@ -163,51 +163,6 @@ def organization_get(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<path:id_system>/<string:id_value>')
-@oauth.require_oauth()
-def organization_get_by_identifier(id_system, id_value):
-    """Access to the requested organization as a FHIR resource
-
-    ---
-    operationId: organization_get_by_identifier
-    tags:
-      - Organization
-    produces:
-      - application/json
-    parameters:
-      - name: id_system
-        in: path
-        description: TrueNTH organization identifier system
-        required: true
-        type: string
-      - name: id_value
-        in: path
-        description: TrueNTH organization identifier value
-        required: true
-        type: string
-    responses:
-      200:
-        description:
-          Returns the requested organization as a FHIR [organization
-          resource](http://www.hl7.org/fhir/patient.html) in JSON.
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
-
-    """
-    query = Organization.query.join(
-                OrganizationIdentifier).join(Identifier).filter(and_(
-                    Organization.id==OrganizationIdentifier.organization_id,
-                    OrganizationIdentifier.identifier_id==Identifier.id,
-                    Identifier.system==id_system,
-                    Identifier._value==id_value))
-    if query.count() > 1:
-        abort(400,'Multiple organizations found for identifier system/value')
-    org = query.first_or_404()
-    return jsonify(org.as_fhir(include_empties=False))
-
-
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
