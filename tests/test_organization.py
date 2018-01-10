@@ -146,9 +146,11 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization/{}/{}'.format(
-            quote_plus(org_id_system), org_id_value))
+        rv = self.client.get('/api/organization?system={system}&value={value}'.format(
+            system=quote_plus(org_id_system), value=org_id_value))
         self.assert200(rv)
+        self.assertEquals(rv.json['total'], 1)
+        self.assertEquals(rv.json['entry'][0]['id'], 999)
 
     def test_organization_list(self):
         count = Organization.query.count()

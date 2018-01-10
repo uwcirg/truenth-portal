@@ -47,6 +47,12 @@ $(function(){
         $(target).modal('show');
       }, 150);
     });
+    $(".watch-button-video").on("click", function(e) {
+        e.stopPropagation();
+        var vFrame = $(".video-module").find("iframe.sproutvideo-player");
+        var videoSrc = vFrame.attr("src");
+        vFrame.attr("src", videoSrc + "?autoplay=true");
+    });
 });
 
 function show_exercise(new_item, current_item) {

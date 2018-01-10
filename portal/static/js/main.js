@@ -4150,7 +4150,6 @@ var tnthAjax = {
             var consented = this.hasConsent(userId, params["org"], status);
             var __url = '/api/user/' + userId + '/consent';
             if (!consented || params["testPatient"]) {
-
                 var data = {};
                 data["user_id"] = userId;
                 data["organization_id"] = params["org"];
@@ -4912,7 +4911,6 @@ var tnthAjax = {
                                                     .replace("{type}", (type && hasValue(type)?('/'+type):''))
                                                     .replace("{all}", (params.hasOwnProperty("all")?'?all=true':''));
         this.sendRequest(url, 'GET', userId, {sync:sync}, function(data) {
-            console.log("data", data)
             if (data) {
                 if (!data.error) {
                     $(".get-tou-error").html("");
