@@ -23,10 +23,13 @@ org_api = Blueprint('org_api', __name__, url_prefix='/api')
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
 
-    Takes key=value pairs to look up.  At this time, only state is supported.
+    Takes key=value pairs to look up.
 
     Example search:
         /api/organization?state=NJ
+
+    Or to lookup by identifier, include system and value:
+        /api/organization?system=http%3A%2F%2Fpcctc.org%2F&value=146-31
 
     Returns a JSON FHIR bundle of organizations as per given search terms.
     Without any search terms, returns all organizations known to the system.
@@ -67,6 +70,7 @@ def organization_search():
     """
     filter = None
     found_ids = []
+    system, value = None, None
     for k,v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
@@ -87,9 +91,25 @@ def organization_search():
                 abort(
                     400, "unknown filter request '{}' - expecting "
                     "'leaves'".format(filter))
+        elif k == 'system':
+            system = v
+        elif k == 'value':
+            value = v
         else:
-            abort(400, "only search on `state` or `filter` are available "
-                  "at this time")
+            abort(400, "only search on `state`, `filter` or `system` AND `value` "
+                  "are available at this time")
+
+    if system and value:
+        query = OrganizationIdentifier.query.join(
+            Identifier).filter(and_(
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == value))
+        found_ids = [oi.organization_id for oi in query]
+        if not found_ids:
+            abort(
+                404, "no organzations found for system, value {}, {}".format(
+                    system, value))
 
     # Apply search on org fields like inheritence - include any children
     # of the matching nodes.  If filter is set, apply to results.
