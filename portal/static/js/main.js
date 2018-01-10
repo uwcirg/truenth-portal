@@ -1278,12 +1278,15 @@ var fillContent = {
                     return typeInTous(type, "inactive");
                 });
 
+                /*
+                 *  note display of checked checkbox when re-consenting is controlled by css
+                 */
                 if (arrReconsent.length > 0) {
                     self.attr("data-reconsent", "true");
                     if (!setReconsentDisplay) {
                         $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
                         setReconsentDisplay = true;
-                    };
+                    }
                 }
 
                 if (item_found !== 0 && (item_found == arrTypes.length)) {
@@ -4907,10 +4910,10 @@ var tnthAjax = {
     },
     "getTerms": function(userId, type, sync, callback, params) {
         if (!params) params = {};
-        var url = '/api/user/{userId}/tou{type}{all}'.replace("{userId}", userId)
-                                                    .replace("{type}", (type && hasValue(type)?('/'+type):''))
-                                                    .replace("{all}", (params.hasOwnProperty("all")?'?all=true':''));
-        this.sendRequest(url, 'GET', userId, {sync:sync}, function(data) {
+        var url = "/api/user/{userId}/tou{type}{all}".replace("{userId}", userId)
+                                                    .replace("{type}", (type && hasValue(type)?("/"+type):""))
+                                                    .replace("{all}", (params.hasOwnProperty("all")?"?all=true":""));
+        this.sendRequest(url, "GET", userId, {sync:sync}, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".get-tou-error").html("");
