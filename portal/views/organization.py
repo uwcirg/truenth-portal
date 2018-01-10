@@ -102,9 +102,9 @@ def organization_search():
     if system and value:
         query = OrganizationIdentifier.query.join(
             Identifier).filter(and_(
-            OrganizationIdentifier.identifier_id == Identifier.id,
-            Identifier.system == system,
-            Identifier._value == value))
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == value))
         found_ids = [oi.organization_id for oi in query]
         if not found_ids:
             abort(
