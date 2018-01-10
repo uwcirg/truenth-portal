@@ -143,7 +143,7 @@ def organization_get(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<string:id_system>/<string:id_value>')
+@org_api.route('/organization/<path:id_system>/<string:id_value>')
 @oauth.require_oauth()
 def organization_get_by_identifier(id_system, id_value):
     """Access to the requested organization as a FHIR resource

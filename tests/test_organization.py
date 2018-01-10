@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 import json
 import os
+from urllib import quote_plus
 
 from portal.extensions import db
 from portal.system_uri import (
@@ -130,7 +131,7 @@ class TestOrganization(TestCase):
         self.assert200(rv)
 
     def test_organization_get_by_identifier(self):
-        org_id_system = "testsystem"
+        org_id_system = "http://test/system"
         org_id_value = "testval"
         self.login()
         org = Organization(name='test',id=999)
@@ -145,8 +146,8 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization/{}/{}'.format(org_id_system,
-                                            org_id_value))
+        rv = self.client.get('/api/organization/{}/{}'.format(
+            quote_plus(org_id_system), org_id_value))
         self.assert200(rv)
 
     def test_organization_list(self):
