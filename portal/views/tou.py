@@ -96,7 +96,7 @@ def get_tou(user_id):
 
     tous = ToU.query.join(Audit).filter(Audit.user_id == user_id)
     if not request.args.get('all'):
-      tous = tous.filter(ToU.active.is_(True))
+        tous = tous.filter(ToU.active.is_(True))
 
     return jsonify(tous=[d.as_json() for d in tous])
 
