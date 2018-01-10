@@ -1236,10 +1236,16 @@ var fillContent = {
     },
     "terms": function(data) {
         if (data.tous) {
-            function typeInTous(type) {
+            var setReconsentDisplay = false;
+            function typeInTous(type, status) {
                 var found = false;
+                var isActive = (status == "active") ? true : false;
                 (data.tous).forEach(function(item) {
-                    if (!found && $.trim(item.type) == $.trim(type)) found = true;
+                    if (!found 
+                        && ($.trim(item.type) === $.trim(type))
+                        && (String($.trim(item.active)) === String(isActive))) {
+                        found = true;
+                    };
                 });
                 return found;
             };
@@ -1263,18 +1269,30 @@ var fillContent = {
                 };
 
                 arrTypes.forEach(function(type) {
-                    if (typeInTous(type)) {
+                    if (typeInTous(type, "active")) {
                         item_found++;
                     };
                 });
 
-                if (item_found == arrTypes.length) {
+                var arrReconsent = $.grep(arrTypes, function(type) {
+                    return typeInTous(type, "inactive");
+                });
+
+                if (arrReconsent.length > 0) {
+                    self.attr("data-reconsent", "true");
+                    if (!setReconsentDisplay) {
+                        $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
+                        setReconsentDisplay = true;
+                    };
+                }
+
+                if (item_found !== 0 && (item_found == arrTypes.length)) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                     self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
                     self.find("[data-type='terms']").each(function() {
                         $(this).attr("data-agree", "true");
-                    })
+                    });
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
@@ -1285,6 +1303,7 @@ var fillContent = {
                     };
                 };
             });
+
         };
     },
     "notifications": function(data) {
@@ -4132,14 +4151,15 @@ var tnthAjax = {
             var __url = '/api/user/' + userId + '/consent';
             if (!consented || params["testPatient"]) {
 
-                params["user_id"] = userId;
-                params["organization_id"] = params["org"];
-                params["agreement_url"] =  params["agreementUrl"]
-                params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
-                params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
-                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
+                var data = {};
+                data["user_id"] = userId;
+                data["organization_id"] = params["org"];
+                data["agreement_url"] =  params["agreementUrl"]
+                data["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
+                data["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
+                data["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
 
-                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(params)}, function(data) {
+                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(data)}, function(data) {
                     if (data) {
                         if (!data.error) {
                             $(".set-consent-error").html("");
@@ -4886,8 +4906,13 @@ var tnthAjax = {
             };
         });
     },
-    "getTerms": function(userId, type, sync, callback) {
-        this.sendRequest('/api/user/'+userId+'/tou'+(type && hasValue(type)?('/'+type):''), 'GET', userId, {sync:sync}, function(data) {
+    "getTerms": function(userId, type, sync, callback, params) {
+        if (!params) params = {};
+        var url = '/api/user/{userId}/tou{type}{all}'.replace("{userId}", userId)
+                                                    .replace("{type}", (type && hasValue(type)?('/'+type):''))
+                                                    .replace("{all}", (params.hasOwnProperty("all")?'?all=true':''));
+        this.sendRequest(url, 'GET', userId, {sync:sync}, function(data) {
+            console.log("data", data)
             if (data) {
                 if (!data.error) {
                     $(".get-tou-error").html("");
@@ -4897,7 +4922,7 @@ var tnthAjax = {
                     var errorMessage = i18next.t("Server error occurred retrieving tou data.");
                     if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
                     else $(".get-tou-error").html(errorMessage);
-                    if (callback) callback({"error": errorMessage})
+                    if (callback) callback({"error": errorMessage});
                 };
             };
         });

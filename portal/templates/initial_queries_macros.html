@@ -131,9 +131,9 @@
     {{tou_agreement_url()}}
     <script>
       $(function() {
-          tnthAjax.getTerms({{user.id}}, false, false, function() {
+          tnthAjax.getTerms($("#iq_userId").val(), false, false, function() {
             $("#termsCheckbox").attr("loaded", "true");
-          });
+          }, {"all": true});
       });
     </script>
   {%- endmacro %}
