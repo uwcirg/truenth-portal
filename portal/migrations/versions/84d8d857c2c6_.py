@@ -34,13 +34,15 @@ def upgrade():
         if current_app.config['GIL']:
             print("TNUSA detected, ignoring questionnaire_bank_id")
 
-            # find QNRs of the same type completed within 1 minute of each other (for the same subject)
+            # find QNRs of the same type completed within 1 minute of each other
             # https://stackoverflow.com/questions/4342370/27631673#27631673
             query = (
                 "SELECT string_agg(id::text, ', ') AS agg_qnr_ids, subject_id, "
                 "to_timestamp(floor((extract('epoch' from authored) / 60 )) * 60) "
-                "AT TIME ZONE 'UTC' as interval_alias, document->'questionnaire'->>'reference' as reference "
-                "FROM questionnaire_responses GROUP BY interval_alias, subject_id, reference having count(*) > 1 "
+                "AT TIME ZONE 'UTC' as interval_alias, "
+                "document->'questionnaire'->>'reference' as reference "
+                "FROM questionnaire_responses "
+                "GROUP BY interval_alias, subject_id, reference having count(*) > 1 "
             )
 
             for agg_qnr_ids, subject_id, interval_alias, reference in session.execute(query):
@@ -62,7 +64,6 @@ def upgrade():
                     'subject_id': subject_id,
                     'reference': reference,
                 }
-
 
     def keep_one(subject_id=None, reference=None, qnr_ids=None):
         if qnr_ids is not None:
