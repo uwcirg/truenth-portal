@@ -30,16 +30,15 @@ def upgrade():
 
     def needs_attention():
         query = (
-            "select count(*) as cnt, subject_id, questionnaire_bank_id, "
+            "select subject_id, questionnaire_bank_id, "
             " document->'questionnaire'->>'reference' as reference "
             "from questionnaire_responses "
-            "group by subject_id, questionnaire_bank_id, reference;")
+            "group by subject_id, questionnaire_bank_id, reference "
+            "having count(*) > 1"
+        )
 
-        for cnt, subject_id, qb_id, reference in session.execute(query):
-            if cnt < 2:
-                continue
-            else:
-                yield subject_id, reference
+        for subject_id, qb_id, reference in session.execute(query):
+            yield subject_id, reference
 
     def keep_one(subject_id, reference):
         items = session.query(QuestionnaireResponse).filter(
