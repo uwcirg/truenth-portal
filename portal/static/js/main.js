@@ -4131,15 +4131,15 @@ var tnthAjax = {
             var consented = this.hasConsent(userId, params["org"], status);
             var __url = '/api/user/' + userId + '/consent';
             if (!consented || params["testPatient"]) {
+                var data = {};
+                data["user_id"] = userId;
+                data["organization_id"] = params["org"];
+                data["agreement_url"] =  params["agreementUrl"]
+                data["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
+                data["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
+                data["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
 
-                params["user_id"] = userId;
-                params["organization_id"] = params["org"];
-                params["agreement_url"] =  params["agreementUrl"]
-                params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
-                params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
-                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
-
-                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(params)}, function(data) {
+                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(data)}, function(data) {
                     if (data) {
                         if (!data.error) {
                             $(".set-consent-error").html("");
