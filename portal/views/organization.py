@@ -23,7 +23,7 @@ org_api = Blueprint('org_api', __name__, url_prefix='/api')
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
 
-    Takes key=value pairs to look up.  At this time, only state is supported.
+    Takes key=value pairs to look up.
 
     Example search:
         /api/organization?state=NJ
