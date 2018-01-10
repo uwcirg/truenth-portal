@@ -146,7 +146,7 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 14}",
-      "expired": "{\"months\": 29}",
+      "expired": "{\"days\": 29}",
       "name": "IRONMAN_recurring_6mo_pattern",
       "overdue": "{\"days\": 21}",
       "questionnaires": [
@@ -194,7 +194,7 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 14}",
-      "expired": "{\"months\": 29}",
+      "expired": "{\"days\": 29}",
       "name": "IRONMAN_recurring_annual_pattern",
       "overdue": "{\"days\": 21}",
       "questionnaires": [
