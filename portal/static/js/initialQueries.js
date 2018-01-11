@@ -560,6 +560,17 @@
           };
         };
       };
+    } else {
+      //check all if current section not available
+      for (var section in self.mainSections) {
+        if (isLoaded) {
+          for (var subsectionId in self.mainSections[section].subsections) {
+            if (!$("#" + subsectionId).attr("loaded")) {
+              isLoaded = false;
+            };
+          };
+        };
+      };
     };
     return isLoaded;
   };
