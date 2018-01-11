@@ -1241,7 +1241,7 @@ var fillContent = {
                 var found = false;
                 var isActive = (status == "active") ? true : false;
                 (data.tous).forEach(function(item) {
-                    if (!found 
+                    if (!found
                         && ($.trim(item.type) === $.trim(type))
                         && (String($.trim(item.active)) === String(isActive))) {
                         found = true;
@@ -1289,7 +1289,7 @@ var fillContent = {
                     }
                 }
 
-                if (item_found !== 0 && (item_found == arrTypes.length)) {
+                if (item_found > 0 && (item_found == arrTypes.length)) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                     self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
@@ -2207,6 +2207,9 @@ var Profile = function(subjectId, currentUserId) {
             case "procedure":
                 this.initProcedureSection();
                 break;
+            case "biopsy":
+                this.initBiopsySection();
+                break;
         };
     };
 
@@ -2278,7 +2281,7 @@ var Profile = function(subjectId, currentUserId) {
                     $("#birthday").val("");
                     return false;
                 };
-                   
+
             });
         });
         this.__convertToNumericField($("#date, #year"));
@@ -2909,6 +2912,11 @@ var Profile = function(subjectId, currentUserId) {
             $("#patientQ hr").hide();
             var self = this;
 
+            tnthAjax.getTreatment(self.subjectId, function() {
+                tnthAjax.getClinical(self.subjectId, function() {
+                  $("#patientQ").attr("loaded", "true");
+                });
+            });
             if (self.currentUserId !== self.subjectId) {
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
@@ -2993,6 +3001,57 @@ var Profile = function(subjectId, currentUserId) {
                 profileObj.checkDiagnosis();
                 fillViews.clinical();
             }, 1000);
+    };
+    this.initBiopsySection = function() {
+        /*
+         *
+         * used by both profile and initial queries
+         */
+        __convertToNumericField($("#biopsy_day, #biopsy_year"));
+        $("input[name='biopsy']").each(function() {
+            $(this).on("click", function(e) {
+              e.stopPropagation();
+              if ($(this).val() == "true") {
+                $("#biopsyDateContainer").show();
+                if ($(this).attr("id") == "biopsy_yes") {
+                  if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
+                };
+              } else {
+                $("#biopsyDate").val("");
+                $("#biopsy_day").val("");
+                $("#biopsy_month").val("");
+                $("#biopsy_year").val("");
+                $("#biopsyDateError").text("");
+                $("#biopsyDateContainer").hide();
+              };
+            });
+        });
+        $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+            $(this).on("change", function() {
+                var d = $("#biopsy_day");
+                var m = $("#biopsy_month");
+                var y = $("#biopsy_year");
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                if (isValid) {
+                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                    $("#biopsyDateError").text("").hide();
+                    $("#biopsy_yes").trigger("click");
+                    //success
+                } else {
+                    //fail
+                    $("#biopsyDate").val("");
+                };
+            });
+        });
+        $("input[name='tx']").each(function() {
+           $(this).on("click", function() {
+              if ($(this).val() == "true") {
+                  tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+              } else {
+                  tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+              };
+           });
+        });
     };
     this.manualEntryModalVis = function(hide) {
         if (hide) {
@@ -5161,7 +5220,7 @@ var tnthAjax = {
                 return data;
             }
         }
-        
+
         if (!hasValue(userId)) {
             callback({"error": i18next.t("User Id is required")});
             return false;
@@ -5175,7 +5234,7 @@ var tnthAjax = {
 
         this.getNotification(userId, false, function(data) {
             if (data.notifications) {
-                 /* 
+                 /*
                  * check if there is notification for this id
                  * dealing with use case where user deletes same notification in a separate open window
                  */
@@ -5183,7 +5242,7 @@ var tnthAjax = {
                     return notification.id == notificationId;
                 });
                 if (arrNotification.length > 0) {
-                    /* 
+                    /*
                      * delete notification only if it exists
                      */
                     self.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {

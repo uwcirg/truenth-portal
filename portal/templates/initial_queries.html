@@ -45,6 +45,9 @@
            {% else %}
                 {{clinic(consent_agreements)}}
            {% endif %}
+           {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+              <input type="hidden" id="iqPatientEditable" value="true" />
+           {% endif %}
         </div>
       </div>
     </div>
@@ -105,6 +108,8 @@ var fc = new window.FieldsChecker("{{user.id}}",
                             });
 var profileObj = new Profile("{{user.id}}", "{{user.id}}");
 profileObj.initSection("orgsstateselector");
+profileObj.initSection("biopsy");
+
 
 $(document).ready(function(){
   /*
