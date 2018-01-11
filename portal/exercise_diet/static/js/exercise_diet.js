@@ -53,6 +53,13 @@ $(function(){
         var videoSrc = vFrame.attr("src");
         vFrame.attr("src", videoSrc + "?autoplay=true");
     });
+
+    $("#Recipe-Accordions [role='tabpanel']").on("shown.bs.collapse", function() {
+        $(this).addClass("visited");
+    });
+    $("#Recipe-Accordions [role='tabpanel']").on("hidden.bs.collapse", function() {
+        $(this).removeClass("visited");
+    });
 });
 
 function show_exercise(new_item, current_item) {

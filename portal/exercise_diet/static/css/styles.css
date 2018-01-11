@@ -655,6 +655,14 @@ h2 a {
 	max-width: 628px;
 }
 
+#Recipe-Accordions [role='tabpanel'] {
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+}
+#Recipe-Accordions [role='tabpanel'].visited {
+    opacity: 1;
+}
+
 .healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
 	position: relative;
 	margin: 1px auto 0px;
