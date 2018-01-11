@@ -381,10 +381,10 @@ def update_card_html_on_completion():
         if assessment_status.overall_status in (
                 'Due', 'Overdue', 'In Progress'):
 
-            link_label = 'Go to questionnaire'
+            link_label = _(u'Go to questionnaire')
             # User has unfinished baseline assessment work
             if assessment_status.overall_status == 'In Progress':
-                link_label = 'Continue questionnaire'
+                link_label = _(u'Continue questionnaire')
 
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
