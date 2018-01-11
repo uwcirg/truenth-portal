@@ -14,6 +14,14 @@
         return false;
     });
   };
+
+  function __convertToNumericField(field) {
+    if (field) {
+        if (_isTouchDevice()) {
+            field.each(function() {$(this).prop("type", "tel");});
+        };
+    };
+  };
   /*
    * helper class to keep track of missing fields based on required/needed core data
    */
@@ -44,6 +52,7 @@
     this.defaultSections = {};
     this.incompleteFields = [];
     this.dependencies = dependencies || {};
+    this.currentSection = "";
 
   };
 
@@ -56,6 +65,14 @@
       };
     });
   };
+
+  FieldsChecker.prototype.initData = function(section) {
+    var tnthAjax = this.__getDependency("tnthAjax");
+    if (this.mainSections[section] && this.mainSections[section].initData) {
+      this.mainSections[section].initData();
+    };
+    this.currentSection = section;
+  }
 
   FieldsChecker.prototype.initSections = function() {
     var self = this;
@@ -93,6 +110,12 @@
                       fields: [$("#topTerms [data-type='terms'][data-required='true']")]
                   }
                 },
+                initData: function() {
+                  tnthAjax.getTerms($("#iq_userId").val(), false, false, function() {
+                              $("#termsCheckbox").attr("loaded", "true");
+                          }, {"all": true});
+                  tnthAjax.getTermsUrl();
+                },
                 handleIncomplete: function() {
                   $("#aboutForm").addClass("full-size");
                   $("#topTerms").removeClass("hide-terms").show();
@@ -127,6 +150,14 @@
                 "bdGroup": {
                     fields: [$("#month"), $("#date"), $("#year")]
                   }
+                },
+                initData: function() {
+                  tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
+                      $("#nameGroup").attr("loaded", "true");
+                      $("#rolesGroup").attr("loaded", "true");
+                      $("#bdGroup").attr("loaded", "true");
+                  });
+                  __convertToNumericField($("#date, #year"));
                 }
             },
             "clinicalContainer": {
@@ -136,6 +167,13 @@
                   "patientQ": {
                     fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")]
                   }
+                },
+                initData: function() {
+                  tnthAjax.getTreatment($("#iq_userId").val(), function() {
+                    tnthAjax.getClinical($("#iq_userId").val(), function() {
+                      $("#patientQ").attr("loaded", "true");
+                    });
+                  });
                 }
             },
             "orgsContainer": {
@@ -145,6 +183,26 @@
                 subsections:{
                   "clinics": {
                     fields: [$("#userOrgs input[name='organization']")]
+                  }
+                },
+                initData: function() {
+                  /*
+                   * for patient, clinic is drawn in orgs state selector template
+                   */
+                  if (!hasValue($("#iqPatientEditable").val())) {
+                    tnthAjax.getOrgs($("#iq_userId").val(), false, true, function() {
+                        var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
+                        if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
+                        var checkedOrgs = {};
+                        userOrgs.each(function() {
+                            if ($(this).prop("checked")) {
+                                checkedOrgs[$(this).val()] = true;
+                            };
+                            $(this).attr("type", "radio");
+                            if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+                        });
+                        $("#clinics").attr("loaded", true);
+                    });
                   }
                 },
                 handleIncomplete: function() {
@@ -475,6 +533,7 @@
     for (var section in self.mainSections) {
       if (!found && !self.sectionCompleted(section)) {
           self.handleIncomplete(section);
+          self.initData(section);
           $("#" + section).fadeIn(500).addClass("open");
           self.stopContinue(section);
           found = true;
@@ -493,11 +552,22 @@
 
   FieldsChecker.prototype.sectionsLoaded = function() {
     var self = this, isLoaded = true;
-    for (var section in self.mainSections) {
+    if (hasValue(self.currentSection)) {
       if (isLoaded) {
-        for (var subsectionId in self.mainSections[section].subsections) {
-          if (!$("#" + subsectionId).attr("loaded")) {
+        for (var subsectionId in self.mainSections[self.currentSection].subsections) {
+          if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
             isLoaded = false;
+          };
+        };
+      };
+    } else {
+      //check all if current section not available
+      for (var section in self.mainSections) {
+        if (isLoaded) {
+          for (var subsectionId in self.mainSections[section].subsections) {
+            if (!$("#" + subsectionId).attr("loaded")) {
+              isLoaded = false;
+            };
           };
         };
       };
@@ -585,6 +655,7 @@
     } else {
       if (!self.sectionCompleted("topTerms")) {
         self.handleIncomplete("topTerms");
+        self.initData("topTerms");
       } else {
         $("#aboutForm").removeClass("full-size");
         self.getNext();

@@ -1236,10 +1236,16 @@ var fillContent = {
     },
     "terms": function(data) {
         if (data.tous) {
-            function typeInTous(type) {
+            var setReconsentDisplay = false;
+            function typeInTous(type, status) {
                 var found = false;
+                var isActive = (status == "active") ? true : false;
                 (data.tous).forEach(function(item) {
-                    if (!found && $.trim(item.type) == $.trim(type)) found = true;
+                    if (!found
+                        && ($.trim(item.type) === $.trim(type))
+                        && (String($.trim(item.active)) === String(isActive))) {
+                        found = true;
+                    };
                 });
                 return found;
             };
@@ -1263,18 +1269,33 @@ var fillContent = {
                 };
 
                 arrTypes.forEach(function(type) {
-                    if (typeInTous(type)) {
+                    if (typeInTous(type, "active")) {
                         item_found++;
                     };
                 });
 
-                if (item_found == arrTypes.length) {
+                var arrReconsent = $.grep(arrTypes, function(type) {
+                    return typeInTous(type, "inactive");
+                });
+
+                /*
+                 *  note display of checked checkbox when re-consenting is controlled by css
+                 */
+                if (arrReconsent.length > 0) {
+                    self.attr("data-reconsent", "true");
+                    if (!setReconsentDisplay) {
+                        $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
+                        setReconsentDisplay = true;
+                    }
+                }
+
+                if (item_found > 0 && (item_found == arrTypes.length)) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                     self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
                     self.find("[data-type='terms']").each(function() {
                         $(this).attr("data-agree", "true");
-                    })
+                    });
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
@@ -1285,6 +1306,7 @@ var fillContent = {
                     };
                 };
             });
+
         };
     },
     "notifications": function(data) {
@@ -2185,6 +2207,9 @@ var Profile = function(subjectId, currentUserId) {
             case "procedure":
                 this.initProcedureSection();
                 break;
+            case "biopsy":
+                this.initBiopsySection();
+                break;
         };
     };
 
@@ -2256,7 +2281,7 @@ var Profile = function(subjectId, currentUserId) {
                     $("#birthday").val("");
                     return false;
                 };
-                   
+
             });
         });
         this.__convertToNumericField($("#date, #year"));
@@ -2887,6 +2912,11 @@ var Profile = function(subjectId, currentUserId) {
             $("#patientQ hr").hide();
             var self = this;
 
+            tnthAjax.getTreatment(self.subjectId, function() {
+                tnthAjax.getClinical(self.subjectId, function() {
+                  $("#patientQ").attr("loaded", "true");
+                });
+            });
             if (self.currentUserId !== self.subjectId) {
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
@@ -2971,6 +3001,57 @@ var Profile = function(subjectId, currentUserId) {
                 profileObj.checkDiagnosis();
                 fillViews.clinical();
             }, 1000);
+    };
+    this.initBiopsySection = function() {
+        /*
+         *
+         * used by both profile and initial queries
+         */
+        __convertToNumericField($("#biopsy_day, #biopsy_year"));
+        $("input[name='biopsy']").each(function() {
+            $(this).on("click", function(e) {
+              e.stopPropagation();
+              if ($(this).val() == "true") {
+                $("#biopsyDateContainer").show();
+                if ($(this).attr("id") == "biopsy_yes") {
+                  if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
+                };
+              } else {
+                $("#biopsyDate").val("");
+                $("#biopsy_day").val("");
+                $("#biopsy_month").val("");
+                $("#biopsy_year").val("");
+                $("#biopsyDateError").text("");
+                $("#biopsyDateContainer").hide();
+              };
+            });
+        });
+        $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+            $(this).on("change", function() {
+                var d = $("#biopsy_day");
+                var m = $("#biopsy_month");
+                var y = $("#biopsy_year");
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                if (isValid) {
+                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                    $("#biopsyDateError").text("").hide();
+                    $("#biopsy_yes").trigger("click");
+                    //success
+                } else {
+                    //fail
+                    $("#biopsyDate").val("");
+                };
+            });
+        });
+        $("input[name='tx']").each(function() {
+           $(this).on("click", function() {
+              if ($(this).val() == "true") {
+                  tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+              } else {
+                  tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+              };
+           });
+        });
     };
     this.manualEntryModalVis = function(hide) {
         if (hide) {
@@ -4886,8 +4967,12 @@ var tnthAjax = {
             };
         });
     },
-    "getTerms": function(userId, type, sync, callback) {
-        this.sendRequest('/api/user/'+userId+'/tou'+(type && hasValue(type)?('/'+type):''), 'GET', userId, {sync:sync}, function(data) {
+    "getTerms": function(userId, type, sync, callback, params) {
+        if (!params) params = {};
+        var url = "/api/user/{userId}/tou{type}{all}".replace("{userId}", userId)
+                                                    .replace("{type}", (type && hasValue(type)?("/"+type):""))
+                                                    .replace("{all}", (params.hasOwnProperty("all")?"?all=true":""));
+        this.sendRequest(url, "GET", userId, {sync:sync}, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".get-tou-error").html("");
@@ -4897,7 +4982,7 @@ var tnthAjax = {
                     var errorMessage = i18next.t("Server error occurred retrieving tou data.");
                     if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
                     else $(".get-tou-error").html(errorMessage);
-                    if (callback) callback({"error": errorMessage})
+                    if (callback) callback({"error": errorMessage});
                 };
             };
         });
@@ -5135,7 +5220,7 @@ var tnthAjax = {
                 return data;
             }
         }
-        
+
         if (!hasValue(userId)) {
             callback({"error": i18next.t("User Id is required")});
             return false;
@@ -5149,7 +5234,7 @@ var tnthAjax = {
 
         this.getNotification(userId, false, function(data) {
             if (data.notifications) {
-                 /* 
+                 /*
                  * check if there is notification for this id
                  * dealing with use case where user deletes same notification in a separate open window
                  */
@@ -5157,7 +5242,7 @@ var tnthAjax = {
                     return notification.id == notificationId;
                 });
                 if (arrNotification.length > 0) {
-                    /* 
+                    /*
                      * delete notification only if it exists
                      */
                     self.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {

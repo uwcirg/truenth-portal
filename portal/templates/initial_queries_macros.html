@@ -128,22 +128,7 @@
             </div>
           </div>
     </div>
-    {{tou_agreement_url()}}
-    <script>
-      $(function() {
-          tnthAjax.getTerms({{user.id}}, false, false, function() {
-            $("#termsCheckbox").attr("loaded", "true");
-          });
-      });
-    </script>
-  {%- endmacro %}
-  {% macro tou_agreement_url() -%}
-       <input type="hidden" id="termsURL" data-url="" value=""/>
-       <script>
-            $(function () {
-                tnthAjax.getTermsUrl();
-            });
-       </script>
+    <input type="hidden" id="termsURL" data-url="" value=""/>
   {%- endmacro %}
 
   {% macro paperWebsiteConsentScript(terms) -%}
@@ -250,15 +235,6 @@
           </div>
         </div>
     </div>
-    <script>
-      $(function () {
-        tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
-          $("#nameGroup").attr("loaded", "true");
-          $("#rolesGroup").attr("loaded", "true");
-          $("#bdGroup").attr("loaded", "true");
-        });
-      });
-    </script>
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
@@ -276,9 +252,6 @@
       </div>
       <div class="get-roles-error error-message"></div>
       <div class="put-roles-error error-message"></div>
-      <script>$(function () { tnthAjax.getRoles($("#iq_userId").val(), false, function() {
-        $("#rolesGroup").attr("loaded", "true");
-      });});</script>
   {%- endmacro %}
   {% macro dobGroup() -%}
       <div id="bdGroup">
@@ -314,11 +287,6 @@
             <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
         </div>
       </div>
-      <script>
-      $(function() {
-        __convertToNumericField($("#date, #year"));
-      });
-      </script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}
     <div id="patientQ">
@@ -331,7 +299,7 @@
                 <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
-            <div id="biopsyDateContainer" class="indent form-group">
+            <div id="biopsyDateContainer" class="indent form-group" data-profile-section-id="biopsy">
             	<label>{{_("Biopsy Date")}}:</label>
             	<input id="biopsyDate" type="hidden" data-name="biopsy" class="form-control" value="">
               <div class="row">
@@ -439,59 +407,6 @@
         <div class="put-clinical-error error-message"></div>
         <div class="post-clinical-error error-message"></div>
       </div>
-      <script>
-        $(function () {
-            tnthAjax.getTreatment({{user.id}}, function() {
-            tnthAjax.getClinical({{user.id}}, function() {
-              $("#patientQ").attr("loaded", "true");
-            });
-          });
-          __convertToNumericField($("#biopsy_day, #biopsy_year"));
-          $("input[name='biopsy']").each(function() {
-            $(this).on("click", function(e) {
-              e.stopPropagation();
-              if ($(this).val() == "true") {
-                $("#biopsyDateContainer").show();
-                if ($(this).attr("id") == "biopsy_yes") {
-                  if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
-                };
-              } else {
-                $("#biopsyDate").val("");
-                $("#biopsy_day").val("");
-                $("#biopsy_month").val("");
-                $("#biopsy_year").val("");
-                $("#biopsyDateError").text("");
-                $("#biopsyDateContainer").hide();
-              };
-            });
-          });
-          $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-              $(this).on("change", function() {
-                  var d = $("#biopsy_day");
-                  var m = $("#biopsy_month");
-                  var y = $("#biopsy_year");
-                  var isValid = tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
-                  if (isValid) {
-                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
-                    $("#biopsyDateError").text("").hide();
-                    $("#biopsy_yes").trigger("click");
-                    //success
-                  } else {
-                     //fail
-                    $("#biopsyDate").val("");
-                  };
-              });
-          });
-          $("input[name='tx']").each(function() {
-               $(this).on("click", function() {
-                  if ($(this).val() == "true") {
-                      tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
-                  } else {
-                      tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
-                  };
-               });
-          });
-        });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
     <div id="clinics">
@@ -505,26 +420,6 @@
       {{consent_fields(consent_agreements)}}
       <div class="get-orgs-error error-message"></div>
     </div>
-    <script>
-    $(function () {
-        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-        tnthAjax.getOrgs($("#iq_userId").val(), false, true, function() {
-          {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
-            var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
-            if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
-            var checkedOrgs = {};
-            userOrgs.each(function() {
-                if ($(this).prop("checked")) {
-                    checkedOrgs[$(this).val()] = true;
-                };
-                $(this).attr("type", "radio");
-                if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
-            });
-            $("#clinics").attr("loaded", true);
-          {% endif %}
-        });
-      });
-    </script>
   {%- endmacro %}
   {% macro consent_fields(consent_agreements, current_user) -%}
     {%-if consent_agreements -%}
