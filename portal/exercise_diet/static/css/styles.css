@@ -656,7 +656,7 @@ h2 a {
 }
 
 #Recipe-Accordions [role='tabpanel'] {
-    opacity: 0;
+    opacity: 0.1;
     transition: opacity 150ms ease-in-out;
 }
 #Recipe-Accordions [role='tabpanel'].visited {
@@ -4931,6 +4931,12 @@ div#supplements.modal.fade.in h4 b, strong {
 /* ======================================================================================== */
 /* ======================================================================================== */
 
+#recipe-modal .btn.btn-secondary-top {
+    position: relative;
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
 #recipe-modal img {
 	padding: 0px;
 	z-index: 1;
