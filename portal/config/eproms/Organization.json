@@ -1193,6 +1193,40 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "timezone": "America/Los_Angeles",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14609,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-09"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "en_US",
+      "name": "University of Washington",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
