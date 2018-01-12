@@ -382,7 +382,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                     var modalElement = $("#" + $(this).attr("modalId"));
                     var self = $(this);
                     tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"),null, function(data) {
-                        modalElement.modal('hide');
+                        modalElement.removeClass("fade").modal("hide");
                         if (data.error) {
                             $(".set-consent-error").text(data.error);
                         } else {
@@ -391,7 +391,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                     });
                 } else {
                     tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                    $("#" + $(this).attr("modalId")).modal('hide');
+                    $("#" + $(this).attr("modalId")).removeClass("fade").modal("hide");
                     tnthAjax.reloadConsentList($(this).attr("data-userId"));
                 };
             });
@@ -506,8 +506,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                                     setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); }, 450);
                                     $("#consentListTable button[data-dismiss]").attr("disabled", false);
                                 } else {
-                                    $("#profileConsentList .consent-date-modal").modal("hide");
-                                    $(".modal-backdrop").removeClass("in");
+                                    $("#consentDate"+ dataIndex + "Modal").removeClass("fade").modal("hide");
                                     tnthAjax.reloadConsentList(ct.attr("data-userId"));
                                 };
                             };
