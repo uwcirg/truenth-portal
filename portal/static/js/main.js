@@ -1314,7 +1314,7 @@ var fillContent = {
             var notifications = [];
             var notificationText = "";
             (data.notifications).forEach(function(notice) {
-                notificationText += "<div class='notification' data-id='" + notice.id + "'>" + i18next.t(notice.content) + "</div>";
+                notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
             });
             if (hasValue(notificationText)) {
 
