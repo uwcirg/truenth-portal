@@ -654,6 +654,10 @@
       };
     } else {
       if (!self.sectionCompleted("topTerms")) {
+        if ($("#notificationBanner").is(":visible")) {
+          $("#notificationBanner .close").hide();
+          $("#notificationBanner .notification-info").trigger("click");
+        };
         self.handleIncomplete("topTerms");
         self.initData("topTerms");
       } else {
@@ -724,6 +728,12 @@
           };
 
           $(this).attr("data-agree","true");
+
+          //delete relevant reconsent notification
+          var notificationEntry = $("#notificationBanner [data-name='website_consent_update']");
+          if (notificationEntry.length > 0) {
+            tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+          }
         };
 
         if (__self.sectionCompleted("topTerms")) {

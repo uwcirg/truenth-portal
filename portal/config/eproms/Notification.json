@@ -9,6 +9,11 @@
       "resourceType": "Notification",
       "name": "privacy_update",
       "content": "<p>The <a href=\"/privacy\" target=\"_blank\">privacy policy</a> has been updated.</p>"
+    },
+    {
+      "resourceType": "Notification",
+      "name": "website_consent_update",
+      "content": "<p>The website consent has been updated and re-consent is required.</p>"
     }
   ],
   "id": "SitePersistence v0.2",
