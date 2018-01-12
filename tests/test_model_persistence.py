@@ -13,6 +13,7 @@ from portal.models.app_text import AppText
 from portal.models.communication_request import CommunicationRequest
 from portal.models.coding import Coding
 from portal.models.organization import Organization
+from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
 
 
@@ -212,3 +213,37 @@ class TestModelPersistence(TestCase):
         with self.assertRaises(NoResultFound):
             Identifier.query.filter_by(
                 value='2 week ST', system=TRUENTH_CR_NAME).one()
+
+    def test_missing_scheduled_job(self):
+        # unmentioned scheduled job should get deleted
+        schedule = "45 * * * *"
+        sj = ScheduledJob(
+            name="test_sched", task="test", schedule=schedule, active=True)
+        sj2 = ScheduledJob(
+            name="test_sched2", task="test", schedule=schedule, active=True)
+        with SessionScope(db):
+            db.session.add(sj)
+            db.session.add(sj2)
+            db.session.commit()
+        self.assertEquals(ScheduledJob.query.count(), 2)
+
+        mp = ModelPersistence(
+            ScheduledJob, lookup_field='name',
+            sequence_name='scheduled_jobs_id_seq'
+        )
+        mp.export(self.tmpdir)
+
+        # Reduce identifiers to one - make sure the other identifier goes away
+        with open(
+                os.path.join(self.tmpdir, 'ScheduledJob.json'), 'r') as pfile:
+            data = json.load(pfile)
+
+        # chop the first
+        data['entry'] = data['entry'][1:]
+
+        with open(
+                os.path.join(self.tmpdir, 'ScheduledJob.json'), 'w') as pfile:
+            pfile.write(json.dumps(data))
+
+        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        self.assertEquals(ScheduledJob.query.count(), 1)

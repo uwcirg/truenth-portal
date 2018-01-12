@@ -179,6 +179,8 @@ class ModelPersistence(object):
                         id=id_description,
                         details=details.getvalue()))
                 merged = getattr(existing, update)(complete_form)
+            else:
+                merged = existing
         else:
             self._log("{type} {id} not found - importing".format(
                 type=self.model.__name__,
