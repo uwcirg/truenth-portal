@@ -380,18 +380,19 @@ var ConsentUIHelper = function(consentItems, userId) {
                     tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
                 } else if ($(this).val() == "suspended") {
                     var modalElement = $("#" + $(this).attr("modalId"));
+                    var self = $(this);
                     tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"),null, function(data) {
                         modalElement.modal('hide');
                         if (data.error) {
                             $(".set-consent-error").text(data.error);
                         } else {
-                            tnthAjax.reloadConsentList($(this).attr("data-userId"));
+                            tnthAjax.reloadConsentList(self.attr("data-userId"));
                         };
                     });
                 } else {
                     tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
                     $("#" + $(this).attr("modalId")).modal('hide');
-                        tnthAjax.reloadConsentList($(this).attr("data-userId"));
+                    tnthAjax.reloadConsentList($(this).attr("data-userId"));
                 };
             });
         });
@@ -462,6 +463,7 @@ var ConsentUIHelper = function(consentItems, userId) {
 
         $("#profileConsentList .btn-submit").each(function() {
             $(this).on("click", function() {
+                var self = $(this);
                 var dataIndex = $.trim($(this).attr("data-index"));
                 var ct = $("#consentDate_" + dataIndex);
                 var h = $("#consentHour_" + dataIndex).val();
@@ -504,7 +506,8 @@ var ConsentUIHelper = function(consentItems, userId) {
                                     setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); }, 450);
                                     $("#consentListTable button[data-dismiss]").attr("disabled", false);
                                 } else {
-                                    $("#consentListTable .modal").modal("hide");
+                                    $("#profileConsentList .consent-date-modal").modal("hide");
+                                    $(".modal-backdrop").removeClass("in");
                                     tnthAjax.reloadConsentList(ct.attr("data-userId"));
                                 };
                             };
@@ -4219,6 +4222,9 @@ var tnthAjax = {
                 data["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
                 data["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
                 data["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
+                if (params.acceptance_date) {
+                    data["acceptance_date"] = params.acceptance_date;
+                }
 
                 this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(data)}, function(data) {
                     if (data) {
