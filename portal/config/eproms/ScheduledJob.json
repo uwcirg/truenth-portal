@@ -70,12 +70,77 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "types": ["subject website consent"]
+        "types": ["privacy policy"],
+        "research_protocol": "IRONMAN v2"
       },
-      "name": "Deactivate subject website consent agreements",
+      "name": "Deactivate IRONMAN (v2) Privacy Policy",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous"
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "research_protocol": "IRONMAN v2",
+        "roles": ["patient"]
+      },
+      "name": "Deactivate IRONMAN (v2) Patient terms (subject website consent)",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "research_protocol": "IRONMAN v2",
+        "roles": ["staff", "staff_admin"]
+      },
+      "name": "Deactivate IRONMAN (v2) Staff terms (subject website consent)",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["privacy policy"],
+        "research_protocol": "TNGR v1"
+      },
+      "name": "Deactivate TNGR (v1) Privacy Policy",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "research_protocol": "TNGR v1",
+        "roles": ["patient"]
+      },
+      "name": "Deactivate TNGR (v1) Patient terms (subject website consent)",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "research_protocol": "TNGR v1",
+        "roles": ["staff", "staff_admin"]
+      },
+      "name": "Deactivate TNGR (v1) Staff terms (subject website consent)",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "deactivate_tous_task"
     },
     {
       "active": false,
