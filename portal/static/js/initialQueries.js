@@ -60,11 +60,28 @@
     var self = this;
     this.initConfig(function(data) {
       self.initSections();
+      self.initSectionData(data);
       if (callback) {
         callback(data);
       };
     });
   };
+
+  FieldsChecker.prototype.initSectionData = function(data) {
+    var self = this;
+    var sections = self.getSections();
+    /*
+     * note: only populate data for still needed section(s)
+     * 
+     */
+    for (var section in sections) {
+      if (!hasValue(self.currentSection)
+          && self.inConfig(sections[section].config, data)) {
+        self.initData(section);
+        self.currentSection = section;
+      }
+    }
+  }
 
   FieldsChecker.prototype.initData = function(section) {
     var tnthAjax = this.__getDependency("tnthAjax");
@@ -72,6 +89,14 @@
       this.mainSections[section].initData();
     };
     this.currentSection = section;
+  }
+
+  FieldsChecker.prototype.getSections = function() {
+      var sections = this.defaultSections;
+      if (Object.keys(this.mainSections).length > 0) {
+        sections = this.mainSections;
+      }
+      return sections;
   }
 
   FieldsChecker.prototype.initSections = function() {
@@ -533,7 +558,6 @@
     for (var section in self.mainSections) {
       if (!found && !self.sectionCompleted(section)) {
           self.handleIncomplete(section);
-          self.initData(section);
           $("#" + section).fadeIn(500).addClass("open");
           self.stopContinue(section);
           found = true;
@@ -659,7 +683,6 @@
           $("#notificationBanner .notification-info").trigger("click");
         };
         self.handleIncomplete("topTerms");
-        self.initData("topTerms");
       } else {
         $("#aboutForm").removeClass("full-size");
         self.getNext();
