@@ -633,7 +633,7 @@ div.footer-wrapper.right-panel {
     text-decoration: underline;
   }
   #termsCheckbox[data-reconsent] {
-    label.terms-label[data-agree='true'] {
+    label.terms-label[data-agree='true']:not([current]) {
       display: none !important;
     }
   }

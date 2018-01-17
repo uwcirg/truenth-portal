@@ -13,7 +13,7 @@
     {
       "resourceType": "Notification",
       "name": "website_consent_update",
-      "content": "<p>The website consent has been updated and re-consent is required.</p>"
+      "content": "<p>Hi, we've updated our website consent below. Please read through and accept these terms to use TrueNTH.</p>"
     }
   ],
   "id": "SitePersistence v0.2",

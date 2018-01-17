@@ -750,6 +750,8 @@
             $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
           };
 
+          //adding css rule here so the checkbox won't be hidden on click
+          $(this).attr("current", "true");
           $(this).attr("data-agree","true");
 
           //delete relevant reconsent notification
