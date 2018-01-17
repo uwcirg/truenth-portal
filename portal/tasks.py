@@ -357,7 +357,7 @@ def deactivate_tous(**kwargs):
         if not rp:
             raise ValueError("No such research_protocol: {}".format(
                 rp_name))
-        require_orgs = OrgTree().all_ids_with_rp(rp)
+        require_orgs = OrgTree.all_ids_with_rp(rp)
         if not require_orgs:
             raise ValueError(
                 "No orgs associated with research_protocol {}".format(

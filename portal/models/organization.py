@@ -709,7 +709,8 @@ class OrgTree(object):
 
         return orgs_list
 
-    def all_ids_with_rp(self, research_protocol):
+    @staticmethod
+    def all_ids_with_rp(research_protocol):
         """Returns set of org IDs that are associated with Research Protocol
 
         As child orgs are considered to be associated if the parent org
