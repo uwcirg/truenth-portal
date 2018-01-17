@@ -210,6 +210,3 @@ class TestTou(TestCase):
         deactivate_tous(**kwargs)
         self.assertFalse(wtou_staff.active)
         self.assertTrue(all((pptou_2.active, wtou.active, wtou_2.active)))
-
-
-
