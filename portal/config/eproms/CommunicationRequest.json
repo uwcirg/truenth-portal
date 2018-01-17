@@ -332,7 +332,7 @@
           "value": "IRONMAN Recurring | 3 Month Reminder (2)"
         }
       ],
-      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
@@ -422,7 +422,7 @@
           "value": "IRONMAN Recurring | 6 Month Reminder (2)"
         }
       ],
-      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
