@@ -336,9 +336,9 @@ def deactivate_tous(**kwargs):
     Optional kwargs:
     :param types: ToU types for which to invalidate agreements
     :param research_protocol: Provide name of research protocol to restrict
-      to respective set of users
+    to respective set of users
     :param roles: Restrict to users with given roles; defaults to
-      (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+    (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
 
     """
     types = kwargs.get('types')
