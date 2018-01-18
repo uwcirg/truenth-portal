@@ -1019,6 +1019,7 @@ function handleAccessCode() {
   if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
     $("#access_code_info").show();
     $("#accessCodeLink").addClass("icon-box__button--disabled");
+    $("#btnCreateAccount").removeAttr("href").addClass("icon-box__button--disabled");
     IO.setInterventionSession();
     setTimeout(function() { location.replace("/go/" + ($("#shortcut_alias").val()).toLowerCase());}, 4000);
   } else {
