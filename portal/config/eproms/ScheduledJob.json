@@ -75,7 +75,7 @@
       },
       "name": "Deactivate IRONMAN (v2) Privacy Policy",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
@@ -88,7 +88,7 @@
       },
       "name": "Deactivate IRONMAN (v2) Patient terms (subject website consent)",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
@@ -101,7 +101,7 @@
       },
       "name": "Deactivate IRONMAN (v2) Staff terms (subject website consent)",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
@@ -113,7 +113,7 @@
       },
       "name": "Deactivate TNGR (v1) Privacy Policy",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
@@ -126,7 +126,7 @@
       },
       "name": "Deactivate TNGR (v1) Patient terms (subject website consent)",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
@@ -139,7 +139,7 @@
       },
       "name": "Deactivate TNGR (v1) Staff terms (subject website consent)",
       "resourceType": "ScheduledJob",
-      "schedule": "0 0 0 0 0",
+      "schedule": "0 0 1 1 0",
       "task": "deactivate_tous_task"
     },
     {
