@@ -680,7 +680,10 @@
       if (!self.sectionCompleted("topTerms")) {
         if ($("#notificationBanner").is(":visible")) {
           $("#notificationBanner .close").hide();
-          $("#notificationBanner .notification-info").trigger("click");
+          //subject website consent
+          if ($("#notificationBanner [data-id]").length > 0) {
+            $("#notificationBanner .notification-info").trigger("click");
+          }
         };
         self.handleIncomplete("topTerms");
       } else {

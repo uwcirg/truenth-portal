@@ -70,8 +70,7 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "types": ["subject website consent"],
-        "roles": ["patient", "staff", "staff_admin"]
+        "types": ["subject website consent"]
       },
       "name": "Deactivate subject website consent agreements",
       "resourceType": "ScheduledJob",
@@ -83,7 +82,7 @@
       "args": null,
       "kwargs": {
         "notification": "subject_website_consent_update",
-        "roles": ["patient", "staff", "staff_admin"]
+        "roles": ["patient"]
       },
       "name": "Subject website consent update notification (run this ONLY AFTER 'Deactivate subject website consent agreements' job)",
       "resourceType": "ScheduledJob",
