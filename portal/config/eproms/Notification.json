@@ -3,7 +3,7 @@
     {
       "resourceType": "Notification",
       "name": "website_terms_of_use_update",
-      "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> has been updated.</p>"
+      "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> have been updated.</p>"
     },
     {
       "resourceType": "Notification",
