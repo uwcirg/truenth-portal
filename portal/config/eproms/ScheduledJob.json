@@ -70,7 +70,8 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "types": ["subject website consent"]
+        "types": ["subject website consent"],
+        "roles": ["patient", "staff", "staff_admin"]
       },
       "name": "Deactivate subject website consent agreements",
       "resourceType": "ScheduledJob",
@@ -81,10 +82,10 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "notification": "website_consent_update",
+        "notification": "subject_website_consent_update",
         "roles": ["patient", "staff", "staff_admin"]
       },
-      "name": "Website consent update notification",
+      "name": "Subject website consent update notification (run this ONLY AFTER 'Deactivate subject website consent agreements' job)",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "notify_users"
@@ -93,10 +94,10 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "notification": "terms_update",
+        "notification": "website_terms_of_use_update",
         "roles": ["patient", "staff", "staff_admin"]
       },
-      "name": "Terms update notification",
+      "name": "Website terms update notification",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "notify_users"
@@ -105,10 +106,10 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "notification": "privacy_update",
+        "notification": "privacy_policy_update",
         "roles": ["patient", "staff", "staff_admin"]
       },
-      "name": "PrivacyPolicy update notification",
+      "name": "Privacy policy update notification",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "notify_users"

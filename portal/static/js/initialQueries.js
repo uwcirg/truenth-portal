@@ -754,10 +754,22 @@
           $(this).attr("current", "true");
           $(this).attr("data-agree","true");
 
-          //delete relevant reconsent notification
-          var notificationEntry = $("#notificationBanner [data-name='website_consent_update']");
-          if (notificationEntry.length > 0) {
-            tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+          //delete relevant notifications
+          var coreTypes = [];
+          var parentCoreType = $(this).attr("data-core-data-type");
+          if (hasValue(parentCoreType)) {
+            coreTypes.push(parentCoreType);
+          };
+          $(this).closest("label").find("[data-core-data-type]").each(function() {
+            coreTypes.push($(this).attr("data-core-data-type"));
+          });
+          if (coreTypes.length > 0) {
+            coreTypes.forEach(function(type) {
+              var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
+              if (notificationEntry.length > 0) {
+                tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+              }
+            });
           }
         };
 

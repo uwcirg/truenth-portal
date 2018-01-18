@@ -2,17 +2,17 @@
   "entry": [
     {
       "resourceType": "Notification",
-      "name": "terms_update",
+      "name": "website_terms_of_use_update",
       "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> has been updated.</p>"
     },
     {
       "resourceType": "Notification",
-      "name": "privacy_update",
+      "name": "privacy_policy_update",
       "content": "<p>The <a href=\"/privacy\" target=\"_blank\">privacy policy</a> has been updated.</p>"
     },
     {
       "resourceType": "Notification",
-      "name": "website_consent_update",
+      "name": "subject_website_consent_update",
       "content": "<p>Hi, we've updated our website consent below. Please read through and accept these terms to use TrueNTH.</p>"
     }
   ],
