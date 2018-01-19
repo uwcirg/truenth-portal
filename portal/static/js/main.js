@@ -1365,6 +1365,14 @@ var fillContent = {
                 $("#notificationBanner .close").on("click", function(e) {
                     //closing the banner
                     e.stopPropagation();
+                    var dataIds = $(this).parent().find("[data-id]");
+                    dataIds.each(function() {                        
+                        //delete entry
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", true);
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
+                    })
                     $(this).parent().hide();
                 });
             } else {
