@@ -1366,7 +1366,7 @@ var fillContent = {
                     //closing the banner
                     e.stopPropagation();
                     var dataIds = $(this).parent().find("[data-id]");
-                    dataIds.each(function() {                        
+                    dataIds.each(function() {
                         //delete entry
                         if (!($(this).attr("data-visited"))) {
                             $(this).attr("data-visited", true);
