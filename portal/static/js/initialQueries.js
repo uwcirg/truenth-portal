@@ -680,7 +680,10 @@
       if (!self.sectionCompleted("topTerms")) {
         if ($("#notificationBanner").is(":visible")) {
           $("#notificationBanner .close").hide();
-          $("#notificationBanner .notification-info").trigger("click");
+          //subject website consent
+          if ($("#notificationBanner [data-id]").length > 0) {
+            $("#notificationBanner .notification-info").trigger("click");
+          }
         };
         self.handleIncomplete("topTerms");
       } else {
@@ -754,10 +757,26 @@
           $(this).attr("current", "true");
           $(this).attr("data-agree","true");
 
-          //delete relevant reconsent notification
-          var notificationEntry = $("#notificationBanner [data-name='website_consent_update']");
-          if (notificationEntry.length > 0) {
-            tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+          //delete relevant notifications
+          var coreTypes = [];
+          var parentCoreType = $(this).attr("data-core-data-type");
+          if (hasValue(parentCoreType)) {
+            coreTypes.push(parentCoreType);
+          };
+          $(this).closest("label").find("[data-core-data-type]").each(function() {
+            coreTypes.push($(this).attr("data-core-data-type"));
+          });
+          /*
+           * need to delete notification for each corresponding coredata terms type
+           * once user has agreed
+           */
+          if (coreTypes.length > 0) {
+            coreTypes.forEach(function(type) {
+              var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
+              if (notificationEntry.length > 0) {
+                tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+              }
+            });
           }
         };
 

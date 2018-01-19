@@ -1335,12 +1335,17 @@ var fillContent = {
                 $("#notificationBanner .notification-info").on("click", function() {
                     $("#notificationBanner .notification").toggleClass("active");
                 });
+
+                $("#notificationBanner [data-id] a").each(function() {
+                    $(this).on("click", function() {
+                        var parentElement = $(this).closest(".notification");
+                        parentElement.attr("data-visited", "true");
+                        //delete relevant notification
+                        tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
+                    })
+                });
                 $("#notificationBanner [data-id]").each(function() {
                     $(this).on("click", function() {
-                        if (!($(this).attr("data-visited"))) {
-                            $(this).attr("data-visited", "true");
-                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
-                        };
                         /*
                          * check if all links have been visited
                          */
@@ -1358,6 +1363,7 @@ var fillContent = {
                     });
                 });
                 $("#notificationBanner .close").on("click", function(e) {
+                    //closing the banner
                     e.stopPropagation();
                     var dataIds = $(this).parent().find("[data-id]");
                     dataIds.each(function() {
