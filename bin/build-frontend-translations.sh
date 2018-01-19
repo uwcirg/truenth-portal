@@ -22,6 +22,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 setup_node_venv() {
+    # Use existing python virtual environment to install nodeenv module
     . "${repo_root}/env/bin/activate"
     pip install nodeenv
 
