@@ -766,6 +766,10 @@
           $(this).closest("label").find("[data-core-data-type]").each(function() {
             coreTypes.push($(this).attr("data-core-data-type"));
           });
+          /*
+           * need to delete notification for each corresponding coredata terms type
+           * once user has agreed
+           */
           if (coreTypes.length > 0) {
             coreTypes.forEach(function(type) {
               var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
