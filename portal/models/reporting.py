@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import current_app, render_template
 from flask_babel import gettext as _
 
+from .assessment_status import AssessmentStatus
 from ..dogpile_cache import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
@@ -93,8 +94,10 @@ def get_reporting_stats():
 
 def calculate_days_overdue(user):
     now = datetime.utcnow()
-    qb = QuestionnaireBank.most_current_qb(
-        user, as_of_date=now).questionnaire_bank
+    a_s = AssessmentStatus(user, as_of_date=now)
+    if a_s.overall_status in ('Completed', 'Expired'):
+        return 0
+    qb = a_s.qb_data.qb
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
