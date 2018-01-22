@@ -34,8 +34,7 @@
 
                 {% if current_user.has_role('admin')%}
                     <br /> {{ _("Created By") }}:
-                    {{ client.user.first_name }}
-                    {{ client.user.last_name }}
+                    {{ client.user.display_name }}
                 {% endif %}
             </li>
         {% endfor %}

@@ -1106,6 +1106,13 @@ def authorize(*args, **kwargs):
         description: Additional HTML to customize registration
         required: false
         type: string
+      - name: suspend_initial_queries
+        in: query
+        description:
+         include with true value to suspend the gathering of initial
+         data such as roles, terms of use, organization, demographics,
+         etc.
+        type: string
     produces:
       - application/json
     responses:
@@ -1126,6 +1133,11 @@ def authorize(*args, **kwargs):
         session['display_html'] = request.args.get('display_html')
         current_app.logger.debug("display_html:" +
                                  request.args.get('display_html'))
+
+    suspend_initial_queries = request.args.get('suspend_initial_queries')
+    if suspend_initial_queries:
+        session['suspend_initial_queries'] = True
+        current_app.logger.debug("/oauth/authorize told to suspend_initial_queries")
 
     user = current_user()
     if not user:
