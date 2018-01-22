@@ -31,6 +31,7 @@ from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
 from .models.notification import Notification, UserNotification
 from .models.organization import Organization, OrgTree
+from .models.research_protocol import ResearchProtocol
 from .models.reporting import get_reporting_stats, overdue_stats_by_org
 from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
@@ -320,19 +321,61 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 @celery.task
 @scheduled_task
+def deactivate_tous_task(**kwargs):
+    """Require users to re-consent to their initial consent
+
+    Scheduled task, delegates work to `deactivate_tous()`
+
+    """
+    return deactivate_tous(**kwargs)
+
+
 def deactivate_tous(**kwargs):
-    "Require users to re-consent to their initial consent"
+    """Deactivate matching consents
+
+    Optional kwargs:
+    :param types: ToU types for which to invalidate agreements
+    :param research_protocol: Provide name of research protocol to restrict
+    to respective set of users
+    :param roles: Restrict to users with given roles; defaults to
+    (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+
+    """
     types = kwargs.get('types')
     sys = User.query.filter_by(email='__system__').first()
 
     if not sys:
         raise ValueError("No system user found")
 
+    require_orgs = None
+    if kwargs.get('research_protocol'):
+        rp_name = kwargs.get('research_protocol')
+        # Adds filter to limit to users with an organization
+        # with the same research protocol
+        rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == rp_name).first()
+        if not rp:
+            raise ValueError("No such research_protocol: {}".format(
+                rp_name))
+        require_orgs = OrgTree.all_ids_with_rp(rp)
+        if not require_orgs:
+            raise ValueError(
+                "No orgs associated with research_protocol {}".format(
+                    rp_name))
+
+    require_roles = set(
+        kwargs.get('roles', (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)))
+    for role in require_roles:
+        if not Role.query.filter(Role.name == role).first():
+            raise ValueError("No such role: {}".format(role))
+
     for user in User.query.filter(User.deleted_id.is_(None)):
-        if any((user.has_role(ROLE.PATIENT),
-                user.has_role(ROLE.STAFF),
-                user.has_role(ROLE.STAFF_ADMIN))):
-            user.deactivate_tous(acting_user=sys, types=types)
+        if require_roles.isdisjoint([r.name for r in user.roles]):
+            continue
+        if require_orgs and require_orgs.isdisjoint(
+                [o.id for o in user.organizations]):
+            continue
+        user.deactivate_tous(acting_user=sys, types=types)
 
 
 @celery.task

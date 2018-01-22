@@ -49,7 +49,7 @@
       "name": "Deactivate website ToU agreements",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous"
+      "task": "deactivate_tous_task"
     }
   ],
   "id": "SitePersistence v0.2",
