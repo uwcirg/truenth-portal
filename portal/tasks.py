@@ -335,8 +335,8 @@ def deactivate_tous(**kwargs):
 
     Optional kwargs:
     :param types: ToU types for which to invalidate agreements
-    :param research_protocol: Provide name of research protocol to restrict
-    to respective set of users
+    :param organization: Provide name of organization to restrict
+    to respective set of users.  All child orgs implicitly included.
     :param roles: Restrict to users with given roles; defaults to
     (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
 
@@ -348,20 +348,12 @@ def deactivate_tous(**kwargs):
         raise ValueError("No system user found")
 
     require_orgs = None
-    if kwargs.get('research_protocol'):
-        rp_name = kwargs.get('research_protocol')
-        # Adds filter to limit to users with an organization
-        # with the same research protocol
-        rp = ResearchProtocol.query.filter(
-            ResearchProtocol.name == rp_name).first()
-        if not rp:
-            raise ValueError("No such research_protocol: {}".format(
-                rp_name))
-        require_orgs = OrgTree.all_ids_with_rp(rp)
-        if not require_orgs:
-            raise ValueError(
-                "No orgs associated with research_protocol {}".format(
-                    rp_name))
+    if kwargs.get('organization'):
+        org_name = kwargs.get('organization')
+        org = Organization.query.filter(Organization.name == org_name).first()
+        if not org:
+            raise ValueError("No such organization: {}".format(org_name))
+        require_orgs = set(OrgTree().here_and_below_id(org.id))
 
     require_roles = set(
         kwargs.get('roles', (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)))

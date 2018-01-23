@@ -136,7 +136,7 @@ class TestTou(TestCase):
         self.test_user.deactivate_tous(self.test_user)
         self.assertFalse(all((pptou.active, wtou.active)))
 
-    def test_deactivate_tous_by_rp(self):
+    def test_deactivate_tous_by_org(self):
         timestamp = datetime.utcnow()
 
         self.add_system_user()
@@ -154,17 +154,6 @@ class TestTou(TestCase):
         second_user.organizations.append(lonely_leaf)
         self.promote_user(self.test_user, 'patient')
         self.test_user.organizations.append(child)
-
-        rp1 = ResearchProtocol(name='RP 101')
-        rp2 = ResearchProtocol(name='RP 102')
-        with SessionScope(db):
-            db.session.add(rp1)
-            db.session.add(rp2)
-            db.session.commit()
-        rp1, rp2 = map(db.session.merge, (rp1, rp2))
-        rp1_name, rp2_name = rp1.name, rp2.name
-        parent.research_protocol_id = rp1.id
-        lonely_leaf.research_protocol_id = rp2.id
 
         def gentou(user_id, type):
             return ToU(
@@ -189,21 +178,20 @@ class TestTou(TestCase):
             db.session.merge, (self.test_user, second_user, staff, parent))
         pptou, pptou_2, pptou_staff, wtou, wtou_2, wtou_staff = map(
             db.session.merge, tous)
-        self.assertTrue(parent.research_protocol)
 
         # confirm active
         self.assertTrue(all((
             pptou.active, pptou_2.active, wtou.active, wtou_2.active)))
 
-        # test deactivating single type by rp - should miss second user
-        kwargs = {'types': ['privacy policy'], 'research_protocol': rp1_name}
+        # test deactivating single type by org - should miss second user
+        kwargs = {'types': ['privacy policy'], 'organization': '101'}
         deactivate_tous(**kwargs)
         self.assertFalse(pptou.active)
         self.assertFalse(pptou_staff.active)
         self.assertTrue(all(
             (pptou_2.active, wtou.active, wtou_2.active, wtou_staff.active)))
 
-        # test limiting to staff on rp both staff and test_user belong to
+        # test limiting to staff on org both staff and test_user belong to
         # only hits staff
         kwargs['types'] = ['website terms of use']
         kwargs['roles'] = ['staff', 'staff_admin']
