@@ -72,7 +72,7 @@
     var sections = self.getSections();
     /*
      * note: only populate data for still needed section(s)
-     * 
+     *
      */
     for (var section in sections) {
       if (!hasValue(self.currentSection)
@@ -663,10 +663,12 @@
        }, 1000);
     });
 
-    $(window).scroll(function() {
-      if ($("html body").is(":animated")) {
-        $("html body").stop(true, true);
-      };
+    $(window).bind("scroll mousedown mousewheel keyup", function(e){
+        if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
+          if ($("html, body").is(":animated")) {
+            $("html, body").stop(true, true);
+          }
+        }
     });
 
     //if term of use form not present - need to show the form
