@@ -16,19 +16,11 @@
 }
 
 body.page-exercise-diet-portal footer {
-    position: absolute;
-    top: 2297px;
     margin: 0 1.31em;
 }
 @media (min-width: 401px) {
     body.page-exercise-diet-portal footer {
-        top: 2247px;
         margin: 0 1.35em;
-    }
-}
-@media (min-width: 768px) {
-    body.page-exercise-diet-portal footer {
-        top: 2290px;
     }
 }
 
@@ -36,6 +28,10 @@ body.page-exercise-diet-portal footer {
     body.page-exercise-diet-portal footer {
         margin: 0 2em;
     }
+}
+
+body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
+    margin-top: 2em;
 }
 
 #Exercise-Diet-Portal {
@@ -89,15 +85,16 @@ body.page-exercise-diet-portal footer {
  {
     width: 780px;
     max-width: 100%;
-    padding: 1em;
+    padding: 1em 1em;
 }
 
 #Exercise-Diet-Portal .intro-content {
-    margin-top: -3em;
+    padding-top: 1em;
 }
 
-@media (min-width: 901px) {
+@media (min-width: 900px) {
     #Exercise-Diet-Portal .intro-content {
+        padding-top: 7em;
         margin-top: 5em;
     }
 }
@@ -157,14 +154,16 @@ hr.objective {
     margin-top: 40px;
     cursor: pointer;
     position: absolute;
-    top: 60%;
-    left: 50%;
+    top: 30%;
+    left: 45%;
     margin-left: -109px;
     margin-top: 0.5em;
 }
 @media (min-width: 699px) {
     #Exercise-Diet-Portal .watch-button-video {
         font-size: 22px;
+        top: 60%;
+        left: 50%;
     }
 }
 
@@ -314,75 +313,58 @@ img.objective-background  {
 }
 */
 
-
-
-
 .intro-module.intro-intro  {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/mountains.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: top center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-*/
-/* 	width: 100%; */
+    position: relative;
+    margin-top: -4em;
     height: 700px;
 }
+@media (min-width: 900px) {
+    .intro-module.intro-intro  {
+        margin-top: -6em;
+    }
+}
 .video-module.video-testimonial-hero {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/video-testimonial-hero.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: center center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-	width: 100%;
-*/
-    height: 600px;
-    top: 700px;
-    background-position: top center;
-}
-
-.video-module iframe {
-    width: 380px;
-    height: 214px;
-    margin: auto;
     position: relative;
-    top: 32%;
-    z-index: 2;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-position: top center;
+    overflow: hidden;
 }
-@media (min-width: 643px) {
-    .video-module iframe {
-        width: 610px;
-        height: 343px;
-        top: 22%;
-    }
-}
-@media (min-width: 912px) {
-    .video-module iframe {
-        width: 810px;
-        height: 456px;
-        top: 12%;
-    }
-}
-
-img.video-testimonial-hero {
+.video-module iframe {
+    position: absolute;
     left: 20px;
     width: calc(100% - 40px);
+    height: 100%;
+    top: 0;
+}
+@media (min-width: 900px) {
+    .video-module iframe {
+        position: absolute;
+        left: 28px;
+        width: calc(100% - 56px);
+        height: 100%;
+        top: 0;
+    }
+}
+
+.video-module img {
+    visibility: hidden !important;
+    width: calc(100% - 50px) !important;
     position: relative;
-    max-width: 100%;
-    vertical-align: middle;
+    margin: 0;
+    top: 0;
+    padding: 0;
+}
+@media (min-width: 699px) {
+    .video-module img {
+        width: calc(100% - 65px) !important;
+    }
+}
+@media (min-width: 900px) {
+    .video-module img {
+        width: calc(100% - 87px) !important;
+    }
 }
 @media (min-width: 1100px) {
     .video-module.video-testimonial-hero {
@@ -390,58 +372,23 @@ img.video-testimonial-hero {
     }
 }
 
-.objective-module.objective-background  {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/objective-background.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: top center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-	width: 100%;
-*/
-    height: 781px;
-    top: 1300px;
-}
-@media (min-width: 400px) {
-    .objective-module.objective-background  {
-        height: 749px;
+@media (min-width: 1376px) {
+    .video-module img {
+        width: calc(100% - 97px) !important;
     }
 }
-@media (min-width: 406px) {
-    .objective-module.objective-background  {
-        height: 717px;
-    }
-}
-@media (min-width: 421px) {
-    .objective-module.objective-background  {
-        height: 697px;
-    }
-}
-@media (min-width: 444px) {
-    .objective-module.objective-background  {
-        height: 886px;
-    }
-}
+
 .intro-module, .video-module, .objective-module {
 	margin: 0px auto;
 	z-index: 0;
 	text-align: center;
-
-	position: absolute;
     display: block;
-/*     background-image: url('../img/objective-background.jpg'); */
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: scroll;
     background-position: top center;
     border: none;
-    padding: 0px 0px 0px 0px;
+    padding: 0px 0px 40px 0px;
 	width: 100%;
 }
 .intro-content {

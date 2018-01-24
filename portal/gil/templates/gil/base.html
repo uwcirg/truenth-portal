@@ -1,44 +1,44 @@
 {%- from "gil/macros.html" import footerHTML -%}
 <!DOCTYPE html>
 <html class="no-js" lang="en">
-  {%- block head -%}
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{%- block title -%}{{_("TrueNTH")}}{%- endblock -%}</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script>window.jQuery || document.write('<script src="../scripts/jquery.min.js"><\/script>')</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
-    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
-    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
-    <!--[if lte IE 6]>
-    <style>#top, #bottom, #left, #right { display: none; }</style>
-    <![endif]-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon-base.ico') }}" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}">
-    <link rel="apple-touch-icon" sizes="60x60" href="{{url_for('static', filename='img/apple-touch-icon-60x60.png') }}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{{url_for('static', filename='img/apple-touch-icon-72x72.png') }}">
-    <link rel="apple-touch-icon" sizes="76x76" href="{{url_for('static', filename='img/apple-touch-icon-76x76.png') }}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{{url_for('static', filename='img/apple-touch-icon-114x114.png') }}">
-    <link rel="apple-touch-icon" sizes="120x120" href="{{url_for('static', filename='img/apple-touch-icon-120x120.png') }}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{{url_for('static', filename='img/apple-touch-icon-144x144.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{url_for('static', filename='img/apple-touch-icon-152x152.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{url_for('static', filename='img/apple-touch-icon-180x180.png') }}">
-    <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-16x16.png') }}" sizes="16x16">
-    <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-32x32.png') }}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-96x96.png') }}" sizes="96x96">
-    <link rel="icon" type="image/png" href="{{url_for('static', filename='img/android-chrome-192x192.png') }}" sizes="192x192">
-    <meta name="msapplication-square70x70logo" content="{{url_for('static', filename='img/smalltile.png') }}">
-    <meta name="msapplication-square150x150logo" content="{{url_for('static', filename='img/mediumtile.png') }}">
-    <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
-    <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
+   <head>
+    {%- block head -%}
+      <meta charset="utf-8">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      <title>{%- block title -%}{{_("TrueNTH")}}{%- endblock -%}</title>
+      <meta name="description" content="">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script>window.jQuery || document.write('<script src="../scripts/jquery.min.js"><\/script>')</script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+      <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
+      <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+      <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
+      <link rel="apple-touch-icon" href="apple-touch-icon.png">
+      <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
+      <!--[if lte IE 6]>
+      <style>#top, #bottom, #left, #right { display: none; }</style>
+      <![endif]-->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+      <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon-base.ico') }}" type="image/x-icon">
+      <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}">
+      <link rel="apple-touch-icon" sizes="60x60" href="{{url_for('static', filename='img/apple-touch-icon-60x60.png') }}">
+      <link rel="apple-touch-icon" sizes="72x72" href="{{url_for('static', filename='img/apple-touch-icon-72x72.png') }}">
+      <link rel="apple-touch-icon" sizes="76x76" href="{{url_for('static', filename='img/apple-touch-icon-76x76.png') }}">
+      <link rel="apple-touch-icon" sizes="114x114" href="{{url_for('static', filename='img/apple-touch-icon-114x114.png') }}">
+      <link rel="apple-touch-icon" sizes="120x120" href="{{url_for('static', filename='img/apple-touch-icon-120x120.png') }}">
+      <link rel="apple-touch-icon" sizes="144x144" href="{{url_for('static', filename='img/apple-touch-icon-144x144.png') }}">
+      <link rel="apple-touch-icon" sizes="152x152" href="{{url_for('static', filename='img/apple-touch-icon-152x152.png') }}">
+      <link rel="apple-touch-icon" sizes="180x180" href="{{url_for('static', filename='img/apple-touch-icon-180x180.png') }}">
+      <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-16x16.png') }}" sizes="16x16">
+      <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-32x32.png') }}" sizes="32x32">
+      <link rel="icon" type="image/png" href="{{url_for('static', filename='img/favicon-96x96.png') }}" sizes="96x96">
+      <link rel="icon" type="image/png" href="{{url_for('static', filename='img/android-chrome-192x192.png') }}" sizes="192x192">
+      <meta name="msapplication-square70x70logo" content="{{url_for('static', filename='img/smalltile.png') }}">
+      <meta name="msapplication-square150x150logo" content="{{url_for('static', filename='img/mediumtile.png') }}">
+      <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
+      <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
+    {%- endblock -%}
   </head>
-  {%- endblock -%}
   <body>
   <div id="loadingIndicator" class="loading-indicator">
         {{_("Loading")}}... &nbsp;
