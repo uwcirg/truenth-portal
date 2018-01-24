@@ -50,7 +50,7 @@ $(function(){
     $(".watch-button-video").on("click", function(e) {
         e.stopPropagation();
         var src = $(".video-module").data("iframe-src");
-        if ($("video-module").find("iframe").length == 0) {
+        if ($("video-module").find("iframe").length === 0) {
             $(".video-module").append("<iframe src='" + src + "' allowfullscreen frameborder='0' />");
         }
         $(this).fadeOut();
