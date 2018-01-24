@@ -108,3 +108,11 @@ $(function(){
     });
 
 });
+
+$(document).ready(function() {
+    if ($("#Exercise-Diet-Portal").length > 0) {
+        setTimeout(function() {
+            $("body").addClass("page-exercise-diet-portal");
+        }, 100);
+    };
+});
