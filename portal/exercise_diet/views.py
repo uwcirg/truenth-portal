@@ -119,7 +119,7 @@ def diet():
 
 @exercise_diet.route('/portal')
 def portal():
-    return render_template('exercise_diet/exercise-diet_portal.html')
+    return render_template('exercise_diet/exercise-diet_portal.html', user=current_user())
 
 
 @exercise_diet.route('/exercise')
