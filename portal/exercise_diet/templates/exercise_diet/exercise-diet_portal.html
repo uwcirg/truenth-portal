@@ -20,11 +20,8 @@
 					<div class="start-button-intro" data-toggle="modal" data-target="#modal-register">{% trans %}start <span>&rarr;</span>{% endtrans %}</div>
 			</div><!-- end class="intro-content" -->
 		</div><!-- end class="intro-module intro-intro" -->
-		<div class="video-module video-testimonial-hero" style="background-image: url({{ url_for('.static', filename='img//video-testimonial-hero.jpg') }})">
-			<div class="video-content">
-				<iframe class='sproutvideo-player' src='//videos.sproutvideo.com/embed/e89adcb2181fe6cb60/0b1c2437f243294d' width='630' height='354' frameborder='0' allowfullscreen></iframe>
-					<div class="watch-button-video">{{_("watch")}}</div>
-			</div><!-- end class="video-content" -->
+		<div class="video-module video-testimonial-hero" style="background-image: url({{ url_for('.static', filename='img//video-testimonial-hero.jpg') }})" data-iframe-src="//videos.sproutvideo.com/embed/e89adcb2181fe6cb60/0b1c2437f243294d?type=hd&amp;autoPlay=true">
+			<div class="watch-button-video">{{_("watch")}}</div>
 		</div><!-- end class="video-module video-testimonial-hero" -->
 
 		<div class="objective-module objective-background" style="background-image: url({{ url_for('.static', filename='img//objective-background.jpg') }})">
