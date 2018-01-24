@@ -114,5 +114,5 @@ $(document).ready(function() {
         setTimeout(function() {
             $("body").addClass("page-exercise-diet-portal");
         }, 100);
-    };
+    }
 });
