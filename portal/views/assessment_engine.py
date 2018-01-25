@@ -1729,26 +1729,25 @@ def patient_assessment_status(patient_id):
 
     """
     patient = get_user(patient_id)
-    if patient:
-        current_user().check_role(permission='view', other_id=patient_id)
-        now = datetime.utcnow()
-        assessment_status = AssessmentStatus(user=patient, as_of_date=now)
-        assessment_overall_status = (
-                assessment_status.overall_status if assessment_status else
-                None)
-
-        # indefinite assessments don't affect overall status, but need to
-        # be available if unfinished
-        outstanding_indefinite_work = len(
-            assessment_status.instruments_needing_full_assessment(
-                classification='indefinite') +
-            assessment_status.instruments_in_progress(
-                classification='indefinite'))
-
-        return jsonify(assessment_status=assessment_overall_status,
-                       outstanding_indefinite_work=outstanding_indefinite_work)
-    else:
+    if not patient:
         abort(400, "invalid patient id")
+    current_user().check_role(permission='view', other_id=patient_id)
+
+    now = datetime.utcnow()
+    assessment_status = AssessmentStatus(user=patient, as_of_date=now)
+    assessment_overall_status = assessment_status.overall_status if assessment_status else None
+
+    # indefinite assessments don't affect overall status, but need to
+    # be available if unfinished
+    outstanding_indefinite_work = len(
+        assessment_status.instruments_needing_full_assessment(classification='indefinite') +
+        assessment_status.instruments_in_progress(classification='indefinite')
+    )
+
+    return jsonify(
+        assessment_status=assessment_overall_status,
+        outstanding_indefinite_work=outstanding_indefinite_work,
+    )
 
 
 @assessment_engine_api.route('/questionnaire_bank')
