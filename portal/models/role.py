@@ -26,6 +26,8 @@ class Role(db.Model):
 
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
+    'access_on_verify':
+        'Provides access prior to registration, on verification',
     'admin':
         'Administrator privileges, i.e. carte blanche',
     'analyst':
