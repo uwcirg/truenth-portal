@@ -938,6 +938,16 @@ module.exports = OrgTool = (function() {
                                 $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="intervention-link">' + i18next.t(itemDescription) + '</a></li>');
                                 ct++;
                               };
+                              /*
+                               * note this will replace applicable links, e.g. 'Start' with the correct link for each respective intervention
+                               */
+                              var linkItems = $("." + item.name + "-link");
+                              if (linkItems.length > 0) {
+                                  linkItems.each(function() {
+                                    $(this).attr("href", itemLink);
+                                    $(this).removeClass("icon-box__button--disabled");
+                                  });
+                              }
                           };
                       };
                   });
