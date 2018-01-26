@@ -227,6 +227,7 @@ class User(db.Model, UserMixin):
     deceased_id = db.Column(
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
+    practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
