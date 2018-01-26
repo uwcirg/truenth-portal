@@ -42,6 +42,13 @@ class Reference(object):
         return instance
 
     @classmethod
+    def practitioner(cls, practitioner_id):
+        """Create a reference object from a known patient id"""
+        instance = cls()
+        instance.practitioner_id = int(practitioner_id)
+        return instance
+
+    @classmethod
     def questionnaire(cls, questionnaire_name):
         """Create a reference object from a known questionnaire name"""
         instance = cls()
@@ -117,6 +124,7 @@ class Reference(object):
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
+            (re.compile('[Pp]ractitioner/(\d+)'), User, 'id'),
             (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
 
@@ -182,6 +190,9 @@ class Reference(object):
 
         if hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
+            display = User.query.get(self.patient_id).display_name
+        if hasattr(self, 'practitioner_id'):
+            ref = "api/practitioner/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
