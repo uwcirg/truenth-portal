@@ -157,13 +157,13 @@ class Reference(object):
                         reference_text))
             with db.session.no_autoflush:
                 result = Organization.query.join(
-                      OrganizationIdentifier).join(Identifier).filter(and_(
-                          Organization.id ==
-                          OrganizationIdentifier.organization_id,
-                          OrganizationIdentifier.identifier_id ==
-                          Identifier.id,
-                          Identifier.system == id_system,
-                          Identifier._value == id_value))
+                    OrganizationIdentifier).join(Identifier).filter(and_(
+                        Organization.id ==
+                        OrganizationIdentifier.organization_id,
+                        OrganizationIdentifier.identifier_id ==
+                        Identifier.id,
+                        Identifier.system == id_system,
+                        Identifier._value == id_value))
             if not result.count():
                 raise MissingReference("Reference not found: {}".format(
                     reference_text))
