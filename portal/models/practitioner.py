@@ -16,7 +16,7 @@ class Practitioner(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "practitioner {0.id}".format(self)
+        return "Practitioner {0.id} {0.first_name} {0.last_name}".format(self)
 
     @property
     def display_name(self):
@@ -68,6 +68,7 @@ class Practitioner(db.Model):
             telecom = Telecom.from_fhir(fhir['telecom'])
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'work')) or self.phone
+        return self
 
     def as_fhir(self):
         d = {}
