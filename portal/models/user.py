@@ -830,6 +830,9 @@ class User(db.Model, UserMixin):
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
+        if self.practitioner_id:
+            d['generalPractitioner'] = reference.Reference.practitioner(
+                practitioner_id).as_fhir()
         if not include_empties:
             return strip_empties(d)
         return d
@@ -1158,6 +1161,9 @@ class User(db.Model, UserMixin):
             org_list = [reference.Reference.parse(item) for item in
                         fhir['careProvider']]
             self.update_orgs(org_list, acting_user)
+        if 'generalPractitioner' in fhir:
+            self.practitioner_id = reference.Reference.parse(
+                fhir['generalPractitioner'])
 
     @classmethod
     def column_names(cls):
