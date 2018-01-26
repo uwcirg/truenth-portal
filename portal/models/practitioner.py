@@ -41,7 +41,12 @@ class Practitioner(db.Model):
             self._phone = ContactPoint(
                 system='phone', use='work', value=val)
 
-    def update_from_fhir(self, fhir, acting_user):
+    @classmethod
+    def from_fhir(cls, data):
+        practitioner = cls()
+        return practitioner.update_from_fhir(data)
+
+    def update_from_fhir(self, fhir):
         """Update the practitioner data from the given FHIR
 
         If a field is defined, it is the final definition for the respective
