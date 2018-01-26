@@ -3,6 +3,7 @@ from flask_webtest import SessionScope
 import json
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.practitioner import Practitioner
 from portal.models.role import ROLE
 from tests import TestCase
@@ -93,6 +94,13 @@ class TestPractitioner(TestCase):
         self.assertEqual(pract.last_name, 'Zoidberg')
         self.assertEqual(pract.phone, '555-1234')
 
+        # confirm audit entry for practitioner creation
+        audit = Audit.query.first()
+        audit_words = audit.comment.split()
+        self.assertEqual(audit_words[0], 'created')
+        self.assertEqual(audit_words[3], 'Practitioner')
+        self.assertEqual(audit_words[-1], 'Zoidberg')
+
     def test_practitioner_put(self):
         pract = Practitioner(first_name="John", last_name="Watson")
         with SessionScope(db):
@@ -129,3 +137,10 @@ class TestPractitioner(TestCase):
         updated = Practitioner.query.get(pract_id)
         self.assertEqual(updated.last_name, 'Zoidberg')
         self.assertEqual(updated.phone, '555-9876')
+
+        # confirm audit entry for practitioner update
+        audit = Audit.query.first()
+        audit_words = audit.comment.split()
+        self.assertEqual(audit_words[0], 'updated')
+        self.assertEqual(audit_words[5], '"Practitioner",')
+        self.assertEqual(audit_words[-1], '"Zoidberg"}}')
