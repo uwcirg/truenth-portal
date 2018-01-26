@@ -92,3 +92,40 @@ class TestPractitioner(TestCase):
         pract = Practitioner.query.all()[0]
         self.assertEqual(pract.last_name, 'Zoidberg')
         self.assertEqual(pract.phone, '555-1234')
+
+    def test_practitioner_put(self):
+        pract = Practitioner(first_name="John", last_name="Watson")
+        with SessionScope(db):
+            db.session.add(pract)
+            db.session.commit()
+        pract = db.session.merge(pract)
+        pract_id = pract.id
+
+        pract.phone = '555-1234'
+
+        data = {
+            'resourceType': 'Practitioner',
+            'name': {
+                'given': 'John',
+                'family': 'Zoidberg'
+            },
+            'telecom': [
+                {
+                    'system': 'phone',
+                    'use': 'work',
+                    'value': '555-9876'
+                }
+            ]
+        }
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        resp = self.client.put('/api/practitioner/{}'.format(pract_id),
+                               data=json.dumps(data),
+                               content_type='application/json')
+        self.assert200(resp)
+
+        updated = Practitioner.query.get(pract_id)
+        self.assertEqual(updated.last_name, 'Zoidberg')
+        self.assertEqual(updated.phone, '555-9876')

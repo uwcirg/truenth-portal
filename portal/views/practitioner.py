@@ -2,6 +2,7 @@
 from flask import abort, jsonify, Blueprint, request
 from flask import render_template, current_app, url_for
 from flask_user import roles_required
+import json
 
 from ..audit import auditable_event
 from ..database import db
@@ -180,77 +181,65 @@ def practitioner_post():
     return jsonify(practitioner.as_fhir())
 
 
-# @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
-# @oauth.require_oauth()  # for service token access, oauth must come first
-# @roles_required([ROLE.ADMIN, ROLE.SERVICE])
-# def organization_put(organization_id):
-#     """Update organization via FHIR Resource Organization. New should POST
+@practitioner_api.route('/practitioner/<int:practitioner_id>',
+                        methods=('PUT',))
+@oauth.require_oauth()  # for service token access, oauth must come first
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+def practitioner_put(practitioner_id):
+    """Update practitioner via FHIR Resource Practitioner. New should POST
 
-#     Submit JSON format [Organization
-#     Resource](https://www.hl7.org/fhir/organization.html) to update an
-#     existing organization.
+    Submit JSON format [Practitioner
+    Resource](https://www.hl7.org/fhir/practitioner.html) to update an
+    existing practitioner.
 
-#     Include an **identifier** with system of
-#     http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
-#     alias for the organization, useful at `/go/<alias>`.  NB, including a
-#     partial list of identifiers will result in the non mentioned identifiers
-#     being deleted.  Consider calling GET first.
+    ---
+    operationId: practitioner_put
+    tags:
+      - Practitioner
+    produces:
+      - application/json
+    parameters:
+      - name: practitioner_id
+        in: path
+        description: TrueNTH practitioner ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: FHIRPractitioner
+          required:
+            - resourceType
+          properties:
+            resourceType:
+              type: string
+              description: defines FHIR resource type, must be Practitioner
+    responses:
+      200:
+        description:
+          Returns updated [FHIR Practitioner
+          resource](http://www.hl7.org/fhir/practitioner.html) in JSON.
+      400:
+        description:
+          if practitioner FHIR JSON is not valid
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
 
-#     A resource mentioned as partOf the given organization must exist as a
-#     prerequisit or a 400 will result.
-
-#     ---
-#     operationId: organization_put
-#     tags:
-#       - Organization
-#     produces:
-#       - application/json
-#     parameters:
-#       - name: organization_id
-#         in: path
-#         description: TrueNTH organization ID
-#         required: true
-#         type: integer
-#         format: int64
-#       - in: body
-#         name: body
-#         schema:
-#           id: FHIROrganization
-#           required:
-#             - resourceType
-#           properties:
-#             resourceType:
-#               type: string
-#               description: defines FHIR resource type, must be Organization
-#     responses:
-#       200:
-#         description:
-#           Returns updated [FHIR organization
-#           resource](http://www.hl7.org/fhir/patient.html) in JSON.
-#       400:
-#         description:
-#           if partOf resource does not exist
-#       401:
-#         description:
-#           if missing valid OAuth token or logged-in user lacks permission
-#           to view requested patient
-
-#     """
-#     if not request.json or 'resourceType' not in request.json or\
-#             request.json['resourceType'] != 'Organization':
-#         abort(400, "Requires FHIR resourceType of 'Organization'")
-#     org = Organization.query.get_or_404(organization_id)
-#     try:
-#         # As we allow partial updates, first obtain a full representation
-#         # of this org, and update with any provided elements
-#         complete = org.as_fhir(include_empties=True)
-#         complete.update(request.json)
-#         org.update_from_fhir(complete)
-#     except MissingReference, e:
-#         abort(400, str(e))
-#     db.session.commit()
-#     auditable_event("updated organization from input {}".format(
-#         json.dumps(request.json)), user_id=current_user().id,
-#         subject_id=current_user().id, context='organization')
-#     OrgTree.invalidate_cache()
-#     return jsonify(org.as_fhir(include_empties=False))
+    """
+    check_int(practitioner_id)
+    if (not request.json or 'resourceType' not in request.json or
+            request.json['resourceType'] != 'Practitioner'):
+        abort(400, "Requires FHIR resourceType of 'Practitioner'")
+    practitioner = Practitioner.query.get_or_404(practitioner_id)
+    try:
+        practitioner.update_from_fhir(request.json)
+    except MissingReference, e:
+        abort(400, str(e))
+    db.session.commit()
+    auditable_event("updated practitioner from input {}".format(
+        json.dumps(request.json)), user_id=current_user().id,
+        subject_id=current_user().id, context='user')
+    return jsonify(practitioner.as_fhir())
