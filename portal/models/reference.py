@@ -103,6 +103,7 @@ class Reference(object):
         """
         # Due to cyclic import problems, keep these local
         from .organization import Organization, OrganizationIdentifier
+        from .practitioner import Practitioner
         from .questionnaire import Questionnaire
         from .questionnaire_bank import QuestionnaireBank
         from .research_protocol import ResearchProtocol
@@ -124,7 +125,7 @@ class Reference(object):
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
-            (re.compile('[Pp]ractitioner/(\d+)'), User, 'id'),
+            (re.compile('[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
             (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
 
@@ -185,15 +186,17 @@ class Reference(object):
         :returns: the appropriate JSON formatted reference string.
 
         """
-        from .organization import Organization  # local to avoid cyclic import
-        from .user import User  # local to avoid cyclic import
+        # local to avoid cyclic import
+        from .organization import Organization
+        from .practitioner import Practitioner
+        from .user import User
 
         if hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name
         if hasattr(self, 'practitioner_id'):
-            ref = "api/practitioner/{}".format(self.patient_id)
-            display = User.query.get(self.patient_id).display_name
+            ref = "api/practitioner/{}".format(self.practitioner_id)
+            display = Practitioner.query.get(self.practitioner_id).display_name
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
             display = Organization.query.get(self.organization_id).name

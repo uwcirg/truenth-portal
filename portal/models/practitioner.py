@@ -14,6 +14,17 @@ class Practitioner(db.Model):
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
                              cascade="save-update, delete")
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "practitioner {0.id}".format(self)
+
+    @property
+    def display_name(self):
+        if self.first_name and self.last_name:
+            name = ' '.join((self.first_name, self.last_name))
+        name = name or 'Dr. {}'.format(self.last_name)
+        return escape(name)
+
     @property
     def phone(self):
         if self._phone:
