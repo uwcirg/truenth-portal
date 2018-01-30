@@ -375,7 +375,9 @@ def access_url(user_id):
     if set((ROLE.ACCESS_ON_VERIFY, ROLE.WRITE_ONLY)).isdisjoint(has):
         # KEEP this restriction.  Weak authentication (which the
         # returned URL provides) should only be available for these roles
-        abort(400, "Account {} lacks WRITE_ONLY role".format(user_id))
+        abort(
+            400,
+            "Access URL restricted to ACCESS_ON_VERIFY or WRITE_ONLY roles")
 
     # generate an access token
     token = user_manager.token_manager.generate_token(user_id)
