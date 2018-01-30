@@ -1481,7 +1481,7 @@ var fillContent = {
                     var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                     var authoredDate = String(entry["authored"]);
                     if (instrumentId) {
-                        var reportLink = "/patients/sessionReport/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var reportLink = "/patients/session-report/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
                         var rowText = "<tr title='{title}' {class}>" +
                                         "<td><a href='{link}'>{display}</a></td>" +
                                         "<td><a href='{link}'>{status}</a></td>" +
