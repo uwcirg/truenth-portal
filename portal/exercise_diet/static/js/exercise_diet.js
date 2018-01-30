@@ -47,6 +47,20 @@ $(function(){
         $(target).modal('show');
       }, 150);
     });
+    $(".watch-button-video").on("click", function(e) {
+        e.stopPropagation();
+        var src = $(".video-module").data("iframe-src");
+        if ($("video-module").find("iframe").length === 0) {
+            $(".video-module").append("<iframe src='" + src + "' allowfullscreen frameborder='0' />");
+        }
+        $(this).fadeOut();
+    });
+    $("#Recipe-Accordions [role='tabpanel']").on("shown.bs.collapse", function() {
+        $(this).addClass("visited");
+    });
+    $("#Recipe-Accordions [role='tabpanel']").on("hidden.bs.collapse", function() {
+        $(this).removeClass("visited");
+    });
 });
 
 function show_exercise(new_item, current_item) {
@@ -93,4 +107,12 @@ $(function(){
         return false;
     });
 
+});
+
+$(document).ready(function() {
+    if ($("#Exercise-Diet-Portal").length > 0) {
+        setTimeout(function() {
+            $("body").addClass("page-exercise-diet-portal");
+        }, 100);
+    }
 });

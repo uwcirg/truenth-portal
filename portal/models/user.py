@@ -27,6 +27,7 @@ from .fhir import Observation, UserObservation
 from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
+from .notification import UserNotification
 from .performer import Performer
 from .organization import Organization, OrgTree
 import reference
@@ -289,6 +290,9 @@ class User(db.Model, UserMixin):
                              cascade="save-update, delete")
     _alt_phone = db.relationship('ContactPoint', foreign_keys=alt_phone_id,
                                  cascade="save-update, delete")
+    notifications = db.relationship(
+        'Notification', secondary='user_notifications',
+        backref=db.backref('users', lazy='dynamic'))
 
     ###
     # PLEASE maintain merge_with() as user model changes #
@@ -1062,9 +1066,13 @@ class User(db.Model, UserMixin):
             # ignore internal system identifiers
             pre_existing = [ident for ident in self._identifiers
                             if ident.system not in internal_identifier_systems]
+            seen = []
             for identifier in fhir['identifier']:
                 try:
                     new_id = Identifier.from_fhir(identifier)
+                    if new_id in seen:
+                        abort(400, 'Duplicate identifiers found, should be unique set')
+                    seen.append(new_id)
                 except KeyError as e:
                     abort(400, "{} field not found for identifier".format(e))
                 except TypeError as e:

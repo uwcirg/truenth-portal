@@ -1,0 +1,29 @@
+{
+  "entry": [
+    {
+      "resourceType": "Notification",
+      "name": "website_terms_of_use_update",
+      "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> have been updated.</p>"
+    },
+    {
+      "resourceType": "Notification",
+      "name": "privacy_policy_update",
+      "content": "<p>The <a href=\"/privacy\" target=\"_blank\">privacy policy</a> has been updated.</p>"
+    },
+    {
+      "resourceType": "Notification",
+      "name": "subject_website_consent_update",
+      "content": "<p>Hi, we've updated our website consent below. Please read through and accept these terms to use TrueNTH.</p>"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2017-11-22T00:23:12.618942Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}

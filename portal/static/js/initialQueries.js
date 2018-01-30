@@ -14,6 +14,14 @@
         return false;
     });
   };
+
+  function __convertToNumericField(field) {
+    if (field) {
+        if (_isTouchDevice()) {
+            field.each(function() {$(this).prop("type", "tel");});
+        };
+    };
+  };
   /*
    * helper class to keep track of missing fields based on required/needed core data
    */
@@ -44,6 +52,7 @@
     this.defaultSections = {};
     this.incompleteFields = [];
     this.dependencies = dependencies || {};
+    this.currentSection = "";
 
   };
 
@@ -51,11 +60,44 @@
     var self = this;
     this.initConfig(function(data) {
       self.initSections();
+      self.initSectionData(data);
       if (callback) {
         callback(data);
       };
     });
   };
+
+  FieldsChecker.prototype.initSectionData = function(data) {
+    var self = this;
+    var sections = self.getSections();
+    /*
+     * note: only populate data for still needed section(s)
+     *
+     */
+    for (var section in sections) {
+      if (!hasValue(self.currentSection)
+          && self.inConfig(sections[section].config, data)) {
+        self.initData(section);
+        self.currentSection = section;
+      }
+    }
+  }
+
+  FieldsChecker.prototype.initData = function(section) {
+    var tnthAjax = this.__getDependency("tnthAjax");
+    if (this.mainSections[section] && this.mainSections[section].initData) {
+      this.mainSections[section].initData();
+    };
+    this.currentSection = section;
+  }
+
+  FieldsChecker.prototype.getSections = function() {
+      var sections = this.defaultSections;
+      if (Object.keys(this.mainSections).length > 0) {
+        sections = this.mainSections;
+      }
+      return sections;
+  }
 
   FieldsChecker.prototype.initSections = function() {
     var self = this;
@@ -93,6 +135,12 @@
                       fields: [$("#topTerms [data-type='terms'][data-required='true']")]
                   }
                 },
+                initData: function() {
+                  tnthAjax.getTerms($("#iq_userId").val(), false, false, function() {
+                              $("#termsCheckbox").attr("loaded", "true");
+                          }, {"all": true});
+                  tnthAjax.getTermsUrl();
+                },
                 handleIncomplete: function() {
                   $("#aboutForm").addClass("full-size");
                   $("#topTerms").removeClass("hide-terms").show();
@@ -127,6 +175,14 @@
                 "bdGroup": {
                     fields: [$("#month"), $("#date"), $("#year")]
                   }
+                },
+                initData: function() {
+                  tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
+                      $("#nameGroup").attr("loaded", "true");
+                      $("#rolesGroup").attr("loaded", "true");
+                      $("#bdGroup").attr("loaded", "true");
+                  });
+                  __convertToNumericField($("#date, #year"));
                 }
             },
             "clinicalContainer": {
@@ -136,6 +192,13 @@
                   "patientQ": {
                     fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")]
                   }
+                },
+                initData: function() {
+                  tnthAjax.getTreatment($("#iq_userId").val(), function() {
+                    tnthAjax.getClinical($("#iq_userId").val(), function() {
+                      $("#patientQ").attr("loaded", "true");
+                    });
+                  });
                 }
             },
             "orgsContainer": {
@@ -145,6 +208,26 @@
                 subsections:{
                   "clinics": {
                     fields: [$("#userOrgs input[name='organization']")]
+                  }
+                },
+                initData: function() {
+                  /*
+                   * for patient, clinic is drawn in orgs state selector template
+                   */
+                  if (!hasValue($("#iqPatientEditable").val())) {
+                    tnthAjax.getOrgs($("#iq_userId").val(), false, true, function() {
+                        var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
+                        if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
+                        var checkedOrgs = {};
+                        userOrgs.each(function() {
+                            if ($(this).prop("checked")) {
+                                checkedOrgs[$(this).val()] = true;
+                            };
+                            $(this).attr("type", "radio");
+                            if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+                        });
+                        $("#clinics").attr("loaded", true);
+                    });
                   }
                 },
                 handleIncomplete: function() {
@@ -440,7 +523,7 @@
     $("div.reg-complete-container").fadeIn();
     $("html, body").stop().animate({
       scrollTop: $("div.reg-complete-container").offset().top
-    }, 2000);
+    }, 1500);
     $("#next").attr("disabled", true).removeClass("open");
     $("#iqErrorMessage").text("");
     $("#updateProfile").removeAttr("disabled").addClass("open");
@@ -493,11 +576,22 @@
 
   FieldsChecker.prototype.sectionsLoaded = function() {
     var self = this, isLoaded = true;
-    for (var section in self.mainSections) {
+    if (hasValue(self.currentSection)) {
       if (isLoaded) {
-        for (var subsectionId in self.mainSections[section].subsections) {
-          if (!$("#" + subsectionId).attr("loaded")) {
+        for (var subsectionId in self.mainSections[self.currentSection].subsections) {
+          if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
             isLoaded = false;
+          };
+        };
+      };
+    } else {
+      //check all if current section not available
+      for (var section in self.mainSections) {
+        if (isLoaded) {
+          for (var subsectionId in self.mainSections[section].subsections) {
+            if (!$("#" + subsectionId).attr("loaded")) {
+              isLoaded = false;
+            };
           };
         };
       };
@@ -569,6 +663,14 @@
        }, 1000);
     });
 
+    $(window).bind("scroll mousedown mousewheel keyup", function(e){
+        if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
+          if ($("html, body").is(":animated")) {
+            $("html, body").stop(true, true);
+          }
+        }
+    });
+
     //if term of use form not present - need to show the form
     if ($("#topTerms").length === 0)  {
       $("#aboutForm").fadeIn();
@@ -578,6 +680,13 @@
       };
     } else {
       if (!self.sectionCompleted("topTerms")) {
+        if ($("#notificationBanner").is(":visible")) {
+          $("#notificationBanner .close").hide();
+          //subject website consent
+          if ($("#notificationBanner [data-id]").length > 0) {
+            $("#notificationBanner .notification-info").trigger("click");
+          }
+        };
         self.handleIncomplete("topTerms");
       } else {
         $("#aboutForm").removeClass("full-size");
@@ -646,7 +755,31 @@
             $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
           };
 
+          //adding css rule here so the checkbox won't be hidden on click
+          $(this).attr("current", "true");
           $(this).attr("data-agree","true");
+
+          //delete relevant notifications
+          var coreTypes = [];
+          var parentCoreType = $(this).attr("data-core-data-type");
+          if (hasValue(parentCoreType)) {
+            coreTypes.push(parentCoreType);
+          };
+          $(this).closest("label").find("[data-core-data-type]").each(function() {
+            coreTypes.push($(this).attr("data-core-data-type"));
+          });
+          /*
+           * need to delete notification for each corresponding coredata terms type
+           * once user has agreed
+           */
+          if (coreTypes.length > 0) {
+            coreTypes.forEach(function(type) {
+              var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
+              if (notificationEntry.length > 0) {
+                tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+              }
+            });
+          }
         };
 
         if (__self.sectionCompleted("topTerms")) {
@@ -717,25 +850,17 @@
         var d = $("#date");
         var m = $("#month");
         var y = $("#year");
-        if (d.val() !== "" && m.val() !== "" && y.val() !== "") {
-          if (this.validity.valid) {
-              var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-              if (isValid) {
-                $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
-                $("#errorbirthday").text("").hide();
-                assembleContent.demo($("#iq_userId").val());
-                if (self.allFieldsCompleted()) {
-                   self.continueToFinish();
-                } else {
-                  if (self.sectionCompleted("demographicsContainer")) {
-                    self.continueToNext("demographicsContainer");
-                  };
-                };
-              } else {
-                self.stopContinue("demographicsContainer");
-              };
+        var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+        if (isValid) {
+          $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
+          $("#errorbirthday").text("").hide();
+          assembleContent.demo($("#iq_userId").val());
+          if (self.allFieldsCompleted()) {
+             self.continueToFinish();
           } else {
-            self.stopContinue("demographicsContainer");
+            if (self.sectionCompleted("demographicsContainer")) {
+              self.continueToNext("demographicsContainer");
+            };
           };
         } else {
           self.stopContinue("demographicsContainer");

@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 import json
 import os
+from urllib import quote_plus
 
 from portal.extensions import db
 from portal.system_uri import (
@@ -12,8 +13,12 @@ from portal.system_uri import (
 from portal.models.coding import Coding
 from portal.models.identifier import Identifier
 from portal.models.locale import LocaleConstants
-from portal.models.organization import Organization, OrgTree
-from portal.models.organization import OrganizationIdentifier
+from portal.models.organization import (
+    LocaleExtension,
+    Organization,
+    OrganizationIdentifier,
+    OrgTree)
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -126,7 +131,7 @@ class TestOrganization(TestCase):
         self.assert200(rv)
 
     def test_organization_get_by_identifier(self):
-        org_id_system = "testsystem"
+        org_id_system = "http://test/system"
         org_id_value = "testval"
         self.login()
         org = Organization(name='test',id=999)
@@ -141,9 +146,11 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization/{}/{}'.format(org_id_system,
-                                            org_id_value))
+        rv = self.client.get('/api/organization?system={system}&value={value}'.format(
+            system=quote_plus(org_id_system), value=org_id_value))
         self.assert200(rv)
+        self.assertEquals(rv.json['total'], 1)
+        self.assertEquals(rv.json['entry'][0]['id'], 999)
 
     def test_organization_list(self):
         count = Organization.query.count()
@@ -308,6 +315,63 @@ class TestOrganization(TestCase):
         self.assertEquals(org.default_locale, 'en_AU')
         self.assertEquals(org.locales[0], en_AU)
         self.assertEquals(org.timezone, 'US/Pacific')
+
+    def test_organization_extension_update(self):
+        # confirm clearing one of several extensions works
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        en_AU = LocaleConstants().AustralianEnglish
+
+        # Populate db with complet org, and set many fields
+        org = Organization(
+            name='test', phone='800-800-5665', timezone='US/Pacific')
+        org.identifiers.append(Identifier(
+            value='state:NY', system=PRACTICE_REGION))
+        org.locales.append(en_AU)
+        org.default_locale = 'en_AU'
+        rp = ResearchProtocol(name='rp1')
+
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.add(org)
+            db.session.commit()
+        org, rp = map(db.session.merge, (org, rp))
+        org_id, rp_id = org.id, rp.id
+        org.research_protocol_id = rp_id
+        data = org.as_fhir()
+        input = {k: v for k, v in data.items() if k in (
+            'name', 'resourceType')}
+
+        # Replace locale extension with null value, copy
+        # over others.
+        input['extension'] = [
+            e for e in data['extension']
+            if e['url'] != LocaleExtension.extension_url]
+        input['extension'].append({'url': LocaleExtension.extension_url})
+
+        rv = self.client.put(
+            '/api/organization/{}'.format(org_id),
+            content_type='application/json',
+            data=json.dumps(input))
+        self.assert200(rv)
+
+        # Pull the updated db entry
+        org = Organization.query.get(org_id)
+        en_AU = db.session.merge(en_AU)
+
+        # Confirm all the unmentioned entries survived
+        self.assertEquals(org.phone, '800-800-5665')
+        self.assertEquals(org.default_locale, 'en_AU')
+        self.assertEquals(org.locales.count(), 0)
+        self.assertEquals(org.timezone, 'US/Pacific')
+        self.assertEquals(org.research_protocol_id, rp_id)
+
+        # Confirm empty extension isn't included in result
+        results = json.loads(rv.data)
+        for e in results['extension']:
+            assert 'url' in e
+            assert len(e.keys()) > 1
 
     def test_organization_post(self):
         with open(os.path.join(

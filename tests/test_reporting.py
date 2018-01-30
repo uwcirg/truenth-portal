@@ -6,6 +6,7 @@ from re import search
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
+from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
@@ -121,6 +122,14 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        # test user with status = 'Expired' (should not show up)
+        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
+        self.assertEqual(a_s.overall_status, 'Expired')
+
+        ostats = overdue_stats_by_org()
+        self.assertEqual(len(ostats), 0)
+
+        # test user with status = 'Overdue' (should show up)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv.id, backdate=relativedelta(days=18))
         with SessionScope(db):
@@ -128,8 +137,10 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
-        ostats = overdue_stats_by_org()
+        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
+        self.assertEqual(a_s.overall_status, 'Overdue')
 
+        ostats = overdue_stats_by_org()
         self.assertEqual(len(ostats), 1)
         self.assertEqual(ostats[crv], [15])
 

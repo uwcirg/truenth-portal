@@ -709,6 +709,20 @@ class OrgTree(object):
 
         return orgs_list
 
+    @staticmethod
+    def all_ids_with_rp(research_protocol):
+        """Returns set of org IDs that are associated with Research Protocol
+
+        As child orgs are considered to be associated if the parent org
+        is, this will return the full list for optimized comparisons.
+
+        """
+        results = set()
+        for o in Organization.query.all():
+            if research_protocol == o.research_protocol:
+                results.add(o.id)
+        return results
+
     def visible_patients(self, staff_user):
         """Returns patient IDs for whom the current staff_user can view
 

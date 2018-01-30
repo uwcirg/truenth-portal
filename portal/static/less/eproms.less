@@ -78,6 +78,7 @@
 @labelColor: #777;
 @inputHeight: 2.5em;
 @wellColor: #F7F7F7;
+@notificationBgColor: #7c959d;
 
 
 /**
@@ -521,6 +522,71 @@ select:not([multiple]) {
     height: auto;
   }
 }
+
+#notificationBanner {
+  display: none;
+  position: absolute;
+  left: 0;
+  z-index: 1000;
+  background-color: @notificationBgColor;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+  right: 0;
+  padding: 0;
+  color: #FFF;
+  .content {
+    width: 650px;
+    max-width: 100%;
+    background-color: @notificationBgColor;
+    margin: auto;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+  .fa-info-circle {
+    margin-right: 4px;
+  }
+  .notification-info {
+    cursor: pointer;
+    width: 500px;
+    max-width: 100%;
+    margin: auto;
+    letter-spacing: 1px;
+    &:hover {
+      color: @linkHover;
+    }
+  }
+  .notification {
+    display: none;
+    max-width: 100%;
+    padding: 2px;
+    p {
+      margin: 0.1em auto;
+      border-bottom: 1px solid #7777;
+      padding: 0.1em;
+    }
+  }
+  .notification.active {
+    display: block;
+  }
+  a {
+    color: #FFF;
+    text-decoration:underline;
+    &:hover {
+      color: @linkHover;
+    }
+  }
+  &, span {
+    font-size: 7pt;
+  }
+  .close {
+    color: #000;
+    position: fixed;
+    z-index: 2001;
+    right: 0;
+    top: 0;
+    margin-top: 4px;
+    margin-right: 1em;
+  }
+}
 div.right-panel {
   position:relative;
   max-width: 991px;
@@ -568,6 +634,11 @@ div.footer-wrapper.right-panel {
   .required-link {
     font-weight: normal;
     text-decoration: underline;
+  }
+  #termsCheckbox[data-reconsent] {
+    label.terms-label[data-agree='true']:not([current]) {
+      display: none !important;
+    }
   }
 }
 .terms-tick-box {
@@ -1663,7 +1734,9 @@ div.footer-wrapper.right-panel {
     margin-right: 1em;
     z-index: 10;
     height: 2.5em;
-    width: 70px;
+    width: auto;
+    outline: 0;
+    white-space: nowrap;
     padding: 0 0.7em;
     color: #FFF;
     background: @btnColor;
@@ -1676,17 +1749,6 @@ div.footer-wrapper.right-panel {
   .profile-item-edit-btn:focus {
     color: #FFF;
     background-color: @linkHover;
-  }
-  .profile-item-edit-btn::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0.5em;
-    left: 0;
-    bottom: 0;
-    right: 0;
-  }
-  .profile-item-container.edit .profile-item-edit-btn::before {
-    content: attr(data-text);
   }
   .profile-item-container .edit-container {
     display: none;
@@ -3006,6 +3068,12 @@ div.timezone-warning.text-warning {
     background-repeat: no-repeat;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=);
     padding-right: 1.5em;
+  }
+  #notificationBanner {
+    padding: 0.1em 1em;
+    &, span {
+      font-size: 1em;
+    }
   }
   #patientListOptions,
   #staffListOptions {

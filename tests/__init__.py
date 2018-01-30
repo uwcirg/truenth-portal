@@ -142,6 +142,12 @@ class TestCase(Base):
             db.session.commit()
         return db.session.merge(service_user)
 
+    def add_system_user(self, sponsor=None):
+        """create and return system user expected for some tasks """
+        sysusername = '__system__'
+        if not User.query.filter_by(username=sysusername).first():
+            return self.add_user(sysusername, 'System', 'Admin')
+
     def add_required_clinical_data(self, backdate=None):
         """Add clinical data to get beyond the landing page
 

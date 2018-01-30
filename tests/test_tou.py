@@ -6,7 +6,10 @@ from flask_webtest import SessionScope
 from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.organization import Organization
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.tou import ToU
+from portal.tasks import deactivate_tous
 
 
 tou_url = 'http://fake-tou.org'
@@ -132,3 +135,66 @@ class TestTou(TestCase):
         # test deactivating all types
         self.test_user.deactivate_tous(self.test_user)
         self.assertFalse(all((pptou.active, wtou.active)))
+
+    def test_deactivate_tous_by_org(self):
+        timestamp = datetime.utcnow()
+
+        self.add_system_user()
+        self.shallow_org_tree()
+        parent = Organization.query.get(101)
+        child = Organization.query.get(1001)  # child of 101
+        lonely_leaf = Organization.query.get(102)
+        staff = self.add_user('staff')
+        staff_id = staff.id
+        self.promote_user(staff, 'staff')
+        staff.organizations.append(parent)
+        second_user = self.add_user('second@foo.bar')
+        second_user_id = second_user.id
+        self.promote_user(second_user, 'patient')
+        second_user.organizations.append(lonely_leaf)
+        self.promote_user(self.test_user, 'patient')
+        self.test_user.organizations.append(child)
+
+        def gentou(user_id, type):
+            return ToU(
+                audit=Audit(
+                    user_id=user_id, subject_id=user_id, timestamp=timestamp),
+                agreement_url=tou_url, type=type)
+
+        pptou = gentou(TEST_USER_ID, 'privacy policy')
+        pptou_2 = gentou(second_user_id, 'privacy policy')
+        pptou_staff = gentou(staff_id, 'privacy policy')
+
+        wtou = gentou(TEST_USER_ID, 'website terms of use')
+        wtou_2 = gentou(second_user_id, 'website terms of use')
+        wtou_staff = gentou(staff_id, 'website terms of use')
+
+        tous = (pptou, pptou_2, pptou_staff, wtou, wtou_2, wtou_staff)
+        with SessionScope(db):
+            for t in tous:
+                db.session.add(t)
+            db.session.commit()
+        self.test_user, second_user, staff, parent = map(
+            db.session.merge, (self.test_user, second_user, staff, parent))
+        pptou, pptou_2, pptou_staff, wtou, wtou_2, wtou_staff = map(
+            db.session.merge, tous)
+
+        # confirm active
+        self.assertTrue(all((
+            pptou.active, pptou_2.active, wtou.active, wtou_2.active)))
+
+        # test deactivating single type by org - should miss second user
+        kwargs = {'types': ['privacy policy'], 'organization': '101'}
+        deactivate_tous(**kwargs)
+        self.assertFalse(pptou.active)
+        self.assertFalse(pptou_staff.active)
+        self.assertTrue(all(
+            (pptou_2.active, wtou.active, wtou_2.active, wtou_staff.active)))
+
+        # test limiting to staff on org both staff and test_user belong to
+        # only hits staff
+        kwargs['types'] = ['website terms of use']
+        kwargs['roles'] = ['staff', 'staff_admin']
+        deactivate_tous(**kwargs)
+        self.assertFalse(wtou_staff.active)
+        self.assertTrue(all((pptou_2.active, wtou.active, wtou_2.active)))

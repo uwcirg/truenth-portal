@@ -6,6 +6,33 @@
 /* row hover: 20% of #cde5be; = rgba(205, 229, 190, 0.2) */
 /* cell hover: 10% of #5f7783; = rgba(95, 119, 131, 0.1) */
 
+.watermark {
+    top: 0;
+    padding: 0;
+    z-index: 3000;
+    width: 100%;
+    color: #000;
+    min-height: 20px;
+}
+
+body.page-exercise-diet-portal footer {
+    margin: 0 1.31em;
+}
+@media (min-width: 401px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 1.35em;
+    }
+}
+
+@media (min-width: 900px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 2em;
+    }
+}
+
+body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
+    margin-top: 2em;
+}
 
 #Exercise-Diet-Portal {
 	position: relative;
@@ -20,7 +47,7 @@
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 35px;
+    font-size: 28px;
     line-height: 40px;
     text-align: center;
     padding: 100px 10px 0px;
@@ -35,11 +62,41 @@
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 35px;
+    font-size: 28px;
     line-height: 40px;
     text-align: center;
     padding: 1px 10px 1px;
     max-width: 740px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: 30px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: 35px;
+    }
+}
+#Exercise-Diet-Portal .intro-content,
+#Exercise-Diet-Portal .objective-content
+ {
+    width: 780px;
+    max-width: 100%;
+    padding: 1em 1em;
+}
+
+#Exercise-Diet-Portal .intro-content {
+    padding-top: 1em;
+}
+
+@media (min-width: 900px) {
+    #Exercise-Diet-Portal .intro-content {
+        padding-top: 7em;
+        margin-top: 5em;
+    }
 }
 hr.objective {
 	margin: 10px auto 30px;
@@ -58,7 +115,7 @@ hr.objective {
     background: rgb(124, 149, 158);
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 18px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
@@ -68,6 +125,16 @@ hr.objective {
     width: 250px;
     margin-top: 40px;
 }
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 22px;
+    }
+}
 
 #Exercise-Diet-Portal .watch-button-video {
     margin: 0px 0px 10px;
@@ -76,7 +143,7 @@ hr.objective {
     background: rgb(124, 149, 158);
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
@@ -85,12 +152,19 @@ hr.objective {
     padding: 25px;
     width: 250px;
     margin-top: 40px;
-
+    cursor: pointer;
     position: absolute;
-    top: 75%;
-    left: 50%;
+    top: 30%;
+    left: 45%;
     margin-left: -109px;
-    margin-top: -36px;
+    margin-top: 0.5em;
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal .watch-button-video {
+        font-size: 22px;
+        top: 60%;
+        left: 50%;
+    }
 }
 
 #Exercise-Diet-Portal p {
@@ -101,12 +175,21 @@ hr.objective {
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 25px;
+    font-size: 18px;
     line-height: 32px;
 	letter-spacing: .03em;
-    text-align: center;
-    padding: 20px 0px;
-    max-width: 780px;
+    text-align: left;
+    padding: 20px 12px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal p {
+        font-size: 20px;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal p {
+        font-size: 25px;
+    }
 }
 
 .objective-content p:last-child {
@@ -141,7 +224,8 @@ hr.objective {
 #Exercise-Diet-Portal ul {
 	margin: 0px auto;
 	padding: 0px;
-	max-width: 768px;
+	width: 768px;
+    max-width: 100%;
 }
 #Exercise-Diet-Portal ul li {
 	position: relative;
@@ -150,7 +234,7 @@ hr.objective {
     color: #fff;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 26px;
+    font-size: 18px;
     line-height: 1.3em;
 	letter-spacing: .03em;
     text-align: left;
@@ -159,9 +243,24 @@ hr.objective {
     background-position: left 10px;
 	padding-left: 20px;
     padding-bottom: 5px;
-    margin-left: 20px;
+    margin-left: 0;
     list-style-position: outside;
     list-style-type: none;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: 20px;
+    }
+}
+@media (min-width: 558px) {
+    #Exercise-Diet-Portal ul li {
+        margin-left: 20px;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: 25px;
+    }
 }
 #Exercise-Diet-Portal img {
 	margin: 0px auto;
@@ -214,85 +313,82 @@ img.objective-background  {
 }
 */
 
-
-
-
 .intro-module.intro-intro  {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/mountains.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: top center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-*/
-/* 	width: 100%; */
+    position: relative;
+    margin-top: -4em;
     height: 700px;
+}
+@media (min-width: 900px) {
+    .intro-module.intro-intro  {
+        margin-top: -6em;
+    }
 }
 .video-module.video-testimonial-hero {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/video-testimonial-hero.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: center center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-	width: 100%;
-*/
-    height: 600px;
-    top: 700px;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-position: top center;
+    overflow: hidden;
 }
-
-img.video-testimonial-hero {
+.video-module iframe {
+    position: absolute;
     left: 20px;
     width: calc(100% - 40px);
-    position: relative;
-    max-width: 100%;
-    vertical-align: middle;
+    height: 100%;
+    top: 0;
+}
+@media (min-width: 900px) {
+    .video-module iframe {
+        position: absolute;
+        left: 28px;
+        width: calc(100% - 56px);
+        height: 100%;
+        top: 0;
+    }
 }
 
-.objective-module.objective-background  {
-/*
-    position: absolute;
-    display: block;
-*/
-/*     background-image: url('../img/objective-background.jpg'); */
-/*
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: top center;
-    border: none;
-    padding: 0px 0px 0px 0px;
-	width: 100%;
-*/
-    height: 700px;
-    top: 1300px;
+.video-module img {
+    visibility: hidden !important;
+    width: calc(100% - 50px) !important;
+    position: relative;
+    margin: 0;
+    top: 0;
+    padding: 0;
 }
+@media (min-width: 699px) {
+    .video-module img {
+        width: calc(100% - 65px) !important;
+    }
+}
+@media (min-width: 900px) {
+    .video-module img {
+        width: calc(100% - 87px) !important;
+    }
+}
+@media (min-width: 1100px) {
+    .video-module.video-testimonial-hero {
+        background-position: 100%;
+    }
+}
+
+@media (min-width: 1376px) {
+    .video-module img {
+        width: calc(100% - 97px) !important;
+    }
+}
+
 .intro-module, .video-module, .objective-module {
 	margin: 0px auto;
 	z-index: 0;
 	text-align: center;
-
-	position: absolute;
     display: block;
-/*     background-image: url('../img/objective-background.jpg'); */
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: scroll;
     background-position: top center;
     border: none;
-    padding: 0px 0px 0px 0px;
+    padding: 0px 0px 40px 0px;
 	width: 100%;
 }
 .intro-content {
@@ -312,12 +408,18 @@ img.video-testimonial-hero {
 }
 .toolbox {
 	position: relative;
-	max-width: 715px;
-	max-height: 137px;
+	width: 715px;
+    max-width: 100%;
+	height: 12em;
     background: rgba(57, 56, 51, 0.8);
 	padding: 10px;
 	margin: 10px auto;
 	display: flex;
+}
+@media (min-width: 585px) {
+    .toolbox {
+        height: 9em;
+    }
 }
 .toolbox h6 {
     color: rgb(169, 178, 183);
@@ -372,16 +474,22 @@ img.video-testimonial-hero {
     background: #8F9385;
     font-family: helvetica, arial, sans-serif;
     font-style: normal;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 26px;
     letter-spacing: 5px;
     display: inline-block;
     text-transform: uppercase;
     text-align: center;
-    padding: 25px;
+    padding: 6px;
     width: 210px;
     margin: 20px 10px 20px;
     height: 70px;
+}
+@media (min-width: 518px) {
+    .toolbox-start-button {
+        font-size: 22px;
+        padding: 25px;
+    }
 }
 
 .toolbox .icon-box {
@@ -516,6 +624,14 @@ h2 a {
 	margin: 20px auto 100px;
 	padding: 0px;
 	max-width: 628px;
+}
+
+#Recipe-Accordions [role='tabpanel'] {
+    opacity: 0.1;
+    transition: opacity 150ms ease-in-out;
+}
+#Recipe-Accordions [role='tabpanel'].visited {
+    opacity: 1;
 }
 
 .healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
@@ -664,7 +780,12 @@ td.collapse.in a:focus {
 }
 
 /*   new styling change id?  */
-
+img.recipe-table-image {
+    -webkit-transition: transform 300ms ease-in-out;
+    -o-transition: transform 300ms ease-in-out;
+    -moz-transition: transform 300ms ease-in-out;
+    transition: transform 300ms ease-in-out;
+}
 #healthy-fats.collapse.in img.recipe-table-image {
 	position: relative;
     border: 1px solid transparent;
@@ -4781,6 +4902,12 @@ div#supplements.modal.fade.in h4 b, strong {
 /* ======================================================================================== */
 /* ======================================================================================== */
 
+#recipe-modal .btn.btn-secondary-top {
+    position: relative;
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
 #recipe-modal img {
 	padding: 0px;
 	z-index: 1;

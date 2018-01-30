@@ -328,7 +328,7 @@ def update_card_html_on_completion():
                 return thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.top_organization.name)
-            raise ValueError("Unexpected state generating intro_heml")
+            raise ValueError("Unexpected state generating intro_html")
 
         def completed_card_html(assessment_status):
             """Generates the appropriate HTML for the 'completed card'"""
@@ -380,10 +380,12 @@ def update_card_html_on_completion():
         ####
         if assessment_status.overall_status in (
                 'Due', 'Overdue', 'In Progress'):
+
+            link_label = _(u'Go to questionnaire')
             # User has unfinished baseline assessment work
-            link_label = 'Continue questionnaire' if (
-                assessment_status.overall_status == 'In Progress') else (
-                    'Go to questionnaire')
+            if assessment_status.overall_status == 'In Progress':
+                link_label = _(u'Continue questionnaire')
+
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
             card_html = u"""
@@ -603,7 +605,7 @@ def combine_strategies(**kwargs):
         strats.append(func(**func_kwargs))
 
     def call_all_combined(intervention, user):
-        "Returns True if ALL of the combined strategies return True"
+        """Returns True if ALL of the combined strategies return True"""
         for strategy in strats:
             if not strategy(intervention, user):
                 _log(
@@ -617,7 +619,7 @@ def combine_strategies(**kwargs):
         return True
 
     def call_any_combined(intervention, user):
-        "Returns True if ANY of the combined strategies return True"
+        """Returns True if ANY of the combined strategies return True"""
         for strategy in strats:
             if strategy(intervention, user):
                 _log(

@@ -1,0 +1,1023 @@
+{% from "initial_queries_macros.html" import patientQGroup, consent_fields %}
+
+{% macro profileImage(person) -%}
+    {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
+{%- endmacro %}
+
+{% macro profileDemo(person, current_user) -%}
+    <div class="row" data-profile-section-id="demo">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="profile-item-container editable" data-sections="demo">
+                <h4 id="patientInformationLoc" class="profile-item-title index-item">
+                    {% if person.id == current_user.id -%}
+                        {{_("My Information")}}
+                    {% else %}
+                        {% if person.has_role(ROLE.PATIENT) -%}
+                            {{_("Patient Information") }}
+                        {%- else%}
+                            {{_("User Information") }}
+                        {%- endif%}
+                    {% endif %}
+                </h4>
+                <div class="view-container">
+                   <table>
+                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
+                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
+                   </table>
+                </div>
+                <div class="edit-container">
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
+                    {{profileEmail(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(current_user)}} {% endif %}
+                    {% if person.has_role('patient') %} {{profileSiteID(current_user)}} {% endif %}
+                    {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
+                </div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileDemoDetail(person, current_user) -%}
+    <div class="row" data-profile-section-id="demodetail">
+        <div class="col-md-12 col-xs-12">
+          <div class="profile-item-container patient-detail-container editable" data-sections="detail">
+                <h4 id="patientDetailLoc" class="profile-item-title index-item">
+                    {% if person.id == current_user.id -%}
+                        {{_("My Detail")}}
+                    {%- else %}
+                        {% if person.has_role('patient') %}
+                            {{_("Patient Detail")}}
+                        {%else%}
+                            {{_("User Detail")}}
+                        {%endif%}
+                    {%- endif %}
+                </h4>
+                <div class="view-container">
+                    <table>
+                        <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+                        <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                        <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                        <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                     </table>
+                </div>
+                <div class="flex edit-container">
+                    {{profileGender(person)|show_macro('gender')}}
+                    {{profileEthnicity(person)|show_macro('ethnicity')}}
+                    {{profileRace(person)|show_macro('race')}}
+                </div>
+                <div class="no-data-container"></div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileBirthDate(person) -%}
+    <div class="form-group profile-section" id="bdGroup" data-profile-section-id="birthday">
+        <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
+        <div class="flex">
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" required />
+            </div>
+            <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
+                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" required>
+                    <option value="">{{ _("Month") }}...</option>
+                    <option value="01">{{ _("January") }}</option>
+                    <option value="02">{{ _("February") }}</option>
+                    <option value="03">{{ _("March") }}</option>
+                    <option value="04">{{ _("April") }}</option>
+                    <option value="05">{{ _("May") }}</option>
+                    <option value="06">{{ _("June") }}</option>
+                    <option value="07">{{ _("July") }}</option>
+                    <option value="08">{{ _("August") }}</option>
+                    <option value="09">{{ _("September") }}</option>
+                    <option value="10">{{ _("October") }}</option>
+                    <option value="11">{{ _("November") }}</option>
+                    <option value="12">{{ _("December") }}</option>
+                </select>
+            </div>
+            <div class="flex-item" id="bdYearContainer" data-loader-container="true">
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" required />
+            </div>
+        </div>
+        <div class="help-block with-errors"></div>
+        <div id="errorbirthday" class="error-message"></div>
+        <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}" />
+     </div>
+{%- endmacro %}
+
+{% macro profileLocale(person) -%}
+    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true" data-profile-section-id="locale">
+        <label for="locale">{{ _("Language") }}</label>
+        <select class="form-control" name="locale" id="locale">
+            {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
+                <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
+            {%- endfor -%}
+        </select>
+        <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
+        <div class="get-demo-error get-locale-error error-message"></div>
+        <div class="put-demo-error error-message"></div>
+     </div>
+{%- endmacro %}
+
+{% macro profileName(person, isFocus=False) -%}
+    <div class="form-group profile-name-label"><label>{{ _("Name") }}</label></div>
+    <div class="row profile-section name-section" data-profile-section-id="name">
+        <div id="firstNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 first-name-container" data-loader-container="true">
+            <div id="firstNameGroup" class="form-group float-input-label">
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname"/>
+                <div class="help-block with-errors"></div>
+                <div id="errorfirstname" class="error-message"></div>
+            </div>
+        </div>
+        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
+            <div id="lastNameGroup" class="form-group float-input-label">
+                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true"/>
+                <div class="help-block with-errors"></div>
+                <div id="errorlastname" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileGender(person) -%}
+    <div class="form-group profile-section flex-item" id="genderGroup" data-profile-section-id="gender">
+        <label id="genderLabel">{{ _("Gender") }}</label>
+        <div id="profile-gender-list" class="profile-radio-list" data-loader-container="true">
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
+                {{ _("Male") }}
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person and person.gender == "female"}}/>
+                {{ _("Female") }}
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person and person.gender == "other"}}/>
+                {{ _("Other") }}
+            </label>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileIndigenous(person) -%}
+    {%- if person and person.org_coding_display_options.indigenous -%}
+        <div id="userIndigenousStatusContainer" data-section-id="indigenous" class="flex-item" data-profile-section-id="indigenous"></div>
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro profileRace(person) -%}
+    {%- if person and person.org_coding_display_options.race -%}
+        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace" data-loader-container="true" data-profile-section-id="race">
+            <label>{{ _("Race") }}</label>
+            <div class="profile-radio-list">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="1002-5">{{ _("American Indian or Alaska Native") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2028-9">{{ _("Asian") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2054-5">{{ _("Black or African American") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2076-8">{{ _("Native Hawaiian or Other Pacific Islander") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2106-3">{{ _("White") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2131-1">{{ _("Other") }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro profileEthnicity(person) -%}
+    {%- if person and person.org_coding_display_options.ethnicity -%}
+        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" data-loader-container="true" id="userEthnicity" data-profile-section-id="ethnicity">
+            <label>{{ _("Ethnicity") }}</label>
+            <div class="profile-radio-list">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2135-2">{{ _("Hispanic or Latino") }}
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2186-5">{{ _("Not Hispanic or Latino") }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro profileEmail(person) -%}
+    <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail" data-loader-container="true" data-profile-section-id="email">
+        <label for="email">{{_("Email Address")}}</label>
+        <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT)%}data-optional="true"{% else %}required{% endif %} />
+        <div class="help-block with-errors" id="erroremail"></div>
+    </div>
+{%- endmacro %}
+{% macro profileEmailForm(person) -%}
+    {%- if person -%}
+        <div id="sendEmailForm" data-profile-section-id="patientemailform">
+            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+            <div class="registration-status-container">
+                <span class="text-muted">{{_('Registration status:')}}</span>
+                {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
+                {%- else -%}
+                <h4 class="text-success registration-label">{{_('registered')}}</h4>
+                {%- endif -%}
+            </div>
+            <label id="sendEmailLabel" class="text-muted">
+                {%-if person and person.has_role(ROLE.PATIENT)-%}
+                    {{_("Send email to patient")}}
+                {%-else-%}
+                    {{_("Send email to user")}}
+                {%-endif-%}
+            </label>
+            <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
+                <option value="">{{ _("Select Email...") }}</option>
+                {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
+                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+            </select>
+            <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
+            <div id="profileEmailMessage" class="text-info"></div>
+            <div id="profileEmailErrorMessage" class="text-danger"></div>
+            <input type="hidden" id="patientRegistrationInviteEmailUrl" value="{{url_for('portal.patient_invite_email', user_id=person.id)}}" />
+            <div id="patientReminderEmailBody" class="tnth-hide">{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}</div>
+            <div id="patientReminderEmailSubject" class="tnth-hide">{{ app_text('profileSendEmail reminder email_subject') }}</div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro profileSendEmail(person) -%}
+    {%- if person -%}
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
+    {% endif %}
+{%- endmacro %}
+{% macro profileStaffRegistrationEmail(person) -%}
+    {%- if person -%}
+    <div id="sendRegistrationEmailForm" data-profile-section-id="staffemailform">
+        <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+        <div class="registration-status-container">
+            <span class="text-muted">{{_('Registration status:')}}</span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_("not yet registered")}}</h4>
+            {%- else -%}
+            <h4 class="text-success registration-label">{{_('registered')}}</h4>
+            {%- endif -%}
+        </div>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn disabled">{{ _("Send registration email") }}</button>
+        <div id="profileEmailMessage" class="text-info"></div>
+        <div id="profileEmailErrorMessage" class="text-danger"></div>
+        <input type="hidden" id="staffRegistrationEmailUrl" value="{{url_for('staff.staff_registration_email', user_id=person.id)}}" />
+    </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro profileCommunications(person, current_user) -%}
+    {%- if person and person.has_role(ROLE.PATIENT) -%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container" data-profile-section-id="communication">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div id="communicationsContainer" class="tabs-container">
+                        <div class="tab">
+                          <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
+                          <div class="tab-content">
+                           {{resetPassword(person)}}
+                          </div>
+                        </div>
+                        {%- if not config.CUSTOM_PATIENT_DETAIL -%}
+                        <div class="tab">
+                          <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send registration email to patient")}}</label>
+                          <div class="tab-content">
+                            <div id="registrationEmailContainer">{{profileSendEmail(person)}}</div>
+                          </div>
+                        </div>
+                        {%- endif %}
+                        {% if current_user and (current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
+                         <div class="tab">
+                          <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
+                          <div class="tab-content">
+                            {{profileEmailLog(person)}}
+                          </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container" data-profile-section-id="communication">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
+                        <div id="communicationsContainer" class="tabs-container">
+                            <div class="tab">
+                                <input id="tab-four" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
+                                <label for="tab-four" class="tab-label">{{_("Send reset password email to user")}}</label>
+                                <div class="tab-content">
+                                    {{resetPassword(person)}}
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input id="tab-five" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
+                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label {% if person and person.has_role('write_only') %}active{% endif %}">{{_("Send registration email to user")}}</label>
+                                <div class="tab-content">
+                                    {{profileStaffRegistrationEmail(person)}}
+                                </div>
+                            </div>
+                        </div>
+                    {%- else -%}
+                        <div class="flex">
+                            <div id="resetPasswordContainer" class="flex-item">
+                                <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
+                                {{resetPassword(person)}}
+                            </div>
+                        </div>
+                    {%- endif -%}
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro profileEmailLog(person) -%}
+    <div id="emailLogContainer">
+        <div id="emailLogContent"><span class="text-muted">{{_("None available")}}</span></div>
+        <div id="emailLogMessage" class="error-message"></div>
+    </div>
+    <div class="modal fade" id="emailBodyModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <div class="modal-header-title">{{_("Email Message Content")}}</div>
+            </div>
+            <div class="modal-body">
+                <div class="body-content"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+            </div>
+          </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profilePhone(person) -%}
+    <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="phone">
+        <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone"/>
+        <div class="help-block with-errors"></div>
+    </div>
+    <div id="errorphone" class="error-message"></div>
+{%- endmacro %}
+
+{% macro profileAltPhone(person) -%}
+    <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="altphone">
+        <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone"/>
+        <div class="help-block with-errors"></div>
+        <div id="erroraltPhone" class="error-message"></div>
+    </div>
+{%- endmacro %}
+
+{% macro resetPassword(person) %}
+    <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{_("Send email")}}</button>
+        <div id="passwordResetMessage" class="text-info"></div>
+    </div>
+{%-endmacro %}
+
+{% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
+    <div id="userOrgs_view" class="view-container"></div>
+    <div class="edit-container" data-profile-section-id="orgsstateselector">
+        <div id="clinics" data-loader-container="true">
+            <div id="userOrgs" class="customized">
+               <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
+               <p class="prompt text-muted">
+                {% if  current_user and current_user.has_role(ROLE.STAFF) %}
+                    {{_("In what state is the patient currently receiving prostate cancer care?")}}
+                {% else %}
+                    {{_("In what state are you currently receiving prostate cancer care?")}}
+                {% endif %}
+               </p>
+               <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
+               <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
+                   <p class="clinic-prompt prompt selector-show">{{_("What is your main clinic for prostate cancer care?")}}</p>
+                   <div class="main-state-container selector-show">
+                   </div>
+               </div>
+                <div class="noOrg-container" style="display: none">
+                    <label>
+                        <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
+                        <span>{{_("None of the Above")}}</span>
+                    </label>
+                </div>
+               <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
+               <div id="defaultConsentContainer"></div>
+               {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="get-orgs-error error-message"></div>
+    <div class="get-demo-error error-message"></div>
+    <div class="put-demo-error error-message"></div>
+{%- endmacro %}
+
+<!--this has an ajax call to fill in the content-->
+{% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
+    <div id="userOrgs_view" class="view-container"></div>
+    <div class="edit-container" data-profile-section-id="orgs">
+        <div id="clinics">
+            <div class="form-group profile-section standard" id="userOrgs">
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
+                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
+                <div class="indent">
+                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
+                {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
+                    <!-- nothing to do -->
+                {%- else -%}
+                    <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                {%- endif -%}
+                </div>
+                <div id="defaultConsentContainer" data-profile-section-id="consent"></div>
+                {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+    </div>
+    <div class="get-orgs-error error-message"></div>
+    <div class="get-demo-error error-message"></div>
+    <div class="put-demo-error error-message"></div>
+    {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
+                ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
+             -%}
+    <input type="hidden" id="requireMorph" value="true" />
+    {%- endif -%}
+{%- endmacro %}
+{% macro consent_modal(person, consent_agreement, org) -%}
+    {%- if person and consent_agreement and org -%}
+        <div class="modal fade consent-modal" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <div class="main-content tnth-hide">
+                            <div class="terms-wrapper">
+                                <h4>Terms</h4>
+                                <div class="terms-container">{{consent_agreement.asset|safe}}</div>
+                            </div>
+                            <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
+                            <br/>
+                            <p>
+                                {% trans org_shortname=consent_agreement.organization_shortname %}
+                                    I consent to sharing information with <span class="consent-clinic-name">{{org_shortname}}</span>.
+                                {% endtrans %}
+                            </p>
+                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                                  {{ _("Yes") }}
+                              </label>
+                              <br/>
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                                  {{ _("No") }}
+                              </label>
+                            </div>
+                        </div>
+                        <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                     </div>
+                     <br/>
+                     <div class="modal-footer" >
+                        <div id="{{org}}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                     </div>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro consent(person, consent_agreements, current_user, includeModal) -%}
+    {%- if person and consent_agreements -%}
+        <div id="consentContainer" data-profile-section-id="consent">
+            {{consent_fields(consent_agreements, current_user)}}
+            {%- if includeModal-%}
+                {%- for org in consent_agreements -%}
+                   {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
+                   {{consent_modal(person, consent_agreements[org], org)}}
+                   {%- endif -%}
+                {%- endfor -%}
+            {%- endif -%}
+            <div class="get-consent-error error-message"></div>
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro patientReports(person) -%}
+    <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
+    <div id="prTableToolBar"><span id="tableCount"></span></div>
+    <a href="#profilePatientReportTable"></a>
+    <table id="profilePatientReportTable" data-profile-section-id="patientreport"></table>
+    <div id="patientReportErrorMessage" class="text-muted"></div>
+{%- endmacro %}
+
+{% macro profileConsent(person, current_user) -%}
+    {% if person %}
+        <div id="profileConsentList">{{_("No information available.")}}</div>
+        <div id="profileConsentHistory">
+            <div class="modal fade" id="consentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="consentHistoryModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">{{_("Consent History")}}</h4>
+                        </div>
+                        <div class="modal-body"></div>
+                         <div class="modal-footer">
+                            <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{_("Close")}}</button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="get-consent-error error-message"></div>
+        <div class="set-consent-error error-message"></div>
+        <div class="delete-consent-error error-message"></div>
+    {% endif %}
+{%- endmacro %}
+{% macro profileConsentDate() -%}
+ <div id="consentDateEditContainer">
+    <div class="form-group">
+        <label>{{ app_text('consent date label')}}</label>
+        <input type="hidden" name="consentDate" id="consentDate" value="" />
+        <div class="flex">
+            <div class="flex-item">
+                <input class="form-control" id="consentDay" name="consentDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" required />
+            </div>
+            <div class="flex-item">
+                <select class="form-control" name="consentMonth" id="consentMonth" data-error="{{_('Date must be valid and in the required format.')}}" required>
+                    <option value="">{{ _("Month") }}...</option>
+                    <option value="01">{{ _("January") }}</option>
+                    <option value="02">{{ _("February") }}</option>
+                    <option value="03">{{ _("March") }}</option>
+                    <option value="04">{{ _("April") }}</option>
+                    <option value="05">{{ _("May") }}</option>
+                    <option value="06">{{ _("June") }}</option>
+                    <option value="07">{{ _("July") }}</option>
+                    <option value="08">{{ _("August") }}</option>
+                    <option value="09">{{ _("September") }}</option>
+                    <option value="10">{{ _("October") }}</option>
+                    <option value="11">{{ _("November") }}</option>
+                    <option value="12">{{ _("December") }}</option>
+                </select>
+            </div>
+            <div class="flex-item">
+                <input class="form-control" id="consentYear" name="consentYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" required />
+            </div>
+        </div>
+        <div class="help-block with-errors"></div>
+        <span id="errorConsentDate" class="help-block error-message"></span>
+    </div>
+</div>
+{%- endmacro %}
+{% macro profileAuditLog(person, current_user) -%}
+    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
+        <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
+        <div id="auditTableToolBar" data-profile-section-id="auditlog"></div>
+        <table id="profileAuditLogTable" class="smaller-text"></table>
+        <div id="profileAuditLogErrorMessage" class="error-message"></div>
+     {% endif %}
+{%- endmacro %}
+
+{% macro profileRole(person, current_user) -%}
+    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
+        <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
+        <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
+        <!-- roles are populated in main.js -->
+        <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist"></div>
+        <div id="rolesLoadingContainer" data-save-container-id="rolesLoadingContainer" data-loader-container="true"></div>
+        <div class="get-roles-error error-message"></div>
+        <div class="put-roles-error error-message"></div>
+        <div class="delete-roles-error error-message"></div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro profileSessionList(person, current_user) -%}
+    <div id="userSessionsListContainer" data-profile-section-id="assessmentlist">
+        <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
+        <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
+            <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{_("click each row to review report")}})</span></caption>
+            <tr><th>{{_("Questionnaire Name")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></tr>
+        </table>
+        <div id="profileSessionListError" class="error-message"></div>
+    </div>
+{%- endmacro %}
+{% macro profileClinicalQuestions(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container {% if person and current_user and person.id == current_user.id %}editable{% endif %}" data-sections="clinical" data-profile-section-id="clinicalquestions">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{% if person.id == current_user.id %}{{_("My Prostate Cancer Profile")}}{% else %}{{ _("Clinical Questions") }}{% endif %}</h4>
+                {% if person.id != current_user.id %}<p class="text-muted">{{ _("Questions asked of the patient at registration") }}</p>{% endif %}
+                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
+                <div class="view-container">
+                     <table>
+                        <tr><td class="text-muted">{{_("Have you had a prostate cancer biopsy?")}}</td><td><div id="biopsy_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Have you been diagnosed with prostate cancer?")}}</td><td><div id="pca_diag_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Is the prostate cancer only within the prostate?")}}</td><td><div id="pca_localized_view"></div></td></tr>
+                   </table>
+                </div>
+                <div id="patientQContainer" class="edit-container">
+                    {{patientQGroup(person)}}
+                </div>
+                <div class="get-clinical-error error-message"></div>
+                <div class="put-clinical-error error-message"></div>
+                <div class="post-clinical-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileInterventionReports(person) -%}
+    <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container" data-profile-section-id="interventionreport">
+                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Intervention Reports") }}</h4>
+                    <div>
+                        {%- if person and person.staff_html() -%}
+                            {{person.staff_html() | safe}}
+                        {%- else -%}
+                            <div class="text-muted">{{ _("No reports available.") }}</div>
+                        {%- endif -%}
+                    </div>
+                </div>
+            </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileTimeZone(person) %}
+    <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item" data-profile-section-id="timezone">
+        <label>Time Zone</label>
+        <select class="form-control" id="profileTimeZone" data-save-container-id="profileTimeZoneGroup">
+            <option value="UTC">-- Select --</option>
+             <option value="America/Chicago">{{_("America/Chicago")}}</option>
+            <option value="America/Denver">{{_("America/Denver")}}</option>
+            <option value="America/Los_Angeles">{{_("America/Los Angeles")}}</option>
+            <option value="America/Indianapolis">{{_("America/Indianapolis")}}</option>
+            <option value="America/New_York">{{_("America/New York")}}</option>
+            <option value="Australia/Adelaide">{{_("Australia/Adelaide")}}</option>
+            <option value="Australia/Brisbane">{{_("Australia/Brisbane")}}</option>
+            <option value="Australia/Broken_Hill">{{_("Australia/Broken_Hill")}}</option>
+            <option value="Australia/Canberra">{{_("Australia/Canberra")}}</option>
+            <option value="Australia/Currie">{{_("Australia/Currie")}}</option>
+            <option value="Australia/Darwin">{{_("Australia/Darwin")}}</option>
+            <option value="Australia/Eucla">{{_("Australia/Eucla")}}</option>
+            <option value="Australia/Hobart">{{_("Australia/Hobart")}}</option>
+            <option value="Australia/Lindeman">{{_("Australia/Lindeman")}}</option>
+            <option value="Australia/Lord_Howe">{{_("Australia/Lord_Howe")}}</option>
+            <option value="Australia/Melbourne">{{_("Australia/Melbourne")}}</option>
+            <option value="Australia/North">{{_("Australia/North")}}</option>
+            <option value="Australia/Perth">{{_("Australia/Perth")}}</option>
+            <option value="Australia/Queensland">{{_("Australia/Queensland")}}</option>
+            <option value="Australia/South">{{_("Australia/South")}}</option>
+            <option value="Australia/Sydney">{{_("Australia/Sydney")}}</option>
+            <option value="Australia/Tasmania">{{_("Australia/Tasmania")}}</option>
+            <option value="Australia/Victoria">{{_("Australia/Victoria")}}</option>
+            <option value="Australia/West">{{_("Australia/West")}}</option>
+            <option value="Australia/Yancowinna">{{_("Australia/Yancowinna")}}</option>
+            <option value="Europe/Andorra">{{_("Europe/Andorra")}}</option>
+            <option value="Europe/Vienna">{{_("Europe/Vienna")}}</option>
+            <option value="Europe/Brussels">{{_("Europe/Brussels")}}</option>
+            <option value="Europe/Andorra">{{_("Europe/Andorra")}}</option>
+            <option value="Europe/Stockholm">{{_("Europe/Stockholm")}}</option>
+            <option value="Europe/Sofia">{{_("Europe/Sofia")}}</option>
+            <option value="Europe/Zurich">{{_("Europe/Zurich")}}</option>
+
+        </select>
+    </div>
+    <div class="timezone-warning"></div>
+    <div class="timezone-error"></div>
+{%-endmacro %}
+
+{% macro profileDeceased(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container editable" data-sections="deceased" data-profile-section-id="deceased">
+                <h4 id="deathLoc" class="profile-item-title index-item">{{ _("Deceased Status") }}</h4>
+                <input type="hidden" id="deathDate" value="" />
+                <div class="view-container">
+                    <div id="boolDeath_view"></div>
+                    <div id="deathDate_view"></div>
+                </div>
+                <div class="edit-container">
+                    <div class="checkbox" id="boolDeathGroup">
+                        <label>
+                            <input type="checkbox" name="boolDeath" id="boolDeath" value="1" data-save-container-id="boolDeathGroup" />{{ _("Has the patient passed away?") }}
+                        </label>
+                    </div>
+                    <hr/>
+                    <div class="form-group">
+                        <label class="text-muted">{{ _("Deceased Date") }}</label>
+                    </div>
+                    <div class="row deceased-date-container">
+                        <div class="col-md-3 col-xs-6">
+                            <div id="deathDayContainer" class="form-group profile-section">
+                                <input class="form-control" id="deathDay" name="deathDay" data-save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                                 <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-10">
+                            <div id="deathMonthContainer" class="form-group profile-section">
+                                <select class="form-control" name="deathMonth" id="deathMonth" data-save-container-id="deathMonthContainer" required>
+                                    <option value="">{{ _("Month") }}...</option>
+                                    <option value="01">{{ _("January") }}</option>
+                                    <option value="02">{{ _("February") }}</option>
+                                    <option value="03">{{ _("March") }}</option>
+                                    <option value="04">{{ _("April") }}</option>
+                                    <option value="05">{{ _("May") }}</option>
+                                    <option value="06">{{ _("June") }}</option>
+                                    <option value="07">{{ _("July") }}</option>
+                                    <option value="08">{{ _("August") }}</option>
+                                    <option value="09">{{ _("September") }}</option>
+                                    <option value="10">{{ _("October") }}</option>
+                                    <option value="11">{{ _("November") }}</option>
+                                    <option value="12">{{ _("December") }}</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-6">
+                            <div id="deathYearContainer" class="form-group profile-section">
+                                <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-save-container-id="deathYearContainer" required />
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="errorDeathDate" class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileStudyID(current_user) -%}
+    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="studyid">
+        <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
+        <div class="help-block with-errors"></div>
+        <div id="errorprofileStudyId" class="error-message"></div>
+    </div>
+{%- endmacro %}
+{% macro profileSiteID(current_user) -%}
+    <div id="profileSiteIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="siteid">
+        <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId"/>
+        <div class="help-block with-errors"></div>
+        <div id="errorprofileSiteId" class="error-message"></div>
+    </div>
+{%- endmacro %}
+{% macro profileCustomDetail(person) -%}
+     <div class="row" data-profile-section-id="custompatientdetail">
+        <div class="col-md-12 col-xs-12">
+            <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
+            <div class="custom-container">
+                <input type="text" style="position: fixed; left: -10000000px;" autofocus/>
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
+                    <br/>
+                    <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
+                    <br/>
+                    <div>{{profileEmailForm(person)}}</div>
+                </div>
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
+                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
+                </div>
+                 <div class="profile-item-container custom-container-item">
+                    <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
+                    <input type="hidden" id="manualEntrySubjectId" value="{{person.id}}" />
+                    <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
+                    <div id="enterManualInfoContainer" class="text-info"></div>
+                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
+                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="manualEntryBodyLoader">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    </div>
+                                    <div id="manualEntryMain">
+                                        <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
+                                        <input type="hidden" id="manualEntryConsentDate" value="" />
+                                        <input type="hidden" id="qCompletionDate" value="" />
+                                        <input type="hidden" id="qToday" value="" />
+                                        <div class="form-group">
+                                            <div class="profile-radio-list">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                                    <span>{{ _("Interview assisted") }}</span>
+                                                </label>
+                                                <br/>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                                    <span>{{ _("Paper") }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div id="manualEntryCompletionDateContainer" class="form-group">
+                                            <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <div id="manualEntryDateFieldsContainer" class="flex">
+                                                <div class="flex-item">
+                                                    <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" required />
+                                                </div>
+                                                <div class="flex-item" id="qCompletionMonthContainer">
+                                                    <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" required>
+                                                        <option value="">{{_("Month")}}...</option>
+                                                        <option value="01">{{_("January")}}</option>
+                                                        <option value="02">{{_("February")}}</option>
+                                                        <option value="03">{{_("March")}}</option>
+                                                        <option value="04">{{_("April")}}</option>
+                                                        <option value="05">{{_("May")}}</option>
+                                                        <option value="06">{{_("June")}}</option>
+                                                        <option value="07">{{_("July")}}</option>
+                                                        <option value="08">{{_("August")}}</option>
+                                                        <option value="09">{{_("September")}}</option>
+                                                        <option value="10">{{_("October")}}</option>
+                                                        <option value="11">{{_("November")}}</option>
+                                                        <option value="12">{{_("December")}}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="flex-item" id="qCompletionYearContainer">
+                                                    <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="errorCompletionDate" class="error-message"></div>
+                                        <div id="manualEntryMessageContainer" class="error-message"></div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <div id="manualEntryLoader" class="loading-message-indicator">
+                                        <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    </div>
+                                    <div id="manualEntryButtonsContainer">
+                                        <a href="#" id="meSubmit" class="btn btn-default">{{_("OK")}}</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileInterventions(user_interventions) -%}
+  <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container" data-profile-section-id="interventionlist">
+                <h4 id="interventionsLoc" class="profile-item-title index-item">{{_("Interventions")}}</h4>
+                    {% if user_interventions %}
+                        {% if user_interventions.length != 0 %}<p class="text-muted">{{_("Patient is participating in the following intervention(s): ")}}</p>{% endif %}
+                        {% for intervention in user_interventions %}
+                            <div class="capitalize">{{intervention.name | replace("_", " ")}}</div>
+                        {% endfor %}
+                        {% if user_interventions.length == 0 %}<div class="text-muted">{{_("None")}}</div>{% endif %}
+                    {% else %}
+                        <div class="text-muted">{{_("None")}}</div>
+                    {% endif %}
+                </div>
+            </div>
+    </div>
+{%- endmacro %}
+{% macro profileProcedures(person, current_user) -%}
+    {% set top_org = current_user.first_top_organization() if current_user else False %}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %} data-profile-section-id="procedure">
+                <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
+                <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
+                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span></h4>
+                <div class="view-container"><div id="procedure_view"></div></div>
+                <div class="edit-container">
+                    <p class="text-muted">
+                        {%-if current_user and current_user.has_role(ROLE.STAFF)-%}
+                            {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
+                        {%-elif person and current_user and (person.id == current_user.id) -%}
+                            {{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+                            date, please make your best guess.") }}
+                        {% else %}
+                            {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
+                        {%-endif-%}
+                    </p><br/>
+                    <div id="profileProcedureContainer">
+                        <div id="procedureForm" class="form-inline event-element">
+                            <p class="text-muted">{{ _("Select an option") }}:</p>
+                            <div class="row">
+                                <div class="col-md-9 col-xs-11">
+                                    <div class='form-group'>
+                                        <select class='form-control' id='tnthproc'></select>
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div id="procDateGroup" class="form-group">
+                                <label class="procedureDateLabel">{{ _("Date") }}:</label>
+                                <div class="flex">
+                                    <div class="flex-item">
+                                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}"/>
+                                    </div>
+                                    <div class="flex-item">
+                                        <select class="form-control" name="procMonth" id="procMonth" data-error="{{_('Date must be valid and in the required format.')}}">
+                                            <option value="">{{_("Month")}}...</option>
+                                            <option value="01">{{_("January")}}</option>
+                                            <option value="02">{{_("February")}}</option>
+                                            <option value="03">{{_("March")}}</option>
+                                            <option value="04">{{_("April")}}</option>
+                                            <option value="05">{{_("May")}}</option>
+                                            <option value="06">{{_("June")}}</option>
+                                            <option value="07">{{_("July")}}</option>
+                                            <option value="08">{{_("August")}}</option>
+                                            <option value="09">{{_("September")}}</option>
+                                            <option value="10">{{_("October")}}</option>
+                                            <option value="11">{{_("November")}}</option>
+                                            <option value="12">{{_("December")}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-item">
+                                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}"/>
+                                    </div>
+                                </div>
+                                <div id="procDateErrorContainer" class="help-block with-errors"></div>
+                                <div class="button-container">
+                                    <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' {% if not person %}data-account-create='true'{% endif %} type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{%-if person-%}{{_("Save")}}{%-else-%}{{_("Add")}}{%-endif-%}</span></button>
+                                </div>
+                            </div>
+                            {% if person %}
+                                <br />
+                                <br />
+                                <div id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
+                                <div id="pastTreatmentsContainer" class="inner">
+                                     <hr style="border-bottom: 1px solid #e5e5e5"/>
+                                    {%- if person.id == current_user.id -%}
+                                        <p class="text-muted">{{_("My History")}}:</p>
+                                    {%- else -%}
+                                        <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                                    {%- endif -%}
+                                    <div id="userProcedures"></div>
+                                </div>
+                                <br/>
+                            {% else %}
+                                <table id="pastTreatmentsContainer" class="inner"></table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+{% macro profileSaveBtn() -%}
+    <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>{{ _("You have updated your profile. Click the Save button to submit your changes.") }} {{ _("Or") }} <a href="">{{ _("cancel") }}</a>.</small></p>
+    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>{{ _("There is a problem with your profile. Please correct it before saving.") }}<br/>{{ _("Make sure all required fields are filled out and all entries are valid.") }}</small></p>
+    <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
+    <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">{{ _("Save") }}</button>
+    <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>{{ _("Profile changes have been saved") }}</em></span>
+{%- endmacro %}

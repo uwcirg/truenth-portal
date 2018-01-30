@@ -1,88 +1,55 @@
-<html lang="en">
 
-<head>
-        <meta charset="UTF-8">
-        <title>{% trans %}Exercise Diet{% endtrans %}</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.css">
-        <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
-        <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/uwcirg/true_nth_usa_portal/develop/portal/static/css/topnav.css">
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="{{ url_for('.static', filename='css/styles.css') }}">
-        <script src="{{ url_for('.static', filename='js/exercise_diet.js') }}"></script>
-    </head>
-
-<body>
-
-
-<div id="Exercise-Diet-Portal">
-
-		<div class="intro-module intro-intro" style="background-image: url(../../static/img/mountains.jpg)">
-
+{% extends "exercise_diet/base.html" %}
+{% block title %}{{super()}} {{_("Exercise And Diet")}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+<main class="main">
+{{super()}}
+{% block intro %}
+{% endblock%}
+	<div id="Exercise-Diet-Portal">
+		<div class="intro-module intro-intro" style="background-image: url({{ url_for('.static', filename='img/mountains.jpg') }})">
 			<div class="intro-content">
-					
-			<h1>Exercise and Diet</h1>
-	
-				<p>Staying on top of exercising and healthy eating may not be easy, but it&rsquo;s important for men with prostate cancer and their loved ones. Use this tool to guide you on:</p>
-						
-							<ul>
-								<li>Choosing cancer-busting foods</li>
-								<li>Making exercise fun, safe and worth it</li>
-								<li>Delicious recipes and quick grocery shopping tips</li>
-							</ul>
-							
-							<div class="start-button-intro">start&nbsp;&rarr;</div>
-					
+				<h1>{{_("Exercise and Diet")}}</h1>
+				<p>{{_("Staying on top of exercising and healthy eating may not be easy, but it's important for men with prostate cancer and their loved ones. Use this tool to guide you on:")}}</p>
+					<ul>
+						<li>{{_("Choosing cancer-busting foods")}}</li>
+						<li>{{_("Making exercise fun, safe and worth it")}}</li>
+						<li>{{_("Delicious recipes and quick grocery shopping tips")}}</li>
+					</ul>
+					{% if not user %}
+						<div class="start-button-intro" data-toggle="modal" data-target="#modal-register">{% trans %}start <span>&rarr;</span>{% endtrans %}</div>
+					{% else %}
+						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><div class="start-button-intro">{% trans %}start <span>&rarr;</span>{% endtrans %}</div></a>
+					{% endif %}
 			</div><!-- end class="intro-content" -->
 		</div><!-- end class="intro-module intro-intro" -->
-		
-		
-		<div class="video-module video-testimonial-hero" style="background-image: url(../../static/img/video-testimonial-hero.jpg)">
-		
-			<iframe class='sproutvideo-player' src='//videos.sproutvideo.com/embed/e89adcb2181fe6cb60/0b1c2437f243294d' width='630' height='354' frameborder='0' allowfullscreen></iframe>
-			
-				<div class="video-content">
-					<div class="watch-button-video">watch</div>
-				</div><!-- end class="video-content" -->
+		<div class="video-module video-testimonial-hero" style="background-image: url({{ url_for('.static', filename='img//video-testimonial-hero.jpg') }})" data-iframe-src="//videos.sproutvideo.com/embed/e89adcb2181fe6cb60/0b1c2437f243294d?type=hd&amp;autoPlay=true">
+			<img src="{{url_for('.static', filename='img//video-testimonial-hero.jpg')}}">
+			<div class="watch-button-video">{{_("watch")}}</div>
 		</div><!-- end class="video-module video-testimonial-hero" -->
-
-		
-		
-		<div class="objective-module objective-background" style="background-image: url(../../static/img/objective-background.jpg)">
+		<div class="objective-module objective-background" style="background-image: url({{ url_for('.static', filename='img//objective-background.jpg') }})">
 			<div class="objective-content">
-
-				<h6 class="accent-heading">Objective N<em>o</em>&nbsp;6: CUSTOM TOOLS &mdash; EXERCISE AND DIET</h6>
-				
-				<hr class="objective" />
-						
-					<h2>Healthy Lifestyle</h2>
-							
-					<p>We&rsquo;ve looked at what helps &ndash; and what doesn&rsquo;t &ndash; when it comes to prostate cancer and your health. Exercising and making healthy food choices are 2 great ways to keep prostate cancer in check. Being active combined with eating fruits, veggies (and other healthy foods) can really make a difference.</p>
-							
-					<p>Log in to start living a healthier and more active lifestyle.</p>
-					
-					
-					<div class="toolbox">
-					<div class="icon-box"></div>
+				<h6 class="accent-heading">{% trans %}Objective N<em>o</em>&nbsp;6: CUSTOM TOOLS &mdash; EXERCISE AND DIET{% endtrans %}</h6>
+				<h2>{{_("Healthy Lifestyle")}}</h2>
+				<p>{{_("We've looked at what helps - and what doesn't - when it comes to prostate cancer and your health. Exercising and making healthy food choices are 2 great ways to keep prostate cancer in check. Being active combined with eating fruits, veggies (and other healthy foods) can really make a difference.")}}</p>
+				<p>{{_("Log in to start living a healthier and more active lifestyle.")}}</p>
+				<div class="toolbox">
 					<div class="middle-content">
-					<h6>TOOL N<em>o</em>&nbsp;4: WELLNESS</h6>
-					<h5>EXERCISE AND DIET</h5>
-					<h6><span>EXERCISE&nbsp;/&nbsp;DIET&nbsp;/&nbsp;RECIPES</span></h6>
+					<h6>{% trans %}TOOL N<em>o</em> 4: WELLNESS{% endtrans %}</h6>
+					<h5>{{_("EXERCISE AND DIET")}}</h5>
+					<h6><span>{{_("EXERCISE / DIET / RECIPES")}}</span></h6>
 					</div>
-					<span class="toolbox-start-button">start&nbsp;&rarr;</span>
-					</div>
-
-
-				</div><!-- end class="objective-content" -->
-		
+					{% if not user %}
+						<span class="toolbox-start-button" data-toggle="modal" data-target="#modal-register">{% trans %}start &rarr;{% endtrans %}</span>
+					{% else %}
+						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><span class="toolbox-start-button">{% trans %}start &rarr;{% endtrans %}</span></a>
+					{% endif %}
+				</div>
+			</div><!-- end class="objective-content" -->
 		</div><!-- end class="objective-module objective-background" -->
-			
-</div><!-- END #Exercise-Diet-Portal --> 
-    
-		<!-- <div class="clearfix">&nbsp;</div> -->
-</body>
+	</div><!-- END #Exercise-Diet-Portal -->
+</main>
+{% endblock %}
 
-
-</html>
 

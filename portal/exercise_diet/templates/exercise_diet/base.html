@@ -10,21 +10,23 @@
 {% endblock %}
 {% block main %}
     {{ super() }}
-    <div class="page-intro">
-        <div class="page-intro__content">
-            <div class="navbar-header">
-                {% trans %}
-                <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
-                {% endtrans %}
-            </div>
-            <div class="navbar-collapse collapse" id="mainNavbar">
-                <ul class="nav navbar-nav">
-                    <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
-                    <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
-                    <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
-                    <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
-                </ul>
+    {% block intro %}
+        <div class="page-intro">
+            <div class="page-intro__content">
+                <div class="navbar-header">
+                    {% trans %}
+                    <button class="navbar-toggle collapsed" data-target="#mainNavbar" data-toggle="collapse" type="type">Show TrueNTH USA Exercise and Diet Links</button>
+                    {% endtrans %}
+                </div>
+                <div class="navbar-collapse collapse" id="mainNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="introduction"><a href="{{ url_for('.introduction') }}">{% trans %}Home{% endtrans %}</a></li>
+                        <li class="exercise"><a href="{{ url_for('.exercise') }}">{% trans %}Exercise{% endtrans %}</a></li>
+                        <li class="diet"><a href="{{ url_for('.diet') }}">{% trans %}Diet{% endtrans %}</a></li>
+                        <li class="recipes"><a href="{{ url_for('.recipes') }}"><span>{% trans %}Recipes &amp; Tips{% endtrans %}</span></a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
+    {% endblock %}
 {% endblock %}

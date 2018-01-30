@@ -59,6 +59,13 @@
 <style>#tnthNavXs .tnth-nav-btn{ display: none; }</style>
 {% endif %}
 {% if config["SYSTEM_TYPE"].lower() != "production" %}<div class='watermark'>TRUE<sup>NTH</sup> - {{config.SYSTEM_TYPE}} version - Not for study or clinical use</div>{% endif %}
+{% if user and not user.has_role(ROLE.WRITE_ONLY) %}
+    <div id="notificationBanner">
+        <input type="hidden" id="notificationUserId" value="{{user.id}}" />
+        <div class="content"></div>
+        <span class="close" title="{{_('dismiss')}}">X</span>
+    </div>
+{% endif %}
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
@@ -89,6 +96,7 @@
                             {% if user and user.has_role(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
                             {% if user and user.has_role(ROLE.ADMIN) %}
                             <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
+                            <li><a href="{{PORTAL}}/scheduled_jobs">{{ _("Scheduled Jobs") }}</a></li>
                             <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                             {% endif %}
                             {% if user and (user.has_role(ROLE.ADMIN) or user.has_role(ROLE.ANALYST)) %}

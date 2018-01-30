@@ -59,7 +59,7 @@ def status_from_recents(recents, start, overdue, expired, as_of_date):
         results['status'] = 'In Progress'
         results['in-progress'] = recents['in-progress']
     as_of_date = as_of_date or datetime.utcnow()
-    if as_of_date < start:
+    if as_of_date.date() < start.date():
         raise ValueError(
             "unexpected call for status on unstarted Questionnaire")
 

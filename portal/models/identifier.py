@@ -93,6 +93,9 @@ class UserIdentifier(db.Model):
     identifier = db.relationship(Identifier, cascade="save-update")
     user = db.relationship('User', cascade="save-update")
 
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'identifier_id', name='_user_identifier'),)
+
     def __str__(self):
         return ("user_identifier {} for {}".format(
             self.identifier, self.user))

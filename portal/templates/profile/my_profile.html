@@ -1,0 +1,99 @@
+{%- extends "profile/profile_base.html" -%}
+{%- import "profile/profile_macros.html" as profile_macro -%}
+{% block profile_title %}
+  {{_("My TrueNTH Profile")}}
+{% endblock %}
+{% block profile_content %}
+    {{profile_macro.profileDemo(user, current_user)}}
+    {% if user and user.has_role(ROLE.PATIENT) %}
+        {{profile_macro.profileDemoDetail(user, current_user)}}
+        <div class="row" id="profileSessionListMainContainer">
+            <div class="col-md-12 col-xs-12">
+                <div  class="profile-item-container">
+                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("My Questionnaires") }}</h4>
+                    {{profile_macro.profileSessionList(user, current_user)}}
+                </div>
+            </div>
+        </div>
+        {%- if user and user.has_role(ROLE.PATIENT) %}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
+                        {{profile_macro.patientReports(user)}}
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
+        {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
+        {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
+        {%-if user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container editable" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                        {{profile_macro.profileOrgsSelector(user, current_user)}}
+                    </div>
+                </div>
+            </div>
+        {%-else-%}
+             <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                        {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+                    </div>
+                </div>
+            </div>
+        {%-endif-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
+                    {{profile_macro.profileConsent(user, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
+                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                    {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div  class="profile-item-container editable" data-sections="locale, timezone">
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("My Locale / Time Zone")}}</h4>
+                <div class="view-container">
+                    <table>
+                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
+                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
+                    </table>
+                    <div class="get-demo-error get-locale-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
+                </div>
+                <div class="edit-container flex">
+                    {{profile_macro.profileLocale(user)|show_macro('language')}}
+                    {{profile_macro.profileTimeZone(user)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if user and user.has_role(ROLE.ADMIN) and not user.has_role(ROLE.SERVICE) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("My Roles") }}</h4>
+                    {{profile_macro.profileRole(user, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block document_ready %}
+    {{super()}}
+{% endblock %}

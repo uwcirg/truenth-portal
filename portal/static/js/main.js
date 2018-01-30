@@ -2,82 +2,6 @@
 
 var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
 var DELAY_LOADING = false;
-
-function equalHeightBoxes(passClass) {
-    var windowsize = $(window).width();
-    // Switch back to auto for small screen or to recalculate on larger
-    $('.'+passClass).css("height","auto");
-    if (windowsize > 768 && $('.'+passClass).length > 1) {
-        var elementHeights = $('.'+passClass).map(function() {
-            return $(this).height();
-        }).get();
-        // Math.max takes a variable number of arguments
-        // `apply` is equivalent to passing each height as an argument
-        var maxHeight = Math.max.apply(null, elementHeights);
-        // Set each height to the max height
-        $('.'+passClass).height(maxHeight);
-    }
-}
-// Return an XHR without XHR header so  it doesn't need to be explicitly allowed with CORS
-function xhr_function(){
-    // Get new xhr object using default factory
-    var xhr = jQuery.ajaxSettings.xhr();
-    // Copy the browser's native setRequestHeader method
-    var setRequestHeader = xhr.setRequestHeader;
-    // Replace with a wrapper
-    xhr.setRequestHeader = function(name, value) {
-        // Ignore the X-Requested-With header
-        if (name == 'X-Requested-With') return;
-        // Otherwise call the native setRequestHeader method
-        // Note: setRequestHeader requires its 'this' to be the xhr object,
-        // which is what 'this' is here when executed.
-        setRequestHeader.call(this, name, value);
-    };
-    // pass it on to jQuery
-    return xhr;
-}
-// AJAX callback
-function embed_page(data){
-    $("#mainNav")
-        // Embed data returned by AJAX call into container element
-        .html(data);
-        loader();
-}
-function showMain() {
-    $("#mainHolder").css({
-                          "visibility" : "visible",
-                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
-                          "filter": "alpha(opacity=100)",
-                          "-moz-opacity": 1,
-                          "-khtml-opacity": 1,
-                          "opacity": 1
-                        });
-
-}
-function hideLoader(delay, time ) {
-    if (delay) {
-        $("#loadingIndicator").hide();
-    } else {
-        setTimeout(function() { $("#loadingIndicator").fadeOut();}, time||200);
-    };
-}
-// Loading indicator that appears in UI on page loads and when saving
-var loader = function(show) {
-	//landing page
-	if ($("#fullSizeContainer").length > 0) {
-        hideLoader();
-        showMain();
-        return false;
-	};
-	if (show) {
-        $("#loadingIndicator").show();
-	} else {
-    	if (!DELAY_LOADING) {
-            setTimeout("showMain();", 100);
-            hideLoader(true);
-        };
-    };
-};
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
 var CONSENT_ENUM = {
@@ -109,6 +33,8 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "shortname": "http://us.truenth.org/identity-codes/shortname"
 };
 var __NOT_PROVIDED_TEXT = "not provided";
+var LR_INVOKE_KEYCODE = 187; // "=" s=ign
+
 /*
  * helper class for drawing consent list table
  */
@@ -161,7 +87,7 @@ var ConsentUIHelper = function(consentItems, userId) {
      *
      */
     this.ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-    this.isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
+    this.isAdmin = typeof isAdmin != "undefined" && isAdmin ? true: false;
     this.editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
     this.consentDateEditable = this.editable && (typeof isTestPatient != "undefined" && isTestPatient);
     this.touObj = [];
@@ -426,7 +352,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
         //and also website terms of use
         // WILL NEED TO CLARIFY
-        tnthAjax.getTerms(this.userId, false, true, function(data) {
+        tnthAjax.getTerms(this.userId, "", true, function(data) {
             if (data && data.tous) {
                 (data.tous).forEach(function(item) {
                     var fType = $.trim(item.type).toLowerCase();
@@ -442,6 +368,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         self.showInitialConsentTerms = (self.touObj.length > 0);
     },
     this.initConsentItemEvent = function() {
+
         $("#profileConsentList input[class='radio_consent_input']").each(function() {
             $(this).on("click", function() {
                 var o = CONSENT_ENUM[$(this).val()];
@@ -453,22 +380,19 @@ var ConsentUIHelper = function(consentItems, userId) {
                     tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
                 } else if ($(this).val() == "suspended") {
                     var modalElement = $("#" + $(this).attr("modalId"));
+                    var self = $(this);
                     tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"),null, function(data) {
-                        modalElement.modal('hide');
+                        modalElement.removeClass("fade").modal("hide");
                         if (data.error) {
                             $(".set-consent-error").text(data.error);
                         } else {
-                            if (typeof reloadConsentList !== "undefined") {
-                                reloadConsentList();
-                            };
+                            tnthAjax.reloadConsentList(self.attr("data-userId"));
                         };
                     });
                 } else {
                     tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                    $("#" + $(this).attr("modalId")).modal('hide');
-                    if (typeof reloadConsentList !== "undefined") {
-                        reloadConsentList();
-                    };
+                    $("#" + $(this).attr("modalId")).removeClass("fade").modal("hide");
+                    tnthAjax.reloadConsentList($(this).attr("data-userId"));
                 };
             });
         });
@@ -539,6 +463,7 @@ var ConsentUIHelper = function(consentItems, userId) {
 
         $("#profileConsentList .btn-submit").each(function() {
             $(this).on("click", function() {
+                var self = $(this);
                 var dataIndex = $.trim($(this).attr("data-index"));
                 var ct = $("#consentDate_" + dataIndex);
                 var h = $("#consentHour_" + dataIndex).val();
@@ -581,9 +506,8 @@ var ConsentUIHelper = function(consentItems, userId) {
                                     setTimeout(function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); }, 450);
                                     $("#consentListTable button[data-dismiss]").attr("disabled", false);
                                 } else {
-                                    $("#consentListTable .modal").modal("hide");
-                                    if (typeof reloadConsentList != "undefined") reloadConsentList();
-                                    else setTimeout("location.reload();", 2000);
+                                    $("#consentDate"+ dataIndex + "Modal").removeClass("fade").modal("hide");
+                                    tnthAjax.reloadConsentList(ct.attr("data-userId"));
                                 };
                             };
                         }), 100);
@@ -894,6 +818,22 @@ var fillViews = {
     }
 };
 var fillContent = {
+    "initPortalWrapper": function(PORTAL_NAV_PAGE) {
+        var isIE = getIEVersion();
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            }, true);
+        } else {
+            funcWrapper(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
+                //ajax to get notifications information
+                tnthAjax.initNotifications();
+            });
+        };
+    },
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
@@ -1094,16 +1034,6 @@ var fillContent = {
             $(this).prop("checked", false);
         });
 
-        var orgStates = [];
-
-        if (data.identifier) {
-            (data.identifier).forEach(function(item) {
-                if (item.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && hasValue(item.value)) {
-                    orgStates.push((item.value).split(":")[1]);
-                }
-            });
-        };
-
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
             if (orgID == "0") {
@@ -1111,16 +1041,17 @@ var fillContent = {
                 $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
             }
             else {
-                var ckOrg;
-                if (orgStates.length > 0 && $(".state-container").length > 0) {
-                    orgStates.forEach(function(state) {
-                        ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
-                        ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
-                    });
+                var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
+                if ($(".state-container").length > 0) {
+                    if (ckOrg.length > 0) {
+                        ckOrg.prop('checked', true);
+                        var state = ckOrg.attr("state");
+                        if (hasValue(state)) {
+                            $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(i18next.t(state));
+                        }
+                    }
                     $(".noOrg-container").show();
                 } else {
-                    var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
                     if (ckOrg.length > 0) ckOrg.prop('checked', true);
                     else {
                         var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
@@ -1274,7 +1205,7 @@ var fillContent = {
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
-            if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
+            if (String(item.url) === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
                 $("#profileTimeZone option").each(function() {
                     if ($.trim($(this).val()) == $.trim(item.timezone)) {
                         $(this).prop("selected", true);
@@ -1307,10 +1238,16 @@ var fillContent = {
     },
     "terms": function(data) {
         if (data.tous) {
-            function typeInTous(type) {
+            var setReconsentDisplay = false;
+            function typeInTous(type, status) {
                 var found = false;
+                var isActive = (status == "active") ? true : false;
                 (data.tous).forEach(function(item) {
-                    if (!found && $.trim(item.type) == $.trim(type)) found = true;
+                    if (!found
+                        && ($.trim(item.type) === $.trim(type))
+                        && (String($.trim(item.active)) === String(isActive))) {
+                        found = true;
+                    };
                 });
                 return found;
             };
@@ -1334,18 +1271,33 @@ var fillContent = {
                 };
 
                 arrTypes.forEach(function(type) {
-                    if (typeInTous(type)) {
+                    if (typeInTous(type, "active")) {
                         item_found++;
                     };
                 });
 
-                if (item_found == arrTypes.length) {
+                var arrReconsent = $.grep(arrTypes, function(type) {
+                    return typeInTous(type, "inactive");
+                });
+
+                /*
+                 *  note display of checked checkbox when re-consenting is controlled by css
+                 */
+                if (arrReconsent.length > 0) {
+                    self.attr("data-reconsent", "true");
+                    if (!setReconsentDisplay) {
+                        $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
+                        setReconsentDisplay = true;
+                    }
+                }
+
+                if (item_found > 0 && (item_found == arrTypes.length)) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                     self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
                     self.find("[data-type='terms']").each(function() {
                         $(this).attr("data-agree", "true");
-                    })
+                    });
                     var vs = self.find(".display-view");
                     if (vs.length > 0) {
                         self.show();
@@ -1356,7 +1308,79 @@ var fillContent = {
                     };
                 };
             });
+
         };
+    },
+    "notifications": function(data) {
+        if (data && data.notifications) {
+            var notifications = [];
+            var notificationText = "";
+            (data.notifications).forEach(function(notice) {
+                notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
+            });
+            if (hasValue(notificationText)) {
+
+                var infoText = "<div class='notification-info'><i class='fa fa-info-circle' aria-hidden='true'></i>";
+
+                if (data.notifications.length > 1) {
+                    infoText += i18next.t("Pending notifications requiring your attention");
+                } else {
+                    infoText += i18next.t("Pending notification requiring your attention");
+                };
+
+                infoText += "</div>";
+
+                $("#notificationBanner .content").html(infoText + notificationText);
+                $("#notificationBanner").show();
+                $("#notificationBanner .notification-info").on("click", function() {
+                    $("#notificationBanner .notification").toggleClass("active");
+                });
+
+                $("#notificationBanner [data-id] a").each(function() {
+                    $(this).on("click", function() {
+                        var parentElement = $(this).closest(".notification");
+                        parentElement.attr("data-visited", "true");
+                        //delete relevant notification
+                        tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
+                    })
+                });
+                $("#notificationBanner [data-id]").each(function() {
+                    $(this).on("click", function() {
+                        /*
+                         * check if all links have been visited
+                         */
+                        var allVisited = true;
+                        $("#notificationBanner [data-id]").each(function() {
+                            if (allVisited && !$(this).attr("data-visited")) {
+                                allVisited = false;
+                            };
+                        });
+                        if (allVisited) {
+                            $("#notificationBanner").hide();
+                        }
+                        $(this).hide();
+
+                    });
+                });
+                $("#notificationBanner .close").on("click", function(e) {
+                    //closing the banner
+                    e.stopPropagation();
+                    var dataIds = $(this).parent().find("[data-id]");
+                    dataIds.each(function() {
+                        //delete entry
+                        if (!($(this).attr("data-visited"))) {
+                            $(this).attr("data-visited", true);
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                        };
+                    })
+                    $(this).parent().hide();
+                });
+            } else {
+                $("#notificationBanner").hide();
+            }
+        } else {
+            $("#notificationBanner").hide();
+        }
     },
     "emailContent": function(userId, messageId) {
         tnthAjax.emailLog(userId, function(data) {
@@ -1397,7 +1421,7 @@ var fillContent = {
                     item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
                     item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
                 });
-                $("#emailLogContent").append("<table id='profileEmailLogTable'></table>");
+                $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                 $('#profileEmailLogTable').bootstrapTable( {
                     data: data.messages,
                     pagination: true,
@@ -1550,6 +1574,167 @@ var fillContent = {
         } else {
             $(".report-error-message").show();
             $(".report-error-message").append("<div>" + i18next.t("Server Error occurred retrieving report data") + "</div>");
+        };
+    },
+    "auditLog": function(data) {
+        if (!data.error) {
+            var ww = $(window).width();
+            var auditUserId = $("#audit_user_id").val();
+            if (data["audits"] && data["audits"].length > 0 ) {
+                var fData = [];
+                data["audits"].forEach(function(item) {
+                    item["by"] = item["by"]["reference"];
+                    var r = /\d+/g;
+                    var m = r.exec(String(item["by"]));
+                    if (m) item["by"] = m[0]
+                    else item["by"] = "-";
+                    item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
+                    item["comment"] = hasValue(item["comment"]) ? escapeHtml(item["comment"]) : "";
+                    var c = String(item["comment"]);
+                    var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
+
+                    item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item["comment"];
+                    item["comment"] = item["comment"].replace("{showText}", "(function (obj) {" +
+                            "if (obj) {" +
+                            'var f = $(obj).parent().find(".second"); ' +
+                            'f.toggleClass("hide"); ' +
+                            '$(obj).text($(obj).text() === i18next.t("More...") ? i18next.t("Less..."): i18next.t("More...")); ' +
+                            "}  " +
+                            "})(this) "
+                    );
+                    fData.push(item);
+                });
+
+                $("#profileAuditLogTable").bootstrapTable( {
+                    data: fData,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: "table table-responsive profile-audit-log",
+                    sortName: "lastUpdated",
+                    sortOrder: "desc",
+                    search: true,
+                    smartDisplay: true,
+                    showToggle: true,
+                    showColumns: true,
+                    toolbar: "#auditTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                          };
+                    },
+                    undefinedText: "--",
+                    columns: [
+                        {
+                            field: "by",
+                            title: i18next.t("User"),
+                            width: "5%",
+                            sortable: true,
+                            searchable: true
+                        }, {
+                            field: "comment",
+                            title: i18next.t("Comment"),
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: "lastUpdated",
+                            title: i18next.t("Date/Time <span class='gmt'>{gmt}</span>").replace("{gmt}", "(GMT), Y-M-D"),
+                            sortable: true,
+                            searchable: true,
+                            /******
+                            sorter: function(a, b) {
+                                return new Date(b).getTime() - new Date(a).getTime();
+                            },
+                            ****/
+                            width: "20%"
+                        },
+                        {
+                            field: "version",
+                            title: i18next.t("Version"),
+                            sortable: true,
+                            visible: false
+                        }
+                    ]
+                } );
+            } else {
+                $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
+            }
+
+        } else {
+            $("#profileAuditLogErrorMessage").text(i18next.t("Problem retrieving audit log from server."));
+        };
+    },
+    "patientReport": function(data) {
+        if (!data.error) {
+            if (data["user_documents"] && data["user_documents"].length > 0 ) {
+                var fData = [];
+                data["user_documents"].forEach(function(item) {
+                    item["filename"] = escapeHtml(item["filename"]);
+                    item["document_type"] = escapeHtml(item["document_type"]);
+                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
+                    item["actions"] = '<a title="' + i18next.t("Download") + '" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-download"></i></a>';
+                    fData.push(item);
+                });
+
+                $("#profilePatientReportTable").bootstrapTable( {
+                    data: fData,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: "table table-responsive profile-patient-reports",
+                    sortName: "uploaded_at",
+                    sortOrder: "desc",
+                    search: true,
+                    smartDisplay: true,
+                    showToggle: true,
+                    showColumns: true,
+                    toolbar: "#prTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                          };
+                    },
+                    undefinedText: "--",
+                    columns: [
+                        {
+                            field: "contributor",
+                            title: i18next.t("Type"),
+                            searchable: true,
+                            sortable: true
+                        },
+                        {
+                            field: "filename",
+                            title: i18next.t("Report Name"),
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: "uploaded_at",
+                            title: i18next.t("Generated (GMT)"),
+                            sortable: true,
+                            searchable: true,
+                            width: "20%"
+                        }, {
+                            field: "document_type",
+                            title: i18next.t("Document Type"),
+                            sortable: true,
+                            visible: false
+                        },{
+                            field: "actions",
+                            title: i18next.t("Download"),
+                            sortable: false,
+                            searchable: false,
+                            visible: true,
+                            class: "text-center"
+                        }
+                    ]
+                } );
+            } else {
+                $("#patientReportErrorMessage").text(i18next.t("No reports available.")).removeClass("error-message");
+            }
+
+        } else {
+            $("#profilePatientReportTable").closest("div.profile-item-container").hide();
+            $("#patientReportErrorMessage").text(i18next.t("Problem retrieving reports from server.")).addClass("error-message");
         };
     }
 };
@@ -1711,15 +1896,8 @@ var assembleContent = {
 
             var studyId = $("#profileStudyId").val();
             var siteId = $("#profileSiteId").val();
-            var states = [];
 
-            $("#userOrgs input[name='organization']").each(function() {
-                if ($(this).is(":checked")) {
-                    if (hasValue($(this).attr("state")) && parseInt($(this).val()) != 0) states.push($(this).attr("state"));
-                };
-            });
-
-            if (hasValue(studyId) || hasValue(siteId) || states.length > 0) {
+            if (hasValue(studyId) || hasValue(siteId)) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
@@ -1769,15 +1947,6 @@ var assembleContent = {
                     };
                 };
 
-                if (states.length > 0) {
-                    states.forEach(function(state) {
-                        identifiers.push({
-                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
-                            use: "secondary",
-                            value: "state:" + state
-                        });
-                    });
-                };
                 demoArray["identifier"] = identifiers;
             };
 
@@ -1883,6 +2052,1312 @@ var assembleContent = {
         tnthAjax.putDemo(userId,demoArray);
     }
 };
+/*
+ * helper Object for initializing profile sections
+ */
+var Profile = function(subjectId, currentUserId) {
+
+    this.subjectId = subjectId;
+    this.currentUserId = currentUserId;
+
+    this.onBeforeSectionsLoad = function() {
+        $("#mainDiv").addClass("profile");
+    };
+
+    this.onSectionsDidLoad = function() {
+        /*
+         * Note, this attach loader indicator to element with the class data-loader-container,
+         * in order for this to work, the element needs to have an id attribute
+         */
+        var self = this;
+        setTimeout(function() {
+            $("#profileForm [data-loader-container]").each(function() {
+                var attachId = $(this).attr("id");
+                if (!hasValue(attachId)) return false;
+                self.getSaveLoaderDiv("profileForm", attachId);
+                var targetFields = $(this).find("input, select");
+                if (targetFields.length > 0) {
+                    targetFields.each(function() {
+                        if ($(this).attr("type") == "hidden") return false;
+                            $(this).attr("data-save-container-id", attachId);
+                            var triggerEvent = $(this).attr("data-trigger-event");
+                            if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+                            $(this).on(triggerEvent, function(e) {
+                            e.stopPropagation();
+                            var valid = this.validity ? this.validity.valid : true;
+                            if (valid) {
+                                var hasError = false;
+                                if ($(this).attr("data-error-field")) {
+                                  var customErrorField = $("#" + $(this).attr("data-error-field"));
+                                  if (customErrorField.length > 0) {
+                                    if (customErrorField.text() != "") hasError = true;
+                                    else hasError = false;
+                                  } else hasError = false;
+                                };
+                            if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo(self.subjectId,true, $(this));
+                        };
+                    });
+                });
+              };
+          });
+
+          $("#profileForm .profile-item-container.editable").each(function() {
+              $(this).prepend('<input type="button" class="btn profile-item-edit-btn" value="{edit}" aria-label="{editButton}"></input>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
+          });
+
+          $("#profileForm .profile-item-edit-btn").each(function() {
+              $(this).on("click", function(e) {
+                e.preventDefault();
+                var container = $(this).closest(".profile-item-container");
+                container.toggleClass("edit");
+                $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
+                if (!container.hasClass("edit")) {
+                    var sections = container.attr("data-sections") ? container.attr("data-sections").split(",") : false;
+                    if (sections) {
+                        sections.forEach(function(sectionId) {
+                            var errorText = container.find(".error-icon").text();
+                            if (!hasValue(errorText) && fillViews[sectionId]) fillViews[sectionId]();
+                        });
+                    }
+                };
+              });
+          });
+        }, 1000);
+    }
+    this.initSections = function(callback) {
+        var self = this;
+        $("[data-profile-section-id]").each(function() {
+            self.initSection($(this).attr("data-profile-section-id"));
+        });
+        if (callback) {
+            setTimeout(function() {
+                callback();
+            }, 300);
+        }
+    };
+    this.initSection = function(type) {
+        switch(String(type).toLowerCase()) {
+            case "demo":
+                this.initBirthdaySection();
+                this.initEmailSection();
+                this.initPhoneSection();
+                this.initAltPhoneSection();
+                break;
+            case "patientonly":
+                this.initPatientReportSection();
+                this.initAssessmentListSection();
+                this.initClinicalQuestionsSection();
+                this.initPatientEmailFormSection();
+                this.initDeceasedSection();
+                break;
+            case "communication":
+                this.initResetPasswordSection();
+                this.initCommunicationSection();
+            case "birthday":
+                this.initBirthdaySection();
+                break;
+            case "locale":
+                this.initLocaleSection();
+                break;
+            case "email":
+                this.initEmailSection();
+                break;
+            case "patientemailform":
+                this.initPatientEmailFormSection();
+                break;
+            case "staffemailform":
+                this.initStaffRegistrationEmailSection();
+                break;
+            case "phone":
+                this.initPhoneSection();
+                break;
+            case "altphone":
+                this.initAltPhoneSection();
+                break;
+            case "resetpassword":
+                this.initResetPasswordSection();
+                break;
+            case "timezone":
+                this.initTimeZoneSection();
+                break;
+            case "deceased":
+                this.initDeceasedSection();
+                break;
+            case "patientreport":
+                this.initPatientReportSection();
+                break;
+            case "assessmentlist":
+                this.initAssessmentListSection();
+                break;
+            case "clinicalquestions":
+                this.initClinicalQuestionsSection();
+                break;
+            case "orgsstateselector":
+                this.initOrgsStateSelectorSection();
+                this.initConsentSection();
+                break;
+            case "orgs":
+                this.initDefaultOrgsSection();
+                this.initConsentSection();
+                break;
+            case "consent":
+                this.initConsentSection();
+                break;
+            case "custompatientdetail":
+                this.initCustomPatientDetailSection();
+                break;
+            case "roleslist":
+                this.initRolesListSection();
+                break;
+            case "auditlog":
+                this.initAuditLogSection();
+                break;
+            case "procedure":
+                this.initProcedureSection();
+                break;
+            case "biopsy":
+                this.initBiopsySection();
+                break;
+        };
+    };
+
+    this.handleLoginAs = function(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+        //sessionStorage does not work in private mode
+        try {
+          sessionStorage.setItem("loginAsPatient", "true");
+        } catch(e) {
+            /*
+             * alert user if this is not set properly
+             */
+             alert(i18next.t("Unable to properly set session storage variable for login-as."));
+        }
+        location.replace("/login-as/" + this.subjectId);
+    };
+
+    this.getSaveLoaderDiv = function(parentID, containerID) {
+        var el = $("#" + containerID + "_load");
+        if (el.length === 0) {
+            var c = $("#" + parentID + " #" + containerID);
+            if (c.length > 0) {
+                var snippet = '<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">' + i18next.t("Unable to Update.System error.") + '</i></div>';
+                if (window.getComputedStyle) {
+                    displayStyle = window.getComputedStyle(c.get(0), null).getPropertyValue("display");
+                } else {
+                    displayStyle = (c.get(0)).currentStyle.display;
+                };
+                if (String(displayStyle) === "block") {
+                    c.append(snippet);
+                } else {
+                    if (String(displayStyle) === "none" || !hasValue(displayStyle)) {
+                        if (c.get(0).nodeName.toUpperCase() === "DIV" || c.get(0).nodeName.toUpperCase() === "P") {
+                            c.append(snippet);
+                        }
+                        else {
+                            c.after(snippet);
+                        }
+                    } else {
+                        c.after(snippet);
+                    };
+                };
+            };
+        };
+    };
+
+    this.initBirthdaySection = function() {
+        $("#month").on("change", function() {
+            $(this).trigger("focusout");
+        });
+        $("#year", "#date").each(function() {
+            $(this).on("change", function() {
+                $(this).trigger("blur");
+            });
+        });
+        ["year", "month", "date"].forEach(function(fn) {
+            var field = $("#" + fn);
+            var triggerEvent = hasValue(field.attr("data-trigger-event")) ? field.attr("data-trigger-event") : (field.attr("type") == "text" ? "blur" : "change");
+            field.on(triggerEvent, function() {
+                var y = $("#year"), m = $("#month"), d = $("#date");
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+                if (isValid) {
+                    $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                    $("#errorbirthday").html("");
+                } else {
+                    $("#birthday").val("");
+                    return false;
+                };
+
+            });
+        });
+        this.__convertToNumericField($("#date, #year"));
+    };
+    this.initLocaleSection = function() {
+        $('#locale').on('change', function() {
+            setTimeout(function(){
+                window.location.reload(true);
+            },1000);
+        });
+    };
+    this.getAccessUrl = function() {
+        var url = '';
+        tnthAjax.accessUrl( this.subjectId, true, function(data) {
+            if (!data.error) {
+                url = data.url;
+                $("#profileEmailErrorMessage").text("");
+            } else {
+                $("#profileEmailErrorMessage").text(i18next.t("failed request to get email invite url"));
+            }
+        });
+        return url;
+    }
+    this.checkEmail = function(email) {
+        if (hasValue(email)) {
+            $("#btnPasswordResetEmail").attr("disabled", false);
+            $("#btnProfileSendEmail").attr("disabled", false);
+            $('#btnProfileSendEmail').removeClass('disabled');
+        } else {
+            if ($("#email").get(0).validity.valid) {
+                $("#btnPasswordResetEmail").attr("disabled", true);
+                $("#btnProfileSendEmail").attr("disabled", true);
+                $('#btnProfileSendEmail').addClass('disabled');
+            };
+        };
+    };
+    this.initEmailSection = function() {
+        var self = this;
+        self.checkEmail($("#email").val());
+        $("#email").on("blur, keyup", function() {
+            self.checkEmail($(this).val());
+            if ($(this).val() !== "") {
+                $("#profileEmailSelect").attr("disabled", false);
+            } else {
+                $("#profileEmailSelect").val("").attr("disabled", true);
+            };
+        });
+        //in profile email is validated and updated after ajax call to check unique email
+        $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
+        $("#btnProfileSendEmail").blur();
+    };
+    this.initPatientEmailFormSection = function() {
+        var self = this;
+        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+
+        $("#profileEmailSelect").on("change", function() {
+            var message = "";
+            if (this.value != "" && $("#email").val() != "" && $("#erroremail").text() == "") {
+                message = i18next.t("{emailType} email will be sent to {email}");
+                message = message.replace("{emailType}", $(this).children("option:selected").text())
+                                .replace("{email}", $("#email").val());
+                $("#profileEmailMessage").html(message);
+                $("#btnProfileSendEmail").removeClass("disabled");
+            } else {
+                $("#profileEmailMessage").text("");
+                $("#btnProfileSendEmail").addClass("disabled");
+            }
+        });
+
+        $("#btnProfileSendEmail").on("click", function(event) {
+            event.preventDefault();
+            var emailTypeElem = $("#profileEmailSelect");
+            var selectedOption = emailTypeElem.children("option:selected");
+            var email = $("#email").val();
+
+            if (selectedOption.val() != "") {
+                var subject = "";
+                var body = "";
+                var clinicName = (function() {
+                    var cn = "";
+                    var selectedOrg = $("#userOrgs input[name='organization']:checked");
+                    if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
+                    if (!hasValue(cn)) cn = i18next.t("your clinic");
+                    return cn;
+                })();
+                if (selectedOption.val() == "invite"){
+                    var return_url = self.getAccessUrl();
+                    if (hasValue(return_url)) {
+                        $.ajax ({
+                            type: "GET",
+                            url: $("#patientRegistrationInviteEmailUrl").val(),
+                            cache: false,
+                            async: false
+                        }).done(function(data) {
+                            if (hasValue(data)) {
+                                subject = data["subject"];
+                                body = data["body"];
+                            };
+                        }).fail(function(xhr) {
+
+                        });
+                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
+                    };
+                }
+                else { // reminder
+                    body = $("#patientReminderEmailBody").html().replace(/\(clinic name\)/g, clinicName);
+                    subject = $("#patientReminderEmailSubject").html().replace(/\(clinic name\)/g, clinicName);
+                }
+                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
+                    tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
+                        if (!data.error) {
+                            $("#profileEmailMessage").html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
+                            $("#profileEmailSelect").val("");
+                            $("#btnProfileSendEmail").addClass("disabled");
+
+                            /*
+                             * reload email audit log
+                             */
+                            tnthAjax.emailLog(subjectId, function(data) {
+                                setTimeout(function() {
+                                    fillContent.emailLog(self.subjectId, data);
+                                }, 100);
+                            });
+                        } else {
+                            $("#profileEmailMessage").text(i18next.t("Unable to send email"));
+                        };
+                    });
+                } else  {
+                    $("#profileEmailMessage").text(i18next.t("Unable to send email."));
+                    if (!hasValue(body)) $("#profileEmailMessage").append("<div>" + i18next.t("Email body content is missing.") + "</div>");
+                    if (!hasValue(subject)) $("#profileEmailMessage").append("<div>" + i18next.t("Email subject is missing.") + "</div>");
+                    if (!hasValue(email)) $("#profileEmailMessage").append("<div>" + i18next.t("Email address is missing.") + "</div>");
+                };
+            } else $("#profileEmailMessage").text(i18next.t("You must select a email type"));
+        });
+    };
+    this.initStaffRegistrationEmailSection = function() {
+        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+
+        var self = this;
+
+        $("#btnProfileSendEmail").on("click", function(event) {
+            event.preventDefault();
+            var email = $("#email").val();
+            var subject = "";
+            var body = "";
+            var return_url = "";
+            var clinicName = (function() {
+                var orgs = $("#userOrgs input[name='organization']:checked");
+                var parentName = "";
+                if (orgs.length > 0 ) {
+                    orgs.each(function() {
+                        if (!parentName) {
+                            parentName = $(this).attr("data-parent-name");
+                            if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                        };
+                    });
+                };
+                var cn = parentName ? parentName: i18next.t("your clinic");
+                return cn;
+            })();
+            $.ajax ({
+                type: "GET",
+                url: $("#staffRegistrationEmailUrl").val(),
+                cache: false,
+                async: false
+            }).done(function(data) {
+                if (hasValue(data)) {
+                    subject = data["subject"];
+                    body = data["body"];
+                };
+            }).fail(function(xhr) {
+
+            });
+
+            //provide default body content if no body content was returned from ajax call
+            if (!hasValue(body)) {
+                body = "<p>" + i18next.t("Hello, this is an invitation to complete your registration.") + "</p>";
+                return_url = self.getAccessUrl()
+                if (hasValue(return_url)) {
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>" + i18next.t("Verify your account to complete registration") + "</a>";
+                }
+            };
+            if (!hasValue(subject)) {
+                subject = i18next.t("Registration invite from {clinicName}").replace("{clinicName}", clinicName);
+            };
+
+            tnthAjax.invite(self.subjectId,{"subject": subject, "recipients": email, "body": body}, function(data) {
+                if (!data.error) {
+                    $("#profileEmailMessage").text(i18next.t("invite email sent to {email}").replace("{email}", email));
+                    $("#btnProfileSendEmail").attr("disabled", true);
+                } else {
+                    if (data.error) $("#profileEmailErrorMessage").text(i18next.t("Unable to send email."));
+                };
+            });
+        });
+    };
+    this.initCommunicationSection = function() {
+        $("#communicationsContainer .tab-label").on("click", function() {
+            $("#communicationsContainer .tab-label").removeClass("active");
+            $(this).addClass("active");
+        });
+        $("#emailBodyModal").modal({"show": false});
+        var subjectId = this.subjectId;
+        tnthAjax.emailLog(subjectId, function(data) {
+            setTimeout(function() {
+                fillContent.emailLog(subjectId, data);
+            }, 100);
+        });
+    };
+    this.initPhoneSection = function() {
+        this.__convertToNumericField($("#phone"));
+    };
+    this.initAltPhoneSection = function() {
+        this.__convertToNumericField($("#altPhone"));
+    };
+    this.initResetPasswordSection = function() {
+        var self = this;
+        if (!hasValue($("#email").val())) {
+            $("#btnPasswordResetEmail").attr("disabled", true);
+        };
+        $("#btnPasswordResetEmail").on("click", function(event) {
+            event.preventDefault();
+            email = $("#email").val();
+            if (email) {
+                tnthAjax.passwordReset(self.subjectId, function(data) {
+                    if (!data.error) {
+                        $("#passwordResetMessage").text(i18next.t("Password reset email sent to {email}").replace("{email}", email));
+                    } else {
+                        $("#passwordResetMessage").text(i18next.t("Unable to send email."));
+                    };
+                });
+            } else {
+                $("#passwordResetMessage").text(i18next.t("No email address found for user"));
+            };
+        });
+    };
+    this.initTimeZoneSection = function() {
+        var self = this;
+        self.getSaveLoaderDiv("profileForm", "profileTimeZoneGroup");
+        $("#profileTimeZone").on("change", function() {
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
+            assembleContent.demo(self.subjectId,true, $(this), true);
+            fillViews.timezone();
+        });
+    };
+    this.initDeceasedSection = function() {
+        this.__convertToNumericField($("#deathDay, #deathYear"));
+        var self = this;
+        var saveLoaderDiv = self.getSaveLoaderDiv;
+        saveLoaderDiv("profileForm", "boolDeathGroup");
+        $("#boolDeath").on("change", function() {
+            if (!($(this).is(":checked"))) {
+                $("#deathYear").val("");
+                $("#deathDay").val("");
+                $("#deathMonth").val("");
+                $("#deathDate").val("");
+            }
+            assembleContent.demo(self.subjectId, true, $(this));
+        });
+
+        ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
+            saveLoaderDiv("profileForm", $("#"+fn).attr("data-save-container-id"));
+            var fd = $("#" + fn);
+            var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
+            var self = this;
+            fd.on(triggerEvent, function() {
+                 var d = $("#deathDay");
+                 var m = $("#deathMonth");
+                 var y = $("#deathYear");
+                 if (d.val() != "" && m.val() != "" && y.val() != "") {
+                    if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                        var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
+                        if (errorMsg === "") {
+                            $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                            $("#boolDeath").prop("checked", true);
+                            $("#errorDeathDate").text("");
+                            assembleContent.demo(self.subjectId, true, $(this));
+                        } else {
+                            $("#errorDeathDate").text(errorMsg);
+                        };
+                    };
+                };
+            });
+        });
+    };
+    this.initPatientReportSection = function() {
+        var self = this;
+        tnthAjax.patientReport(self.subjectId, function(data) {
+            fillContent.patientReport(data);
+        });
+    };
+    this.initAssessmentListSection = function() {
+        var self = this;
+        tnthAjax.assessmentList(self.subjectId, function(data) {
+            fillContent.assessmentList(data);
+        });
+    };
+    this.initOrgsStateSelectorSection = function() {
+        var subjectId = this.subjectId;
+        var stateDict={AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")};
+        this.getSaveLoaderDiv("profileForm", "userOrgs");
+        $("#stateSelector").on("change", function() {
+            var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
+            var defaultPrompt = i18next.t("What is your main clinic for prostate cancer care");
+            $("#userOrgsInfo").hide();
+            if (selectedState.val() != "") {
+                if (selectedState.val() == "none") {
+                    $(".state-container, .noOrg-container").hide();
+                    $(".clinic-prompt").text("").hide();
+                    $("#noOrgs").prop("checked", true).trigger("click");
+                    //send of ajax to update org to 0 here
+                } else {
+                    if (container.length > 0) {
+                        $(".state-container").hide();
+                        $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text() + "?").show();
+                        $(".noOrg-container").show();
+                        $("#noOrgs").prop("checked", false);
+                        container.show();
+                    } else {
+                        $(".state-container, .clinic-prompt, .noOrg-container").hide();
+                        $("#userOrgsInfo").show();
+                    };
+                };
+            } else {
+                $(".state-container, .noOrg-container").hide();
+                $(".clinic-prompt").text("").hide();
+            };
+        });
+        $.ajax ({
+            type: "GET",
+            url: "/api/organization",
+            async: false
+        }).done(function(data) {
+            if (data && data.entry) {
+                var entry = data.entry, states = {}, contentHTML = "";
+                /*
+                * populate orgs list object
+                */
+                OT.populateOrgsList(entry);
+                var orgsList = OT.getOrgsList();
+
+                /**** draw state select element first to gather all states
+                    assign orgs to each state in array
+                ***/
+                entry.forEach(function(item) {
+                    var __state = "";
+                    if (item.identifier) {
+                        (item.identifier).forEach(function(region) {
+                            if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
+                                __state = (region.value).split(":")[1];
+                                if (!states[__state]) {
+                                    states[__state] = [item.id];
+                                    $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                } else {
+                                    (states[__state]).push(item.id);
+                                };
+
+                                if ($("#stateSelector option[value='" + __state + "']").length === 0) {
+                                    $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                };
+                                /*
+                                * assign state for each item
+                                */
+                                orgsList[item.id].state = __state;
+                            };
+                        });
+                    };
+                });
+
+                /*
+                * If an organization is a top level org and has child orgs,
+                * we render legend for it.  This will prevent the organization from being selected by the user.
+                * Note: a hidden input field is rendered for the organization so it can still be referenced by the child orgs if necessary.
+                */
+                var parentOrgs = $.grep(entry, function(item) {
+                    return parseInt(item.id) !== 0 && !item.partOf;
+                });
+
+                /*
+                 * sort parent orgs so ones with children displayed first
+                 */
+                parentOrgs = parentOrgs.sort(function(a, b) {
+                    var oo_1 = orgsList[a.id];
+                    var oo_2 = orgsList[b.id];
+                    if (oo_1 && oo_2) {
+                        if (oo_1.children.length > 0 && oo_2.children.length > 0) {
+                            if (a.name < b.name) return -1;
+                            if (a.name > b.name) return 1;
+                            return 0;
+                        }
+                        else if (oo_1.children.length > 0 && oo_2.children.length == 0) return -1;
+                        else if (oo_2.children.length > 0 && oo_1.children.length == 0) return 1;
+                        else {
+                            if (a.name < b.name) return -1;
+                            if (a.name > b.name) return 1;
+                            return 0;
+                        };
+                    } else return 0;
+                });
+
+                parentOrgs.forEach(function(item) {
+                    var state = orgsList[item.id].state;
+                    if ($("#" + state + "_container").length > 0) {
+                        var oo = orgsList[item.id];
+                        if (oo.children.length > 0) {
+                            contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
+                            contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' org_name='{orgName}' ";
+                            contentHTML += " id='{orgId}_org' value='{orgId}' />";
+                            contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                    .replace(/\{orgName\}/g, item.name)
+                                                    .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+                        } else {
+                            /*
+                             * also need to check for top level orgs that do not have children and render those
+                             */
+                            contentHTML = "<div class='radio'>" +
+                                    "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
+                                    "</div>";
+                            contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                .replace(/\{state\}/g, state)
+                                                .replace(/\{orgName\}/g, item.name)
+                                                .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+                        };
+                        $("#" + state + "_container").append(contentHTML);
+                    };
+                });
+
+                /**** draw input element(s) that belongs to each state based on parent organization id ***/
+                var childOrgs = $.grep(entry, function(item) {
+                    return parseInt(item.id) !== 0 && item.partOf;
+                });
+
+                // sort child clinics in alphabetical order
+                childOrgs = childOrgs.sort(function(a,b){
+                    if (a.name < b.name) return 1;
+                    if (a.name > b.name) return -1;
+                    return 0;
+                });
+
+                childOrgs.forEach(function(item) {
+                    var parentId = (item.partOf.reference).split("/")[2];
+                    if (parentId) {
+                        var parentState = (function(o) {
+                            var s = "", found = false;
+                            for (var state in states) {
+                                if (!found) {
+                                    (states[state]).forEach(function(i) {
+                                        if (i == o) {
+                                           s = state;
+                                           found = true;
+                                        };
+                                    });
+                                };
+                            };
+                            return s;
+                        })(parentId);
+
+                        contentHTML = "<div class='radio'>" +
+                                    "<label class='indent'><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{parentOrgName}' data-parent-id='{parentOrgId}'>{translatedOrgName}</label>" +
+                                    "</div>";
+                        contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
+                                                .replace(/\{state\}/g, parentState)
+                                                .replace(/\{parentOrgName\}/g, item.name)
+                                                .replace(/\{parentOrgId\}/g, parentId)
+                                                .replace(/\{translatedOrgName\}/g, i18next.t(item.name));
+
+                        if ($("#" + parentState + "_container legend[orgId='" + parentId + "']").length > 0) {
+                            $("#" + parentState + "_container legend[orgId='" + parentId + "']").after(contentHTML);
+                        } else {
+                            $("#" + parentState + "_container").append(contentHTML);
+                        };
+                    };
+                  });
+
+                var selectOptions = $("#stateSelector").sortOptions();
+                if (selectOptions.length > 0) {
+                    $("#stateSelector").empty().append(selectOptions)
+                      .append("<option value='none'>" + i18next.t('Other') + "</option>")
+                      .prepend("<option value='' selected>" + i18next.t('Select') + "</option>")
+                      .val("");
+                    $(".state-container, .clinic-prompt").hide();
+                    setTimeout(function() { OT.handlePreSelectedClinic();}, 500);
+                    //case of pre-selected clinic, need to check if any clinic has prechecked
+                    setTimeout(function () {
+                        var o = $("#userOrgs input[name='organization']:checked");
+                        if (o.length > 0 && o.val() != 0) {
+                            o.closest(".state-container").show();
+                            $(".clinic-prompt").show();
+                        };
+                    }, 500);
+                    $("#userOrgs input[name='organization']").each(function() {
+                        if (parseInt($(this).val()) !== 0) OT.getDefaultModal(this);
+                    });
+
+                    tnthAjax.getDemo(subjectId);
+                    OT.handleEvent();
+                } else { // if no states found, then need to draw the orgs UI
+                    $("#userOrgs .selector-show").hide();
+                    setTimeout(function() { tnthAjax.getOrgs(subjectId, false, false, function() {
+                        OT.filterOrgs(OT.getHereBelowOrgs());
+                        OT.morphPatientOrgs();
+                        $(".noOrg-container, .noOrg-container *").show();
+                    }); }, 500);
+                };
+
+                if ($("#mainDiv.profile").length > 0) {
+                    setTimeout(function() { tnthAjax.getConsent(subjectId, true);}, 500);
+                };
+
+                $("#clinics").attr("loaded", true);
+            };
+
+        }).fail(function(xhr) {
+            tnthAjax.sendError(xhr, "/api/organization", subjectId);
+        });
+    };
+    this.initDefaultOrgsSection = function() {
+        var subjectId = this.subjectId;
+        this.getSaveLoaderDiv("profileForm", "userOrgs");
+        setTimeout(function() { tnthAjax.getOrgs(subjectId, false, false,
+                function() {
+                    tnthAjax.getDemo(subjectId, false, false, function() {
+                        if ((typeof leafOrgs != "undefined") && leafOrgs) OT.filterOrgs(leafOrgs);
+                        if ($("#requireMorph").val()) OT.morphPatientOrgs();
+                        setTimeout(function() { tnthAjax.getConsent(subjectId);}, 500);
+                        $("#clinics").attr("loaded", true);
+                    });
+                });}, 500);
+    };
+    this.initConsentSection = function() {
+        $("#consentHistoryModal").modal({"show": false});
+        $(".consent-modal").each(function() {
+            var agreemntUrl = $(this).find(".agreement-url").val();
+            if (/stock\-org\-consent/.test(agreemntUrl)) {
+                $(this).find(".terms-wrapper").hide();
+            };
+        });
+        $("#consentContainer input[name='toConsent']").each(function() {
+            $(this).on("click", function(e) {
+                e.stopPropagation();
+                $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true);
+                var orgId = $(this).attr("data-org");
+                var userId = $("#fillOrgs").attr("userId");
+                $("#" + orgId + "_loader").show();
+                if ($(this).val() == "yes") {
+                    (function(orgId) {
+                        var params = CONSENT_ENUM["consented"];
+                        params.org = orgId;
+                        params.agreementUrl = $("#" + orgId + "_agreement_url").val();
+                        setTimeout(function() { tnthAjax.setConsent(userId, params);}, 10);
+                        setTimeout(function() { tnthAjax.removeObsoleteConsent();}, 100);
+                    })(orgId);
+                }
+                else {
+                    tnthAjax.deleteConsent(subjectId, {"org":orgId});
+                    setTimeout(function() { tnthAjax.removeObsoleteConsent();}, 100);
+                };
+                setTimeout(function() { tnthAjax.reloadConsentList(userId);}, 500);
+                setTimeout(function() { $(".modal").modal("hide");}, 250);
+            });
+        });
+        $(document).delegate("#consentContainer button[data-dismiss]", "click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setTimeout(function() { location.reload();}, 10);
+        });
+        $("#consentContainer .modal").each(function() {
+            $(this).on("hidden.bs.modal", function() {
+                if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
+                    var userId = $("#fillOrgs").attr("userId");
+                    assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
+                };
+            });
+            $(this).on("show.bs.modal", function() {
+                $("#consentContainer .loading-message-indicator").hide();
+                $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
+                var checkedOrg = $("#userOrgs input[name='organization']:checked");
+                var shortName = OT.getShortName(checkedOrg.val());
+                if (hasValue(shortName)) {
+                    $(this).find(".consent-clinic-name").text(i18next.t(shortName));
+                };
+                $("#consentContainer input[name='toConsent']").each(function(){
+                    $(this).prop("checked", false);
+                });
+                var agreement_url = $(this).find(".agreement-url").val();
+                if (/stock\-org\-consent/.test(agreement_url)) {
+                    $(".terms-wrapper").hide();
+                };
+                var self = $(this);
+                $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
+                    self.find(".main-content").removeClass("tnth-hide");
+                });
+            });
+        });
+    };
+    this.checkDiagnosis = function() {
+        var diag = $("#pca_diag_yes");
+        var self = this;
+        if (diag.is(":checked")) {
+            diag.parents(".pat-q").nextAll().fadeIn();
+        } else {
+            diag.parents(".pat-q").nextAll().fadeOut();
+        };
+        if (self.currentUserId !== self.subjectId) {
+            if (!$("#patientQ input[type='radio']").is(":checked")) {
+                $("#patientQContainer").append("<span class='text-muted'>" + i18next.t("no answers provided") + "</span>");
+            };
+        };
+    };
+    this.initProcedureSection = function() {
+        var subjectId = $("#profileProcSubjectId").val();
+        tnthAjax.treatmentOptions(subjectId,null, function(data) {
+            if (!data.error) {
+                fillContent.treatmentOptions(data);
+            };
+        });
+
+        if (subjectId) {
+            tnthAjax.getProc(subjectId, false);
+        };
+    };
+    this.initClinicalQuestionsSection = function() {
+            $("#patientQ").show();
+            //don't show treatment
+            $("#patTx").remove();
+            $("#patientQ hr").hide();
+            var self = this;
+
+            tnthAjax.getTreatment(self.subjectId, function() {
+                tnthAjax.getClinical(self.subjectId, function() {
+                  $("#patientQ").attr("loaded", "true");
+                });
+            });
+            if (self.currentUserId !== self.subjectId) {
+                $("#patientQ input[type='radio']").each(function() {
+                    $(this).attr("disabled", "disabled");
+                });
+                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+                    $(this).attr("disabled", true);
+                });
+            };
+
+            if (hasValue(self.subjectId)) {
+                $(".pat-q input:radio").on("click",function(){
+                    var thisItem = $(this);
+                    var toCall = thisItem.attr("name")
+                    // Get value from div - either true or false
+                    var toSend = thisItem.val();
+                    if (toCall != "biopsy") {
+                        tnthAjax.postClinical(self.subjectId,toCall,toSend, $(this).attr("data-status"), $(this));
+                    };
+                    if (toSend == "true" || toCall ==  "pca_localized") {
+                        if (toCall == "biopsy") {
+                            if ($("#biopsyDate").val() == "") {
+                                return true;
+                            }
+                            else {
+                              //$("#biopsyDate").datepicker("hide").blur();
+                              tnthAjax.postClinical(self.subjectId, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
+                            };
+                        };
+                        thisItem.parents(".pat-q").nextAll().fadeIn();
+                    } else {
+                        if (toCall == "biopsy") {
+                            tnthAjax.postClinical(self.subjectId, toCall, "false", $(this).attr("data-status"), $(this));
+                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
+                                $("input[name='" + fieldName + "']").each(function() {
+                                    $(this).prop("checked", false);
+                                });
+                            });
+                            if ($("input[name='pca_diag']").length > 0) {
+                                tnthAjax.putClinical(self.subjectId,"pca_diag","false", $(this));
+                            };
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
+                            };
+                        } else if (toCall == "pca_diag") {
+                            ["pca_localized"].forEach(function(fieldName) {
+                              $("input[name='" + fieldName + "']").each(function() {
+                                  $(this).prop("checked", false);
+                              });
+                            });
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
+                            };
+                        }
+                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                    };
+                });
+            };
+
+            [{
+                "fields": $("#patientQ input[name='biopsy']"),
+                "containerId": "patBiopsy"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_diag']"),
+                "containerId": "patDiag"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_localized']"),
+                "containerId": "patMeta"
+            }
+            ].forEach( function(item) {
+                item.fields.each(function() {
+                     self.getSaveLoaderDiv("profileForm", item.containerId);
+                    $(this).attr("data-save-container-id", item.containerId);
+                });
+            });
+
+            //wait for ajax calls to finish?
+            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+            var self = this;
+            setTimeout(function() {
+                profileObj.checkDiagnosis();
+                fillViews.clinical();
+            }, 1000);
+    };
+    this.initBiopsySection = function() {
+        /*
+         *
+         * used by both profile and initial queries
+         */
+        __convertToNumericField($("#biopsy_day, #biopsy_year"));
+        $("input[name='biopsy']").each(function() {
+            $(this).on("click", function(e) {
+              e.stopPropagation();
+              if ($(this).val() == "true") {
+                $("#biopsyDateContainer").show();
+                if ($(this).attr("id") == "biopsy_yes") {
+                  if (!hasValue($("#biopsy_day").val())) $("#biopsy_day").focus();
+                };
+              } else {
+                $("#biopsyDate").val("");
+                $("#biopsy_day").val("");
+                $("#biopsy_month").val("");
+                $("#biopsy_year").val("");
+                $("#biopsyDateError").text("");
+                $("#biopsyDateContainer").hide();
+              };
+            });
+        });
+        $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+            $(this).on("change", function() {
+                var d = $("#biopsy_day");
+                var m = $("#biopsy_month");
+                var y = $("#biopsy_year");
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                if (isValid) {
+                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                    $("#biopsyDateError").text("").hide();
+                    $("#biopsy_yes").trigger("click");
+                    //success
+                } else {
+                    //fail
+                    $("#biopsyDate").val("");
+                };
+            });
+        });
+        $("input[name='tx']").each(function() {
+           $(this).on("click", function() {
+              if ($(this).val() == "true") {
+                  tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+              } else {
+                  tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+              };
+           });
+        });
+    };
+    this.manualEntryModalVis = function(hide) {
+        if (hide) {
+            $("#manualEntryButtonsContainer").hide();
+            $("#manualEntryLoader").show();
+        } else {
+            $("#manualEntryButtonsContainer").show();
+            $("#manualEntryLoader").hide();
+        };
+    };
+    this.continueToAssessment = function(method, completionDate, assessment_url) {
+        if (hasValue(assessment_url)) {
+            var still_needed = false;
+            var self = this;
+            var subjectId = this.subjectId;
+            tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
+                if (data && ! data.error && data.length > 0) {
+                    still_needed = true;
+                };
+            }, method);
+
+            /*
+             * passing additional query params
+             */
+            if (/\?/.test(assessment_url)) {
+                assessment_url += "&entry_method=" + method;
+            }
+            else{
+                assessment_url += "?entry_method=" + method;
+            };
+
+            if (method === "paper") {
+                assessment_url += "&authored=" + completionDate;
+            };
+
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+
+            self.manualEntryModalVis(true);
+
+            setTimeout(function() {
+                self.manualEntryModalVis();
+            }, 2000);
+
+            setTimeout(function() { window.location = winLocation;}, 100);
+
+        } else {
+            $("#manualEntryMessageContainer").html(i18next.t("The user does not have a valid assessment link."));
+        };
+    };
+    this.initCustomPatientDetailSection = function() {
+        var subjectId = this.subjectId;
+        var self = this;
+
+        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false);
+
+        $("#loginAsButton").on("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.handleLoginAs(e);
+        });
+
+        //fix for safari
+        $(window).on("beforeunload", function() {
+            if (navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
+                $("#manualEntryButtonsContainer").show();
+                $("#manualEntryLoader").hide();
+                $("#manualEntryModal").modal("hide");
+            }
+        });
+
+        $("#manualEntryModal").on("show.bs.modal", function() {
+            $("#manualEntryBodyLoader").show();
+            $("#manualEntryMain").hide();
+        });
+        $("#manualEntryModal").on("shown.bs.modal", function() {
+
+            $("#manualEntryMessageContainer").text("");
+            $("#errorCompletionDate").text("");
+            $("#meSubmit").attr("disabled", false);
+            /*
+            * get GMT date/time for today
+            */
+            var todayObj = tnthDates.getTodayDateObj();
+            $("#qCompletionDay").val(todayObj.displayDay);
+            $("#qCompletionMonth").val(todayObj.displayMonth);
+            $("#qCompletionYear").val(todayObj.displayYear);
+            $("#qCompletionDate").val(todayObj.gmtDate);
+            $("#qToday").val(todayObj.gmtDate);
+
+            if ($("#paper").is(":checked")) {
+                $("#manualEntryCompletionDateContainer").show();
+            };
+            //get consent date
+            tnthAjax.getConsent(subjectId, true, function(data) {
+                var dataArray = [];
+                if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+                    dataArray = data["consent_agreements"].sort(function(a,b){
+                         return new Date(b.signed) - new Date(a.signed);
+                    });
+                };
+                if (dataArray.length > 0) {
+                    /*
+                     * filtered out non-deleted items from all consents
+                     */
+                    var items = $.grep(dataArray, function(item) {
+                        return !item.deleted && item.status == "consented";
+                    });
+                    /*
+                     * consent date in GMT
+                     */
+                    if (items.length > 0) {
+                        $("#manualEntryConsentDate").val(items[0].signed);
+                    };
+                };
+            });
+
+            setTimeout(function() {
+                $("#manualEntryBodyLoader").hide();
+                $("#manualEntryMain").show();
+            }, 10);
+        });
+
+        $("input[name='entryMethod']").on("click", function() {
+            if ($(this).is(":checked")) {
+                $("#manualEntryModal .error-message").text("");
+                $("#meSubmit").attr("disabled", false);
+                if ($(this).val() == "interview_assisted") {
+                    /*
+                    * if method is interview assisted,
+                    * reset completion date to GMT date/time for today
+                    */
+                    var todayObj = tnthDates.getTodayDateObj();
+                    $("#qCompletionDay").val(todayObj.displayDay);
+                    $("#qCompletionMonth").val(todayObj.displayMonth);
+                    $("#qCompletionYear").val(todayObj.displayYear);
+                    $("#qCompletionDate").val(todayObj.gmtDate);
+                };
+            };
+        });
+        $("#paper").on("click", function() {
+            $("#manualEntryCompletionDateContainer").show();
+        });
+        $("#interviewAssisted").on("click", function() {
+            $("#manualEntryCompletionDateContainer").hide();
+        });
+
+        self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
+
+
+        ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
+            var fd = $("#" + fn);
+            fd.on("change", function() {
+                var d = $("#qCompletionDay");
+                var m = $("#qCompletionMonth");
+                var y = $("#qCompletionYear");
+                var todayObj = tnthDates.getTodayDateObj();
+                var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
+
+                if (d.val() != "" && m.val() != "" && y.val() != "") {
+                    if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                        var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        var consentDate = $("#manualEntryConsentDate").val();
+                        if (!hasValue(errorMsg) && hasValue(consentDate)) {
+                             /*
+                             * check if date entered is today, if so use today's date/time
+                             */
+                            if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                                $("#qCompletionDate").val(todayObj.gmtDate);
+                            } else {
+                                var gmtDateObj = tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0);
+                                $("#qCompletionDate").val(tnthDates.getDateWithTimeZone(gmtDateObj));
+                            };
+                            /*
+                             * all date/time should be in GMT date/time
+                             */
+                            var completionDate = new Date($("#qCompletionDate").val());
+                            var cConsentDate = new Date(consentDate);
+                            var cToday = new Date($("#qToday").val());
+                            var nCompletionDate = completionDate.setHours(0,0,0,0);
+                            var nConsentDate = cConsentDate.setHours(0,0,0,0);
+                            var nToday = cToday.setHours(0,0,0,0);
+                            if (nCompletionDate < nConsentDate) {
+                                errorMsg = i18next.t("Completion date cannot be before consent date.");
+                            };
+                            if (nConsentDate >= nToday) {
+                                if (nCompletionDate > nConsentDate) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            } else {
+                                if (nCompletionDate > nToday) {
+                                    errorMsg = i18next.t("Completion date cannot be in the future.");
+                                };
+                            };
+                        };
+                        if (errorMsg === "") {
+                            $("#errorCompletionDate").text("");
+                            $("#meSubmit").attr("disabled", false);
+                        } else {
+                            $("#errorCompletionDate").text(errorMsg);
+                            $("#meSubmit").attr("disabled", true);
+                        };
+                    } else {
+                        $("#meSubmit").attr("disabled", true);
+                    };
+                } else {
+                    $("#errorCompletionDate").text(i18next.t("Completion date must be valid."));
+                    $("#meSubmit").attr("disabled", true);
+                };
+            });
+        });
+        $(document).delegate("#meSubmit", "click", function(event){
+
+            var method = $("input[name='entryMethod']:checked").val();
+            var completionDate = $("#qCompletionDate").val();
+            var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
+
+            if (method != "") {
+                $("#manualEntryMessageContainer").text("");
+
+                if (method === "paper") {
+
+                    /*
+                     * check questionnaire time windows
+                     * disallow user to continue if the completion date is not in windows?
+                     * but display warning
+                     */
+
+                    self.manualEntryModalVis(true);
+
+                    var errorMsg = "";
+
+                    tnthAjax.getCurrentQB(subjectId, tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
+                        if (!data.error) {
+                            if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
+                                errorMsg = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
+                            };
+
+                            if (hasValue(errorMsg)) {
+                                $("#errorCompletionDate").text(errorMsg);
+                                $("#meSubmit").attr("disabled", true);
+                                self.manualEntryModalVis();
+                            } else {
+                                $("#errorCompletionDate").text("");
+                                $("#meSubmit").attr("disabled", false);
+                            };
+
+                            if (!hasValue(errorMsg)) {
+                                self.continueToAssessment(method, completionDate, linkUrl);
+                            };
+
+                        };
+                    });
+                } else {
+                    self.continueToAssessment(method, completionDate, linkUrl);
+                };
+            } else {
+                $("#manualEntryMessageContainer").html(i18next.t("You must select a method."));
+            };
+        });
+
+        tnthAjax.assessmentStatus(subjectId, function(data) {
+            if (!data.error) {
+                if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
+                    (parseInt(data.outstanding_indefinite_work) === 0)) {
+                    $("#assessmentLink").attr("disabled", true);
+                    $("#enterManualInfoContainer").text(i18next.t("All available questionnaires have been completed."));
+                };
+            };
+        });
+    };
+    this.initRolesListSection = function() {
+        var self = this;
+        tnthAjax.getRoleList(function() {
+            tnthAjax.getRoles(self.subjectId, true);
+            $("#rolesGroup input[name='user_type']").each(function() {
+                $(this).on("click", function() {
+                    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                        return { name: $(this).val() };
+                    }).get();
+                    var toSend = {"roles": roles};
+                    tnthAjax.putRoles(self.subjectId,toSend, $("#rolesLoadingContainer"));
+                 });
+            });
+        });
+    };
+    this.initAuditLogSection = function() {
+        tnthAjax.auditLog(this.subjectId, function(data) {
+            fillContent.auditLog(data);
+        });
+    };
+    this.__convertToNumericField = function(field) {
+        if (field) {
+            if (("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch)) {
+                field.each(function() {$(this).prop("type", "tel");});
+            };
+        };
+    };
+}
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
@@ -1936,7 +3411,6 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
     if (leafOrgs.length == 0) return false;
     var self = this;
-
     $("input[name='organization']").each(function() {
         if (! self.inArray($(this).val(), leafOrgs)) {
             $(this).hide();
@@ -2223,12 +3697,10 @@ OrgTool.prototype.getDefaultModal = function(o) {
                         setTimeout("tnthAjax.setDefaultConsent(" + userId + "," +  orgId + ");", 100);
                     } else {
                         tnthAjax.deleteConsent(userId, {"org":orgId});
-                        setTimeout("tnthAjax.removeObsoleteConsent();", 100);
+                        setTimeout(function() { tnthAjax.removeObsoleteConsent(); }, 100);
                     };
-                    if (typeof reloadConsentList != "undefined") {
-                        setTimeout("reloadConsentList();", 500);
-                    };
-                    setTimeout('$(".modal").modal("hide");', 250);
+                        setTimeout(function() { tnthAjax.reloadConsentList(self.userId); }, 500);
+                    setTimeout(function() { $(".modal").modal("hide");}, 250);
                 });
              });
              $(document).delegate("#" + orgId + "_defaultConsentModal button[data-dismiss]", "click", function(e) {
@@ -2312,7 +3784,6 @@ OrgTool.prototype.getConsentModal = function(parentOrg) {
     } else return false;
 };
 OrgTool.prototype.handleEvent = function() {
-    getSaveLoaderDiv("profileForm", "userOrgs");
     $("#userOrgs input[name='organization']").each(function() {
         $(this).attr("data-save-container-id", "userOrgs");
         $(this).on("click", function(e) {
@@ -2373,7 +3844,7 @@ OrgTool.prototype.handleEvent = function() {
                 setTimeout(function() {
                     assembleContent.demo(userId,true, $(this), true);
                 }, 500);
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                tnthAjax.reloadConsentList(userId);
             };
             if ($("#locale").length > 0) {
                 tnthAjax.getLocale(userId);
@@ -2532,21 +4003,21 @@ var tnthAjax = {
             };
         }).fail(function(xhr){
             if (params.attempts < params.max_attempts) {
-        		//use closure for scope
-        		(function(self, url, method, userId, params, callback) {
+                //use closure for scope
+                (function(self, url, method, userId, params, callback) {
                     setTimeout(function() { self.sendRequest(url, method, userId, params, callback); }, 3000); //retry after 3 seconds
-        		})(self, url, method, userId, params, callback);
-        	} else {
+                })(self, url, method, userId, params, callback);
+            } else {
                 params.attempts = 0;
                 if (callback) callback({"error": true});
                 self.sendError(xhr, url, userId);
-	        };
+            };
         });
     },
     "sendError": function(xhr, url, userId) {
-    	 if (hasValue(xhr)) {
-	           var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status) + ", response text - " + (hasValue(xhr.responseText)?xhr.responseText:"no response text returned from server");
-	           tnthAjax.reportError(hasValue(userId)?userId:"Not available",url, errorMessage, true);
+        if (hasValue(xhr)) {
+            var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status) + ", response text - " + (hasValue(xhr.responseText)?xhr.responseText:"no response text returned from server");
+            tnthAjax.reportError(hasValue(userId)?userId:"Not available",url, errorMessage, true);
          };
     },
     "reportError": function(userId, page_url, message, sync) {
@@ -2575,56 +4046,56 @@ var tnthAjax = {
         if (!hasValue(userId)) return false;
         var __url = "/api/coredata/user/" + userId + "/still_needed" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):"");
         this.sendRequest(__url, 'GET', userId, {sync: sync, cache: true}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			var __localizedFound = false;
-	                if ((data.still_needed).length > 0) $("#termsText").show();
-	                (data.still_needed).forEach(function(item) {
-	                    if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
-	                        $("#termsCheckbox [data-type='terms']").each(function() {
-	                            var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
-	                            dataTypes.forEach(function(type) {
-	                                if ($.trim(type) == $.trim(item)) {
-	                                    self.show().removeClass("tnth-hide");
-	                                    self.attr("data-required", "true");
+            if (data) {
+                if (!data.error) {
+                    var __localizedFound = false;
+                    if ((data.still_needed).length > 0) $("#termsText").show();
+                    (data.still_needed).forEach(function(item) {
+                        if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
+                            $("#termsCheckbox [data-type='terms']").each(function() {
+                                var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
+                                dataTypes.forEach(function(type) {
+                                    if ($.trim(type) == $.trim(item)) {
+                                        self.show().removeClass("tnth-hide");
+                                        self.attr("data-required", "true");
                                         var parentNode = self.closest("label.terms-label");
                                         if (parentNode.length > 0) parentNode.show().removeClass("tnth-hide");
-	                                };
-	                            });
-	                        });
-	                    };
-	                    if (item == "localized") __localizedFound = true;
-	                });
-	                if (!__localizedFound) $("#patMeta").remove();
-	                else $("#patientQ").show();
-	                if (callback) callback(data.still_needed);
-        		} else {
-        			if (callback) callback({"error": i18next.t("unable to get needed core data")});
-        		};
-        	} else {
-        		if (callback) {
+                                    };
+                                });
+                            });
+                        };
+                        if (item == "localized") __localizedFound = true;
+                    });
+                    if (!__localizedFound) $("#patMeta").remove();
+                    else $("#patientQ").show();
+                    if (callback) callback(data.still_needed);
+                } else {
+                    if (callback) callback({"error": i18next.t("unable to get needed core data")});
+                };
+            } else {
+                if (callback) {
                     callback({"error": i18next.t("no data returned")});
                 };
-        	};
+            };
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
         if (!hasValue(userId)) return false;
         this.sendRequest('/api/coredata/user/' + userId + '/required', 'GET', userId, {sync:sync, cache: true}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			if (data.required) {
-        				if (callback) callback(data.required);
-        			} else {
-        				if (callback) callback({"error": i18next.t("no data returned")});
-        			}
-        		} else {
-        			if (callback) callback({"error": i18next.t("unable to get required core data")});
-        		};
+            if (data) {
+                if (!data.error) {
+                    if (data.required) {
+                        if (callback) callback(data.required);
+                    } else {
+                        if (callback) callback({"error": i18next.t("no data returned")});
+                    }
+                } else {
+                    if (callback) callback({"error": i18next.t("unable to get required core data")});
+                };
 
-        	} else {
-        		if (callback) callback({"error": i18next.t("no data returned")});
-        	};
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
         });
     },
     "getOptionalCoreData": function(userId, sync, target, callback, entry_method) {
@@ -2634,45 +4105,44 @@ var tnthAjax = {
             target.find(".profile-item-loader").show();
         };
         this.sendRequest(__url, 'GET', userId, {sync:sync, cache:true}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			if (data.optional) {
-		                var sections = $("#profileForm .optional");
-		                sections.each(function() {
-		                    var section = $(this).attr("data-section-id");
-		                    var parent = $(this).closest(".profile-item-container");
-		                    var visibleRows = parent.find(".view-container tr:visible").length;
-		                    var noDataContainer = parent.find(".no-data-container");
-		                    var btn = parent.find(".profile-item-edit-btn").hide();
-		                    if (hasValue(section)) {
-		                        if (OT.inArray(section, data.optional)) {
-		                            $(this).show();
-		                            noDataContainer.html("");
-		                            btn.show();
-		                        } else {
-		                            $(this).hide();
-		                            if (visibleRows == 0) {
-		                                noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
-		                                btn.hide();
-		                            };
-		                        };
-		                    };
-		                });
-		                if (callback) callback(data);
-        			} else {
-        				if (callback) callback({"error": i18next.t("no data found")});
-        			};
-        		} else {
-        			if (callback) callback({"error": i18next.t("unable to get required core data")});
-        		};
+            if (data) {
+                if (!data.error) {
+                    if (data.optional) {
+                        var sections = $("#profileForm .optional");
+                        sections.each(function() {
+                        var section = $(this).attr("data-section-id");
+                        var parent = $(this).closest(".profile-item-container");
+                        var visibleRows = parent.find(".view-container tr:visible").length;
+                        var noDataContainer = parent.find(".no-data-container");
+                        var btn = parent.find(".profile-item-edit-btn");
+                        if (hasValue(section)) {
+                            if (OT.inArray(section, data.optional)) {
+                                $(this).show();
+                                noDataContainer.html("");
+                                btn.show();
+                            } else {
+                                $(this).hide();
+                                if (visibleRows == 0) {
+                                    noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
+                                    btn.hide();
+                                };
+                            };
+                        };
+                    });
+                    if (callback) callback(data);
+                    } else {
+                        if (callback) callback({"error": i18next.t("no data found")});
+                    };
+                } else {
+                    if (callback) callback({"error": i18next.t("unable to get required core data")});
+                };
+                if (target) {
+                    target.find(".profile-item-loader").hide();
+                };
 
-        		if (target) {
-                	target.find(".profile-item-loader").hide();
-            	};
-
-        	} else {
-        		if (callback) callback({"error": i18next.t("no data found")});
-        	};
+            } else {
+                if (callback) callback({"error": i18next.t("no data found")});
+            };
         });
     },
     "getPortalFooter": function(userId, sync, containerId, callback) {
@@ -2681,16 +4151,16 @@ var tnthAjax = {
             return false;
         };
         this.sendRequest('/api/portal-footer-html/', 'GET', userId, {sync:sync, cache:true, 'dataType': 'html'}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			if (hasValue(containerId)) $("#" + containerId).html(data);
-                	if (callback) callback(data);
-        		} else {
-        			if (callback) callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
-        		};
-        	} else {
-        		if (callback) callback("<div class='error-message'>" + i18next.t("No data found") + "</div>");
-        	};
+            if (data) {
+                if (!data.error) {
+                    if (hasValue(containerId)) $("#" + containerId).html(data);
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
+                };
+            } else {
+                if (callback) callback("<div class='error-message'>" + i18next.t("No data found") + "</div>");
+            };
         });
     },
     "getOrgs": function(userId, noOverride, sync, callback, noPopulate) {
@@ -2750,15 +4220,18 @@ var tnthAjax = {
             var consented = this.hasConsent(userId, params["org"], status);
             var __url = '/api/user/' + userId + '/consent';
             if (!consented || params["testPatient"]) {
+                var data = {};
+                data["user_id"] = userId;
+                data["organization_id"] = params["org"];
+                data["agreement_url"] =  params["agreementUrl"]
+                data["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
+                data["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
+                data["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
+                if (params.acceptance_date) {
+                    data["acceptance_date"] = params.acceptance_date;
+                }
 
-                params["user_id"] = userId;
-                params["organization_id"] = params["org"];
-                params["agreement_url"] =  params["agreementUrl"]
-                params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
-                params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
-                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
-
-                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(params)}, function(data) {
+                this.sendRequest(__url, "POST", userId, {sync:sync, data: JSON.stringify(data)}, function(data) {
                     if (data) {
                         if (!data.error) {
                             $(".set-consent-error").html("");
@@ -2792,8 +4265,8 @@ var tnthAjax = {
             params.agreementUrl = agreementUrl;
             this.setConsent(userId, params, "default");
             //need to remove all other consents associated w un-selected org(s)
-            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
-            if (typeof reloadConsentList != "undefined") reloadConsentList();
+            setTimeout(function() { tnthAjax.removeObsoleteConsent(); }, 100);
+            tnthAjax.reloadConsentList(userId);
             $($("#consentContainer .error-message").get(0)).text("");
         } else {
             $($("#consentContainer .error-message").get(0)).text(i18next.t("Unable to set default consent agreement"));
@@ -3038,6 +4511,19 @@ var tnthAjax = {
             };
         });
     },
+    /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
+    "reloadConsentList": function (userId) {
+        var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+        var self = this;
+        $("#profileConsentList").animate({opacity: 0}, function() {
+            $(this).html(eventLoading).css('opacity',1);
+            // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+            // more obvious when the updated list loads
+            setTimeout(function(){
+                tnthAjax.getConsent(userId || self.subjectId, true);
+            },1500);
+        });
+    },
     "getDemo": function(userId, noOverride, sync, callback) {
         this.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: sync}, function(data) {
             if (!data.error) {
@@ -3063,6 +4549,7 @@ var tnthAjax = {
         });
     },
     "putDemo": function(userId,toSend,targetField,sync) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         this.sendRequest('/api/demographics/'+userId, "PUT", userId, {sync:sync, data:JSON.stringify(toSend)}, function(data) {
             if (!data.error) {
@@ -3096,29 +4583,29 @@ var tnthAjax = {
     },
     "getLocale": function(userId) {
         this.sendRequest('/api/demographics/'+userId, 'GET', userId, null, function(data) {
-        	if (data) {
-	            if (!data.error) {
-	                if (data.communication) {
-	                    data.communication.forEach(function(item, index) {
-	                        if (item.language) {
-	                            locale = item["language"]["coding"][0].code;
-	                            $("#locale").find("option").each(function() {
-	                                $(this).removeAttr("selected");
-	                            });
-	                            $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
-	                            $("#locale").val(locale);
-	                            fillViews.locale();
-	                        };
-	                    });
-	                    $(".get-locale-error").html("");
-	                };
+            if (data) {
+                if (!data.error) {
+                    if (data.communication) {
+                        data.communication.forEach(function(item, index) {
+                            if (item.language) {
+                                locale = item["language"]["coding"][0].code;
+                                $("#locale").find("option").each(function() {
+                                    $(this).removeAttr("selected");
+                                });
+                                $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
+                                $("#locale").val(locale);
+                                fillViews.locale();
+                            };
+                        });
+                        $(".get-locale-error").html("");
+                    };
 
-	            } else {
-	                var errorMessage = i18next.t("Server error occurred retrieving locale information.");
-	                if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
-	                else $(".get-locale-error").html(errorMessage);
-	            }
-	        };
+                } else {
+                    var errorMessage = i18next.t("Server error occurred retrieving locale information.");
+                    if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-locale-error").html(errorMessage);
+                }
+            };
         });
     },
     "hasTreatment": function(data) {
@@ -3220,6 +4707,7 @@ var tnthAjax = {
         });
     },
     "postProc": function(userId,toSend,targetField, callback) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         this.sendRequest('/api/procedure', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
@@ -3240,6 +4728,7 @@ var tnthAjax = {
         });
     },
     "deleteProc": function(procedureId, targetField, sync) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         this.sendRequest('/api/procedure/'+procedureId, 'DELETE', null, {sync: sync}, function(data) {
             if (data) {
@@ -3262,7 +4751,7 @@ var tnthAjax = {
                     fillContent.roleList(data);
                     if (callback) callback(data);
                 } else {
-                	var errorMessage = i18next.t("Server error occurred retrieving roles information.");
+                    var errorMessage = i18next.t("Server error occurred retrieving roles information.");
                     $(".get-roles-error").html(errorMessage);
                     if (callback) callback({"error": errorMessage})
                 };
@@ -3286,6 +4775,7 @@ var tnthAjax = {
         });
     },
     "putRoles": function(userId,toSend, targetField) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         this.sendRequest('/api/user/'+userId+'/roles', 'PUT', userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
@@ -3303,73 +4793,75 @@ var tnthAjax = {
     },
     "deleteRoles": function(userId,toSend) {
         this.sendRequest('/api/user/'+userId, 'GET', userId, {data: JSON.stringify(toSend)}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			$(".delete-roles-error").html("");
-        		} else {
-        			// console.log("Problem updating role on server.");
-		           var errorMessage = i18next.t("Server error occurred deleting user role.");
-		           if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
-		           else $(".delete-roles-error").html(errorMessage);
-        		};
-        	};
+            if (data) {
+                if (!data.error) {
+                    $(".delete-roles-error").html("");
+                } else {
+                    // console.log("Problem updating role on server.");
+                    var errorMessage = i18next.t("Server error occurred deleting user role.");
+                    if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
+                    else $(".delete-roles-error").html(errorMessage);
+                };
+            };
         });
     },
     "getClinical": function(userId, callback) {
-    	this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				$(".get-clinical-error").html("");
-            		fillContent.clinical(data);
+        this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".get-clinical-error").html("");
+                    fillContent.clinical(data);
                     if (callback) callback(data);
-    			} else {
-    			   var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
-		           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
-		           else $(".get-clinical-error").html(errorMessage);
-                   if (callback) callback({"error": errorMessage});
-    			};
-    		};
-    	});
+                } else {
+                    var errorMessage = i18next.t("Server error occurred retrieving clinical data.");
+                    if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-clinical-error").html(errorMessage);
+                    if (callback) callback({"error": errorMessage});
+                };
+            };
+        });
     },
     "putClinical": function(userId, toCall, toSend, targetField, status) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         this.sendRequest('/api/patient/'+userId+'/clinical/'+toCall, 'POST', userId, {data: JSON.stringify({value: toSend})}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			$(".put-clinical-error").html("");
-		            flo.showUpdate(targetField);
-		            fillViews.clinical();
-        		} else {
-        			 //alert("There was a problem saving your answers. Please try again.");
-		            var errorMessage = i18next.t("Server error occurred updating clinical data.");
-		            if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
-		            else $(".put-clinical-error").html(errorMessage);
-		            flo.showError(targetField);
-		            fillViews.clinical();
-        		};
-        	};
+            if (data) {
+                if (!data.error) {
+                    $(".put-clinical-error").html("");
+                    flo.showUpdate(targetField);
+                    fillViews.clinical();
+                } else {
+                    //alert("There was a problem saving your answers. Please try again.");
+                    var errorMessage = i18next.t("Server error occurred updating clinical data.");
+                    if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
+                    else $(".put-clinical-error").html(errorMessage);
+                    flo.showError(targetField);
+                    fillViews.clinical();
+                };
+            };
         });
     },
     "getObservationId": function(userId, code) {
         if (!hasValue(userId) && !hasValue(code)) return false;
         var obId = "", _code="";
         this.sendRequest('/api/patient/'+userId+'/clinical', 'GET', userId, {sync: true}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			if (data.entry) {
-		                (data.entry).forEach(function(item) {
-		                    if (!hasValue(obId)) {
-		                        _code = item.content.code.coding[0].code;
-		                        if (_code == code) obId = item.content.id;
-		                    };
-		                });
-		            };
-        		};
-        	};
+            if (data) {
+                if (!data.error) {
+                    if (data.entry) {
+                        (data.entry).forEach(function(item) {
+                            if (!hasValue(obId)) {
+                                _code = item.content.code.coding[0].code;
+                                if (_code == code) obId = item.content.id;
+                            };
+                        });
+                    };
+                };
+            };
         });
         return obId;
     },
     "postClinical": function(userId, toCall, toSend, status, targetField, params) {
+        var flo = new FieldLoaderHelper();
         flo.showLoader(targetField);
         if (!userId) return false;
         if (!params) params = {};
@@ -3406,184 +4898,185 @@ var tnthAjax = {
             url = url + "/" + obsId;
         };
         this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			$(".post-clinical-error").html("");
-		            flo.showUpdate(targetField);
-		            fillViews.clinical();
-        		} else {
-        			var errorMessage = i18next.t("Server error occurred updating clinical data.");
-		            if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
-		            else $(".post-clinical-error").html(errorMessage);
-		            flo.showError(targetField);
-		            fillViews.clinical();
-        		};
-        	};
+            if (data) {
+                if (!data.error) {
+                    $(".post-clinical-error").html("");
+                    flo.showUpdate(targetField);
+                    fillViews.clinical();
+                } else {
+                    var errorMessage = i18next.t("Server error occurred updating clinical data.");
+                    if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
+                    else $(".post-clinical-error").html(errorMessage);
+                    flo.showError(targetField);
+                    fillViews.clinical();
+                };
+            };
         });
     },
     "getTermsUrl": function(sync, callback) {
-    	this.sendRequest('/api/tou', 'GET', null, {sync:sync}, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				$(".get-tou-error").html("");
-		            if (data.url) {
-		                $("#termsURL").attr("data-url", data.url);
-		                if (callback) callback({"url": data.url});
-		            } else {
-		                if (callback) callback({"error": i18next.t("no url returned")});
-		            }
+        this.sendRequest('/api/tou', 'GET', null, {sync:sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".get-tou-error").html("");
+                    if (data.url) {
+                        $("#termsURL").attr("data-url", data.url);
+                        if (callback) callback({"url": data.url});
+                    } else {
+                        if (callback) callback({"error": i18next.t("no url returned")});
+                    }
 
-    			} else {
-    			   var errorMessage = i18next.t("Server error occurred retrieving tou url.");
-		           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
-		           else $(".get-tou-error").html(errorMessage);
-		           if (callback) callback({"error": i18next.t("Server error")});
-		    	};
-    		};
-    	});
+                } else {
+                    var errorMessage = i18next.t("Server error occurred retrieving tou url.");
+                    if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-tou-error").html(errorMessage);
+                    if (callback) callback({"error": i18next.t("Server error")});
+                };
+            };
+        });
     },
     /*
      *  return instruments list by organization(s)
      */
     "getInstrumentsList": function(sync, callback) {
-    	this.sendRequest('api/questionnaire_bank', 'GET', null, {sync: sync}, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (data.entry) {
-		                if ((data.entry).length === 0) {
-		                    if (callback) callback({"error": i18next.t("no data returned")});
-		                } else {
-		                    var qList = {};
-		                    (data.entry).forEach(function(item) {
-		                        if (item.organization) {
-		                            var orgID = (item.organization.reference).split("/")[2];
-		                            /*
+        this.sendRequest('api/questionnaire_bank', 'GET', null, {sync: sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (data.entry) {
+                        if ((data.entry).length === 0) {
+                            if (callback) callback({"error": i18next.t("no data returned")});
+                        } else {
+                            var qList = {};
+                            (data.entry).forEach(function(item) {
+                                if (item.organization) {
+                                    var orgID = (item.organization.reference).split("/")[2];
+                                    /*
 		                             * don't assign orgID to object if it was already present
 		                             */
-		                            if (!qList[orgID]) qList[orgID] = [];
-		                            if (item.questionnaires) {
-		                                (item.questionnaires).forEach(function(q) {
-		                                    /*
-		                                     * add instrument name to instruments array for the org
-		                                     * will not add if it is already in the array
-		                                     * NOTE: inArray returns -1 if the item is NOT in the array
-		                                     */
-		                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
-		                                        qList[orgID].push(q.questionnaire.display);
-		                                    };
-		                                });
-		                            };
-		                        };
-		                    });
-		                    if (callback) callback(qList);
-		                };
-		            } else {
-		                if (callback) callback({"error": i18next.t("no data returned")});
-		            };
-
-    			} else {
-    				if (callback) callback({"error": i18next.t("error retrieving instruments list")});
-    			};
-    		};
-    	});
+                                    if (!qList[orgID]) qList[orgID] = [];
+                                    if (item.questionnaires) {
+                                        (item.questionnaires).forEach(function(q) {
+                                            /*
+		                                      * add instrument name to instruments array for the org
+		                                      * will not add if it is already in the array
+		                                      * NOTE: inArray returns -1 if the item is NOT in the array
+		                                      */
+                                            if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
+                                                qList[orgID].push(q.questionnaire.display);
+                                            };
+                                        });
+                                    };
+                                };
+                            });
+                            if (callback) callback(qList);
+                        };
+                    } else {
+                        if (callback) callback({"error": i18next.t("no data returned")});
+                    };
+                } else {
+                    if (callback) callback({"error": i18next.t("error retrieving instruments list")});
+                };
+            };
+        });
     },
-    "getTerms": function(userId, type, sync, callback) {
-    	this.sendRequest('/api/user/'+userId+'/tou'+(hasValue(type)?('/'+type):''), 'GET', userId, {sync:sync}, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				$(".get-tou-error").html("");
-		            fillContent.terms(data);
-		            if (callback) callback(data);
-    			} else {
-    				var errorMessage = i18next.t("Server error occurred retrieving tou data.");
-		            if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
-		            else $(".get-tou-error").html(errorMessage);
-		            if (callback) callback({"error": errorMessage})
-    			};
-    		};
-    	});
+    "getTerms": function(userId, type, sync, callback, params) {
+        if (!params) params = {};
+        var url = "/api/user/{userId}/tou{type}{all}".replace("{userId}", userId)
+                                                    .replace("{type}", (type && hasValue(type)?("/"+type):""))
+                                                    .replace("{all}", (params.hasOwnProperty("all")?"?all=true":""));
+        this.sendRequest(url, "GET", userId, {sync:sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".get-tou-error").html("");
+                    fillContent.terms(data);
+                    if (callback) callback(data);
+                } else {
+                    var errorMessage = i18next.t("Server error occurred retrieving tou data.");
+                    if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+                    else $(".get-tou-error").html(errorMessage);
+                    if (callback) callback({"error": errorMessage});
+                };
+            };
+        });
     },
     "postTermsByUser": function(userId, toSend) {
         this.sendRequest('/api/user/' + userId + '/tou/accepted', 'POST', userId, {data: JSON.stringify(toSend)}, function(data) {
-        	if (data) {
-        		if (!data.error) {
-        			$(".post-tou-error").html("");
-        		} else {
-        			//alert("There was a problem saving your answers. Please try again.");
-		            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
-		            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
-		            else $(".post-tou-error").html(errorMessage);
-        		};
-        	};
+            if (data) {
+                if (!data.error) {
+                    $(".post-tou-error").html("");
+                } else {
+                    var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+                    if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+                    else $(".post-tou-error").html(errorMessage);
+                };
+            };
         });
     },
     "postTerms": function(toSend) {
-    	this.sendRequest('/api/tou/accepted', 'POST', null, {data: JSON.stringify(toSend)}, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				$(".post-tou-error").html("");
-    			} else {
-    				//alert("There was a problem saving your answers. Please try again.");
-		            var errorMessage = i18next.t("Server error occurred saving terms of use information.");
-		            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
-		            else $(".post-tou-error").html(errorMessage);
-    			}
-    		};
-    	});
+        this.sendRequest('/api/tou/accepted', 'POST', null, {data: JSON.stringify(toSend)}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    $(".post-tou-error").html("");
+                } else {
+                    var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+                    if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+                    else $(".post-tou-error").html(errorMessage);
+                }
+            };
+        });
     },
     "accessUrl": function(userId, sync,callback) {
-    	 if (!hasValue(userId)) return false;
-    	 var url = '';
-    	 this.sendRequest('/api/user/'+userId+'/access_url', 'GET', userId, {sync:sync}, function(data) {
-    	 	if (data) {
-    	 		if (!data.error) {
-    	 			if (callback) callback({url: data['access_url']});
-    	 		} else {
-    	 			if (callback) callback({"error": i18next.t("Error occurred retrieving access url.")});
-    	 		}
-    	 	} else {
-    	 		if (callback) callback({"error": i18next.t("no data returned")});
-    	 	}
-    	 });
+        if (!hasValue(userId)) return false;
+        var url = '';
+        this.sendRequest('/api/user/'+userId+'/access_url', 'GET', userId, {sync:sync}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback({url: data['access_url']});
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving access url.")});
+                }
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            }
+        });
     },
     "invite": function(userId, data, callback) {
-    	if (!hasValue(data)) return false;
-    	this.sendRequest('/invite', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8', 'data': data, 'dataType': 'html' }, function(data) {
-    		if (data) {
-    			if (callback) callback(data);
-    		} else {
-    		 	if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(data)) return false;
+        this.sendRequest('/invite', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8', 'data': data, 'dataType': 'html' }, function(data) {
+            if (data) {
+                if (callback) callback(data);
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "passwordReset": function(userId, callback) {
-    	if (!hasValue(userId)) return false;
-    	this.sendRequest('/api/user/'+userId+'/password_reset', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8'}, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred sending password reset request.")});
-    			};
-    		} else {
-    		 if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(userId)) return false;
+        this.sendRequest('/api/user/'+userId+'/password_reset', 'POST', userId, {'contentType':'application/x-www-form-urlencoded; charset=UTF-8'}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred sending password reset request.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "assessmentStatus": function(userId, callback) {
-    	if (!hasValue(userId)) return false;
-    	this.sendRequest('/api/patient/'+userId+'/assessment-status', 'GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment status.")});
-    			};
+        if (!hasValue(userId)) return false;
+        this.sendRequest('/api/patient/'+userId+'/assessment-status', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving assessment status.")});
+                };
 
-    		} else {
-    			if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
 
     },
     "updateAssessment": function(userId, data, callback) {
@@ -3611,35 +5104,33 @@ var tnthAjax = {
         });
     },
     "assessmentList": function(userId, callback) {
-    	if (!hasValue(userId)) return false;
-    	this.sendRequest('/api/patient/'+userId+'/assessment', 'GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment list.")});
-    			};
-
-    		} else {
-    			if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(userId)) return false;
+        this.sendRequest('/api/patient/'+userId+'/assessment', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving assessment list.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "assessmentReport": function(userId, instrumentId, callback) {
-    	if (!hasValue(userId)) return false;
-    	if (!hasValue(instrumentId)) return false;
-    	this.sendRequest('/api/patient/'+userId+'/assessment/'+instrumentId, 'GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred retrieving assessment report.")});
-    			};
-
-    		} else {
-    			if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(userId)) return false;
+        if (!hasValue(instrumentId)) return false;
+        this.sendRequest('/api/patient/'+userId+'/assessment/'+instrumentId, 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving assessment report.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "getCurrentQB": function(userId, completionDate, params, callback) {
         if (!hasValue(userId)) {
@@ -3666,18 +5157,18 @@ var tnthAjax = {
         });
     },
     "patientReport": function(userId, callback) {
-    	if (!hasValue(userId)) return false;
-    	this.sendRequest('/api/user/'+userId+'/user_documents?document_type=PatientReport', 'GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred retrieving patient report.")});
-    			};
-    		} else {
-    		 if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(userId)) return false;
+        this.sendRequest('/api/user/'+userId+'/user_documents?document_type=PatientReport', 'GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                } else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving patient report.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "setTablePreference": function(userId, tableName, params, callback) {
         if (!hasValue(userId) || !hasValue(tableName)) return false;
@@ -3707,6 +5198,81 @@ var tnthAjax = {
             };
         });
     },
+    "initNotifications": function() {
+        this.getNotification($("#notificationUserId").val(), false, function(data) {
+            fillContent.notifications(data);
+        });
+    },
+    "getNotification": function(userId, params, callback) {
+        if (hasValue(userId)) {
+            if (!params) params = {};
+            this.sendRequest('/api/user/'+userId+'/notification', 'GET', userId, {"sync":params.sync}, function(data) {
+                if (data) {
+                    if (!data.error) {
+                        if (callback) callback(data);
+                    } else {
+                        if (callback) callback({"error": i18next.t("Error occurred retrieving notification.")});
+                    };
+                } else {
+                    if (callback) callback({"error": i18next.t("no data returned")});
+                };
+            });
+
+        } else {
+            if (callback) {
+                callback({"error": i18next.t("User id is required")});
+            }
+        }
+    },
+    "deleteNotification": function(userId, notificationId, params, callback) {
+
+        if (!callback) {
+            callback = function(data) {
+                return data;
+            }
+        }
+
+        if (!hasValue(userId)) {
+            callback({"error": i18next.t("User Id is required")});
+            return false;
+        };
+        if (!hasValue(notificationId)) {
+            callback({"error": i18next.t("Notification id is required.")});
+        };
+        if (!params) params = {};
+
+        var self = this;
+
+        this.getNotification(userId, false, function(data) {
+            if (data.notifications) {
+                 /*
+                 * check if there is notification for this id
+                 * dealing with use case where user deletes same notification in a separate open window
+                 */
+                var arrNotification = $.grep(data.notifications, function(notification) {
+                    return notification.id == notificationId;
+                });
+                if (arrNotification.length > 0) {
+                    /*
+                     * delete notification only if it exists
+                     */
+                    self.sendRequest('/api/user/'+userId+'/notification/'+notificationId, 'DELETE', userId, {"sync":params.sync}, function(data) {
+                        if (data) {
+                            if (!data.error) {
+                                callback(data);
+                            } else {
+                                callback({"error": i18next.t("Error occurred deleting notification.")});
+                            };
+                        } else {
+                            callback({"error": i18next.t("no data returned")});
+                        };
+                    });
+                };
+            };
+
+        });
+
+    },
     "emailLog": function(userId, callback) {
         if (!userId) return false;
         this.sendRequest('/api/user/'+userId+'/messages', 'GET', userId, null, function(data) {
@@ -3722,18 +5288,19 @@ var tnthAjax = {
         });
     },
     "auditLog": function(userId, callback) {
-    	if (!hasValue(userId)) return false;
-    	this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {
-    		if (data) {
-    			if (!data.error) {
-    				if (callback) callback(data);
-    			} else {
-    				if (callback) callback({"error": i18next.t("Error occurred retrieving audit log.")});
-    			};
-    		} else {
-    		 if (callback) callback({"error": i18next.t("no data returned")});
-    		};
-    	});
+        if (!hasValue(userId)) return false;
+        this.sendRequest('/api/user/'+userId+'/audit','GET', userId, null, function(data) {
+            if (data) {
+                if (!data.error) {
+                    if (callback) callback(data);
+                }
+                else {
+                    if (callback) callback({"error": i18next.t("Error occurred retrieving audit log.")});
+                };
+            } else {
+                if (callback) callback({"error": i18next.t("no data returned")});
+            };
+        });
     },
     "setting": function(key, userId, params, callback) {
         if (!hasValue(key)) {
@@ -3788,82 +5355,18 @@ var tnthAjax = {
     }
 };
 
-function getIEVersion() {
-    var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
-    return match ? parseInt(match[1]) : undefined;
-};
-
-function newHttpRequest(url,callBack, noCache)
-{
-    attempts++;
-    var xmlhttp;
-    if (window.XDomainRequest)
-    {
-        xmlhttp=new XDomainRequest();
-        xmlhttp.onload = function(){callBack(xmlhttp.responseText)};
-    } else if (window.XMLHttpRequest) xmlhttp=new XMLHttpRequest();
-    else xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    xmlhttp.onreadystatechange=function()
-    {
-        if (xmlhttp.readyState==4) {
-            if (xmlhttp.status==200) {
-                if (callBack) callBack(xmlhttp.responseText);
-            } else {
-                if (attempts < 3) setTimeout ( function(){ newHttpRequest(url,callBack, noCache); }, 3000 );
-                else loader();
-            };
-        };
-    };
-    if (noCache) url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-    xmlhttp.open("GET",url,true);
-    xmlhttp.send();
-};
-
-var attempts = 0;
-
-funcWrapper = function() {
-    attempts++;
-    $.ajax({
-        url: PORTAL_NAV_PAGE,
-        type:'GET',
-        contentType:'text/plain',
-        timeout: 5000,
-        cache: (getIEVersion() ? false : true)
-    }, 'html')
-    .done(function(data) {
-        embed_page(data);
-        //showSearch();
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-        if (attempts < 3) {
-            setTimeout ( function(){ funcWrapper( ) }, 3000 );
-        } else loader();
-    })
-    .always(function() {
-        loader();
-        attempts = 0;
-    });
-};
-
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
-
         loader(true);
-
-        var isIE = getIEVersion();
-        if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
-        } else {
-            funcWrapper();
-        };
+        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
 
     tnthAjax.beforeSend();
+
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
@@ -3932,19 +5435,19 @@ $(document).ready(function() {
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
-                	tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
-                		if (!data.error) {
-                			if (data.unique) {
-	                            $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-	                            update($el);
-	                        } else {
-	                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-	                        };
+                    tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
+                        if (!data.error) {
+                            if (data.unique) {
+                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                update($el);
+                            } else {
+                                $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
+                            };
 
-                		} else {
-                			console.log(i18next.t("Problem retrieving data from server."));
-                		};
-                	});
+                        } else {
+                            console.log(i18next.t("Problem retrieving data from server."));
+                        };
+                    });
                 }
                 return emailReg.test(emailVal);
             },
@@ -3967,39 +5470,45 @@ $(document).ready(function() {
 
 var tnthDates = {
     /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
-     ** params: month, day and year values and error field ID
+     ** params: month, day and year fields and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateDateInputFields": function(m, d, y, errorFieldId) {
+    "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
+        var m = $(monthField).val();
+        var d = $(dayField).val();
+        var y = $(yearField).val();
         if (hasValue(m) && hasValue(d) && hasValue(y)) {
+            if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
+                m = parseInt(m);
+                d = parseInt(d);
+                y = parseInt(y);
+                var errorField = $("#" + errorFieldId);
 
-            var m = parseInt(m);
-            var d = parseInt(d);
-            var y = parseInt(y);
-            var errorField = $("#" + errorFieldId);
+                if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+                    var today = new Date();
+                    // Check to see if this is a real date
+                    var date = new Date(y,m-1,d);
+                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                        errorField.html(i18next.t("Invalid date. Please try again.")).show();
+                        return false;
+                    }
+                    else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
+                        return false; //shouldn't be in the future
+                    }
+                    else if (y < 1900) {
+                        errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
+                        return false;
+                    };
 
-            if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
-                var today = new Date();
-                // Check to see if this is a real date
-                var date = new Date(y,m-1,d);
-                if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    errorField.html(i18next.t("Invalid date. Please try again.")).show();
-                    return false;
-                }
-                else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                    errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
-                    return false; //shouldn't be in the future
-                }
-                else if (y < 1900) {
-                    errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
-                    return false;
-                };
+                    errorField.html("").hide();
 
-                errorField.html("").hide();
+                    return true;
 
-                return true;
-
-            } else return false;
+                } else return false;
+            } else {
+                return false;
+            }
 
         } else {
             return false;
@@ -4515,20 +6024,20 @@ var tnthDates = {
         var userTimeZone = "";
         if (selectVal == "") {
             if (userId) {
-            	tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
-            		if (!data.error) {
-            			if (data) {
-	                        data.extension.forEach(
-	                            function(item, index) {
-	                                if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
-	                                    userTimeZone = item.timezone;
-	                                };
-	                            });
-	                    };
-            		} else {
-            			userTimeZone = "UTC";
-            		};
-            	});
+                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
+                    if (!data.error) {
+                        if (data) {
+                            data.extension.forEach(
+                                function(item, index) {
+                                    if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
+                                        userTimeZone = item.timezone;
+                                    };
+                                });
+                            };
+                    } else {
+                        userTimeZone = "UTC";
+                    };
+                });
             };
         } else {
             userTimeZone = selectVal;
@@ -4542,20 +6051,20 @@ var tnthDates = {
 
       if (!localeSelect) {
             if (userId) {
-            	tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-            		if (!data.error) {
-            			if (data && data.communication) {
-	                        data.communication.forEach(
-	                            function(item, index) {
-	                                if (item.language) {
-	                                    locale = item["language"]["coding"][0].code;
-	                                };
-	                        });
-                    	};
-            		} else {
-            			locale="en-us";
-            		};
-            	});
+                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                    if (!data.error) {
+                        if (data && data.communication) {
+                                data.communication.forEach(
+                                    function(item, index) {
+                                        if (item.language) {
+                                            locale = item["language"]["coding"][0].code;
+                                        };
+                                });
+                            };
+                    } else {
+                        locale="en-us";
+                    };
+                });
             };
        } else locale = localeSelect;
 
@@ -4709,51 +6218,6 @@ var tnthTables = {
         return alphanum(a, b);
     }
 };
-/**
- * Protect window.console method calls, e.g. console is not defined on IE
- * unless dev tools are open, and IE doesn't define console.debug
- */
-(function() {
-    var console = (window.console = window.console || {});
-    var noop = function () {};
-    var log = console.log || noop;
-    var start = function(name) { return function(param) { log("Start " + name + ": " + param); } };
-    var end = function(name) { return function(param) { log("End " + name + ": " + param); } };
-
-    var methods = {
-        // Internet Explorer (IE 10): http://msdn.microsoft.com/en-us/library/ie/hh772169(v=vs.85).aspx#methods
-        // assert(test, message, optionalParams), clear(), count(countTitle), debug(message, optionalParams), dir(value, optionalParams), dirxml(value), error(message, optionalParams), group(groupTitle), groupCollapsed(groupTitle), groupEnd([groupTitle]), info(message, optionalParams), log(message, optionalParams), msIsIndependentlyComposed(oElementNode), profile(reportName), profileEnd(), time(timerName), timeEnd(timerName), trace(), warn(message, optionalParams)
-        // "assert", "clear", "count", "debug", "dir", "dirxml", "error", "group", "groupCollapsed", "groupEnd", "info", "log", "msIsIndependentlyComposed", "profile", "profileEnd", "time", "timeEnd", "trace", "warn"
-
-        // Safari (2012. 07. 23.): https://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html#//apple_ref/doc/uid/TP40007874-CH8-SW20
-        // assert(expression, message-object), count([title]), debug([message-object]), dir(object), dirxml(node), error(message-object), group(message-object), groupEnd(), info(message-object), log(message-object), profile([title]), profileEnd([title]), time(name), markTimeline("string"), trace(), warn(message-object)
-        // "assert", "count", "debug", "dir", "dirxml", "error", "group", "groupEnd", "info", "log", "profile", "profileEnd", "time", "markTimeline", "trace", "warn"
-
-        // Firefox (2013. 05. 20.): https://developer.mozilla.org/en-US/docs/Web/API/console
-        // debug(obj1 [, obj2, ..., objN]), debug(msg [, subst1, ..., substN]), dir(object), error(obj1 [, obj2, ..., objN]), error(msg [, subst1, ..., substN]), group(), groupCollapsed(), groupEnd(), info(obj1 [, obj2, ..., objN]), info(msg [, subst1, ..., substN]), log(obj1 [, obj2, ..., objN]), log(msg [, subst1, ..., substN]), time(timerName), timeEnd(timerName), trace(), warn(obj1 [, obj2, ..., objN]), warn(msg [, subst1, ..., substN])
-        // "debug", "dir", "error", "group", "groupCollapsed", "groupEnd", "info", "log", "time", "timeEnd", "trace", "warn"
-
-        // Chrome (2013. 01. 25.): https://developers.google.com/chrome-developer-tools/docs/console-api
-        // assert(expression, object), clear(), count(label), debug(object [, object, ...]), dir(object), dirxml(object), error(object [, object, ...]), group(object[, object, ...]), groupCollapsed(object[, object, ...]), groupEnd(), info(object [, object, ...]), log(object [, object, ...]), profile([label]), profileEnd(), time(label), timeEnd(label), timeStamp([label]), trace(), warn(object [, object, ...])
-        // "assert", "clear", "count", "debug", "dir", "dirxml", "error", "group", "groupCollapsed", "groupEnd", "info", "log", "profile", "profileEnd", "time", "timeEnd", "timeStamp", "trace", "warn"
-        // Chrome (2012. 10. 04.): https://developers.google.com/web-toolkit/speedtracer/logging-api
-        // markTimeline(String)
-        // "markTimeline"
-
-        assert: noop, clear: noop, trace: noop, count: noop, timeStamp: noop, msIsIndependentlyComposed: noop,
-        debug: log, info: log, log: log, warn: log, error: log,
-        dir: log, dirxml: log, markTimeline: log,
-        group: start('group'), groupCollapsed: start('groupCollapsed'), groupEnd: end('group'),
-        profile: start('profile'), profileEnd: end('profile'),
-        time: start('time'), timeEnd: end('time')
-    };
-
-    for (var method in methods) {
-        if ( methods.hasOwnProperty(method) && !(method in console) ) { // define undefined methods as best-effort methods
-            console[method] = methods[method];
-        }
-    }
-})();
 var FieldLoaderHelper = function () {
     this.delayDuration = 600;
     this.showLoader = function(targetField) {
@@ -4799,163 +6263,8 @@ var FieldLoaderHelper = function () {
             })(targetField); }, __timeout);
         };
     };
+};
 
-};
-var flo = new FieldLoaderHelper();
-var LR_INVOKE_KEYCODE = 187; // "=" s=ign
-function LRKeyEvent() {
-    if ($(".button--LR").length > 0) {
-        $("html").on("keydown", function(e) {
-            if (e.keyCode == LR_INVOKE_KEYCODE) {
-               $(".button--LR").toggleClass("data-show");
-            };
-        });
-    };
-};
-function appendLREditContainer(target, url, show) {
-    if (!hasValue(url)) return false;
-    if (!target) target = $(document);
-    target.append('<div>' +
-                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' +
-                '</div>'
-                );
-    if (show) $(".button--LR").addClass("data-show");
 
-};
-function getSaveLoaderDiv(parentID, containerID) {
-    var el = $("#" + containerID + "_load");
-    if (el.length == 0) {
-        var c = $("#" + parentID + " #" + containerID);
-        if (c.length > 0) {
-            var snippet = '<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>';
-            if (window.getComputedStyle) {
-                displayStyle = window.getComputedStyle(c.get(0), null).getPropertyValue('display');
-            } else {
-                displayStyle = (c.get(0)).currentStyle.display;
-            };
-            if (displayStyle == "block") {
-                c.append(snippet);
-            } else {
-                if (displayStyle == "none" || !hasValue(displayStyle)) {
-                    if (c.get(0).nodeName.toUpperCase() == "DIV" || c.get(0).nodeName.toUpperCase() == "P") c.append(snippet);
-                    else c.after(snippet);
-                } else c.after(snippet);
-            };
-        };
-    };
-};
-function __getLoaderHTML(message) {
-    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message)?"&nbsp;"+message:"") + '</div>';
-}
-function _isTouchDevice(){
-    return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
-};
-function __convertToNumericField(field) {
-    if (field) {
-        if (_isTouchDevice()) field.each(function() {$(this).prop("type", "tel");});
-    };
-};
-function hasValue(val) {return val != null && val != "" && val != "undefined";};
-function isString (obj) {return (Object.prototype.toString.call(obj) === '[object String]');};
-function disableHeaderFooterLinks() {
-    var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
-    links.addClass("disabled");
-    links.prop('onclick',null).off('click');
-    links.on("click", function(e) {
-        e.preventDefault();
-        return false;
-    });
-};
-function pad(n) {n = parseInt(n); return (n < 10) ? '0' + n : n;};
-function escapeHtml(text) {
-    'use strict';
-    if (text == null || text.length == 0)return text;
-    return text.replace(/[\"&'\/<>]/g, function (a) {
-        return {
-            '"': '&quot;', '&': '&amp;', "'": '&#39;',
-            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
-        }[a];
-    });
-};
-function containHtmlTags(text) {
-    if (!hasValue(text)) return false;
-    return /[<>]/.test(text);
-};
-function __getExportFileName(prefix) {
-    var d = new Date();
-    return (prefix?prefix:"ExportList_")+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear();
-}
-function capitalize(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
-var __winHeight = $(window).height(), __winWidth = $(window).width();
-$.fn.isOnScreen = function(){
-    var viewport = {};
-    viewport.top = $(window).scrollTop();
-    viewport.bottom = viewport.top + __winHeight;
-    var bounds = {};
-    bounds.top = this.offset().top;
-    bounds.bottom = bounds.top + this.outerHeight();
-    return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
-};
-$.fn.sortOptions = function() {
-      var selectOptions = $(this).find("option");
-      selectOptions.sort(function(a, b) {
-            if (a.text > b.text) return 1;
-            else if (a.text < b.text) return -1;
-            else return 0; });
-      return selectOptions;
-};
-//Promise polyfill - IE doesn't support Promise - so need this
-!function(e){function n(){}function t(e,n){return function(){e.apply(n,arguments)}}function o(e){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(e,this)}function i(e,n){for(;3===e._state;)e=e._value;return 0===e._state?void e._deferreds.push(n):(e._handled=!0,void o._immediateFn(function(){var t=1===e._state?n.onFulfilled:n.onRejected;if(null===t)return void(1===e._state?r:u)(n.promise,e._value);var o;try{o=t(e._value)}catch(i){return void u(n.promise,i)}r(n.promise,o)}))}function r(e,n){try{if(n===e)throw new TypeError("A promise cannot be resolved with itself.");if(n&&("object"==typeof n||"function"==typeof n)){var i=n.then;if(n instanceof o)return e._state=3,e._value=n,void f(e);if("function"==typeof i)return void s(t(i,n),e)}e._state=1,e._value=n,f(e)}catch(r){u(e,r)}}function u(e,n){e._state=2,e._value=n,f(e)}function f(e){2===e._state&&0===e._deferreds.length&&o._immediateFn(function(){e._handled||o._unhandledRejectionFn(e._value)});for(var n=0,t=e._deferreds.length;n<t;n++)i(e,e._deferreds[n]);e._deferreds=null}function c(e,n,t){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof n?n:null,this.promise=t}function s(e,n){var t=!1;try{e(function(e){t||(t=!0,r(n,e))},function(e){t||(t=!0,u(n,e))})}catch(o){if(t)return;t=!0,u(n,o)}}var a=setTimeout;o.prototype["catch"]=function(e){return this.then(null,e)},o.prototype.then=function(e,t){var o=new this.constructor(n);return i(this,new c(e,t,o)),o},o.all=function(e){var n=Array.prototype.slice.call(e);return new o(function(e,t){function o(r,u){try{if(u&&("object"==typeof u||"function"==typeof u)){var f=u.then;if("function"==typeof f)return void f.call(u,function(e){o(r,e)},t)}n[r]=u,0===--i&&e(n)}catch(c){t(c)}}if(0===n.length)return e([]);for(var i=n.length,r=0;r<n.length;r++)o(r,n[r])})},o.resolve=function(e){return e&&"object"==typeof e&&e.constructor===o?e:new o(function(n){n(e)})},o.reject=function(e){return new o(function(n,t){t(e)})},o.race=function(e){return new o(function(n,t){for(var o=0,i=e.length;o<i;o++)e[o].then(n,t)})},o._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},o._unhandledRejectionFn=function(e){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)},o._setImmediateFn=function(e){o._immediateFn=e},o._setUnhandledRejectionFn=function(e){o._unhandledRejectionFn=e},"undefined"!=typeof module&&module.exports?module.exports=o:e.Promise||(e.Promise=o)}(this);
-
-/*!
- * Validator v0.9.0 for Bootstrap 3, by @1000hz
- * Copyright 2015 Cina Saffary
- * Licensed under http://opensource.org/licenses/MIT
- *
- * https://github.com/1000hz/bootstrap-validator
- */
-
-+function(a){"use strict";function b(b){return this.each(function(){var d=a(this),e=a.extend({},c.DEFAULTS,d.data(),"object"==typeof b&&b),f=d.data("bs.validator");(f||"destroy"!=b)&&(f||d.data("bs.validator",f=new c(this,e)),"string"==typeof b&&f[b]())})}var c=function(b,d){this.$element=a(b),this.options=d,d.errors=a.extend({},c.DEFAULTS.errors,d.errors);for(var e in d.custom)if(!d.errors[e])throw new Error("Missing default error message for custom validator: "+e);a.extend(c.VALIDATORS,d.custom),this.$element.attr("novalidate",!0),this.toggleSubmit(),this.$element.on("input.bs.validator change.bs.validator focusout.bs.validator",a.proxy(this.validateInput,this)),this.$element.on("submit.bs.validator",a.proxy(this.onSubmit,this)),this.$element.find("[data-match]").each(function(){var b=a(this),c=b.data("match");a(c).on("input.bs.validator",function(){b.val()&&b.trigger("input.bs.validator")})})};c.INPUT_SELECTOR=':input:not([type="submit"], button):enabled:visible',c.DEFAULTS={delay:500,html:!1,disable:!0,custom:{},errors:{match:"Does not match",minlength:"Not long enough"},feedback:{success:"glyphicon-ok",error:"glyphicon-remove"}},c.VALIDATORS={"native":function(a){var b=a[0];return b.checkValidity?b.checkValidity():!0},match:function(b){var c=b.data("match");return!b.val()||b.val()===a(c).val()},minlength:function(a){var b=a.data("minlength");return!a.val()||a.val().length>=b}},c.prototype.validateInput=function(b){var c=a(b.target),d=c.data("bs.validator.errors");if(c.is('[type="radio"]')&&(c=this.$element.find('input[name="'+c.attr("name")+'"]')),this.$element.trigger(b=a.Event("validate.bs.validator",{relatedTarget:c[0]})),!b.isDefaultPrevented()){var e=this;this.runValidators(c).done(function(f){c.data("bs.validator.errors",f),f.length?e.showErrors(c):e.clearErrors(c),d&&f.toString()===d.toString()||(b=f.length?a.Event("invalid.bs.validator",{relatedTarget:c[0],detail:f}):a.Event("valid.bs.validator",{relatedTarget:c[0],detail:d}),e.$element.trigger(b)),e.toggleSubmit(),e.$element.trigger(a.Event("validated.bs.validator",{relatedTarget:c[0]}))})}},c.prototype.runValidators=function(b){function d(a){return b.data(a+"-error")||b.data("error")||"native"==a&&b[0].validationMessage||g.errors[a]}var e=[],f=a.Deferred(),g=this.options;return b.data("bs.validator.deferred")&&b.data("bs.validator.deferred").reject(),b.data("bs.validator.deferred",f),a.each(c.VALIDATORS,a.proxy(function(a,c){if((b.data(a)||"native"==a)&&!c.call(this,b)){var f=d(a);!~e.indexOf(f)&&e.push(f)}},this)),!e.length&&b.val()&&b.data("remote")?this.defer(b,function(){var c={};c[b.attr("name")]=b.val(),a.get(b.data("remote"),c).fail(function(a,b,c){e.push(d("remote")||c)}).always(function(){f.resolve(e)})}):f.resolve(e),f.promise()},c.prototype.validate=function(){var a=this.options.delay;return this.options.delay=0,this.$element.find(c.INPUT_SELECTOR).trigger("input.bs.validator"),this.options.delay=a,this},c.prototype.showErrors=function(b){var c=this.options.html?"html":"text";this.defer(b,function(){var d=b.closest(".form-group"),e=d.find(".help-block.with-errors"),f=d.find(".form-control-feedback"),g=b.data("bs.validator.errors");g.length&&(g=a("<ul/>").addClass("list-unstyled").append(a.map(g,function(b){return a("<li/>")[c](b)})),void 0===e.data("bs.validator.originalContent")&&e.data("bs.validator.originalContent",e.html()),e.empty().append(g),d.addClass("has-error"),f.length&&f.removeClass(this.options.feedback.success)&&f.addClass(this.options.feedback.error)&&d.removeClass("has-success"))})},c.prototype.clearErrors=function(a){var b=a.closest(".form-group"),c=b.find(".help-block.with-errors"),d=b.find(".form-control-feedback");c.html(c.data("bs.validator.originalContent")),b.removeClass("has-error"),d.length&&d.removeClass(this.options.feedback.error)&&d.addClass(this.options.feedback.success)&&b.addClass("has-success")},c.prototype.hasErrors=function(){function b(){return!!(a(this).data("bs.validator.errors")||[]).length}return!!this.$element.find(c.INPUT_SELECTOR).filter(b).length},c.prototype.isIncomplete=function(){function b(){return"checkbox"===this.type?!this.checked:"radio"===this.type?!a('[name="'+this.name+'"]:checked').length:""===a.trim(this.value)}return!!this.$element.find(c.INPUT_SELECTOR).filter("[required]").filter(b).length},c.prototype.onSubmit=function(a){this.validate(),(this.isIncomplete()||this.hasErrors())&&a.preventDefault()},c.prototype.toggleSubmit=function(){if(this.options.disable){var b=a('button[type="submit"], input[type="submit"]').filter('[form="'+this.$element.attr("id")+'"]').add(this.$element.find('input[type="submit"], button[type="submit"]'));b.toggleClass("disabled",this.isIncomplete()||this.hasErrors())}},c.prototype.defer=function(b,c){return c=a.proxy(c,this),this.options.delay?(window.clearTimeout(b.data("bs.validator.timeout")),void b.data("bs.validator.timeout",window.setTimeout(c,this.options.delay))):c()},c.prototype.destroy=function(){return this.$element.removeAttr("novalidate").removeData("bs.validator").off(".bs.validator"),this.$element.find(c.INPUT_SELECTOR).off(".bs.validator").removeData(["bs.validator.errors","bs.validator.deferred"]).each(function(){var b=a(this),c=b.data("bs.validator.timeout");window.clearTimeout(c)&&b.removeData("bs.validator.timeout")}),this.$element.find(".help-block.with-errors").each(function(){var b=a(this),c=b.data("bs.validator.originalContent");b.removeData("bs.validator.originalContent").html(c)}),this.$element.find('input[type="submit"], button[type="submit"]').removeClass("disabled"),this.$element.find(".has-error").removeClass("has-error"),this};var d=a.fn.validator;a.fn.validator=b,a.fn.validator.Constructor=c,a.fn.validator.noConflict=function(){return a.fn.validator=d,this},a(window).on("load",function(){a('form[data-toggle="validator"]').each(function(){var c=a(this);b.call(c,c.data())})})}(jQuery);
-
-/* ============================================================
- * Bootstrap: rowlink.js v3.1.3
- * http://jasny.github.io/bootstrap/javascript/#rowlink
- * ============================================================
- * Copyright 2012-2014 Arnold Daniels
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ============================================================ */
-+function($){"use strict";var Rowlink=function(element,options){this.$element=$(element)
-this.options=$.extend({},Rowlink.DEFAULTS,options)
-this.$element.on('click.bs.rowlink','td:not(.rowlink-skip)',$.proxy(this.click,this))}
-Rowlink.DEFAULTS={target:"a"}
-Rowlink.prototype.click=function(e){var target=$(e.currentTarget).closest('tr').find(this.options.target)[0]
-if($(e.target)[0]===target)return
-e.preventDefault();if(target.click){target.click()}else if(document.createEvent){var evt=document.createEvent("MouseEvents");evt.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);target.dispatchEvent(evt);}}
-var old=$.fn.rowlink
-$.fn.rowlink=function(options){return this.each(function(){var $this=$(this)
-var data=$this.data('bs.rowlink')
-if(!data)$this.data('bs.rowlink',(data=new Rowlink(this,options)))})}
-$.fn.rowlink.Constructor=Rowlink
-$.fn.rowlink.noConflict=function(){$.fn.rowlink=old
-return this}
-$(document).on('click.bs.rowlink.data-api','[data-link="row"]',function(e){if($(e.target).closest('.rowlink-skip').length!==0)return
-var $this=$(this)
-if($this.data('bs.rowlink'))return
-$this.rowlink($this.data())
-$(e.target).trigger('click.bs.rowlink')})}(window.jQuery);
 
 
