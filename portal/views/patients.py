@@ -139,11 +139,11 @@ def patient_profile_create():
         leaf_organizations=leaf_organizations)
 
 
-@patients.route('/session-report/<int:user_id>/<instrument_id>/<authored_date>')
+@patients.route('/session-report/<int:subject_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
-def session_report(user_id, instrument_id, authored_date):
-    current_user().check_role("view", other_id=user_id)
-    user = get_user(user_id)
+def session_report(subject_id, instrument_id, authored_date):
+    current_user().check_role("view", other_id=subject_id)
+    user = get_user(subject_id)
     return render_template(
         "sessionReport.html",user=user,
         current_user=current_user(), instrument_id=instrument_id,

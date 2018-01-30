@@ -510,7 +510,7 @@ def profile(user_id):
     user = current_user()
     # template file for user self's profile
     template_file = 'profile/my_profile.html'
-    if user_id:
+    if user_id and user_id != user.id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
         # template file for view of other user's profile
