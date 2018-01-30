@@ -46,6 +46,11 @@ def upgrade():
 
 
 def downgrade():
+    # Force any created into best available old value
+    op.execute(
+        "UPDATE encounters SET auth_method = 'url_authenticated' "
+        "WHERE auth_method = 'url_authenticated_and_verified'")
+
     # Create old type for restoration - need tmp for storage
     tmp_type.create(op.get_bind(), checkfirst=False)
     op.execute(
