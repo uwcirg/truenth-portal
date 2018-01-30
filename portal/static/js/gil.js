@@ -1,9 +1,23 @@
-var VO, IO, OT, MO;
+var __PORTAL = $("#portalURI").val();
+var __CRSF_TOKEN = $("#csrfToken").val();
+var __CRSF_TOKEN_HEADER = {"X-CSRFToken": __CRSF_TOKEN};
+var LR_INVOKE_KEYCODE = 187; // "=" sign
+
+$.ajaxSetup({
+  	beforeSend: function(xhr, settings) {
+    	if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+        	xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
+    	}
+  	}
+});
+
+window.__i18next.init({"debug": false, "initImmediate": false});
+
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
   fx: {
-    easing: 'easeOutExpo',
+    easing: "easeOutExpo",
     speed: {
       slow: 1500,
       mid: 1000,
@@ -16,27 +30,30 @@ module.exports = {
 },{}],2:[function(require,module,exports){
 var admin, global, navToggle, upperBanner, video, windowResize, windowScroll, visObj, interventionSessionObj, orgTool, menuObj;
 
-upperBanner = require('./modules/upper-banner');
+upperBanner = require("./modules/upper-banner");
 
-windowScroll = require('./modules/window-scroll');
+windowScroll = require("./modules/window-scroll");
 
-windowResize = require('./modules/window-resize');
+windowResize = require("./modules/window-resize");
 
-navToggle = require('./modules/nav-toggle');
+navToggle = require("./modules/nav-toggle");
 
-global = require('./modules/global');
+global = require("./modules/global");
 
-admin = require('./modules/admin');
+admin = require("./modules/admin");
 
-video = require('./modules/video');
+video = require("./modules/video");
 
-visObj = require('./modules/visobj');
+visObj = require("./modules/visobj");
 
-menuObj = require('./modules/menuObj');
+menuObj = require("./modules/menuObj");
 
-interventionSessionObj = require('./modules/interventionSessionObj');
+interventionSessionObj = require("./modules/interventionSessionObj");
 
-orgTool = require('./modules/orgTool');
+orgTool = require("./modules/orgTool");
+
+accessCodeObj= require("./modules/accessCodeObj");
+
 
 $(function() {
   if (window.app == null) {
@@ -48,22 +65,23 @@ $(function() {
   window.app.windowResize = new windowResize();
   window.app.navToggle = new navToggle();
   window.app.admin = new admin();
-  VO = new visObj();
-  IO = new interventionSessionObj();
-  OT = new orgTool();
-  MO = new menuObj();
-  return window.app.video = new video();
+  window.app.visObj = new visObj();
+  window.app.interventionSessionObj = new interventionSessionObj();
+  window.app.orgTool = new orgTool();
+  window.app.menuObj = new menuObj();
+  window.app.video = new video();
+  window.app.accessCodeObj = new accessCodeObj();
 });
 
 
-},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12, "./modules/menuObj":13}],3:[function(require,module,exports){
+},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12, "./modules/menuObj":13, "./modules/accessCodeObj":14}],3:[function(require,module,exports){
 var Admin, loggedInAdminClass, loggedInClass, upperBannerClosedClass;
 
-loggedInAdminClass = 'is-showing-logged-in';
+loggedInAdminClass = "is-showing-logged-in";
 
-loggedInClass = 'is-logged-in';
+loggedInClass = "is-logged-in";
 
-upperBannerClosedClass = 'is-upper-banner-closed';
+upperBannerClosedClass = "is-upper-banner-closed";
 
 module.exports = Admin = (function() {
   function Admin() {
@@ -71,9 +89,9 @@ module.exports = Admin = (function() {
   }
 
   Admin.prototype.build = function() {
-    return $('.js-mock-submit').on('submit', function(e) {
+    return $(".js-mock-submit").on("submit", function(e) {
       e.preventDefault();
-      return $(this).addClass('is-submitted');
+      return $(this).addClass("is-submitted");
     });
   };
 
@@ -85,7 +103,7 @@ module.exports = Admin = (function() {
 },{}],4:[function(require,module,exports){
 var Global, config;
 
-config = require('../config');
+config = require("../config");
 
 module.exports = Global = (function() {
   function Global() {
@@ -99,25 +117,25 @@ module.exports = Global = (function() {
   };
 
   Global.prototype.addPlugins = function() {
-    $('.modal').on('show.bs.modal', function(e) {
-      return $(this).addClass('is-modal-active');
+    $(".modal").on("show.bs.modal", function(e) {
+      return $(this).addClass("is-modal-active");
     });
-    return $('.modal').on('hide.bs.modal', function(e) {
+    return $(".modal").on("hide.bs.modal", function(e) {
       var $this;
       $this = $(this);
       return setTimeout(function() {
-        return $this.removeClass('is-modal-active');
+        return $this.removeClass("is-modal-active");
       }, 200);
     });
   };
 
   Global.prototype.bindEvents = function() {
-    return $('.js-scroll-down').on('click', function(e) {
+    return $(".js-scroll-down").on("click", function(e) {
       var $target, position;
       e.preventDefault();
-      $target = $($(this).attr('data-target'));
+      $target = $($(this).attr("data-target"));
       position = $target.offset().top + $target.outerHeight() - 92;
-      return $('html,body').animate({
+      return $("html,body").animate({
         scrollTop: position
       }, config.fx.speed.mid, config.fx.easing);
     });
@@ -131,7 +149,7 @@ module.exports = Global = (function() {
 },{"../config":1}],5:[function(require,module,exports){
 var NavToggle, navExpandedClass;
 
-navExpandedClass = 'is-nav-expanded';
+navExpandedClass = "is-nav-expanded";
 
 module.exports = NavToggle = (function() {
   function NavToggle() {
@@ -139,32 +157,37 @@ module.exports = NavToggle = (function() {
   }
 
   NavToggle.prototype.build = function() {
-    $('.js-nav-menu-toggle').on('click', function(e) {
+    $(".js-nav-menu-toggle").on("click", function(e) {
       e.preventDefault();
-      return $('html').toggleClass(navExpandedClass, !$('html').hasClass(navExpandedClass));
+      return $("html").toggleClass(navExpandedClass, !$("html").hasClass(navExpandedClass));
     });
-    $("figure.nav-overlay, .js-close-nav").on('click', function(e) {
-      if ($('html').hasClass(navExpandedClass)) {
-        return $('html').removeClass(navExpandedClass);
+    $("figure.nav-overlay, .js-close-nav").on("click", function(e) {
+      if ($("html").hasClass(navExpandedClass)) {
+        return $("html").removeClass(navExpandedClass);
       }
     });
-    $('.side-nav a').not('[data-toggle=modal]').on('click touchend', function(e) {
+    $(".side-nav a").not("[data-toggle=modal]").on("click touchend", function(e) {
       var href;
       e.preventDefault();
-      href = $(this).attr('href');
-      $('html').removeClass(navExpandedClass);
+      href = $(this).attr("href");
+      $("html").removeClass(navExpandedClass);
       __loader(true);
       return setTimeout(function() {
         return window.location = href;
       }, 500);
     });
-    return $('.side-nav a[data-toggle=modal]').on('click touchend', function(e) {
+    $(window).on("unload", function() {
+      setTimeout(function() {
+        __loader();
+      }, 500);
+    });
+    return $(".side-nav a[data-toggle=modal]").on("click touchend", function(e) {
       var target;
       e.preventDefault();
-      target = $(this).attr('data-target');
-      $('html').removeClass(navExpandedClass);
+      target = $(this).attr("data-target");
+      $("html").removeClass(navExpandedClass);
       return setTimeout(function() {
-        return $(target).modal('show');
+        return $(target).modal("show");
       }, 500);
     });
   };
@@ -183,11 +206,32 @@ module.exports = UpperBanner = (function() {
   }
 
   UpperBanner.prototype.build = function() {
-    return $('.js-close-upper-banner').on('click touchstart', function(e) {
+    return $(".js-close-upper-banner").on("click touchstart", function(e) {
       e.preventDefault();
-      return $('html').addClass('is-upper-banner-closed');
+      return $("html").addClass("is-upper-banner-closed");
     });
   };
+
+  UpperBanner.prototype.handleAccess = function() {
+    if (typeof sessionStorage !== "undefined") {
+      var data = sessionStorage.getItem('bannerAccessed');
+      if (String(data) === "yes") {
+        $(".js-close-upper-banner").trigger("click");
+      }
+
+      $("a.js-close-upper-banner").on("click", function() {
+          sessionStorage.setItem("bannerAccessed", "yes");
+      });
+
+    }
+  }
+
+  UpperBanner.prototype.handleWatermark = function() {
+    var __env = $("#env").val();
+    if ((__env !== "" && __env.toLowerCase() !== "production") && ($(".watermark").length === 0)) {
+      $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
+    }
+  }
 
   return UpperBanner;
 
@@ -196,7 +240,7 @@ module.exports = UpperBanner = (function() {
 },{}],7:[function(require,module,exports){
 var Video, navExpandedClass;
 
-navExpandedClass = 'is-nav-expanded';
+navExpandedClass = "is-nav-expanded";
 
 module.exports = Video = (function() {
   function Video() {
@@ -204,16 +248,16 @@ module.exports = Video = (function() {
   }
 
   Video.prototype.build = function() {
-    $('.js-video-toggle a').on('click', function(e) {
+    $(".js-video-toggle a").on("click", function(e) {
       return e.preventDefault();
     });
-    return $('.js-video-toggle').on('click', function(e) {
+    return $(".js-video-toggle").on("click", function(e) {
       var $div, src;
       e.preventDefault();
-      $('html').addClass('is-video-active');
+      $("html").addClass("is-video-active");
       $div = $(this);
-      src = $div.data('iframe-src');
-      return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass('is-js-video-active');
+      src = $div.data("iframe-src");
+      return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass("is-js-video-active");
     });
   };
 
@@ -228,17 +272,17 @@ var Resize;
 module.exports = Resize = (function() {
   function Resize() {
     var $intro;
-    $intro = $('.intro');
+    $intro = $(".intro");
     $intro.imagesLoaded(function() {
-      return $(window).on('resize.setElements', _.debounce(function(e) {
+      return $(window).on("resize.setElements", _.debounce(function(e) {
         var imgHeight;
         if ($(window).width() <= 767) {
-          imgHeight = $intro.find('img.intro__img--mobile').height();
+          imgHeight = $intro.find("img.intro__img--mobile").height();
         } else {
-          imgHeight = $intro.find('img.intro__img--desktop').height();
+          imgHeight = $intro.find("img.intro__img--desktop").height();
         }
-        return $intro.css('height', imgHeight);
-      }, 50)).trigger('resize.setElements');
+        return $intro.css("height", imgHeight);
+      }, 50)).trigger("resize.setElements");
     });
   }
   return Resize;
@@ -258,18 +302,18 @@ module.exports = WindowScroll = (function() {
     var checkScroll;
     checkScroll = _.debounce(function() {
       var offset;
-      if ($('.upper-banner').outerHeight() > 0) {
-        offset = $('.upper-banner').outerHeight();
+      if ($(".upper-banner").outerHeight() > 0) {
+        offset = $(".upper-banner").outerHeight();
       } else {
         offset = 0;
       }
       if ($(window).scrollTop() <= offset) {
-        return $('html').removeClass('is-scrolled');
+        return $("html").removeClass("is-scrolled");
       } else {
-        return $('html').addClass('is-scrolled');
+        return $("html").addClass("is-scrolled");
       }
     }, 0);
-    return $(window).on('scroll.checkScroll', checkScroll).trigger('scroll.checkScroll');
+    return $(window).on("scroll.checkScroll", checkScroll).trigger("scroll.checkScroll");
   };
 
   return WindowScroll;
@@ -310,7 +354,9 @@ module.exports = VisObj = (function() {
       };
     };
     this.showLoader = function() {
-      if (!($("#loadingIndicator").is(":visible"))) $("#loadingIndicator").show();
+      if (!($("#loadingIndicator").is(":visible"))) {
+        $("#loadingIndicator").show();
+      }
     };
     this.hideLoader = function() {
       $("#loadingIndicator").hide();
@@ -330,57 +376,25 @@ var InterventionSessionObj;
 
 module.exports = InterventionSessionObj = (function() {
   return function () {
-
-    var SESSION_ID_ENUM = {
-      "decision-support": "decisionSupportInSession",
-      "symptom-tracker": "symptomTrackerInSession"
-    };
-
     this.setInterventionSession = function() {
-        var inDecisionSupport = $("main.decision-support-main").length > 0;
-        var inSymptomTracker = $("main.symptom-tracker-main").length > 0;
-        if (inDecisionSupport) {
-            if (typeof sessionStorage != "undefined") {
-               try {
-                 sessionStorage.setItem(SESSION_ID_ENUM["decision-support"], "true");
-               } catch(e) {
-
-               };
-            };
-        };
-        if (inSymptomTracker) {
-            if (typeof sessionStorage != "undefined") {
-               try {
-                 sessionStorage.setItem(SESSION_ID_ENUM["symptom-tracker"], "true");
-               } catch(e) {
-
-               };
-            };
-        };
+        var dataSectionId = $("main").attr("data-section");
+        if (hasValue(dataSectionId)) {
+        	if (typeof sessionStorage !== "undefined") {
+            sessionStorage.setItem(dataSectionId+"InSession", "true");
+          }
+        }
     };
     this.getSession = function(id) {
-      if (!id) return false;
-      else return (typeof sessionStorage != "undefined" && sessionStorage.getItem(SESSION_ID_ENUM[id]));
+      if (!id) {
+        return false;
+      } else {
+        return (typeof sessionStorage !== "undefined" && sessionStorage.getItem(id+"InSession"));
+      }
     };
-    this.clearSession = function(type) {
-        switch(type) {
-          case "decision-support":
-            if (this.getSession("decision-support")){
-                sessionStorage.removeItem(SESSION_ID_ENUM["decision-support"])
-            };
-            break;
-          case "symptom-tracker":
-            if (this.getSession("symptom-tracker")){
-                sessionStorage.removeItem(SESSION_ID_ENUM["symptom-tracker"])
-            };
-            break;
-          default:
-            //remove all
-            for (var item in SESSION_ID_ENUM) {
-              this.clearSession(item);
-            };
-            break;
-        };
+    this.clearSession = function(id) {
+    	if (this.getSession(id)) {
+        sessionStorage.removeItem(id+"InSession");
+    	}
     };
   };
 
@@ -423,12 +437,14 @@ module.exports = OrgTool = (function() {
     var orgsList = {};
 
     this.inArray = function (val, array) {
-        if (val && array) {
-            for (var i = 0; i < array.length; i++) {
-                if (array[i] == val) return true;
-            };
-        };
-        return false;
+      if (val && array) {
+          for (var i = 0; i < array.length; i++) {
+              if (array[i] === val) {
+                return true;
+              }
+          };
+      };
+      return false;
     };
 
     this.getTopLevelOrgs = function() {
@@ -449,7 +465,7 @@ module.exports = OrgTool = (function() {
             var params = CONSENT_ENUM["consented"];
             params.org = orgId;
             params.agreementUrl = encodeURIComponent(agreementUrl);
-            this.setConsent(userId, params, "default");
+            this.setConsent(userId, params, "default", true);
         };
     };
     this.setConsent = function(userId, params, status, sync) {
@@ -458,10 +474,10 @@ module.exports = OrgTool = (function() {
             if (!consented) {
                 $.ajax ({
                     type: "POST",
-                    url: '/api/user/' + userId + '/consent',
+                    url: "/api/user/" + userId + "/consent",
                     contentType: "application/json; charset=utf-8",
                     cache: false,
-                    dataType: 'json',
+                    dataType: "json",
                     async: (sync? false: true),
                     data: JSON.stringify({"user_id": userId, "organization_id": params["org"], "agreement_url": params["agreementUrl"], "staff_editable": (hasValue(params["staff_editable"])? params["staff_editable"] : false), "include_in_reports": (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false), "send_reminders": (hasValue(params["send_reminders"]) ? params["send_reminders"] : false) })
                 }).done(function(data) {
@@ -479,10 +495,11 @@ module.exports = OrgTool = (function() {
         if (!orgId) return false;
 
         var consentedOrgIds = [], expired = 0, found = false, suspended = false;
+        var self = this;
 
         $.ajax ({
             type: "GET",
-            url: '/api/user/'+userId+"/consent",
+            url: "/api/user/"+userId+"/consent",
             async: false,
             cache: false
         }).done(function(data) {
@@ -493,31 +510,43 @@ module.exports = OrgTool = (function() {
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
                     item = d[0];
-                    expired = OT.getDateDiff(item.expires);
-                    if (item.deleted) found = true;
-                    if (expired > 0) found = true;
-                    if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
+                    expired = self.getDateDiff(item.expires);
+                    if (item.deleted) {
+                      found = true;
+                    }
+                    if (expired > 0) {
+                      found = true;
+                    }
+                    if (item.staff_editable && item.include_in_reports && !item.send_reminders) {
+                      suspended = true;
+                    }
                     if (!found) {
-                        if (orgId == item.organization_id) {
-                            //console.log("consented orgid: " + orgId)
-                            switch(filterStatus) {
-                                case "suspended":
-                                    if (suspended) found = true;
-                                    break;
-                                case "purged":
+                      if (String(orgId) === String(item.organization_id)) {
+                        //console.log("consented orgid: " + orgId)
+                        switch(filterStatus) {
+                            case "suspended":
+                              if (suspended) {
+                                found = true;
+                              }
+                              break;
+                            case "purged":
+                              found = true;
+                              break;
+                            case "consented":
+                              if (!suspended) {
+                                  if (item.staff_editable && item.send_reminders && item.include_in_reports) {
                                     found = true;
-                                    break;
-                                case "consented":
-                                    if (!suspended) {
-                                        if (item.staff_editable && item.send_reminders && item.include_in_reports) found = true;
-                                    };
-                                    break;
-                                default:
-                                    found = true; //default is to return both suspended and consented entries
-                            };
-                            if (found) consentedOrgIds.push(orgId);
-
+                                  }
+                              };
+                              break;
+                            default:
+                              found = true; //default is to return both suspended and consented entries
                         };
+                        if (found) {
+                          consentedOrgIds.push(orgId);
+                        }
+
+                      };
                     };
                 }
             };
@@ -545,16 +574,22 @@ module.exports = OrgTool = (function() {
     };
 
     this.validateIdentifier = function(sync, callback) {
-      if (this.identifiers) return this.identifiers;
+      if (this.identifiers) {
+      	return this.identifiers;
+      }
       var self = this;
        $.ajax ({
             type: "GET",
             url: "/gil-shortcut-alias-validation/" + ($("#shortcut_alias").val()).toLowerCase(),
             async: sync? false : true
         }).done(function(data) {
-          if (callback) callback(data);
+          if (callback) {
+          	callback(data);
+          }
         }).fail(function() {
-          if (callback) callback({error: "failed request"});
+          if (callback) {
+          	callback({error: "failed request"});
+          }
         });
 
     };
@@ -562,39 +597,75 @@ module.exports = OrgTool = (function() {
         var self = this;
         $.ajax ({
             type: "GET",
-            url: '/api/organization',
+            url: "/api/organization",
             async: sync? false : true
         }).done(function(data) {
 
-            $("#fillOrgs").attr("userId", userId);
+          $("#fillOrgs").attr("userId", userId);
 
-            OT.populateOrgsList(data.entry);
-            OT.populateUI();
-            if (callback) callback();
+          (self.populateOrgsList).apply(self, [data.entry]);
+          self.populateUI();
+          if (callback) {
+          	callback();
+          }
 
-            $("#userOrgs input[name='organization']").each(function() {
-                $(this).on("click", function() {
+          $("#modal-org").on("hide.bs.modal", function(e) {
+            if (typeof sessionStorage !== "undefined") {
+              sessionStorage.setItem("noOrgModalViewed", "true");
+            } else {
+              alert(i18next.t("Unable to set session variable for organization modal viewed."));
+            }
+            setTimeout(function() { location.reload(); }, 0);
+          });
 
-                    var userId = $("#fillOrgs").attr("userId");
+          $("#submit-orgs").on("click", function() {
+            var os = $("#userOrgs input[name='organization']:checked");
+            if (os.length > 0) {
+              os.each(function() {
+                  if ($(this).attr("id") !== "noOrgs") {
                     var parentOrg = $(this).attr("data-parent-id");
-
-                    if ($(this).prop("checked")){
-                        if ($(this).attr("id") !== "noOrgs") {
-                            //console.log("set no org here")
-                            $("#noOrgs").prop('checked',false);
-
-                        } else {
-                            $("#userOrgs input[name='organization']").each(function() {
-                                //console.log("in id: " + $(this).attr("id"))
-                               if ($(this).attr("id") !== "noOrgs") {
-                                    $(this).prop('checked',false);
-                                };
-                            });
-
-                        };
+                    if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+                    var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                    console.log('agreement: ' + agreementUrl)
+                    if (agreementUrl && String(agreementUrl) !== "") {
+                      var params = CONSENT_ENUM["consented"];
+                      params.org = parentOrg;
+                      params.agreementUrl = agreementUrl;
+                      setTimeout(function() {
+                        self.setConsent($("#currentUserId").val(), params, "all", true);
+                        }, 0);
+                    } else {
+                      self.setDefaultConsent($("#currentUserId").val(), parentOrg);
                     };
-                });
-            });
+                  };
+              });
+              self.updateOrg($("#currentUserId").val(), self.updateOrgCallback);
+            };
+          });
+
+          $("#userOrgs input[name='organization']").each(function() {
+              $(this).on("click", function() {
+
+                  var userId = $("#fillOrgs").attr("userId");
+                  var parentOrg = $(this).attr("data-parent-id");
+
+                  if ($(this).prop("checked")){
+                      if ($(this).attr("id") !== "noOrgs") {
+                          //console.log("set no org here")
+                          $("#noOrgs").prop("checked",false);
+
+                      } else {
+                          $("#userOrgs input[name='organization']").each(function() {
+                              //console.log("in id: " + $(this).attr("id"))
+                             if ($(this).attr("id") !== "noOrgs") {
+                                  $(this).prop("checked",false);
+                              };
+                          });
+
+                      };
+                  };
+              });
+          });
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
            if (callback) callback();
@@ -606,7 +677,7 @@ module.exports = OrgTool = (function() {
 
         $.ajax ({
             type: "GET",
-            url: '/api/demographics/'+userId,
+            url: "/api/demographics/"+userId,
             async: false
         }).done(function(data) {
             demoArray = data;
@@ -619,39 +690,50 @@ module.exports = OrgTool = (function() {
         }).get();
 
         if (!hasValue(errorMessage)) {
-          if (typeof orgIDs === 'undefined'){
+          if (typeof orgIDs === "undefined"){
               orgIDs = [0]  // special value for `none of the above`
           }
           demoArray["careProvider"] = orgIDs;
 
           $.ajax ({
               type: "PUT",
-              url: '/api/demographics/'+userId,
+              url: "/api/demographics/"+userId,
               contentType: "application/json; charset=utf-8",
-              dataType: 'json',
+              dataType: "json",
               async: true,
               data: JSON.stringify(demoArray)
           }).done(function(data) {
-              if (callback) callback(errorMessage);
+              if (callback) {
+                callback(errorMessage);
+              }
           }).fail(function() {
               errorMessage += (hasValue(errorMessage) ? "<br/>":"") + i18next.t("Error occurred updating user organization.");
-              if (callback) callback(errorMessage);
+              if (callback) {
+                callback(errorMessage);
+              }
           });
         } else {
-          if(typeof callback != "undefined") callback(errorMessage);
+          if(typeof callback !== "undefined") {
+            callback(errorMessage);
+          }
         };
 
     },
 
     this.filterOrgs = function(leafOrgs) {
         //console.log(leafOrgs)
-        if (!leafOrgs) return false;
+        if (!leafOrgs) {
+          return false;
+        }
+
         var self = this;
 
         $("input[name='organization']:checkbox").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length === 0) {
+                  $(this).closest("label").hide();
+                }
             };
         });
 
@@ -669,28 +751,32 @@ module.exports = OrgTool = (function() {
                              if ($(this).is(":visible")) {
                                 isVisible = true;
                                 allChildrenHidden = false;
-                             };
+                             }
                          });
                         if (!isVisible) {
                             $(this).hide();
-                        } else allSubOrgsHidden = false;
+                        } else {
+                          allSubOrgsHidden = false;
+                        }
 
                     });
 
-                    if (allSubOrgsHidden) $(this).children("label").hide();
+                    if (allSubOrgsHidden) {
+                      $(this).children("label").hide();
+                    }
 
                 } else {
                     var ip = $(this).find("input[name='organization']");
                     if (ip.length > 0) {
-                        ip.each(function() {
-                            if ($(this).is(":visible")) allChildrenHidden = false;
-                        });
-                    };
-                };
+                      ip.each(function() {
+                        if ($(this).is(":visible")) allChildrenHidden = false;
+                      });
+                    }
+                }
             });
             if (allChildrenHidden) {
                 $("#fillOrgs").find("legend[orgid='" + orgId + "']").hide();
-            };
+            }
 
         });
     };
@@ -700,26 +786,30 @@ module.exports = OrgTool = (function() {
         if (entry && orgId) {
             entry.forEach(function(item) {
                 if (!org) {
-                    if (item.id == orgId) org = item;
-                };
+                    if (String(item.id) === String(orgId)) {
+                      org = item;
+                    }
+                }
             });
-        };
+        }
         return org;
     };
     this.getTopLevelOrgs = function() {
         if (TOP_LEVEL_ORGS.length == 0) {
-            var topOrgs = $("#fillOrgs").find(input[name='organization'][parent_org='true']);
+            var topOrgs = $("#fillOrgs").find(input[name="organization"][parent_org="true"]);
             if (topOrgs.length > 0) {
                 topOrgs.each(function() {
                     TOP_LEVEL_ORGS.push[$(this).val()];
                 });
-            };
+            }
         };
         return TOP_LEVEL_ORGS;
     };
 
     this.populateOrgsList = function(items) {
-        if (!items) return false;
+        if (!items) {
+          return false;
+        }
         var entry = items, self = this, parentId;
         items.forEach(function(item) {
             if (item.partOf) {
@@ -730,10 +820,12 @@ module.exports = OrgTool = (function() {
                 };
                 orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
                 if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
-                else orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+                else {
+                  orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+                }
             } else {
                 if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
-                if (item.id != 0) {
+                if (parseInt(item.id) !== 0) {
                     orgsList[item.id].isTopLevel = true;
                     TOP_LEVEL_ORGS.push(item.id);
                 };
@@ -742,7 +834,9 @@ module.exports = OrgTool = (function() {
         items.forEach(function(item) {
             if (item.partOf) {
                 parentId = item.partOf.reference.split("/").pop();
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+                if (orgsList[item.id]) {
+                  orgsList[item.id].parentOrgId = parentId;
+                }
             };
         });
         return orgsList;
@@ -758,7 +852,7 @@ module.exports = OrgTool = (function() {
                 } else {
                   $("#fillOrgs").append('<div id="' + orgsList[org].id + '_container" data-parent-id="'+ orgsList[org].name +'"  data-parent-name="' + orgsList[org].name + '" class="org-container"><label id="org-label-' + orgsList[org].id + '" class="org-label"><input class="clinic" type="radio" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
                         orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + i18next.t(orgsList[org].name) + '</span></label></div>');
-                };
+                }
                 parentOrgsCt++;
             };
             // Fill in each child clinic
@@ -783,65 +877,67 @@ module.exports = OrgTool = (function() {
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
                         i18next.t(item.name) +
                         '</span></label>';
-                    };
+                    }
 
                     childClinic += '</div>';
 
                     if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
-                    else $("#fillOrgs").append(childClinic);
+                    else {
+                      $("#fillOrgs").append(childClinic);
+                    }
 
                 });
             };
 
-            if (parentOrgsCt > 0 && orgsList[org].isTopLevel) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
+            if (parentOrgsCt > 0 && orgsList[org].isTopLevel) {
+              $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
+            }
         };
     };
     this.handleNoOrgs = function (userId) {
         $(".intervention-link, a.decision-support-link").each(function() {
-          var dm = /decision\s?support/gi;
-          if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
-              var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
-              //allow modal to show once once action has been taken
-              if (hasSet) return false;
-              var self = this;
-              $.ajax ({
-                  type: "GET",
-                  url: '/api/demographics/' + userId,
-                  async: false
-              }).done(function(data) {
-                  //console.log(data)
-                  if (data && data.careProvider) {
-                      $.each(data.careProvider,function(i,val){
-                          var orgID = val.reference.split("/").pop();
-                          if (parseInt(orgID) === 0) {
-                            $(self).removeAttr("href");
-                            $(self).on("click", function() {
-                              $("figure.js-close-nav").trigger("click");
-                              setTimeout('$("#modal-org").modal("show");', 0);
-                            });
-                            IO.clearSession("decision-support");
-                          };
-                      });
-                  };
-              }).fail(function() {
-                 // console.log("Problem retrieving data from server.");
-              });
-          };
+          	var dm = /decision\s?support/gi;
+          	if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
+	            var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+	            //allow modal to show once once action has been taken
+	            if (hasSet) return false;
+	            var self = this;
+	            $.ajax ({
+	            	type: "GET",
+	                url: "/api/demographics/" + userId,
+	                async: false
+	            }).done(function(data) {
+	                //console.log(data)
+	                if (data && data.careProvider) {
+	                    $.each(data.careProvider,function(i,val){
+	                        var orgID = val.reference.split("/").pop();
+	                        if (parseInt(orgID) === 0) {
+	                            $(self).removeAttr("href");
+	                            $(self).on("click", function() {
+	                            	$("figure.js-close-nav").trigger("click");
+	                              	setTimeout(function() {
+	                              		$("#modal-org").modal("show");
+	                              	}, 0);
+	                            });
+	                            window.app.interventionSessionObj.clearSession("decision-support");
+	                        };
+	                    });
+	                  };
+	              }).fail(function() {
+	                 // console.log("Problem retrieving data from server.");
+	              });
+          	};
        });
     };
 
     this.updateOrgCallback = function (errorMessage) {
-      if (!errorMessage) {
-        $("#modal-org a.box-modal__close").trigger("click");
-        __loader(true);
-        setTimeout("location.reload();", 1000);
-        if (typeof sessionStorage != "undefined") {
-          try {
+    	if (!errorMessage) {
+          $("#modal-org a.box-modal__close").trigger("click");
+          __loader(true);
+          setTimeout(function() { location.reload(); }, 1000);
+        	if (typeof sessionStorage !== "undefined") {
             sessionStorage.setItem("noOrgModalViewed", "true");
-          } catch(e) {
-
-          };
-        };
+        	};
       } else {
         $("#modal-org-error").html(i18next.t("Error updating organization"));
       };
@@ -854,214 +950,419 @@ module.exports = OrgTool = (function() {
   var menuObj;
   module.exports = menuObj = (function() {
       return function () {
-            this.filterMenu = function (userId) {
-              if (!userId) return false;
-              $.ajax({
-                url: __PORTAL + "/gil-interventions-items/" + userId,
-                context: document.body,
-                async: false,
-                cache: false
-              }).done(function(data) {
-                //console.log(data)
-                var ct = 0, found_decision_support = false, found_symptom_tracker = false;
-                //$(".side-nav-items__item--decisionsupport").hide();
-                if (data.interventions) {
-                  if (data.interventions.length > 0) {
-                    var db = $(".side-nav-items__item--dashboard");
-                    if (db.length == 0) {
-                      $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
-                      if ($("#portalMain").length > 0) {
-                           setSelectedNavItem($(".side-nav-items__item--dashboard"));
-                      };
-                    };
-                    $(".side-nav-items__item--home").hide();
-                  };
-                  (data.interventions).forEach(function(item) {
-                      var itemDescription = item.description;
-                      var itemLink = item.link_url;
-                      var itemName = item.name.replace(/\_/g, " ");
-                      var disabled = item.link_url == "disabled";
-                      var dm = /decision\s?support/gi;
-                      var sm = /symptom\s?tracker/gi;
-                      var sm2 = /self[_\s]?management/gi;
-                      //console.log(n + " " + d)
-                      if (dm.test(itemDescription) || dm.test(itemName)) {
-                          if (!disabled) {
-                              var ditem = $("#intervention_item_decisionsupport");
-                              if (ditem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="capitalize intervention-link">' + i18next.t("Decision Support") + '</a></li>');
-                              };
+          this.init = function(currentUserId) {
+            if ($("#interventionMenu").val() === "true") {
+              this.filterMenu(currentUserId);
+            } else {
+              window.app.visObj.hideLoader();
+            }
+            this.setSelectedNavItem($(".side-nav-items__item--" + $("main").attr("data-section")));
+            this.handleDisabledLinks();
+            $("footer a[href='/" + $("main").attr("data-link-identifier") + "']").hide();
+            if ($("main").attr("data-section") === "about") {
+              $("#repoVersion").show();
+            }
+          };
 
-                              found_decision_support = true;
-
-                              $(".decision-support-link").each(function() {
-                                $(this).attr("href", itemLink);
-                                $(this).removeClass("icon-box__button--disabled");
-                              });
-                              $(".icon-box-decision-support").removeClass("icon-box--theme-inactive");
-                          } else {
-                            $(".decision-support-link").each(function() {
-                                $(this).removeAttr("href");
-                                $(this).addClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
-                          };
-                      }
-                      else if (sm.test(itemDescription) || sm2.test(itemName)) {
-                          //do nothing - always display symptom tracker
-                          if (!disabled) {
-                            var sitem = $("#intervention_item_symptomtracker");
-                            if (sitem.length == 0) { //only draw this when there isn't already one
-                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="capitalize intervention-link">' + i18next.t("Symptom Tracker") + '</a></li>');
-                            };
-
-                            found_symptom_tracker = true;
-
-                            $(this).removeClass("icon-box__button--disabled");
-                            $(".symptom-tracker-link").each(function() {
-                                $(this).attr("href", itemLink)
-                                $(this).removeClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-symptom-tracker").removeClass("icon-box--theme-inactive");
-                          } else {
-                            $(".symptom-tracker-link").each(function() {
-                                $(this).removeAttr("href");
-                                $(this).addClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
-                          };
-                      }
-                      else if ($.trim(itemDescription) != "") {
-                          if (!disabled) {
-                              var eitem = $("#intervention_item_" + ct);
-                              if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + itemLink + '" class="intervention-link">' + i18next.t(itemDescription) + '</a></li>');
-                                ct++;
-                              };
-                              /*
-                               * note this will replace applicable links, e.g. 'Start' with the correct link for each respective intervention
-                               */
-                              var linkItems = $("." + item.name + "-link");
-                              if (linkItems.length > 0) {
-                                  linkItems.each(function() {
-                                    $(this).attr("href", itemLink);
-                                    $(this).removeClass("icon-box__button--disabled");
-                                  });
-                              }
-                          };
-                      };
-                  });
-
-                  if (!found_decision_support) {
-                    $(".decision-support-link").each(function() {
-                          $(this).removeAttr("href");
-                          $(this).addClass("icon-box__button--disabled");
+          this.handleDisabledLinks = function() {
+            if ($("#disableLinks").val() === "true") {
+              $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
+                if (!$(this).hasClass("side-nav-items__item--home") &&
+                  !$(this).hasClass("side-nav-items__item--logout") &&
+                  !$(this).hasClass("nav-list__item--home")) {
+                    $(this).children("a").each(function() {
+                      $(this).addClass("disabled");
+                      $(this).prop("onclick",null).off("click");
+                      $(this).on("click", function(e) {
+                        e.preventDefault();
+                        return false;
                       });
-                    $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
-                    IO.clearSession("decision-support");
-                  } else {
-                        OT.handleNoOrgs(userId);
-                        if (IO.getSession("decision-support")) {
-                            var l =  $("#intervention_item_decisionsupport a");
-                            var la = l.attr("href");
-                            if (l.length > 0 && validateUrl(la)) {
-                              IO.clearSession("decision-support");
-                              VO.setRedirect();
-                              setTimeout('location.replace("' + l.attr("href") + '");', 0);
-                              return true;
-                            };
-                        };
-                  };
-
-                  if (!found_symptom_tracker) {
-                    $(".symptom-tracker-link").each(function() {
-                        $(this).removeAttr("href");
-                        $(this).addClass("icon-box__button--disabled");
-                    });
-                    $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
-                    IO.clearSession("symptom-tracker");
-                  } else {
-                    //#intervention_item_symptomtracker
-                    if (IO.getSession("symptom-tracker")) {
-                        var l =  $("#intervention_item_symptomtracker a");
-                        var la = l.attr("href");
-                        if (l.length > 0 && validateUrl(la)) {
-                          IO.clearSession("symptom-tracker");
-                          VO.setRedirect();
-                          setTimeout('location.replace("' + l.attr("href") + '");', 0);
-                          return true;
-                        };
-                    };
-                  };
-
-                };
-                __loader(false);
-              }).fail(function() {
-                __loader(false);
+                  });
+                }
               });
-          }
-        };
+            }
+          };
+          this.setSelectedNavItem = function(obj) {
+            $(obj).addClass("side-nave-items__item--selected");
+            $("li.side-nave-items__item--selected").find("a").attr("href", "#");
+            $(obj).on("click", function(event) {
+              event.preventDefault();
+              __loader(false);
+              $(".side-nav__close").trigger("click");
+              return;
+            });
+          };
+
+      		this.handleItemRedirect = function(userId, itemName, enable) {
+            var visObj = window.app.visObj;
+	  			  if (!enable) {
+              $("." + itemName + "-link").each(function() {
+	       				$(this).removeAttr("href");
+                $(this).addClass("icon-box__button--disabled");
+              });
+              $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
+              window.app.interventionSessionObj.clearSession(itemName);
+            } else {
+	            window.app.orgTool.handleNoOrgs(userId);
+	            if (window.app.interventionSessionObj.getSession(itemName)) {
+	            	var l =  $("#intervention_item_" + itemName + " a");
+                var la = l.attr("href");
+                if (l.length > 0 && validateUrl(la)) {
+                  window.app.interventionSessionObj.clearSession(itemName);
+                  visObj.setRedirect();
+                  setTimeout(function() { location.replace(l.attr("href")); }, 0);
+                  return true;
+                };
+              };
+            };
+      		};
+      		this.setItemVis = function(item, itemLink, vis) {
+      			if (item) {
+              switch(vis) {
+      				  case "disabled":
+      				    item.removeAttr("href");
+                  item.addClass("icon-box__button--disabled");
+                  break;
+      				  default:
+                  item.attr("href", itemLink);
+                  item.removeClass("icon-box__button--disabled");
+      				}
+      			}
+      		};
+      		this.handleInterventionItemLinks = function(interventionItem, customName){
+      			var self = this;
+      			if (interventionItem) {
+      				var link = interventionItem.link_url;
+      				var disabled = (String(link) === "disabled");
+      				var itemName = customName||interventionItem.name;
+      				var linkItems = $("." + itemName + "-link");
+      				var menuItem = $("#intervention_item_" + itemName);
+      				if (!disabled && menuItem.length === 0) { //only draw this when there isn't already one
+      				  $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + itemName + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + link + '" class="capitalize intervention-link">' + interventionItem.description + '</a></li>');
+      				};
+      				if (linkItems.length > 0) {
+	      				if (!disabled) {
+	      					linkItems.each(function() {
+	      						self.setItemVis($(this), link);
+	      					});
+		              $(".icon-box-" + itemName).removeClass("icon-box--theme-inactive");
+	      				} else {
+	      					linkItems.each(function() {
+                    self.setItemVis($(this), link, "disabled");
+                  });
+                  $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
+	      				}
+	      			}
+      			}
+      		};
+          this.filterMenu = function (userId) {
+            if (!userId) {
+              return false;
+            }
+            var self = this;
+            $.ajax({
+              url: __PORTAL + "/gil-interventions-items/" + userId,
+              context: document.body,
+              async: false,
+              cache: false
+            }).done(function(data) {
+              //console.log(data)
+              var found_decision_support = false, found_symptom_tracker = false;
+              if (data.interventions) {
+                if (data.interventions.length > 0) {
+		              var db = $(".side-nav-items__item--dashboard");
+		              if (db.length === 0) {
+		                $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
+		                if ($("#portalMain").length > 0) {
+		                  self.setSelectedNavItem($(".side-nav-items__item--dashboard"));
+		                }
+		              };
+		              $(".side-nav-items__item--home").hide();
+                }
+                (data.interventions).forEach(function(item) {
+                  var itemDescription = item.description;
+                  var itemLink = item.link_url;
+                  var itemName = item.name.replace(/\_/g, " ");
+                  var disabled = item.link_url == "disabled";
+                  var dm = /decision\s?support/gi;
+                  var sm = /symptom\s?tracker/gi;
+                  var sm2 = /self[_\s]?management/gi;
+                  //console.log(n + " " + d)
+                  if (dm.test(itemDescription) || dm.test(itemName)) {
+                    if (!disabled) {
+                      found_decision_support = true;
+                    }
+                    self.handleInterventionItemLinks(item, "decision-support");
+                  } else if (sm.test(itemDescription) || sm2.test(itemName)) {
+                    if (!disabled) {
+                      found_symptom_tracker = true;
+                    }
+                    self.handleInterventionItemLinks(item, "symptom-tracker");
+                  } else if ($.trim(itemDescription) !== "") {
+                    self.handleInterventionItemLinks(item);
+                  };
+              });
+              self.handleItemRedirect(userId, "decision-support", found_decision_support);
+						  self.handleItemRedirect(userId, "symptom-tracker", found_symptom_tracker);
+            };
+            __loader(false);
+          }).fail(function() {
+            __loader(false);
+          });
+        }
+      };
   })();
-},{}]
-},{},[2])
+},{}],
+14:[function(require,module,exports){
+var accessCodeObj;
 
-function checkBannerStatus() {
-  if (typeof sessionStorage != "undefined") {
-    var data = sessionStorage.getItem('bannerAccessed');
-    if (data == "yes") {
-      $('.js-close-upper-banner').trigger("click");
+module.exports = accessCodeObj = (function() {
+  return function() {
+    this.handleAccessCode = function() {
+      if ($("#shortcut_alias").val() !== "" && $("#access_code_error").text() === "") {
+        $("#access_code_info").show();
+        $("#accessCodeLink").addClass("icon-box__button--disabled");
+        $("#btnCreateAccount").removeAttr("href").addClass("icon-box__button--disabled");
+        window.app.interventionSessionObj.setInterventionSession();
+        setTimeout(function() { location.replace("/go/" + ($("#shortcut_alias").val()).toLowerCase());}, 4000);
+      } else {
+        if ($("#access_code_error").text() !== "") {
+          $("#access_code_error").show();
+        }
+      }
     };
+    this.handleEvents = function() {
+        var self = this;
+        $("#shortcut_alias").on("keyup paste", function(e) {
+          if ($(this).val() !== "") {
+            window.app.orgTool.validateIdentifier(false,
+              function(data) {
+                if (data) {
+                  if (data.name) {
+                    $("#access_code_info").html(i18next.t("Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ...").replace("{shortcut_alias}", "<b>"+$("#shortcut_alias").val()+"</b>").replace("{org_name}", "<b>"+data.name+"</b>"));
+                      $("#access_code_error").text("");
+
+                    } else {
+                      if (data.error) {
+                        $("#access_code_info").text("");
+                        $("#access_code_error").text(i18next.t("You have entered an invalid access code.  Please try again"));
+                      };
+                  };
+                } else {
+                    if (hasValue($("#shortcut_alias").val())) {
+                      $("#access_code_info").text("");
+                      $("#access_code_error").text(i18next.t("System was unable to process your request."));
+                    };
+                };
+
+              });
+          } else {
+            $("#access_code_info").text("");
+          }
+        }).on("keydown", function(e) {
+          if (e.keyCode === 13) {
+            e.preventDefault();
+            self.handleAccessCode();
+          };
+        });
+
+
+        $("#accessCodeLink").on("click", function() {
+          self.handleAccessCode();
+        });
+    }
+
   }
-};
 
-function setSelectedNavItem(obj) {
-    $(obj).addClass("side-nave-items__item--selected");
-    $("li.side-nave-items__item--selected").find("a").attr("href", "#");
+})();
+},{}]
+},{},[2]);
 
-    $(obj).on("click", function(event) {
-          event.preventDefault();
-          __loader(false);
-          $(".side-nav__close").trigger("click");
-          return;
-     });
-};
-function handleAccessCode() {
-  if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
-    $("#access_code_info").show();
-    $("#accessCodeLink").addClass("icon-box__button--disabled");
-    $("#btnCreateAccount").removeAttr("href").addClass("icon-box__button--disabled");
-    IO.setInterventionSession();
-    setTimeout(function() { location.replace("/go/" + ($("#shortcut_alias").val()).toLowerCase());}, 4000);
+
+/*********
+ *
+ general global utilities function
+ *
+ *********/
+function __loader(show) {
+  if (show) {
+    window.app.visObj.showLoader();
   } else {
-    if ($("#access_code_error").text() != "") $("#access_code_error").show();
-  };
-};
-
-var LR_INVOKE_KEYCODE = 187; // "=" sign
+    window.app.visObj.showMain();
+  }
+}
 
 function LRKeyEvent() {
     if ($(".button--LR").length > 0) {
-        $("html").on("keydown", function(e) {
-            if (e.keyCode == LR_INVOKE_KEYCODE) {
-               $(".button--LR").toggleClass("show");
-            };
-        });
-    };
-};
+      $("html").on("keydown", function(e) {
+        if (e.keyCode === LR_INVOKE_KEYCODE) {
+          $(".button--LR").toggleClass("show");
+        }
+      });
+    }
+}
 function appendLREditContainer(target, url, show) {
-    if (!hasValue(url)) return false;
-    if (!target) target = $(document);
-    target.append('<div>' +
+    if (!hasValue(url)) {
+      return false;
+    }
+    if (!target) {
+      target = $(document);
+    }
+    target.append("<div>" +
                 '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">' + i18next.t("Edit in Liferay") + '</a>' +
-                '</div>'
+                "</div>"
                 );
-    if (show) $(".button--LR").addClass("show");
-
+    if (show) {
+      $(".button--LR").addClass("show");
+    }
 };
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };
 //this test for full URL - "https://stg-sm.us.truenth.org" etc.
 function validateUrl(val) {
-    return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
+    return  hasValue(val) && $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
 };
+
+function readCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === " ") {
+        c = c.substring(1, c.length);
+      }
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+  }
+  return null;
+};
+
+function initSessionMonitor() {
+  var sessionMonitor=(function(__CRSF_TOKEN) {
+      return function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",headers: {"X-CSRFToken": __CRSF_TOKEN}, cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
+      })(__CRSF_TOKEN);
+
+  // Set default sessionLifetime from Flask config
+  // Subtract 10 seconds to ensure the backend doesn't expire the session first
+  var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+  var cookieTimeout = readCookie("SS_TIMEOUT");
+  cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
+
+  if (cookieTimeout && cookieTimeout > 0) {
+    DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
+  } else {
+    try {
+      CONFIG_SESSION_LIFETIME = $("#sessionLifeTime").val();
+      if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") {
+        CONFIG_SESSION_LIFETIME = 15 * 60;
+      }
+      DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
+    } catch(e) {
+      DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+    }
+  }
+
+  var sessMon = sessionMonitor({
+      sessionLifetime: DEFAULT_SESSION_LIFETIME,
+      timeBeforeWarning: 1 * 60 * 1000,
+      minPingInterval: 1 * 60 * 1000,  // 1 minute
+      activityEvents: "mouseup",
+      pingUrl: "/api/ping",
+      logoutUrl: "/logout",
+      timeoutUrl: "/logout?timed_out=1",
+      modalShown: false,
+      intervalMonitor: false,
+      onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
+  });
+  window.sessMon = sessMon;
+  var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
+  $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+        .on("show.bs.modal", function() { sessMon.modalShown = true})
+        .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
+        .on("click", "#stay-logged-in", sessMon.extendsess)
+        .on("click", "#log-out", sessMon.logout)
+        .find("#remaining-time").text(warningText);
+}
+
+function handleLoginAsUser() {
+  var __LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+  if (__LOGIN_AS_PATIENT) {
+      if (typeof history !== "undefined" && history.pushState) {
+        history.pushState(null, null, location.href);
+      }
+      window.addEventListener("popstate", function(event) {
+        if (typeof history !== "undefined" && history.pushState) {
+          history.pushState(null, null, location.href);
+          setTimeout(function() { location.reload(); } , 0);
+        } else {
+          window.history.forward(1);
+          setTimeout(function() { location.reload();}, 0);
+        }
+      });
+  }
+}
+
+$(document).ready(function(){
+
+  var currentUserId = $("#currentUserId").val();
+  // Configure and start the session timeout monitor
+  if (hasValue(currentUserId)) {
+    initSessionMonitor();
+    handleLoginAsUser();
+  }
+
+
+  $(".button--login--register").on("click", function () {
+    $("#modal-login-register").modal("hide");
+    setTimeout(function() { $("#modal-login").modal("show"); }, 400);
+  });
+
+  $("#modal-login").on("show.bs.modal", function(e) {
+    __loader(false);
+  });
+
+  $("#btnCreateAccount").on("click", function() {
+  	window.app.interventionSessionObj.setInterventionSession();
+  });
+
+  if (hasValue(currentUserId)) {
+    window.app.orgTool.getOrgs(currentUserId);
+  }
+
+  $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
+  	e.preventDefault();
+  	__loader(false);
+  	return false;
+  });
+
+  $("#password").on("keyup", function() {
+    if (e.keyCode === 13) {
+  		e.preventDefault();
+  		if ($("input[name='email']").val() !== "") {
+  			$("#btnLogin").trigger("click");
+  		}
+    }
+  });
+
+  $("input[type='text']").on("blur paste", function() {
+    $(this).val($.trim($(this).val()));
+  });
+  
+  window.app.upperBanner.handleAccess();
+  window.app.upperBanner.handleWatermark();
+  window.app.accessCodeObj.handleEvents();
+  window.app.menuObj.init(currentUserId);
+  window.app.interventionSessionObj.clearSession($("main").attr("data-section"));
+  
+  if ($("#sessionTimedOut").val() === "true") {
+    $("#timeout-modal").modal("show");
+  }
+
+  if ($("main").attr("data-theme") === "white") {
+    $("body").addClass("theme--intro-light");
+  }
+  appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), $("#isContentManager").val() === "true");
+  setTimeout(function() { __loader(false); }, 0);
+});

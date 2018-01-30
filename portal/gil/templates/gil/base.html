@@ -44,6 +44,23 @@
         {{_("Loading")}}... &nbsp;
   </div>
   <section id="mainHolder">
+    <input type="hidden" id="currentUserId" value="{{user.id if user}}" />
+    {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %}
+      <input type="hidden" id="interventionMenu" value="true" />
+    {% endif %}
+    {% if timed_out %}
+      <input type="hidden" id="sessionTimedOut" value="true" />
+    {% endif %}
+    {% if request.args.get("disableLinks", "") %}
+      <input type="hidden" id="disableLinks" value="true" />
+    {% endif %}
+    {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}
+      <input type="hidden" id="isContentManager" value="true" />
+    {% endif %}
+    <input type="hidden" id="portalURI" value="{{PORTAL}}" />
+    <input type="hidden" id="csrfToken" value="{{csrf_token()}}" />
+    <input type="hidden" id="env" value="{{config.SYSTEM_TYPE if config.SYSTEM_TYPE}}" />
+    <input type="hidden" id="sessionLifeTime" value="{{config.PERMANENT_SESSION_LIFETIME if config.PERMANENT_SESSION_LIFETIME}}" />
   {% block nav %}
     <!--if lt IE 8
     p.browserupgrade
@@ -295,17 +312,16 @@
     {% endif %}
 {% endblock %}
 {% block init_scripts %}
-    <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
-    <script src="{{url_for('static', filename='js/gil.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
     <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
     <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
+    <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
     <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
+    <script src="{{url_for('static', filename='js/gil.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
     {% if config.PIWIK_SITEID %}
         <script type="text/javascript">
             var _paq = _paq || [];
-
             {% if config.PIWIK_DOMAINS %}
             _paq.push(["setDomains", {{ config.PIWIK_DOMAINS|safe }}]);
             {% endif %}
@@ -325,259 +341,9 @@
             })();
         </script>
         <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="PIWIK site ID" /></p></noscript>
-      {% endif %}
-      <script>
-          var __PORTAL = "{{PORTAL}}";
-          var __CRSF_TOKEN = "{{csrf_token()}}";
-          var __CRSF_TOKEN_HEADER = {
-              "X-CSRFToken": __CRSF_TOKEN
-          };
-
-          $.ajaxSetup({
-              beforeSend: function(xhr, settings) {
-                  if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                      xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
-                  }
-              }
-          });
-          __i18next.init({"debug": false, "initImmediate": true});
-
-          // Configure and start the session timeout monitor
-          {% if user %}
-              function _readCookie(name) {
-                var nameEQ = name + "=";
-                var ca = document.cookie.split(';');
-                for (var i = 0; i < ca.length; i++) {
-                    var c = ca[i];
-                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-                };
-                return null;
-              };
-              var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",headers: {"X-CSRFToken": "{{ csrf_token() }}"}, cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
-
-              var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
-              // Set default sessionLifetime from Flask config
-              // Subtract 10 seconds to ensure the backend doesn't expire the session first
-              var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
-              var cookieTimeout = _readCookie("SS_TIMEOUT");
-              cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
-
-              if (cookieTimeout && cookieTimeout > 0) {
-                  DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
-              } else {
-                  try {
-                      CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} {{config.PERMANENT_SESSION_LIFETIME}} {% else %} "" {% endif %};
-                      if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
-                      DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
-                  } catch(e) {
-                      DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
-                  };
-              };
-
-              var sessMon = sessionMonitor({
-                    sessionLifetime: DEFAULT_SESSION_LIFETIME,
-                    timeBeforeWarning: 1 * 60 * 1000,
-                    minPingInterval: 1 * 60 * 1000,  // 1 minute
-                    activityEvents: "mouseup",
-                    pingUrl: '{{PORTAL}}/api/ping',
-                    logoutUrl: '{{PORTAL}}/logout',
-                    timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
-                    modalShown: false,
-                    intervalMonitor: false,
-                    onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
-              });
-              window.sessMon = sessMon;
-              var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
-              $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-                      .on("show.bs.modal", function() { sessMon.modalShown = true})
-                      .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
-                      .on("click", "#stay-logged-in", sessMon.extendsess)
-                      .on("click", "#log-out", sessMon.logout)
-                      .find("#remaining-time").text(warningText);
-
-          {% endif %}
-
-          var __loader = function(show) {
-              if (show) {
-                  VO.showLoader();
-              } else {
-                  VO.showMain();
-              };
-          };
-
-
-         $(document).ready(function(){
-
-            checkBannerStatus();
-
-            {% if timed_out %}
-                $("#timeout-modal").modal("show");
-            {% endif %}
-
-            {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %} MO.filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
-
-            (function() {
-              var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
-              if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
-            })();
-
-            $(".button--login--register").on("click", function () {
-                $('#modal-login-register').modal('hide');
-                setTimeout("$('#modal-login').modal('show'); ", 400);
-            });
-
-            $("#modal-login").on("show.bs.modal", function(e) {
-                __loader(false);
-            });
-
-            $("#btnCreateAccount").on("click", function() {
-                IO.setInterventionSession();
-            });
-
-            $("#modal-org").on("hide.bs.modal", function(e) {
-                 if (typeof sessionStorage != "undefined") {
-                   try {
-                     sessionStorage.setItem("noOrgModalViewed", "true");
-                   } catch(e) {
-
-                   };
-                 };
-                 setTimeout("location.reload();", 0);
-             });
-
-            {% if user %}
-               OT.getOrgs({{user.id}});
-              $("#submit-orgs").on("click", function() {
-                    var os = $("#userOrgs input[name='organization']:checked");
-                    if (os.length > 0) {
-                      os.each(function() {
-                        if ($(this).attr("id") !== "noOrgs") {
-                          var parentOrg = $(this).attr("data-parent-id");
-                          if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-                          var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                          //console.log('agreement: ' + agreementUrl)
-                          if (agreementUrl && agreementUrl != "") {
-                              var params = CONSENT_ENUM["consented"];
-                              params.org = parentOrg;
-                              params.agreementUrl = agreementUrl;
-                              setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
-                          } else {
-                            OT.setDefaultConsent($("#fillOrgs").attr("userId"), parentOrg);
-                          };
-                        };
-
-                      });
-                      OT.updateOrg({{user.id}}, OT.updateOrgCallback);
-                    };
-              });
-            {% endif %}
-
-            $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
-            	__loader(false);
-                e.preventDefault();
-                return false;
-            });
-
-            $("#shortcut_alias").on("keyup paste", function(e) {
-                if ($(this).val() != "") {
-                    OT.validateIdentifier(false,
-                      function(data) {
-                        if (data) {
-                          if (data.name) {
-                            $("#access_code_info").html(i18next.t("Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ...").replace("{shortcut_alias}", "<b>"+$("#shortcut_alias").val()+"</b>").replace("{org_name}", "<b>"+data.name+"</b>"));
-                            $("#access_code_error").text("");
-
-                          } else {
-                            if (data.error) {
-                              $("#access_code_info").text("");
-                              $("#access_code_error").text("{{_('You have entered an invalid access code.  Please try again')}}");
-                            };
-                          };
-                        } else {
-                            if (hasValue($("#shortcut_alias").val())) {
-                              $("#access_code_info").text("");
-                              $("#access_code_error").text("{{_('System was unable to process your request.')}}");
-                            };
-                        };
-
-                      });
-                } else $("#access_code_info").text("");
-            }).on("keydown", function(e) {
-                if (e.keyCode == 13) {
-                  e.preventDefault();
-                  handleAccessCode();
-                };
-            });
-
-
-            $("#accessCodeLink").on("click", function() {
-                handleAccessCode();
-            });
-
-            $("#password").on("keyup", function() {
-                if (e.keyCode == 13) {
-                  e.preventDefault();
-                  if ($("input[name='email']").val() != "") $("#btnLogin").trigger("click");
-                };
-            });
-
-            $("a.js-close-upper-banner").on("click", function() {
-            	if (typeof sessionStorage != "undefined") {
-      					sessionStorage.setItem('bannerAccessed', 'yes');
-      				};
-            });
-
-            $("input[type='text']").on("blur paste", function() {
-                  $(this).val($.trim($(this).val()));
-            });
-            var __LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-            if (__LOGIN_AS_PATIENT) {
-                if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
-                window.addEventListener('popstate', function(event) {
-                  if (typeof history != 'undefined' && history.pushState) {
-                    history.pushState(null, null, location.href);
-                    setTimeout('location.reload();', 0);
-                  } else {
-                    window.history.forward(1);
-                    setTimeout('location.reload();', 0);
-                  };
-                });
-            };
-
-            {% if request.args.get("disableLinks", "") %}
-               $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
-                  if (!$(this).hasClass("side-nav-items__item--home") &&
-                      !$(this).hasClass("side-nav-items__item--logout") &&
-                      !$(this).hasClass("nav-list__item--home")) {
-                    $(this).children("a").each(function() {
-                        $(this).addClass("disabled");
-                        $(this).prop('onclick',null).off('click');
-                        $(this).on("click", function(e) {
-                            e.preventDefault();
-                            return false;
-                        });
-                    });
-                  };
-               });
-            {% endif %}
-
-            //uncomment if want to allow LR edit link to display on hot key
-            //setTimeout("LRKeyEvent();", 500);
-
-            //see gil.js to call loader onclick event of each nav.link
-            setTimeout("__loader(false);", 0);
-
-          });
-
-      </script>
+    {% endif %}
 {% endblock %} <!-- end block footer -->
 {% block document_ready %}
-  <script>
-    $(document).ready(function(){
-      $("body").attr("class", "page-about theme--intro-light");
-    });
-  </script>
 {% endblock %}
   </body>
 </html>

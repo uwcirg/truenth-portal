@@ -2,7 +2,7 @@
 {% block title %}{{_("About")}} {{super()}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
-    <main class="main">
+    <main class="main about-main" data-section="about" data-theme="white">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--about {%if user%}no-banner{%endif%}" style="background-image: url({{url_for('.static', filename='img/About-Top-Background.jpg') }})">
         <div class="page-intro__content">
@@ -136,13 +136,4 @@
         </div>
       </div>
     </main>
-{% endblock %}
-{% block document_ready %}
-    <script>
-        $(document).ready(function() {
-            $("body").attr("class", "page-about theme--intro-light");
-            $("#repoVersion").show();
-            setSelectedNavItem($(".side-nav-items__item--about"));
-        });
-    </script>
 {% endblock %}

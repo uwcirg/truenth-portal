@@ -6,15 +6,11 @@
       {{ super()}}
       <div class="page-intro page-intro--theme-brown-light">
         <div class="page-intro__content">
-          <div id="termsConditionsContainer" class="simple-page-content">
+          <div id="termsConditionsContainer" class="simple-page-content LR-content-container">
             <div>{{ content|safe if content}}</div>
           </div>
         </div>
       </div>
+      <input type="hidden" id="LREditorURL" value="{{editorUrl if editorUrl}}" />
     </main>
 {% endblock %}
- {% block document_ready %}
-  {% if editorUrl %}
-    <script>appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
-  {% endif %}
- {% endblock %}

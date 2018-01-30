@@ -1,5 +1,5 @@
 /*** wrapper object to initalize i18next ***/
-var __i18next = (function() {
+var __i18next = window.__i18next = (function() {
 
     function init(options, callback) {
 
