@@ -95,7 +95,7 @@ def get_reporting_stats():
 def calculate_days_overdue(user):
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
-    if a_s.overall_status in ('Completed', 'Expired'):
+    if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
         return 0
     qb = a_s.qb_data.qb
     if not qb:
