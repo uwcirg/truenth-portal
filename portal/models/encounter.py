@@ -29,6 +29,7 @@ status_types = ENUM(
 auth_method_types = ENUM(
     'password_authenticated', 'url_authenticated', 'staff_authenticated',
     'staff_handed_to_patient', 'service_token_authenticated',
+    'url_authenticated_and_verified',
     name='auth_methods', create_type=False)
 
 
