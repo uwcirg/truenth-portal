@@ -142,8 +142,8 @@ def patient_profile_create():
 @patients.route('/session-report/<int:user_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
 def session_report(user_id, instrument_id, authored_date):
+    current_user().check_role("view", other_id=user_id)
     user = get_user(user_id)
-    user.check_role("view", other_id=user_id)
     return render_template(
         "sessionReport.html",user=user,
         current_user=current_user(), instrument_id=instrument_id,
