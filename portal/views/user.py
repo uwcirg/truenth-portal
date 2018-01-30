@@ -325,8 +325,8 @@ def access_url(user_id):
     Generates a single use access token for the given user as a
     one click, weak authentication access to the system.
 
-    NB - user must be a member of the WRITE_ONLY role, and not a member
-    of privileged roles, as a safeguard from abuse.
+    NB - user must be a member of the WRITE_ONLY role or ACCESS_ON_VERIFY,
+    and not a member of privileged roles, as a safeguard from abuse.
 
     ---
     tags:
@@ -372,9 +372,9 @@ def access_url(user_id):
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
 
-    if ROLE.WRITE_ONLY not in has:
+    if set((ROLE.ACCESS_ON_VERIFY, ROLE.WRITE_ONLY)).isdisjoint(has):
         # KEEP this restriction.  Weak authentication (which the
-        # returned URL provides) should only be available for WRITE_ONLY users
+        # returned URL provides) should only be available for these roles
         abort(400, "Account {} lacks WRITE_ONLY role".format(user_id))
 
     # generate an access token
