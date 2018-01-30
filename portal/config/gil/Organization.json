@@ -1917,6 +1917,11 @@
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "music"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
         }
       ],
       "indigenous_codings": false,
