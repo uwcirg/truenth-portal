@@ -49,7 +49,7 @@ def practitioner_search():
       200:
         description:
           Returns a FHIR bundle of [practitioner
-          resources](http://www.hl7.org/fhir/practitioner.html) in JSON.
+          resources](http://www.hl7.org/fhir/DSTU2/practitioner.html) in JSON.
       400:
         description:
           if invalid search param keys are used
@@ -111,7 +111,7 @@ def practitioner_get(practitioner_id):
       200:
         description:
           Returns the requested practitioner as a FHIR [practitioner
-          resource](http://www.hl7.org/fhir/practitioner.html) in JSON.
+          resource](http://www.hl7.org/fhir/DSTU2/practitioner.html) in JSON.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -132,7 +132,7 @@ def practitioner_post():
     Returns the JSON FHIR practitioner as known to the system after adding.
 
     Submit JSON format [Practitioner
-    Resource](https://www.hl7.org/fhir/practitioner.html) to add an
+    Resource](https://www.hl7.org/fhir/DSTU2/practitioner.html) to add an
     practitioner.
 
     ---
@@ -156,7 +156,7 @@ def practitioner_post():
       200:
         description:
           Returns created [FHIR practitioner
-          resource](http://www.hl7.org/fhir/practitioner.html) in JSON.
+          resource](http://www.hl7.org/fhir/DSTU2/practitioner.html) in JSON.
       400:
         description:
           if practitioner FHIR JSON is not valid
@@ -189,7 +189,7 @@ def practitioner_put(practitioner_id):
     """Update practitioner via FHIR Resource Practitioner. New should POST
 
     Submit JSON format [Practitioner
-    Resource](https://www.hl7.org/fhir/practitioner.html) to update an
+    Resource](https://www.hl7.org/fhir/DSTU2/practitioner.html) to update an
     existing practitioner.
 
     ---
@@ -219,7 +219,7 @@ def practitioner_put(practitioner_id):
       200:
         description:
           Returns updated [FHIR Practitioner
-          resource](http://www.hl7.org/fhir/practitioner.html) in JSON.
+          resource](http://www.hl7.org/fhir/DSTU2/practitioner.html) in JSON.
       400:
         description:
           if practitioner FHIR JSON is not valid
