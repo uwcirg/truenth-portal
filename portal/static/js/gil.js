@@ -452,7 +452,9 @@ module.exports = OrgTool = (function() {
         return orgsList;
     };
     this.setDefaultConsent =  function(userId, orgId) {
-        if (!userId && !orgId) return false;
+        if (!userId && !orgId) {
+          return false;
+        }
         var stockConsentUrl = $("#stock_consent_url").val();
         var agreementUrl = "";
         if (stockConsentUrl) {
@@ -492,7 +494,7 @@ module.exports = OrgTool = (function() {
         if (!userId) return false;
         if (!orgId) return false;
 
-        var consentedOrgIds = [], expired = 0, found = false, suspended = false;
+        var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
         var self = this;
 
         $.ajax ({
@@ -622,9 +624,10 @@ module.exports = OrgTool = (function() {
               os.each(function() {
                   if ($(this).attr("id") !== "noOrgs") {
                     var parentOrg = $(this).attr("data-parent-id");
-                    if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+                    if (!parentOrg) {
+                      parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+                    };
                     var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                    console.log('agreement: ' + agreementUrl)
                     if (agreementUrl && String(agreementUrl) !== "") {
                       var params = CONSENT_ENUM["consented"];
                       params.org = parentOrg;
@@ -767,7 +770,9 @@ module.exports = OrgTool = (function() {
                     var ip = $(this).find("input[name='organization']");
                     if (ip.length > 0) {
                       ip.each(function() {
-                        if ($(this).is(":visible")) allChildrenHidden = false;
+                        if ($(this).is(":visible")) {
+                          allChildrenHidden = false;
+                        }
                       });
                     }
                 }
@@ -780,8 +785,8 @@ module.exports = OrgTool = (function() {
     };
 
     this.findOrg = function(entry, orgId) {
-        var org;
         if (entry && orgId) {
+            var org;
             entry.forEach(function(item) {
                 if (!org) {
                     if (String(item.id) === String(orgId)) {
@@ -794,7 +799,7 @@ module.exports = OrgTool = (function() {
     };
     this.getTopLevelOrgs = function() {
         if (TOP_LEVEL_ORGS.length == 0) {
-            var topOrgs = $("#fillOrgs").find(input[name="organization"][parent_org="true"]);
+            var topOrgs = $("#fillOrgs").find('input[name="organization"][parent_org="true"]');
             if (topOrgs.length > 0) {
                 topOrgs.each(function() {
                     TOP_LEVEL_ORGS.push[$(this).val()];
