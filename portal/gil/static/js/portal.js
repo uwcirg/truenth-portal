@@ -10,10 +10,10 @@ $(document).ready(function() {
                 $("html, body").animate({
                     scrollTop: t - 90
                 }, 1000);
-            };
+            }
         });
-    };
+    }
     if (hc.length === 1) {
         hc.removeClass("home--item-container").addClass("home--item-container-full");
-    };
+    }
 });

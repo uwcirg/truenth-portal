@@ -13,9 +13,9 @@ $(document).ready(function() {
           if ($(".button--video").is(":visible")) {
             var src = $(".embed-video").attr("src");
             $(".embed-video").attr("src", src);
-          };
+          }
       });
-    };
+    }
     if ($("main").attr("data-section") === "livedexperience") {
       $("#lnReadMoreStory").addClass("disabled").on("click", function(e) {
           e.preventDefault();

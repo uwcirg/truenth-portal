@@ -173,7 +173,9 @@ module.exports = Global = (function() {
       var roles = this.getRoles();
       if (roles) {
         return roles.indexOf(roleName) !== -1;
-      } else return false;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
@@ -554,8 +556,12 @@ module.exports = OrgTool = (function() {
     };
     /****** NOTE - this will return the latest updated consent entry *******/
     this.hasConsent = function(userId, orgId, filterStatus) {
-        if (!userId) return false;
-        if (!orgId) return false;
+        if (!userId) {
+          return false;
+        }
+        if (!orgId) {
+          return false;
+        }
 
         var consentedOrgIds = [], expired = 0, found = false, suspended = false;
         var self = this;
@@ -625,13 +631,13 @@ module.exports = OrgTool = (function() {
         var d;
         if (dateToCalc) {
             var c = dateToCalc.split(/[^0-9]/);
-            d = new Date(c[0], c[1]-1, c[2]).getTime()
+            d = new Date(c[0], c[1]-1, c[2]).getTime();
         } else {
             // If no baseDate, then use today to find the number of days between dateToCalc and today
-            d = new Date().getTime()
+            d = new Date().getTime();
         }
         // Round down to floor so we don't add an extra day if session is 12+ hours into the day
-        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24));
     };
 
     this.validateIdentifier = function(sync, callback) {
@@ -727,8 +733,10 @@ module.exports = OrgTool = (function() {
               });
           });
         }).fail(function(xhr) {
-           window.app.global.reportError(userId, "/api/organization", xhr.responseText);
-           if (callback) callback();
+          window.app.global.reportError(userId, "/api/organization", xhr.responseText);
+          if (callback) {
+            callback();
+          }
         });
     },
     this.updateOrg = function(userId, callback) {
@@ -751,7 +759,7 @@ module.exports = OrgTool = (function() {
 
         if (!hasValue(errorMessage)) {
           if (typeof orgIDs === "undefined"){
-              orgIDs = [0]  // special value for `none of the above`
+              orgIDs = [0];  // special value for `none of the above`
           }
           demoArray["careProvider"] = orgIDs;
 
@@ -856,7 +864,7 @@ module.exports = OrgTool = (function() {
         return org;
     };
     this.getTopLevelOrgs = function() {
-        if (TOP_LEVEL_ORGS.length == 0) {
+        if (TOP_LEVEL_ORGS.length === 0) {
             var topOrgs = $("#fillOrgs").find('input[name="organization"][parent_org="true"]');
             if (topOrgs.length > 0) {
                 topOrgs.each(function() {
@@ -880,15 +888,19 @@ module.exports = OrgTool = (function() {
                     orgsList[parentId] = new OrgObj(o.id, o.name);
                 };
                 orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+                if (orgsList[item.id]) {
+                  orgsList[item.id].parentOrgId = parentId;
+                }
                 else {
                   orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
                 }
             } else {
-                if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
+                if (!orgsList[item.id]) {
+                  orgsList[item.id] = new OrgObj(item.id, item.name);
+                }
                 if (parseInt(item.id) !== 0) {
-                    orgsList[item.id].isTopLevel = true;
-                    TOP_LEVEL_ORGS.push(item.id);
+                  orgsList[item.id].isTopLevel = true;
+                  TOP_LEVEL_ORGS.push(item.id);
                 };
             };
         });
@@ -905,7 +917,7 @@ module.exports = OrgTool = (function() {
 
     this.populateUI = function() {
         var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs();
-        for (org in orgsList) {
+        for (var org in orgsList) {
             if (orgsList[org].isTopLevel) {
                 if (orgsList[org].children.length > 0) {
                   $("#fillOrgs").append("<legend orgId='" + org + "'>"+i18next.t(orgsList[org].name)+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
@@ -1228,11 +1240,10 @@ module.exports = accessCodeObj = (function() {
           }
         });
 
-
         $("#accessCodeLink").on("click", function() {
           self.handleAccessCode();
         });
-    }
+    };
 
   }
 

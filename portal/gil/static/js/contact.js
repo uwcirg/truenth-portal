@@ -3,7 +3,7 @@ $(document).ready(function(){
     $("#first-name, #last-name").each(function() {
         $(this).on("blur", function() {
           var name = $("#first-name").val();
-          name += (name != "" ? " " : "") + $("#last-name").val();
+          name += (String(name) !== "" ? " " : "") + $("#last-name").val();
           $("#sendername").val(name.trim());
         });
     });
@@ -39,7 +39,7 @@ $(document).ready(function(){
             },
             error: function(response) {
               var msg = $("<div></div>").html(response.responseText);
-              var error = $("p", msg).text()
+              var error = $("p", msg).text();
               $("#contactForm .post-contact-response").html(error);
               self.show();
               loadingIndicator.hide();
@@ -47,6 +47,6 @@ $(document).ready(function(){
         });
       } else {
           $("#contactForm .post-contact-response").html(i18next.t("Please confirm all fields are filled."));
-      };
+      }
     });
 });

@@ -26,8 +26,8 @@ var SessionMonitorObj = function(crsf_token, session_lifetime) {
     window.sessMon = sessMon;
     var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
     $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-            .on("show.bs.modal", function() { sessMon.modalShown = true})
-            .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
+            .on("show.bs.modal", function() { sessMon.modalShown = true; })
+            .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor)  { clearInterval(sessMon.intervalMonitor); } })
             .on("click", "#stay-logged-in", sessMon.extendsess)
             .on("click", "#log-out", sessMon.logout)
             .find("#remaining-time").text(warningText);
