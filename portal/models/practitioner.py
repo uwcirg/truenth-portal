@@ -74,10 +74,10 @@ class Practitioner(db.Model):
             telecom = Telecom.from_fhir(fhir['telecom'])
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'work')) or self.phone
-        if 'identifier' in data:
+        if 'identifier' in fhir:
             # track current identifiers - must remove any not requested
             remove_if_not_requested = [i for i in self.identifiers]
-            for id in data['identifier']:
+            for id in fhir['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)

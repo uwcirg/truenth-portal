@@ -4,6 +4,7 @@ import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.identifier import Identifier
 from portal.models.practitioner import Practitioner
 from portal.models.role import ROLE
 from tests import TestCase
@@ -16,6 +17,8 @@ class TestPractitioner(TestCase):
         pract1 = Practitioner(first_name="Indiana", last_name="Jones")
         pract2 = Practitioner(first_name="John", last_name="Watson")
         pract3 = Practitioner(first_name="John", last_name="Zoidberg")
+        ident = Identifier(system="testsys", _value="testval")
+        pract1.identifiers.append(ident)
         with SessionScope(db):
             db.session.add(pract1)
             db.session.add(pract2)
@@ -45,6 +48,23 @@ class TestPractitioner(TestCase):
 
         self.assertEqual(resp.json['total'], 1)
         self.assertEqual(resp.json['entry'][0]['name']['family'], 'Zoidberg')
+
+        # test query using identifier system/value
+        resp = self.client.get(
+            '/api/practitioner?system=testsys&value=testval')
+        self.assert200(resp)
+
+        self.assertEqual(resp.json['total'], 1)
+        self.assertEqual(resp.json['entry'][0]['name']['family'], 'Jones')
+
+        # test invalid system/value combos
+        resp = self.client.get(
+            '/api/practitioner?system=testsys')
+        self.assert400(resp)
+
+        resp = self.client.get(
+            '/api/practitioner?system=testsys&value=notvalid')
+        self.assert404(resp)
 
     def test_practitioner_get(self):
         pract = Practitioner(first_name="Indiana", last_name="Jones")

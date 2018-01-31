@@ -3,13 +3,16 @@ from flask import abort, jsonify, Blueprint, request
 from flask import render_template, current_app, url_for
 from flask_user import roles_required
 import json
+from sqlalchemy import and_
 
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.identifier import Identifier
+from ..models.practitioner import Practitioner, PractitionerIdentifier
+from ..models.reference import MissingReference
 from ..models.role import ROLE
-from ..models.practitioner import Practitioner
 from ..models.user import current_user
 from .portal import check_int
 
@@ -26,6 +29,9 @@ def practitioner_search():
 
     Example search:
         /api/practitioner?first_name=Indiana&last_name=Jones
+
+    Or to lookup by identifier, include system and value:
+        /api/practitioner?system=http%3A%2F%2Fpcctc.org%2F&value=146-31
 
     Returns a JSON FHIR bundle of practitioners as per given search terms.
     Without any search terms, returns all practitioners known to the system.
@@ -63,13 +69,32 @@ def practitioner_search():
 
     """
     query = Practitioner.query
+    system, value = None, None
     for k, v in request.args.items():
-        if k not in ('first_name', 'last_name'):
-            abort(400, "only `first_name`, `last_name` search filters "
-                  "are available at this time")
-        if v:
-            d = {k: v}
-            query = query.filter_by(**d)
+        if (k == 'system') and v:
+            system = v
+        elif (k == 'value') and v:
+            value = v
+        elif k in ('first_name', 'last_name'):
+            if v:
+                d = {k: v}
+                query = query.filter_by(**d)
+        else:
+            abort(400, "only `first_name`, `last_name`, and `system`/`value` "
+                  "search filters are available at this time")
+
+    if system or value:
+        if not (system and value):
+            abort(400, 'for identifier search, must provide both '
+                  '`system` and `value` params')
+        ident = Identifier.query.filter_by(system=system, _value=value).first()
+        if not ident:
+            abort(404, 'no identifiers found for system `{}`, '
+                  'value `{}`'.format(system, value))
+        query = query.join(
+            PractitionerIdentifier).filter(and_(
+                PractitionerIdentifier.identifier_id == ident.id,
+                PractitionerIdentifier.practitioner_id == Practitioner.id))
 
     practs = [p.as_fhir() for p in query]
 
