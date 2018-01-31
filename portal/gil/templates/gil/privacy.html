@@ -7,14 +7,10 @@
       <div class="page-intro page-intro--theme-brown-light">
         <div class="page-intro__content">
           <div class="simple-page-content">
-            <div id="privacyContentContainer">{{ content|safe }}</div>
+            <div id="privacyContentContainer" class="LR-content-container">{{ content|safe }}</div>
           </div>
         </div>
       </div>
+      <input type="hidden" id="LREditorURL" value="{{editorUrl if editorUrl}}" />
     </main>
- {% endblock %}
- {% block document_ready %}
-   {% if editorUrl %}
-    <script>appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
-   {% endif %}
  {% endblock %}

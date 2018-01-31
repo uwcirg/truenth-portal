@@ -2,7 +2,7 @@
 {% block title %}{{_("About")}} {{super()}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
-    <main class="main">
+    <main class="main about-main" data-section="about" data-theme="white">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--about {%if user%}no-banner{%endif%}" style="background-image: url({{url_for('.static', filename='img/About-Top-Background.jpg') }})">
         <div class="page-intro__content">
@@ -39,7 +39,7 @@
                     <use xlink:href="#ST-Graph"></use>
                   </svg></a></div>
               <div class="icon-box-wrap">
-                 <a class="icon-box icon-box--theme-compass" href="{{url_for('gil.exercise_and_diet')}}">
+                 <a class="icon-box icon-box--theme-compass exercise_diet-link community_of_wellness-link" href="{{url_for('gil.exercise_and_diet')}}">
                    <strong class="icon-box__subhead">{% trans %}Tool N<em>o</em>3: All Stages{% endtrans %}</strong>
                     <h4 class="icon-box__head">{{_("Exercise And Diet")}}</h4>
                     <span class="icon-box__lowhead">{{_("Personalized Guides")}}</span>
@@ -136,13 +136,4 @@
         </div>
       </div>
     </main>
-{% endblock %}
-{% block document_ready %}
-    <script>
-        $(document).ready(function() {
-            $("body").attr("class", "page-about theme--intro-light");
-            $("#repoVersion").show();
-            setSelectedNavItem($(".side-nav-items__item--about"));
-        });
-    </script>
 {% endblock %}

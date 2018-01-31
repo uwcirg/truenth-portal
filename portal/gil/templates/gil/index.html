@@ -2,7 +2,8 @@
 {% block title %}{{super()}} Home{% endblock %}
 {% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
-    <main class="main">
+    <main class="main" data-section="home">
+      {% if init_login_modal %}<input type="hidden" id="initLoginModal" value="true" />{% endif %}
       {{ super() }}
       <div class="home-intro">
         <div class="intro"><img class="intro__img intro__img--desktop" src="{{url_for('.static', filename='img/Home-Truck-Top-001.jpg') }}" alt="{{_('Truenth Home')}}"><img class="intro__img intro__img--mobile" src="{{url_for('.static', filename='img/Home-Truck-Top-Mobile.jpg') }}" alt="{{_('Truenth Home')}}">
@@ -126,25 +127,4 @@
         </div>
       </div>
     </main>
-  {% endblock %}
-  {% block document_ready %}
-    <script>
-        $(document).ready(function() {
-            $("body").attr("class", "page-home");
-            setSelectedNavItem($(".side-nav-items__item--home"));
-            {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
-
-            var sessionStorageDefined = (typeof sessionStorage != "undefined");
-            if (sessionStorageDefined) {
-              try {
-                sessionStorage.clear();
-              } catch(e) {
-
-              };
-            };
-            if (/applewebkit/i.test(String(navigator.userAgent)) &&
-                /ipad/i.test(String(navigator.userAgent))) window.kp_Browser_clearCookies();
-
-        });
-    </script>
   {% endblock %}
