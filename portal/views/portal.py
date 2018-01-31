@@ -673,6 +673,8 @@ def config_settings(config_key):
     # handing out consent related keys e.g. consent_with_top_level_org
     elif key.startswith('CONSENT_'):
         return jsonify({key: current_app.config.get(key)})
+    elif key == 'SYSTEM_TYPE' or key.startswith('DEBUG'):
+        return jsonify({key: current_app.config.get(key)}) 
     else:
         abort(400, "Configuration key '{}' not available".format(key))
 

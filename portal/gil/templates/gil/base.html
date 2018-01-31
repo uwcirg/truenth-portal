@@ -45,17 +45,8 @@
   </div>
   <section id="mainHolder">
     <input type="hidden" id="currentUserId" value="{{user.id if user}}" />
-    {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %}
-      <input type="hidden" id="interventionMenu" value="true" />
-    {% endif %}
     {% if timed_out %}
       <input type="hidden" id="sessionTimedOut" value="true" />
-    {% endif %}
-    {% if request.args.get("disableLinks", "") %}
-      <input type="hidden" id="disableLinks" value="true" />
-    {% endif %}
-    {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}
-      <input type="hidden" id="isContentManager" value="true" />
     {% endif %}
     <input type="hidden" id="portalURI" value="{{PORTAL}}" />
     <input type="hidden" id="csrfToken" value="{{csrf_token()}}" />
@@ -317,6 +308,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
     <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sessionMonitor.js') }}"></script>
     <script src="{{url_for('static', filename='js/gil.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
     {% if config.PIWIK_SITEID %}

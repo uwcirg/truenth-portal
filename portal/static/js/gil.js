@@ -8,6 +8,8 @@ $.ajaxSetup({
 
 window.__i18next.init({"debug": false, "initImmediate": false});
 
+var RETURN_KEY_CODE = 13;
+
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
@@ -107,6 +109,7 @@ module.exports = Global = (function() {
     this.addFX();
     this.addPlugins();
     this.bindEvents();
+    this.setRoles();
   }
 
   Global.prototype.addFX = function() {
@@ -135,6 +138,68 @@ module.exports = Global = (function() {
       return $("html,body").animate({
         scrollTop: position
       }, config.fx.speed.mid, config.fx.easing);
+    });
+  };
+
+  Global.prototype.setRoles = function() {
+    var userId = $("#currentUserId").val();
+    if (userId) {
+     $.ajax ({
+        type: "GET",
+        url: "/api/user/" + userId + "/roles",
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        async: false,
+        dataType: "json",
+      }).done(function(data) {
+        if (data && data.roles) {
+          var roles = [];
+          data.roles.forEach(function(role) {
+            roles.push(role.name);
+          });
+          localStorage.setItem("userRoles", JSON.stringify(roles));
+        }
+      }).fail(function(xhr) {
+      });
+    }
+  };
+
+  Global.prototype.getRoles = function() {
+    return localStorage.getItem("userRoles") ? JSON.parse(localStorage.getItem("userRoles")) : null;
+  };
+
+  Global.prototype.checkRole = function(roleName) {
+    if (roleName) {
+      var roles = this.getRoles();
+      if (roles) {
+        return roles.indexOf(roleName) !== -1;
+      } else return false;
+    } else {
+      return false;
+    }
+  };
+
+  Global.prototype.reportError = function(userId, page_url, message, sync) {
+    //params need to contain the following:
+    //:subject_id: User on which action is being attempted
+    //:message: Details of the error event
+    //:page_url: The page requested resulting in the error
+    var params = {};
+    userId = userId || $("#currentUserId").val();
+    params.subject_id = userId ? userId : 0;
+    params.page_url = page_url ? page_url: window.location.href;
+    //don't think we want to translate message sent back to the server here
+    params.message = "Error generated in JS - " + (message ? message : "no detail available");
+
+    $.ajax ({
+        type: "GET",
+        url: "/report-error",
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        async: (sync ? false : true),
+        data: params
+    }).done(function(data) {
+    }).fail(function(){
     });
   };
 
@@ -481,10 +546,8 @@ module.exports = OrgTool = (function() {
                     async: (sync? false: true),
                     data: JSON.stringify({"user_id": userId, "organization_id": params["org"], "agreement_url": params["agreementUrl"], "staff_editable": (hasValue(params["staff_editable"])? params["staff_editable"] : false), "include_in_reports": (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false), "send_reminders": (hasValue(params["send_reminders"]) ? params["send_reminders"] : false) })
                 }).done(function(data) {
-                    //console.log("consent updated successfully.");
                 }).fail(function(xhr) {
-                    //console.log("request to updated consent failed.");
-                    //console.log(xhr.responseText)
+                    window.app.global.reportError(userId, "/api/user/" + userId + "/consent", xhr.responseText);
                 });
             };
         };
@@ -522,7 +585,6 @@ module.exports = OrgTool = (function() {
                   }
                   if (!found) {
                     if (String(orgId) === String(item.organization_id)) {
-                      //console.log("consented orgid: " + orgId)
                       switch(filterStatus) {
                         case "suspended":
                           if (suspended) {
@@ -554,7 +616,6 @@ module.exports = OrgTool = (function() {
         }).fail(function() {
           return false;
         });
-        //console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     };
 
@@ -652,12 +713,10 @@ module.exports = OrgTool = (function() {
 
                   if ($(this).prop("checked")){
                       if ($(this).attr("id") !== "noOrgs") {
-                          //console.log("set no org here")
                           $("#noOrgs").prop("checked",false);
 
                       } else {
                           $("#userOrgs input[name='organization']").each(function() {
-                              //console.log("in id: " + $(this).attr("id"))
                              if ($(this).attr("id") !== "noOrgs") {
                                   $(this).prop("checked",false);
                               };
@@ -667,8 +726,8 @@ module.exports = OrgTool = (function() {
                   };
               });
           });
-        }).fail(function() {
-           // console.log("Problem retrieving data from server.");
+        }).fail(function(xhr) {
+           window.app.global.reportError(userId, "/api/organization", xhr.responseText);
            if (callback) callback();
         });
     },
@@ -722,7 +781,6 @@ module.exports = OrgTool = (function() {
     },
 
     this.filterOrgs = function(leafOrgs) {
-        //console.log(leafOrgs)
         if (!leafOrgs) {
           return false;
         }
@@ -912,7 +970,6 @@ module.exports = OrgTool = (function() {
                 url: "/api/demographics/" + userId,
                 async: false
             }).done(function(data) {
-              //console.log(data)
               if (data && data.careProvider) {
                   $.each(data.careProvider,function(i,val){
                     var orgID = val.reference.split("/").pop();
@@ -928,8 +985,8 @@ module.exports = OrgTool = (function() {
                     };
                   });
                 };
-            }).fail(function() {
-                 // console.log("Problem retrieving data from server.");
+            }).fail(function(xhr) {
+                 window.app.global.reportError(userId, "/api/demographics/" + userId, xhr.responseText);
             });
           };
        });
@@ -956,7 +1013,8 @@ module.exports = OrgTool = (function() {
   module.exports = menuObj = (function() {
       return function () {
           this.init = function(currentUserId) {
-            if ($("#interventionMenu").val() === "true") {
+
+            if (window.app.global.checkRole("patient") || window.app.global.checkRole("partner")) {
               this.filterMenu(currentUserId);
             } else {
               window.app.visObj.hideLoader();
@@ -970,7 +1028,7 @@ module.exports = OrgTool = (function() {
           };
 
           this.handleDisabledLinks = function() {
-            if ($("#disableLinks").val() === "true") {
+            if (window.app.utilObj.getUrlParameter("disableLinks")) {
               $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
                 if (!$(this).hasClass("side-nav-items__item--home") &&
                   !$(this).hasClass("side-nav-items__item--logout") &&
@@ -1072,13 +1130,12 @@ module.exports = OrgTool = (function() {
               async: false,
               cache: false
             }).done(function(data) {
-              //console.log(data)
               var found_decision_support = false, found_symptom_tracker = false;
               if (data.interventions) {
                 if (data.interventions.length > 0) {
                   var db = $(".side-nav-items__item--dashboard");
                   if (db.length === 0) {
-                    $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
+                    $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">' + i18next.t("My Dashboard") + '</a></li>');
                     if ($("#portalMain").length > 0) {
                       self.setSelectedNavItem($(".side-nav-items__item--dashboard"));
                     }
@@ -1093,7 +1150,6 @@ module.exports = OrgTool = (function() {
                   var dm = /decision\s?support/gi;
                   var sm = /symptom\s?tracker/gi;
                   var sm2 = /self[_\s]?management/gi;
-                  //console.log(n + " " + d)
                   if (dm.test(itemDescription) || dm.test(itemName)) {
                     if (!disabled) {
                       found_decision_support = true;
@@ -1166,7 +1222,7 @@ module.exports = accessCodeObj = (function() {
             $("#access_code_info").text("");
           }
         }).on("keydown", function(e) {
-          if (e.keyCode === 13) {
+          if (e.keyCode === RETURN_KEY_CODE) {
             e.preventDefault();
             self.handleAccessCode();
           }
@@ -1233,67 +1289,15 @@ module.exports = utilObj = (function() {
         return  val && $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
     };
 
+    this.getUrlParameter = function (name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
+
     this.initSessionMonitor = function() {
-      var __CRSF_TOKEN = $("#csrfToken").val();
-      var sessionMonitor=(function(__CRSF_TOKEN) {
-        return function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",headers: {"X-CSRFToken": __CRSF_TOKEN}, cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
-      })(__CRSF_TOKEN);
-
-      var readCookie = function(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(";");
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) === " ") {
-              c = c.substring(1, c.length);
-            }
-            if (c.indexOf(nameEQ) === 0) {
-              return c.substring(nameEQ.length, c.length);
-            }
-        }
-        return null;
-      };
-
-      // Set default sessionLifetime from Flask config
-      // Subtract 10 seconds to ensure the backend doesn't expire the session first
-      var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
-      var cookieTimeout = readCookie("SS_TIMEOUT");
-      cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
-
-      if (cookieTimeout && cookieTimeout > 0) {
-        DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
-      } else {
-        try {
-          CONFIG_SESSION_LIFETIME = $("#sessionLifeTime").val();
-          if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") {
-            CONFIG_SESSION_LIFETIME = 15 * 60;
-          }
-          DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
-        } catch(e) {
-          DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
-        }
-      }
-
-      var sessMon = sessionMonitor({
-          sessionLifetime: DEFAULT_SESSION_LIFETIME,
-          timeBeforeWarning: 1 * 60 * 1000,
-          minPingInterval: 1 * 60 * 1000,  // 1 minute
-          activityEvents: "mouseup",
-          pingUrl: "/api/ping",
-          logoutUrl: "/logout",
-          timeoutUrl: "/logout?timed_out=1",
-          modalShown: false,
-          intervalMonitor: false,
-          onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
-      });
-      window.sessMon = sessMon;
-      var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
-      $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-            .on("show.bs.modal", function() { sessMon.modalShown = true})
-            .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
-            .on("click", "#stay-logged-in", sessMon.extendsess)
-            .on("click", "#log-out", sessMon.logout)
-            .find("#remaining-time").text(warningText);
+      (new SessionMonitorObj($("#csrfToken").val(), $("#sessionLifeTime").val())).init();
     };
 
     this.handleLoginAsUser = function() {
@@ -1349,7 +1353,7 @@ $(document).ready(function(){
   });
 
   $("#password").on("keyup", function() {
-    if (e.keyCode === 13) {
+    if (e.keyCode === RETURN_KEY_CODE) {
       e.preventDefault();
       if ($("input[name='email']").val() !== "") {
         $("#btnLogin").trigger("click");
@@ -1368,12 +1372,11 @@ $(document).ready(function(){
   if ($("main").attr("data-theme") === "white") {
     $("body").addClass("theme--intro-light");
   }
-
   window.app.upperBanner.handleAccess();
   window.app.upperBanner.handleWatermark();
   window.app.accessCodeObj.handleEvents();
   window.app.menuObj.init(currentUserId);
   window.app.interventionSessionObj.clearSession($("main").attr("data-link-identifier"));
-  window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), $("#isContentManager").val() === "true");
+  window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
   setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
 });
