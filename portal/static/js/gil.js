@@ -1115,7 +1115,7 @@ module.exports = OrgTool = (function() {
           }).fail(function() {
             window.app.utilObj.setVis(false);
           });
-        }
+        };
       };
   })();
 },{}],
