@@ -1,14 +1,9 @@
-var __PORTAL = $("#portalURI").val();
-var __CRSF_TOKEN = $("#csrfToken").val();
-var __CRSF_TOKEN_HEADER = {"X-CSRFToken": __CRSF_TOKEN};
-var LR_INVOKE_KEYCODE = 187; // "=" sign
-
 $.ajaxSetup({
-  	beforeSend: function(xhr, settings) {
-    	if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-        	xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
-    	}
-  	}
+  beforeSend: function(xhr, settings) {
+    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("X-CSRFToken", $("#csrfToken").val());
+    }
+  }
 });
 
 window.__i18next.init({"debug": false, "initImmediate": false});
@@ -28,53 +23,55 @@ module.exports = {
 
 
 },{}],2:[function(require,module,exports){
-var admin, global, navToggle, upperBanner, video, windowResize, windowScroll, visObj, interventionSessionObj, orgTool, menuObj;
 
-upperBanner = require("./modules/upper-banner");
+var UpperBanner = require("./modules/upper-banner");
 
-windowScroll = require("./modules/window-scroll");
+var WindowScroll = require("./modules/window-scroll");
 
-windowResize = require("./modules/window-resize");
+var WindowResize = require("./modules/window-resize");
 
-navToggle = require("./modules/nav-toggle");
+var NavToggle = require("./modules/nav-toggle");
 
-global = require("./modules/global");
+var Global = require("./modules/global");
 
-admin = require("./modules/admin");
+var Admin = require("./modules/admin");
 
-video = require("./modules/video");
+var Video = require("./modules/video");
 
-visObj = require("./modules/visobj");
+var VisObj = require("./modules/visobj");
 
-menuObj = require("./modules/menuObj");
+var MenuObj = require("./modules/menuObj");
 
-interventionSessionObj = require("./modules/interventionSessionObj");
+var InterventionSessionObj = require("./modules/interventionSessionObj");
 
-orgTool = require("./modules/orgTool");
+var OrgTool = require("./modules/orgTool");
 
-accessCodeObj= require("./modules/accessCodeObj");
+var AccessCodeObj= require("./modules/accessCodeObj");
+
+var UtilObj = require("./modules/utilObj");
 
 
 $(function() {
   if (window.app == null) {
     window.app = {};
   }
-  window.app.global = new global();
-  window.app.upperBanner = new upperBanner();
-  window.app.windowScroll = new windowScroll();
-  window.app.windowResize = new windowResize();
-  window.app.navToggle = new navToggle();
-  window.app.admin = new admin();
-  window.app.visObj = new visObj();
-  window.app.interventionSessionObj = new interventionSessionObj();
-  window.app.orgTool = new orgTool();
-  window.app.menuObj = new menuObj();
-  window.app.video = new video();
-  window.app.accessCodeObj = new accessCodeObj();
+  window.app.global = new Global();
+  window.app.upperBanner = new UpperBanner();
+  window.app.windowScroll = new WindowScroll();
+  window.app.windowResize = new WindowResize();
+  window.app.navToggle = new NavToggle();
+  window.app.admin = new Admin();
+  window.app.visObj = new VisObj();
+  window.app.interventionSessionObj = new InterventionSessionObj();
+  window.app.orgTool = new OrgTool();
+  window.app.menuObj = new MenuObj();
+  window.app.video = new Video();
+  window.app.accessCodeObj = new AccessCodeObj();
+  window.app.utilObj = new UtilObj();
 });
 
 
-},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12, "./modules/menuObj":13, "./modules/accessCodeObj":14}],3:[function(require,module,exports){
+},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12, "./modules/menuObj":13, "./modules/accessCodeObj":14, "./modules/utilObj":15}],3:[function(require,module,exports){
 var Admin, loggedInAdminClass, loggedInClass, upperBannerClosedClass;
 
 loggedInAdminClass = "is-showing-logged-in";
@@ -171,14 +168,14 @@ module.exports = NavToggle = (function() {
       e.preventDefault();
       href = $(this).attr("href");
       $("html").removeClass(navExpandedClass);
-      __loader(true);
+      window.app.utilObj.setVis(true);
       return setTimeout(function() {
         return window.location = href;
       }, 500);
     });
     $(window).on("unload", function() {
       setTimeout(function() {
-        __loader();
+        window.app.utilObj.setVis();
       }, 500);
     });
     return $(".side-nav a[data-toggle=modal]").on("click touchend", function(e) {
@@ -224,14 +221,14 @@ module.exports = UpperBanner = (function() {
       });
 
     }
-  }
+  };
 
   UpperBanner.prototype.handleWatermark = function() {
     var __env = $("#env").val();
     if ((__env !== "" && __env.toLowerCase() !== "production") && ($(".watermark").length === 0)) {
       $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
     }
-  }
+  };
 
   return UpperBanner;
 
@@ -341,7 +338,7 @@ module.exports = VisObj = (function() {
       if (!this.HAS_REDIRECT) {
         if ($(".watermark").length > 0) {
           $("header.no-banner ").css("padding-top", "35px");
-        };
+        }
         $("#mainHolder").css({
                   "visibility" : "visible",
                   "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
@@ -377,9 +374,9 @@ var InterventionSessionObj;
 module.exports = InterventionSessionObj = (function() {
   return function () {
     this.setInterventionSession = function() {
-        var dataSectionId = $("main").attr("data-section");
-        if (hasValue(dataSectionId)) {
-        	if (typeof sessionStorage !== "undefined") {
+        var dataSectionId = $("main").attr("data-link-identifier");
+        if (dataSectionId) {
+          if (typeof sessionStorage !== "undefined") {
             sessionStorage.setItem(dataSectionId+"InSession", "true");
           }
         }
@@ -392,9 +389,9 @@ module.exports = InterventionSessionObj = (function() {
       }
     };
     this.clearSession = function(id) {
-    	if (this.getSession(id)) {
+      if (this.getSession(id)) {
         sessionStorage.removeItem(id+"InSession");
-    	}
+      }
     };
   };
 
@@ -455,13 +452,13 @@ module.exports = OrgTool = (function() {
         return orgsList;
     };
     this.setDefaultConsent =  function(userId, orgId) {
-        if (!hasValue(userId) && !hasValue(orgId)) return false;
+        if (!userId && !orgId) return false;
         var stockConsentUrl = $("#stock_consent_url").val();
         var agreementUrl = "";
-        if (hasValue(stockConsentUrl)) {
+        if (stockConsentUrl) {
             agreementUrl = stockConsentUrl.replace("placeholder", $("#" + orgId + "_org").attr("data-parent-name"));
         };
-        if (hasValue(agreementUrl)) {
+        if (agreementUrl) {
             var params = CONSENT_ENUM["consented"];
             params.org = orgId;
             params.agreementUrl = encodeURIComponent(agreementUrl);
@@ -469,6 +466,7 @@ module.exports = OrgTool = (function() {
         };
     };
     this.setConsent = function(userId, params, status, sync) {
+        var hasValue = window.app.utilObj.hasValue;
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
             if (!consented) {
@@ -504,56 +502,56 @@ module.exports = OrgTool = (function() {
             cache: false
         }).done(function(data) {
             if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                if (d.length > 0) {
-                    d = d.sort(function(a,b){
-                        return new Date(b.signed) - new Date(a.signed); //latest comes first
-                    });
-                    item = d[0];
-                    expired = self.getDateDiff(item.expires);
-                    if (item.deleted) {
-                      found = true;
-                    }
-                    if (expired > 0) {
-                      found = true;
-                    }
-                    if (item.staff_editable && item.include_in_reports && !item.send_reminders) {
-                      suspended = true;
-                    }
-                    if (!found) {
-                      if (String(orgId) === String(item.organization_id)) {
-                        //console.log("consented orgid: " + orgId)
-                        switch(filterStatus) {
-                            case "suspended":
-                              if (suspended) {
+              var d = data["consent_agreements"];
+              if (d.length > 0) {
+                  d = d.sort(function(a,b){
+                      return new Date(b.signed) - new Date(a.signed); //latest comes first
+                  });
+                  item = d[0];
+                  expired = self.getDateDiff(item.expires);
+                  if (item.deleted) {
+                    found = true;
+                  }
+                  if (expired > 0) {
+                    found = true;
+                  }
+                  if (item.staff_editable && item.include_in_reports && !item.send_reminders) {
+                    suspended = true;
+                  }
+                  if (!found) {
+                    if (String(orgId) === String(item.organization_id)) {
+                      //console.log("consented orgid: " + orgId)
+                      switch(filterStatus) {
+                        case "suspended":
+                          if (suspended) {
+                            found = true;
+                          }
+                          break;
+                        case "purged":
+                          found = true;
+                          break;
+                        case "consented":
+                          if (!suspended) {
+                              if (item.staff_editable && item.send_reminders && item.include_in_reports) {
                                 found = true;
                               }
-                              break;
-                            case "purged":
-                              found = true;
-                              break;
-                            case "consented":
-                              if (!suspended) {
-                                  if (item.staff_editable && item.send_reminders && item.include_in_reports) {
-                                    found = true;
-                                  }
-                              };
-                              break;
-                            default:
-                              found = true; //default is to return both suspended and consented entries
-                        };
-                        if (found) {
-                          consentedOrgIds.push(orgId);
-                        }
-
+                          };
+                          break;
+                        default:
+                          found = true; //default is to return both suspended and consented entries
                       };
-                    };
-                }
-            };
+                      if (found) {
+                        consentedOrgIds.push(orgId);
+                      }
+
+                    }
+                  }
+              }
+            }
 
         }).fail(function() {
-            return false;
-         });
+          return false;
+        });
         //console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     };
@@ -575,22 +573,22 @@ module.exports = OrgTool = (function() {
 
     this.validateIdentifier = function(sync, callback) {
       if (this.identifiers) {
-      	return this.identifiers;
+        return this.identifiers;
       }
       var self = this;
-       $.ajax ({
-            type: "GET",
-            url: "/gil-shortcut-alias-validation/" + ($("#shortcut_alias").val()).toLowerCase(),
-            async: sync? false : true
-        }).done(function(data) {
-          if (callback) {
-          	callback(data);
-          }
-        }).fail(function() {
-          if (callback) {
-          	callback({error: "failed request"});
-          }
-        });
+      $.ajax ({
+        type: "GET",
+        url: "/gil-shortcut-alias-validation/" + ($("#shortcut_alias").val()).toLowerCase(),
+        async: sync? false : true
+      }).done(function(data) {
+        if (callback) {
+          callback(data);
+        }
+      }).fail(function() {
+        if (callback) {
+          callback({error: "failed request"});
+        }
+      });
 
     };
     this.getOrgs = function(userId, sync, callback) {
@@ -606,7 +604,7 @@ module.exports = OrgTool = (function() {
           (self.populateOrgsList).apply(self, [data.entry]);
           self.populateUI();
           if (callback) {
-          	callback();
+            callback();
           }
 
           $("#modal-org").on("hide.bs.modal", function(e) {
@@ -673,7 +671,7 @@ module.exports = OrgTool = (function() {
     },
     this.updateOrg = function(userId, callback) {
 
-        var demoArray = {}, errorMessage = "";
+        var demoArray = {}, errorMessage = "", hasValue = window.app.utilObj.hasValue;
 
         $.ajax ({
             type: "GET",
@@ -896,51 +894,53 @@ module.exports = OrgTool = (function() {
     };
     this.handleNoOrgs = function (userId) {
         $(".intervention-link, a.decision-support-link").each(function() {
-          	var dm = /decision\s?support/gi;
-          	if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
-	            var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
-	            //allow modal to show once once action has been taken
-	            if (hasSet) return false;
-	            var self = this;
-	            $.ajax ({
-	            	type: "GET",
-	                url: "/api/demographics/" + userId,
-	                async: false
-	            }).done(function(data) {
-	                //console.log(data)
-	                if (data && data.careProvider) {
-	                    $.each(data.careProvider,function(i,val){
-	                        var orgID = val.reference.split("/").pop();
-	                        if (parseInt(orgID) === 0) {
-	                            $(self).removeAttr("href");
-	                            $(self).on("click", function() {
-	                            	$("figure.js-close-nav").trigger("click");
-	                              	setTimeout(function() {
-	                              		$("#modal-org").modal("show");
-	                              	}, 0);
-	                            });
-	                            window.app.interventionSessionObj.clearSession("decision-support");
-	                        };
-	                    });
-	                  };
-	              }).fail(function() {
-	                 // console.log("Problem retrieving data from server.");
-	              });
-          	};
+          var dm = /decision\s?support/gi;
+          if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
+            var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+            //allow modal to show once once action has been taken
+            if (hasSet) {
+              return false;
+            }
+            var self = this;
+            $.ajax ({
+               type: "GET",
+                url: "/api/demographics/" + userId,
+                async: false
+            }).done(function(data) {
+              //console.log(data)
+              if (data && data.careProvider) {
+                  $.each(data.careProvider,function(i,val){
+                    var orgID = val.reference.split("/").pop();
+                    if (parseInt(orgID) === 0) {
+                        $(self).removeAttr("href");
+                        $(self).on("click", function() {
+                          $("figure.js-close-nav").trigger("click");
+                          setTimeout(function() {
+                            $("#modal-org").modal("show");
+                          }, 0);
+                        });
+                        window.app.interventionSessionObj.clearSession("decision-support");
+                    };
+                  });
+                };
+            }).fail(function() {
+                 // console.log("Problem retrieving data from server.");
+            });
+          };
        });
     };
 
     this.updateOrgCallback = function (errorMessage) {
-    	if (!errorMessage) {
+      if (!errorMessage) {
           $("#modal-org a.box-modal__close").trigger("click");
-          __loader(true);
+          window.app.utilObj.setVis(true);
           setTimeout(function() { location.reload(); }, 1000);
-        	if (typeof sessionStorage !== "undefined") {
+          if (typeof sessionStorage !== "undefined") {
             sessionStorage.setItem("noOrgModalViewed", "true");
-        	};
+          }
       } else {
         $("#modal-org-error").html(i18next.t("Error updating organization"));
-      };
+      }
     };
   };
 
@@ -987,27 +987,27 @@ module.exports = OrgTool = (function() {
             $("li.side-nave-items__item--selected").find("a").attr("href", "#");
             $(obj).on("click", function(event) {
               event.preventDefault();
-              __loader(false);
+              window.app.utilObj.setVis(false);
               $(".side-nav__close").trigger("click");
               return;
             });
           };
 
-      		this.handleItemRedirect = function(userId, itemName, enable) {
+          this.handleItemRedirect = function(userId, itemName, enable) {
             var visObj = window.app.visObj;
-	  			  if (!enable) {
+            if (!enable) {
               $("." + itemName + "-link").each(function() {
-	       				$(this).removeAttr("href");
+                $(this).removeAttr("href");
                 $(this).addClass("icon-box__button--disabled");
               });
               $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
               window.app.interventionSessionObj.clearSession(itemName);
             } else {
-	            window.app.orgTool.handleNoOrgs(userId);
-	            if (window.app.interventionSessionObj.getSession(itemName)) {
-	            	var l =  $("#intervention_item_" + itemName + " a");
+              window.app.orgTool.handleNoOrgs(userId);
+              if (window.app.interventionSessionObj.getSession(itemName)) {
+                var l =  $("#intervention_item_" + itemName + " a");
                 var la = l.attr("href");
-                if (l.length > 0 && validateUrl(la)) {
+                if (l.length > 0 && window.app.utilObj.validateUrl(la)) {
                   window.app.interventionSessionObj.clearSession(itemName);
                   visObj.setRedirect();
                   setTimeout(function() { location.replace(l.attr("href")); }, 0);
@@ -1015,51 +1015,52 @@ module.exports = OrgTool = (function() {
                 };
               };
             };
-      		};
-      		this.setItemVis = function(item, itemLink, vis) {
-      			if (item) {
+          };
+          this.setItemVis = function(item, itemLink, vis) {
+            if (item) {
               switch(vis) {
-      				  case "disabled":
-      				    item.removeAttr("href");
+                case "disabled":
+                  item.removeAttr("href");
                   item.addClass("icon-box__button--disabled");
                   break;
-      				  default:
+                default:
                   item.attr("href", itemLink);
                   item.removeClass("icon-box__button--disabled");
-      				}
-      			}
-      		};
-      		this.handleInterventionItemLinks = function(interventionItem, customName){
-      			var self = this;
-      			if (interventionItem) {
-      				var link = interventionItem.link_url;
-      				var disabled = (String(link) === "disabled");
-      				var itemName = customName||interventionItem.name;
-      				var linkItems = $("." + itemName + "-link");
-      				var menuItem = $("#intervention_item_" + itemName);
-      				if (!disabled && menuItem.length === 0) { //only draw this when there isn't already one
-      				  $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + itemName + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + link + '" class="capitalize intervention-link">' + interventionItem.description + '</a></li>');
-      				};
-      				if (linkItems.length > 0) {
-	      				if (!disabled) {
-	      					linkItems.each(function() {
-	      						self.setItemVis($(this), link);
-	      					});
-		              $(".icon-box-" + itemName).removeClass("icon-box--theme-inactive");
-	      				} else {
-	      					linkItems.each(function() {
+              }
+            }
+          };
+          this.handleInterventionItemLinks = function(interventionItem, customName){
+            var self = this;
+            if (interventionItem) {
+              var link = interventionItem.link_url;
+              var disabled = (String(link) === "disabled");
+              var itemName = customName||interventionItem.name;
+              var linkItems = $("." + itemName + "-link");
+              var menuItem = $("#intervention_item_" + itemName);
+              if (!disabled && menuItem.length === 0) { //only draw this when there isn't already one
+                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + itemName + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + link + '" class="capitalize intervention-link">' + interventionItem.description + '</a></li>');
+              }
+              if (linkItems.length > 0) {
+                if (!disabled) {
+                  linkItems.each(function() {
+                    self.setItemVis($(this), link);
+                  });
+                  $(".icon-box-" + itemName).removeClass("icon-box--theme-inactive");
+                } else {
+                  linkItems.each(function() {
                     self.setItemVis($(this), link, "disabled");
                   });
                   $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
-	      				}
-	      			}
-      			}
-      		};
+                }
+              }
+            }
+          };
           this.filterMenu = function (userId) {
             if (!userId) {
               return false;
             }
             var self = this;
+            var __PORTAL = $("#portalURI").val();
             $.ajax({
               url: __PORTAL + "/gil-interventions-items/" + userId,
               context: document.body,
@@ -1070,14 +1071,14 @@ module.exports = OrgTool = (function() {
               var found_decision_support = false, found_symptom_tracker = false;
               if (data.interventions) {
                 if (data.interventions.length > 0) {
-		              var db = $(".side-nav-items__item--dashboard");
-		              if (db.length === 0) {
-		                $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
-		                if ($("#portalMain").length > 0) {
-		                  self.setSelectedNavItem($(".side-nav-items__item--dashboard"));
-		                }
-		              };
-		              $(".side-nav-items__item--home").hide();
+                  var db = $(".side-nav-items__item--dashboard");
+                  if (db.length === 0) {
+                    $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
+                    if ($("#portalMain").length > 0) {
+                      self.setSelectedNavItem($(".side-nav-items__item--dashboard"));
+                    }
+                  }
+                  $(".side-nav-items__item--home").hide();
                 }
                 (data.interventions).forEach(function(item) {
                   var itemDescription = item.description;
@@ -1103,11 +1104,11 @@ module.exports = OrgTool = (function() {
                   };
               });
               self.handleItemRedirect(userId, "decision-support", found_decision_support);
-						  self.handleItemRedirect(userId, "symptom-tracker", found_symptom_tracker);
+              self.handleItemRedirect(userId, "symptom-tracker", found_symptom_tracker);
             };
-            __loader(false);
+            window.app.utilObj.setVis(false);
           }).fail(function() {
-            __loader(false);
+            window.app.utilObj.setVis(false);
           });
         }
       };
@@ -1146,14 +1147,14 @@ module.exports = accessCodeObj = (function() {
                       if (data.error) {
                         $("#access_code_info").text("");
                         $("#access_code_error").text(i18next.t("You have entered an invalid access code.  Please try again"));
-                      };
-                  };
+                      }
+                  }
                 } else {
-                    if (hasValue($("#shortcut_alias").val())) {
+                    if ($("#shortcut_alias").val() !== "") {
                       $("#access_code_info").text("");
                       $("#access_code_error").text(i18next.t("System was unable to process your request."));
-                    };
-                };
+                    }
+                }
 
               });
           } else {
@@ -1163,7 +1164,7 @@ module.exports = accessCodeObj = (function() {
           if (e.keyCode === 13) {
             e.preventDefault();
             self.handleAccessCode();
-          };
+          }
         });
 
 
@@ -1175,142 +1176,151 @@ module.exports = accessCodeObj = (function() {
   }
 
 })();
-},{}]
-},{},[2]);
-
-
-/*********
- *
- general global utilities function
- *
- *********/
-function __loader(show) {
-  if (show) {
-    window.app.visObj.showLoader();
-  } else {
-    window.app.visObj.showMain();
-  }
-}
-
-function LRKeyEvent() {
-    if ($(".button--LR").length > 0) {
-      $("html").on("keydown", function(e) {
-        if (e.keyCode === LR_INVOKE_KEYCODE) {
-          $(".button--LR").toggleClass("show");
-        }
-      });
-    }
-}
-function appendLREditContainer(target, url, show) {
-    if (!hasValue(url)) {
-      return false;
-    }
-    if (!target) {
-      target = $(document);
-    }
-    target.append("<div>" +
-                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">' + i18next.t("Edit in Liferay") + '</a>' +
-                "</div>"
-                );
-    if (show) {
-      $(".button--LR").addClass("show");
-    }
-};
-function hasValue(val) {
-    return val != null && val != "" && val != "undefined";
-};
-//this test for full URL - "https://stg-sm.us.truenth.org" etc.
-function validateUrl(val) {
-    return  hasValue(val) && $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
-};
-
-function readCookie(name) {
-  var nameEQ = name + "=";
-  var ca = document.cookie.split(";");
-  for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) === " ") {
-        c = c.substring(1, c.length);
+},{}],
+15:[function(require,module,exports){
+var utilObj;
+module.exports = utilObj = (function() {
+  return function() {
+    /*********
+     *
+     * general global utilities function
+     *
+     *********/
+    this.setVis = function(show) {
+      if (show) {
+        window.app.visObj.showLoader();
+      } else {
+        window.app.visObj.showMain();
       }
-      if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length, c.length);
-      }
-  }
-  return null;
-};
+    };
 
-function initSessionMonitor() {
-  var sessionMonitor=(function(__CRSF_TOKEN) {
-      return function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",headers: {"X-CSRFToken": __CRSF_TOKEN}, cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
+    this.LRKeyEvent = function() {
+      if ($(".button--LR").length > 0) {
+        $("html").on("keydown", function(e) {
+          var LR_INVOKE_KEYCODE = 187; // "=" sign
+          if (e.keyCode === LR_INVOKE_KEYCODE) {
+            $(".button--LR").toggleClass("show");
+          }
+        });
+      }
+    };
+
+    this.appendLREditContainer = function(target, url, show) {
+      if (!url) {
+        return false;
+      }
+      if (!target) {
+        target = $(document);
+      }
+      target.append("<div>" +
+                  '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">' + i18next.t("Edit in Liferay") + '</a>' +
+                  "</div>"
+                  );
+      if (show) {
+        $(".button--LR").addClass("show");
+      }
+    };
+    this.hasValue = function(val) {
+      return val != null && val != "" && val != "undefined";
+    };
+    //this test for full URL - "https://stg-sm.us.truenth.org" etc.
+    this.validateUrl = function(val) {
+        return  val && $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
+    };
+
+    this.initSessionMonitor = function() {
+      var __CRSF_TOKEN = $("#csrfToken").val();
+      var sessionMonitor=(function(__CRSF_TOKEN) {
+        return function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",headers: {"X-CSRFToken": __CRSF_TOKEN}, cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
       })(__CRSF_TOKEN);
 
-  // Set default sessionLifetime from Flask config
-  // Subtract 10 seconds to ensure the backend doesn't expire the session first
-  var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
-  var cookieTimeout = readCookie("SS_TIMEOUT");
-  cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
+      var readCookie = function(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === " ") {
+              c = c.substring(1, c.length);
+            }
+            if (c.indexOf(nameEQ) === 0) {
+              return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+      };
 
-  if (cookieTimeout && cookieTimeout > 0) {
-    DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
-  } else {
-    try {
-      CONFIG_SESSION_LIFETIME = $("#sessionLifeTime").val();
-      if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") {
-        CONFIG_SESSION_LIFETIME = 15 * 60;
+      // Set default sessionLifetime from Flask config
+      // Subtract 10 seconds to ensure the backend doesn't expire the session first
+      var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+      var cookieTimeout = readCookie("SS_TIMEOUT");
+      cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
+
+      if (cookieTimeout && cookieTimeout > 0) {
+        DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
+      } else {
+        try {
+          CONFIG_SESSION_LIFETIME = $("#sessionLifeTime").val();
+          if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") {
+            CONFIG_SESSION_LIFETIME = 15 * 60;
+          }
+          DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
+        } catch(e) {
+          DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+        }
       }
-      DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
-    } catch(e) {
-      DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
-    }
-  }
 
-  var sessMon = sessionMonitor({
-      sessionLifetime: DEFAULT_SESSION_LIFETIME,
-      timeBeforeWarning: 1 * 60 * 1000,
-      minPingInterval: 1 * 60 * 1000,  // 1 minute
-      activityEvents: "mouseup",
-      pingUrl: "/api/ping",
-      logoutUrl: "/logout",
-      timeoutUrl: "/logout?timed_out=1",
-      modalShown: false,
-      intervalMonitor: false,
-      onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
-  });
-  window.sessMon = sessMon;
-  var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
-  $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-        .on("show.bs.modal", function() { sessMon.modalShown = true})
-        .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
-        .on("click", "#stay-logged-in", sessMon.extendsess)
-        .on("click", "#log-out", sessMon.logout)
-        .find("#remaining-time").text(warningText);
-}
+      var sessMon = sessionMonitor({
+          sessionLifetime: DEFAULT_SESSION_LIFETIME,
+          timeBeforeWarning: 1 * 60 * 1000,
+          minPingInterval: 1 * 60 * 1000,  // 1 minute
+          activityEvents: "mouseup",
+          pingUrl: "/api/ping",
+          logoutUrl: "/logout",
+          timeoutUrl: "/logout?timed_out=1",
+          modalShown: false,
+          intervalMonitor: false,
+          onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
+      });
+      window.sessMon = sessMon;
+      var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
+      $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+            .on("show.bs.modal", function() { sessMon.modalShown = true})
+            .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
+            .on("click", "#stay-logged-in", sessMon.extendsess)
+            .on("click", "#log-out", sessMon.logout)
+            .find("#remaining-time").text(warningText);
+    };
 
-function handleLoginAsUser() {
-  var __LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-  if (__LOGIN_AS_PATIENT) {
-      if (typeof history !== "undefined" && history.pushState) {
-        history.pushState(null, null, location.href);
-      }
-      window.addEventListener("popstate", function(event) {
+    this.handleLoginAsUser = function() {
+      var __LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+      if (__LOGIN_AS_PATIENT) {
         if (typeof history !== "undefined" && history.pushState) {
           history.pushState(null, null, location.href);
-          setTimeout(function() { location.reload(); } , 0);
-        } else {
-          window.history.forward(1);
-          setTimeout(function() { location.reload();}, 0);
         }
-      });
-  }
-}
+        window.addEventListener("popstate", function(event) {
+          if (typeof history !== "undefined" && history.pushState) {
+            history.pushState(null, null, location.href);
+            setTimeout(function() { location.reload(); } , 0);
+          } else {
+            window.history.forward(1);
+            setTimeout(function() { location.reload();}, 0);
+          }
+        });
+      }
+    };
+  };
+})();
+},{}]
+},{},[2]);
 
 $(document).ready(function(){
 
   var currentUserId = $("#currentUserId").val();
   // Configure and start the session timeout monitor
-  if (hasValue(currentUserId)) {
-    initSessionMonitor();
-    handleLoginAsUser();
+  if (currentUserId !== "") {
+    window.app.utilObj.initSessionMonitor();
+    window.app.utilObj.handleLoginAsUser();
+    window.app.orgTool.getOrgs(currentUserId);
   }
 
 
@@ -1320,42 +1330,32 @@ $(document).ready(function(){
   });
 
   $("#modal-login").on("show.bs.modal", function(e) {
-    __loader(false);
+    window.app.utilObj.setVis(false);
   });
 
   $("#btnCreateAccount").on("click", function() {
-  	window.app.interventionSessionObj.setInterventionSession();
+    window.app.interventionSessionObj.setInterventionSession();
   });
 
-  if (hasValue(currentUserId)) {
-    window.app.orgTool.getOrgs(currentUserId);
-  }
-
   $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
-  	e.preventDefault();
-  	__loader(false);
-  	return false;
+    e.preventDefault();
+    window.app.utilObj.setVis(false);
+    return false;
   });
 
   $("#password").on("keyup", function() {
     if (e.keyCode === 13) {
-  		e.preventDefault();
-  		if ($("input[name='email']").val() !== "") {
-  			$("#btnLogin").trigger("click");
-  		}
+      e.preventDefault();
+      if ($("input[name='email']").val() !== "") {
+        $("#btnLogin").trigger("click");
+      }
     }
   });
 
   $("input[type='text']").on("blur paste", function() {
     $(this).val($.trim($(this).val()));
   });
-  
-  window.app.upperBanner.handleAccess();
-  window.app.upperBanner.handleWatermark();
-  window.app.accessCodeObj.handleEvents();
-  window.app.menuObj.init(currentUserId);
-  window.app.interventionSessionObj.clearSession($("main").attr("data-section"));
-  
+
   if ($("#sessionTimedOut").val() === "true") {
     $("#timeout-modal").modal("show");
   }
@@ -1363,6 +1363,12 @@ $(document).ready(function(){
   if ($("main").attr("data-theme") === "white") {
     $("body").addClass("theme--intro-light");
   }
-  appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), $("#isContentManager").val() === "true");
-  setTimeout(function() { __loader(false); }, 0);
+
+  window.app.upperBanner.handleAccess();
+  window.app.upperBanner.handleWatermark();
+  window.app.accessCodeObj.handleEvents();
+  window.app.menuObj.init(currentUserId);
+  window.app.interventionSessionObj.clearSession($("main").attr("data-link-identifier"));
+  window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), $("#isContentManager").val() === "true");
+  setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
 });
