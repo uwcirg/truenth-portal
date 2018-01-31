@@ -181,6 +181,18 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
         self.assert400(rv)
 
+    def test_demographics_bad_names(self):
+        # confirm we error peacefully when given lists for names
+        data = {"resourceType": "Patient",
+                "name": {"family": ['family'], "given": ['given']}
+               }
+
+        self.login()
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
+
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
         data = {"careProvider": [{"reference": "Organization/1"}],

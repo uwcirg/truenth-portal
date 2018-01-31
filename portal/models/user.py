@@ -1090,10 +1090,13 @@ class User(db.Model, UserMixin):
                 self._identifiers.remove(unmentioned)
 
         if 'name' in fhir:
-            self.first_name = v_or_n(
-                fhir['name'].get('given')) or self.first_name
-            self.last_name = v_or_n(
-                fhir['name'].get('family')) or self.last_name
+            try:
+                self.first_name = v_or_n(
+                    fhir['name'].get('given')) or self.first_name
+                self.last_name = v_or_n(
+                    fhir['name'].get('family')) or self.last_name
+            except AttributeError:
+                abort(400, "name fields must be string values")
         if 'birthDate' in fhir:
             try:
                 bd = fhir['birthDate']
