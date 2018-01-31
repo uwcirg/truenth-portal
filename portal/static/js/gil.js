@@ -494,7 +494,7 @@ module.exports = OrgTool = (function() {
         if (!userId) return false;
         if (!orgId) return false;
 
-        var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
+        var consentedOrgIds = [], expired = 0, found = false, suspended = false;
         var self = this;
 
         $.ajax ({
@@ -509,7 +509,7 @@ module.exports = OrgTool = (function() {
                   d = d.sort(function(a,b){
                       return new Date(b.signed) - new Date(a.signed); //latest comes first
                   });
-                  item = d[0];
+                  var item = d[0];
                   expired = self.getDateDiff(item.expires);
                   if (item.deleted) {
                     found = true;
@@ -785,14 +785,14 @@ module.exports = OrgTool = (function() {
     };
 
     this.findOrg = function(entry, orgId) {
+        var org;
         if (entry && orgId) {
-            var org;
             entry.forEach(function(item) {
-                if (!org) {
-                    if (String(item.id) === String(orgId)) {
-                      org = item;
-                    }
+              if (!org) {
+                if (String(item.id) === String(orgId)) {
+                  org = item;
                 }
+              }
             });
         }
         return org;
