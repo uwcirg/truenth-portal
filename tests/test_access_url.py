@@ -29,7 +29,9 @@ class TestAccessUrl(TestCase):
 
     def test_use_access_url(self):
         """The current flow forces access to the challenge page"""
-        onetime = self.add_user('one@time.com')
+        onetime = self.add_user(
+            'one@time.com', first_name='first', last_name='last')
+        onetime.birthdate = '01-31-1969'  # verify requires DOB
         self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY)
         onetime = db.session.merge(onetime)
 
