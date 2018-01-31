@@ -114,10 +114,14 @@ def practitioner_search():
     return jsonify(bundle)
 
 
-@practitioner_api.route('/practitioner/<int:practitioner_id>')
+@practitioner_api.route('/practitioner/<string:id_or_code>')
 @oauth.require_oauth()
-def practitioner_get(practitioner_id):
+def practitioner_get(id_or_code):
     """Access to the requested practitioner as a FHIR resource
+
+    If 'system' param is provided, looks up the user by identifier,
+    using the `id_or_code` string as the identifier value; otherwise,
+    treats `id_or_code` as the practitioner.id
 
     ---
     operationId: practitioner_get
@@ -126,12 +130,11 @@ def practitioner_get(practitioner_id):
     produces:
       - application/json
     parameters:
-      - name: practitioner_id
+      - name: id_or_code
         in: path
-        description: TrueNTH practitioner ID
+        description: TrueNTH practitioner ID OR Identifier value code
         required: true
-        type: integer
-        format: int64
+        type: string
     responses:
       200:
         description:
@@ -143,8 +146,24 @@ def practitioner_get(practitioner_id):
           to view requested patient
 
     """
-    check_int(practitioner_id)
-    practitioner = Practitioner.query.get_or_404(practitioner_id)
+    system = request.args.get('system')
+    if system:
+        ident = Identifier.query.filter_by(
+            system=system, _value=id_or_code).first()
+        if not ident:
+            abort(404, 'no identifiers found for system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
+        practitioner = Practitioner.query.join(
+            PractitionerIdentifier).filter(and_(
+                PractitionerIdentifier.identifier_id == ident.id,
+                PractitionerIdentifier.practitioner_id == Practitioner.id)
+            ).first()
+        if not practitioner:
+            abort(404, 'no practitioner found with identifier: system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
+    else:
+        check_int(id_or_code)
+        practitioner = Practitioner.query.get_or_404(id_or_code)
     return jsonify(practitioner.as_fhir())
 
 

@@ -67,14 +67,18 @@ class TestPractitioner(TestCase):
         self.assert404(resp)
 
     def test_practitioner_get(self):
-        pract = Practitioner(first_name="Indiana", last_name="Jones")
+        pract = Practitioner(first_name="Indiana", last_name="Jones",
+                             phone='555-1234')
+        pract2 = Practitioner(first_name="John", last_name="Watson")
+        ident = Identifier(system='testsys', _value='testval')
+        pract2.identifiers.append(ident)
         with SessionScope(db):
             db.session.add(pract)
+            db.session.add(pract2)
             db.session.commit()
         pract = db.session.merge(pract)
 
-        pract.phone = '555-1234'
-
+        # test get by ID
         resp = self.client.get('/api/practitioner/{}'.format(pract.id))
         self.assert200(resp)
 
@@ -85,6 +89,19 @@ class TestPractitioner(TestCase):
         self.assertEqual(cp_json['system'], 'phone')
         self.assertEqual(cp_json['use'], 'work')
         self.assertEqual(cp_json['value'], '555-1234')
+
+        # test get by external identifier
+        resp = self.client.get(
+            '/api/practitioner/{}?system={}'.format('testval', 'testsys'))
+        self.assert200(resp)
+
+        self.assertEqual(resp.json['resourceType'], 'Practitioner')
+        self.assertEqual(resp.json['name']['family'], 'Watson')
+
+        # test with invalid external identifier
+        resp = self.client.get(
+            '/api/practitioner/{}?system={}'.format('invalid', 'testsys'))
+        self.assert404(resp)
 
     def test_practitioner_post(self):
         data = {
