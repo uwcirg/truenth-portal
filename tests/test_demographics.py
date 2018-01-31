@@ -181,6 +181,23 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
         self.assert400(rv)
 
+    def test_demographics_list_names(self):
+        # confirm we can handle when given lists for names as spec'd
+        data = {
+            "resourceType": "Patient",
+            "name": [
+                {"family": ['family'], "given": ['given']}
+            ]}
+
+        self.login()
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert200(rv)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.last_name, 'family')
+        self.assertEquals(user.first_name, 'given')
+
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
         data = {"careProvider": [{"reference": "Organization/1"}],
