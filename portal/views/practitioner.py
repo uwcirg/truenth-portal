@@ -135,6 +135,11 @@ def practitioner_get(id_or_code):
         description: TrueNTH practitioner ID OR Identifier value code
         required: true
         type: string
+      - name: system
+        in: query
+        description: Identifier system
+        required: false
+        type: string
     responses:
       200:
         description:
@@ -148,19 +153,7 @@ def practitioner_get(id_or_code):
     """
     system = request.args.get('system')
     if system:
-        ident = Identifier.query.filter_by(
-            system=system, _value=id_or_code).first()
-        if not ident:
-            abort(404, 'no identifiers found for system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
-        practitioner = Practitioner.query.join(
-            PractitionerIdentifier).filter(and_(
-                PractitionerIdentifier.identifier_id == ident.id,
-                PractitionerIdentifier.practitioner_id == Practitioner.id)
-            ).first()
-        if not practitioner:
-            abort(404, 'no practitioner found with identifier: system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
+        practitioner = lookup_practitioner_by_external_id(system, id_or_code)
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -225,16 +218,20 @@ def practitioner_post():
     return jsonify(practitioner.as_fhir())
 
 
-@practitioner_api.route('/practitioner/<int:practitioner_id>',
+@practitioner_api.route('/practitioner/<string:id_or_code>',
                         methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
-def practitioner_put(practitioner_id):
+def practitioner_put(id_or_code):
     """Update practitioner via FHIR Resource Practitioner. New should POST
 
     Submit JSON format [Practitioner
     Resource](https://www.hl7.org/fhir/DSTU2/practitioner.html) to update an
     existing practitioner.
+
+    If 'system' param is provided, looks up the user by identifier,
+    using the `id_or_code` string as the identifier value; otherwise,
+    treats `id_or_code` as the practitioner.id
 
     ---
     operationId: practitioner_put
@@ -243,12 +240,16 @@ def practitioner_put(practitioner_id):
     produces:
       - application/json
     parameters:
-      - name: practitioner_id
+      - name: id_or_code
         in: path
-        description: TrueNTH practitioner ID
+        description: TrueNTH practitioner ID OR Identifier value code
         required: true
-        type: integer
-        format: int64
+        type: string
+      - name: system
+        in: query
+        description: Identifier system
+        required: false
+        type: string
       - in: body
         name: body
         schema:
@@ -273,11 +274,15 @@ def practitioner_put(practitioner_id):
           to view requested patient
 
     """
-    check_int(practitioner_id)
     if (not request.json or 'resourceType' not in request.json or
             request.json['resourceType'] != 'Practitioner'):
         abort(400, "Requires FHIR resourceType of 'Practitioner'")
-    practitioner = Practitioner.query.get_or_404(practitioner_id)
+    system = request.args.get('system')
+    if system:
+        practitioner = lookup_practitioner_by_external_id(system, id_or_code)
+    else:
+        check_int(id_or_code)
+        practitioner = Practitioner.query.get_or_404(id_or_code)
     try:
         practitioner.update_from_fhir(request.json)
     except MissingReference, e:
@@ -287,3 +292,20 @@ def practitioner_put(practitioner_id):
         json.dumps(request.json)), user_id=current_user().id,
         subject_id=current_user().id, context='user')
     return jsonify(practitioner.as_fhir())
+
+
+def lookup_practitioner_by_external_id(system, value):
+    ident = Identifier.query.filter_by(
+        system=system, _value=value).first()
+    if not ident:
+        abort(404, 'no identifiers found for system `{}`, '
+              'value `{}`'.format(system, value))
+    practitioner = Practitioner.query.join(
+        PractitionerIdentifier).filter(and_(
+            PractitionerIdentifier.identifier_id == ident.id,
+            PractitionerIdentifier.practitioner_id == Practitioner.id)
+        ).first()
+    if not practitioner:
+        abort(404, 'no practitioner found with identifier: system `{}`, '
+              'value `{}`'.format(system, value))
+    return practitioner

@@ -139,14 +139,18 @@ class TestPractitioner(TestCase):
         self.assertEqual(audit_words[-1], 'Zoidberg')
 
     def test_practitioner_put(self):
-        pract = Practitioner(first_name="John", last_name="Watson")
+        pract = Practitioner(first_name="John", last_name="Watson",
+                             phone='555-1234')
+        pract2 = Practitioner(first_name="Indiana", last_name="Jones")
+        ident = Identifier(system='testsys', _value='testval')
+        pract2.identifiers.append(ident)
         with SessionScope(db):
             db.session.add(pract)
+            db.session.add(pract2)
             db.session.commit()
-        pract = db.session.merge(pract)
+        pract, pract2 = map(db.session.merge, (pract, pract2))
         pract_id = pract.id
-
-        pract.phone = '555-1234'
+        pract2_id = pract2.id
 
         data = {
             'resourceType': 'Practitioner',
@@ -166,6 +170,7 @@ class TestPractitioner(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
+        # test update by ID
         resp = self.client.put('/api/practitioner/{}'.format(pract_id),
                                data=json.dumps(data),
                                content_type='application/json')
@@ -181,3 +186,32 @@ class TestPractitioner(TestCase):
         self.assertEqual(audit_words[0], 'updated')
         self.assertEqual(audit_words[5], '"Practitioner",')
         self.assertEqual(audit_words[-1], '"Zoidberg"}}')
+
+        # test update by external identifier
+        data = {
+            'resourceType': 'Practitioner',
+            'telecom': [
+                {
+                    'system': 'phone',
+                    'use': 'work',
+                    'value': '999-9999'
+                }
+            ]
+        }
+
+        resp = self.client.put(
+            '/api/practitioner/{}?system={}'.format('testval', 'testsys'),
+            data=json.dumps(data),
+            content_type='application/json')
+        self.assert200(resp)
+
+        updated = Practitioner.query.get(pract2_id)
+        self.assertEqual(updated.last_name, 'Jones')
+        self.assertEqual(updated.phone, '999-9999')
+
+        # test with invalid external identifier
+        resp = self.client.put(
+            '/api/practitioner/{}?system={}'.format('invalid', 'testsys'),
+            data=json.dumps(data),
+            content_type='application/json')
+        self.assert404(resp)
