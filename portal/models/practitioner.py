@@ -1,7 +1,9 @@
 """General Practitioner module"""
 from cgi import escape
+from sqlalchemy import UniqueConstraint
 
 from ..database import db
+from .identifier import Identifier
 from .telecom import ContactPoint, Telecom
 
 
@@ -15,6 +17,8 @@ class Practitioner(db.Model):
 
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
                              cascade="save-update, delete")
+    identifiers = db.relationship('Identifier', lazy='dynamic',
+                                  secondary="practitioner_identifiers")
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -70,6 +74,17 @@ class Practitioner(db.Model):
             telecom = Telecom.from_fhir(fhir['telecom'])
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'work')) or self.phone
+        if 'identifier' in data:
+            # track current identifiers - must remove any not requested
+            remove_if_not_requested = [i for i in self.identifiers]
+            for id in data['identifier']:
+                identifier = Identifier.from_fhir(id).add_if_not_found()
+                if identifier not in self.identifiers.all():
+                    self.identifiers.append(identifier)
+                else:
+                    remove_if_not_requested.remove(identifier)
+            for obsolete in remove_if_not_requested:
+                self.identifiers.remove(obsolete)
         return self
 
     def as_fhir(self):
@@ -80,4 +95,20 @@ class Practitioner(db.Model):
         d['name']['family'] = self.last_name
         telecom = Telecom(contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
+        d['identifier'] = []
+        for id in self.identifiers:
+            d['identifier'].append(id.as_fhir())
         return d
+
+
+class PractitionerIdentifier(db.Model):
+    """link table for practitioner : n identifiers"""
+    __tablename__ = 'practitioner_identifiers'
+    id = db.Column(db.Integer, primary_key=True)
+    practitioner_id = db.Column(db.ForeignKey(
+        'practitioners.id', ondelete='cascade'), nullable=False)
+    identifier_id = db.Column(db.ForeignKey(
+        'identifiers.id', ondelete='cascade'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('practitioner_id', 'identifier_id',
+                                       name='_practitioner_identifier'),)
