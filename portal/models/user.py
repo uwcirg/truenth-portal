@@ -28,8 +28,9 @@ from .fhir import ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .notification import UserNotification
-from .performer import Performer
 from .organization import Organization, OrgTree
+from .performer import Performer
+from .practitioner import Practitioner
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
@@ -827,12 +828,12 @@ class User(db.Model, UserMixin):
                 extensions.append(data)
         d['extension'] = extensions
         d['careProvider'] = careProviders()
+        if self.practitioner_id:
+            d['careProvider'].append(reference.Reference.practitioner(
+                self.practitioner_id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
-        if self.practitioner_id:
-            d['generalPractitioner'] = reference.Reference.practitioner(
-                practitioner_id).as_fhir()
         if not include_empties:
             return strip_empties(d)
         return d
@@ -1117,6 +1118,17 @@ class User(db.Model, UserMixin):
             for unmentioned in pre_existing:
                 self._identifiers.remove(unmentioned)
 
+        def update_care_providers(fhir):
+            """Update user fields based on careProvider Reference types"""
+            org_list = []
+            for cp in fhir.get('careProvider'):
+                parsed = reference.Reference.parse(cp)
+                if type(parsed) is Organization:
+                    org_list.append(parsed)
+                elif type(parsed) is Practitioner:
+                    self.practitioner_id = parsed.id
+            self.update_orgs(org_list, acting_user)
+
         if 'name' in fhir:
             name = v_or_first(fhir['name'], 'name')
             self.first_name = v_or_n(
@@ -1135,6 +1147,7 @@ class User(db.Model, UserMixin):
                       "'%Y-%m-%d'".format(fhir['birthDate']))
         update_deceased(fhir)
         update_identifiers(fhir)
+        update_care_providers(fhir)
         if 'gender' in fhir:
             self.gender = fhir['gender'].lower() if fhir['gender'] else None
         if 'telecom' in fhir:
@@ -1157,13 +1170,6 @@ class User(db.Model, UserMixin):
             for e in fhir['extension']:
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
-        if 'careProvider' in fhir:
-            org_list = [reference.Reference.parse(item) for item in
-                        fhir['careProvider']]
-            self.update_orgs(org_list, acting_user)
-        if 'generalPractitioner' in fhir:
-            self.practitioner_id = reference.Reference.parse(
-                fhir['generalPractitioner'])
 
     @classmethod
     def column_names(cls):

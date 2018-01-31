@@ -1,4 +1,6 @@
 """General Practitioner module"""
+from cgi import escape
+
 from ..database import db
 from .telecom import ContactPoint, Telecom
 
