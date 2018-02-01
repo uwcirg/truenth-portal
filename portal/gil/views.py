@@ -104,7 +104,7 @@ def home():
     if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER):
-        return redirect(url_for('.research_dashboard'))
+        return redirect(url_for('portal.research_dashboard'))
     if user.has_role(ROLE.STAFF_ADMIN):
         return redirect(url_for('staff.staff_index'))
 
