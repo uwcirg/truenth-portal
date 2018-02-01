@@ -4038,6 +4038,11 @@ var tnthAjax = {
         //don't think we want to translate message sent back to the server here
         params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
 
+        if (window.console) {
+            console.log("Errors occurred.....");
+            console.log(params);
+        }
+
         $.ajax ({
             type: "GET",
             url: "/report-error",
