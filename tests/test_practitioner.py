@@ -32,14 +32,14 @@ class TestPractitioner(TestCase):
         self.assert200(resp)
 
         self.assertEqual(resp.json['total'], 3)
-        self.assertEqual(resp.json['entry'][0]['name']['given'], 'Indiana')
+        self.assertEqual(resp.json['entry'][0]['name'][0]['given'], 'Indiana')
 
         # test query with multiple results
         resp = self.client.get('/api/practitioner?first_name=John')
         self.assert200(resp)
 
         self.assertEqual(resp.json['total'], 2)
-        self.assertEqual(resp.json['entry'][0]['name']['family'], 'Watson')
+        self.assertEqual(resp.json['entry'][0]['name'][0]['family'], 'Watson')
 
         # test query with multiple search parameters
         resp = self.client.get(
@@ -47,7 +47,8 @@ class TestPractitioner(TestCase):
         self.assert200(resp)
 
         self.assertEqual(resp.json['total'], 1)
-        self.assertEqual(resp.json['entry'][0]['name']['family'], 'Zoidberg')
+        self.assertEqual(
+            resp.json['entry'][0]['name'][0]['family'], 'Zoidberg')
 
         # test query using identifier system/value
         resp = self.client.get(
@@ -55,7 +56,7 @@ class TestPractitioner(TestCase):
         self.assert200(resp)
 
         self.assertEqual(resp.json['total'], 1)
-        self.assertEqual(resp.json['entry'][0]['name']['family'], 'Jones')
+        self.assertEqual(resp.json['entry'][0]['name'][0]['family'], 'Jones')
 
         # test invalid system/value combos
         resp = self.client.get(
@@ -83,7 +84,7 @@ class TestPractitioner(TestCase):
         self.assert200(resp)
 
         self.assertEqual(resp.json['resourceType'], 'Practitioner')
-        self.assertEqual(resp.json['name']['given'], 'Indiana')
+        self.assertEqual(resp.json['name'][0]['given'], 'Indiana')
         phone_json = {'system': 'phone', 'use': 'work', 'value': '555-1234'}
         self.assertTrue(phone_json in resp.json['telecom'])
         email_json = {'system': 'email', 'value': 'test@notarealsite.com'}
@@ -95,7 +96,7 @@ class TestPractitioner(TestCase):
         self.assert200(resp)
 
         self.assertEqual(resp.json['resourceType'], 'Practitioner')
-        self.assertEqual(resp.json['name']['family'], 'Watson')
+        self.assertEqual(resp.json['name'][0]['family'], 'Watson')
 
         # test with invalid external identifier
         resp = self.client.get(

@@ -99,9 +99,10 @@ class Practitioner(db.Model):
     def as_fhir(self):
         d = {}
         d['resourceType'] = "Practitioner"
-        d['name'] = {}
-        d['name']['given'] = self.first_name
-        d['name']['family'] = self.last_name
+        name = {}
+        name['given'] = self.first_name
+        name['family'] = self.last_name
+        d['name'] = [name]
         telecom = Telecom(email=self.email, contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
         d['identifier'] = []
