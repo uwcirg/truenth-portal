@@ -14,6 +14,7 @@ class Practitioner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(120))
     phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
                                                    ondelete='cascade'))
 
@@ -76,6 +77,12 @@ class Practitioner(db.Model):
             telecom = Telecom.from_fhir(fhir['telecom'])
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone', 'work')) or self.phone
+            if telecom.email:
+                if ((telecom.email != self.email) and
+                        (Practitioner.query.filter_by(
+                            email=telecom.email).count() > 0)):
+                    abort(400, "email address already in use")
+                self.email = telecom.email
         if 'identifier' in fhir:
             # track current identifiers - must remove any not requested
             remove_if_not_requested = [i for i in self.identifiers]
@@ -95,7 +102,7 @@ class Practitioner(db.Model):
         d['name'] = {}
         d['name']['given'] = self.first_name
         d['name']['family'] = self.last_name
-        telecom = Telecom(contact_points=[self._phone])
+        telecom = Telecom(email=self.email, contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
         d['identifier'] = []
         for ident in self.identifiers:

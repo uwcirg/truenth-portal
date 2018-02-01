@@ -68,7 +68,7 @@ class TestPractitioner(TestCase):
 
     def test_practitioner_get(self):
         pract = Practitioner(first_name="Indiana", last_name="Jones",
-                             phone='555-1234')
+                             phone='555-1234', email='test@notarealsite.com')
         pract2 = Practitioner(first_name="John", last_name="Watson")
         ident = Identifier(system='testsys', _value='testval')
         pract2.identifiers.append(ident)
@@ -84,11 +84,10 @@ class TestPractitioner(TestCase):
 
         self.assertEqual(resp.json['resourceType'], 'Practitioner')
         self.assertEqual(resp.json['name']['given'], 'Indiana')
-        self.assertEqual(len(resp.json['telecom']), 1)
-        cp_json = resp.json['telecom'][0]
-        self.assertEqual(cp_json['system'], 'phone')
-        self.assertEqual(cp_json['use'], 'work')
-        self.assertEqual(cp_json['value'], '555-1234')
+        phone_json = {'system': 'phone', 'use': 'work', 'value': '555-1234'}
+        self.assertTrue(phone_json in resp.json['telecom'])
+        email_json = {'system': 'email', 'value': 'test@notarealsite.com'}
+        self.assertTrue(email_json in resp.json['telecom'])
 
         # test get by external identifier
         resp = self.client.get(
@@ -117,6 +116,10 @@ class TestPractitioner(TestCase):
                     'system': 'phone',
                     'use': 'work',
                     'value': '555-1234'
+                },
+                {
+                    'system': 'email',
+                    'value': 'test@notarealsite.com'
                 }
             ],
             'identifier': [
@@ -137,6 +140,7 @@ class TestPractitioner(TestCase):
         self.assertEqual(Practitioner.query.count(), 1)
         pract = Practitioner.query.all()[0]
         self.assertEqual(pract.last_name, 'Zoidberg')
+        self.assertEqual(pract.email, 'test@notarealsite.com')
         self.assertEqual(pract.phone, '555-1234')
         self.assertEqual(len(pract.identifiers.all()), 1)
         self.assertEqual(pract.identifiers[0].system, 'testsys')
@@ -169,7 +173,7 @@ class TestPractitioner(TestCase):
 
     def test_practitioner_put(self):
         pract = Practitioner(first_name="John", last_name="Watson",
-                             phone='555-1234')
+                             phone='555-1234', email='test1@notarealsite.com')
         pract2 = Practitioner(first_name="Indiana", last_name="Jones")
         ident = Identifier(system='testsys', _value='testval')
         pract2.identifiers.append(ident)
@@ -194,6 +198,10 @@ class TestPractitioner(TestCase):
                     'system': 'phone',
                     'use': 'work',
                     'value': '555-9876'
+                },
+                {
+                    'system': 'email',
+                    'value': 'test2@notarealsite.com'
                 }
             ]
         }
@@ -210,6 +218,7 @@ class TestPractitioner(TestCase):
         updated = Practitioner.query.get(pract_id)
         self.assertEqual(updated.last_name, 'Zoidberg')
         self.assertEqual(updated.phone, '555-9876')
+        self.assertEqual(updated.email, 'test2@notarealsite.com')
 
         # confirm audit entry for practitioner update
         audit = Audit.query.first()
