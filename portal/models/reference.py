@@ -103,11 +103,43 @@ class Reference(object):
         """
         # Due to cyclic import problems, keep these local
         from .organization import Organization, OrganizationIdentifier
-        from .practitioner import Practitioner
+        from .practitioner import Practitioner, PractitionerIdentifier
         from .questionnaire import Questionnaire
         from .questionnaire_bank import QuestionnaireBank
         from .research_protocol import ResearchProtocol
         from .user import User
+
+        def get_object_by_identifier(obj, system, value):
+            if obj == Organization:
+                query = obj.query.join(OrganizationIdentifier).join(
+                    Identifier).filter(and_(
+                        Organization.id ==
+                        OrganizationIdentifier.organization_id,
+                        Identifier.id ==
+                        OrganizationIdentifier.identifier_id,
+                        Identifier.system == system,
+                        Identifier._value == value))
+            elif obj == Practitioner:
+                query = obj.query.join(PractitionerIdentifier).join(
+                    Identifier).filter(and_(
+                        Practitioner.id ==
+                        PractitionerIdentifier.practitioner_id,
+                        Identifier.id ==
+                        PractitionerIdentifier.identifier_id,
+                        Identifier.system == system,
+                        Identifier._value == value))
+            else:
+                raise ValueError(
+                    '`{}` does not support external identifier '
+                    'reference'.format(obj))
+            if not query.count():
+                raise MissingReference(
+                    "Reference not found: {}".format(reference_text))
+            elif query.count() > 1:
+                raise MultipleReference(
+                    'Multiple objects found for reference {}'.format(
+                        reference_text))
+            return query.first()
 
         if 'reference' in reference_dict:
             reference_text = reference_dict['reference']
@@ -119,12 +151,16 @@ class Reference(object):
                     reference_dict))
 
         lookup = (
+            (re.compile('[Oo]rganization/(\w+)\?[Ss]ystem=(\w+)'),
+             Organization, 'identifier'),
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
             (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),
             (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
+            (re.compile('[Pp]ractitioner/(\w+)\?[Ss]ystem=(\w+)'),
+             Practitioner, 'identifier'),
             (re.compile('[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
             (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
@@ -132,6 +168,15 @@ class Reference(object):
         for pattern, obj, attribute in lookup:
             match = pattern.search(reference_text)
             if match:
+                if attribute == 'identifier':
+                    try:
+                        id_system = match.groups()[1]
+                        id_value = match.groups()[0]
+                    except:
+                        raise ValueError(
+                            'Identifier values not found in reference '
+                            '{}'.format(reference_text))
+                    return get_object_by_identifier(obj, id_system, id_value)
                 value = match.groups()[0]
                 if attribute == 'id':
                     try:
@@ -146,33 +191,6 @@ class Reference(object):
                     raise MissingReference("Reference not found: {}".format(
                         reference_text))
                 return result
-
-        match = re.compile('[Oo]rganization/(.+)/(.+)').search(reference_text)
-        if match:
-            try:
-                id_system = match.groups()[0]
-                id_value = match.groups()[1]
-            except:
-                raise ValueError(
-                    'Identifier values not found in reference {}'.format(
-                        reference_text))
-            with db.session.no_autoflush:
-                result = Organization.query.join(
-                    OrganizationIdentifier).join(Identifier).filter(and_(
-                        Organization.id ==
-                        OrganizationIdentifier.organization_id,
-                        OrganizationIdentifier.identifier_id ==
-                        Identifier.id,
-                        Identifier.system == id_system,
-                        Identifier._value == id_value))
-            if not result.count():
-                raise MissingReference("Reference not found: {}".format(
-                    reference_text))
-            elif result.count() > 1:
-                raise MultipleReference(
-                    'Multiple organizations found for reference {}'.format(
-                        reference_text))
-            return result.first()
 
         raise ValueError('Reference not found: {}'.format(reference_text))
 

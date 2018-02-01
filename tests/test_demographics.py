@@ -296,7 +296,7 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, 'test org')
 
-    def test_demographics_org_identifier_ref(self):
+    def test_demographics_identifier_ref(self):
         # referencing careProvider by (unique) external Identifier
 
         self.shallow_org_tree()
@@ -310,14 +310,24 @@ class TestDemographics(TestCase):
         org_ident = OrganizationIdentifier(organization_id=org_id,
                                             identifier_id=99)
 
+        # create Practitioner and add Identifier
+        pract = Practitioner(first_name="Indiana", last_name="Jones")
+        ident2 = Identifier(system='practsys', value='practval')
+        pract.identifiers.append(ident2)
+
         with SessionScope(db):
+            db.session.add(pract)
             db.session.add(ident)
             db.session.commit()
             db.session.add(org_ident)
             db.session.commit()
 
-        data = {"careProvider": [{"reference": "Organization/{}/{}".format(
-                org_id_system, org_id_value)}],
+        data = {"careProvider": [
+                    {"reference": "Organization/{}?system={}".format(
+                        org_id_value, org_id_system)},
+                    {"reference": "Practitioner/{}?system={}".format(
+                        'practval', 'practsys')}
+                ],
                 "resourceType": "Patient",
                }
 
@@ -327,9 +337,10 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
 
         self.assert200(rv)
-        user = db.session.merge(self.test_user)
+        user, pract = map(db.session.merge, (self.test_user, pract))
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, org_name)
+        self.assertEquals(user.practitioner_id, pract.id)
 
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
