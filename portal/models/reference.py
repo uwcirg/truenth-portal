@@ -172,7 +172,7 @@ class Reference(object):
                     try:
                         id_system = match.groups()[1]
                         id_value = match.groups()[0]
-                    except:
+                    except IndexError:
                         raise ValueError(
                             'Identifier values not found in reference '
                             '{}'.format(reference_text))
