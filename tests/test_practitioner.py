@@ -135,8 +135,6 @@ class TestPractitioner(TestCase):
         audit = Audit.query.first()
         audit_words = audit.comment.split()
         self.assertEqual(audit_words[0], 'created')
-        self.assertEqual(audit_words[3], 'Practitioner')
-        self.assertEqual(audit_words[-1], 'Zoidberg')
 
     def test_practitioner_put(self):
         pract = Practitioner(first_name="John", last_name="Watson",
@@ -184,8 +182,6 @@ class TestPractitioner(TestCase):
         audit = Audit.query.first()
         audit_words = audit.comment.split()
         self.assertEqual(audit_words[0], 'updated')
-        self.assertEqual(audit_words[5], '"Practitioner",')
-        self.assertEqual(audit_words[-1], '"Zoidberg"}}')
 
         # test update by external identifier
         data = {
