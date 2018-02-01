@@ -1,6 +1,6 @@
 """Practitioner API view functions"""
 from flask import abort, jsonify, Blueprint, request
-from flask import render_template, current_app, url_for
+from flask import render_template, url_for
 from flask_user import roles_required
 import json
 from sqlalchemy import and_
