@@ -116,6 +116,12 @@ class TestPractitioner(TestCase):
                     'use': 'work',
                     'value': '555-1234'
                 }
+            ],
+            'identifier': [
+                {
+                    'system': 'testsys',
+                    'value': 'testval'
+                }
             ]
         }
 
@@ -130,11 +136,32 @@ class TestPractitioner(TestCase):
         pract = Practitioner.query.all()[0]
         self.assertEqual(pract.last_name, 'Zoidberg')
         self.assertEqual(pract.phone, '555-1234')
+        self.assertEqual(len(pract.identifiers.all()), 1)
+        self.assertEqual(pract.identifiers[0].system, 'testsys')
 
         # confirm audit entry for practitioner creation
         audit = Audit.query.first()
         audit_words = audit.comment.split()
         self.assertEqual(audit_words[0], 'created')
+
+        # test with existing external identifier
+        data = {
+            'resourceType': 'Practitioner',
+            'name': {
+                'given': 'John',
+                'family': 'Watson'
+            },
+            'identifier': [
+                {
+                    'system': 'testsys',
+                    'value': 'testval'
+                }
+            ]
+        }
+
+        resp = self.client.post('/api/practitioner', data=json.dumps(data),
+                                content_type='application/json')
+        self.assertEqual(resp.status_code, 409)
 
     def test_practitioner_put(self):
         pract = Practitioner(first_name="John", last_name="Watson",
@@ -211,3 +238,19 @@ class TestPractitioner(TestCase):
             data=json.dumps(data),
             content_type='application/json')
         self.assert404(resp)
+
+        # test with existing external identifier
+        data = {
+            'resourceType': 'Practitioner',
+            'identifier': [
+                {
+                    'system': 'testsys',
+                    'value': 'testval'
+                }
+            ]
+        }
+
+        resp = self.client.put('/api/practitioner/{}'.format(pract_id),
+                               data=json.dumps(data),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, 409)

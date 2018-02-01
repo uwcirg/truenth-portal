@@ -1,6 +1,5 @@
 """Practitioner API view functions"""
-from flask import abort, jsonify, Blueprint, request
-from flask import render_template, url_for
+from flask import abort, jsonify, Blueprint, request, url_for
 from flask_user import roles_required
 import json
 from sqlalchemy import and_
@@ -154,6 +153,9 @@ def practitioner_get(id_or_code):
     system = request.args.get('system')
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
+        if not practitioner:
+            abort(404, 'no practitioner found with identifier: system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -201,12 +203,17 @@ def practitioner_post():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+      409:
+        description:
+          if attempting to update Practitioner with an identifier in use by
+          another Practitioner
 
     """
     if (not request.json or 'resourceType' not in request.json or
             request.json['resourceType'] != 'Practitioner'):
         abort(400, "Requires FHIR resourceType of 'Practitioner'")
     try:
+        check_for_existing_external_id(request.json)
         practitioner = Practitioner.from_fhir(request.json)
     except MissingReference, e:
         abort(400, str(e))
@@ -272,6 +279,10 @@ def practitioner_put(id_or_code):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+      409:
+        description:
+          if attempting to update Practitioner with an identifier in use by
+          another Practitioner
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -280,10 +291,14 @@ def practitioner_put(id_or_code):
     system = request.args.get('system')
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
+        if not practitioner:
+            abort(404, 'no practitioner found with identifier: system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
     try:
+        check_for_existing_external_id(request.json)
         practitioner.update_from_fhir(request.json)
     except MissingReference, e:
         abort(400, str(e))
@@ -295,17 +310,21 @@ def practitioner_put(id_or_code):
 
 
 def lookup_practitioner_by_external_id(system, value):
-    ident = Identifier.query.filter_by(
-        system=system, _value=value).first()
-    if not ident:
-        abort(404, 'no identifiers found for system `{}`, '
-              'value `{}`'.format(system, value))
-    practitioner = Practitioner.query.join(
-        PractitionerIdentifier).filter(and_(
-            PractitionerIdentifier.identifier_id == ident.id,
-            PractitionerIdentifier.practitioner_id == Practitioner.id)
-        ).first()
-    if not practitioner:
-        abort(404, 'no practitioner found with identifier: system `{}`, '
-              'value `{}`'.format(system, value))
-    return practitioner
+    return Practitioner.query.join(PractitionerIdentifier).join(
+        Identifier).filter(and_(
+            Practitioner.id == PractitionerIdentifier.practitioner_id,
+            Identifier.id == PractitionerIdentifier.identifier_id,
+            Identifier.system == system,
+            Identifier._value == value)).first()
+
+
+def check_for_existing_external_id(json):
+    for ident in (json.get('identifier') or []):
+        system = ident.get('system')
+        value = ident.get('value')
+        if not (system and value):
+            abort(400, 'Both system and value must be provided '
+                  'for identifier {}'.format(ident))
+        if lookup_practitioner_by_external_id(system, value):
+            abort(409, 'Practitioner with identifier {} already '
+                  'exists'.format(ident))
