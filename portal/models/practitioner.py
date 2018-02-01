@@ -3,6 +3,7 @@ from cgi import escape
 from sqlalchemy import UniqueConstraint
 
 from ..database import db
+from .fhir import v_or_n, v_or_first
 from .identifier import Identifier
 from .telecom import ContactPoint, Telecom
 
@@ -63,14 +64,14 @@ class Practitioner(db.Model):
         :param fhir: JSON defining portions of the user demographics to change
 
         """
-        def v_or_n(val):
-            return val.rstrip() if val else None
-
         if 'name' in fhir:
+            name = v_or_first(fhir['name'], 'name')
             self.first_name = v_or_n(
-                fhir['name'].get('given')) or self.first_name
+                v_or_first(name.get('given'), 'given name')
+            ) or self.first_name
             self.last_name = v_or_n(
-                fhir['name'].get('family')) or self.last_name
+                v_or_first(name.get('family'), 'family name')
+            ) or self.last_name
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             telecom_cps = telecom.cp_dict()

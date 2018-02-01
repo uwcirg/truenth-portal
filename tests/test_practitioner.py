@@ -106,10 +106,12 @@ class TestPractitioner(TestCase):
     def test_practitioner_post(self):
         data = {
             'resourceType': 'Practitioner',
-            'name': {
-                'given': 'John',
-                'family': 'Zoidberg'
-            },
+            'name': [
+                {
+                    'given': 'John',
+                    'family': 'Zoidberg'
+                }
+            ],
             'telecom': [
                 {
                     'system': 'phone',
@@ -147,10 +149,12 @@ class TestPractitioner(TestCase):
         # test with existing external identifier
         data = {
             'resourceType': 'Practitioner',
-            'name': {
-                'given': 'John',
-                'family': 'Watson'
-            },
+            'name': [
+                {
+                    'given': 'John',
+                    'family': 'Watson'
+                }
+            ],
             'identifier': [
                 {
                     'system': 'testsys',
@@ -179,10 +183,12 @@ class TestPractitioner(TestCase):
 
         data = {
             'resourceType': 'Practitioner',
-            'name': {
-                'given': 'John',
-                'family': 'Zoidberg'
-            },
+            'name': [
+                {
+                    'given': 'John',
+                    'family': 'Zoidberg'
+                }
+            ],
             'telecom': [
                 {
                     'system': 'phone',

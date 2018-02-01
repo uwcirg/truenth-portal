@@ -24,7 +24,7 @@ from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .extension import CCExtension, TimezoneExtension
 from .fhir import Observation, UserObservation
-from .fhir import ValueQuantity
+from .fhir import ValueQuantity, v_or_n, v_or_first
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .notification import UserNotification
@@ -1016,35 +1016,6 @@ class User(db.Model, UserMixin):
         :param acting_user: user requesting the change
 
         """
-        def v_or_n(value):
-            """Return None unless the value contains data"""
-            if value:
-                return value.rstrip() or None
-
-        def v_or_first(value, field_name):
-            """Return desired from list or scalar value
-
-            :param value: the raw data, may be a single value (directly
-             returned) or a list from which the first element will be returned
-            :param field_name: used in error text when multiple values
-             are found for a constrained item.
-
-            Some fields, such as `name` were assumed to always be a single
-            dictionary containing single values, whereas the FHIR spec
-            defines them to support 0..* meaning we must handle a list.
-
-            NB - as the datamodel still only expects one, a 400 will be
-            raised if given multiple values, using the `field_name` in the text.
-
-            """
-            if isinstance(value, (tuple, list)):
-                if len(value) > 1:
-                    msg = "Can't handle multiple values for `{}`".format(field_name)
-                    current_app.logger.warn(msg)
-                    abort(400, msg)
-                return value[0]
-            return value
-
         def update_deceased(fhir):
             if 'deceasedDateTime' in fhir:
                 dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
