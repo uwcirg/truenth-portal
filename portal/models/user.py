@@ -1123,9 +1123,9 @@ class User(db.Model, UserMixin):
             org_list = []
             for cp in fhir.get('careProvider'):
                 parsed = reference.Reference.parse(cp)
-                if type(parsed) is Organization:
+                if isinstance(parsed, Organization):
                     org_list.append(parsed)
-                elif type(parsed) is Practitioner:
+                elif isinstance(parsed, Practitioner):
                     self.practitioner_id = parsed.id
             self.update_orgs(org_list, acting_user)
 

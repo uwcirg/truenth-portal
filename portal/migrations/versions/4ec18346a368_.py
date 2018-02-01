@@ -1,7 +1,3 @@
-from alembic import op
-import sqlalchemy as sa
-
-
 """empty message
 
 Revision ID: 4ec18346a368

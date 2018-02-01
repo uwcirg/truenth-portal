@@ -1,4 +1,4 @@
-"""General Practitioner module"""
+"""Practitioner module"""
 from cgi import escape
 from sqlalchemy import UniqueConstraint
 
@@ -8,6 +8,7 @@ from .telecom import ContactPoint, Telecom
 
 
 class Practitioner(db.Model):
+    """Practitioner model for storing physician information"""
     __tablename__ = 'practitioners'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64))
@@ -77,8 +78,8 @@ class Practitioner(db.Model):
         if 'identifier' in fhir:
             # track current identifiers - must remove any not requested
             remove_if_not_requested = [i for i in self.identifiers]
-            for id in fhir['identifier']:
-                identifier = Identifier.from_fhir(id).add_if_not_found()
+            for ident in fhir['identifier']:
+                identifier = Identifier.from_fhir(ident).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
                 else:
@@ -96,8 +97,8 @@ class Practitioner(db.Model):
         telecom = Telecom(contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
         d['identifier'] = []
-        for id in self.identifiers:
-            d['identifier'].append(id.as_fhir())
+        for ident in self.identifiers:
+            d['identifier'].append(ident.as_fhir())
         return d
 
 
