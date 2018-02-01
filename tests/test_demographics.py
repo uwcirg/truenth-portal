@@ -170,6 +170,38 @@ class TestDemographics(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(user.identifiers.count(), 5)
 
+    def test_demographics_update_email(self):
+        data = {"resourceType": "Patient",
+                "telecom": [
+                    {
+                        "system": 'email',
+                        'value': 'updated@email.com'
+                    }],
+               }
+
+        self.login()
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
+        self.assert200(rv)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.email, 'updated@email.com')
+
+    def test_demographics_bogus_identifiers_update(self):
+        # Users can't update email via identifier - confirm 400
+        data = {"resourceType": "Patient",
+                "identifier": [{
+                    "system": "http://us.truenth.org/identity-codes/TrueNTH-username",
+                    "use": "secondary",
+                    "value": "updated@email.com"}]
+               }
+
+        self.login()
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
+        self.assert400(rv)
+
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
                 "birthDate": '10/20/1980'
