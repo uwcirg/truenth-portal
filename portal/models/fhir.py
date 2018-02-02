@@ -1,6 +1,6 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
-from flask import current_app
+from flask import current_app, abort
 from html.parser import HTMLParser
 import json
 from sqlalchemy import UniqueConstraint, or_
