@@ -72,6 +72,7 @@
 {% endblock %}
 {% block document_ready %}
 var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+var OT = new OrgTool(); OT.init();
 var aco = new AccountCreationObj(
 [{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}],
 {'i18next': i18next,
