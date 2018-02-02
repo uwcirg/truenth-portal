@@ -103,7 +103,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             this.orgTool.init();
         }
         return this.orgTool;
-    }
+    };
 
 
     this.getHeaderRow = function(header) {
