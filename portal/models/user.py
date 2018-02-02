@@ -1102,6 +1102,10 @@ class User(db.Model, UserMixin):
                 except TypeError as e:
                     abort(400, "invalid format for identifier {}".format(e))
                 if new_id.system in internal_identifier_systems:
+                    # Let user know this isn't how to change email if attempted
+                    if (new_id.system == TRUENTH_USERNAME and
+                            self._email != new_id.value):
+                        abort(400, "use telecom to update email address")
                     continue
                 new_id = new_id.add_if_not_found()
                 if new_id in pre_existing:
