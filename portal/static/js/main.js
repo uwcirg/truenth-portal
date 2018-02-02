@@ -3389,7 +3389,7 @@ var OrgTool = function() {
     this.initialized = false;
 };
 OrgTool.prototype.init = function (callback) {
-    var self = this;
+    var self = this, callback = callback||function() {};
     $.ajax ({
         type: "GET",
         url: "/api/organization",
@@ -3397,14 +3397,10 @@ OrgTool.prototype.init = function (callback) {
     }).done(function(data) {
         if (data && data.entry) {
             self.populateOrgsList(data.entry);
-            if (callback) {
-                callback(data.entry);
-            }
+            callback(data.entry);
         };
     }).fail(function(xhr) {
-        if (callback) {
-            callback({"error": xhr.responseText});
-        }
+        callback({"error": xhr.responseText});
         tnthAjax.sendError(xhr, "/api/organization");
     });
 }
