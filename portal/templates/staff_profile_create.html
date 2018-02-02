@@ -62,6 +62,7 @@
 {% endblock %}
 {% block document_ready %}
     var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
+    var OT = new OrgTool(); OT.init();
     //instantiation of account creation object, note, staff role is passed in
     var aco = new AccountCreationObj(
     [{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'},],
