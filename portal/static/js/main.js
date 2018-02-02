@@ -1894,15 +1894,20 @@ var assembleContent = {
                 };
             };
 
-            var studyId = $("#profileStudyId").val();
-            var siteId = $("#profileSiteId").val();
+            var studyIdField = $("#profileStudyId");
+            var siteIdField = $("#profileSiteId");
+            var hasStudyId = studyIdField.length > 0 && studyIdField.is(":visible");
+            var hasSiteId = siteIdField.length > 0 && siteIdField.is(":visible");
+            var studyId = studyIdField.val();
+            var siteId = siteIdField.val();
 
-            if (hasValue(studyId) || hasValue(siteId)) {
+
+            if (hasStudyId || hasSiteId) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
                     type: "GET",
-                    url: '/api/demographics/'+userId,
+                    url: "/api/demographics/"+userId,
                     async: false
                 }).done(function(data) {
                     if (data && data.identifier) {
@@ -1910,14 +1915,16 @@ var assembleContent = {
                         (data.identifier).forEach(function(identifier) {
                             if (identifier.system != SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
                                 identifier.system != SYSTEM_IDENTIFIER_ENUM["external_site_id"] &&
-                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) identifiers.push(identifier);
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) {
+                                identifiers.push(identifier);
+                            }
                         });
-                    };
-                }).fail(function() {
-                   // console.log("Problem retrieving data from server.");
+                    }
+                }).fail(function(xhr) {
+                   tnthAjax.reportError(userId, "api/demographics"+userId, xhr.responseText);
                 });
 
-                if (hasValue(studyId)) {
+                if (hasStudyId) {
                     studyId = $.trim(studyId);
                     var studyIdObj = {
                         system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
@@ -1932,7 +1939,7 @@ var assembleContent = {
                     };
                 };
 
-                if (hasValue(siteId)) {
+                if (hasSiteId) {
                     siteId = $.trim(siteId);
                     var siteIdObj = {
                         system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
@@ -4030,6 +4037,11 @@ var tnthAjax = {
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
         //don't think we want to translate message sent back to the server here
         params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
+
+        if (window.console) {
+            console.log("Errors occurred.....");
+            console.log(params);
+        }
 
         $.ajax ({
             type: "GET",
