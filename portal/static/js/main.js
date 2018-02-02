@@ -4032,10 +4032,12 @@ var tnthAjax = {
             }
         });
     },
-    "getOrgTool": function() {
+    "getOrgTool": function(init) {
         if (!this.orgTool) {
             this.orgTool = new OrgTool();
-            this.orgTool.init();
+            if (init) {
+                this.orgTool.init();
+            }
         }
         return this.orgTool;
     },
