@@ -11,9 +11,10 @@ import json
 
 from portal.extensions import db
 from portal.models.auth import AuthProvider
+from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
-from portal.models.identifier import Identifier
+from portal.models.practitioner import Practitioner
 from portal.models.role import ROLE
 from portal.models.user import User
 
@@ -57,6 +58,13 @@ class TestDemographics(TestCase):
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
 
+        pract = Practitioner(first_name='Indiana', last_name='Jones')
+        with SessionScope(db):
+            db.session.add(pract)
+            db.session.commit()
+        pract = db.session.merge(pract)
+        pract_id = pract.id
+
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
@@ -99,6 +107,7 @@ class TestDemographics(TestCase):
                 "careProvider": [
                     {"reference": "Organization/{}".format(org_id)},
                     {"reference": "api/organization/{}".format(org2_id)},
+                    {"reference": "Practitioner/{}".format(pract_id)},
                 ]
                }
 
@@ -130,7 +139,11 @@ class TestDemographics(TestCase):
         self.assertEquals(2, len(
             [ext for ext in fhir['extension']
              if 'valueCodeableConcept' in ext]))
-        self.assertEquals(2, len(fhir['careProvider']))
+        self.assertEquals(3, len(fhir['careProvider']))
+        self.assertTrue(
+            {'display': 'Indiana Jones',
+             'reference': 'api/practitioner/{}'.format(pract_id)}
+            in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         self.assertTrue(user._email.startswith('__no_email__'))
@@ -142,6 +155,7 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations.count(), 2)
         self.assertEquals(user.organizations[0].name, org_name)
         self.assertEquals(user.organizations[1].name, org2_name)
+        self.assertEquals(user.practitioner_id, pract_id)
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
@@ -314,7 +328,7 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, 'test org')
 
-    def test_demographics_org_identifier_ref(self):
+    def test_demographics_identifier_ref(self):
         # referencing careProvider by (unique) external Identifier
 
         self.shallow_org_tree()
@@ -328,14 +342,24 @@ class TestDemographics(TestCase):
         org_ident = OrganizationIdentifier(organization_id=org_id,
                                             identifier_id=99)
 
+        # create Practitioner and add Identifier
+        pract = Practitioner(first_name="Indiana", last_name="Jones")
+        ident2 = Identifier(system='practsys', value='practval')
+        pract.identifiers.append(ident2)
+
         with SessionScope(db):
+            db.session.add(pract)
             db.session.add(ident)
             db.session.commit()
             db.session.add(org_ident)
             db.session.commit()
 
-        data = {"careProvider": [{"reference": "Organization/{}/{}".format(
-                org_id_system, org_id_value)}],
+        data = {"careProvider": [
+                    {"reference": "Organization/{}?system={}".format(
+                        org_id_value, org_id_system)},
+                    {"reference": "Practitioner/{}?system={}".format(
+                        'practval', 'practsys')}
+                ],
                 "resourceType": "Patient",
                }
 
@@ -345,9 +369,10 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
 
         self.assert200(rv)
-        user = db.session.merge(self.test_user)
+        user, pract = map(db.session.merge, (self.test_user, pract))
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, org_name)
+        self.assertEquals(user.practitioner_id, pract.id)
 
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
