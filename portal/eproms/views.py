@@ -91,9 +91,15 @@ def home():
 
     # Enforce flow - confirm we have acquired initial data
     if not Coredata().initial_obtained(user):
+        # For flows including `suspend_initial_queries`, notify of this
+        # invalid state in a sane manner, otherwise, unexpected, treat
+        # as server error
+        status_code = (
+            400 if session and session.get('suspend_initial_queries') else 500)
         still_needed = Coredata().still_needed(user)
-        abort(500, 'Missing initial data still needed: {}'.\
-              format(still_needed))
+        abort(
+            status_code,
+            'Missing inital data still needed: {}'.format(still_needed))
 
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
