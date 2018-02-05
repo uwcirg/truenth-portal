@@ -298,7 +298,7 @@ def practitioner_put(id_or_code):
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
     try:
-        check_for_existing_external_id(request.json)
+        check_for_existing_external_id(request.json, practitioner.id)
         practitioner.update_from_fhir(request.json)
     except MissingReference, e:
         abort(400, str(e))
@@ -318,13 +318,15 @@ def lookup_practitioner_by_external_id(system, value):
             Identifier._value == value)).first()
 
 
-def check_for_existing_external_id(json):
+def check_for_existing_external_id(json, current_id=None):
     for ident in (json.get('identifier') or []):
         system = ident.get('system')
         value = ident.get('value')
         if not (system and value):
             abort(400, 'Both system and value must be provided '
                   'for identifier {}'.format(ident))
-        if lookup_practitioner_by_external_id(system, value):
+        practitioner = lookup_practitioner_by_external_id(system, value)
+        if (practitioner and
+                (not current_id or (practitioner.id != current_id))):
             abort(409, 'Practitioner with identifier {} already '
                   'exists'.format(ident))

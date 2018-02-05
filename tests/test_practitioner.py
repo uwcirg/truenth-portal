@@ -270,3 +270,9 @@ class TestPractitioner(TestCase):
                                data=json.dumps(data),
                                content_type='application/json')
         self.assertEqual(resp.status_code, 409)
+
+        # test updating with same external identifier
+        resp = self.client.put('/api/practitioner/{}'.format(pract2_id),
+                               data=json.dumps(data),
+                               content_type='application/json')
+        self.assert200(resp)
