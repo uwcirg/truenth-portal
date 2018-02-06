@@ -319,7 +319,17 @@
             {% endif %}
 
             {% if user %}
-            _paq.push(["setUserId", "{{ user.id }}"]);
+                _paq.push(["setUserId", "{{ user.id }}"]);
+                {% if user.has_role(ROLE.TEST) %}
+                    _paq.push(["setCustomDimension", 1, "Test"]);
+                {% elif user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN) or user.has_role(ROLE.RESEARCHER) or user.has_role(ROLE.ANALYST) or user.has_role(ROLE.ADMIN) %}
+                    _paq.push(["setCustomDimension", 1, "Staff"]);
+                {% elif user.has_role(ROLE.PATIENT) %}
+                    _paq.push(["setCustomDimension", 1, "Patient"]);
+                {% endif %}
+                {% if user.organizations %}
+                    _paq.push(["setCustomDimension", 2, "{{ user.organizations[0].name }}"]);
+                {% endif %}
             {% endif %}
 
             _paq.push(['trackPageView']);
