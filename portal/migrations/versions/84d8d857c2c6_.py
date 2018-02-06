@@ -31,7 +31,7 @@ def upgrade():
 
     def needs_attention():
         # TNUSA - QNRs do not necessarily have questionnaire_bank_id
-        if current_app.config['GIL']:
+        if current_app.config.get('GIL'):
             print("TNUSA detected, ignoring questionnaire_bank_id")
 
             # find QNRs of the same type completed within 1 minute of each other
