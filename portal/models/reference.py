@@ -159,7 +159,7 @@ class Reference(object):
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
-            (re.compile('[Pp]ractitioner/(\w+)\?[Ss]ystem=(\w+)'),
+            (re.compile('[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
              Practitioner, 'identifier'),
             (re.compile('[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
             (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
