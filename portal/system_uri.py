@@ -3,6 +3,7 @@
 SNOMED = 'http://snomed.info/sct'
 ICHOM = 'http://www.ichom.org/medical-conditions/localized-prostate-cancer/'
 IETF_LANGUAGE_TAG = 'urn:ietf:bcp:47'
+US_NPI = 'http://hl7.org/fhir/sid/us-npi'
 
 # Our common, unique namespace
 TRUENTH_NAMESPACE = 'http://us.truenth.org'
