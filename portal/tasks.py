@@ -31,7 +31,6 @@ from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
 from .models.notification import Notification, UserNotification
 from .models.organization import Organization, OrgTree
-from .models.research_protocol import ResearchProtocol
 from .models.reporting import get_reporting_stats, overdue_stats_by_org
 from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
@@ -322,7 +321,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
 @celery.task
 @scheduled_task
 def deactivate_tous_task(**kwargs):
-    """Require users to re-consent to their initial consent
+    """Deactivates matching ToUs and triggers appropriate notifications
 
     Scheduled task, delegates work to `deactivate_tous()`
 
@@ -331,19 +330,20 @@ def deactivate_tous_task(**kwargs):
 
 
 def deactivate_tous(**kwargs):
-    """Deactivate matching consents
+    """Deactivate matching consents and notify if appropriate
 
     Optional kwargs:
     :param types: ToU types for which to invalidate agreements
     :param organization: Provide name of organization to restrict
-    to respective set of users.  All child orgs implicitly included.
+    to respective set of users (all child orgs implicitly included)
+    :param notification: Name the notification to trigger, if applicable
     :param roles: Restrict to users with given roles; defaults to
     (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
 
     """
+    # Validate args and build the respective sets
     types = kwargs.get('types')
     sys = User.query.filter_by(email='__system__').first()
-
     if not sys:
         raise ValueError("No system user found")
 
@@ -361,6 +361,14 @@ def deactivate_tous(**kwargs):
         if not Role.query.filter(Role.name == role).first():
             raise ValueError("No such role: {}".format(role))
 
+    notif = None
+    if kwargs.get('notification'):
+        notif_name = kwargs.get('notification')
+        notif = Notification.query.filter_by(name=notif_name).first()
+        if not notif:
+            raise ValueError("Notification `{}` not found".format(notif_name))
+
+    # For each applicable user, deactivate matching tous and add a notification
     for user in User.query.filter(User.deleted_id.is_(None)):
         if require_roles.isdisjoint([r.name for r in user.roles]):
             continue
@@ -368,25 +376,10 @@ def deactivate_tous(**kwargs):
                 [o.id for o in user.organizations]):
             continue
         user.deactivate_tous(acting_user=sys, types=types)
-
-
-@celery.task
-@scheduled_task
-def notify_users(**kwargs):
-    "Create UserNotifications for a given Notification"
-    notif_name = kwargs.get('notification')
-    notif = Notification.query.filter_by(name=notif_name).first()
-    if not notif:
-        raise ValueError("Notification `{}` not found".format(notif_name))
-
-    roles = kwargs.get('roles')
-
-    for user in User.query.filter(User.deleted_id.is_(None)):
-        if set([role.name for role in user.roles]).isdisjoint(set(roles)):
-            continue
-        if not UserNotification.query.filter_by(
-                user_id=user.id, notification_id=notif.id).count():
-            un = UserNotification(user_id=user.id,
-                                  notification_id=notif.id)
-            db.session.add(un)
+        if notif:
+            if not UserNotification.query.filter_by(
+                    user_id=user.id, notification_id=notif.id).count():
+                un = UserNotification(user_id=user.id,
+                                      notification_id=notif.id)
+                db.session.add(un)
     db.session.commit()
