@@ -57,7 +57,6 @@ get_configured_registries | while read config ; do
     echo "$DOCKER_TAGS" | while read tag ; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
         echo "Pushed ${repo}/${DOCKER_IMAGE_NAME}:${tag}"
-    done &
     done #&
 done
 
