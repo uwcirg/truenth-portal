@@ -58,7 +58,9 @@ get_configured_registries | while read config ; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
         echo "Pushed ${repo}/${DOCKER_IMAGE_NAME}:${tag}"
     done &
+    done #&
 done
 
+# todo: figure out why TravisCI won't wait
 # Wait for background jobs to finish
-wait
+# wait
