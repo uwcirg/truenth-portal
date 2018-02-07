@@ -1868,14 +1868,41 @@ div.main-state-container .noOrg-container {
   }
   .parent-org-container {
     margin: 0.4em 0 0.1em;
+    input {
+      vertical-align: top;
+    }
     label.org-label{
       padding: 0 0.3em;
+    }
+    .parent-singleton {
+      input[type='radio'] {
+        top: -4px;
+        & ~ span {
+          margin-left: 0;
+        }
+      }
+      input[type='checkbox'] ~ span {
+        margin-left: 4px;
+      }
+    }
+  }
+  .parent-singleton {
+    margin: 0.3em 0 1em;
+    border-bottom: 1px solid #e5e5e5;
+    left: -4px;
+    label {
+      position: relative;
+      top: 6px;
+      color: @legendColor;
+      span {
+        display: inline-block;
+      }
     }
   }
   label.org-label input[type="radio"] {
     position: relative;
     left: -4px;
-    top: -1px;
+    top: -4px;
   }
   .divider {
     display: block;
@@ -2876,6 +2903,14 @@ div.timezone-warning.text-warning {
   #fillOrgs *,
   .noOrg-container *  {
     font-size: @baseFontSize * 0.95;
+  }
+
+  #fillOrgs {
+    label.org-label input[type="radio"] {
+      position: relative;
+      left: -4px;
+      top: -2px;
+    }
   }
 
   #adminTableToolbar {
