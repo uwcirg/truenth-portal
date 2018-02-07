@@ -49,7 +49,7 @@
         {% elif user.has_role(ROLE.PATIENT) %}
             _paq.push(["setCustomDimension", 1, "Patient"]);
         {% endif %}
-        {% if user.organizations %}
+        {% if user.organizations.count() %}
             _paq.push(["setCustomDimension", 2, "{{ user.organizations[0].name }}"]);
         {% endif %}
     {% endif %}
