@@ -3640,7 +3640,7 @@ OrgTool.prototype.populateUI = function() {
             };
         } else {
             if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container parent-singleton'><label id='org-label-{{orgId}}' class='org-label'>"
                                 + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
                                 + "data-parent-id='{{orgId}}'  data-org-name='{{orgName}}' data-short-name='{{shortName}}' data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
                 parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
@@ -3675,7 +3675,6 @@ OrgTool.prototype.populateUI = function() {
                 if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
                     return true;
                 };
-
                 childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container {{containerClass}}'>"
                             + "<label id='org-label-{{itemId}}' class='org-label {{textClasses}}'>"
                             + "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' data-org-name='{{itemName}}' data-short-name='{{shortName}}' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
@@ -5429,18 +5428,17 @@ var tnthAjax = {
     }
 };
 
+__i18next.init({
+    "debug": false,
+    "initImmediate": false
+});
+
 $(document).ready(function() {
 
     var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
     if (PORTAL_NAV_PAGE) {
         loader(true);
-        fillContent.initPortalWrapper(PORTAL_NAV_PAGE, function() {
-            if ((typeof window.sessMon !== "undefined") && window.sessMon) {
-                var warningText = (i18next.t("Your session will expire in approximately {time} seconds due to inactivity.")).replace("{time}",(sessMon.timeBeforeWarning / 1000));
-                $("#session-warning-modal")
-                .find("#remaining-time").text(warningText,(window.sessMon.timeBeforeWarning / 1000));
-            }
-        });
+        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
     } else {
         loader();
     }
@@ -5458,11 +5456,6 @@ $(document).ready(function() {
             }
         });
     }
-
-     __i18next.init({
-        "debug": false,
-        "initImmediate": false
-    });
 
     if ($("#homeFooter .logo-link").length > 0) {
         $("#homeFooter .logo-link").each(function() {
