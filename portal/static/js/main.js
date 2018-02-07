@@ -5428,11 +5428,6 @@ var tnthAjax = {
     }
 };
 
-__i18next.init({
-    "debug": false,
-    "initImmediate": false
-});
-
 $(document).ready(function() {
 
     var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";

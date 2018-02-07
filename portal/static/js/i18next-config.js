@@ -55,3 +55,7 @@ var __i18next = window.__i18next = (function() {
     };
 }
 )();
+__i18next.init({
+    "debug": false,
+    "initImmediate": false
+});
