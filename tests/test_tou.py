@@ -8,9 +8,7 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.notification import Notification, UserNotification
-from portal.models.tou import ToU
-from portal.tasks import deactivate_tous
-
+from portal.models.tou import ToU, update_tous
 
 tou_url = 'http://fake-tou.org'
 
@@ -189,10 +187,9 @@ class TestTou(TestCase):
             pptou.active, pptou_2.active, wtou.active, wtou_2.active)))
 
         # test deactivating single type by org - should miss second user
-        kwargs = {
-            'types': ['privacy policy'], 'organization': '101',
-            'notification': 'priv notif'}
-        deactivate_tous(**kwargs)
+        update_tous(
+            types=['privacy policy'], organization='101',
+            notification='priv notif', deactivate=True)
         self.assertFalse(pptou.active)
         self.assertFalse(pptou_staff.active)
         self.assertTrue(all(
@@ -209,10 +206,10 @@ class TestTou(TestCase):
 
         # test limiting to staff on org both staff and test_user belong to
         # only hits staff
-        kwargs['types'] = ['website terms of use']
-        kwargs['roles'] = ['staff', 'staff_admin']
-        kwargs['notification'] = 'web notif'
-        deactivate_tous(**kwargs)
+        update_tous(
+            types=['website terms of use'], organization='101',
+            roles=['staff', 'staff_admin'], notification='web notif',
+            deactivate=True)
         self.assertFalse(wtou_staff.active)
         self.assertTrue(all((pptou_2.active, wtou.active, wtou_2.active)))
         self.assertEquals(

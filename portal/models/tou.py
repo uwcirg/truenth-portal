@@ -3,6 +3,10 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .notification import Notification, UserNotification
+from .organization import Organization, OrgTree
+from .role import Role, ROLE
+from .user import User
 
 tou_types = ENUM('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
@@ -37,3 +41,69 @@ class ToU(db.Model):
             d['organization_id'] = self.organization_id
         d['active'] = self.active
         return d
+
+
+def update_tous(
+        types, organization=None, roles=None, notification=None,
+        deactivate=False, job_id=None, manual_run=None):
+    """Used to notify user and potentially deactivate matching ToU agreements
+
+    When the Terms of Use are updated, this will mark the existing, matching
+    terms as inactive (if requested via the deactivate param) and create a
+    notification (if requested via the notification param) message to display
+    to the user on next login.
+
+    :param types: list of ToU types; see ``tou.tou_types`` for valid options
+    :param organization: Provide name of organization to restrict
+     to respective set of users (all child orgs implicitly included)
+    :param roles: Restrict to users with given roles; defaults to
+     (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+    :param notification: Name the notification to trigger, if applicable
+    :param deactivate: set True to deactivate matching consents
+    :param job_id: Used by scheduler - ignored in this context
+    :param manual_run: Used by scheduler - ignored in this context
+
+    """
+    # Need system user if deactivating, for audit
+    sys = User.query.filter_by(email='__system__').first()
+    if deactivate and not sys:
+        raise ValueError("No system user found")
+
+    # Validate args and build the respective sets
+
+    require_orgs = None
+    if organization:
+        org = Organization.query.filter(Organization.name == organization).first()
+        if not org:
+            raise ValueError("No such organization: {}".format(organization))
+        require_orgs = set(OrgTree().here_and_below_id(org.id))
+
+    require_roles = set(roles) if roles else set(
+        (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))
+    for role in require_roles:
+        if not Role.query.filter(Role.name == role).first():
+            raise ValueError("No such role: {}".format(role))
+
+    notif = None
+    if notification:
+        notif = Notification.query.filter_by(name=notification).first()
+        if not notif:
+            raise ValueError("Notification `{}` not found".format(notification))
+
+    # For each applicable user, deactivate matching tous and add a notification
+    # as requested
+    for user in User.query.filter(User.deleted_id.is_(None)):
+        if require_roles.isdisjoint([r.name for r in user.roles]):
+            continue
+        if require_orgs and require_orgs.isdisjoint(
+                [o.id for o in user.organizations]):
+            continue
+        if deactivate:
+            user.deactivate_tous(acting_user=sys, types=types)
+        if notif:
+            if not UserNotification.query.filter_by(
+                    user_id=user.id, notification_id=notif.id).count():
+                un = UserNotification(user_id=user.id,
+                                      notification_id=notif.id)
+                db.session.add(un)
+    db.session.commit()
