@@ -2721,7 +2721,7 @@ var Profile = function(subjectId, currentUserId) {
                             /*
                              * also need to check for top level orgs that do not have children and render those
                              */
-                            contentHTML = "<div class='radio'>" +
+                            contentHTML = "<div class='radio parent-singleton'>" +
                                     "<label><input class='clinic' type='radio' id='{orgId}_org' value='{orgId}' state='{state}' name='organization' data-parent-name='{orgName}' data-parent-id='{orgId}'>{translatedOrgName}</label>" +
                                     "</div>";
                             contentHTML = contentHTML.replace(/\{orgId\}/g, item.id)
@@ -3637,7 +3637,7 @@ OrgTool.prototype.populateUI = function() {
             };
         } else {
             if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
-                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><label id='org-label-{{orgId}}' class='org-label'>"
+                parentContent = "<div id='{{orgId}}_container' class='parent-org-container parent-singleton'><label id='org-label-{{orgId}}' class='org-label'>"
                                 + "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' "
                                 + "data-parent-id='{{orgId}}'  data-org-name='{{orgName}}' data-short-name='{{shortName}}' data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
                 parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
@@ -3672,7 +3672,6 @@ OrgTool.prototype.populateUI = function() {
                 if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
                     return true;
                 };
-
                 childClinic = "<div id='{{itemId}}_container' {{dataAttributes}} class='indent org-container {{containerClass}}'>"
                             + "<label id='org-label-{{itemId}}' class='org-label {{textClasses}}'>"
                             + "<input class='clinic' type='checkbox' name='organization' id='{{itemId}}_org' data-org-name='{{itemName}}' data-short-name='{{shortName}}' state='{{state}}' value='{{itemId}}' {{dataAttributes}} />"
