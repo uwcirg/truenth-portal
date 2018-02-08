@@ -600,7 +600,19 @@ def assessment(patient_id, instrument_id):
             ].astext.endswith(instrument_id)
         )
 
-    documents = [qnr.document for qnr in questionnaire_responses]
+    documents = []
+    for qnr in questionnaire_responses:
+        for question in qnr.document['group']['question']:
+            for answer in question['answer']:
+                # Hack: Extensions should be a list, correct in-place if need be
+                # todo: migrate towards FHIR spec in persisted data
+                if (
+                    'valueCoding' in answer and
+                    'extension' in answer['valueCoding'] and
+                    isinstance(answer['valueCoding']['extension'], dict)
+                ):
+                    answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+        documents.append(qnr.document)
 
     bundle = {
         'resourceType':'Bundle',
