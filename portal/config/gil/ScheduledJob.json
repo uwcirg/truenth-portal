@@ -46,12 +46,13 @@
       "kwargs": {
         "types": ["website terms of use"],
         "notification": "website_terms_of_use_update",
-        "roles": ["patient", "staff", "staff_admin"]
+        "roles": ["patient", "staff", "staff_admin"],
+        "deactivate": true
       },
-      "name": "Reset -- Website Terms of Use",
+      "name": "Update -- Website Terms of Use",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
+      "task": "update_tous_task"
     }
   ],
   "id": "SitePersistence v0.2",

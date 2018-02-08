@@ -1,5 +1,11 @@
 {
-  "entry": [],
+  "entry": [
+    {
+      "resourceType": "Notification",
+      "name": "website_terms_of_use_update",
+      "content": "<p>The <a href=\"/terms\" target=\"_blank\">terms</a> have been updated.</p>"
+    }
+  ],
   "id": "SitePersistence v0.2",
   "meta": {
     "fhir_comments": [

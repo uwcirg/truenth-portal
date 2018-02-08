@@ -29,12 +29,12 @@ from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
 from .models.communication import Communication, load_template_args
 from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
-from .models.notification import Notification, UserNotification
 from .models.organization import Organization, OrgTree
 from .models.reporting import get_reporting_stats, overdue_stats_by_org
 from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
+from .models.tou import update_tous
 from .models.user import User, UserRoles
 from .models.scheduled_job import check_active, update_job_status
 
@@ -320,66 +320,10 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 @celery.task
 @scheduled_task
-def deactivate_tous_task(**kwargs):
-    """Deactivates matching ToUs and triggers appropriate notifications
+def update_tous_task(**kwargs):
+    """Job to manage updates for various ToUs
 
-    Scheduled task, delegates work to `deactivate_tous()`
-
-    """
-    return deactivate_tous(**kwargs)
-
-
-def deactivate_tous(**kwargs):
-    """Deactivate matching consents and notify if appropriate
-
-    Optional kwargs:
-    :param types: ToU types for which to invalidate agreements
-    :param organization: Provide name of organization to restrict
-    to respective set of users (all child orgs implicitly included)
-    :param notification: Name the notification to trigger, if applicable
-    :param roles: Restrict to users with given roles; defaults to
-    (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+    Scheduled task, see docs in ``tou.update_tous()``
 
     """
-    # Validate args and build the respective sets
-    types = kwargs.get('types')
-    sys = User.query.filter_by(email='__system__').first()
-    if not sys:
-        raise ValueError("No system user found")
-
-    require_orgs = None
-    if kwargs.get('organization'):
-        org_name = kwargs.get('organization')
-        org = Organization.query.filter(Organization.name == org_name).first()
-        if not org:
-            raise ValueError("No such organization: {}".format(org_name))
-        require_orgs = set(OrgTree().here_and_below_id(org.id))
-
-    require_roles = set(
-        kwargs.get('roles', (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)))
-    for role in require_roles:
-        if not Role.query.filter(Role.name == role).first():
-            raise ValueError("No such role: {}".format(role))
-
-    notif = None
-    if kwargs.get('notification'):
-        notif_name = kwargs.get('notification')
-        notif = Notification.query.filter_by(name=notif_name).first()
-        if not notif:
-            raise ValueError("Notification `{}` not found".format(notif_name))
-
-    # For each applicable user, deactivate matching tous and add a notification
-    for user in User.query.filter(User.deleted_id.is_(None)):
-        if require_roles.isdisjoint([r.name for r in user.roles]):
-            continue
-        if require_orgs and require_orgs.isdisjoint(
-                [o.id for o in user.organizations]):
-            continue
-        user.deactivate_tous(acting_user=sys, types=types)
-        if notif:
-            if not UserNotification.query.filter_by(
-                    user_id=user.id, notification_id=notif.id).count():
-                un = UserNotification(user_id=user.id,
-                                      notification_id=notif.id)
-                db.session.add(un)
-    db.session.commit()
+    return update_tous(**kwargs)
