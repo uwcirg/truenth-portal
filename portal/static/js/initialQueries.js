@@ -215,7 +215,7 @@
                    * for patient, clinic is drawn in orgs state selector template
                    */
                   if (!hasValue($("#iqPatientEditable").val())) {
-                    tnthAjax.getOrgs($("#iq_userId").val(), false, true, function() {
+                    tnthAjax.getOrgs($("#iq_userId").val(), true, function() {
                         var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
                         if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                         var checkedOrgs = {};

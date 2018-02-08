@@ -830,19 +830,22 @@ var fillViews = {
     }
 };
 var fillContent = {
-    "initPortalWrapper": function(PORTAL_NAV_PAGE) {
+    "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         var isIE = getIEVersion();
+        callback = callback || function() {};
         if (isIE) {
             newHttpRequest(PORTAL_NAV_PAGE, function(data) {
                 embed_page(data);
                 //ajax to get notifications information
                 tnthAjax.initNotifications();
+                callback();
             }, true);
         } else {
             funcWrapper(PORTAL_NAV_PAGE, function(data) {
                 embed_page(data);
                 //ajax to get notifications information
                 tnthAjax.initNotifications();
+                callback();
             });
         };
     },
@@ -4033,7 +4036,7 @@ var tnthAjax = {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
+                    xhr.setRequestHeader("X-CSRFToken", $("#__CRSF_TOKEN").val());
                 }
             }
         });
@@ -5425,15 +5428,91 @@ var tnthAjax = {
     }
 };
 
+__i18next.init({
+    "debug": false,
+    "initImmediate": false
+});
+
 $(document).ready(function() {
 
-    if (typeof PORTAL_NAV_PAGE != 'undefined') {
+    var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
+    if (PORTAL_NAV_PAGE) {
         loader(true);
         fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
-    } else loader();
+    } else {
+        loader();
+    }
+
+    var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+    if (LOGIN_AS_PATIENT) {
+        if (typeof history !== "undefined" && history.pushState) {
+            history.pushState(null, null, location.href);
+        }
+        window.addEventListener("popstate", function(event) {
+            if (typeof history !== "undefined" && history.pushState) {
+                history.pushState(null, null, location.href);
+            } else {
+                window.history.forward(1);
+            }
+        });
+    }
+
+    if ($("#homeFooter .logo-link").length > 0) {
+        $("#homeFooter .logo-link").each(function() {
+            if (!$.trim($(this).attr("href"))) {
+                $(this).removeAttr("target");
+                $(this).on("click", function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            }
+        });
+    }
 
     // Reveal footer after load to avoid any flashes will above content loads
-    setTimeout('$("#homeFooter").show();', 100);
+    setTimeout(function() { $("#homeFooter").show(); }, 100);
+
+    setTimeout(function() {
+        var userLocale = $("#copyrightLocaleCode").val();
+        var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
+        var getContent = function(cc) {
+            var content = "";
+            switch(String(cc.toUpperCase())) {
+                case "US":
+                case "EN_US":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                    break;
+                case "AU":
+                case "EN_AU":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                    break;
+                case "NZ":
+                case "EN_NZ":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                    break;
+                default:
+                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+
+            }
+            return content;
+
+        };
+        if (userLocale) {
+            $(footerElements).html(getContent(userLocale));
+        } else {
+            $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
+                if (data && data.country_code) {
+                    //country code
+                    //Australia AU
+                    //New Zealand NZ
+                    //USA US
+                    $(footerElements).html(getContent(data.country_code));
+                } else {
+                    $(footerElements).html(getContent());
+                }
+            });      
+        }
+    }, 500);
 
     tnthAjax.beforeSend();
 
