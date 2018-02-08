@@ -26,7 +26,7 @@ $(document).ready(function(){
               },
               error: function(response) {
                   var msg = $("<div></div>").html(response.responseText);
-                  var error = $("p", msg).text()
+                  var error = $("p", msg).text();
                   $("#contactForm .post-contact-response").html(error);
                   self.show();
                   loadingIndicator.hide();

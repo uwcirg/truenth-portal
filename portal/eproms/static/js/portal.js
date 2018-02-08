@@ -3,14 +3,14 @@ $(".button-container").each(function() {
 });
 $(".btn-tnth-primary").on("click", function() {
     var link = $(this).attr("href");
-    if (hasValue(link)) {
+    if (link) {
         event.preventDefault();
         $(this).hide();
         $(this).prev(".loading-message-indicator").show();
         setTimeout(function() {
             window.location=link;
         }, 300);
-    };
+    }
 });
 $(document).on("ready", function() {
     $("#mainDiv").addClass("portal");
@@ -23,3 +23,4 @@ $(document).on("ready", function() {
         };
     });
 });
+
