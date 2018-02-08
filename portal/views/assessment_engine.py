@@ -607,9 +607,8 @@ def assessment(patient_id, instrument_id):
                 # Hack: Extensions should be a list, correct in-place if need be
                 # todo: migrate towards FHIR spec in persisted data
                 if (
-                    'valueCoding' in answer and
-                    'extension' in answer['valueCoding'] and
-                    isinstance(answer['valueCoding']['extension'], dict)
+                    'extension' in answer.get('valueCoding', {}) and
+                    not isinstance(answer['valueCoding']['extension'], (tuple, list))
                 ):
                     answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
         documents.append(qnr.document)
