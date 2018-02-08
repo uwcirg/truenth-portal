@@ -1326,6 +1326,106 @@ var fillContent = {
 
         };
     },
+    "websiteConsentScript": function() {
+        var patientId = $("#wcsPatientId").val();
+        var entryMethod = $("#wcsEntryMethod").val();
+        var topOrgName = $("#wcsTopOrganization").attr("data-name");
+        var topOrgId = $("#wcsTopOrganization").attr("data-id");
+        var tVar = setInterval(function(){
+                if ($("#tnthNavWrapper").length > 0) {
+                    $("#tnthNavWrapper, #homeFooter, .watermark").each(function() {
+                        $(this).addClass("hidden-print");
+                    });
+                    clearInterval(tVar);
+                };
+        }, 1000);
+
+        //get still needed
+        tnthAjax.getStillNeededCoreData(patientId, true, null, entryMethod);
+
+        //populate existing checkbox(es)
+        tnthAjax.getTerms(patientId, false, true, function(data) {
+            if ($("[data-agree='false']").length === 0) {
+                $(".continue-msg-wrapper").show();
+            };
+        });
+
+        $(".intro-text").text($(".intro-text").text().replace("[organization]", topOrgName));
+
+        if ($(".terms-tick-box-text[data-org='" + topOrgName + "']").length > 0) {
+            $(".terms-tick-box-text[data-org]").each(function() {
+                if (String($(this).attr("data-org")).toLowerCase() === String(topOrgName).toLowerCase()) {
+                    $(this).show();
+                }
+                else {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $($(".terms-tick-box-text[data-org]").get(0)).show();
+        }
+
+        $("[data-type='terms']").each(function() {
+            $(this).on("click", function() {
+                if (String($(this).attr("data-agree")) === "false") {
+                    var types = $(this).attr("data-tou-type");
+                    if (types) {
+                        var arrTypes = types.split(",");
+                        var self = $(this);
+                        arrTypes.forEach(function(type) {
+                            var theTerms = {};
+                            theTerms["agreement_url"] = self.attr("data-url");
+                            theTerms["type"] = type;
+                            if (topOrgId) {
+                                theTerms["organization_id"] = topOrgId;
+                            }
+                             // Post terms agreement via API
+                            tnthAjax.postTermsByUser(patientId, theTerms);
+                        });
+                    }
+                    // Update UI
+                    $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+                    $(this).attr("data-agree","true");
+                    if ($("[data-agree='false']").length === 0) {
+                        $(".continue-msg-wrapper").fadeIn();
+                    }
+                }
+            });
+        });
+        $(".button-container").each(function() {
+            $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+        });
+        $("#continue").on("click", function() {
+            $(this).hide();
+            $(".loading-message-indicator").show();
+            setTimeout(function() {
+                window.location=$("#wcsRedirectUrl").val();
+            }, 100);
+        });
+        $(".consent-form-checkbox").each(function() {
+            $(this).on("click", function() {
+                $(this).toggleClass("fa-square-o fa-check-square-o");
+            });
+        });
+        $("#consentPrintButton").on("click", function() {
+            var elem = document.getElementById("websiteDeclarationForm");
+            $(elem).removeClass("hidden-print");
+            var domClone = elem.cloneNode(true);
+            var $printSection = document.getElementById("printSection");
+            if (!$printSection) {
+                var $printSection = document.createElement("div");
+                $printSection.id = "printSection";
+                document.body.appendChild($printSection);
+            }
+            $printSection.innerHTML = "";
+            $printSection.appendChild(domClone);
+            $(elem).addClass("hidden-print");
+            window.print();
+        });
+        $("#websiteDeclarationFormModal").on("hide.bs.modal", function() {
+            $(this).removeClass("fade");
+        });
+    },
     "notifications": function(data) {
         if (data && data.notifications) {
             var notifications = [];
@@ -5516,6 +5616,10 @@ $(document).ready(function() {
 
     tnthAjax.beforeSend();
 
+
+    if ($("#termsContainer.website-consent-script").length > 0) {
+        fillContent.websiteConsentScript();
+    }
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 

@@ -2,6 +2,10 @@
 {% block main %}
 	{%- from "initial_queries_macros.html" import paperWebsiteConsentScript, interviewAssistedWebConsentScript -%}
 	<div id="termsContainer" class="website-consent-script">
+		<input id="wcsPatientId" value="{{patient_id}}" type="hidden" />
+		<input id="wcsEntryMethod" value="{{entry_method}}"  type="hidden" />
+		<input id="wcsTopOrganization"  data-id="{{top_organization.id}}" data-name="{{top_organization.name}}"  type="hidden" />
+		<input id="wcsRedirectUrl" value="{{redirect_url|safe}}" type="hidden" />
 		{%- if entry_method == 'paper' %}
 			{{paperWebsiteConsentScript(terms)}}
 		{%- else -%}
@@ -13,74 +17,9 @@
         <button id="continue" type="button" class="btn btn-lg btn-tnth-primary">{{ _("Continue to TrueNTH") }}</button>
       </div>
     </div>
+    <div class="post-tou-error hidden-print"></div>
 {% endblock %}
 {% block footer %}
 {%- from "flask_user/_macros.html" import footer -%}
 {{footer(user=user)}}
-{% endblock %}
-{% block document_ready %}
-	$(document).ready(function() {
-
-		var tVar = setInterval(function(){
-				if ($("#tnthNavWrapper").length > 0) {
-					$("#tnthNavWrapper, #homeFooter, .watermark").each(function() {
-						$(this).addClass("hidden-print");
-					});
-					clearInterval(tVar);
-				};
-		}, 1000);
-
-		//get still needed
-		tnthAjax.getStillNeededCoreData({{patient_id}}, true, null, "{{entry_method}}");
-
-		//populate existing checkbox(es)
-		tnthAjax.getTerms('{{patient_id}}', false, true, function(data) {
-            if ($("[data-agree='false']").length == 0) {
-	        	$(".continue-msg-wrapper").show();
-	        };
-        });
-
-        $(".intro-text").text($(".intro-text").text().replace("[organization]", "{{top_organization.name}}"));
-
-        if ($(".terms-tick-box-text[data-org='{{top_organization.name}}']").length > 0) {
-	        $(".terms-tick-box-text[data-org]").each(function() {
-	        	if ($(this).attr("data-org").toLowerCase() == "{{top_organization.name}}".toLowerCase()) $(this).show();
-	        	else $(this).hide();
-	    	});
-	    } else $($(".terms-tick-box-text[data-org]").get(0)).show();
-
-		$("[data-type='terms']").each(function() {
-			$(this).on("click", function() {
-				if ($(this).attr("data-agree") == "false") {
-		            var types = $(this).attr("data-tou-type");
-		            if (hasValue(types)) {
-		                var arrTypes = types.split(",");
-		                var self = $(this);
-		                arrTypes.forEach(function(type) {
-		                    var theTerms = {};
-		                    theTerms["agreement_url"] = self.attr("data-url");
-		                    theTerms["type"] = type;
-		                    {% if top_organization %}
-		                    	theTerms["organization_id"] = "{{top_organization.id}}";
-		                    {% endif %}
-		                     // Post terms agreement via API
-		                    tnthAjax.postTermsByUser('{{patient_id}}', theTerms);
-		                });
-		            }
-		            // Update UI
-		            $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
-		            $(this).attr("data-agree","true");
-		            if ($("[data-agree='false']").length == 0) $(".continue-msg-wrapper").fadeIn();
-         		};
-			});
-		});
-		$(".button-container").each(function() {
-		    $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-		});
-		$("#continue").on("click", function() {
-			$(this).hide();
-        	$(".loading-message-indicator").show();
-        	setTimeout("window.location='{{redirect_url|safe}}'", 100);
-		});
-	});
 {% endblock %}
