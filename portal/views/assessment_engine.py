@@ -1265,6 +1265,9 @@ def assessment_add(patient_id):
     if not hasattr(request, 'json') or not request.json:
         return abort(400, 'Invalid request')
 
+    if "questionnaire" not in request.json:
+        abort(400, "Requires `questionnaire` element")
+
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
@@ -1313,24 +1316,23 @@ def assessment_add(patient_id):
 
     qnr_qb = None
     authored = FHIR_datetime.parse(request.json['authored'])
-    if "questionnaire" in request.json:
-        qn_ref = request.json.get("questionnaire").get("reference")
-        qn_name = qn_ref.split("/")[-1] if qn_ref else None
-        qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qbd = QuestionnaireBank.most_current_qb(
+    qn_ref = request.json.get("questionnaire").get("reference")
+    qn_name = qn_ref.split("/")[-1] if qn_ref else None
+    qn = Questionnaire.query.filter_by(name=qn_name).first()
+    qbd = QuestionnaireBank.most_current_qb(
+        patient, as_of_date=authored)
+    qb = qbd.questionnaire_bank
+    if (qb and qn and (qn.id in [qbq.questionnaire.id
+                       for qbq in qb.questionnaires])):
+        qnr_qb = qb
+    # if a valid qb wasn't found, try the indefinite option
+    if not qnr_qb:
+        qbd = QuestionnaireBank.indefinite_qb(
             patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
-        # if a valid qb wasn't found, try the indefinite option
-        if not qnr_qb:
-            qbd = QuestionnaireBank.indefinite_qb(
-                patient, as_of_date=authored)
-            qb = qbd.questionnaire_bank
-            if (qb and qn and (qn.id in [qbq.questionnaire.id
-                               for qbq in qb.questionnaires])):
-                qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
