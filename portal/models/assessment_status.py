@@ -22,16 +22,16 @@ def recent_qnr_status(user, questionnaire_name, qb):
 
     """
     query = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.subject_id == user.id
-        ).filter(
-            QuestionnaireResponse.document[
-                ('questionnaire', 'reference')
-            ].astext.endswith(questionnaire_name),
-            QuestionnaireResponse.questionnaire_bank_id == qb.id
-        ).order_by(
-            QuestionnaireResponse.status,
-            QuestionnaireResponse.authored.desc()).with_entities(
-                QuestionnaireResponse.status, QuestionnaireResponse.authored)
+        QuestionnaireResponse.subject_id == user.id
+    ).filter(
+        QuestionnaireResponse.document[
+            ('questionnaire', 'reference')
+        ].astext.endswith(questionnaire_name),
+        QuestionnaireResponse.questionnaire_bank_id == qb.id
+    ).order_by(
+        QuestionnaireResponse.status,
+        QuestionnaireResponse.authored.desc()).with_entities(
+            QuestionnaireResponse.status, QuestionnaireResponse.authored)
 
     results = {}
     for qr in query:
@@ -63,7 +63,8 @@ def status_from_recents(recents, start, overdue, expired, as_of_date):
         raise ValueError(
             "unexpected call for status on unstarted Questionnaire")
 
-    if (overdue and as_of_date < overdue) or (not overdue and as_of_date < expired):
+    if ((overdue and as_of_date < overdue) or
+            (not overdue and as_of_date < expired)):
         tmp = {
             'status': 'Due',
             'by_date': overdue if overdue else expired
@@ -113,15 +114,16 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
-    def __init__(self, user, as_of_date):
+    def __init__(self, user, as_of_date, qb=None):
         """ Initialize and lookup status for respective questionnaires
 
         :param user: subject for details
         :param as_of_date: None value implies now
+        :param qb: None value implies most_current_qb
 
         """
         self.user = user
-        self.qb = QuestionnaireBank.most_current_qb(
+        self.qb = qb or QuestionnaireBank.most_current_qb(
             user, as_of_date=as_of_date).questionnaire_bank
         self.status_by_q = qb_status_dict(
             user=user, questionnaire_bank=self.qb, as_of_date=as_of_date)
@@ -138,7 +140,7 @@ class QuestionnaireBankDetails(object):
             return None
 
     def overall_status(self):
-        """Returns the `overall_status` for the users most_current_qb"""
+        """Returns the `overall_status` for the given QB"""
         if not (self.qb and self.qb.trigger_date):
             return 'Expired'
         status_strings = [v['status'] for v in self.status_by_q.values()]
@@ -241,7 +243,8 @@ class AssessmentStatus(object):
             qb = QuestionnaireBank.qbs_for_user(self.user, 'indefinite')
             if qb:
                 assert len(qb) == 1
-                results.update(qb_status_dict(self.user, qb[0], as_of_date=self.as_of_date))
+                results.update(qb_status_dict(self.user, qb[0],
+                                              as_of_date=self.as_of_date))
         return results
 
     def instruments_needing_full_assessment(self, classification=None):
