@@ -1390,6 +1390,10 @@ var fillContent = {
                     })
                     $(this).parent().hide();
                 });
+                var actionRequired = $("#notificationBanner [data-action-required]").length > 0;
+                if(actionRequired) {
+                    $("#notificationBanner .close").hide();
+                }
             } else {
                 $("#notificationBanner").hide();
             }
