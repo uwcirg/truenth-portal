@@ -221,7 +221,8 @@ class QuestionnaireBank(db.Model):
         def filter_invalid_qb_statuses(qbs):
             valid_qbs = []
             for qb in qbs:
-                qb_data = QuestionnaireBankDetails(user, as_of_date=as_of_date)
+                qb_data = QuestionnaireBankDetails(
+                    user, as_of_date=as_of_date, qb=qb)
                 if (qb_data.overall_status not in
                         ('Completed', 'Expired', 'Partially Completed')):
                     valid_qbs.append(qb)
