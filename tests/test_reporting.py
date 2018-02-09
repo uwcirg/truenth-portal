@@ -122,6 +122,8 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        self.test_user = db.session.merge(self.test_user)
+
         # test user with status = 'Expired' (should not show up)
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
         self.assertEqual(a_s.overall_status, 'Expired')
