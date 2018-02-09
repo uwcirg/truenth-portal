@@ -151,8 +151,8 @@
 {% if user %}
 <script type="text/javascript">
     (function() {
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('head')[0];
-        g.type='text/javascript'; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/sessionMonitor.js") }}'; 
+        var d=document, g=d.createElement("script"), s=d.getElementsByTagName("head")[0];
+        g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/sessionMonitor.js") }}'; 
         //inserting script in HEAD element
         s.appendChild(g);
         function loadSessionMonitor() {
