@@ -20,7 +20,7 @@ $(document).on("ready", function() {
             $('html, body').animate({
                 scrollTop: t - 90
             }, 1000);
-        };
+        }
     });
 });
 
