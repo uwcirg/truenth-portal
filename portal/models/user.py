@@ -623,7 +623,8 @@ class User(db.Model, UserMixin):
 
         issued = fhir.get('issued') and\
             parser.parse(fhir.get('issued')) or None
-        observation = self.save_observation(cc, vq, audit, issued)
+        status = fhir.get('status')
+        observation = self.save_observation(cc, vq, audit, status, issued)
         if 'performer' in fhir:
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
@@ -678,13 +679,30 @@ class User(db.Model, UserMixin):
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
         return service_user
 
-    def fetch_values_for_concept(self, codeable_concept):
-        """Return any matching ValueQuantities for this user"""
+    def fetch_value_status_for_concept(self, codeable_concept):
+        """Return matching ValueQuantity & status for this user
+
+        Expected to be used on constrained concepts, where a user
+        should have zero or one defined.  More than one will raise
+        a value error
+
+        :returns: (value_quantity, status) tuple for the observation
+         if found on the user, else (None, None)
+
+        """
         # User may not have persisted concept - do so now for match
         codeable_concept = codeable_concept.add_if_not_found()
 
-        return [obs.value_quantity for obs in self.observations if
-                obs.codeable_concept_id == codeable_concept.id]
+        matching_obs = [
+            obs for obs in self.observations if
+            obs.codeable_concept_id == codeable_concept.id]
+        if not matching_obs:
+            return None, None
+        if len(matching_obs) > 1:
+            raise ValueError(
+                "multiple observations for {} on constrianed {}".format(
+                    self, codeable_concept))
+        return matching_obs[0].value_quantity, matching_obs[0].status
 
     def fetch_datetime_for_concept(self, codeable_concept):
         """Return newest issued timestamp from matching observation"""
@@ -699,7 +717,8 @@ class User(db.Model, UserMixin):
         return newest
 
     def save_constrained_observation(
-            self, codeable_concept, value_quantity, audit, issued=None):
+            self, codeable_concept, value_quantity, audit, status,
+            issued=None):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -719,7 +738,11 @@ class User(db.Model, UserMixin):
 
         if existing:
             if existing[0].value_quantity_id == value_quantity.id:
-                # perfect match -- update audit info
+                # perfect match -- update audit info, setting status
+                # and issued as given
+                existing.status = status
+                if issued:
+                    existing.issued = issued
                 existing[0].audit = audit
                 return
             else:
@@ -727,15 +750,16 @@ class User(db.Model, UserMixin):
                 # with different values.  Delete old and add new
                 self.observations.remove(existing[0])
 
-        self.save_observation(codeable_concept, value_quantity, audit, issued)
+        self.save_observation(codeable_concept, value_quantity, audit, status, issued)
 
-    def save_observation(self, cc, vq, audit, issued):
+    def save_observation(self, cc, vq, audit, status, issued):
         """Helper method for creating new observations"""
         # avoid cyclical imports
         from .assessment_status import invalidate_assessment_status_cache
 
         observation = Observation(
             codeable_concept_id=cc.id,
+            status=status,
             issued=issued,
             value_quantity_id=vq.id).add_if_not_found(True)
         # The audit defines the acting user, to which the current

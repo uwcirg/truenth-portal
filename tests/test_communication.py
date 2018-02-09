@@ -382,7 +382,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='final')
 
         # Confirm test user doesn't qualify for ST QB
         self.assertFalse(
