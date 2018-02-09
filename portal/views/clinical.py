@@ -152,6 +152,9 @@ def biopsy_set(patient_id):
             value:
               type: boolean
               description: has the patient undergone a biopsy
+            status:
+              type: string
+              description: optional status such as 'final' or 'unknown'
     responses:
       200:
         description: successful operation
@@ -207,6 +210,9 @@ def pca_diag_set(patient_id):
             value:
               type: boolean
               description: the patient's PCa diagnosis
+            status:
+              type: string
+              description: optional status such as 'final' or 'unknown'
     responses:
       200:
         description: successful operation
@@ -262,6 +268,9 @@ def pca_localized_set(patient_id):
             value:
               type: boolean
               description: the patient's PCaLocalized diagnosis
+            status:
+              type: string
+              description: optional status such as 'final' or 'unknown'
     responses:
       200:
         description: successful operation
@@ -488,10 +497,12 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
         abort(400, "Expecting boolean for 'value'")
 
     truthiness = ValueQuantity(value=value, units='boolean')
-    patient.save_constrained_observation(codeable_concept=codeable_concept,
-                                         value_quantity=truthiness,
-                                         audit=Audit(user_id=current_user().id,
-                                          subject_id=patient_id, context='observation'))
+    audit = Audit(user_id=current_user().id,
+                  subject_id=patient_id, context='observation')
+    patient.save_constrained_observation(
+        codeable_concept=codeable_concept, value_quantity=truthiness,
+        audit=audit, status=request.json.get('status'))
+
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
         codeable_concept, truthiness, patient_id), user_id=current_user().id,
@@ -505,9 +516,9 @@ def clinical_api_shortcut_get(patient_id, codeable_concept):
     patient = get_user(patient_id)
     if patient.deleted:
         abort(400, "deleted user - operation not permitted")
-    value_quantities = patient.fetch_values_for_concept(codeable_concept)
-    if value_quantities:
-        assert len(value_quantities) == 1
-        return jsonify(value=value_quantities[0].value)
+    value_quantity, status = patient.fetch_value_status_for_concept(
+        codeable_concept)
+    if value_quantity and status != 'unknown':
+        return jsonify(value=value_quantity.value)
 
     return jsonify(value='unknown')

@@ -1490,6 +1490,10 @@ var fillContent = {
                     })
                     $(this).parent().hide();
                 });
+                var actionRequired = $("#notificationBanner [data-action-required]").length > 0;
+                if(actionRequired) {
+                    $("#notificationBanner .close").hide();
+                }
             } else {
                 $("#notificationBanner").hide();
             }
@@ -4120,6 +4124,7 @@ OrgTool.prototype.morphPatientOrgs = function() {
     var checkedOrgs = {};
     var orgs = $("#userOrgs input[name='organization']");
     orgs.each(function() {
+        $(this).closest("label").addClass("radio-label");
         if ($(this).prop("checked")) {
             checkedOrgs[$(this).val()] = true;
         };
@@ -5610,7 +5615,7 @@ $(document).ready(function() {
                 } else {
                     $(footerElements).html(getContent());
                 }
-            });      
+            });
         }
     }, 500);
 

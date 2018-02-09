@@ -85,7 +85,8 @@ class TestSitePersistence(TestCase):
             code='424313000', display='Started active surveillance')
         get_user(TEST_USER_ID).save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status=None)
         self.promote_user(user, role_name=ROLE.PATIENT)
         with SessionScope(db):
             db.session.commit()

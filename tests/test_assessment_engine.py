@@ -36,6 +36,17 @@ class TestAssessmentEngine(TestCase):
             self.test_user.questionnaire_responses[0].encounter.auth_method,
             'password_authenticated')
 
+    def test_submit_invalid_assessment(self):
+        data = {'no_questionnaire_field': True}
+
+        self.login()
+        rv = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data),
+        )
+        self.assert400(rv)
+
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']

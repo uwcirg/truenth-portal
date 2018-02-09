@@ -647,6 +647,7 @@ class TestTnthAssessmentStatus(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.save_constrained_observation(
             codeable_concept=CC.BIOPSY, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='final')
         self.assertFalse(
             QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))

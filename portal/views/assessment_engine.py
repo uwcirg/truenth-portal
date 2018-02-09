@@ -600,7 +600,18 @@ def assessment(patient_id, instrument_id):
             ].astext.endswith(instrument_id)
         )
 
-    documents = [qnr.document for qnr in questionnaire_responses]
+    documents = []
+    for qnr in questionnaire_responses:
+        for question in qnr.document['group']['question']:
+            for answer in question['answer']:
+                # Hack: Extensions should be a list, correct in-place if need be
+                # todo: migrate towards FHIR spec in persisted data
+                if (
+                    'extension' in answer.get('valueCoding', {}) and
+                    not isinstance(answer['valueCoding']['extension'], (tuple, list))
+                ):
+                    answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+        documents.append(qnr.document)
 
     bundle = {
         'resourceType':'Bundle',
@@ -1265,6 +1276,9 @@ def assessment_add(patient_id):
     if not hasattr(request, 'json') or not request.json:
         return abort(400, 'Invalid request')
 
+    if "questionnaire" not in request.json:
+        abort(400, "Requires `questionnaire` element")
+
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
@@ -1313,24 +1327,23 @@ def assessment_add(patient_id):
 
     qnr_qb = None
     authored = FHIR_datetime.parse(request.json['authored'])
-    if "questionnaire" in request.json:
-        qn_ref = request.json.get("questionnaire").get("reference")
-        qn_name = qn_ref.split("/")[-1] if qn_ref else None
-        qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qbd = QuestionnaireBank.most_current_qb(
+    qn_ref = request.json.get("questionnaire").get("reference")
+    qn_name = qn_ref.split("/")[-1] if qn_ref else None
+    qn = Questionnaire.query.filter_by(name=qn_name).first()
+    qbd = QuestionnaireBank.most_current_qb(
+        patient, as_of_date=authored)
+    qb = qbd.questionnaire_bank
+    if (qb and qn and (qn.id in [qbq.questionnaire.id
+                       for qbq in qb.questionnaires])):
+        qnr_qb = qb
+    # if a valid qb wasn't found, try the indefinite option
+    if not qnr_qb:
+        qbd = QuestionnaireBank.indefinite_qb(
             patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
-        # if a valid qb wasn't found, try the indefinite option
-        if not qnr_qb:
-            qbd = QuestionnaireBank.indefinite_qb(
-                patient, as_of_date=authored)
-            qb = qbd.questionnaire_bank
-            if (qb and qn and (qn.id in [qbq.questionnaire.id
-                               for qbq in qb.questionnaires])):
-                qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
