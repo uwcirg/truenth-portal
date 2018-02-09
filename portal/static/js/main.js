@@ -4017,9 +4017,11 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
   return here_below_orgs;
 };
 OrgTool.prototype.morphPatientOrgs = function() {
+    console.log("HERE")
     var checkedOrgs = {};
     var orgs = $("#userOrgs input[name='organization']");
     orgs.each(function() {
+        $(this).closest("label").addClass("radio-label");
         if ($(this).prop("checked")) {
             checkedOrgs[$(this).val()] = true;
         };

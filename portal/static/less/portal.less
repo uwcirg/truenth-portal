@@ -1887,15 +1887,24 @@ div.main-state-container .noOrg-container {
     }
   }
   .parent-singleton {
-    margin: 0.3em 0 1em;
-    border-bottom: 1px solid #e5e5e5;
-    left: -4px;
+    margin: 0.5em 0;
     label {
       position: relative;
       top: 6px;
+      &.radio-label {
+        margin-left: 2px;
+      }
       color: @legendColor;
       span {
         display: inline-block;
+      }
+    }
+    &.radio {
+      position: relative;
+      padding-bottom: 6px;
+      label {
+        left: -2px;
+        margin-left: 0;
       }
     }
   }
