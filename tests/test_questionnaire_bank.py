@@ -86,7 +86,8 @@ class TestQuestionnaireBank(TestCase):
         self.login()
         self.test_user.save_constrained_observation(
             codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='')
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
         self.assertEquals(obs.codeable_concept.codings[0].display, 'biopsy')

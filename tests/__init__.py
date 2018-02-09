@@ -162,7 +162,7 @@ class TestCase(Base):
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=audit, issued=timestamp)
+                audit=audit, status='preliminary', issued=timestamp)
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                       system=SNOMED, setdate=None):

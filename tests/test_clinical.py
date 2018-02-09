@@ -128,6 +128,25 @@ class TestClinical(TestCase):
         rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         self.assert200(rv)
 
+    def test_unknown_clinical_post(self):
+        self.login()
+        data = {
+            "resourceType": "Observation",
+            "code":{"coding":[{
+                "code":"121",
+                "display":"PCa diagnosis",
+                "system":"http://us.truenth.org/clinical-codes"}]},
+                "status":"unknown",
+                "valueQuantity":{"units":"boolean","value":"false"}}
+        rv = self.client.post('/api/patient/{}/clinical'.format(
+            TEST_USER_ID), content_type='application/json',
+            data=json.dumps(data))
+
+        # confirm status unknown sticks
+        self.assert200(rv)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        self.assertEquals('unknown', rv.json['entry'][0]['content']['status'])
+
     def test_empty_biopsy_get(self):
         """Access biopsy on user w/o any clinical info"""
         self.login()
@@ -180,6 +199,53 @@ class TestClinical(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(user.observations.count(), 1)
 
+    def test_clinical_biopsy_unknown(self):
+        """Shortcut API - biopsy data w status unknown"""
+        self.login()
+        rv = self.client.post(
+            '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps({'value': True, 'status': 'unknown'}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
+        status = data['entry'][0]['content']['status']
+
+        self.assertEquals(coding['code'], '111')
+        self.assertEquals(coding['display'], 'biopsy')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'true')
+        self.assertEquals(status, 'unknown')
+
+        # Access the direct biopsy value
+        rv = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'unknown')
+
+        # Can we alter the value?
+        rv = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+                              content_type='application/json',
+                              data=json.dumps({'value': False}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Confirm it's altered
+        rv = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'false')
+
+        # Confirm the db is clean
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.observations.count(), 1)
+
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
         self.login()
@@ -209,6 +275,37 @@ class TestClinical(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
+    def test_clinical_pca_diag_unknown(self):
+        """Shortcut API - PCa diagnosis w/ status unknown"""
+        self.login()
+        rv = self.client.post(
+            '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps({'value': True, 'status': 'unknown'}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
+        status = data['entry'][0]['content']['status']
+
+        self.assertEquals(coding['code'], '121')
+        self.assertEquals(coding['display'], 'PCa diagnosis')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'true')
+        self.assertEquals(status, 'unknown')
+
+        # Access the direct pca_diag value
+        rv = self.client.get(
+            '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'unknown')
+
     def test_clinical_pca_localized(self):
         """Shortcut API - just PCa localized diagnosis w/o FHIR overhead"""
         self.login()
@@ -236,6 +333,37 @@ class TestClinical(TestCase):
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
+
+    def test_clinical_pca_localized_unknown(self):
+        """Shortcut API - PCa localized diagnosis w status unknown"""
+        self.login()
+        rv = self.client.post(
+            '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps({'value': False, 'status': 'unknown'}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
+        status = data['entry'][0]['content']['status']
+
+        self.assertEquals(coding['code'], '141')
+        self.assertEquals(coding['display'], 'PCa localized diagnosis')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'false')
+        self.assertEquals(status, 'unknown')
+
+        # Access the direct pca_localized value
+        rv = self.client.get(
+            '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'unknown')
 
     def test_weight(self):
         with open(os.path.join(os.path.dirname(__file__),
