@@ -738,9 +738,9 @@ class User(db.Model, UserMixin):
             if existing[0].value_quantity_id == value_quantity.id:
                 # perfect match -- update audit info, setting status
                 # and issued as given
-                existing.status = status
+                existing[0].status = status
                 if issued:
-                    existing.issued = issued
+                    existing[0].issued = issued
                 existing[0].audit = audit
                 return
             else:
