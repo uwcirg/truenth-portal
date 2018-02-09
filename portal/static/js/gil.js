@@ -1308,7 +1308,40 @@ module.exports = utilObj = (function() {
     };
 
     this.initSessionMonitor = function() {
-      (new SessionMonitorObj($("#csrfToken").val(), $("#sessionLifeTime").val())).init();
+      /*
+       * get portal wrapper nav content
+       * this contains session monitor & piwik setups
+       */
+      $.ajax({
+          url: $("#portalURI").val() + "/api/portal-wrapper-html/",
+          type: "GET",
+          contentType:"text/plain"
+      }, "html")
+      .done(function(data) {
+          $("#portalWrapperNav")
+          // Embed data returned by AJAX call into container element
+          .html(data);
+      })
+      .fail(function(xhr) {
+          /*
+           * report error
+           */
+          var params = {};
+          params.subject_id = $("#currentUserId").val() ? $("#currentUserId").val() : 0;
+          params.page_url = window.location.href;
+          //don't think we want to translate message sent back to the server here
+          params.message = "In GIL, error loading nav elements from portal - " + xhr.responseText;
+
+          $.ajax ({
+              type: "GET",
+              url: "/report-error",
+              contentType: "application/json; charset=utf-8",
+              cache: false,
+              async: true,
+              data: params
+          }).done(function(data) {
+          });
+      });
     };
 
     this.handleLoginAsUser = function() {
