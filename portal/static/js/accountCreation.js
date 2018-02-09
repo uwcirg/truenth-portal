@@ -420,6 +420,7 @@ var AccountCreationObj = function (roles, dependencies) {
 
                 var userOrgs = $("#userOrgs input[name='organization']");
                 userOrgs.each(function() {
+                    $(this).closest("label").addClass("radio-label");
                     $(this).attr("type", "radio");
                 });
 

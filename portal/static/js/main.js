@@ -4024,6 +4024,7 @@ OrgTool.prototype.morphPatientOrgs = function() {
     var checkedOrgs = {};
     var orgs = $("#userOrgs input[name='organization']");
     orgs.each(function() {
+        $(this).closest("label").addClass("radio-label");
         if ($(this).prop("checked")) {
             checkedOrgs[$(this).val()] = true;
         };
@@ -5514,7 +5515,7 @@ $(document).ready(function() {
                 } else {
                     $(footerElements).html(getContent());
                 }
-            });      
+            });
         }
     }, 500);
 
