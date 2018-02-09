@@ -4017,7 +4017,6 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
   return here_below_orgs;
 };
 OrgTool.prototype.morphPatientOrgs = function() {
-    console.log("HERE")
     var checkedOrgs = {};
     var orgs = $("#userOrgs input[name='organization']");
     orgs.each(function() {
@@ -5512,7 +5511,7 @@ $(document).ready(function() {
                 } else {
                     $(footerElements).html(getContent());
                 }
-            });      
+            });
         }
     }, 500);
 
