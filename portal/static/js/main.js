@@ -1327,8 +1327,15 @@ var fillContent = {
         };
     },
     "websiteConsentScript": function() {
-        var patientId = $("#wcsPatientId").val();
-        var entryMethod = $("#wcsEntryMethod").val();
+        var getUrlParameter = function(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+        var patientId = getUrlParameter("subject_id");
+        var entryMethod = getUrlParameter("entry_method");
+        var urlRedirect = getUrlParameter("redirect_url");
         var topOrgName = $("#wcsTopOrganization").attr("data-name");
         var topOrgId = $("#wcsTopOrganization").attr("data-id");
         var tVar = setInterval(function(){
@@ -1399,7 +1406,7 @@ var fillContent = {
             $(this).hide();
             $(".loading-message-indicator").show();
             setTimeout(function() {
-                window.location=$("#wcsRedirectUrl").val();
+                window.location=urlRedirect;
             }, 100);
         });
         $(".consent-form-checkbox").each(function() {
@@ -3223,7 +3230,8 @@ var Profile = function(subjectId, currentUserId) {
                 assessment_url += "&authored=" + completionDate;
             };
 
-            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() + 
+            "&redirect_url=" + encodeURIComponent(assessment_url);
 
             self.manualEntryModalVis(true);
 

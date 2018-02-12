@@ -2,10 +2,7 @@
 {% block main %}
 	{%- from "initial_queries_macros.html" import paperWebsiteConsentScript, interviewAssistedWebConsentScript -%}
 	<div id="termsContainer" class="website-consent-script">
-		<input id="wcsPatientId" value="{{patient_id}}" type="hidden" />
-		<input id="wcsEntryMethod" value="{{entry_method}}"  type="hidden" />
 		<input id="wcsTopOrganization"  data-id="{{top_organization.id}}" data-name="{{top_organization.name}}"  type="hidden" />
-		<input id="wcsRedirectUrl" value="{{redirect_url|safe}}" type="hidden" />
 		{%- if entry_method == 'paper' %}
 			{{paperWebsiteConsentScript(terms)}}
 		{%- else -%}
