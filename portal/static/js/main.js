@@ -1334,23 +1334,9 @@ var fillContent = {
                 notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
             });
             if (hasValue(notificationText)) {
-
-                var infoText = "<div class='notification-info'><i class='fa fa-info-circle' aria-hidden='true'></i>";
-
-                if (data.notifications.length > 1) {
-                    infoText += i18next.t("Pending notifications requiring your attention");
-                } else {
-                    infoText += i18next.t("Pending notification requiring your attention");
-                };
-
-                infoText += "</div>";
-
-                $("#notificationBanner .content").html(infoText + notificationText);
+                $("#notificationBanner .content").html(notificationText);
+                $("#notificationBanner .notification").addClass("active");
                 $("#notificationBanner").show();
-                $("#notificationBanner .notification-info").on("click", function() {
-                    $("#notificationBanner .notification").toggleClass("active");
-                });
-
                 $("#notificationBanner [data-id] a").each(function() {
                     $(this).on("click", function() {
                         var parentElement = $(this).closest(".notification");
