@@ -136,6 +136,7 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="sessionMonitorProps" data-baseurl="{{PORTAL}}" data-crsftoken="{{csrf_token()}}" data-sessionlifetime="{{config.PERMANENT_SESSION_LIFETIME if config.PERMANENT_SESSION_LIFETIME}}" />
 <div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -157,7 +158,7 @@
         s.appendChild(g);
         function loadSessionMonitor() {
             setTimeout(function() {
-                (new SessionMonitorObj("{{PORTAL}}", "{{csrf_token()}}", "{{config.PERMANENT_SESSION_LIFETIME if config.PERMANENT_SESSION_LIFETIME}}")).init();
+                (new SessionMonitorObj()).init();
             }, 150);
         }
         g.onreadystatechange= function () { //IE
