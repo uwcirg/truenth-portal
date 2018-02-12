@@ -1,11 +1,14 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from flask_swagger import swagger
 from flask_webtest import SessionScope
+import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC
+from portal.models.encounter import Encounter
+from portal.models.fhir import CC, QuestionnaireResponse
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
@@ -13,6 +16,7 @@ from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
+from portal.models.user_consent import UserConsent
 from portal.system_uri import ICHOM
 from tests import TestCase, TEST_USER_ID
 
@@ -487,6 +491,122 @@ class TestQuestionnaireBank(TestCase):
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp3)
         self.assertFalse(resp3.json['questionnaire_bank'])
+
+    def test_outdated_inprogress_qb(self):
+        # create base QB/RP
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        qn = Questionnaire(name='epic26')
+        org = Organization(name="testorg", research_protocol_id=rp_id)
+        with SessionScope(db):
+            db.session.add(qn)
+            db.session.add(org)
+            db.session.commit()
+
+        qn, org, self.test_user = map(
+            db.session.merge, (qn, org, self.test_user))
+        qb = QuestionnaireBank(
+            name='Test Questionnaire Bank',
+            classification='baseline',
+            research_protocol_id=rp_id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+
+        self.test_user.organizations.append(org)
+
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org,
+            audit=audit, agreement_url='http://no.com')
+
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.add(self.test_user)
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+        qb = db.session.merge(qb)
+
+        # create in-progress QNR for User/QB/RP
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        enc = Encounter(status='planned', auth_method='url_authenticated',
+                        user_id=TEST_USER_ID, start_time=datetime.utcnow())
+        qnr = QuestionnaireResponse(
+            subject_id=TEST_USER_ID,
+            encounter=enc,
+            questionnaire_bank_id=qb.id,
+            status='in-progress',
+            document=data)
+
+        with SessionScope(db):
+            db.session.add(enc)
+            db.session.add(qnr)
+            db.session.commit()
+
+        # User associated with CRV org should generate appropriate
+        # questionnaires
+        self.test_user = db.session.merge(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None).questionnaire_bank
+        self.assertEquals(qb.research_protocol.name, 'proto')
+
+        # Pointing the User's org to a new QB/RP
+        rp2 = ResearchProtocol(name='new_proto')
+        qn2 = Questionnaire(name='epic27')
+        with SessionScope(db):
+            db.session.add(rp2)
+            db.session.add(qn2)
+            db.session.commit()
+        rp2 = db.session.merge(rp2)
+        rp2_id = rp2.id
+
+        qn2, org = map(db.session.merge, (qn2, org))
+        qb2 = QuestionnaireBank(
+            name='Test Questionnaire Bank 2',
+            classification='baseline',
+            research_protocol_id=rp2_id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=qn2, rank=0)
+        qb2.questionnaires.append(qbq2)
+
+        org.research_protocol_id = rp2_id
+
+        with SessionScope(db):
+            db.session.add(qb2)
+            db.session.add(org)
+            db.session.commit()
+        qb2 = db.session.merge(qb2)
+
+        # outdated QB/RP should be used as long as User has in-progress QNR
+        self.test_user, qnr = map(db.session.merge, (self.test_user, qnr))
+        qb = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None).questionnaire_bank
+        self.assertEquals(qb.name, 'Test Questionnaire Bank')
+        self.assertEquals(qb.research_protocol.name, 'proto')
+
+        # completing QNR should move User to new QB
+        qnr.status = 'completed'
+        with SessionScope(db):
+            db.session.add(qnr)
+            db.session.commit()
+
+        self.test_user = db.session.merge(self.test_user)
+        qb = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=None).questionnaire_bank
+        self.assertEquals(qb.name, 'Test Questionnaire Bank 2')
+        self.assertEquals(qb.research_protocol.name, 'new_proto')
 
 
 def setup_qbs():
