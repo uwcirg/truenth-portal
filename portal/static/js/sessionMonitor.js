@@ -24,17 +24,19 @@ var SessionMonitorObj = function() {
     var sessMon=(function(n, o) {
       return function(t) {
           "use strict";
-          var l = {},
-          g = new Date,
-          r, u, a = {
-                  sessionLifetime: 36e5,
-                  timeBeforeWarning: 6e5,
-                  minPingInterval: 6e4,
-                  activityEvents: "mouseup",
-                  pingUrl: n + "/api/ping",
-                  logoutUrl: n + "/logout",
-                  timeoutUrl: n + "/logout?timeout=1",
-                  ping: function() {
+          var l = {};
+          var g = new Date;
+          var r;
+          var u;
+          var a = {
+                    sessionLifetime: 36e5,
+                    timeBeforeWarning: 6e5,
+                    minPingInterval: 6e4,
+                    activityEvents: "mouseup",
+                    pingUrl: n + "/api/ping",
+                    logoutUrl: n + "/logout",
+                    timeoutUrl: n + "/logout?timeout=1",
+                    ping: function() {
                       $.ajax({
                           type: "POST",
                           contentType: "text/plain",
@@ -45,11 +47,11 @@ var SessionMonitorObj = function() {
                           url: l.pingUrl,
                           crossDomain: !0
                       });
-                  },
-                  logout: function() {
+                    },
+                    logout: function() {
                       window.location.href = l.logoutUrl;
-                  },
-                  onwarning: function() {
+                    },
+                    onwarning: function() {
                       var n = Math.round(l.timeBeforeWarning / 60 / 1e3),
                           o = $('<div id="jqsm-warning">Your session will expire in ' + n + ' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');
                       $("body").children("div#jqsm-warning").length || $("body").prepend(o), $("div#jqsm-warning").show(), $("button#stay-logged-in").on("click", function(n) {
@@ -57,12 +59,12 @@ var SessionMonitorObj = function() {
                       }).on("click", function() {
                           o.hide();
                       }), $("button#jqsm-log-out").on("click", l.logout);
-                  },
-                  onbeforetimeout: function() {},
-                  ontimeout: function() {
+                    },
+                    onbeforetimeout: function() {},
+                    ontimeout: function() {
                       window.location.href = l.timeoutUrl;
-                  }
-              };
+                    }
+                  };
 
           function i(n) {
               n && n.stopPropagation();
@@ -82,7 +84,7 @@ var SessionMonitorObj = function() {
           return $.extend(l, a, t, {
               extendsess: i
           }), $(document).on(l.activityEvents, i), e(), l.ping(), l;
-      }
+      };
   })(__BASE_URL, __CRSF_TOKEN)({
       sessionLifetime: DEFAULT_SESSION_LIFETIME,
       timeBeforeWarning: 6e4,
