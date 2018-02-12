@@ -24,7 +24,9 @@ var SessionMonitorObj = function() {
     var sessMon=(function(n, o) {
       return function(t) {
           "use strict";
-          var r, u, a = {
+          var l = {},
+          g = new Date,
+          r, u, a = {
                   sessionLifetime: 36e5,
                   timeBeforeWarning: 6e5,
                   minPingInterval: 6e4,
@@ -60,9 +62,7 @@ var SessionMonitorObj = function() {
                   ontimeout: function() {
                       window.location.href = l.timeoutUrl;
                   }
-              },
-          l = {},
-          g = new Date;
+              };
 
           function i(n) {
               n && n.stopPropagation();
