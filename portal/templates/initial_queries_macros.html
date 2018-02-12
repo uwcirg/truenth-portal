@@ -188,7 +188,7 @@
                 </div>
               </div>
               <div class="modal-footer hidden-print">
-                <button type="button"  class="btn btn-default" id="consentPrintButton" onclick="window.print()">{{_("Print")|upper }}</button>
+                <button type="button"  class="btn btn-default" id="consentPrintButton">{{_("Print")|upper }}</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("CLOSE") }}</button>
               </div>
             </div>
@@ -206,17 +206,8 @@
           <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
       </div>
-      <div class="get-tou-error error-message"></div>
-      <div class="post-tou-error error-message"></div>
-      <script>
-        $(function() {
-            $(".consent-form-checkbox").each(function() {
-              $(this).on("click", function() {
-                  $(this).toggleClass("fa-square-o fa-check-square-o");
-              });
-            });
-        });
-      </script>
+      <div class="get-tou-error error-message hidden-print"></div>
+      <div class="post-tou-error error-message hidden-print"></div>
   {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup">

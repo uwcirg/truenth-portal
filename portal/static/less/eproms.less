@@ -3410,3 +3410,24 @@ div.or {
 {
     padding-top: 1.7em;
 }
+
+@media screen {
+  #printSection {
+      display: none;
+  }
+}
+@media print {
+  #printSection, #printSection * {
+      visibility:visible;
+  }
+  #printSection {
+      position:absolute;
+      left:0;
+      top:0;
+  }
+  #websiteDeclarationFormModal {
+    .modal-content {
+      border: 0;
+    }
+  }
+}
