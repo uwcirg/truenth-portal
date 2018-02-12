@@ -251,15 +251,6 @@ class QuestionnaireBank(db.Model):
             if rp:
                 user_rps.add(rp.id)
 
-        # find current QBs for user's organizations
-        base = []
-        if user_rps:
-            base = QuestionnaireBank.query.filter(
-                QuestionnaireBank.research_protocol_id.in_(user_rps))
-            if classification:
-                base.filter(QuestionnaireBank.classification == classification)
-            base = base.all()
-
         # find any outdated QBs that the user already started
         in_progress = QuestionnaireBank.query.join(
             QuestionnaireResponse).filter(
@@ -267,16 +258,21 @@ class QuestionnaireBank(db.Model):
                 QuestionnaireResponse.questionnaire_bank_id ==
                 QuestionnaireBank.id)
 
+        # find current QBs for user's organizations
+        results = QuestionnaireBank.query.filter(
+            QuestionnaireBank.research_protocol_id.in_(user_rps))
+
         if classification:
             # use in-progress if found for user, otherwise use current
             in_progress = in_progress.filter(
                 QuestionnaireBank.classification == classification).all()
             in_progress = filter_invalid_qb_statuses(in_progress)
-            results = in_progress or base
+            results = in_progress or results.filter(
+                QuestionnaireBank.classification == classification).all()
         else:
             # if no classification specified, combine current with in-progress
             in_progress = filter_invalid_qb_statuses(in_progress.all())
-            results = list(set().union(in_progress, base))
+            results = list(set().union(in_progress, results.all()))
 
         # Complicated rules (including strategies and UserIntervention rows)
         # define a user's access to an intervention.  Rely on the
