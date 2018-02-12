@@ -5,7 +5,7 @@ var SessionMonitorObj = function() {
   this.init = function() {
     // Set default sessionLifetime from Flask config
     // Subtract 10 seconds to ensure the backend doesn't expire the session first
-    var CONFIG_SESSION_LIFETIME = this.sessionLifetime, DEFAULT_SESSION_LIFETIME;
+    var DEFAULT_SESSION_LIFETIME;
     var cookieTimeout = this.readCookie("SS_TIMEOUT");
     cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
     var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
@@ -21,24 +21,9 @@ var SessionMonitorObj = function() {
           DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
         }
     }
-    var sessMon=function(n, o) {
+    var sessMon=(function(n, o) {
       return function(t) {
           "use strict";
-          function i(n) {
-              n && n.stopPropagation();
-              var o = new Date,
-                  t = o - g;
-              n && n.target && "stay-logged-in" === String(n.target.id) ? (g = o, e(), n = null, l.ping()) : t > l.minPingInterval && (g = o, e(), l.ping());
-          }
-
-          function e() {
-              var n = l.sessionLifetime - l.timeBeforeWarning;
-              window.clearTimeout(r), window.clearTimeout(u), r = window.setTimeout(l.onwarning, n), u = window.setTimeout(s, l.sessionLifetime);
-          }
-
-          function s() {
-              $.when(l.onbeforetimeout()).always(l.ontimeout);
-          }
           var r, u, a = {
                   sessionLifetime: 36e5,
                   timeBeforeWarning: 6e5,
@@ -76,13 +61,29 @@ var SessionMonitorObj = function() {
                       window.location.href = l.timeoutUrl;
                   }
               },
-              l = {},
-              g = new Date;
+          l = {},
+          g = new Date;
+
+          function i(n) {
+              n && n.stopPropagation();
+              var o = new Date,
+                  t = o - g;
+              n && n.target && "stay-logged-in" === String(n.target.id) ? (g = o, e(), n = null, l.ping()) : t > l.minPingInterval && (g = o, e(), l.ping());
+          }
+
+          function e() {
+              var n = l.sessionLifetime - l.timeBeforeWarning;
+              window.clearTimeout(r), window.clearTimeout(u), r = window.setTimeout(l.onwarning, n), u = window.setTimeout(s, l.sessionLifetime);
+          }
+
+          function s() {
+              $.when(l.onbeforetimeout()).always(l.ontimeout);
+          }
           return $.extend(l, a, t, {
               extendsess: i
           }), $(document).on(l.activityEvents, i), e(), l.ping(), l;
       }
-  }(__BASE_URL, __CRSF_TOKEN)({
+  })(__BASE_URL, __CRSF_TOKEN)({
       sessionLifetime: DEFAULT_SESSION_LIFETIME,
       timeBeforeWarning: 6e4,
       minPingInterval: 6e4,
