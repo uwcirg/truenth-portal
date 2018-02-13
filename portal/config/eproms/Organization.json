@@ -86,10 +86,6 @@
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 11000,
@@ -119,10 +115,6 @@
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 11100,
@@ -164,10 +156,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13000,
@@ -197,10 +185,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13100,
@@ -230,10 +214,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13200,
@@ -263,10 +243,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13300,
@@ -296,10 +272,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13400,
@@ -329,10 +301,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13500,
@@ -362,10 +330,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13600,
@@ -395,10 +359,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "TNGR v1",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 13700,
@@ -697,6 +657,10 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocol": "IRONMAN v3",
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22000,

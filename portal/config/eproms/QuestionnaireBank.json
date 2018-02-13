@@ -87,6 +87,56 @@
       "start": "{\"days\": 0}"
     },
     {
+      "classification": "baseline",
+      "expired": "{\"days\": 31}",
+      "name": "IRONMAN_baseline_v3",
+      "overdue": "{\"days\": 1}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi"
+          },
+          "rank": 2
+        },
+        {
+          "questionnaire": {
+            "display": "epic26",
+            "reference": "api/questionnaire/epic26"
+          },
+          "rank": 3
+        },
+        {
+          "questionnaire": {
+            "display": "prems",
+            "reference": "api/questionnaire/prems"
+          },
+          "rank": 4
+        }
+      ],
+      "recurs": [],
+      "research_protocol": {
+        "display": "IRONMAN v3",
+        "reference": "api/research_protocol/IRONMAN v3"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
       "classification": "indefinite",
       "expired": "{\"years\": 50}",
       "name": "IRONMAN_indefinite",
@@ -103,6 +153,26 @@
       "research_protocol": {
         "display": "IRONMAN v2",
         "reference": "api/research_protocol/IRONMAN v2"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    {
+      "classification": "indefinite",
+      "expired": "{\"years\": 50}",
+      "name": "IRONMAN_v3_indefinite",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "irondemogv3",
+            "reference": "api/questionnaire/irondemogv3"
+          },
+          "rank": 0
+        }
+      ],
+      "recurs": [],
+      "research_protocol": {
+        "display": "IRONMAN v3",
+        "reference": "api/research_protocol/IRONMAN v3"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -139,6 +209,42 @@
       "research_protocol": {
         "display": "IRONMAN v2",
         "reference": "api/research_protocol/IRONMAN v2"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 14}",
+      "expired": "{\"days\": 29}",
+      "name": "IRONMAN_v3_recurring_3mo_pattern",
+      "overdue": "{\"days\": 21}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc"
+          },
+          "rank": 1
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"months\": 6}",
+          "start": "{\"months\": 3, \"days\": -14}",
+          "termination": "{\"months\": 24}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v3",
+        "reference": "api/research_protocol/IRONMAN v3"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -187,6 +293,54 @@
       "research_protocol": {
         "display": "IRONMAN v2",
         "reference": "api/research_protocol/IRONMAN v2"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 14}",
+      "expired": "{\"days\": 29}",
+      "name": "IRONMAN_v3_recurring_6mo_pattern",
+      "overdue": "{\"days\": 21}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi"
+          },
+          "rank": 2
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"months\": 30}",
+          "termination": "{\"months\": 33}"
+        },
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"months\": 6, \"days\": -14}",
+          "termination": "{\"months\": 21}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v3",
+        "reference": "api/research_protocol/IRONMAN v3"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -244,6 +398,63 @@
       "research_protocol": {
         "display": "IRONMAN v2",
         "reference": "api/research_protocol/IRONMAN v2"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 14}",
+      "expired": "{\"days\": 29}",
+      "name": "IRONMAN_v3_recurring_annual_pattern",
+      "overdue": "{\"days\": 21}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "epic26",
+            "reference": "api/questionnaire/epic23"
+          },
+          "rank": 2
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc"
+          },
+          "rank": 3
+        },
+        {
+          "questionnaire": {
+            "display": "prems",
+            "reference": "api/questionnaire/prems"
+          },
+          "rank": 4
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"years\": 1, \"days\": -14}",
+          "termination": "{\"years\": 3, \"months\": 3}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v3",
+        "reference": "api/research_protocol/IRONMAN v3"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
