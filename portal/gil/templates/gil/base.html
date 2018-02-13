@@ -1,4 +1,4 @@
-{%- from "gil/macros.html" import footerHTML, SVGTags -%}
+{%- from "gil/macros.html" import footerHTML -%}
 <!DOCTYPE html>
 <html class="no-js" lang="en">
    <head>
@@ -167,7 +167,7 @@
     <div id="portalWrapperNav"><!-- content contains session monitor and piwik information --></div>
   {% endblock %}
   </section>
-{% block hidden %}{{SVGTags()}}{% endblock %}
+{% block hidden %}<div class="visuallyhidden"><img src="{{url_for('.static', filename='img/GIL.svg')}}"></div>{% endblock %}
 {% block modal %}
     <div class="modal fade" id="modal-register">
       <div class="modal-dialog" role="document">
