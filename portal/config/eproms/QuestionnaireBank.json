@@ -89,7 +89,7 @@
     {
       "classification": "baseline",
       "expired": "{\"days\": 31}",
-      "name": "IRONMAN_baseline_v3",
+      "name": "IRONMAN_v3_baseline",
       "overdue": "{\"days\": 1}",
       "questionnaires": [
         {
@@ -164,8 +164,8 @@
       "questionnaires": [
         {
           "questionnaire": {
-            "display": "irondemogv3",
-            "reference": "api/questionnaire/irondemogv3"
+            "display": "irondemog_v3",
+            "reference": "api/questionnaire/irondemog_v3"
           },
           "rank": 0
         }
