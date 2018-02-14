@@ -209,7 +209,7 @@ class AssessmentStatus(object):
             return False
 
     @property
-    def organization(self):
+    def __organization(self):
         """Returns the organization associated with users's QB or None"""
         rp_id = self.qb_data.qb.research_protocol_id
         for org in self.user.organizations:
@@ -218,15 +218,30 @@ class AssessmentStatus(object):
         return None
 
     @property
-    def top_organization(self):
-        """Returns the top-level organization for the established A_S org"""
-        org = self.organization
-        if org:
-            OT = OrgTree()
-            top = OT.find_top_level_org([org])
-            if top:
-                return top[0]
-        return None
+    def assigning_authority(self):
+        """Returns the best string available for the assigning authority
+
+        Typically, the top-level organization used to associate the user
+        with the questionnaire bank.  For organizations that have moved
+        to a newer research protocol, we no longer have this lookup available.
+
+        In this case, we're currently left to guessing - as the data model
+        doesn't capture the authority (say organization or intervention)
+        behind the assignment.  But given the typical scenario, the user will
+        have one organization, and the top level of that will be the correct
+        guess.
+
+        If nothing is available, return an empty string as it can safely
+        be used in string formatting.
+
+        :returns: string for assigning authority or empty string
+
+        """
+        org = self.__organization
+        if not org:
+            org = self.user.first_top_organization()
+
+        return getattr(org, 'name', '')
 
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
