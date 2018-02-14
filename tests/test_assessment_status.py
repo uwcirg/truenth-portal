@@ -383,9 +383,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        mock_qr(instrument_id='eproms_add', status='in-progress')
-        mock_qr(instrument_id='epic26', status='in-progress')
-        mock_qr(instrument_id='comorb', status='in-progress')
+        mock_qr(
+            instrument_id='eproms_add', status='in-progress',
+            doc_id='eproms_add')
+        mock_qr(instrument_id='epic26', status='in-progress', doc_id='epic26')
+        mock_qr(instrument_id='comorb', status='in-progress', doc_id='comorb')
 
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=None)
@@ -477,7 +479,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_localized()
         # backdate so the baseline q's have expired
-        mock_qr(instrument_id='epic26', status='in-progress',
+        mock_qr(instrument_id='epic26', status='in-progress', doc_id='doc-26',
                 timestamp=datetime.utcnow() - relativedelta(months=3))
 
         self.test_user = db.session.merge(self.test_user)
@@ -490,7 +492,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertEquals(
             set(['eproms_add', 'comorb']),
             set(a_s.instruments_needing_full_assessment()))
-        self.assertEquals(['epic26'], a_s.instruments_in_progress())
+        self.assertEquals(['doc-26'], a_s.instruments_in_progress())
 
     def test_metastatic_as_of_date(self):
         # backdating consent beyond expired and the status lookup date
@@ -499,7 +501,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(backdate=relativedelta(months=3))
         self.mark_metastatic()
         # backdate so the baseline q's have expired
-        mock_qr(instrument_id='epic23', status='in-progress',
+        mock_qr(instrument_id='epic23', status='in-progress', doc_id='doc-23',
                 timestamp=datetime.utcnow() - relativedelta(months=3))
 
         self.test_user = db.session.merge(self.test_user)
@@ -509,7 +511,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # with only epic26 started, should see results for both
         # instruments_needing_full_assessment and instruments_in_progress
-        self.assertEquals(['epic23'], a_s.instruments_in_progress())
+        self.assertEquals(['doc-23'], a_s.instruments_in_progress())
         self.assertTrue(a_s.instruments_needing_full_assessment())
 
     def test_initial_recur_due(self):

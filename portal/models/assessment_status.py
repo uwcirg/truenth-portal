@@ -4,8 +4,8 @@ from datetime import datetime
 from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
-from .fhir import QuestionnaireResponse
-from .organization import Organization, OrgTree
+from .fhir import QuestionnaireResponse, qnr_document_id
+from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from ..trace import trace
 from .user import User
@@ -269,7 +269,7 @@ class AssessmentStatus(object):
         return results
 
     def instruments_in_progress(self, classification=None):
-        """Return list of questionnaire names in-progress for classification
+        """Return list of questionnaire ids in-progress for classification
 
         NB - if the questionnaire is outside the valid date range, such as in
         an expired state, it will not be included in the list regardless of
@@ -277,7 +277,10 @@ class AssessmentStatus(object):
 
         :param classification: set to 'indefinite' to consider that
             classification, or 'all', otherwise uses current QB.
-        :returns: list of questionnaire names (IDs)
+        :returns: list of external questionnaire identifiers, that is, the
+            id needed to resume work on the same questionnaire that was
+            in progress.  The `document['identifier']` from the previously
+            submitted QuestionnaireResponse.
 
         """
         results = []
@@ -287,7 +290,18 @@ class AssessmentStatus(object):
                 # Only counts if there's a `by_date`, otherwise, although this
                 # questionnaire is partially done, it can't be resumed
                 if 'by_date' in data:
-                    results.append(name)
+                    # Look up the external id and append to results
+                    # Look out for indefinite work in-progress, as it
+                    # belongs to a different questionnaire bank
+                    qb_id = self.qb_data.qb.id
+                    if name not in (
+                            q.name for q in self.qb_data.qb.questionnaires):
+                        qb_id = QuestionnaireBank.query.filter(
+                            QuestionnaireBank.classification == 'indefinite'
+                        ).one().id  # only a single indefinite expected
+
+                    results.append(
+                        qnr_document_id(self.user.id, qb_id, name, 'in-progress'))
         return results
 
     def next_available_due_date(self):

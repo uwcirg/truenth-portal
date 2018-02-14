@@ -1400,28 +1400,11 @@ def present_needed():
         assessment_status.instruments_needing_full_assessment(
             classification='all'))
 
-    # If we find any instruments_in_progress, need to fetch their
-    # identifiers for reliable resume behavior on the AE side.
-    # This is also done now to avoid the overhead of looking up
-    # when generating reports and reminders.
-    resume_ids = []
-    for questionnaire_name in assessment_status.instruments_in_progress(
-            classification='all'):
-        questionnaire_bank = assessment_status.qb_data.qb
-        if questionnaire_name not in (
-                q.name for q in
-                assessment_status.qb_data.qb.questionnaires):
-            # This should only happen in the indefinite case
-            questionnaire_bank = QuestionnaireBank.query.filter(
-                QuestionnaireBank.classification == 'indefinite').one()
-
-        resume_ids.append(
-            qnr_document_id(
-                subject_id=subject_id,
-                questionnaire_bank_id=questionnaire_bank.id,
-                questionnaire_name=questionnaire_name,
-                status='in-progress'))
-
+    # Instruments in progress need special handling.  Assemble
+    # the list of external document ids for reliable resume
+    # behavior at external assessment intervention.
+    resume_ids = assessment_status.instruments_in_progress(
+            classification='all')
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
