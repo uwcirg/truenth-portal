@@ -1719,7 +1719,7 @@ def patient_assessment_status(patient_id):
       - application/json
     responses:
       200:
-        description: return current overall assessment status of given patient
+        description: return current assessment status of given patient
       400:
         description: if patient id is invalid
       401:
@@ -1744,10 +1744,15 @@ def patient_assessment_status(patient_id):
         assessment_status.instruments_in_progress(classification='indefinite')
     )
 
-    return jsonify(
-        assessment_status=assessment_overall_status,
-        outstanding_indefinite_work=outstanding_indefinite_work,
-    )
+    response = {
+        'assessment_status': assessment_overall_status,
+        'outstanding_indefinite_work': outstanding_indefinite_work,
+        'questionnaires_ids': assessment_status.instruments_needing_full_assessment(
+            classification='all'
+        ),
+        'resume_ids': assessment_status.instruments_in_progress(classification='all'),
+    }
+    return jsonify(response)
 
 
 @assessment_engine_api.route('/questionnaire_bank')
