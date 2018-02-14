@@ -286,14 +286,14 @@ def update_card_html_on_completion():
                         u"Please complete your {} "
                         "questionnaire as soon as possible. It will expire "
                         "on {}.").format(
-                            assessment_status.top_organization.name,
+                            assessment_status.assigning_authority,
                             expired_date.strftime('%-d %b %Y'))
                 else:
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
                         u"Please complete your {} "
                         "questionnaire by {}.").format(
-                            assessment_status.top_organization.name,
+                            assessment_status.assigning_authority,
                             due_date.strftime('%-d %b %Y'))
 
                 return u"""
@@ -312,7 +312,7 @@ def update_card_html_on_completion():
                 reminder = _(
                     u"Please complete your {} "
                     "questionnaire at your convenience.").format(
-                        assessment_status.top_organization.name)
+                        assessment_status.assigning_authority)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -327,7 +327,7 @@ def update_card_html_on_completion():
             if assessment_status.overall_status == "Completed":
                 return thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.top_organization.name)
+                    registry=assessment_status.assigning_authority)
             raise ValueError("Unexpected state generating intro_html")
 
         def completed_card_html(assessment_status):
@@ -471,7 +471,7 @@ def update_card_html_on_completion():
             if assessment_status.enrolled_in_classification('indefinite'):
                 card_html = thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.top_organization.name)
+                    registry=assessment_status.assigning_authority)
             else:
                 message = _(
                     u"The assessment is no longer available.\n"
