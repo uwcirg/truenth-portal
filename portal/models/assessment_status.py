@@ -237,10 +237,7 @@ class AssessmentStatus(object):
         :returns: string for assigning authority or empty string
 
         """
-        org = self.__organization
-        if not org:
-            org = self.user.first_top_organization()
-
+        org = self.__organization or self.user.first_top_organization()
         return getattr(org, 'name', '')
 
     def enrolled_in_classification(self, classification):
