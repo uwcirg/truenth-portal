@@ -1457,8 +1457,8 @@ var fillContent = {
                         }
                         if (!$(this).attr("data-visited")) {
                             /*
-                             * don't hide the close button if there one link that hasn't been visited
-                             */
+                            * don't hide the close button if there one link that hasn't been visited
+                            */
                             doHideCloseButton = false;
                         }
                     } else {
@@ -1480,6 +1480,9 @@ var fillContent = {
                 $("#notificationBanner [data-id] a").each(function() {
                     $(this).on("click", function() {
                         var parentElement = $(this).closest(".notification");
+                        /*
+                         *  adding the attribute data-visited will hide the notification entry
+                         */
                         parentElement.attr("data-visited", "true");
                         //delete relevant notification
                         tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
@@ -1488,6 +1491,9 @@ var fillContent = {
                 $("#notificationBanner [data-id]").each(function() {
                     var actionRequired = $(this).find("[data-action-required]").length > 0;
                     if (!actionRequired) {
+                        /*
+                         * adding the class of active will allow close button to display
+                         */
                         $("#notificationBanner .close").addClass("active");
                     }
                     $(this).on("click", function(e) {
