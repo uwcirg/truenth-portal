@@ -680,13 +680,6 @@
       };
     } else {
       if (!self.sectionCompleted("topTerms")) {
-        if ($("#notificationBanner").is(":visible")) {
-          $("#notificationBanner .close").hide();
-          //subject website consent
-          if ($("#notificationBanner [data-id]").length > 0) {
-            $("#notificationBanner .notification-info").trigger("click");
-          }
-        };
         self.handleIncomplete("topTerms");
       } else {
         $("#aboutForm").removeClass("full-size");
