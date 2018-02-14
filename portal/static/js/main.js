@@ -1440,6 +1440,39 @@ var fillContent = {
             (data.notifications).forEach(function(notice) {
                 notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
             });
+            var setVis = function() {
+                var allVisited = true;
+                var doHideCloseButton = true;
+                $("#notificationBanner [data-id]").each(function() {
+                    var actionRequired = $(this).find("[data-action-required]").length > 0;
+                    /*
+                     * close button should not be hidden if there is any link that does not require user action
+                     */
+                    if (!actionRequired) {
+                         /*
+                         * check if all links have been visited
+                         */
+                        if (allVisited && !$(this).attr("data-visited")) {
+                            allVisited = false;
+                        }
+                        if (!$(this).attr("data-visited")) {
+                            /*
+                            * don't hide the close button if there one link that hasn't been visited
+                            */
+                            doHideCloseButton = false;
+                        }
+                    } else {
+                        allVisited = false;
+                    }
+                });
+                if (allVisited) {
+                    $("#notificationBanner").hide();
+                } else {
+                    if (doHideCloseButton) {
+                        $("#notificationBanner .close").removeClass("active");
+                    }
+                }
+            };
             if (hasValue(notificationText)) {
                 $("#notificationBanner .content").html(notificationText);
                 $("#notificationBanner .notification").addClass("active");
@@ -1447,46 +1480,39 @@ var fillContent = {
                 $("#notificationBanner [data-id] a").each(function() {
                     $(this).on("click", function() {
                         var parentElement = $(this).closest(".notification");
+                        /*
+                         *  adding the attribute data-visited will hide the notification entry
+                         */
                         parentElement.attr("data-visited", "true");
                         //delete relevant notification
                         tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
                     })
                 });
                 $("#notificationBanner [data-id]").each(function() {
-                    $(this).on("click", function() {
+                    var actionRequired = $(this).find("[data-action-required]").length > 0;
+                    if (!actionRequired) {
                         /*
-                         * check if all links have been visited
+                         * adding the class of active will allow close button to display
                          */
-                        var allVisited = true;
-                        $("#notificationBanner [data-id]").each(function() {
-                            if (allVisited && !$(this).attr("data-visited")) {
-                                allVisited = false;
-                            };
-                        });
-                        if (allVisited) {
-                            $("#notificationBanner").hide();
-                        }
-                        $(this).hide();
-
+                        $("#notificationBanner .close").addClass("active");
+                    }
+                    $(this).on("click", function(e) {
+                        e.stopPropagation();
+                        setVis();
                     });
                 });
                 $("#notificationBanner .close").on("click", function(e) {
                     //closing the banner
                     e.stopPropagation();
-                    var dataIds = $(this).parent().find("[data-id]");
-                    dataIds.each(function() {
-                        //delete entry
-                        if (!($(this).attr("data-visited"))) {
-                            $(this).attr("data-visited", true);
+                    $("#notificationBanner [data-id]").each(function() {
+                        var actionRequired = $(this).find("[data-action-required]").length > 0;
+                        if (!actionRequired) {
                             tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
-                        };
-                    })
-                    $(this).parent().hide();
+                            $(this).attr("data-visited", "true");
+                        }
+                    });
+                    setVis();
                 });
-                var actionRequired = $("#notificationBanner [data-action-required]").length > 0;
-                if(actionRequired) {
-                    $("#notificationBanner .close").hide();
-                }
             } else {
                 $("#notificationBanner").hide();
             }
