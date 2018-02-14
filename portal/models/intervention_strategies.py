@@ -234,7 +234,7 @@ def update_card_html_on_completion():
         def thank_you_block(name, registry):
             greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                u"You've completed the {} questionnaire"
+                u"You've completed the {}questionnaire"
                 ".").format(registry)
             reminder = _(
                 u"You will be notified when the next "
@@ -266,6 +266,11 @@ def update_card_html_on_completion():
                 assessment_status.instruments_in_progress(
                     classification='indefinite'))
 
+            top_org_name = None
+            if assessment_status.top_organization:
+                top_org_name = "{} ".format(
+                    assessment_status.top_organization.name)
+
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
                 greeting = _(u"Hi {}").format(user.display_name)
@@ -283,17 +288,17 @@ def update_card_html_on_completion():
                         trigger_date, as_of_date=now) or utc_start
                     expired_date = localize_datetime(utc_expired, user)
                     reminder = _(
-                        u"Please complete your {} "
+                        u"Please complete your {}"
                         "questionnaire as soon as possible. It will expire "
                         "on {}.").format(
-                            assessment_status.top_organization.name,
+                            top_org_name,
                             expired_date.strftime('%-d %b %Y'))
                 else:
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
-                        u"Please complete your {} "
+                        u"Please complete your {}"
                         "questionnaire by {}.").format(
-                            assessment_status.top_organization.name,
+                            top_org_name,
                             due_date.strftime('%-d %b %Y'))
 
                 return u"""
@@ -310,9 +315,9 @@ def update_card_html_on_completion():
             if any(indefinite_questionnaires):
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} "
+                    u"Please complete your {}"
                     "questionnaire at your convenience.").format(
-                        assessment_status.top_organization.name)
+                        top_org_name)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -327,7 +332,7 @@ def update_card_html_on_completion():
             if assessment_status.overall_status == "Completed":
                 return thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.top_organization.name)
+                    registry=top_org_name)
             raise ValueError("Unexpected state generating intro_html")
 
         def completed_card_html(assessment_status):
@@ -466,12 +471,17 @@ def update_card_html_on_completion():
             link_label = u"N/A"
             link_url = None
 
+            top_org_name = None
+            if assessment_status.top_organization:
+                top_org_name = "{} ".format(
+                    assessment_status.top_organization.name)
+
             # If the user was enrolled in indefinite work and lands
             # here, they should see the thank you text.
             if assessment_status.enrolled_in_classification('indefinite'):
                 card_html = thank_you_block(
                     name=user.display_name,
-                    registry=assessment_status.top_organization.name)
+                    registry=top_org_name)
             else:
                 message = _(
                     u"The assessment is no longer available.\n"
