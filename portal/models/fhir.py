@@ -1,6 +1,6 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
-from flask import current_app, abort
+from flask import current_app, abort, url_for
 from html.parser import HTMLParser
 import json
 from sqlalchemy import UniqueConstraint, or_
@@ -357,7 +357,8 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
-def aggregate_responses(instrument_ids, current_user):
+
+def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -399,6 +400,19 @@ def aggregate_responses(instrument_ids, current_user):
                 Reference.organization(org.id).as_fhir()
                 for org in subject.organizations
             ]
+
+        # Hack: add missing "resource" wrapper for DTSU2 compliance
+        # Remove when all interventions compliant
+        if patch_dstu2:
+            questionnaire_response.document = {
+                'resource': questionnaire_response.document,
+                # Todo: return URL to individual QuestionnaireResponse resource
+                'fullUrl': url_for(
+                    '.assessment',
+                    patient_id=questionnaire_response.subject_id,
+                    _external=True,
+                ),
+            }
 
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
