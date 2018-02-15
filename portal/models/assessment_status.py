@@ -259,6 +259,15 @@ class AssessmentStatus(object):
                                               as_of_date=self.as_of_date))
         return results
 
+    def instruments_completed(self, classfication=None):
+        """Return list of completed questionnaires"""
+        results = []
+        input = self._status_by_classification(classfication)
+        for name, data in input.items():
+            if 'completed' in data:
+                results.append(name)
+        return results
+
     def instruments_needing_full_assessment(self, classification=None):
         """Return list of questionnaire names needed
 

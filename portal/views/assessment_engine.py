@@ -1702,7 +1702,7 @@ def batch_assessment_status():
 )
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
-    """Return to the assessment status for a given patient
+    """Return current assessment status for a given patient
 
     ---
     operationId: patient_assessment_status
@@ -1751,6 +1751,8 @@ def patient_assessment_status(patient_id):
             classification='all'
         ),
         'resume_ids': assessment_status.instruments_in_progress(classification='all'),
+        'completed_ids': assessment_status.instruments_completed(classfication='all'),
+        'qb_name': assessment_status.qb_data.qb.name
     }
     return jsonify(response)
 
