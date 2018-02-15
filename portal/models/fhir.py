@@ -357,6 +357,7 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
+
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     """Build a bundle of QuestionnaireResponses
 
