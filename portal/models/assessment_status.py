@@ -210,11 +210,11 @@ class AssessmentStatus(object):
 
     @property
     def __organization(self):
-        """Returns the organization associated with users's QB or None"""
+        """Returns the top organization associated with users's QB or None"""
         rp_id = self.qb_data.qb.research_protocol_id
         for org in self.user.organizations:
             if org.research_protocol and (org.research_protocol.id == rp_id):
-                return org
+                return OrgTree().find_top_level_org([org])[0]
         return None
 
     @property
