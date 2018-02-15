@@ -406,7 +406,11 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             questionnaire_response.document = {
                 'resource': questionnaire_response.document,
                 # Todo: return URL to individual QuestionnaireResponse resource
-                'fullUrl': url_for('.assessment', patient=document.subject_id),
+                'fullUrl': url_for(
+                    '.assessment',
+                    patient_id=questionnaire_response.subject_id,
+                    _external=True,
+                ),
             }
 
         annotated_questionnaire_responses.append(questionnaire_response.document)
