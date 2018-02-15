@@ -892,10 +892,10 @@ def preview_communication(comm_id):
                    recipients=preview.recipients)
 
 
-@portal.route("/communicate/<email>")
+@portal.route("/communicate/<email_or_id>")
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
-def communicate(email):
+def communicate(email_or_id):
     """Direct call to trigger communications to given user.
 
     Typically handled by scheduled jobs, this API enables testing of
@@ -912,7 +912,11 @@ def communicate(email):
 
     """
     from ..tasks import send_user_messages
-    u = User.query.filter(User.email == email).first()
+    try:
+        uid = int(email_or_id)
+        u = User.query.get(uid)
+    except ValueError:
+        u = User.query.filter(User.email == email_or_id).first()
     if not u:
         message = 'no such user'
     elif u.deleted_id:
@@ -930,7 +934,7 @@ def communicate(email):
         if purge:
             Communication.query.filter_by(user_id=u.id).delete()
         try:
-            message = send_user_messages(email, force)
+            message = send_user_messages(u, force)
         except ValueError as ve:
             message = "ERROR {}".format(ve)
         if trace:
