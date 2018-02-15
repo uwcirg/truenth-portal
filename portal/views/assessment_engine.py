@@ -652,6 +652,12 @@ def get_assessments():
           - json
           - csv
         default: json
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
       - name: instrument_id
         in: query
         description:
@@ -717,10 +723,11 @@ def get_assessments():
 
     """
     # Rather than call current_user.check_role() for every patient
-    # in the bundle, deligate that responsibility to aggregate_responses()
+    # in the bundle, delegate that responsibility to aggregate_responses()
     bundle = aggregate_responses(
         instrument_ids=request.args.getlist('instrument_id'),
-        current_user=current_user()
+        current_user=current_user(),
+        patch_dstu2=request.args.get('patch_dstu2'),
     )
     bundle.update({
         'link': {
