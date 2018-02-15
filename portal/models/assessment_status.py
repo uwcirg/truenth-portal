@@ -243,7 +243,7 @@ class AssessmentStatus(object):
     @property
     def qb_name(self):
         """Return name of applicable questionnaire bank if defined"""
-        return getattr(self.qb_data.qb, 'name')
+        return getattr(self.qb_data.qb, 'name', None)
 
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
