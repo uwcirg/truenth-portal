@@ -913,8 +913,8 @@ def communicate(email_or_id):
     """
     from ..tasks import send_user_messages
     try:
-        id = int(email_or_id)
-        u = User.query.get(id)
+        uid = int(email_or_id)
+        u = User.query.get(uid)
     except ValueError:
         u = User.query.filter(User.email == email_or_id).first()
     if not u:

@@ -240,6 +240,11 @@ class AssessmentStatus(object):
         org = self.__organization or self.user.first_top_organization()
         return getattr(org, 'name', '')
 
+    @property
+    def qb_name(self):
+        """Return name of applicable questionnaire bank if defined"""
+        return getattr(self.qb_data.qb, 'name')
+
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
         return len(
@@ -261,11 +266,10 @@ class AssessmentStatus(object):
 
     def instruments_completed(self, classfication=None):
         """Return list of completed questionnaires"""
-        results = []
-        input = self._status_by_classification(classfication)
-        for name, data in input.items():
-            if 'completed' in data:
-                results.append(name)
+        results = [
+            name for name,data in
+            self._status_by_classification(classfication).items()
+            if 'completed' in data]
         return results
 
     def instruments_needing_full_assessment(self, classification=None):

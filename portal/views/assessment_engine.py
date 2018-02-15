@@ -1752,7 +1752,7 @@ def patient_assessment_status(patient_id):
         ),
         'resume_ids': assessment_status.instruments_in_progress(classification='all'),
         'completed_ids': assessment_status.instruments_completed(classfication='all'),
-        'qb_name': assessment_status.qb_data.qb.name
+        'qb_name': assessment_status.qb_name
     }
     return jsonify(response)
 
