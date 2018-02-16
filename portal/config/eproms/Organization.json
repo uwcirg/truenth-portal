@@ -617,10 +617,6 @@
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "IRONMAN v3",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21400,
@@ -661,10 +657,6 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocol": "IRONMAN v3",
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22000,
