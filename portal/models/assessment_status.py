@@ -321,9 +321,9 @@ class AssessmentStatus(object):
                     qb_id = self.qb_data.qb.id
                     if name not in (
                             q.name for q in self.qb_data.qb.questionnaires):
-                        qb_id = QuestionnaireBank.query.filter(
-                            QuestionnaireBank.classification == 'indefinite'
-                        ).one().id  # only a single indefinite expected
+                        indef_qb = QuestionnaireBank.indefinite_qb(
+                            user=self.user, as_of_date=self.as_of_date)
+                        qb_id = indef_qb.questionnaire_bank.id
 
                     results.append(
                         qnr_document_id(self.user.id, qb_id, name, 'in-progress'))
