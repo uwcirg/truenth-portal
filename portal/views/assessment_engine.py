@@ -79,7 +79,12 @@ def assessment(patient_id, instrument_id):
         enum:
           - epic26
           - eq5d
-
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
     responses:
       200:
         description: successful operation
@@ -611,6 +616,15 @@ def assessment(patient_id, instrument_id):
                     not isinstance(answer['valueCoding']['extension'], (tuple, list))
                 ):
                     answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+
+        # Hack: add missing "resource" wrapper for DTSU2 compliance
+        # Remove when all interventions compliant
+        if request.args.get('patch_dstu2'):
+            qnr.document = {
+                'resource': qnr.document,
+                'fullUrl': request.url,
+            }
+
         documents.append(qnr.document)
 
     bundle = {
