@@ -195,6 +195,8 @@ gulp.task("i18nextConvertPOToJSON", ["clean-dest"], function() {
   var __path = path.join(__dirname,"./translations");
   return fs.readdir(__path, function(err, files) {
       files.forEach(function(file) {
+        //skip js directory - as it contains original translation json file
+        if (file.toLowerCase() !== "js") {
           let filePath = __path + "/" + file;
           fs.stat(filePath, function(err, stat) {
               if (stat.isDirectory()) {
@@ -208,18 +210,15 @@ gulp.task("i18nextConvertPOToJSON", ["clean-dest"], function() {
                   fs.mkdirSync(destDir);
                 };
 
-                [ __path + "/" + file + "/LC_MESSAGES/messages.po",
-                  __path + "/" + file + "/LC_MESSAGES/frontend.po",
-                  __path + "/" + file + "/LC_MESSAGES/eproms.po",
-                  __path + "/" + file + "/LC_MESSAGES/gil.po"
-                ].forEach(function(item) {
-                  /*
-                   * write corresponding json file from each messages po file
-                   */
-                  writeJsonFileFromPoFile(file, item, destDir+"/messages.json");
+                ["messages", "frontend", "eproms", "gil"].forEach(function(source) {
+                    /*
+                     * write corresponding json file from each po file
+                     */
+                    writeJsonFileFromPoFile(file, __path+"/"+file+"/LC_MESSAGES/"+source+".po", destDir+"/"+source+".json");
                 });
               };
           });
+        }
       });
   });
 });
@@ -249,6 +248,7 @@ gulp.task("combineTranslationJsons", function() {
                 /*
                  * merge json files into one for frontend to consume
                  * note this plug-in will remove duplicate entries
+                 * not this will not delete the original json files that were merged
                  */
                   console.log("merge json files...");
                   console.log("destination directory: " + destDir);
