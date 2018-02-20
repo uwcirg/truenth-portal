@@ -2,7 +2,7 @@
 {% block title %}{{super()}} {{_("Exercise and Diet")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
-    <main class="main">
+    <main class="main" data-section="exercisediet">
       {{super()}}
       <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('.static', filename='img/Contact-Background.jpg') }})">
         <div class="page-intro__content">
@@ -11,11 +11,4 @@
         </div>
       </div>
     </main>
-{% endblock %}
-{% block document_ready %}
-  <script>
-      $(document).ready(function(){
-        setSelectedNavItem($(".side-nav-items__item--exercisediet"));
-      });
-  </script>
 {% endblock %}

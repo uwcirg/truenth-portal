@@ -96,6 +96,8 @@ var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{
 var CONFIG_DEFAULT_CORE_DATA = {%if config.REQUIRED_CORE_DATA %}{{config.REQUIRED_CORE_DATA|safe}}{% else%}false{%endif%};
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
+var OT = new OrgTool();
+OT.init();
 var fc = new window.FieldsChecker("{{user.id}}",
                             {%-if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)-%}true{%-else-%}false{%-endif-%}, CONFIG_DEFAULT_CORE_DATA,
                             null,

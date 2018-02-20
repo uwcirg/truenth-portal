@@ -78,7 +78,8 @@
 @labelColor: #777;
 @inputHeight: 2.5em;
 @wellColor: #F7F7F7;
-@notificationBgColor: #7c959d;
+@notificationBgColor: #EB1939;
+@notificationLinkHoverBgColor: #CC112D;
 
 
 /**
@@ -534,7 +535,7 @@ select:not([multiple]) {
   padding: 0;
   color: #FFF;
   .content {
-    width: 650px;
+    width: 100%;
     max-width: 100%;
     background-color: @notificationBgColor;
     margin: auto;
@@ -546,32 +547,44 @@ select:not([multiple]) {
   }
   .notification-info {
     cursor: pointer;
-    width: 500px;
+    width: 100%;
     max-width: 100%;
     margin: auto;
     letter-spacing: 1px;
+    color: #FFF;
     &:hover {
-      color: @linkHover;
+      cursor: pointer;
+      background-color: @notificationLinkHoverBgColor;
     }
   }
   .notification {
     display: none;
     max-width: 100%;
     padding: 2px;
+    &:hover {
+      cursor: pointer;
+      background-color: @notificationLinkHoverBgColor;
+    }
     p {
       margin: 0.1em auto;
-      border-bottom: 1px solid #7777;
       padding: 0.1em;
     }
   }
   .notification.active {
     display: block;
   }
+  .notification[data-visited] {
+    display: none;
+  }
+  .notification
   a {
     color: #FFF;
     text-decoration:underline;
+    display: inline-block;
     &:hover {
-      color: @linkHover;
+      cursor: pointer;
+      -webkit-transform: scale(1.02);
+      transform: scale(1.02);
     }
   }
   &, span {
@@ -585,6 +598,13 @@ select:not([multiple]) {
     top: 0;
     margin-top: 4px;
     margin-right: 1em;
+    display: none;
+    &.active {
+      display: block;
+    }
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 div.right-panel {
@@ -3070,7 +3090,7 @@ div.timezone-warning.text-warning {
     padding-right: 1.5em;
   }
   #notificationBanner {
-    padding: 0.1em 1em;
+    padding: 0.1em 0;
     &, span {
       font-size: 1em;
     }
@@ -3397,4 +3417,25 @@ div.or {
 #socialMediaLoginContainer .btn-social
 {
     padding-top: 1.7em;
+}
+
+@media screen {
+  #printSection {
+      display: none;
+  }
+}
+@media print {
+  #printSection, #printSection * {
+      visibility:visible;
+  }
+  #printSection {
+      position:absolute;
+      left:0;
+      top:0;
+  }
+  #websiteDeclarationFormModal {
+    .modal-content {
+      border: 0;
+    }
+  }
 }

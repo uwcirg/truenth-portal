@@ -62,7 +62,7 @@ def get_tou(user_id):
         schema:
           id: tous
           properties:
-            tou_agreements:
+            tous:
               type: array
               items:
                 type: object

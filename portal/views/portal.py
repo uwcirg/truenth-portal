@@ -38,6 +38,7 @@ from ..models.coredata import Coredata
 from ..models.fhir import QuestionnaireResponse
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
+from ..models.login import login_user
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
@@ -259,9 +260,17 @@ def access_via_token(token):
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
-    if ROLE.WRITE_ONLY in has:
+    if set((ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY)).intersection(has):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
+
+            # access_on_verify users are REQUIRED to verify
+            if ROLE.ACCESS_ON_VERIFY in has:
+                current_app.logger.error(
+                    "ACCESS_ON_VERIFY {} has disallowed role "
+                    "PROMOTE_WITHOUT_IDENTITY_CHALLENGE".format(user))
+                abort(400, "Invalid state - access denied")
+
             # only give such tokens 5 minutes - recheck validity
             verify_token(valid_seconds=5*60)
             auditable_event("promoting user without challenge via token, "
@@ -272,16 +281,29 @@ def access_via_token(token):
             session['invited_verified_user_id'] = user.id
             return redirect(url_for('user.register', email=user.email))
 
-        # If WRITE_ONLY user does not have PROMOTE_WITHOUT_IDENTITY_CHALLENGE,
+        # If user does not have PROMOTE_WITHOUT_IDENTITY_CHALLENGE,
         # challenge the user identity, followed by a redirect to the
-        # registration page. Preserve the invited user id, should we need to
-        # merge associated details after user proves themselves and logs in
-        auditable_event("invited user entered using token, pending "
-                        "registration", user_id=user.id, subject_id=user.id,
-                        context='account')
+        # appropriate page.
         session['challenge.user_id'] = user.id
-        session['challenge.next_url'] = url_for('user.register', email=user.email)
-        session['challenge.merging_accounts'] = True
+        if not all((user.birthdate, user.first_name, user.last_name)):
+            current_app.logger.error(
+                "{} w/o all (birthdate, first_name, last_name); can't "
+                "verify".format(user))
+            abort(400, "invalid state - can't continue")
+
+        if ROLE.ACCESS_ON_VERIFY in has:
+            # Send user to verify, and then follow post login flow
+            session['challenge.access_on_verify'] = True
+            session['challenge.next_url'] = url_for('auth.next_after_login')
+        else:
+            # Still here implies a WRITE_ONLY user in process of registration.
+            # Preserve the invited user id, should we need to
+            # merge associated details after user proves themselves and logs in
+            auditable_event("invited user entered using token, pending "
+                            "registration", user_id=user.id, subject_id=user.id,
+                            context='account')
+            session['challenge.next_url'] = url_for('user.register', email=user.email)
+            session['challenge.merging_accounts'] = True
         return redirect(url_for('portal.challenge_identity'))
 
     # If not WRITE_ONLY user, redirect to login page
@@ -296,6 +318,7 @@ class ChallengeIdForm(FlaskForm):
     next_url = HiddenField('next')
     user_id = HiddenField('user')
     merging_accounts = HiddenField('merging_accounts')
+    access_on_verify = HiddenField('access_on_verify')
     first_name = StringField(
         'First Name', validators=[validators.input_required()])
     last_name = StringField(
@@ -305,7 +328,9 @@ class ChallengeIdForm(FlaskForm):
 
 
 @portal.route('/challenge', methods=['GET', 'POST'])
-def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
+def challenge_identity(
+        user_id=None, next_url=None, merging_accounts=False,
+        access_on_verify=False):
     """Challenge the user to verify themselves
 
     Can't expose the parameters for security reasons - use the session,
@@ -317,6 +342,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
     :param merging_accounts: boolean value, set true IFF on success, the
         user account will be merged into a new account, say from a weak
         authenicated WRITE_ONLY invite account
+    :param access_on_verify: boolean value, set true IFF on success, the
+        user should be logged in once validated, i.e. w/o a password
 
     """
     if request.method == 'GET':
@@ -325,6 +352,7 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
             user_id = session.get('challenge.user_id')
             next_url = session.get('challenge.next_url')
             merging_accounts = session.get('challenge.merging_accounts', False)
+            access_on_verify = session.get('challenge.access_on_verify', False)
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
@@ -341,7 +369,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
             abort(400, "missing user in identity challenge")
         form = ChallengeIdForm(
             next_url=next_url, user_id=user.id,
-            merging_accounts=merging_accounts)
+            merging_accounts=merging_accounts,
+            access_on_verify=access_on_verify)
 
     errorMessage = ""
     if not form.validate_on_submit():
@@ -362,6 +391,10 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
             user.mask_email()
             db.session.commit()
             session['invited_verified_user_id'] = user.id
+        if form.access_on_verify.data == 'True':
+            # Log user in as they have now verified
+            login_user(
+                user=user, auth_method='url_authenticated_and_verified')
         return redirect(form.next_url.data)
 
     else:
@@ -510,7 +543,7 @@ def profile(user_id):
     user = current_user()
     # template file for user self's profile
     template_file = 'profile/my_profile.html'
-    if user_id:
+    if user_id and user_id != user.id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
         # template file for view of other user's profile
@@ -859,10 +892,10 @@ def preview_communication(comm_id):
                    recipients=preview.recipients)
 
 
-@portal.route("/communicate/<email>")
+@portal.route("/communicate/<email_or_id>")
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
-def communicate(email):
+def communicate(email_or_id):
     """Direct call to trigger communications to given user.
 
     Typically handled by scheduled jobs, this API enables testing of
@@ -879,7 +912,11 @@ def communicate(email):
 
     """
     from ..tasks import send_user_messages
-    u = User.query.filter(User.email == email).first()
+    try:
+        uid = int(email_or_id)
+        u = User.query.get(uid)
+    except ValueError:
+        u = User.query.filter(User.email == email_or_id).first()
     if not u:
         message = 'no such user'
     elif u.deleted_id:
@@ -897,7 +934,7 @@ def communicate(email):
         if purge:
             Communication.query.filter_by(user_id=u.id).delete()
         try:
-            message = send_user_messages(email, force)
+            message = send_user_messages(u, force)
         except ValueError as ve:
             message = "ERROR {}".format(ve)
         if trace:

@@ -95,7 +95,7 @@ def get_reporting_stats():
 def calculate_days_overdue(user):
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
-    if a_s.overall_status in ('Completed', 'Expired'):
+    if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
         return 0
     qb = a_s.qb_data.qb
     if not qb:
@@ -132,7 +132,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     rows = []
     totals = defaultdict(int)
 
-    for org in sorted(overdue_stats, key=lambda x: x.id):
+    for org in sorted(overdue_stats, key=lambda x: x.name):
         if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
             continue
         user_accessible = False

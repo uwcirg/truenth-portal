@@ -122,6 +122,8 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        self.test_user = db.session.merge(self.test_user)
+
         # test user with status = 'Expired' (should not show up)
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
         self.assertEqual(a_s.overall_status, 'Expired')
@@ -145,22 +147,28 @@ class TestReporting(TestCase):
         self.assertEqual(ostats[crv], [15])
 
     def test_overdue_table_html(self):
-        org = Organization(name='testorg')
+        org = Organization(name='OrgC', id=101)
+        org2 = Organization(name='OrgB', id=102, partOf_id=101)
+        org3 = Organization(name='OrgA', id=103, partOf_id=101)
         false_org = Organization(name='falseorg')
 
         user = self.add_user('test_user)')
 
         with SessionScope(db):
             db.session.add(org)
+            db.session.add(org3)
+            db.session.add(org2)
             db.session.add(false_org)
             user.organizations.append(org)
+            user.organizations.append(org3)
+            user.organizations.append(org2)
             user.organizations.append(false_org)
             db.session.add(user)
             db.session.commit()
-        org, false_org, user = map(db.session.merge,
-                                   (org, false_org, user))
+        org, org2, org3, false_org, user = map(
+            db.session.merge, (org, org2, org3, false_org, user))
 
-        ostats = {org: [1, 8, 9, 11]}
+        ostats = {org3: [2, 3], org2: [1, 5], org: [1, 8, 9, 11]}
         cutoffs = [5, 10]
 
         table1 = generate_overdue_table_html(cutoff_days=cutoffs,
@@ -172,9 +180,12 @@ class TestReporting(TestCase):
         self.assertTrue('<th>1-5 Days</th>' in table1)
         self.assertTrue('<th>6-10 Days</th>' in table1)
         self.assertTrue('<td>{}</td>'.format(org.name) in table1)
-        orgrow = (r'<td>{}<\/td>\s*<td>1<\/td>\s*'
-                  '<td>2<\/td>\s*<td>3<\/td>'.format(org.name))
-        self.assertTrue(search(orgrow, table1))
+        org_row = (r'<td>{}<\/td>\s*<td>1<\/td>\s*'
+                   '<td>2<\/td>\s*<td>3<\/td>'.format(org.name))
+        self.assertTrue(search(org_row, table1))
+        # confirm alphabetical order
+        org_order = r'{}[^O]*{}[^O]*{}'.format(org3.name, org2.name, org.name)
+        self.assertTrue(search(org_order, table1))
 
         # confirm that the table contains no orgs
         table2 = generate_overdue_table_html(cutoff_days=cutoffs,

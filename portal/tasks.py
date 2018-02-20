@@ -29,13 +29,12 @@ from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
 from .models.communication import Communication, load_template_args
 from .models.communication_request import queue_outstanding_messages
 from .models.message import EmailMessage
-from .models.notification import Notification, UserNotification
 from .models.organization import Organization, OrgTree
-from .models.research_protocol import ResearchProtocol
 from .models.reporting import get_reporting_stats, overdue_stats_by_org
 from .models.reporting import generate_overdue_table_html
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
+from .models.tou import update_tous
 from .models.user import User, UserRoles
 from .models.scheduled_job import check_active, update_job_status
 
@@ -226,10 +225,10 @@ def send_messages():
         db.session.commit()
 
 
-def send_user_messages(email, force_update=False):
+def send_user_messages(user, force_update=False):
     """Send queued messages to only given user (if found)
 
-    @param email: to process
+    @param user: to email
     @param force_update: set True to force reprocessing of cached
     data and queue any messages previously overlooked.
 
@@ -238,7 +237,6 @@ def send_user_messages(email, force_update=False):
 
     """
     if force_update:
-        user = User.query.filter(User.email == email).one()
         invalidate_assessment_status_cache(user_id=user.id)
         qbd = QuestionnaireBank.most_current_qb(
             user=user, as_of_date=datetime.utcnow())
@@ -249,14 +247,14 @@ def send_user_messages(email, force_update=False):
                 iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
-        Communication.status == 'preparation').filter(User.email == email)
+        Communication.status == 'preparation').filter(User == user)
     for communication in ready:
         current_app.logger.debug("Collate ready communication {}".format(
             communication))
         communication.generate_and_send()
         db.session.commit()
         count += 1
-    message = "Sent {} messages to {}".format(count, email)
+    message = "Sent {} messages to {}".format(count, user.email)
     if force_update:
         message += " after forced update"
     return message
@@ -321,72 +319,10 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
 @celery.task
 @scheduled_task
-def deactivate_tous_task(**kwargs):
-    """Require users to re-consent to their initial consent
+def update_tous_task(**kwargs):
+    """Job to manage updates for various ToUs
 
-    Scheduled task, delegates work to `deactivate_tous()`
-
-    """
-    return deactivate_tous(**kwargs)
-
-
-def deactivate_tous(**kwargs):
-    """Deactivate matching consents
-
-    Optional kwargs:
-    :param types: ToU types for which to invalidate agreements
-    :param organization: Provide name of organization to restrict
-    to respective set of users.  All child orgs implicitly included.
-    :param roles: Restrict to users with given roles; defaults to
-    (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+    Scheduled task, see docs in ``tou.update_tous()``
 
     """
-    types = kwargs.get('types')
-    sys = User.query.filter_by(email='__system__').first()
-
-    if not sys:
-        raise ValueError("No system user found")
-
-    require_orgs = None
-    if kwargs.get('organization'):
-        org_name = kwargs.get('organization')
-        org = Organization.query.filter(Organization.name == org_name).first()
-        if not org:
-            raise ValueError("No such organization: {}".format(org_name))
-        require_orgs = set(OrgTree().here_and_below_id(org.id))
-
-    require_roles = set(
-        kwargs.get('roles', (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)))
-    for role in require_roles:
-        if not Role.query.filter(Role.name == role).first():
-            raise ValueError("No such role: {}".format(role))
-
-    for user in User.query.filter(User.deleted_id.is_(None)):
-        if require_roles.isdisjoint([r.name for r in user.roles]):
-            continue
-        if require_orgs and require_orgs.isdisjoint(
-                [o.id for o in user.organizations]):
-            continue
-        user.deactivate_tous(acting_user=sys, types=types)
-
-
-@celery.task
-@scheduled_task
-def notify_users(**kwargs):
-    "Create UserNotifications for a given Notification"
-    notif_name = kwargs.get('notification')
-    notif = Notification.query.filter_by(name=notif_name).first()
-    if not notif:
-        raise ValueError("Notification `{}` not found".format(notif_name))
-
-    roles = kwargs.get('roles')
-
-    for user in User.query.filter(User.deleted_id.is_(None)):
-        if set([role.name for role in user.roles]).isdisjoint(set(roles)):
-            continue
-        if not UserNotification.query.filter_by(
-                user_id=user.id, notification_id=notif.id).count():
-            un = UserNotification(user_id=user.id,
-                                  notification_id=notif.id)
-            db.session.add(un)
-    db.session.commit()
+    return update_tous(**kwargs)

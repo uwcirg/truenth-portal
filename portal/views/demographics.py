@@ -90,7 +90,7 @@ def demographics_set(patient_id):
     will be retained.  Consider calling GET first.
 
     For fields outside the defined patient resource
-    (http://www.hl7.org/fhir/patient.html), include in the 'extension'
+    (http://www.hl7.org/fhir/DSTU2/patient.html), include in the 'extension'
     list.  This includes 'race' and 'ethnicity'.  See example usage
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
@@ -105,6 +105,9 @@ def demographics_set(patient_id):
     resource.  At this time, all users, regarless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's role.
     Use the /api/roles endpoints for that purpose.
+
+    NB - although the email address may be viewed as an identifier, to alter
+    its value, make use the appropriate telecom field.
 
     ---
     operationId: setPatientDemographics

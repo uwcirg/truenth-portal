@@ -44,12 +44,15 @@
       "active": false,
       "args": null,
       "kwargs": {
-        "types": ["website terms of use"]
+        "types": ["website terms of use"],
+        "notification": "website_terms_of_use_update",
+        "roles": ["patient", "staff", "staff_admin"],
+        "deactivate": true
       },
-      "name": "Deactivate website ToU agreements",
+      "name": "Update -- Website Terms of Use",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
+      "task": "update_tous_task"
     }
   ],
   "id": "SitePersistence v0.2",

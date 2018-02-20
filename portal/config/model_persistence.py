@@ -42,7 +42,12 @@ class ModelPersistence(object):
         self.filename = persistence_filename(
             scope=scope, target_dir=target_dir)
         with open(self.filename, 'r') as f:
-            data = json.load(f)
+            try:
+                data = json.load(f)
+            except ValueError, e:
+                msg = "Ill formed JSON in {}".format(self.filename)
+                self._log(msg)
+                raise ValueError(e, msg)
         self.__verify_header__(data)
         return data
 

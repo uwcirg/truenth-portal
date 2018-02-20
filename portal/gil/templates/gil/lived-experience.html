@@ -2,7 +2,7 @@
 {% block title %}{{super()}} {{_("Lived Experience")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
-    <main class="main main--white">
+    <main class="main main--white lived-experience-main" data-section="livedexperience">
       {{super()}}
       {% block header %}
         <header class="header header--white {%if user%}no-banner{%endif%}">
@@ -48,15 +48,4 @@
         </div>
       </div>
     </main>
-{% endblock %}
-{% block document_ready %}
-  <script>
-      $(document).ready(function(){
-        $("#lnReadMoreStory").addClass("disabled").on("click", function(e) {
-          e.preventDefault();
-          return false;
-        });
-        setSelectedNavItem($(".side-nav-items__item--livedexperience"));
-      });
-  </script>
 {% endblock %}

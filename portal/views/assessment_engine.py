@@ -79,7 +79,12 @@ def assessment(patient_id, instrument_id):
         enum:
           - epic26
           - eq5d
-
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
     responses:
       200:
         description: successful operation
@@ -600,7 +605,27 @@ def assessment(patient_id, instrument_id):
             ].astext.endswith(instrument_id)
         )
 
-    documents = [qnr.document for qnr in questionnaire_responses]
+    documents = []
+    for qnr in questionnaire_responses:
+        for question in qnr.document['group']['question']:
+            for answer in question['answer']:
+                # Hack: Extensions should be a list, correct in-place if need be
+                # todo: migrate towards FHIR spec in persisted data
+                if (
+                    'extension' in answer.get('valueCoding', {}) and
+                    not isinstance(answer['valueCoding']['extension'], (tuple, list))
+                ):
+                    answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+
+        # Hack: add missing "resource" wrapper for DTSU2 compliance
+        # Remove when all interventions compliant
+        if request.args.get('patch_dstu2'):
+            qnr.document = {
+                'resource': qnr.document,
+                'fullUrl': request.url,
+            }
+
+        documents.append(qnr.document)
 
     bundle = {
         'resourceType':'Bundle',
@@ -641,6 +666,12 @@ def get_assessments():
           - json
           - csv
         default: json
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
       - name: instrument_id
         in: query
         description:
@@ -706,10 +737,11 @@ def get_assessments():
 
     """
     # Rather than call current_user.check_role() for every patient
-    # in the bundle, deligate that responsibility to aggregate_responses()
+    # in the bundle, delegate that responsibility to aggregate_responses()
     bundle = aggregate_responses(
         instrument_ids=request.args.getlist('instrument_id'),
-        current_user=current_user()
+        current_user=current_user(),
+        patch_dstu2=request.args.get('patch_dstu2'),
     )
     bundle.update({
         'link': {
@@ -1265,6 +1297,9 @@ def assessment_add(patient_id):
     if not hasattr(request, 'json') or not request.json:
         return abort(400, 'Invalid request')
 
+    if "questionnaire" not in request.json:
+        abort(400, "Requires `questionnaire` element")
+
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
@@ -1313,24 +1348,23 @@ def assessment_add(patient_id):
 
     qnr_qb = None
     authored = FHIR_datetime.parse(request.json['authored'])
-    if "questionnaire" in request.json:
-        qn_ref = request.json.get("questionnaire").get("reference")
-        qn_name = qn_ref.split("/")[-1] if qn_ref else None
-        qn = Questionnaire.query.filter_by(name=qn_name).first()
-        qbd = QuestionnaireBank.most_current_qb(
+    qn_ref = request.json.get("questionnaire").get("reference")
+    qn_name = qn_ref.split("/")[-1] if qn_ref else None
+    qn = Questionnaire.query.filter_by(name=qn_name).first()
+    qbd = QuestionnaireBank.most_current_qb(
+        patient, as_of_date=authored)
+    qb = qbd.questionnaire_bank
+    if (qb and qn and (qn.id in [qbq.questionnaire.id
+                       for qbq in qb.questionnaires])):
+        qnr_qb = qb
+    # if a valid qb wasn't found, try the indefinite option
+    if not qnr_qb:
+        qbd = QuestionnaireBank.indefinite_qb(
             patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
         if (qb and qn and (qn.id in [qbq.questionnaire.id
                            for qbq in qb.questionnaires])):
             qnr_qb = qb
-        # if a valid qb wasn't found, try the indefinite option
-        if not qnr_qb:
-            qbd = QuestionnaireBank.indefinite_qb(
-                patient, as_of_date=authored)
-            qb = qbd.questionnaire_bank
-            if (qb and qn and (qn.id in [qbq.questionnaire.id
-                               for qbq in qb.questionnaires])):
-                qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
@@ -1387,28 +1421,11 @@ def present_needed():
         assessment_status.instruments_needing_full_assessment(
             classification='all'))
 
-    # If we find any instruments_in_progress, need to fetch their
-    # identifiers for reliable resume behavior on the AE side.
-    # This is also done now to avoid the overhead of looking up
-    # when generating reports and reminders.
-    resume_ids = []
-    for questionnaire_name in assessment_status.instruments_in_progress(
-            classification='all'):
-        questionnaire_bank = assessment_status.qb_data.qb
-        if questionnaire_name not in (
-                q.name for q in
-                assessment_status.qb_data.qb.questionnaires):
-            # This should only happen in the indefinite case
-            questionnaire_bank = QuestionnaireBank.query.filter(
-                QuestionnaireBank.classification == 'indefinite').one()
-
-        resume_ids.append(
-            qnr_document_id(
-                subject_id=subject_id,
-                questionnaire_bank_id=questionnaire_bank.id,
-                questionnaire_name=questionnaire_name,
-                status='in-progress'))
-
+    # Instruments in progress need special handling.  Assemble
+    # the list of external document ids for reliable resume
+    # behavior at external assessment intervention.
+    resume_ids = assessment_status.instruments_in_progress(
+            classification='all')
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
@@ -1706,7 +1723,7 @@ def batch_assessment_status():
 )
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
-    """Return to the assessment status for a given patient
+    """Return current assessment status for a given patient
 
     ---
     operationId: patient_assessment_status
@@ -1723,7 +1740,7 @@ def patient_assessment_status(patient_id):
       - application/json
     responses:
       200:
-        description: return current overall assessment status of given patient
+        description: return current assessment status of given patient
       400:
         description: if patient id is invalid
       401:
@@ -1733,26 +1750,32 @@ def patient_assessment_status(patient_id):
 
     """
     patient = get_user(patient_id)
-    if patient:
-        current_user().check_role(permission='view', other_id=patient_id)
-        now = datetime.utcnow()
-        assessment_status = AssessmentStatus(user=patient, as_of_date=now)
-        assessment_overall_status = (
-                assessment_status.overall_status if assessment_status else
-                None)
-
-        # indefinite assessments don't affect overall status, but need to
-        # be available if unfinished
-        outstanding_indefinite_work = len(
-            assessment_status.instruments_needing_full_assessment(
-                classification='indefinite') +
-            assessment_status.instruments_in_progress(
-                classification='indefinite'))
-
-        return jsonify(assessment_status=assessment_overall_status,
-                       outstanding_indefinite_work=outstanding_indefinite_work)
-    else:
+    if not patient:
         abort(400, "invalid patient id")
+    current_user().check_role(permission='view', other_id=patient_id)
+
+    now = datetime.utcnow()
+    assessment_status = AssessmentStatus(user=patient, as_of_date=now)
+    assessment_overall_status = assessment_status.overall_status if assessment_status else None
+
+    # indefinite assessments don't affect overall status, but need to
+    # be available if unfinished
+    outstanding_indefinite_work = len(
+        assessment_status.instruments_needing_full_assessment(classification='indefinite') +
+        assessment_status.instruments_in_progress(classification='indefinite')
+    )
+
+    response = {
+        'assessment_status': assessment_overall_status,
+        'outstanding_indefinite_work': outstanding_indefinite_work,
+        'questionnaires_ids': assessment_status.instruments_needing_full_assessment(
+            classification='all'
+        ),
+        'resume_ids': assessment_status.instruments_in_progress(classification='all'),
+        'completed_ids': assessment_status.instruments_completed(classfication='all'),
+        'qb_name': assessment_status.qb_name
+    }
+    return jsonify(response)
 
 
 @assessment_engine_api.route('/questionnaire_bank')

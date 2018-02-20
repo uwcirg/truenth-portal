@@ -7,10 +7,8 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
-from portal.models.research_protocol import ResearchProtocol
-from portal.models.tou import ToU
-from portal.tasks import deactivate_tous
-
+from portal.models.notification import Notification, UserNotification
+from portal.models.tou import ToU, update_tous
 
 tou_url = 'http://fake-tou.org'
 
@@ -169,11 +167,16 @@ class TestTou(TestCase):
         wtou_2 = gentou(second_user_id, 'website terms of use')
         wtou_staff = gentou(staff_id, 'website terms of use')
 
+        notif_p = Notification(name="priv notif", content="Test Alert!")
+        notif_w = Notification(name="web notif", content="Test Alert!")
         tous = (pptou, pptou_2, pptou_staff, wtou, wtou_2, wtou_staff)
         with SessionScope(db):
+            db.session.add(notif_p)
+            db.session.add(notif_w)
             for t in tous:
                 db.session.add(t)
             db.session.commit()
+
         self.test_user, second_user, staff, parent = map(
             db.session.merge, (self.test_user, second_user, staff, parent))
         pptou, pptou_2, pptou_staff, wtou, wtou_2, wtou_staff = map(
@@ -184,17 +187,37 @@ class TestTou(TestCase):
             pptou.active, pptou_2.active, wtou.active, wtou_2.active)))
 
         # test deactivating single type by org - should miss second user
-        kwargs = {'types': ['privacy policy'], 'organization': '101'}
-        deactivate_tous(**kwargs)
+        update_tous(
+            types=['privacy policy'], organization='101',
+            notification='priv notif', deactivate=True)
         self.assertFalse(pptou.active)
         self.assertFalse(pptou_staff.active)
         self.assertTrue(all(
             (pptou_2.active, wtou.active, wtou_2.active, wtou_staff.active)))
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == TEST_USER_ID).count(), 1)
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == staff_id).count(), 1)
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == second_user_id).count(), 0)
 
         # test limiting to staff on org both staff and test_user belong to
         # only hits staff
-        kwargs['types'] = ['website terms of use']
-        kwargs['roles'] = ['staff', 'staff_admin']
-        deactivate_tous(**kwargs)
+        update_tous(
+            types=['website terms of use'], organization='101',
+            roles=['staff', 'staff_admin'], notification='web notif',
+            deactivate=True)
         self.assertFalse(wtou_staff.active)
         self.assertTrue(all((pptou_2.active, wtou.active, wtou_2.active)))
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == TEST_USER_ID).count(), 1)
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == staff_id).count(), 2)
+        self.assertEquals(
+            UserNotification.query.filter(
+                UserNotification.user_id == second_user_id).count(), 0)

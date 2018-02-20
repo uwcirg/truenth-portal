@@ -71,112 +71,150 @@
       "args": null,
       "kwargs": {
         "types": ["privacy policy"],
-        "organization": "IRONMAN"
-      },
-      "name": "Deactivate IRONMAN Privacy Policy",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "types": ["subject website consent"],
         "organization": "IRONMAN",
-        "roles": ["patient"]
+        "notification": "privacy_policy_update",
+        "roles": ["patient"],
+        "deactivate": false
       },
-      "name": "Deactivate IRONMAN Patient terms (subject website consent)",
+      "name": "Update -- IRONMAN Privacy Policy for Patients",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "types": ["subject website consent"],
-        "organization": "IRONMAN",
-        "roles": ["staff", "staff_admin"]
-      },
-      "name": "Deactivate IRONMAN Staff terms (subject website consent)",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
+      "task": "update_tous_task"
     },
     {
       "active": false,
       "args": null,
       "kwargs": {
         "types": ["privacy policy"],
-        "organization": "TrueNTH Global Registry"
-      },
-      "name": "Deactivate TNGR Privacy Policy",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "types": ["subject website consent"],
-        "organization": "TrueNTH Global Registry",
-        "roles": ["patient"]
-      },
-      "name": "Deactivate TNGR Patient terms (subject website consent)",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "types": ["subject website consent"],
-        "organization": "TrueNTH Global Registry",
-        "roles": ["staff", "staff_admin"]
-      },
-      "name": "Deactivate TNGR Staff terms (subject website consent)",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "deactivate_tous_task"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "notification": "subject_website_consent_update",
-        "roles": ["patient"]
-      },
-      "name": "Subject website consent update notification (run this ONLY AFTER 'Deactivate subject website consent agreements' job)",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "notify_users"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
-        "notification": "website_terms_of_use_update",
-        "roles": ["patient", "staff", "staff_admin"]
-      },
-      "name": "Website terms update notification",
-      "resourceType": "ScheduledJob",
-      "schedule": "0 0 1 1 0",
-      "task": "notify_users"
-    },
-    {
-      "active": false,
-      "args": null,
-      "kwargs": {
+        "organization": "IRONMAN",
         "notification": "privacy_policy_update",
-        "roles": ["patient", "staff", "staff_admin"]
+        "roles": ["staff", "staff_admin"],
+        "deactivate": false
       },
-      "name": "Privacy policy update notification",
+      "name": "Update -- IRONMAN Privacy Policy for Staff",
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
-      "task": "notify_users"
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "organization": "IRONMAN",
+        "notification": "subject_website_consent_update",
+        "roles": ["patient"],
+        "deactivate": true
+      },
+      "name": "Update -- IRONMAN Subject Website Consent for Patients",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["website terms of use"],
+        "organization": "IRONMAN",
+        "notification": "website_terms_of_use_update",
+        "roles": ["patient"],
+        "deactivate": false
+      },
+      "name": "Update -- IRONMAN Website Terms of Use for Patients",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["website terms of use"],
+        "organization": "IRONMAN",
+        "notification": "website_terms_of_use_update",
+        "roles": ["staff", "staff_admin"],
+        "deactivate": false
+      },
+      "name": "Update -- IRONMAN Website Terms of Use for Staff",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["privacy policy"],
+        "organization": "TrueNTH Global Registry",
+        "notification": "privacy_policy_update",
+        "roles": ["patient"],
+        "deactivate": false
+      },
+      "name": "Update -- TNGR Privacy Policy for Patients",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["privacy policy"],
+        "organization": "TrueNTH Global Registry",
+        "notification": "privacy_policy_update",
+        "roles": ["staff", "staff_admin"],
+        "deactivate": false
+      },
+      "name": "Update -- TNGR Privacy Policy for Staff",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["subject website consent"],
+        "organization": "TrueNTH Global Registry",
+        "notification": "subject_website_consent_update",
+        "roles": ["patient"],
+        "deactivate": true
+      },
+      "name": "Update -- TNGR Subject Website Consent for Patients",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["website terms of use"],
+        "organization": "TrueNTH Global Registry",
+        "notification": "website_terms_of_use_update",
+        "roles": ["patient"],
+        "deactivate": false
+      },
+      "name": "Update -- TNGR Website Terms of Use for Patients",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "types": ["website terms of use"],
+        "organization": "TrueNTH Global Registry",
+        "notification": "website_terms_of_use_update",
+        "roles": ["staff", "staff_admin"],
+        "deactivate": false
+      },
+      "name": "Update -- TNGR Website Terms of Use for Staff",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 1 1 0",
+      "task": "update_tous_task"
     }
   ],
   "id": "SitePersistence v0.2",

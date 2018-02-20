@@ -50,7 +50,7 @@ class FHIR_datetime(object):
         epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')
         try:
             dt = parser.parse(data)
-        except ValueError:
+        except (TypeError, ValueError):
             msg = "Unable to parse {}: {}".format(error_subject, data)
             current_app.logger.warn(msg)
             abort(400, msg)

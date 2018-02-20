@@ -93,6 +93,8 @@
             {% endif %}
         {%- endwith %}
     {% endblock %}
+    <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
+<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
 <script src="https://unpkg.com/i18next-xhr-backend@1.4.3/i18nextXHRBackend.min.js"></script>
 <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.min.js"></script>
@@ -104,7 +106,6 @@
 <script href="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.min.js"></script>
 <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
 {%block table_export_filter_script %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.min.js"></script>
 <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js" async></script>
@@ -112,42 +113,6 @@
 {% endblock %}
 {%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
 <script>
-PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
-PORTAL_HOSTNAME = "";
-function _setHostName(url) {
-    if (url) {
-        var parser = document.createElement("a");
-        parser.href = url;
-        PORTAL_HOSTNAME = parser.hostname;
-    };
-};
-_setHostName(PORTAL_NAV_PAGE);
-var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-if (LOGIN_AS_PATIENT) {
-  if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
-  window.addEventListener('popstate', function(event) {
-    if (typeof history != 'undefined' && history.pushState) {
-      history.pushState(null, null, location.href);
-    } else {
-      window.history.forward(1);
-    };
-  });
-};
-var __CRSF_TOKEN = "{{csrf_token()}}";
-var __CRSF_TOKEN_HEADER = {
-    "X-CSRFToken": __CRSF_TOKEN
-};
- __i18next.init({"debug": false, "initImmediate": true});
-
-$("#homeFooter .logo-link").each(function() {
-  if (! hasValue($.trim($(this).attr("href")))) {
-      $(this).removeAttr("target");
-      $(this).on("click", function(e) {
-        e.preventDefault();
-        return false;
-      });
-  };
-});
 {% block document_ready -%}
 {%- endblock %}
 </script>

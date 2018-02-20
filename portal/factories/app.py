@@ -33,6 +33,7 @@ from ..views.intervention import intervention_api
 from ..views.notification import notification_api
 from ..views.patient import patient_api
 from ..views.patients import patients
+from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
 from ..views.portal import portal
 from ..views.organization import org_api
@@ -59,6 +60,7 @@ DEFAULT_BLUEPRINTS = (
     org_api,
     patient_api,
     patients,
+    practitioner_api,
     procedure_api,
     portal,
     scheduled_job_api,

@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
-from .fhir import CC
+from .fhir import CC, QuestionnaireResponse
 from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
@@ -206,7 +206,10 @@ class QuestionnaireBank(db.Model):
         return bundle
 
     @staticmethod
-    def qbs_for_user(user, classification):
+    def qbs_for_user(user, classification, as_of_date=None):
+        # avoid cyclical import
+        from .assessment_status import QuestionnaireBankDetails
+
         """Return questionnaire banks applicable to (user, classification)
 
         QuestionnaireBanks are associated with a user through the user's
@@ -215,21 +218,61 @@ class QuestionnaireBank(db.Model):
         :return: matching QuestionnaireBanks if found, else empty list
 
         """
+        def filter_invalid_qb_statuses(qbs):
+            valid_qbs = []
+            for qb in qbs:
+                qb_data = QuestionnaireBankDetails(
+                    user, as_of_date=as_of_date, qb=qb)
+                if (qb_data.overall_status() not in
+                        ('Completed', 'Expired', 'Partially Completed')):
+                    valid_qbs.append(qb)
+            return valid_qbs
+
+        def validate_classification_count(qbs):
+            if qbs and qbs[0].classification == 'recurring':
+                return
+            if (len(qbs) > 1):
+                errstr = ("multiple QuestionnaireBanks for {user} with "
+                          "{classification} found.  The UI won't correctly "
+                          "display more than one at this "
+                          "time.").format(user=user,
+                                          classification=classification)
+                systype = current_app.config.get('SYSTEM_TYPE', '').lower()
+                if systype == 'production':
+                    current_app.logger.error(errstr)
+                else:
+                    current_app.logger.warn(errstr)
+
+        as_of_date = as_of_date or datetime.utcnow()
+
         user_rps = set()
         for org in (o for o in user.organizations if o.id):
             rp = org.research_protocol
             if rp:
                 user_rps.add(rp.id)
 
-        if not user_rps:
-            results = []
-        elif classification:
-            results = QuestionnaireBank.query.filter(
-                QuestionnaireBank.research_protocol_id.in_(user_rps),
+        # find any outdated QBs that the user already started
+        in_progress = QuestionnaireBank.query.join(
+            QuestionnaireResponse).filter(
+                QuestionnaireResponse.subject_id == user.id,
+                QuestionnaireResponse.questionnaire_bank_id ==
+                QuestionnaireBank.id)
+
+        # find current QBs for user's organizations
+        results = QuestionnaireBank.query.filter(
+            QuestionnaireBank.research_protocol_id.in_(user_rps))
+
+        if classification:
+            # use in-progress if found for user, otherwise use current
+            in_progress = in_progress.filter(
+                QuestionnaireBank.classification == classification).all()
+            in_progress = filter_invalid_qb_statuses(in_progress)
+            results = in_progress or results.filter(
                 QuestionnaireBank.classification == classification).all()
         else:
-            results = QuestionnaireBank.query.filter(
-                QuestionnaireBank.research_protocol_id.in_(user_rps)).all()
+            # if no classification specified, combine current with in-progress
+            in_progress = filter_invalid_qb_statuses(in_progress.all())
+            results = list(set().union(in_progress, results.all()))
 
         # Complicated rules (including strategies and UserIntervention rows)
         # define a user's access to an intervention.  Rely on the
@@ -257,21 +300,6 @@ class QuestionnaireBank(db.Model):
                 if check_func(intervention=intervention, user=user):
 
                     results.append(qb)
-
-        def validate_classification_count(qbs):
-            if qbs and qbs[0].classification == 'recurring':
-                return
-            if (len(qbs) > 1):
-                errstr = ("multiple QuestionnaireBanks for {user} with "
-                          "{classification} found.  The UI won't correctly "
-                          "display more than one at this "
-                          "time.").format(user=user,
-                                          classification=classification)
-                systype = current_app.config.get('SYSTEM_TYPE', '').lower()
-                if systype == 'production':
-                    current_app.logger.error(errstr)
-                else:
-                    current_app.logger.warn(errstr)
 
         validate_classification_count(results)
         return results
@@ -343,8 +371,7 @@ class QuestionnaireBank(db.Model):
         as_of_date = as_of_date or datetime.utcnow()
         trigger_date = indefinite_qb[0].trigger_date(user)
         return indefinite_qb[0].calculated_start(
-                trigger_date=trigger_date, as_of_date=as_of_date)
-
+            trigger_date=trigger_date, as_of_date=as_of_date)
 
     def calculated_start(self, trigger_date, as_of_date):
         """Return namedtuple (QBD) for QB

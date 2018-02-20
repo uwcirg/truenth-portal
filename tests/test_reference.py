@@ -1,13 +1,17 @@
 """Unit test module for Reference class"""
+from flask_webtest import SessionScope
 from tests import TestCase, TEST_USER_ID
 
+from portal.extensions import db
+from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
+from portal.models.practitioner import Practitioner
 from portal.models.reference import Reference
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.system_uri import US_NPI
 
-
-class TestDemographics(TestCase):
+class TestReference(TestCase):
 
     def test_patient(self):
         patient = Reference.patient(TEST_USER_ID)
@@ -43,3 +47,28 @@ class TestDemographics(TestCase):
         ref = {'reference': 'api/intervention/self_management'}
         i = Reference.parse(ref)
         self.assertEquals(i.name, 'self_management')
+
+    def prep_practitioner(self):
+        p = Practitioner(first_name='first', last_name='last')
+        i = Identifier(system=US_NPI, value='12345')
+        p.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(p)
+            db.session.commit()
+        p = db.session.merge(p)
+        return p
+
+    def test_practioner(self):
+        p = self.prep_practitioner()
+        p_ref = Reference.practitioner(p.id)
+        self.assertEquals(
+            p_ref.as_fhir()['display'], 'first last')
+        self.assertEquals(
+            p_ref.as_fhir()['reference'],
+            'api/practitioner/{}'.format(p.id))
+
+    def test_practitioner_parse(self):
+        p = self.prep_practitioner()
+        ref = {'reference': 'api/practitioner/12345?system={}'.format(US_NPI)}
+        parsed = Reference.parse(ref)
+        self.assertEquals(p, parsed)

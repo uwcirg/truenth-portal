@@ -34,7 +34,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 
-. "$bin_path/utils.sh"
+. "${bin_path}/utils.sh"
 
 # Default values (mirrors values in docker-compose.yaml)
 DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}"
@@ -56,8 +56,10 @@ get_configured_registries | while read config ; do
     echo "Pushing images to $repo..."
     echo "$DOCKER_TAGS" | while read tag ; do
         docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
-    done &
+        echo "Pushed ${repo}/${DOCKER_IMAGE_NAME}:${tag}"
+    done #&
 done
 
+# todo: figure out why TravisCI won't wait
 # Wait for background jobs to finish
-wait
+# wait

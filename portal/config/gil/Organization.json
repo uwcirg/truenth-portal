@@ -1901,6 +1901,46 @@
         }
       ],
       "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40001,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "music"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "p3p"
+        }
+      ],
+      "indigenous_codings": false,
+      "name": "MUSIC",
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     }
   ],
   "id": "SitePersistence v0.2",
