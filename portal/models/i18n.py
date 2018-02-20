@@ -260,8 +260,22 @@ def download_zip_file(headers, project_id, uri, state):
 
 
 def extract_po_file(language, data, fname):
-    po_path = os.path.join(current_app.root_path, "translations", language,
-                           'LC_MESSAGES', 'temp_{}.po'.format(fname))
+    po_dir = os.path.join(
+        current_app.root_path,
+        "translations",
+        language,
+        'LC_MESSAGES',
+        'temp_{}.po'.format(fname),
+    )
+    po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
+
+    # Create directory if necessary
+    try:
+        os.makedirs(po_dir)
+    except OSError:
+        if not os.path.isdir(po_dir):
+            raise
+
     with open(po_path, "wb") as fout:
         fout.write(data)
     current_app.logger.debug("{} po file extracted".format(language))
