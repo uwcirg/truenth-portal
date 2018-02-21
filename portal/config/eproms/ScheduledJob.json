@@ -67,6 +67,13 @@
       "task": "cache_reporting_stats"
     },
     {
+      "active": true,
+      "name": "Service Token Watchdog",
+      "resourceType": "ScheduledJob",
+      "schedule": "30 2 * * *",
+      "task": "token_watchdog"
+    },
+    {
       "active": false,
       "args": null,
       "kwargs": {
