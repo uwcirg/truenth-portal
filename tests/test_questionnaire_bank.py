@@ -19,6 +19,7 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent
 from portal.system_uri import ICHOM
 from tests import TestCase, TEST_USER_ID
+from tests.test_assessment_status import mock_qr
 
 
 class TestQuestionnaireBank(TestCase):
@@ -104,6 +105,38 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qb.__trigger_date = None  # clear out stored trigger_date
         self.assertEquals(qb.trigger_date(self.test_user), tx_date)
+
+    def test_intervention_in_progress(self):
+        # testing intervention-based QBs
+        q = Questionnaire(name='q')
+        interv = Intervention(name='interv', description='test')
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.add(interv)
+            db.session.commit()
+        q, interv, self.test_user = map(db.session.merge,
+                                        (q, interv, self.test_user))
+        qb = QuestionnaireBank(
+            name='qb', intervention_id=interv.id, classification='baseline',
+            start='{"days": 0}', expired='{"days": 2}')
+        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
+        qb.questionnaires.append(qbq)
+
+        # user with biopsy should return biopsy date
+        self.login()
+        self.test_user.save_constrained_observation(
+            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='')
+        self.test_user = db.session.merge(self.test_user)
+        obs = self.test_user.observations.first()
+        self.assertEquals(obs.codeable_concept.codings[0].display, 'biopsy')
+        self.assertEquals(qb.trigger_date(self.test_user), obs.issued)
+
+        # add mock in-process QB - confirm most_current_qb still returns one
+        mock_qr('q', 'in-progress', qb=qb)
+        self.test_user, qb = map(db.session.merge, (self.test_user, qb))
+        self.assertEquals(qb.most_current_qb(self.test_user, as_of_date=None).questionnaire_bank, qb)
 
     def test_start(self):
         rp = ResearchProtocol(name='proto')

@@ -237,11 +237,9 @@ class QuestionnaireBank(db.Model):
                           "display more than one at this "
                           "time.").format(user=user,
                                           classification=classification)
-                systype = current_app.config.get('SYSTEM_TYPE', '').lower()
-                if systype == 'production':
-                    current_app.logger.error(errstr)
-                else:
-                    current_app.logger.warn(errstr)
+                if current_app.config.get('TESTING'):
+                    raise ValueError(errstr)
+                current_app.logger.error(errstr)
 
         as_of_date = as_of_date or datetime.utcnow()
 
