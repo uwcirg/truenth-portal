@@ -298,8 +298,8 @@ class QuestionnaireBank(db.Model):
                 # move to site persistence for QB to user mappings.
                 check_func = observation_check("biopsy", 'true')
                 if check_func(intervention=intervention, user=user):
-
-                    results.append(qb)
+                    if qb not in results:
+                        results.append(qb)
 
         validate_classification_count(results)
         return results
