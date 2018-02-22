@@ -406,6 +406,7 @@ def create_service_token(client, user):
     # Token should now exist as only token for said user - return it
     return Token.query.filter_by(user_id=user.id).first()
 
+
 def token_janitor():
     """Called by scheduled job to clean up and send alerts
 
@@ -447,9 +448,10 @@ def token_janitor():
             User.id == sponsor).with_entities(User.email).one()[0]
         subject = 'WARNING: Service Token Expiration'
         body = (
-            "The service token in use at {app} is about to expire.  "
+            "The service token in use at {app} expires {expires}.  "
             "Please renew at {client_url}".format(
                 app=current_app.config.get('USER_APP_NAME'),
+                expires=expires,
                 client_url=url_for(
                     'auth.client_edit', client_id=client_id, _external=True)))
         current_app.logger.warn(body)
