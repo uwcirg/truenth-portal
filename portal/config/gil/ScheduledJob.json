@@ -32,6 +32,13 @@
     },
     {
       "active": true,
+      "name": "Service Token Watchdog",
+      "resourceType": "ScheduledJob",
+      "schedule": "30 2 * * *",
+      "task": "token_watchdog"
+    },
+    {
+      "active": true,
       "args": null,
       "id": 3,
       "kwargs": null,

@@ -4,14 +4,18 @@ import hashlib
 import hmac
 import json
 import time
-from flask import abort, current_app
+from flask import abort, current_app, url_for
 from datetime import datetime, timedelta
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy.dialects.postgresql import ENUM
 from urlparse import urlparse
 
 from ..database import db
 from ..extensions import oauth
-from .relationship import RELATIONSHIP
+from .message import EmailMessage
+from .role import Role, ROLE
+from .relationship import Relationship, RELATIONSHIP
+from .user import User, UserRoles, UserRelationship
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
 from ..factories.celery import create_celery
 
@@ -401,3 +405,68 @@ def create_service_token(client, user):
 
     # Token should now exist as only token for said user - return it
     return Token.query.filter_by(user_id=user.id).first()
+
+
+def token_janitor():
+    """Called by scheduled job to clean up and send alerts
+
+    No value in keeping around stale tokens, so we delete any that have expired.
+
+    For service tokens, trigger an email alert if they will be expiring soon.
+
+    :returns: list of unreachable email addresses
+
+    """
+    # Delete expired tokens
+    Token.query.filter(Token.expires < datetime.utcnow()).delete()
+    db.session.commit()
+
+    # Look up all service tokens and warn any sponsors via email if about
+    # to expire
+    error_emails = set()
+    threshold = datetime.utcnow() + timedelta(weeks=6)
+    results = Token.query.join(
+        UserRoles, Token.user_id == UserRoles.user_id).join(
+        Role, UserRoles.role_id == Role.id).filter(
+        Role.name == ROLE.SERVICE).filter(
+        Token.expires < threshold).with_entities(
+        UserRoles.user_id, Token.client_id, Token.expires).order_by(
+        Token.expires).all()
+    for user_id, client_id, expires in results:
+        # Lookup the sponsor of the service account, and send em an email
+        sponsor = UserRelationship.query.join(
+            Relationship,
+            Relationship.id == UserRelationship.relationship_id).filter(
+            Relationship.name == RELATIONSHIP.SPONSOR).filter(
+            UserRelationship.other_user_id == user_id).with_entities(
+            UserRelationship.user_id)
+        if sponsor.count() != 1:
+            raise ValueError(
+                'expiring service token, cannot locate sponsor for {}'.format(
+                    user_id))
+        sponsor_email = User.query.filter(
+            User.id == sponsor).with_entities(User.email).one()[0]
+        subject = 'WARNING: Service Token Expiration'
+        body = (
+            "The service token in use at {app} expires {expires}.  "
+            "Please renew at {client_url}".format(
+                app=current_app.config.get('USER_APP_NAME'),
+                expires=expires,
+                client_url=url_for(
+                    'auth.client_edit', client_id=client_id, _external=True)))
+        current_app.logger.warn(body)
+        em = EmailMessage(
+            recipients=sponsor_email,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            subject=subject,
+            body=body)
+        try:
+            em.send_message()
+        except SMTPRecipientsRefused as exc:
+            msg = ("Error sending site summary email to {}: "
+                   "{}".format(sponsor_email, exc))
+            current_app.logger.error(msg)
+            for email in exc[0]:
+                error_emails.add(email)
+
+    return list(error_emails)

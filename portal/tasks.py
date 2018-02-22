@@ -326,3 +326,14 @@ def update_tous_task(**kwargs):
 
     """
     return update_tous(**kwargs)
+
+
+@celery.task
+@scheduled_task
+def token_watchdog(**kwargs):
+    """Clean up stale tokens and alert service sponsors if nearly expired"""
+    from models.auth import token_janitor
+    error_emails = token_janitor()
+    if error_emails:
+        return '\nUnable to reach recipient(s): {}'.format(
+            ', '.join(error_emails))
