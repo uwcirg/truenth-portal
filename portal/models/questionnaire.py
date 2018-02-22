@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 
 
 class Questionnaire(db.Model):
@@ -20,13 +21,16 @@ class Questionnaire(db.Model):
     def from_fhir(cls, data):
         instance = cls()
         assert data['resourceType'] == 'Questionnaire'
-        instance.name = data['name']
+        instance.name = data['identifier'][0]['value']
         return instance
 
     def as_fhir(self):
         d = {}
         d['resourceType'] = 'Questionnaire'
-        d['name'] = self.name
+        d['identifier'] = [{
+            "system": TRUENTH_QUESTIONNAIRE_CODE_SYSTEM,
+            "value": self.name,
+        }]
         return d
 
     def add_if_not_found(self, commit_immediately=False):
