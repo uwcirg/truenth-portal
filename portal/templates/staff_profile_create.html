@@ -62,20 +62,17 @@
 {% endblock %}
 {% block document_ready %}
     var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
-    var OT = new OrgTool(); OT.init();
     //instantiation of account creation object, note, staff role is passed in
     var aco = new AccountCreationObj(
     [{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'},],
     {'i18next': i18next,
     'tnthAjax': tnthAjax,
     'SYSTEM_IDENTIFIER_ENUM': SYSTEM_IDENTIFIER_ENUM,
-    'OrgTool': OT,
+    'OrgTool': new OrgTool(),
     'orgList': orgList
     });
     $(function () {
         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
         aco.getOrgs(aco.populateStaffOrgs);
-        var profileObj = new Profile("", $("#currentStaffUserId").val());
-        profileObj.initSections();
     });
 {% endblock %}

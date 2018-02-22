@@ -86,15 +86,66 @@ var ConsentUIHelper = function(consentItems, userId) {
      * relevant variables currently defined in profile_macro.html, but can be defined by consumer
      *
      */
-    this.ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-    this.isAdmin = typeof isAdmin != "undefined" && isAdmin ? true: false;
-    this.editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-    this.consentDateEditable = this.editable && (typeof isTestPatient != "undefined" && isTestPatient);
+    this.ctop = false;
+    this.isAdmin = false;
+    this.editable = String($("#profileConsentEditable").val()).toLowerCase() === "true" ? true : false;
+    this.consentDateEditable = this.editable && (String($("#profileIsTestPatient").val()).toLowerCase() === "true");
     this.touObj = [];
     this.showInitialConsentTerms = false;
     this.hasConsent = false;
     this.hasHistory = false;
     this.orgTool = null;
+    this.initChecks = [];
+    this.userRoles = [];
+
+
+    const CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
+
+
+    this.init = function(callback) {
+        var self = this;
+        self.initStartTime = new Date();
+
+        self.getOrgTool();
+        
+        /*
+         * check whether user is admin, can also check for other roles if need be
+         */
+        tnthAjax.getRoles($("#profileCurrentUserId").val(), false, function(data) {
+            if (data && data.roles) {
+                data.roles.forEach(function(role) {
+                    if (role.name.toLowerCase() === "admin") {
+                        self.isAdmin = true;
+                    }
+                    self.userRoles.push(role.name);
+                });
+            }
+            self.initChecks.push({"roleCheckDone": true});
+        });
+
+         /*
+          * get config variable, only consent with top level variable for now, but can be used to get others
+          */
+        tnthAjax.getConfiguration(CONSENT_WITH_TOP_LEVEL_ORG, self.userId, false, function(data) {
+            if (data && data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
+                self.ctop = data.CONSENT_WITH_TOP_LEVEL_ORG;
+            }
+            self.initChecks.push({"configCheckDone": true});
+        }, true);
+
+        /*
+         * wait for ajax calls to finish
+         */
+        var consentVar = setInterval(function(){
+            self.initEndTime = new Date();
+            var elapsedTime = self.initEndTime - self.initStartTime;
+            elapsedTime /= 1000;
+            if (self.initChecks.length === 2 || elapsedTime >= 3) {
+                callback();
+                clearInterval(consentVar);
+            };
+        }, 1000);
+    }
 
 
     this.getOrgTool = function() {
@@ -1112,7 +1163,9 @@ var fillContent = {
                 });
             };
             var co = new ConsentUIHelper(dataArray, userId);
-            co.getConsentList();
+            co.init(function() {
+                co.getConsentList.apply(co);
+            });
         };
     },
     "treatmentOptions": function(data) {
@@ -1899,7 +1952,9 @@ var assembleContent = {
 
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        if (typeof preselectClinic != "undefined" && hasValue(preselectClinic)) {
+        var preselectClinic = $("#preselectClinic").val();
+
+        if (hasValue(preselectClinic)) {
             var parentOrg = $("#userOrgs input[name='organization'][value='" + preselectClinic + "']").attr("data-parent-id");
             if (!parentOrg) {
                 parentOrg = preselectClinic;
@@ -2205,6 +2260,15 @@ var Profile = function(subjectId, currentUserId) {
 
     this.subjectId = subjectId;
     this.currentUserId = currentUserId;
+
+    this.init = function() {
+        var self = this;
+        this.onBeforeSectionsLoad();
+        self.initSections(function() {
+            tnthAjax.getDemo($("#profileUserId").val());
+        });
+        self.onSectionsDidLoad();
+    };
 
     this.onBeforeSectionsLoad = function() {
         $("#mainDiv").addClass("profile");
@@ -3061,101 +3125,100 @@ var Profile = function(subjectId, currentUserId) {
         };
     };
     this.initClinicalQuestionsSection = function() {
-            $("#patientQ").show();
-            //don't show treatment
-            $("#patTx").remove();
-            $("#patientQ hr").hide();
-            var self = this;
+        $("#patientQ").show();
+        //don't show treatment
+        $("#patTx").remove();
+        $("#patientQ hr").hide();
+        var self = this;
 
-            tnthAjax.getTreatment(self.subjectId, function() {
-                tnthAjax.getClinical(self.subjectId, function() {
-                  $("#patientQ").attr("loaded", "true");
-                });
+        tnthAjax.getTreatment(self.subjectId, function() {
+            tnthAjax.getClinical(self.subjectId, function() {
+              $("#patientQ").attr("loaded", "true");
             });
-            if (self.currentUserId !== self.subjectId) {
-                $("#patientQ input[type='radio']").each(function() {
-                    $(this).attr("disabled", "disabled");
-                });
-                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-                    $(this).attr("disabled", true);
-                });
-            };
+        });
+        if (self.currentUserId !== self.subjectId) {
+            $("#patientQ input[type='radio']").each(function() {
+                $(this).attr("disabled", "disabled");
+            });
+            $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+                $(this).attr("disabled", true);
+            });
+        };
 
-            if (hasValue(self.subjectId)) {
-                $(".pat-q input:radio").on("click",function(){
-                    var thisItem = $(this);
-                    var toCall = thisItem.attr("name")
-                    // Get value from div - either true or false
-                    var toSend = thisItem.val();
-                    if (toCall != "biopsy") {
-                        tnthAjax.postClinical(self.subjectId,toCall,toSend, $(this).attr("data-status"), $(this));
-                    };
-                    if (toSend == "true" || toCall ==  "pca_localized") {
-                        if (toCall == "biopsy") {
-                            if ($("#biopsyDate").val() == "") {
-                                return true;
-                            }
-                            else {
-                              //$("#biopsyDate").datepicker("hide").blur();
-                              tnthAjax.postClinical(self.subjectId, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
-                            };
-                        };
-                        thisItem.parents(".pat-q").nextAll().fadeIn();
-                    } else {
-                        if (toCall == "biopsy") {
-                            tnthAjax.postClinical(self.subjectId, toCall, "false", $(this).attr("data-status"), $(this));
-                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
-                                $("input[name='" + fieldName + "']").each(function() {
-                                    $(this).prop("checked", false);
-                                });
-                            });
-                            if ($("input[name='pca_diag']").length > 0) {
-                                tnthAjax.putClinical(self.subjectId,"pca_diag","false", $(this));
-                            };
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
-                            };
-                        } else if (toCall == "pca_diag") {
-                            ["pca_localized"].forEach(function(fieldName) {
-                              $("input[name='" + fieldName + "']").each(function() {
-                                  $(this).prop("checked", false);
-                              });
-                            });
-                            if ($("input[name='pca_localized']").length > 0) {
-                                tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
-                            };
+        if (hasValue(self.subjectId)) {
+            $(".pat-q input:radio").on("click",function(){
+                var thisItem = $(this);
+                var toCall = thisItem.attr("name")
+                // Get value from div - either true or false
+                var toSend = thisItem.val();
+                if (String(toCall) !== "biopsy") {
+                    tnthAjax.postClinical(self.subjectId,toCall,toSend, $(this).attr("data-status"), $(this));
+                }
+                if (String(toSend) === "true" || String(toCall) ===  "pca_localized") {
+                    if (String(toCall) === "biopsy") {
+                        if ($("#biopsyDate").val() === "") {
+                            return true;
                         }
-                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                        else {
+                          tnthAjax.postClinical(self.subjectId, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
+                        }
                     };
-                });
-            };
-
-            [{
-                "fields": $("#patientQ input[name='biopsy']"),
-                "containerId": "patBiopsy"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_diag']"),
-                "containerId": "patDiag"
-            },
-            {
-                "fields": $("#patientQ input[name='pca_localized']"),
-                "containerId": "patMeta"
-            }
-            ].forEach( function(item) {
-                item.fields.each(function() {
-                     self.getSaveLoaderDiv("profileForm", item.containerId);
-                    $(this).attr("data-save-container-id", item.containerId);
-                });
+                    thisItem.parents(".pat-q").nextAll().fadeIn();
+                } else {
+                    if (String(toCall) === "biopsy") {
+                        tnthAjax.postClinical(self.subjectId, toCall, "false", $(this).attr("data-status"), $(this));
+                        ["pca_diag", "pca_localized"].forEach(function(fieldName) {
+                            $("input[name='" + fieldName + "']").each(function() {
+                                $(this).prop("checked", false);
+                            });
+                        });
+                        if ($("input[name='pca_diag']").length > 0) {
+                            tnthAjax.putClinical(self.subjectId,"pca_diag","false", $(this));
+                        };
+                        if ($("input[name='pca_localized']").length > 0) {
+                            tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
+                        };
+                    } else if (String(toCall) === "pca_diag") {
+                        ["pca_localized"].forEach(function(fieldName) {
+                          $("input[name='" + fieldName + "']").each(function() {
+                              $(this).prop("checked", false);
+                          });
+                        });
+                        if ($("input[name='pca_localized']").length > 0) {
+                            tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
+                        };
+                    }
+                    thisItem.parents(".pat-q").nextAll().fadeOut();
+                };
             });
+        };
 
-            //wait for ajax calls to finish?
-            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-            var self = this;
-            setTimeout(function() {
-                profileObj.checkDiagnosis();
-                fillViews.clinical();
-            }, 1000);
+        [{
+            "fields": $("#patientQ input[name='biopsy']"),
+            "containerId": "patBiopsy"
+        },
+        {
+            "fields": $("#patientQ input[name='pca_diag']"),
+            "containerId": "patDiag"
+        },
+        {
+            "fields": $("#patientQ input[name='pca_localized']"),
+            "containerId": "patMeta"
+        }
+        ].forEach( function(item) {
+            item.fields.each(function() {
+                 self.getSaveLoaderDiv("profileForm", item.containerId);
+                $(this).attr("data-save-container-id", item.containerId);
+            });
+        });
+
+        //wait for ajax calls to finish?
+        //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+        var self = this;
+        setTimeout(function() {
+            self.checkDiagnosis();
+            fillViews.clinical();
+        }, 1000);
     };
     this.initBiopsySection = function() {
         /*
@@ -3920,7 +3983,8 @@ OrgTool.prototype.getDefaultModal = function(o) {
         return $("#" + orgId + "_defaultConsentModal");
 };
 OrgTool.prototype.handlePreSelectedClinic = function() {
-    if ((typeof preselectClinic !== "undefined") && hasValue(preselectClinic)) {
+    var preselectClinic = $("#preselectClinic").val();
+    if (hasValue(preselectClinic)) {
         var ob = $("#userOrgs input[value='"+preselectClinic+"']");
         var self = this;
         if (ob.length > 0) {
@@ -4633,13 +4697,18 @@ var tnthAjax = {
     handleConsent: function(obj) {
         var self = this;
         var OT = this.getOrgTool();
+        var userId = $("#fillOrgs").attr("userId");
+        if (!hasValue(userId)) {
+            userId = $("#userOrgs").attr("userId");
+        }
+        var configVar = $("#profile_CONSENT_WITH_TOP_LEVEL_ORG").val();
+        if (!hasValue(configVar)) {
+            tnthAjax.getConfiguration("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, false, true);
+        }
         $(obj).each(function() {
             var parentOrg = OT.getElementParentOrg(this);
             var orgId = $(this).val();
-            var userId = $("#fillOrgs").attr("userId");
-            if (!hasValue(userId)) userId = $("#userOrgs").attr("userId");
-
-            var cto = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
+            var cto = String(configVar).toLowerCase() === "true";
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
                     if (parentOrg) {
@@ -4961,7 +5030,9 @@ var tnthAjax = {
             if (data) {
                 if (!data.error) {
                     $(".get-roles-error").html("");
-                    fillContent.roles(data,isProfile);
+                    if (isProfile) {
+                        fillContent.roles(data,isProfile);
+                    }
                     if (callback) callback(data);
                 } else {
                     var errorMessage = i18next.t("Server error occurred retrieving user role information.");
@@ -5550,6 +5621,31 @@ var tnthAjax = {
              if (callback) callback({"error": i18next.t("no data returned")});
             };
         });
+    },
+    "setConfigurationUI": function(configKey, value) {
+        if (configKey) {
+            if ($("#profile_" + configKey).length === 0) {
+                $("body").append("<input type='hidden' id='profile_" + configKey + "' value='" + (value?value:"") + "'/>");
+            }
+        }
+    },
+    "getConfiguration": function(configVar, userId, params, callback, setConfigInUI) {
+        callback = callback || function() {};
+        if (!configVar) {
+            callback({"error": "a configuration variable name is required"});
+            return false;
+        }
+        var self = this;
+        this.sendRequest("/api/settings/"+ configVar, "GET", userId, (params||{}), function(data) {
+            if (data) {
+                callback(data);
+                if (setConfigInUI && data.hasOwnProperty(configVar)) {
+                    self.setConfigurationUI(configVar, data[configVar]+"");
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        });
     }
 };
 
@@ -5648,6 +5744,22 @@ $(document).ready(function() {
 
     __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
+    var profileObj;
+    if ($("#profileForm").length > 0) {
+        profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
+        profileObj.init();
+    } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
+        /*
+         * initial queries  - only selected sections
+         */
+        profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
+        profileObj.initSection("orgsstateselector");
+        profileObj.initSection("biopsy");
+    } else if ($("#createProfileForm").length > 0) {
+        profileObj = new Profile("", $("#currentStaffUserId").val());
+        profileObj.initSections();
+    }
+
     //setTimeout('LRKeyEvent();', 1500);
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
@@ -5706,9 +5818,7 @@ $(document).ready(function() {
                 var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 // Add user_id to api call (used on patient_profile page so that staff can edit)
                 var addUserId = "";
-                if (typeof(patientId) !== "undefined") {
-                    addUserId = "&user_id="+patientId;
-                } else if (hasValue($el.attr("data-user-id"))) {
+                if (hasValue($el.attr("data-user-id"))) {
                     addUserId = "&user_id="+ $el.attr("data-user-id");
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
