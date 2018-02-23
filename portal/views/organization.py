@@ -178,7 +178,7 @@ def organization_get(id_or_code):
                 Identifier._value == id_or_code))
         if query.count() == 1:
             org = query.first()
-        if not org:
+        else:
             abort(404, 'no organization found with identifier: '
                   'system `{}`, value `{}`'.format(system, id_or_code))
     else:

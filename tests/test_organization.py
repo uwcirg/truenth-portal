@@ -163,6 +163,13 @@ class TestOrganization(TestCase):
         self.assertEquals(org.id, fetched.id)
         self.assertEquals(org.name, fetched.name)
 
+    def test_org_missing_identifier(self):
+        # should get 404 w/o finding a match
+        rv = self.client.get(
+            '/api/organization/{value}?system={system}'.format(
+                system=quote_plus('http://nonsense.org'), value='123-45'))
+        self.assert404(rv)
+
     def test_organization_list(self):
         count = Organization.query.count()
 
