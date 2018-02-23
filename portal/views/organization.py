@@ -130,10 +130,14 @@ def organization_search():
     return jsonify(bundle)
 
 
-@org_api.route('/organization/<int:organization_id>')
+@org_api.route('/organization/<string:id_or_code>')
 @oauth.require_oauth()
-def organization_get(organization_id):
+def organization_get(id_or_code):
     """Access to the requested organization as a FHIR resource
+
+    If 'system' param is provided, looks up the organization by identifier,
+    using the `id_or_code` string as the identifier value; otherwise,
+    treats `id_or_code` as the organization.id
 
     ---
     operationId: organization_get
@@ -142,24 +146,50 @@ def organization_get(organization_id):
     produces:
       - application/json
     parameters:
-      - name: organization_id
+      - name: id_or_code
         in: path
-        description: TrueNTH organization ID
+        description: TrueNTH organization ID OR Identifier value code
         required: true
-        type: integer
-        format: int64
+        type: string
+      - name: system
+        in: query
+        description: Identifier system
+        required: false
+        type: string
     responses:
       200:
         description:
           Returns the requested organization as a FHIR [organization
-          resource](http://www.hl7.org/fhir/patient.html) in JSON.
+          resource](https://www.hl7.org/fhir/DSTU2/organization.html) in JSON.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
 
     """
-    org = Organization.query.get_or_404(organization_id)
+    system = request.args.get('system')
+    if system:
+        query = Organization.query.join(
+            OrganizationIdentifier).join(
+            Identifier).filter(and_(
+                Organization.id == OrganizationIdentifier.organization_id,
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == id_or_code))
+        if query.count() == 1:
+            org = query.first()
+        if not org:
+            abort(404, 'no organization found with identifier: '
+                  'system `{}`, value `{}`'.format(system, id_or_code))
+    else:
+        try:
+            organization_id = int(id_or_code)
+            org = Organization.query.get_or_404(organization_id)
+        except ValueError:
+            abort(
+                400, "invalid input '{}' - expected integer without system "
+                "parameter".format(id_or_code))
+
     return jsonify(org.as_fhir(include_empties=False))
 
 

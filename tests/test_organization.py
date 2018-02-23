@@ -146,11 +146,22 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization?system={system}&value={value}'.format(
-            system=quote_plus(org_id_system), value=org_id_value))
+        rv = self.client.get(
+            '/api/organization?system={system}&value={value}'.format(
+                system=quote_plus(org_id_system), value=org_id_value))
         self.assert200(rv)
         self.assertEquals(rv.json['total'], 1)
         self.assertEquals(rv.json['entry'][0]['id'], 999)
+
+        # use alternative API to obtain organization
+        rv = self.client.get(
+            '/api/organization/{value}?system={system}'.format(
+                system=quote_plus(org_id_system), value=org_id_value))
+        self.assert200(rv)
+        fetched = Organization.from_fhir(rv.json)
+        org = db.session.merge(org)
+        self.assertEquals(org.id, fetched.id)
+        self.assertEquals(org.name, fetched.name)
 
     def test_organization_list(self):
         count = Organization.query.count()
