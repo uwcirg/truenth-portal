@@ -172,10 +172,10 @@ def organization_get(id_or_code):
         query = Organization.query.join(
             OrganizationIdentifier).join(
             Identifier).filter(and_(
-            Organization.id == OrganizationIdentifier.organization_id,
-            OrganizationIdentifier.identifier_id == Identifier.id,
-            Identifier.system == system,
-            Identifier._value == id_or_code))
+                Organization.id == OrganizationIdentifier.organization_id,
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == id_or_code))
         if query.count() == 1:
             org = query.first()
         if not org:
