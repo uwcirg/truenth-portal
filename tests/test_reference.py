@@ -27,7 +27,7 @@ class TestReference(TestCase):
 
     def prep_org_w_identifier(self):
         o = Organization(name='test org')
-        i = Identifier(system=US_NPI, value='12345')
+        i = Identifier(system=US_NPI, value='123-45')
         o.identifiers.append(i)
         with SessionScope(db):
             db.session.add(o)
@@ -46,7 +46,7 @@ class TestReference(TestCase):
 
     def test_org_w_identifier_parse(self):
         o = self.prep_org_w_identifier()
-        ref = {'reference': 'api/organization/12345?system={}'.format(US_NPI)}
+        ref = {'reference': 'api/organization/123-45?system={}'.format(US_NPI)}
         parsed = Reference.parse(ref)
         self.assertEquals(o, parsed)
 
