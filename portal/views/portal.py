@@ -695,21 +695,32 @@ def settings():
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
 
-
+@portal.route('/api/settings', defaults={'config_key': None})
 @portal.route('/api/settings/<string:config_key>')
 @oauth.require_oauth()
 def config_settings(config_key):
-    key = config_key.upper()
-    # handing out LifeRay keys at this time
-    if key.startswith('LR_'):
-        return jsonify({key: current_app.config.get(key)})
-    # handing out consent related keys e.g. consent_with_top_level_org
-    elif key.startswith('CONSENT_'):
-        return jsonify({key: current_app.config.get(key)})
-    elif key.startswith('REQUIRED_CORE_DATA'):
-        return jsonify({key: current_app.config.get(key)})
+    if config_key:
+        key = config_key.upper()
+        # handing out LifeRay keys at this time
+        if key.startswith('LR_'):
+            return jsonify({key: current_app.config.get(key)})
+        # handing out consent related keys e.g. consent_with_top_level_org
+        elif key.startswith('CONSENT_'):
+            return jsonify({key: current_app.config.get(key)})
+        elif key.startswith('REQUIRED_CORE_DATA'):
+            return jsonify({key: current_app.config.get(key)})
+        elif key.startswith('SYSTEM'):
+            return jsonify({key: current_app.config.get(key)})
+        else:
+            abort(400, "Configuration key '{}' not available".format(key))
     else:
-        abort(400, "Configuration key '{}' not available".format(key))
+        config_settings = {}
+        # return selective keys - not all can be be viewed by users, e.g.secret key
+        for key in current_app.config:
+            if key.startswith('LR_') or key.startswith('CONSENT_') or\
+            key.startswith('REQUIRED_CORE_DATA') or key.startswith('SYSTEM'):
+                config_settings[key] = current_app.config.get(key)
+        return jsonify(config_settings)
 
 
 @portal.route('/research')

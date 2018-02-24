@@ -318,15 +318,15 @@
 
   FieldsChecker.prototype.getDefaultConfig = function() {
     var self = this;
+    var tnthAjax = this.__getDependency("tnthAjax");
     if (!this.CONFIG_DEFAULT_CORE_DATA) {
-       $.ajax({
-          url: "/api/settings/REQUIRED_CORE_DATA",
-          async: false
-        }).done(function(configData) {
-          if (configData && configData.REQUIRED_CORE_DATA) {
-            self.CONFIG_DEFAULT_CORE_DATA = configData.REQUIRED_CORE_DATA;
+      tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {sync: true}, function(data) {
+        if (!data.error) {
+          if (data.REQUIRED_CORE_DATA) {
+            self.CONFIG_DEFAULT_CORE_DATA = data.REQUIRED_CORE_DATA;
           }
-        });
+        }
+      });
     }
     return this.CONFIG_DEFAULT_CORE_DATA;
   };
@@ -337,6 +337,7 @@
 
   FieldsChecker.prototype.setConfig = function(data, callback) {
     callback = callback || function() {};
+    var tnthAjax = this.__getDependency("tnthAjax");
     if (data) {
       if (!data.error) {
         this.CONFIG_REQUIRED_CORE_DATA = data;
@@ -347,14 +348,13 @@
      */
     if (!this.CONFIG_REQUIRED_CORE_DATA) {
         var self = this;
-        $.ajax({
-          url: "/api/settings/REQUIRED_CORE_DATA",
-          async: false
-        }).done(function(configData) {
-          if (configData && configData.REQUIRED_CORE_DATA) {
-            self.CONFIG_REQUIRED_CORE_DATA = configData.REQUIRED_CORE_DATA;
+        var tnthAjax = this.__getDependency("tnthAjax");
+        tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {sync: true}, function(data) {
+          if (!data.error) {
+            if (data.REQUIRED_CORE_DATA) {
+              self.CONFIG_REQUIRED_CORE_DATA = data.REQUIRED_CORE_DATA;
+            }
           }
-        }).always(function() {
           callback();
         });
     } else {

@@ -86,17 +86,14 @@ var ConsentUIHelper = function(consentItems, userId) {
      * relevant variables currently defined in profile_macro.html, but can be defined by consumer
      *
      */
-    this.ctop = false;
-    this.isAdmin = false;
-    this.editable = String($("#profileConsentEditable").val()).toLowerCase() === "true" ? true : false;
-    this.consentDateEditable = this.editable && (String($("#profileIsTestPatient").val()).toLowerCase() === "true");
     this.touObj = [];
     this.showInitialConsentTerms = false;
     this.hasConsent = false;
     this.hasHistory = false;
     this.orgTool = null;
     this.initChecks = [];
-    this.userRoles = [];
+    this.currentUserRoles = [];
+    this.settings = {};
 
 
     const CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
@@ -109,29 +106,33 @@ var ConsentUIHelper = function(consentItems, userId) {
         self.getOrgTool();
         
         /*
-         * check whether user is admin, can also check for other roles if need be
+         * get user roles
+         * note using the current user Id
+         * so we can determine:
+         * if user is an admin, if he/she can edit the consent, etc.
          */
         tnthAjax.getRoles($("#profileCurrentUserId").val(), false, function(data) {
             if (data && data.roles) {
                 data.roles.forEach(function(role) {
-                    if (role.name.toLowerCase() === "admin") {
-                        self.isAdmin = true;
-                    }
-                    self.userRoles.push(role.name);
+                    self.currentUserRoles.push(role.name.toLowerCase());
                 });
             }
             self.initChecks.push({"roleCheckDone": true});
         });
 
          /*
-          * get config variable, only consent with top level variable for now, but can be used to get others
+          * get config settings
           */
-        tnthAjax.getConfiguration(CONSENT_WITH_TOP_LEVEL_ORG, self.userId, false, function(data) {
-            if (data && data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
-                self.ctop = data.CONSENT_WITH_TOP_LEVEL_ORG;
+        tnthAjax.getConfiguration(self.userId, false, function(data) {
+            if (data) {
+                self.settings = data;
+                if (data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
+                    //for use by UI later, e.g. handle consent submission
+                    tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data[CONSENT_WITH_TOP_LEVEL_ORG]+"");
+                }
             }
             self.initChecks.push({"configCheckDone": true});
-        }, true);
+        });
 
         /*
          * wait for ajax calls to finish
@@ -140,9 +141,9 @@ var ConsentUIHelper = function(consentItems, userId) {
             self.initEndTime = new Date();
             var elapsedTime = self.initEndTime - self.initStartTime;
             elapsedTime /= 1000;
-            if (self.initChecks.length === 2 || elapsedTime >= 3) {
-                callback();
+            if (self.initChecks.length === 2 || (elapsedTime >= 5)) {
                 clearInterval(consentVar);
+                callback();
             };
         }, 1000);
     }
@@ -155,7 +156,28 @@ var ConsentUIHelper = function(consentItems, userId) {
         }
         return this.orgTool;
     };
+    /*
+     * helper functions to be used for rendering UI
+     */
 
+    this.isEditable = function() {
+        var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
+        var isPatient = this.currentUserRoles.indexOf("patient") !== -1;
+        var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings["CONSENT_EDIT_PERMISSIBLE_ROLES"].indexOf("staff") !== -1;
+        var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings["CONSENT_EDIT_PERMISSIBLE_ROLES"].indexOf("patient") !== -1;
+
+        return this.isAdmin() || (isStaff && isEditableByStaff) || (isPatient && isEditableByPatient);
+    };
+    this.isTestPatient = function() {
+        return String(this.settings["SYSTEM_TYPE"]).toLowerCase() !== "production";
+    };
+    this.isAdmin = function() {
+        return this.currentUserRoles.indexOf("admin") !== -1;
+    };
+
+    this.isConsentWithTopLevelOrg = function() {
+        return this.settings["CONSENT_WITH_TOP_LEVEL_ORG"];
+    };
 
     this.getHeaderRow = function(header) {
         var content = "";
@@ -182,7 +204,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                 content: self.getConsentOrgDisplayName(item)
             },
             {
-                content: sDisplay + (self.editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentModalHTML(item, index): ""),
+                content: sDisplay + (self.isEditable() && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentModalHTML(item, index): ""),
                 "_class": "indent"
             },
             {
@@ -197,7 +219,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                 })(item)
             },
             {
-                content: tnthDates.formatDateString(item.signed) + (self.consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentDateModalHTML(item, index) : "")
+                content: tnthDates.formatDateString(item.signed) + (self.isEditable() && self.isTestPatient() && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + self.getConsentDateModalHTML(item, index) : "")
 
             }
         ];
@@ -240,7 +262,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         var OT = this.getOrgTool();
         var currentOrg = OT.orgsList[orgId];
         var orgName = "";
-        if (!this.ctop) {
+        if (!this.isConsentWithTopLevelOrg()) {
             var topOrgID = OT.getTopLevelParentOrg(orgId);
             var topOrg = OT.orgsList[topOrgID];
             if (topOrg) {
@@ -339,7 +361,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             + '<div>'
             + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
             + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '><span class="withdrawn-label">' + consentLabels["withdrawn"] + '</span></input></label></div>'
-            + (this.isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
+            + (this.isAdmin() ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
             + '</div><br/><br/>'
             + '</div>'
             + '<div class="modal-footer">'
@@ -649,7 +671,7 @@ var ConsentUIHelper = function(consentItems, userId) {
                 } else  $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found") + "</span>");
             };
 
-            if (self.editable && self.hasHistory) {
+            if (self.isEditable() && self.hasHistory) {
                 $("#profileConsentList").append("<br/><button id='viewConsentHistoryButton' class='btn btn-tnth-primary sm-btn'>" + i18next.t("History") + "</button>");
                 (function(self) {
                     $("#viewConsentHistoryButton").on("click", function(e) {
@@ -659,10 +681,10 @@ var ConsentUIHelper = function(consentItems, userId) {
                 })(self);
             };
 
-            if (self.editable) {
+            if (self.isEditable()) {
                 self.initConsentItemEvent();
             };
-            if (self.consentDateEditable) {
+            if (self.isEditable() && self.isTestPatient()) {
                 self.initConsentDateEvents();
             };
 
@@ -2283,40 +2305,59 @@ var Profile = function(subjectId, currentUserId) {
         setTimeout(function() {
             $("#profileForm [data-loader-container]").each(function() {
                 var attachId = $(this).attr("id");
-                if (!hasValue(attachId)) return false;
+                if (!attachId) {
+                    return false;
+                }
                 self.getSaveLoaderDiv("profileForm", attachId);
                 var targetFields = $(this).find("input, select");
                 if (targetFields.length > 0) {
                     targetFields.each(function() {
-                        if ($(this).attr("type") == "hidden") return false;
-                            $(this).attr("data-save-container-id", attachId);
-                            var triggerEvent = $(this).attr("data-trigger-event");
-                            if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
-                            $(this).on(triggerEvent, function(e) {
+                        if ($(this).attr("type") === "hidden") {
+                            return false;
+                        }
+                        $(this).attr("data-save-container-id", attachId);
+                        var triggerEvent = $(this).attr("data-trigger-event");
+                        if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") === "text" ? "blur" : "change";
+                        $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
                             var valid = this.validity ? this.validity.valid : true;
                             if (valid) {
                                 var hasError = false;
                                 if ($(this).attr("data-error-field")) {
-                                  var customErrorField = $("#" + $(this).attr("data-error-field"));
-                                  if (customErrorField.length > 0) {
-                                    if (customErrorField.text() != "") hasError = true;
-                                    else hasError = false;
-                                  } else hasError = false;
+                                    var customErrorField = $("#" + $(this).attr("data-error-field"));
+                                    if (customErrorField.length > 0) {
+                                        if (customErrorField.text() !== "") {
+                                            hasError = true;
+                                        }
+                                        else {
+                                            hasError = false;
+                                        }
+                                    } else {
+                                        hasError = false;
+                                    }
                                 };
-                            if (!hasError && !$(this).attr("data-update-on-validated")) assembleContent.demo(self.subjectId,true, $(this));
+                            if (!hasError && !$(this).attr("data-update-on-validated")) {
+                                assembleContent.demo(self.subjectId,true, $(this));
+                            }
                         };
                     });
                 });
-              };
-          });
+            };
+        });
 
-          $("#profileForm .profile-item-container.editable").each(function() {
-              $(this).prepend('<input type="button" class="btn profile-item-edit-btn" value="{edit}" aria-label="{editButton}"></input>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
-          });
 
-          $("#profileForm .profile-item-edit-btn").each(function() {
-              $(this).on("click", function(e) {
+        $("#btnLoginAs").on("click", function(e) {
+            e.stopPropagation();
+            self.handleLoginAs(e);
+        });
+
+
+        $("#profileForm .profile-item-container.editable").each(function() {
+            $(this).prepend('<input type="button" class="btn profile-item-edit-btn" value="{edit}" aria-label="{editButton}"></input>'.replace("{edit}", i18next.t("Edit")).replace("{editButton}", i18next.t("Edit Button")));
+        });
+
+        $("#profileForm .profile-item-edit-btn").each(function() {
+            $(this).on("click", function(e) {
                 e.preventDefault();
                 var container = $(this).closest(".profile-item-container");
                 container.toggleClass("edit");
@@ -2330,8 +2371,8 @@ var Profile = function(subjectId, currentUserId) {
                         });
                     }
                 };
-              });
-          });
+            });
+        });
         }, 1000);
     }
     this.initSections = function(callback) {
@@ -3174,10 +3215,10 @@ var Profile = function(subjectId, currentUserId) {
                         });
                         if ($("input[name='pca_diag']").length > 0) {
                             tnthAjax.putClinical(self.subjectId,"pca_diag","false", $(this));
-                        };
+                        }
                         if ($("input[name='pca_localized']").length > 0) {
                             tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
-                        };
+                        }
                     } else if (String(toCall) === "pca_diag") {
                         ["pca_localized"].forEach(function(fieldName) {
                           $("input[name='" + fieldName + "']").each(function() {
@@ -3186,7 +3227,7 @@ var Profile = function(subjectId, currentUserId) {
                         });
                         if ($("input[name='pca_localized']").length > 0) {
                             tnthAjax.putClinical(self.subjectId,"pca_localized","false", $(this));
-                        };
+                        }
                     }
                     thisItem.parents(".pat-q").nextAll().fadeOut();
                 };
@@ -4703,7 +4744,7 @@ var tnthAjax = {
         }
         var configVar = $("#profile_CONSENT_WITH_TOP_LEVEL_ORG").val();
         if (!hasValue(configVar)) {
-            tnthAjax.getConfiguration("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, false, true);
+            tnthAjax.getConfigurationByKey("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, false, true);
         }
         $(obj).each(function() {
             var parentOrg = OT.getElementParentOrg(this);
@@ -5026,22 +5067,36 @@ var tnthAjax = {
         });
     },
     "getRoles": function(userId,isProfile,callback) {
-        this.sendRequest('/api/user/'+userId+'/roles', 'GET', userId, null, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".get-roles-error").html("");
-                    if (isProfile) {
-                        fillContent.roles(data,isProfile);
+        callback = callback || function() {};
+        var sessionStorageKey = "userRole_"+userId;
+        if (sessionStorage.getItem(sessionStorageKey)) {
+            var data = JSON.parse(sessionStorage.getItem(sessionStorageKey));
+            if (isProfile) {
+                fillContent.roles(data,isProfile);
+            }
+            callback(data);
+        } else {
+            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, null, function(data) {
+                if (data) {
+                    if (!data.error) {
+                        $(".get-roles-error").html("");
+                        sessionStorage.setItem(sessionStorageKey, JSON.stringify(data));
+                        if (isProfile) {
+                            fillContent.roles(data,isProfile);
+                        }
+                        callback(data);
+                    } else {
+                        var errorMessage = i18next.t("Server error occurred retrieving user role information.");
+                        if ($(".get-roles-error").length === 0) {
+                            $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
+                        } else {
+                            $(".get-roles-error").html(errorMessage);
+                        }
+                        callback({"error": errorMessage});
                     }
-                    if (callback) callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred retrieving user role information.");
-                   if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
-                   else $(".get-roles-error").html(errorMessage);
-                   if (callback) callback({"error": errorMessage});
-                };
-            };
-        });
+                }
+            });
+        }
     },
     "putRoles": function(userId,toSend, targetField) {
         var flo = new FieldLoaderHelper();
@@ -5051,6 +5106,9 @@ var tnthAjax = {
                 if (!data.error) {
                     flo.showUpdate(targetField);
                     $(".put-roles-error").html("");
+                    if (sessionStorage.getItem("userRole_"+userId)) {
+                        sessionStorage.setItem("userRole_"+userId, "");
+                    }
                 } else {
                     flo.showError(targetField);
                     var errorMessage = i18next.t("Server error occurred setting user role information.");
@@ -5629,23 +5687,63 @@ var tnthAjax = {
             }
         }
     },
-    "getConfiguration": function(configVar, userId, params, callback, setConfigInUI) {
+    "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
         callback = callback || function() {};
-        if (!configVar) {
-            callback({"error": "a configuration variable name is required"});
+        if (!userId) {
+            callback({"error": i18next.t("User id is required.")});
             return false;
         }
-        var self = this;
-        this.sendRequest("/api/settings/"+ configVar, "GET", userId, (params||{}), function(data) {
-            if (data) {
-                callback(data);
-                if (setConfigInUI && data.hasOwnProperty(configVar)) {
-                    self.setConfigurationUI(configVar, data[configVar]+"");
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
+        if (!configVar) {
+            callback({"error": i18next.t("configuration variable name is required.")});
+            return false;
+        }
+        var sessionConfigKey = "config_"+configVar+"_"+userId;
+        if (sessionStorage.getItem(sessionConfigKey)) {
+            var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
+            if (setConfigInUI) {
+                var data = JSON.parse(sessionStorage.getItem(sessionConfigKey))
+                self.setConfigurationUI(configVar, data[configVar]+"");
             }
-        });
+            callback(data);
+        } else {
+            var self = this;
+            this.sendRequest("/api/settings/"+configVar, "GET", userId, (params||{}), function(data) {
+                if (data) {
+                    callback(data);
+                    if (data.hasOwnProperty(configVar)) {
+                        if (setConfigInUI) {
+                            self.setConfigurationUI(configVar, data[configVar]+"");
+                        }
+                        sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
+                    }
+                } else {
+                    callback({"error": i18next.t("no data returned")});
+                }
+            });
+        }
+    },
+    "getConfiguration": function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User id is required.")});
+            return false;
+        }
+        var sessionConfigKey = "settings_"+userId;
+        if (sessionStorage.getItem(sessionConfigKey)) {
+            var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
+            callback(data);
+        } else {
+            var self = this;
+            this.sendRequest("/api/settings", "GET", userId, (params||{}), function(data) {
+                if (data) {
+                    callback(data);
+                    sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
+                } else {
+                    callback({"error": i18next.t("no data returned")});
+                }
+            });
+
+        }
     }
 };
 

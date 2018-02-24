@@ -4,12 +4,6 @@
 <form id="profileForm" class="form tnth-form to-validate" data-toggle="validator">
   <input type="hidden" id="profileUserId" value="{{user.id if user}}" />
   <input type="hidden" id="profileCurrentUserId" value="{{current_user.id if current_user}}" />
-  {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}
-    <input type="hidden" id="profileConsentEditable" value="true" />
-  {% endif %}
-  {% if user.has_role(ROLE.PATIENT) and (current_user and not current_user.has_role(ROLE.PATIENT)) and (config.get("SYSTEM_TYPE").upper() != "PRODUCTION") %}
-    <input type="hidden" id="profileIsTestPatient" value="true" />
-  {% endif %}
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
       <br/>
