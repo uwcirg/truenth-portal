@@ -695,6 +695,7 @@ def settings():
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
 
+
 @portal.route('/api/settings', defaults={'config_key': None})
 @portal.route('/api/settings/<string:config_key>')
 @oauth.require_oauth()
@@ -717,7 +718,7 @@ def config_settings(config_key):
         config_settings = {}
         # return selective keys - not all can be be viewed by users, e.g.secret key
         for key in current_app.config:
-            if key.startswith('LR_') or key.startswith('CONSENT_') or\
+            if key.startswith('LR_') or key.startswith('CONSENT_') or \
             key.startswith('REQUIRED_CORE_DATA') or key.startswith('SYSTEM'):
                 config_settings[key] = current_app.config.get(key)
         return jsonify(config_settings)
