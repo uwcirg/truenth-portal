@@ -1816,6 +1816,40 @@
         }
       ],
       "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14639,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-39"
+        }
+      ],
+      "indigenous_codings": true,
+      "language": "de_CH",
+      "name": "Kantonsspital St. Gallen",
+      "partOf": {
+        "reference": "api/organization/25000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
     }
   ],
   "id": "SitePersistence v0.2",
