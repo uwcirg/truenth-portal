@@ -29,9 +29,6 @@
   var FieldsChecker = function(
     userId,
     roleRequired,
-    CONFIG_DEFAULT_CORE_DATA,
-    CONFIG_REQUIRED_CORE_DATA,
-    preselectClinic,
     dependencies) {
 
     this.__getDependency = function(key) {
@@ -44,21 +41,23 @@
       };
     };
     this.userId = userId;
-    this.CONFIG_DEFAULT_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
-    this.CONFIG_REQUIRED_CORE_DATA = CONFIG_REQUIRED_CORE_DATA;
+    this.CONFIG_DEFAULT_CORE_DATA = null;
+    this.CONFIG_REQUIRED_CORE_DATA = null;
     this.roleRequired = roleRequired;
-    this.preselectClinic = preselectClinic;
+    this.preselectClinic = "";
     this.mainSections = {};
     this.defaultSections = {};
     this.incompleteFields = [];
     this.dependencies = dependencies || {};
     this.currentSection = "";
+    this.orgTool = null;
 
   };
 
   FieldsChecker.prototype.init = function(callback) {
     var self = this;
     this.initConfig(function(data) {
+      self.preselectClinic = $("#preselectClinic").val();
       self.initSections();
       self.initSectionData(data);
       if (callback) {
@@ -66,6 +65,14 @@
       };
     });
   };
+
+  FieldsChecker.prototype.getOrgTool = function() {
+      if (!this.orgTool) {
+        this.orgTool = this.__getDependency("orgTool");
+        this.orgTool.init();
+      }
+      return this.orgTool;
+  }
 
   FieldsChecker.prototype.initSectionData = function(data) {
     var self = this;
@@ -121,7 +128,7 @@
       var preselectClinic = this.preselectClinic;
       var self = this;
       var i18next = this.__getDependency("i18next");
-      var orgTool = this.__getDependency("orgTool");
+      var orgTool = this.getOrgTool();
       /*
        * main sections blueprint object, this will help keeping track of missing fields for each section
        *
@@ -278,10 +285,7 @@
   FieldsChecker.prototype.initConfig = function(callback) {
     var self = this, tnthAjax = self.__getDependency("tnthAjax");
     tnthAjax.getStillNeededCoreData(self.userId, true, function(data) {
-      self.setConfig(self.roleRequired ? data : null);
-      if (callback) {
-        callback(data);
-      };
+      self.setConfig(self.roleRequired ? data : null, callback);
     });
   };
 
@@ -313,6 +317,17 @@
   };
 
   FieldsChecker.prototype.getDefaultConfig = function() {
+    var self = this;
+    var tnthAjax = this.__getDependency("tnthAjax");
+    if (!this.CONFIG_DEFAULT_CORE_DATA) {
+      tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {sync: true}, function(data) {
+        if (!data.error) {
+          if (data.REQUIRED_CORE_DATA) {
+            self.CONFIG_DEFAULT_CORE_DATA = data.REQUIRED_CORE_DATA;
+          }
+        }
+      });
+    }
     return this.CONFIG_DEFAULT_CORE_DATA;
   };
 
@@ -320,15 +335,33 @@
     return this.CONFIG_REQUIRED_CORE_DATA;
   };
 
-  FieldsChecker.prototype.setConfig = function(data) {
+  FieldsChecker.prototype.setConfig = function(data, callback) {
+    callback = callback || function() {};
+    var tnthAjax = this.__getDependency("tnthAjax");
     if (data) {
       if (!data.error) {
         this.CONFIG_REQUIRED_CORE_DATA = data;
-      };
+      }
+    }
+    /*
+     * get default required core data
+     */
+    if (!this.CONFIG_REQUIRED_CORE_DATA) {
+        var self = this;
+        var tnthAjax = this.__getDependency("tnthAjax");
+        tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {sync: true}, function(data) {
+          if (!data.error) {
+            if (data.REQUIRED_CORE_DATA) {
+              self.CONFIG_REQUIRED_CORE_DATA = data.REQUIRED_CORE_DATA;
+            }
+          }
+          callback();
+        });
     } else {
-        this.CONFIG_REQUIRED_CORE_DATA = this.CONFIG_DEFAULT_CORE_DATA;
-    };
+        callback();
+    }
   };
+
 
   FieldsChecker.prototype.getTotalSections = function() {
     /*** note counting all the default main sections to show progress for each**/
@@ -698,7 +731,7 @@
     var __self = this;
     var userId = __self.userId;
     var tnthAjax = this.__getDependency("tnthAjax");
-    var orgTool = this.__getDependency("orgTool");
+    var orgTool = this.getOrgTool();
 
     var termsEvent = function() {
       if ($(this).attr("data-agree") === "false") {
