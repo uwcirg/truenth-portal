@@ -104,7 +104,8 @@ class TestReporting(TestCase):
         rp = db.session.merge(rp)
         rp_id = rp.id
 
-        crv = Organization(name='CRV', research_protocol_id=rp_id)
+        crv = Organization(name='CRV')
+        crv.research_protocols.append(rp)
         epic26 = Questionnaire(name='epic26')
         with SessionScope(db):
             db.session.add(crv)

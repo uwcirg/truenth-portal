@@ -322,8 +322,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(
-            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.assertTrue(QuestionnaireBank.qbs_for_user(
+                self.test_user, 'baseline', as_of_date=datetime.utcnow()))
 
         # Being a day short, shouldn't fire
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -340,8 +340,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(
-            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.assertTrue(QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
 
         for instrument in symptom_tracker_instruments:
             mock_qr(instrument_id=instrument)
@@ -361,8 +361,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(
-            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.assertTrue(QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
@@ -386,8 +386,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             status='final')
 
         # Confirm test user doesn't qualify for ST QB
-        self.assertFalse(
-            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.assertFalse(QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
 
         # shouldn't generate a message either
         mock_qr(instrument_id='epic26')
@@ -405,8 +405,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(
-            QuestionnaireBank.qbs_for_user(self.test_user, 'baseline'))
+        self.assertTrue(QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
 
         # Add fresh procedure
         self.add_procedure('4', 'External beam radiation therapy', ICHOM)

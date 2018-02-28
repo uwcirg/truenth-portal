@@ -129,8 +129,8 @@ class TestSitePersistence(TestCase):
         rp = db.session.merge(rp)
         rp_id = rp.id
 
-        metastatic_org = Organization(name='metastatic',
-                                      research_protocol_id=rp_id)
+        metastatic_org = Organization(name='metastatic')
+        metastatic_org.research_protocols.append(rp)
         questionnaire = Questionnaire(name='test_q')
         with SessionScope(db):
             db.session.add(initial_recur)
@@ -141,7 +141,6 @@ class TestSitePersistence(TestCase):
 
         initial_recur = db.session.merge(initial_recur)
         every_six_thereafter = db.session.merge(every_six_thereafter)
-        metastatic_org_id = db.session.merge(metastatic_org).id
 
         # with bits in place, setup a recurring QB
         recurs = [initial_recur, every_six_thereafter]

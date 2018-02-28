@@ -1,5 +1,6 @@
 """Unit test module for ResearchProtocol logic"""
 from flask_webtest import SessionScope
+from datetime import datetime
 
 from portal.extensions import db
 from portal.models.organization import Organization
@@ -44,11 +45,12 @@ class TestResearchProtocol(TestCase):
         org_data = {"name": "test_org",
                     "extension": [
                     {"url": TRUENTH_RP_EXTENSION,
-                     "research_protocol": "test_rp"}
+                     "research_protocols": [{'name': "test_rp"}]}
                     ]}
 
         org = Organization.from_fhir(org_data)
-        self.assertEquals(org.research_protocol_id, rp.id)
+        self.assertEquals(1, len(org.research_protocols))
+        self.assertEquals(org.research_protocols[0].id, rp.id)
 
     def test_rp_inheritance(self):
         rp = ResearchProtocol(name="test_rp")
@@ -57,8 +59,8 @@ class TestResearchProtocol(TestCase):
             db.session.commit()
         rp = db.session.merge(rp)
 
-        parent = Organization(name='parent', id=101,
-                              research_protocol_id=rp.id)
+        parent = Organization(name='parent', id=101)
+        parent.research_protocols.append(rp)
         child = Organization(name='child', partOf_id=101)
         with SessionScope(db):
             db.session.add(parent)
@@ -66,7 +68,7 @@ class TestResearchProtocol(TestCase):
             db.session.commit()
         parent, child, rp = map(db.session.merge, (parent, child, rp))
 
-        self.assertEquals(parent.research_protocol_id, rp.id)
-        self.assertEquals(parent.research_protocol.id, rp.id)
-        self.assertFalse(child.research_protocol_id)
-        self.assertEquals(child.research_protocol.id, rp.id)
+        self.assertEquals(1, len(parent.research_protocols))
+        self.assertEquals(parent.research_protocols[0].id, rp.id)
+        self.assertEquals(0, len(child.research_protocols))
+        self.assertEquals(child.research_protocol(as_of_date=datetime.utcnow()).id, rp.id)
