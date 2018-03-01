@@ -70,7 +70,6 @@ class Organization(db.Model):
     research_protocols = association_proxy(
         "organization_research_protocols", "research_protocol",
         creator=lambda rp: OrganizationResearchProtocol(research_protocol=rp))
-        # order_by='OrganizationResearchProtocol.retired_as_of')
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __init__(self, **kwargs):

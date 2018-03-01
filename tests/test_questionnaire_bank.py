@@ -38,7 +38,7 @@ class TestQuestionnaireBank(TestCase):
             db.session.add(org)
             db.session.add(rp)
             db.session.commit()
-        org, rp = map(db.session.merge, (org,rp))
+        org, rp = map(db.session.merge, (org, rp))
         if not retired_as_of:
             org.research_protocols.append(rp)
         else:
