@@ -700,26 +700,23 @@ def settings():
 @portal.route('/api/settings/<string:config_key>')
 @oauth.require_oauth()
 def config_settings(config_key):
+    # return selective keys - not all can be be viewed by users, e.g.secret key
+    config_prefix_whitelist = (
+        'LR_',
+        'CONSENT',
+        'REQUIRED_CORE_DATA',
+        'SYSTEM',
+    )
     if config_key:
         key = config_key.upper()
-        # handing out LifeRay keys at this time
-        if key.startswith('LR_'):
-            return jsonify({key: current_app.config.get(key)})
-        # handing out consent related keys e.g. consent_with_top_level_org
-        elif key.startswith('CONSENT_'):
-            return jsonify({key: current_app.config.get(key)})
-        elif key.startswith('REQUIRED_CORE_DATA'):
-            return jsonify({key: current_app.config.get(key)})
-        elif key.startswith('SYSTEM'):
-            return jsonify({key: current_app.config.get(key)})
-        else:
+        if not any(key.startswith(prefix) for prefix in config_prefix_whitelist):
             abort(400, "Configuration key '{}' not available".format(key))
+        return jsonify({key: current_app.config.get(key)})
     else:
         config_settings = {}
         # return selective keys - not all can be be viewed by users, e.g.secret key
         for key in current_app.config:
-            if key.startswith('LR_') or key.startswith('CONSENT_') or \
-               key.startswith('REQUIRED_CORE_DATA') or key.startswith('SYSTEM'):
+            if any(key.startswith(prefix) for prefix in config_prefix_whitelist):
                 config_settings[key] = current_app.config.get(key)
         return jsonify(config_settings)
 
