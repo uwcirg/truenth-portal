@@ -1480,6 +1480,29 @@ def get_user(uid):
         return User.query.get(uid)
 
 
+def get_user_or_abort(uid):
+    """Wraps `get_user` and raises error if not found
+
+    Safe to call with path or parameter info.  Confirms integer value before
+    attempting lookup.
+
+    :raises 404: if the given uid isn't an integer, or if no matching user
+    :raises 403: if the named user has been deleted
+    :returns: user if valid and found
+
+    """
+    try:
+        user_id = int(uid)
+    except ValueError:
+        abort(404, "User not found - expected integer ID")
+    user = get_user(user_id)
+    if not user:
+        abort(404, "User not found")
+    if user.deleted:
+        abort(403, "deleted user - operation not permitted")
+    return user
+
+
 class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(
