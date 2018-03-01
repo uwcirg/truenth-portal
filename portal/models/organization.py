@@ -758,6 +758,17 @@ class OrgTree(object):
         """Return list of all top level organization identifiers"""
         return self.root.children.keys()
 
+    def top_level_names(self):
+        """Fetch org names for `all_top_level_ids`
+
+        :returns: list of top level org names
+
+        """
+        results = Organization.query.filter(
+            Organization.id.in_(self.all_top_level_ids())).with_entities(
+            Organization.name).all()
+        return [r[0] for r in results]
+
     def all_leaf_ids(self):
         nodes = set()
         for id in self.all_top_level_ids():
