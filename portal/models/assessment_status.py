@@ -213,7 +213,8 @@ class AssessmentStatus(object):
         """Returns the top organization associated with users's QB or None"""
         rp_id = self.qb_data.qb.research_protocol_id
         for org in self.user.organizations:
-            if org.research_protocol and (org.research_protocol.id == rp_id):
+            org_rp = org.research_protocol(self.as_of_date)
+            if org_rp and org_rp.id == rp_id:
                 return OrgTree().find_top_level_org([org])[0]
         return None
 
@@ -248,7 +249,9 @@ class AssessmentStatus(object):
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
         return len(
-            QuestionnaireBank.qbs_for_user(self.user, classification)) > 0
+            QuestionnaireBank.qbs_for_user(
+                self.user, classification=classification,
+                as_of_date=self.as_of_date)) > 0
 
     def _status_by_classification(self, classification):
         """Returns appropriate status dict for requested QB type(s)"""
@@ -257,7 +260,9 @@ class AssessmentStatus(object):
             # Assumes current by default
             results = self.qb_data.status_by_q
         if classification in ('all', 'indefinite'):
-            qb = QuestionnaireBank.qbs_for_user(self.user, 'indefinite')
+            qb = QuestionnaireBank.qbs_for_user(
+                self.user, classification='indefinite',
+                as_of_date=self.as_of_date)
             if qb:
                 assert len(qb) == 1
                 results.update(qb_status_dict(self.user, qb[0],

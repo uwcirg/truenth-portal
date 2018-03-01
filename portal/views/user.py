@@ -2124,7 +2124,7 @@ def get_current_user_qb(user_id):
         abort(400, "deleted user - operation not permitted")
 
     date = request.args.get('as_of_date')
-    date = datetime.strptime(date, '%Y-%m-%d') if date else None
+    date = datetime.strptime(date, '%Y-%m-%d') if date else datetime.utcnow()
 
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 

@@ -206,7 +206,7 @@ class QuestionnaireBank(db.Model):
         return bundle
 
     @staticmethod
-    def qbs_for_user(user, classification, as_of_date=None):
+    def qbs_for_user(user, classification, as_of_date):
         # avoid cyclical import
         from .assessment_status import QuestionnaireBankDetails
 
@@ -241,11 +241,10 @@ class QuestionnaireBank(db.Model):
                     raise ValueError(errstr)
                 current_app.logger.error(errstr)
 
-        as_of_date = as_of_date or datetime.utcnow()
-
+        assert(as_of_date)
         user_rps = set()
         for org in (o for o in user.organizations if o.id):
-            rp = org.research_protocol
+            rp = org.research_protocol(as_of_date=as_of_date)
             if rp:
                 user_rps.add(rp.id)
 
@@ -310,7 +309,7 @@ class QuestionnaireBank(db.Model):
         the QB's calculated start date, the current QB recurrence, and the
         recurrence iteration number. Values are set as None if N/A.
 
-        :param as_of_date: if not provided, use current utc time.
+        :param as_of_date: utc time value for computation, i.e. utcnow()
 
         Ideally, return the one current QuestionnaireBank that applies
         to the user 'as_of_date'.  If none, return the most recently
@@ -320,9 +319,9 @@ class QuestionnaireBank(db.Model):
         and should be treated independently - see `indefinite_qb`
 
         """
-        as_of_date = as_of_date or datetime.utcnow()
-
-        baseline = QuestionnaireBank.qbs_for_user(user, 'baseline')
+        assert(as_of_date)
+        baseline = QuestionnaireBank.qbs_for_user(
+            user, 'baseline', as_of_date=as_of_date)
         if not baseline:
             trace("no baseline questionnaire_bank, can't continue")
             return QBD(None, None, None, None)
@@ -336,7 +335,8 @@ class QuestionnaireBank(db.Model):
         for classification in classification_types:
             if classification == 'indefinite':
                 continue
-            for qb in QuestionnaireBank.qbs_for_user(user, classification):
+            for qb in QuestionnaireBank.qbs_for_user(
+                    user, classification, as_of_date=as_of_date):
                 qbd = qb.calculated_start(trigger_date, as_of_date)
                 if qbd.relative_start is None:
                     # indicates QB hasn't started yet, continue
@@ -359,7 +359,8 @@ class QuestionnaireBank(db.Model):
         :returns QBD: with values only if the user has an indefinite qb
 
         """
-        indefinite_qb = QuestionnaireBank.qbs_for_user(user, 'indefinite')
+        indefinite_qb = QuestionnaireBank.qbs_for_user(
+            user, classification='indefinite', as_of_date=as_of_date)
         if not indefinite_qb:
             return QBD(None, None, None, None)
 

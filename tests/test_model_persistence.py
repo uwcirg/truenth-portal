@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from tests import TestCase
 from flask_webtest import SessionScope
 import os
@@ -8,11 +9,15 @@ from tempfile import mkdtemp
 
 from portal.config.model_persistence import ModelPersistence
 from portal.database import db
+from portal.date_tools import FHIR_datetime
 from portal.models.locale import LocaleConstants
 from portal.models.app_text import AppText
 from portal.models.communication_request import CommunicationRequest
 from portal.models.coding import Coding
-from portal.models.organization import Organization
+from portal.models.organization import (
+    Organization,
+    ResearchProtocolExtension)
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
 
@@ -247,3 +252,58 @@ class TestModelPersistence(TestCase):
 
         mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
         self.assertEquals(ScheduledJob.query.count(), 1)
+
+    def test_rp_alteration(self):
+        # orgs with old rp should migrate to multiple w/ updated retired
+        from portal.system_uri import SHORTCUT_ALIAS, TRUENTH_CR_NAME
+        from portal.models.identifier import Identifier
+
+        rp1 = ResearchProtocol(name='initial')
+        rp2 = ResearchProtocol(name='replacement')
+        org = Organization(name='testy')
+        org.research_protocols.append(rp1)
+        with SessionScope(db):
+            db.session.add(rp2)
+            db.session.add(org)
+            db.session.commit()
+        mp = ModelPersistence(
+            Organization, lookup_field='id',
+            sequence_name='organizations_id_seq'
+        )
+        mp.export(self.tmpdir)
+
+        # Add second rp, mark old as retired
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'r') as pfile:
+            data = json.load(pfile)
+
+        now = datetime.utcnow().replace(microsecond=0)
+        updated = {
+            'url': ResearchProtocolExtension.extension_url,
+            'research_protocols': [
+                {"name": 'replacement'},
+                {"name": 'initial', "retired_as_of": FHIR_datetime.as_fhir(
+                    now)}]}
+        for i, entry in enumerate(data['entry']):
+            if entry['name'] != 'testy':
+                continue
+            extensions = entry['extension']
+            keepers = [
+                ext for ext in extensions
+                if ext['url'] != ResearchProtocolExtension.extension_url]
+            keepers.append(updated)
+            data['entry'][i]['extension'] = keepers
+
+        with open(
+                os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
+            pfile.write(json.dumps(data))
+
+        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        org = Organization.query.filter(Organization.name == 'testy').one()
+        self.assertEquals(len(org.research_protocols), 2)
+
+        # Make sure retired_as_of was set properly on old
+        rp1, rp2 = map(db.session.merge, (rp1, rp2))
+        expected = [(rp2, None), (rp1, now)]
+        results = [(rp, retired) for rp, retired in org.rps_w_retired()]
+        self.assertEquals(results, expected)

@@ -33,7 +33,7 @@ class FHIR_datetime(object):
         return as_fhir(obj)
 
     @staticmethod
-    def parse(data, error_subject=None):
+    def parse(data, error_subject=None, none_safe=False):
         """Parse input string to generate a UTC datetime instance
 
         NB - date must be more recent than year 1900 or a ValueError
@@ -41,10 +41,15 @@ class FHIR_datetime(object):
 
         :param data: the datetime string to parse
         :param error_subject: Subject string to use in error message
+        :param none_safe: set true to sanely handle None values
+         (None in, None out).  By default a 400 is raised.
 
         :return: UTC datetime instance from given data
 
         """
+        if none_safe and data is None:
+            return None
+
         # As we use datetime.strftime for display, and it can't handle dates
         # older than 1900, treat all such dates as an error
         epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')

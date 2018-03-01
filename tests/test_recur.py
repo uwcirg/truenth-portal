@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from portal.models.recur import Recur
 from tests import TestCase
 
+now = datetime.utcnow()
+
 
 class TestRecur(TestCase):
 
@@ -12,7 +14,7 @@ class TestRecur(TestCase):
         recur = Recur(start='{"days": 30}', cycle_length='{"days": 2}',
                       termination='{"days": 35}')
         result, _ = recur.active_interval_start(
-            trigger_date=back_36, as_of_date=None)
+            trigger_date=back_36, as_of_date=now)
         # None implies expired or not started
         self.assertIsNone(result)
 
@@ -21,7 +23,7 @@ class TestRecur(TestCase):
         recur = Recur(start='{"days": 2}', cycle_length='{"days": 2}',
                       termination='{"days": 35}')
         result, _ = recur.active_interval_start(
-            trigger_date=yesterday, as_of_date=None)
+            trigger_date=yesterday, as_of_date=now)
         # None implies expired or not started
         self.assertIsNone(result)
 
@@ -30,7 +32,7 @@ class TestRecur(TestCase):
         recur = Recur(start='{"days": 2}', cycle_length='{"days": 10}',
                       termination='{"days": 35}')
         result, ic = recur.active_interval_start(
-            trigger_date=three_back, as_of_date=None)
+            trigger_date=three_back, as_of_date=now)
         # should get three back plus start
         self.assertAlmostEqual(result, three_back + timedelta(days=2))
         self.assertEqual(ic, 0)
@@ -40,7 +42,7 @@ class TestRecur(TestCase):
         recur = Recur(start='{"days": 2}', cycle_length='{"days": 10}',
                       termination='{"days": 35}')
         result, ic = recur.active_interval_start(
-            trigger_date=thirty_back, as_of_date=None)
+            trigger_date=thirty_back, as_of_date=now)
         # should get back 30 back, plus 2 to start, plus 10*2
         self.assertAlmostEqual(result, thirty_back + timedelta(days=22))
         self.assertEquals(ic, 2)
