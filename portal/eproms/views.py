@@ -318,7 +318,7 @@ def resources():
             return render_template('eproms/resources.html',
                                    results=results, video_content=video_content)
         except TemplateNotFound as err:
-            abort(404)
+            abort(404, 'Error rendering content {}'.format(err))
     else:
         abort(400, 'user must belong to an organization')
 

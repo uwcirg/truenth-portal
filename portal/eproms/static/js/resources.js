@@ -26,7 +26,7 @@ var ResourcesTool = function() {
             window.print();
         });
     };
-}
+};
 
 $(function() {
     (new ResourcesTool()).init();
