@@ -5,6 +5,7 @@ from flask_swagger import swagger
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC, QuestionnaireResponse
@@ -56,6 +57,27 @@ class TestQuestionnaireBank(TestCase):
             db.session.add(q)
             db.session.commit()
         return db.session.merge(q)
+
+    def setup_qb(self, questionnaire_name, qb_name, classification, rp_id):
+        """Shortcut to setup a testing QB with given values
+
+        Sets up a single qb with a single questionnaire for given
+        classification and research_protocol
+
+        """
+        qn = self.setup_q(questionnaire_name)
+        qb = QuestionnaireBank(
+            name=qb_name,
+            classification=classification,
+            research_protocol_id=rp_id,
+            start='{"days": 0}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.commit()
+        return db.session.merge(qb)
 
     def setup_qbs(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
@@ -694,3 +716,63 @@ class TestQuestionnaireBank(TestCase):
         pre_retirement = weekago - timedelta(days=1)
         self.assertEquals(qb2, QuestionnaireBank.most_current_qb(
             user, as_of_date=pre_retirement).questionnaire_bank)
+
+    def test_outdated_done_indef(self):
+        """Confirm completed indefinite counts after RP switch"""
+
+        # boiler plate to create baseline and indef with retired RP
+        yesterday = now - timedelta(days=1)
+        weekago = now - timedelta(weeks=1)
+        org, rp2, rp2_id = self.setup_org_n_rp(
+            org_name='testorg', rp_name='v2', retired_as_of=yesterday)
+        org, rp3, rp3_id = self.setup_org_n_rp(org=org, rp_name='v3')
+        org_id = org.id
+        self.test_user.organizations.append(org)
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, timestamp=weekago)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            audit=audit, agreement_url='http://no.com')
+        with SessionScope(db):
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+
+        self.setup_qb(
+            questionnaire_name='epic23', qb_name='baseline v2',
+            classification='baseline', rp_id=rp2_id)
+        self.setup_qb(
+            questionnaire_name='epic26', qb_name='baseline v3',
+            classification='baseline', rp_id=rp3_id)
+        qb2_indef = self.setup_qb(
+            questionnaire_name='irondemog', qb_name='indef v2',
+            classification='indefinite', rp_id=rp2_id)
+        self.setup_qb(
+            questionnaire_name='irondemog_v3', qb_name='indef v3',
+            classification='indefinite', rp_id=rp3_id)
+
+        # for today, should get the v3 baseline
+        user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        self.assertEquals(
+            ['epic26', 'irondemog_v3'],
+            a_s.instruments_needing_full_assessment(classification='all'))
+
+        # create done QNR for indefinite dated prior to rp transition
+        # belonging to older qb - confirm that clears indef work as of then
+        mock_qr('irondemog', timestamp=weekago, qb=qb2_indef)
+        user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=user, as_of_date=weekago)
+        self.assertEquals([], a_s.instruments_needing_full_assessment(
+            classification='indefinite'))
+
+        # move forward in time; user should no longer need indefinite, even
+        # tho RP changed
+        qb2_indef = db.session.merge(qb2_indef)
+        self.assertEquals([qb2_indef], QuestionnaireBank.qbs_for_user(
+            user, classification='indefinite', as_of_date=now))
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        self.assertEquals([], a_s.instruments_needing_full_assessment(
+            classification='indefinite'))
+        self.assertEquals(['epic26'], a_s.instruments_needing_full_assessment(
+            classification='all'))
