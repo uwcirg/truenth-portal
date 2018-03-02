@@ -4,19 +4,13 @@ from collections import OrderedDict
 from flask import Blueprint, current_app, render_template, redirect, url_for
 
 from ..models.user import current_user
+from ..views.portal import get_asset
 
 
 exercise_diet = Blueprint(
     'exercise_diet', __name__, template_folder='templates',
     static_folder='static', static_url_path='/exercise_diet/static',
     url_prefix='/exercise-and-diet')
-
-
-def get_asset(uuid):
-    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
-    data = requests.get(url).content
-    return json.JSONDecoder().decode(data)['asset']
 
 
 def get_tag_data(anyTags):
