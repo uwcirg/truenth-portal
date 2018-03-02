@@ -259,11 +259,13 @@ def website_consent_script(patient_id):
         entry_method=entry_method, redirect_url=redirect_url,
         declaration_form=declaration_form, patient_id=patient_id)
 
+
 def get_asset(uuid):
     url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
         LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
     data = requests.get(url).content
     return json.JSONDecoder().decode(data)['asset']
+
 
 def get_any_tag_data(anyTags):
     """
@@ -281,6 +283,7 @@ def get_any_tag_data(anyTags):
             LR_ORIGIN=current_app.config["LR_ORIGIN"], anyTags='&'.join(tags_list)))
     return requests.get(url).content
 
+
 def get_all_tag_data(allTags):
     """
         query LR based on all required tags
@@ -297,6 +300,7 @@ def get_all_tag_data(allTags):
             LR_ORIGIN=current_app.config["LR_ORIGIN"], allTags='&'.join(tags_list)))
     return requests.get(url).content
 
+
 @eproms.route('/resources', methods=['GET'])
 @roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
@@ -312,11 +316,12 @@ def resources():
                 video_content.append(get_asset(asset['uuid']))
         try:
             return render_template('eproms/resources.html',
-                                    results=results, video_content=video_content)
+                results=results, video_content=video_content)
         except TemplateNotFound as err:
             abort(404)
     else:
         abort(400, 'user must belong to an organization')
+
 
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])
 @roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
@@ -327,12 +332,13 @@ def work_instruction(tag):
     if not tag:
         abort(400, 'work instruction tag is required')
     if org:
-        work_instruction_data = get_all_tag_data([tag, '{} work instruction'.format(org.name.lower())])
+        work_instruction_data = get_all_tag_data([tag, '{} work instruction'.\
+                                format(org.name.lower())])
         results = json.JSONDecoder().decode(work_instruction_data)['results']
         if len(results) > 0:
             content = get_asset(results[0]['uuid'])
             return render_template('eproms/work_instruction.html',
-                                    content=content, title=tag)
+                content=content, title=tag)
         else:
             abort(400, 'work instruction not found')
     else:
