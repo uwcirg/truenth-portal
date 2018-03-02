@@ -207,9 +207,6 @@ class QuestionnaireBank(db.Model):
 
     @staticmethod
     def qbs_for_user(user, classification, as_of_date):
-        # avoid cyclical import
-        from .assessment_status import QuestionnaireBankDetails
-
         """Return questionnaire banks applicable to (user, classification)
 
         QuestionnaireBanks are associated with a user through the user's
@@ -218,6 +215,9 @@ class QuestionnaireBank(db.Model):
         :return: matching QuestionnaireBanks if found, else empty list
 
         """
+        # avoid cyclical import
+        from .assessment_status import QuestionnaireBankDetails
+
         def filter_invalid_qb_statuses(qbs):
             valid_qbs = []
             for qb in qbs:
@@ -263,6 +263,8 @@ class QuestionnaireBank(db.Model):
             # use in-progress if found for user, otherwise use current
             in_progress = in_progress.filter(
                 QuestionnaireBank.classification == classification).all()
+            if in_progress and classification == 'indefinite':
+                return in_progress
             in_progress = filter_invalid_qb_statuses(in_progress)
             results = in_progress or results.filter(
                 QuestionnaireBank.classification == classification).all()
