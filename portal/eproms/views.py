@@ -1,4 +1,3 @@
-import requests
 import json
 from flask import (
     abort,
@@ -32,6 +31,7 @@ from ..models.organization import Organization
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..views.auth import next_after_login
+from ..views.portal import get_asset, get_any_tag_data, get_all_tag_data
 
 
 eproms = Blueprint(
@@ -259,46 +259,6 @@ def website_consent_script(patient_id):
         declaration_form=declaration_form, patient_id=patient_id)
 
 
-def get_asset(uuid):
-    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
-    data = requests.get(url).content
-    return json.JSONDecoder().decode(data)['asset']
-
-
-def get_any_tag_data(anyTags):
-    """
-        query LR based on any tags
-        this is an OR condition
-        will match any tag specified
-        e.g. anyTag=tag1&anyTag=tag2
-    """
-    tags_list = []
-    for tag in anyTags:
-        tags_list.append("anyTags={}".format(tag))
-    url = (
-        "{LR_ORIGIN}/c/portal/truenth/asset/query?{anyTags}&sort=true"
-        "&sortType=DESC".format(
-            LR_ORIGIN=current_app.config["LR_ORIGIN"], anyTags='&'.join(tags_list)))
-    return requests.get(url).content
-
-
-def get_all_tag_data(allTags):
-    """
-        query LR based on all required tags
-        this is an AND condition
-        all required tags must be present
-        e.g. allTag=tag1&allTag=tag2
-    """
-    tags_list = []
-    for tag in allTags:
-        tags_list.append("allTags={}".format(tag))
-    url = (
-        "{LR_ORIGIN}/c/portal/truenth/asset/query?{allTags}&sort=true"
-        "&sortType=DESC".format(
-            LR_ORIGIN=current_app.config["LR_ORIGIN"], allTags='&'.join(tags_list)))
-    return requests.get(url).content
-
 
 @eproms.route('/resources', methods=['GET'])
 @roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
@@ -306,20 +266,19 @@ def get_all_tag_data(allTags):
 def resources():
     user = current_user()
     org = user.first_top_organization()
-    if org:
-        resources_data = get_any_tag_data(['{} work instruction'.format(org.name.lower())])
-        results = json.JSONDecoder().decode(resources_data)['results']
-        if (len(results) > 0):
-            video_content = []
-            for asset in results:
-                if 'video' in asset['tags']:
-                    video_content.append(get_asset(asset['uuid']))
-            return render_template('eproms/resources.html',
-                                   results=results, video_content=video_content)
-        else:
-            abort(400, 'no resources found')
-    else:
+    if not org:
         abort(400, 'user must belong to an organization')
+    resources_data = get_any_tag_data(['{} work instruction'.format(org.name.lower())])
+    results = json.JSONDecoder().decode(resources_data)['results']
+    if (len(results) > 0):
+        video_content = []
+        for asset in results:
+            if 'video' in asset['tags']:
+                video_content.append(get_asset(asset['uuid']))
+        return render_template('eproms/resources.html',
+                               results=results, video_content=video_content)
+    else:
+        abort(400, 'no resources found')
 
 
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])
@@ -330,15 +289,15 @@ def work_instruction(tag):
     org = user.first_top_organization()
     if not tag:
         abort(400, 'work instruction tag is required')
-    if org:
-        work_instruction_data = get_all_tag_data([tag, '{} work instruction'.
-                                                 format(org.name.lower())])
-        results = json.JSONDecoder().decode(work_instruction_data)['results']
-        if len(results) > 0:
-            content = get_asset(results[0]['uuid'])
-            return render_template('eproms/work_instruction.html',
-                                   content=content, title=tag)
-        else:
-            abort(400, 'work instruction not found')
-    else:
+    if not org:
         abort(400, 'user must belong to an organization')
+    work_instruction_data = get_all_tag_data([tag, '{} work instruction'.
+                                             format(org.name.lower())])
+    results = json.JSONDecoder().decode(work_instruction_data)['results']
+    if len(results) > 0:
+        content = get_asset(results[0]['uuid'])
+        return render_template('eproms/work_instruction.html',
+                               content=content, title=tag)
+    else:
+        abort(400, 'work instruction not found')
+

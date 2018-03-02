@@ -1,4 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+import json
+import requests
 from celery.result import AsyncResult
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, make_response, redirect, request, session, url_for
@@ -987,3 +989,48 @@ def check_int(i):
         return int(i)
     except ValueError, e:
         abort(400, "invalid input '{}' - must be an integer".format(i))
+
+
+def get_asset(uuid):
+    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
+        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
+    data = requests.get(url).content
+    return json.JSONDecoder().decode(data)['asset']
+
+
+def get_any_tag_data(anyTags):
+    """
+        query LR based on any tags
+        this is an OR condition
+        will match any tag specified
+        parameter:
+            name: anyTags
+            type: list
+            description: tag(s) to be queried e.g ['tag1', 'tag2']
+    """
+    # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
+    url = (
+       "{LR_ORIGIN}/c/portal/truenth/asset/query?{anyTags}&sort=true"
+       "&sortType=DESC".format(
+           LR_ORIGIN=current_app.config["LR_ORIGIN"],
+           anyTags='&'.join(["anyTags={}".format(tag) for tag in anyTags])))
+    return requests.get(url).content
+
+
+def get_all_tag_data(allTags):
+    """
+        query LR based on all required tags
+        this is an AND condition
+        all required tags must be present
+        parameter:
+            name: allTags
+            type: list
+            description: tag(s) to be queried e.g ['tag1', 'tag2']
+    """
+    # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
+    url = (
+        "{LR_ORIGIN}/c/portal/truenth/asset/query?{allTags}&sort=true"
+        "&sortType=DESC".format(
+            LR_ORIGIN=current_app.config["LR_ORIGIN"],
+            allTags='&'.join(["allTags={}".format(tag) for tag in allTags])))
+    return requests.get(url).content
