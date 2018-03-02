@@ -259,7 +259,6 @@ def website_consent_script(patient_id):
         declaration_form=declaration_form, patient_id=patient_id)
 
 
-
 @eproms.route('/resources', methods=['GET'])
 @roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
 @oauth.require_oauth()
@@ -300,4 +299,3 @@ def work_instruction(tag):
                                content=content, title=tag)
     else:
         abort(400, 'work instruction not found')
-
