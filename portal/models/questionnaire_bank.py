@@ -207,28 +207,26 @@ class QuestionnaireBank(db.Model):
 
     @staticmethod
     def qbs_for_user(user, classification, as_of_date):
-        """Return questionnaire banks applicable to (user, classification)
+        """Returns questionnaire banks applicable to (user, classification)
 
-        QuestionnaireBanks are associated with a user through the user's
-        organization's (inherited) research_protocols, or through interventions
+        Looks up the appropriate questionnaire banks for the user.
+        Considers both the current mappings (such as affiliation
+        through intervention or organization) as well as any in-progress or
+        completed questionnaire banks.
 
-        :return: matching QuestionnaireBanks if found, else empty list
+        :param user: for whom to look up QBs
+        :param classification: set to restrict to a given classification.
+        :param as_of_date: as assigned QBs change over time (due to research
+         protocol upgrades), required to lookup what applied at the given time.
+        :return: list of unique matching QuestionnaireBanks.  Any applicable
+         `in_progress` or `completed` will be at head of list.
 
         """
-        # avoid cyclical import
-        from .assessment_status import QuestionnaireBankDetails
-
-        def filter_invalid_qb_statuses(qbs):
-            valid_qbs = []
-            for qb in qbs:
-                qb_data = QuestionnaireBankDetails(
-                    user, as_of_date=as_of_date, qb=qb)
-                if (qb_data.overall_status() not in
-                        ('Completed', 'Expired', 'Partially Completed')):
-                    valid_qbs.append(qb)
-            return valid_qbs
+        if not as_of_date:
+            raise ValueError("requires valid as_of_date")
 
         def validate_classification_count(qbs):
+            """Only allow a single QB for baseline and indefinite"""
             if qbs and qbs[0].classification == 'recurring':
                 return
             if (len(qbs) > 1):
@@ -241,64 +239,83 @@ class QuestionnaireBank(db.Model):
                     raise ValueError(errstr)
                 current_app.logger.error(errstr)
 
-        assert(as_of_date)
-        user_rps = set()
-        for org in (o for o in user.organizations if o.id):
-            rp = org.research_protocol(as_of_date=as_of_date)
-            if rp:
-                user_rps.add(rp.id)
+        def current_rps(user):
+            """returns current research protocols for user's orgs"""
+            user_rps = set()
+            for org in (o for o in user.organizations if o.id):
+                rp = org.research_protocol(as_of_date=as_of_date)
+                if rp:
+                    user_rps.add(rp.id)
+            return user_rps
 
-        # find any outdated QBs that the user already started
-        in_progress = QuestionnaireBank.query.join(
-            QuestionnaireResponse).filter(
-                QuestionnaireResponse.subject_id == user.id,
-                QuestionnaireResponse.questionnaire_bank_id ==
-                QuestionnaireBank.id)
+        def submitted_qbs(user, classification):
+            """return list QBs for which the user already submitted work"""
+            submitted = QuestionnaireBank.query.join(
+                QuestionnaireResponse).filter(
+                    QuestionnaireResponse.subject_id == user.id,
+                    QuestionnaireResponse.questionnaire_bank_id ==
+                    QuestionnaireBank.id).order_by(
+                QuestionnaireResponse.authored.desc())
+            if classification:
+                submitted = submitted.filter(
+                    QuestionnaireBank.classification == classification)
+            return submitted.all()
 
-        # find current QBs for user's organizations
-        results = QuestionnaireBank.query.filter(
-            QuestionnaireBank.research_protocol_id.in_(user_rps))
+        def qbs_by_org(user, classification):
+            """return QBs associated with the user via organizations"""
+            results = QuestionnaireBank.query.filter(
+                QuestionnaireBank.research_protocol_id.in_(current_rps(user)))
+            if classification:
+                results = results.filter(
+                    QuestionnaireBank.classification == classification)
+            return results.all()
 
-        if classification:
-            # use in-progress if found for user, otherwise use current
-            in_progress = in_progress.filter(
-                QuestionnaireBank.classification == classification).all()
-            if in_progress and classification == 'indefinite':
-                return in_progress
-            in_progress = filter_invalid_qb_statuses(in_progress)
-            results = in_progress or results.filter(
-                QuestionnaireBank.classification == classification).all()
-        else:
-            # if no classification specified, combine current with in-progress
-            in_progress = filter_invalid_qb_statuses(in_progress.all())
-            results = list(set().union(in_progress, results.all()))
+        def qbs_by_intervention(user, classification):
+            """returns QBs associated with the user via intervention"""
+            results = []
 
-        # Complicated rules (including strategies and UserIntervention rows)
-        # define a user's access to an intervention.  Rely on the
-        # same check used to display the intervention cards, and only
-        # check for interventions actually associated with QBs.
-        if classification:
-            intervention_associated_qbs = QuestionnaireBank.query.filter(
-                QuestionnaireBank.intervention_id.isnot(None),
-                QuestionnaireBank.classification == classification)
-        else:
-            intervention_associated_qbs = QuestionnaireBank.query.filter(
-                QuestionnaireBank.intervention_id.isnot(None))
-        for qb in intervention_associated_qbs:
             # At this time, doesn't apply to metastatic patients.
-            if any((obs.codeable_concept == CC.PCaLocalized
+            if not any((obs.codeable_concept == CC.PCaLocalized
                     and obs.value_quantity == CC.FALSE_VALUE)
                    for obs in user.observations):
-                break
 
-            intervention = Intervention.query.get(qb.intervention_id)
-            if intervention.quick_access_check(user):
-                # TODO: business rule details like the following should
-                # move to site persistence for QB to user mappings.
-                check_func = observation_check("biopsy", 'true')
-                if check_func(intervention=intervention, user=user):
-                    if qb not in results:
-                        results.append(qb)
+                # Complicated rules (including strategies and UserIntervention rows)
+                # define a user's access to an intervention.  Rely on the
+                # same check used to display the intervention cards, and only
+                # check if intervention is associated with QBs.
+                intervention_qbs = QuestionnaireBank.query.filter(
+                    QuestionnaireBank.intervention_id.isnot(None))
+                if classification:
+                    intervention_qbs = intervention_qbs.filter(
+                        QuestionnaireBank.classification == classification)
+
+                for qb in intervention_qbs:
+                    intervention = Intervention.query.get(qb.intervention_id)
+                    if intervention.quick_access_check(user):
+                        # TODO: business rule details like the following should
+                        # move to site persistence for QB to user mappings.
+                        check_func = observation_check("biopsy", 'true')
+                        if check_func(intervention=intervention, user=user):
+                            if qb not in results:
+                                results.append(qb)
+            return results
+
+        # find submitted QBs, QBs by org and QBs by intervention
+        in_progress = submitted_qbs(user=user, classification=classification)
+        by_org = qbs_by_org(user=user, classification=classification)
+        by_intervention = qbs_by_intervention(user=user, classification=classification)
+
+
+        if in_progress and classification in ('baseline', 'indefinite'):
+            # Need one QB for baseline, indef - prefer in_progress
+            results = in_progress
+        else:
+            # combine current with in-progress
+            # maintain order (in-progress first) for most_current_qb filtering
+            in_progress_set = set(in_progress)  # O(n)
+            others = set(by_org + by_intervention)
+            results = in_progress + [
+                e for e in others if e not in in_progress_set]
 
         validate_classification_count(results)
         return results
