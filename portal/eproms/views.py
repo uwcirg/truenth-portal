@@ -12,7 +12,6 @@ from flask import (
     url_for
 )
 from flask_user import roles_required
-from jinja2 import TemplateNotFound
 
 from ..database import db
 from ..extensions import oauth, recaptcha
@@ -310,15 +309,15 @@ def resources():
     if org:
         resources_data = get_any_tag_data(['{} work instruction'.format(org.name.lower())])
         results = json.JSONDecoder().decode(resources_data)['results']
-        video_content = []
-        for asset in results:
-            if 'video' in asset['tags']:
-                video_content.append(get_asset(asset['uuid']))
-        try:
+        if (len(results) > 0):
+            video_content = []
+            for asset in results:
+                if 'video' in asset['tags']:
+                    video_content.append(get_asset(asset['uuid']))
             return render_template('eproms/resources.html',
                                    results=results, video_content=video_content)
-        except TemplateNotFound as err:
-            abort(404, 'Error rendering content {}'.format(err))
+        else:
+            abort(400, 'no resources found')
     else:
         abort(400, 'user must belong to an organization')
 
