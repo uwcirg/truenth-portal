@@ -386,6 +386,47 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_AU",
+                "display": "Australian English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 12000,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "en_AU",
+      "name": "The Alfred",
+      "partOf": {
+        "display": "TrueNTH Global Registry",
+        "reference": "api/organization/10000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "timezone": "UTC",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         },
