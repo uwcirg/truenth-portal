@@ -1,0 +1,37 @@
+{% extends "eproms/base.html" %}
+{% block main %}
+<h3 class="tnth-headline">{{_("Resources")}}</h3>
+<article id="resourcesContentContainer">
+    <section class="tabs-container">
+        {% if video_content|length > 0 %}
+            <div class="tab">
+              <input id="tab-one" type="checkbox" name="tabs" class="tab-input">
+              <label for="tab-one" class="tab-label">{{_("Videos")}}</label>
+              <div class="tab-content">
+                <ul>
+                    {% for video in video_content %}
+                        <li class="work-instruction-item">{{video | safe}}</li>
+                    {% endfor %}
+                </ul>
+              </div>
+            </div>
+        {% endif %}
+        <div class="tab">
+            <input id="tab-two" type="checkbox" name="tabs" class="tab-input">
+            <label for="tab-two" class="tab-label">{{_("Work Instructions")}}</label>
+            <div class="tab-content">
+                <ul>
+                    {% for asset in results %}
+                        {% if 'video' not in asset['tags'] %}
+                            <li class="work-instruction-item">
+                                <a href="{{url_for('.work_instruction', tag=asset['tags'][1])}}" class="first-letter">{{asset['tags'][1] | replace('-', ' ')}}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+</article>
+<script src="{{url_for('.static', filename='js/resources.js')}}"></script>
+{% endblock %}
