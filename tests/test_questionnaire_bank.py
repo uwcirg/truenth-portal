@@ -1,13 +1,12 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from flask_swagger import swagger
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
-from portal.models.encounter import Encounter
-from portal.models.fhir import CC, QuestionnaireResponse
+from portal.models.fhir import CC
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.organization import OrganizationResearchProtocol
@@ -57,26 +56,60 @@ class TestQuestionnaireBank(TestCase):
             db.session.commit()
         return db.session.merge(q)
 
-    def setup_qbs(self):
-        crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
-        epic26 = Questionnaire(name='epic26')
+    def setup_qb(self, questionnaire_name, qb_name, classification, rp_id):
+        """Shortcut to setup a testing QB with given values
+
+        Sets up a single qb with a single questionnaire for given
+        classification and research_protocol
+
+        """
+        qn = self.setup_q(questionnaire_name)
+        qb = QuestionnaireBank(
+            name=qb_name,
+            classification=classification,
+            research_protocol_id=rp_id,
+            start='{"days": 0}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.commit()
+        return db.session.merge(qb)
+
+    def setup_qbs(self, org=None, rp_name='v2', retired_as_of=None):
+        org, rp, rp_id = self.setup_org_n_rp(
+            org=org, org_name='CRV', rp_name=rp_name,
+            retired_as_of=retired_as_of)
+        epic26 = Questionnaire(name='epic26_{}'.format(rp_name))
         recur3 = Recur(
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
+        exists = Recur.query.filter_by(
+                start=recur3.start, cycle_length=recur3.cycle_length,
+                termination=recur3.termination).first()
+        if exists:
+            recur3 = exists
+
         recur6 = Recur(
             start='{"months": 6}', cycle_length='{"years": 1}',
             termination='{"years": 3, "months": 3}')
+        exists = Recur.query.filter_by(
+                start=recur6.start, cycle_length=recur6.cycle_length,
+                termination=recur6.termination).first()
+        if exists:
+            recur6 = exists
 
         with SessionScope(db):
             db.session.add(epic26)
             db.session.add(recur3)
             db.session.add(recur6)
             db.session.commit()
-        crv, epic26, recur3, recur6 = map(
-            db.session.merge, (crv, epic26, recur3, recur6))
+        org, epic26, recur3, recur6 = map(
+            db.session.merge, (org, epic26, recur3, recur6))
 
         qb_base = QuestionnaireBank(
-            name='CRV Baseline',
+            name='CRV Baseline {}'.format(rp_name),
             classification='baseline',
             research_protocol_id=rp_id,
             start='{"days": 0}',
@@ -86,7 +119,7 @@ class TestQuestionnaireBank(TestCase):
         qb_base.questionnaires.append(qbq)
 
         qb_m3 = QuestionnaireBank(
-            name='CRV_recurring_3mo_period',
+            name='CRV_recurring_3mo_period {}'.format(rp_name),
             classification='recurring',
             research_protocol_id=rp_id,
             start='{"days": 0}',
@@ -97,7 +130,7 @@ class TestQuestionnaireBank(TestCase):
         qb_m3.questionnaires.append(qbq)
 
         qb_m6 = QuestionnaireBank(
-            name='CRV_recurring_6mo_period',
+            name='CRV_recurring_6mo_period {}'.format(rp_name),
             classification='recurring',
             research_protocol_id=rp_id,
             start='{"days": 0}',
@@ -115,7 +148,7 @@ class TestQuestionnaireBank(TestCase):
         qb_base, qb_m3, qb_m6 = map(
             db.session.merge, (qb_base, qb_m3, qb_m6))
 
-        return crv
+        return db.session.merge(org)
 
     def test_org_trigger_date(self):
         # testing org-based QBs
@@ -521,14 +554,14 @@ class TestQuestionnaireBank(TestCase):
                                'questionnaire_bank'.format(TEST_USER_ID))
         self.assert200(resp)
         self.assertEquals(resp.json['questionnaire_bank']['name'],
-                          'CRV_recurring_3mo_period')
+                          'CRV_recurring_3mo_period v2')
 
         dt = (datetime.utcnow() - relativedelta(months=2)).strftime('%Y-%m-%d')
         resp2 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp2)
         self.assertEquals(resp2.json['questionnaire_bank']['name'],
-                          'CRV Baseline')
+                          'CRV Baseline v2')
 
         dt = (datetime.utcnow() - relativedelta(months=4)).strftime('%Y-%m-%d')
         resp3 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
@@ -569,22 +602,9 @@ class TestQuestionnaireBank(TestCase):
         qb = db.session.merge(qb)
 
         # create in-progress QNR for User/QB/RP
-        swagger_spec = swagger(self.app)
-        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
-
-        enc = Encounter(status='planned', auth_method='url_authenticated',
-                        user_id=TEST_USER_ID, start_time=now)
-        qnr = QuestionnaireResponse(
-            subject_id=TEST_USER_ID,
-            encounter=enc,
-            questionnaire_bank_id=qb.id,
-            status='in-progress',
-            document=data)
-
-        with SessionScope(db):
-            db.session.add(enc)
-            db.session.add(qnr)
-            db.session.commit()
+        mock_qr(
+            instrument_id='epic_26', status='in-progress',
+            timestamp=now, qb=qb)
 
         # User associated with CRV org should generate appropriate
         # questionnaires
@@ -628,23 +648,22 @@ class TestQuestionnaireBank(TestCase):
         qb2 = db.session.merge(qb2)
 
         # outdated QB/RP should be used as long as User has in-progress QNR
-        self.test_user, qnr = map(db.session.merge, (self.test_user, qnr))
+        self.test_user = db.session.merge(self.test_user)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
         self.assertEquals(qb.name, 'Test Questionnaire Bank')
         self.assertEquals(qb.research_protocol.name, 'proto')
 
-        # completing QNR should move User to new QB
-        qnr.status = 'completed'
-        with SessionScope(db):
-            db.session.add(qnr)
-            db.session.commit()
+        # completing QNR should result in completed status
+        # shouldn't pick up new protocol till next iteration
+        mock_qr(
+            instrument_id='epic_26', status='completed',
+            timestamp=now, qb=qb)
 
         self.test_user = db.session.merge(self.test_user)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
-        self.assertEquals(qb.name, 'Test Questionnaire Bank 2')
-        self.assertEquals(qb.research_protocol.name, 'new_proto')
+        self.assertEquals(qb.name, 'Test Questionnaire Bank')
 
     def test_qb_pre_retired(self):
         # Confirm backdating returns the correct QB
@@ -694,3 +713,111 @@ class TestQuestionnaireBank(TestCase):
         pre_retirement = weekago - timedelta(days=1)
         self.assertEquals(qb2, QuestionnaireBank.most_current_qb(
             user, as_of_date=pre_retirement).questionnaire_bank)
+
+    def test_outdated_done_indef(self):
+        """Confirm completed indefinite counts after RP switch"""
+
+        # boiler plate to create baseline and indef with retired RP
+        yesterday = now - timedelta(days=1)
+        weekago = now - timedelta(weeks=1)
+        org, rp2, rp2_id = self.setup_org_n_rp(
+            org_name='testorg', rp_name='v2', retired_as_of=yesterday)
+        org, rp3, rp3_id = self.setup_org_n_rp(org=org, rp_name='v3')
+        org_id = org.id
+        self.test_user.organizations.append(org)
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, timestamp=weekago)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            audit=audit, agreement_url='http://no.com')
+        with SessionScope(db):
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+
+        self.setup_qb(
+            questionnaire_name='epic23', qb_name='baseline v2',
+            classification='baseline', rp_id=rp2_id)
+        self.setup_qb(
+            questionnaire_name='epic26', qb_name='baseline v3',
+            classification='baseline', rp_id=rp3_id)
+        qb2_indef = self.setup_qb(
+            questionnaire_name='irondemog', qb_name='indef v2',
+            classification='indefinite', rp_id=rp2_id)
+        self.setup_qb(
+            questionnaire_name='irondemog_v3', qb_name='indef v3',
+            classification='indefinite', rp_id=rp3_id)
+
+        # for today, should get the v3 baseline
+        user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        self.assertEquals(
+            ['epic26', 'irondemog_v3'],
+            a_s.instruments_needing_full_assessment(classification='all'))
+
+        # create done QNR for indefinite dated prior to rp transition
+        # belonging to older qb - confirm that clears indef work as of then
+        mock_qr('irondemog', timestamp=weekago, qb=qb2_indef)
+        user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=user, as_of_date=weekago)
+        self.assertEquals([], a_s.instruments_needing_full_assessment(
+            classification='indefinite'))
+
+        # move forward in time; user should no longer need indefinite, even
+        # tho RP changed
+        qb2_indef = db.session.merge(qb2_indef)
+        self.assertEquals([qb2_indef], QuestionnaireBank.qbs_for_user(
+            user, classification='indefinite', as_of_date=now))
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        self.assertEquals([], a_s.instruments_needing_full_assessment(
+            classification='indefinite'))
+        self.assertEquals(['epic26'], a_s.instruments_needing_full_assessment(
+            classification='all'))
+
+    def test_completed_older_rp(self):
+        """If current qb completed on older rp, should show as done"""
+        fourmonthsago = now - timedelta(days=120)
+        weekago = now - timedelta(weeks=1)
+        twoweeksago = now - timedelta(weeks=2)
+        org = self.setup_qbs(rp_name='v2', retired_as_of=weekago)
+        org_id = org.id
+        self.setup_qbs(org=org, rp_name='v3')
+
+        self.test_user.organizations.append(org)
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+            timestamp=fourmonthsago)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            audit=audit, agreement_url='http://no.com')
+        with SessionScope(db):
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+
+        # Two weeks ago, still on rp v2, should be in 3mo recurrence
+        user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
+        v2qb = a_s.qb_data.qb
+        self.assertEquals('CRV_recurring_3mo_period v2', a_s.qb_data.qb.name)
+        self.assertEquals(
+            ['epic26_v2'], a_s.instruments_needing_full_assessment())
+
+        # Now, should still be rp v3, 3mo recurrence
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        self.assertEquals('CRV_recurring_3mo_period v3', a_s.qb_data.qb.name)
+        self.assertEquals(
+            ['epic26_v3'], a_s.instruments_needing_full_assessment())
+
+        # Complete the questionnaire from the 3mo v2 QB
+        mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb)
+
+        # Two weeks ago, should be completed
+        user = db.session.merge(user)
+        a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
+        self.assertEquals('Completed', a_s.overall_status)
+
+        # Current should also be completed, even tho protocol changed
+        a_s = AssessmentStatus(user=user, as_of_date=now)
+        qb = QuestionnaireBank.qbs_for_user(user, classification='recurring', as_of_date=now)
+        self.assertEquals('Completed', a_s.overall_status)

@@ -379,7 +379,6 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # confirm appropriate instruments
         self.assertFalse(a_s.instruments_needing_full_assessment('all'))
-        self.assertFalse(a_s.instruments_in_progress('baseline'))
 
     def test_localized_inprogress_on_time(self):
         # User finished both on time
@@ -415,7 +414,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             localized_instruments -
             set(a_s.instruments_needing_full_assessment('all')),
             set(['eproms_add']))
-        self.assertFalse(a_s.instruments_in_progress('baseline'))
+        self.assertFalse(a_s.instruments_in_progress())
 
     def test_metastatic_on_time(self):
         # User finished both on time
