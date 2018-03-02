@@ -254,7 +254,14 @@ class AssessmentStatus(object):
                 as_of_date=self.as_of_date)) > 0
 
     def _status_by_classification(self, classification):
-        """Returns appropriate status dict for requested QB type(s)"""
+        """Returns appropriate status dict for requested QB type(s)
+
+        :raises ValueError: if classification other than None, 'all'
+        or 'indefinite' - others not supported at this time.
+
+        """
+        if classification not in (None, 'all', 'indefinite'):
+            raise ValueError("Unsupported stratification for status lookup")
         results = OrderedDict()
         if classification is None or classification == 'all':
             # Assumes current by default
