@@ -316,7 +316,7 @@ def resources():
                 video_content.append(get_asset(asset['uuid']))
         try:
             return render_template('eproms/resources.html',
-                   results=results, video_content=video_content)
+                                   results=results, video_content=video_content)
         except TemplateNotFound as err:
             abort(404)
     else:
@@ -333,12 +333,12 @@ def work_instruction(tag):
         abort(400, 'work instruction tag is required')
     if org:
         work_instruction_data = get_all_tag_data([tag, '{} work instruction'.
-                                format(org.name.lower())])
+                                                 format(org.name.lower())])
         results = json.JSONDecoder().decode(work_instruction_data)['results']
         if len(results) > 0:
             content = get_asset(results[0]['uuid'])
             return render_template('eproms/work_instruction.html',
-                   content=content, title=tag)
+                                   content=content, title=tag)
         else:
             abort(400, 'work instruction not found')
     else:
