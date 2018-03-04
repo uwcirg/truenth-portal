@@ -4,7 +4,7 @@ from collections import OrderedDict
 from flask import Blueprint, current_app, render_template, redirect, url_for
 
 from ..models.user import current_user
-from ..views.portal import get_asset
+from ..views.portal import get_asset, get_any_tag_data
 
 
 exercise_diet = Blueprint(
@@ -13,16 +13,8 @@ exercise_diet = Blueprint(
     url_prefix='/exercise-and-diet')
 
 
-def get_tag_data(anyTags):
-    url = (
-        "{LR_ORIGIN}/c/portal/truenth/asset/query?anyTags={anyTags}&sort=true"
-        "&sortType=DESC".format(
-            LR_ORIGIN=current_app.config["LR_ORIGIN"], anyTags=anyTags))
-    return requests.get(url).content
-
-
 def get_all_recipes():
-    recipe_data = get_tag_data(anyTags="recipe")
+    recipe_data = get_any_tag_data("recipe")
     recipe_assets = {'vegetables': [],
                      'healthy_vegetable_fat': [],
                      'tomatoes': [],
@@ -50,7 +42,7 @@ def get_all_recipes():
                 (asset['title'], asset['uuid'],
                  asset['small_image'], 'recipe'))
 
-    shopping_data = get_tag_data(anyTags="shopping_tips")
+    shopping_data = get_any_tag_data("shopping_tips")
     for asset in json.JSONDecoder().decode(shopping_data)['results']:
         if 'vegetables' in asset['tags']:
             recipe_assets['vegetables'].append(
@@ -84,7 +76,7 @@ def index():
 @exercise_diet.route('/introduction')
 def introduction():
     assets = []
-    data = get_tag_data(anyTags="introduction")
+    data = get_any_tag_data("introduction")
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
@@ -94,12 +86,12 @@ def introduction():
 
 @exercise_diet.route('/diet')
 def diet():
-    data = get_tag_data(anyTags="diet")
+    data = get_any_tag_data("diet")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
-    modal_data = get_tag_data(anyTags="diet-modal")
+    modal_data = get_any_tag_data("diet-modal")
     modals = OrderedDict()
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
@@ -118,12 +110,12 @@ def portal():
 
 @exercise_diet.route('/exercise')
 def exercise():
-    data = get_tag_data(anyTags="exercise")
+    data = get_any_tag_data("exercise")
     assets = []
     for asset in json.JSONDecoder().decode(data)['results']:
         assets.append(get_asset(asset['uuid']))
 
-    modal_data = get_tag_data(anyTags="exercise-modal")
+    modal_data = get_any_tag_data("exercise-modal")
     modals = OrderedDict()
     for modal in json.JSONDecoder().decode(modal_data)['results']:
         tag = modal['tags']
@@ -137,7 +129,7 @@ def exercise():
 
 @exercise_diet.route('/recipes')
 def recipes():
-    data = get_tag_data(anyTags="recipe-intro")
+    data = get_any_tag_data("recipe-intro")
     recipe_intro = get_asset(
         json.JSONDecoder().decode(data)['results'][0]['uuid'])
     recipe_assets = get_all_recipes()

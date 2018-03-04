@@ -267,7 +267,7 @@ def resources():
     org = user.first_top_organization()
     if not org:
         abort(400, 'user must belong to an organization')
-    resources_data = get_any_tag_data(['{} work instruction'.format(org.name.lower())])
+    resources_data = get_any_tag_data('{} work instruction'.format(org.name.lower()))
     results = json.JSONDecoder().decode(resources_data)['results']
     if (len(results) > 0):
         video_content = []
@@ -290,8 +290,8 @@ def work_instruction(tag):
         abort(400, 'work instruction tag is required')
     if not org:
         abort(400, 'user must belong to an organization')
-    work_instruction_data = get_all_tag_data([tag, '{} work instruction'.
-                                             format(org.name.lower())])
+    work_instruction_data = get_all_tag_data(tag, '{} work instruction'.
+                                             format(org.name.lower()))
     results = json.JSONDecoder().decode(work_instruction_data)['results']
     if len(results) > 0:
         content = get_asset(results[0]['uuid'])
