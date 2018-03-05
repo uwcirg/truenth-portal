@@ -82,10 +82,7 @@ class Intervention(db.Model):
 
         for attr in ('name', 'description', 'card_html', 'link_label',
                      'status_text', 'public_access', 'display_rank'):
-            if data.get(attr, None) is not None:
-                setattr(self, attr, data[attr])
-            else:
-                setattr(self, attr, None)
+            setattr(self, attr, data.get(attr))
 
         # static_link_url is special - generally we don't pull links
         # from persisted format as each instance is configured to
