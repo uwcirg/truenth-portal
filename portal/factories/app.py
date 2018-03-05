@@ -37,6 +37,7 @@ from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
 from ..views.portal import portal
 from ..views.organization import org_api
+from ..views.reporting import reporting_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.staff import staff
 from ..views.tou import tou_api
@@ -63,6 +64,7 @@ DEFAULT_BLUEPRINTS = (
     practitioner_api,
     procedure_api,
     portal,
+    reporting_api,
     scheduled_job_api,
     staff,
     truenth_api,
