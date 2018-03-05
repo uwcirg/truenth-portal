@@ -1,8 +1,8 @@
 {
   "entry": [
     {
-      "card_html": "set by access strategy depending on state",
-      "description": "",
+      "card_html": "Assessment Engine",
+      "description": "Assessment Engine",
       "display_rank": 1,
       "link_label": "Begin questionnaire",
       "name": "assessment_engine",
