@@ -1006,10 +1006,16 @@ def get_any_tag_data(*anyTags):
         :param anyTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
-    url = (
-       "{LR_ORIGIN}/c/portal/truenth/asset/query?{anyTags}&sort=true"
-       "&sortType=DESC".format(LR_ORIGIN=current_app.config["LR_ORIGIN"],
-                               anyTags='&'.join(["anyTags={}".format(tag) for tag in anyTags])))
+    liferay_qs_params = {
+        'anyTags': anyTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                  "/c/portal/truenth/asset/query?",
+                  requests.compat.urlencode(liferay_qs_params,
+                                            doseq=True,)])
+
     return requests.get(url).content
 
 
@@ -1021,8 +1027,14 @@ def get_all_tag_data(*allTags):
         :param allTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
-    url = (
-        "{LR_ORIGIN}/c/portal/truenth/asset/query?{allTags}&sort=true"
-        "&sortType=DESC".format(LR_ORIGIN=current_app.config["LR_ORIGIN"],
-                                allTags='&'.join(["allTags={}".format(tag) for tag in allTags])))
+    liferay_qs_params = {
+        'allTags': allTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                  "/c/portal/truenth/asset/query?",
+                  requests.compat.urlencode(liferay_qs_params,
+                                            doseq=True,)])
+
     return requests.get(url).content
