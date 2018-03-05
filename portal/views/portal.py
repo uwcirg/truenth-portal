@@ -1012,9 +1012,9 @@ def get_any_tag_data(*anyTags):
         'sortType': 'DESC'
     }
     url = ''.join([current_app.config["LR_ORIGIN"],
-                  "/c/portal/truenth/asset/query?",
-                  requests.compat.urlencode(liferay_qs_params,
-                                            doseq=True,)])
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
 
     return requests.get(url).content
 
@@ -1033,8 +1033,8 @@ def get_all_tag_data(*allTags):
         'sortType': 'DESC'
     }
     url = ''.join([current_app.config["LR_ORIGIN"],
-                  "/c/portal/truenth/asset/query?",
-                  requests.compat.urlencode(liferay_qs_params,
-                                            doseq=True,)])
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
 
     return requests.get(url).content
