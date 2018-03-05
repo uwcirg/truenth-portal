@@ -1003,10 +1003,8 @@ def get_any_tag_data(*anyTags):
         query LR based on any tags
         this is an OR condition
         will match any tag specified
-        parameter:
-            name: anyTags
-            type: a variable number of strings
-            description: tag(s) to be queried e.g 'tag1', 'tag2'
+
+        :param anyTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
     url = (
@@ -1021,10 +1019,8 @@ def get_all_tag_data(*allTags):
         query LR based on all required tags
         this is an AND condition
         all required tags must be present
-        parameter:
-            name: allTags
-            type: a variable number of strings
-            description: tag(s) to be queried e.g 'tag1', 'tag2'
+        
+        :param allTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
     url = (
