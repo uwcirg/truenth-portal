@@ -1011,9 +1011,8 @@ def get_any_tag_data(*anyTags):
     # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
     url = (
        "{LR_ORIGIN}/c/portal/truenth/asset/query?{anyTags}&sort=true"
-       "&sortType=DESC".format(
-           LR_ORIGIN=current_app.config["LR_ORIGIN"],
-           anyTags='&'.join(["anyTags={}".format(tag) for tag in anyTags])))
+       "&sortType=DESC".format(LR_ORIGIN=current_app.config["LR_ORIGIN"],
+                               anyTags='&'.join(["anyTags={}".format(tag) for tag in anyTags])))
     return requests.get(url).content
 
 
@@ -1030,7 +1029,6 @@ def get_all_tag_data(*allTags):
     # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
     url = (
         "{LR_ORIGIN}/c/portal/truenth/asset/query?{allTags}&sort=true"
-        "&sortType=DESC".format(
-            LR_ORIGIN=current_app.config["LR_ORIGIN"],
-            allTags='&'.join(["allTags={}".format(tag) for tag in allTags])))
+        "&sortType=DESC".format(LR_ORIGIN=current_app.config["LR_ORIGIN"],
+                                allTags='&'.join(["allTags={}".format(tag) for tag in allTags])))
     return requests.get(url).content
