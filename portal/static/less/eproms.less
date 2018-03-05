@@ -340,7 +340,7 @@ select:not([multiple]) {
     transition: max-height .35s;
   }
   /* :checked */
-  label.tab-label.active ~ .tab-content,ß
+  label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
     max-height: 25em;
     margin: 1em auto;
@@ -370,6 +370,61 @@ select:not([multiple]) {
 }
 #mainDiv.profile .tabs-container {
   margin-bottom: 1.5em;
+}
+#resourcesContentContainer {
+  min-height: 50vh;
+  .tab-label {
+    font-size: 1.1em;
+    background: @featureBtnColor;
+    color: #FFF;
+    letter-spacing: 0.1em;
+  }
+  .tab-content {
+    background: lighten(@featureBtnColor, 42%);
+    border: 0;
+    overflow: hidden;
+    ul {
+      padding: 1em 1em 0.5em;
+    }
+    li {
+      line-height: 3rem;
+      margin-left: 1em;
+    }
+  }
+}
+.work-instruction-title {
+  background: @featureBtnColor;
+  padding: 0.5em;
+  color: #FFF;
+  display: block;
+  position: relative;
+  & .pull-right {
+    position:absolute;
+    width: 75px;
+    right:0;
+    top: 11px;
+    margin-right: 0.5em;
+    & span {
+      display: inline-block;
+      margin: 0 0.2em;
+    }
+    & a {
+      color: #FFF;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.work-instruction-printicon {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.work-instruction-content {
+  padding: 1em 1.5em;
+  max-width: 100%;
+  overflow: auto;
 }
 .form-control {
   height: @inputHeight;
@@ -2455,6 +2510,7 @@ input.clinic {
 .modal-footer {
   background-color: @modalBackgroundColor;
   color: #FFF;
+  letter-spacing: 1px;
 }
 .modal-body {
   font-size: @baseMobileFontSize;
@@ -2781,6 +2837,12 @@ div.timezone-warning.text-warning {
 }
 .capitalize {
   text-transform: capitalize;
+}
+.first-letter {
+  display: block;
+  &::first-letter {
+    text-transform: capitalize;
+  }
 }
 
 #consentListTable,

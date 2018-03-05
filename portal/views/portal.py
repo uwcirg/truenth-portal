@@ -1,4 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+import json
+import requests
 from celery.result import AsyncResult
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, make_response, redirect, request, session, url_for
@@ -987,3 +989,52 @@ def check_int(i):
         return int(i)
     except ValueError, e:
         abort(400, "invalid input '{}' - must be an integer".format(i))
+
+
+def get_asset(uuid):
+    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
+        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
+    data = requests.get(url).content
+    return json.JSONDecoder().decode(data)['asset']
+
+
+def get_any_tag_data(*anyTags):
+    """
+        query LR based on any tags
+        this is an OR condition
+        will match any tag specified
+        :param anyTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+    """
+    # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
+    liferay_qs_params = {
+        'anyTags': anyTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
+
+    return requests.get(url).content
+
+
+def get_all_tag_data(*allTags):
+    """
+        query LR based on all required tags
+        this is an AND condition
+        all required tags must be present
+        :param allTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+    """
+    # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
+    liferay_qs_params = {
+        'allTags': allTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
+
+    return requests.get(url).content
