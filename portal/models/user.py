@@ -1486,8 +1486,9 @@ def get_user_or_abort(uid):
     Safe to call with path or parameter info.  Confirms integer value before
     attempting lookup.
 
-    :raises 404: if the given uid isn't an integer, or if no matching user
-    :raises 403: if the named user has been deleted
+    :raises NotFound: (404) if the given uid isn't an integer, or if no
+     matching user
+    :raises Forbidden: (403) if the named user has been deleted
     :returns: user if valid and found
 
     """
