@@ -1417,7 +1417,7 @@ $(document).ready(function(){
     $("body").addClass("theme--intro-light");
   }
 
-  if ($("#showFlashMessageModal").val().toLowerCase() === "true") {
+  if (String($("#showFlashMessageModal").val()).toLowerCase() === "true") {
     $("#alertModal").modal("show");
   }
   window.app.upperBanner.handleAccess();
