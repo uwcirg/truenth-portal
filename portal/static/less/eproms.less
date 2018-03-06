@@ -379,6 +379,9 @@ select:not([multiple]) {
     color: #FFF;
     letter-spacing: 0.1em;
   }
+  .tabs-container input.tab-input:checked+label.tab-label::after {
+    visibility: hidden;
+  }
   .tab-content {
     background: lighten(@featureBtnColor, 42%);
     border: 0;
