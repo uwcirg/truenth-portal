@@ -52,10 +52,12 @@ Portal.Models
 .. automodule:: portal.models.relationship
     :members:
     :undoc-members:
+    :exclude-members: RELATIONSHIP
 
 .. automodule:: portal.models.role
     :members:
     :undoc-members:
+    :exclude-members: ROLE
 
 .. automodule:: portal.models.telecom
     :members:
