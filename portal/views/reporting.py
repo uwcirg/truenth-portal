@@ -5,6 +5,7 @@ from flask import Blueprint, render_template, make_response, request
 from flask_babel import gettext as _
 from flask_user import roles_required
 from StringIO import StringIO
+from time import strftime
 
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
@@ -135,7 +136,9 @@ def generate_numbers():
                 cw.writerow((
                     user.id, email, qb, a_s.overall_status, od, org_name))
 
+    filename = 'overdue-numbers-{}.csv'.format(strftime('%Y_%m_%d-%H_%M'))
     output = make_response(results.getvalue())
-    output.headers['Content-Disposition'] = "attachment; filename=overdue-numbers.csv"
+    output.headers['Content-Disposition'] = "attachment; filename={}".format(
+        filename)
     output.headers['Content-type'] = "text/csv"
     return output
