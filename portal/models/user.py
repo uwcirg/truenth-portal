@@ -14,6 +14,7 @@ from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
 import time
+from werkzeug.exceptions import Forbidden, NotFound
 
 from .audit import Audit
 from .codeable_concept import CodeableConcept
@@ -27,7 +28,6 @@ from .fhir import Observation, UserObservation
 from .fhir import ValueQuantity, v_or_n, v_or_first
 from .identifier import Identifier
 from .intervention import UserIntervention
-from .notification import UserNotification
 from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
@@ -1495,12 +1495,12 @@ def get_user_or_abort(uid):
     try:
         user_id = int(uid)
     except ValueError:
-        abort(404, "User not found - expected integer ID")
+        raise NotFound("User not found - expected integer ID")
     user = get_user(user_id)
     if not user:
-        abort(404, "User not found")
+        raise NotFound("User not found")
     if user.deleted:
-        abort(403, "deleted user - operation not permitted")
+        raise Forbidden("deleted user - operation not permitted")
     return user
 
 
