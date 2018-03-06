@@ -1,19 +1,23 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
 from datetime import datetime
-from flask import current_app, render_template
-from flask_babel import gettext as _
+from flask import current_app
+from smtplib import SMTPRecipientsRefused
 
+from .app_text import app_text, MailResource, SiteSummaryEmail_ATMA
 from .assessment_status import AssessmentStatus
+from ..audit import auditable_event
+from .communication import load_template_args
 from ..dogpile_cache import dogpile_cache
 from .fhir import CC
 from .intervention import Intervention
-from .organization import OrgTree
+from .message import EmailMessage
+from .organization import Organization, OrgTree
 from .procedure_codes import known_treatment_started
 from .procedure_codes import known_treatment_not_started
-from .questionnaire_bank import QuestionnaireBank
 from .role import ROLE
 from .user import User
+from ..views.reporting import generate_overdue_table_html
 
 
 @dogpile_cache.region('hourly')
@@ -107,7 +111,9 @@ def calculate_days_overdue(user):
     return (datetime.utcnow() - overdue).days if overdue else 0
 
 
+@dogpile_cache.region('hourly')
 def overdue_stats_by_org():
+    current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
         if user.has_role(ROLE.TEST) or not user.has_role(ROLE.PATIENT):
@@ -119,49 +125,46 @@ def overdue_stats_by_org():
     return overdue_stats
 
 
-def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
-    cutoff_days.sort()
-
-    day_ranges = []
-    curr_min = 0
-    for cd in cutoff_days:
-        day_ranges.append("{}-{}".format(curr_min + 1, cd))
-        curr_min = cd
+def generate_and_send_summaries(cutoff_days, org_id):
+    ostats = overdue_stats_by_org()
+    cutoffs = [int(i) for i in cutoff_days.split(',')]
+    error_emails = set()
 
     ot = OrgTree()
-    rows = []
-    totals = defaultdict(int)
+    top_org = Organization.query.get(org_id)
+    if not top_org:
+        raise ValueError("No org with ID {} found.".format(org_id))
+    name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
-    for org in sorted(overdue_stats, key=lambda x: x.name):
-        if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
-            continue
-        user_accessible = False
-        for user_org in user.organizations:
-            if ot.at_or_below_ids(user_org.id, [org.id]):
-                user_accessible = True
-                break
-        if not user_accessible:
-            continue
-        counts = overdue_stats[org]
-        org_row = [org.name]
-        curr_min = 0
-        row_total = 0
-        for cd in cutoff_days:
-            count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
-            org_row.append(count)
-            totals[cd] += count
-            row_total += count
-            curr_min = cd
-        org_row.append(row_total)
-        rows.append(org_row)
+    for user in User.query.filter_by(deleted_id=None).all():
+        if (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
+                and (top_org in ot.find_top_level_org(user.organizations))):
+            args = load_template_args(user=user)
+            args['eproms_site_summary_table'] = generate_overdue_table_html(
+                cutoff_days=cutoffs,
+                overdue_stats=ostats,
+                user=user,
+                top_org=top_org)
+            summary_email = MailResource(app_text(name_key), variables=args)
+            em = EmailMessage(recipients=user.email,
+                              sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                              subject=summary_email.subject,
+                              body=summary_email.body)
+            try:
+                em.send_message()
+            except SMTPRecipientsRefused as exc:
+                msg = ("Error sending site summary email to {}: "
+                       "{}".format(user.email, exc))
 
-    totalrow = [_(u"TOTAL")]
-    row_total = 0
-    for cd in cutoff_days:
-        totalrow.append(totals[cd])
-        row_total += totals[cd]
-    totalrow.append(row_total)
-    rows.append(totalrow)
+                sys = User.query.filter_by(email='__system__').first()
 
-    return render_template('site_overdue_table.html',
-                           ranges=day_ranges, rows=rows)
+                auditable_event(message=msg,
+                                user_id=(sys.id if sys else user.id),
+                                subject_id=user.id,
+                                context="user")
+
+                current_app.logger.error(msg)
+                for email in exc[0]:
+                    error_emails.add(email)
+
+    return error_emails or None
