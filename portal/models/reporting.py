@@ -137,34 +137,36 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
+        if not (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
                 and (top_org in ot.find_top_level_org(user.organizations))):
-            args = load_template_args(user=user)
-            args['eproms_site_summary_table'] = generate_overdue_table_html(
-                cutoff_days=cutoffs,
-                overdue_stats=ostats,
-                user=user,
-                top_org=top_org)
-            summary_email = MailResource(app_text(name_key), variables=args)
-            em = EmailMessage(recipients=user.email,
-                              sender=current_app.config['MAIL_DEFAULT_SENDER'],
-                              subject=summary_email.subject,
-                              body=summary_email.body)
-            try:
-                em.send_message()
-            except SMTPRecipientsRefused as exc:
-                msg = ("Error sending site summary email to {}: "
-                       "{}".format(user.email, exc))
+            continue
 
-                sys = User.query.filter_by(email='__system__').first()
+        args = load_template_args(user=user)
+        args['eproms_site_summary_table'] = generate_overdue_table_html(
+            cutoff_days=cutoffs,
+            overdue_stats=ostats,
+            user=user,
+            top_org=top_org)
+        summary_email = MailResource(app_text(name_key), variables=args)
+        em = EmailMessage(recipients=user.email,
+                          sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                          subject=summary_email.subject,
+                          body=summary_email.body)
+        try:
+            em.send_message()
+        except SMTPRecipientsRefused as exc:
+            msg = ("Error sending site summary email to {}: "
+                   "{}".format(user.email, exc))
 
-                auditable_event(message=msg,
-                                user_id=(sys.id if sys else user.id),
-                                subject_id=user.id,
-                                context="user")
+            sys = User.query.filter_by(email='__system__').first()
 
-                current_app.logger.error(msg)
-                for email in exc[0]:
-                    error_emails.add(email)
+            auditable_event(message=msg,
+                            user_id=(sys.id if sys else user.id),
+                            subject_id=user.id,
+                            context="user")
+
+            current_app.logger.error(msg)
+            for email in exc[0]:
+                error_emails.add(email)
 
     return error_emails or None
