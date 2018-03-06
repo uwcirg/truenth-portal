@@ -15,7 +15,7 @@ var ResourcesTool = function() {
                     var elapsedTime = self.endTime - self.startTime;
                     elapsedTime /= 1000;
                     if (!$("#tnthNavWrapper").hasClass("no-fouc") || elapsedTime >= 3) {
-                        $("#tnthNavWrapper, .watermark").each(function() {
+                        $("#mainNav, #tnthNavWrapper, .watermark").each(function() {
                             $(this).addClass("hidden-print");
                         });
                         clearInterval(self.tVar);
