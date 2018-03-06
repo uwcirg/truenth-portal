@@ -1413,8 +1413,10 @@ def present_needed():
     if subject != current_user():
         current_user().check_role(permission='edit', other_id=subject_id)
 
-    authored = request.args.get('authored')
-    as_of_date = FHIR_datetime.parse(authored) if authored else None
+    as_of_date = FHIR_datetime.parse(
+        request.args.get('authored'), none_safe=True)
+    if not as_of_date:
+        as_of_date = datetime.utcnow()
     assessment_status = AssessmentStatus(subject, as_of_date=as_of_date)
     args = dict(request.args.items())
     args['instrument_id'] = (
