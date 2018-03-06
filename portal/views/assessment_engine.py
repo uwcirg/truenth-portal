@@ -31,13 +31,12 @@ from ..models.fhir import (
     aggregate_responses,
     EC,
     generate_qnr_csv,
-    QuestionnaireResponse,
-    qnr_document_id)
+    QuestionnaireResponse)
 from ..models.intervention import INTERVENTION
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
-from ..models.user import current_user, get_user, User
+from ..models.user import current_user, get_user_or_abort, User
 from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
@@ -592,10 +591,9 @@ def assessment(patient_id, instrument_id):
     """
 
     current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
-    questionnaire_responses = QuestionnaireResponse.query.filter_by(subject_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
+    patient = get_user_or_abort(patient_id)
+    questionnaire_responses = QuestionnaireResponse.query.filter_by(
+        subject_id=patient.id).order_by(QuestionnaireResponse.authored.desc())
 
     instrument_id = request.args.get('instrument_id', instrument_id)
     if instrument_id is not None:
@@ -805,10 +803,7 @@ def assessment_update(patient_id):
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+    patient = get_user_or_abort(patient_id)
     swag = swagger(current_app)
 
     draft4_schema = {
@@ -851,7 +846,7 @@ def assessment_update(patient_id):
         ).one()
     # except NoResultException:
     except NoResultFound:
-        abort(404,"existing QuestionnaireResponse not found")
+        abort(404, "existing QuestionnaireResponse not found")
     else:
         response.update({'message': 'previous questionnaire response found'})
 
@@ -862,16 +857,15 @@ def assessment_update(patient_id):
     auditable_event(
         "updated {}".format(existing_qnr),
         user_id=current_user().id,
-        subject_id=patient_id,
+        subject_id=patient.id,
         context='assessment',
     )
     response.update({'message': 'questionnaire response updated successfully'})
     return jsonify(response)
 
+
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment',
-    methods=('POST',),
-)
+    '/patient/<int:patient_id>/assessment', methods=('POST',))
 @oauth.require_oauth()
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
@@ -1302,10 +1296,7 @@ def assessment_add(patient_id):
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+    patient = get_user_or_abort(patient_id)
     swag = swagger(current_app)
 
     draft4_schema = {
@@ -1389,9 +1380,7 @@ def assessment_add(patient_id):
 @assessment_engine_api.route('/invalidate/<int:user_id>')
 @oauth.require_oauth()
 def invalidate(user_id):
-    user = get_user(user_id)
-    if not user:
-        abort(404)
+    user = get_user_or_abort(user_id)
     invalidate_assessment_status_cache(user_id)
     return jsonify(invalidated=user.as_fhir())
 
@@ -1409,7 +1398,7 @@ def present_needed():
 
     """
     subject_id = request.args.get('subject_id') or current_user().id
-    subject = get_user(subject_id)
+    subject = get_user_or_abort(subject_id)
     if subject != current_user():
         current_user().check_role(permission='edit', other_id=subject_id)
 
@@ -1545,7 +1534,7 @@ def present_assessment(instruments=None):
         "authored": request.args.get('authored'),
     }
     # Clear empty querystring params
-    assessment_params = {k:v for k,v in assessment_params.items() if v}
+    assessment_params = {k: v for k, v in assessment_params.items() if v}
 
     assessment_url = "".join((
         INTERVENTION.ASSESSMENT_ENGINE.link_url,
@@ -1575,6 +1564,7 @@ def present_assessment(instruments=None):
         session['assessment_return'] = next_url
 
     return redirect(assessment_url, code=303)
+
 
 @assessment_engine_api.route('/present-assessment/<instrument_id>')
 @oauth.require_oauth()
@@ -1720,9 +1710,7 @@ def batch_assessment_status():
     return jsonify(status=results)
 
 
-@assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment-status'
-)
+@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status')
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
     """Return current assessment status for a given patient
@@ -1743,17 +1731,15 @@ def patient_assessment_status(patient_id):
     responses:
       200:
         description: return current assessment status of given patient
-      400:
-        description: if patient id is invalid
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+      404:
+        description: if patient id is invalid
 
     """
-    patient = get_user(patient_id)
-    if not patient:
-        abort(400, "invalid patient id")
+    patient = get_user_or_abort(patient_id)
     current_user().check_role(permission='view', other_id=patient_id)
 
     now = datetime.utcnow()
@@ -1858,7 +1844,7 @@ def get_questionnaire(name):
     """
     try:
         name = str(name)
-    except ValueError, e:
+    except ValueError:
         abort(400, "invalid input '{}' - must be a valid string".format(name))
     q = Questionnaire.query.filter_by(name=name).first()
     return jsonify(questionnaire=q.as_fhir())

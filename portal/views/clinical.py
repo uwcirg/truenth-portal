@@ -7,7 +7,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.fhir import CC, ValueQuantity, Observation
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')
 
@@ -326,9 +326,7 @@ def clinical(patient_id):
 
     """
     current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
+    patient = get_user_or_abort(patient_id)
     return jsonify(patient.clinical_history(requestURL=request.url))
 
 
@@ -393,19 +391,19 @@ def clinical_set(patient_id):
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
+    patient = get_user_or_abort(patient_id)
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
-    audit = Audit(user_id=current_user().id, subject_id=patient_id,
+    audit = Audit(
+        user_id=current_user().id, subject_id=patient.id,
         context='observation')
     code, result = patient.add_observation(request.json, audit)
     if code != 200:
         abort(code, result)
     db.session.commit()
-    auditable_event(result, user_id=current_user().id, subject_id=patient_id,
+    auditable_event(
+        result, user_id=current_user().id, subject_id=patient.id,
         context='observation')
     return jsonify(message=result)
 
@@ -468,17 +466,16 @@ def clinical_update(patient_id, observation_id):
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
+    patient = get_user_or_abort(patient_id)
     if not request.json:
         abort(400, "No update data provided")
     observation = Observation.query.filter_by(id=observation_id).first()
     if not observation_id or not observation:
         abort(400, "No Observation found for provided ID")
     result = observation.update_from_fhir(request.json)
-    auditable_event('updated observation {}'.format(observation_id),
-        user_id=current_user().id, subject_id=patient_id,
+    auditable_event(
+        'updated observation {}'.format(observation_id),
+        user_id=current_user().id, subject_id=patient.id,
         context='observation')
     return jsonify(result)
 
@@ -486,10 +483,7 @@ def clinical_update(patient_id, observation_id):
 def clinical_api_shortcut_set(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+    patient = get_user_or_abort(patient_id)
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
     value = str(request.json['value']).lower()
@@ -513,9 +507,7 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
 def clinical_api_shortcut_get(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
     current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
+    patient = get_user_or_abort(patient_id)
     value_quantity, status = patient.fetch_value_status_for_concept(
         codeable_concept)
     if value_quantity and status != 'unknown':

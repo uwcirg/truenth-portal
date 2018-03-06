@@ -3,7 +3,8 @@ from flask import abort, current_app, url_for, session
 from flask_user.views import reset_password
 
 from .portal import challenge_identity
-from ..models.user import get_user
+from ..models.role import ROLE
+from ..models.user import get_user_or_abort
 
 
 def reset_password_view_function(token):
@@ -16,10 +17,14 @@ def reset_password_view_function(token):
         # Some early users were not forced to set DOB and name fields.
         # As they will fail the challenge without data to compare, provide
         # a back door.
-        user = get_user(user_id)
-        if not user:
-            abort (404, "User not found")
+        user = get_user_or_abort(user_id)
         if not all((user.birthdate, user.first_name, user.last_name)):
+            if user.has_role(ROLE.ACCESS_ON_VERIFY):
+                message = (
+                    "User missing required verify attribute not allowed "
+                    "to bypass verify on p/w reset")
+                current_app.logger.error(message)
+                abort(403, message)
             return reset_password(token)
 
     # Once the user has passed the challenge, let the flask_user

@@ -30,7 +30,7 @@ from ..models.organization import (
     Organization,
     OrganizationIdentifier
 )
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
@@ -135,7 +135,7 @@ def gil_interventions_items(user_id):
     user = None
 
     if user_id:
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
     else:
         user = current_user()
 

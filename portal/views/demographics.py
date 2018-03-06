@@ -7,7 +7,7 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.reference import MissingReference
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 
@@ -66,13 +66,9 @@ def demographics(patient_id):
     """
     if patient_id:
         current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user(patient_id)
+        patient = get_user_or_abort(patient_id)
     else:
         patient = current_user()
-    if not patient:
-        abort(404, "Patient {} not found!".format(patient_id))
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
     return jsonify(patient.as_fhir(include_empties=False))
 
 
@@ -145,9 +141,7 @@ def demographics_set(patient_id):
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
+    patient = get_user_or_abort(patient_id)
     if not request.json:
         abort(400, "Requires JSON with submission including "
               "HEADER 'Content-Type: application/json'")

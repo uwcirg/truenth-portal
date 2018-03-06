@@ -8,7 +8,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from ..models.audit import Audit
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 from ..models.tou import ToU, tou_types
 
 
@@ -89,12 +89,9 @@ def get_tou(user_id):
           to view requested patient
 
     """
-    user = get_user(user_id)
-    if not user:
-        abort(404)
-    current_user().check_role(permission='view', other_id=user_id)
-
-    tous = ToU.query.join(Audit).filter(Audit.user_id == user_id)
+    user = get_user_or_abort(user_id)
+    current_user().check_role(permission='view', other_id=user.id)
+    tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
     if not request.args.get('all'):
         tous = tous.filter(ToU.active.is_(True))
 
@@ -158,7 +155,7 @@ def get_tou_by_type(user_id, tou_type):
           to view requested patient
 
     """
-    user = get_user(user_id)
+    user = get_user_or_abort(user_id)
     if not user:
         abort(404)
     current_user().check_role(permission='view', other_id=user_id)
@@ -277,7 +274,7 @@ def accept_tou(user_id=None):
 
     """
     if user_id:
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
     else:
         user = current_user()
     if not request.json or 'agreement_url' not in request.json:

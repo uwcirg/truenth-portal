@@ -14,6 +14,7 @@ from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
 import time
+from werkzeug.exceptions import Forbidden, NotFound
 
 from .audit import Audit
 from .codeable_concept import CodeableConcept
@@ -27,7 +28,6 @@ from .fhir import Observation, UserObservation
 from .fhir import ValueQuantity, v_or_n, v_or_first
 from .identifier import Identifier
 from .intervention import UserIntervention
-from .notification import UserNotification
 from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
@@ -1478,6 +1478,32 @@ def current_user():
 def get_user(uid):
     if uid:
         return User.query.get(uid)
+
+
+def get_user_or_abort(uid):
+    """Wraps `get_user` and raises error if not found
+
+    Safe to call with path or parameter info.  Confirms integer value before
+    attempting lookup.
+
+    :raises :py:exc:`werkzeug.exceptions.NotFound`: if the given uid isn't
+        an integer, or if no matching user
+    :raises :py:exc:`werkzeug.exceptions.Forbidden`: if the named user has
+        been deleted
+
+    :returns: user if valid and found
+
+    """
+    try:
+        user_id = int(uid)
+    except ValueError:
+        raise NotFound("User not found - expected integer ID")
+    user = get_user(user_id)
+    if not user:
+        raise NotFound("User not found")
+    if user.deleted:
+        raise Forbidden("deleted user - operation not permitted")
+    return user
 
 
 class UserRoles(db.Model):
