@@ -104,7 +104,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         self.initStartTime = new Date();
 
         self.getOrgTool();
-        
+
         /*
          * get user roles
          * note using the current user Id
@@ -3340,13 +3340,11 @@ var Profile = function(subjectId, currentUserId) {
             }
             else{
                 assessment_url += "?entry_method=" + method;
-            };
+            }
 
-            if (method === "paper") {
-                assessment_url += "&authored=" + completionDate;
-            };
+            assessment_url += "&authored=" + completionDate;
 
-            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() + 
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
             "&redirect_url=" + encodeURIComponent(assessment_url);
 
             self.manualEntryModalVis(true);
