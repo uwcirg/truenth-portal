@@ -379,6 +379,9 @@ select:not([multiple]) {
     color: #FFF;
     letter-spacing: 0.1em;
   }
+  .tabs-container input.tab-input:checked+label.tab-label::after {
+    visibility: hidden;
+  }
   .tab-content {
     background: lighten(@featureBtnColor, 42%);
     border: 0;
@@ -400,13 +403,20 @@ select:not([multiple]) {
   position: relative;
   & .pull-right {
     position:absolute;
-    width: 75px;
+    width: 125px;
     right:0;
-    top: 11px;
-    margin-right: 0.5em;
+    top: 2px;
     & span {
       display: inline-block;
-      margin: 0 0.2em;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 12px;
+      &:hover {
+        cursor: pointer;
+        background: darken(@featureBtnColor, 5%);
+      }
+    }
+    & span:last-of-type {
+      margin-left: 0.1em;
     }
     & a {
       color: #FFF;
@@ -421,8 +431,11 @@ select:not([multiple]) {
     cursor: pointer;
   }
 }
+.work-instruction-content-heading {
+  margin-bottom: 1.5em;
+}
 .work-instruction-content {
-  padding: 1em 1.5em;
+  padding: 0 0.5em;
   max-width: 100%;
   overflow: auto;
 }
@@ -3103,6 +3116,11 @@ div.timezone-warning.text-warning {
   #createProfileForm {
     #bdGroup .flex {
       flex-wrap: nowrap;
+    }
+  }
+  .work-instruction-title {
+    & .pull-right {
+      top: 4px
     }
   }
 }
