@@ -2,9 +2,9 @@
 {% block main %}
 <h4 class="tnth-headline work-instruction-title">
     <span>{{_("Work Instructions")}}</span>
-    <div class="pull-right hidden-print">
-        <a href="{{url_for('.resources')}}"><span class="glyphicon glyphicon-chevron-left" title="{{_('Back to Resources')}}"></span></a>
-        <span class="glyphicon glyphicon-print work-instruction-printicon" title="{{_('Print')}}"></span>
+    <div class="pull-right work-instruction-icons hidden-print">
+         <span class="glyphicon glyphicon-print work-instruction-printicon" title="{{_('Print')}}"></span>
+        <a href="{{url_for('.resources')}}"><span class="glyphicon glyphicon-menu-left" title="{{_('Back to Resources')}}"></span></a>
     </div>
 </h4>
 <div class="work-instruction-content">
