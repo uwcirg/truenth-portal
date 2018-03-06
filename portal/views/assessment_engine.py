@@ -52,10 +52,12 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
 )
 @oauth.require_oauth()
 def assessment(patient_id, instrument_id):
-    """Return a patient's responses to a questionnaire
+    """Return a patient's responses to questionnaire(s)
 
     Retrieve a minimal FHIR doc in JSON format including the
-    'QuestionnaireResponse' resource type.
+    'QuestionnaireResponse' resource type. If 'instrument_id'
+    is excluded, the patient's QuestionnaireResponses for all
+    instruments are returned.
     ---
     operationId: getQuestionnaireResponse
     tags:
