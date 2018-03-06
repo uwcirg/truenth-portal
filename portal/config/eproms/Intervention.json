@@ -1,8 +1,7 @@
 {
   "entry": [
     {
-      "card_html": "Assessment Engine",
-      "description": "Assessment Engine",
+      "description": "",
       "display_rank": 1,
       "link_label": "Begin questionnaire",
       "name": "assessment_engine",
