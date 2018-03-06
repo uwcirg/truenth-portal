@@ -28,7 +28,7 @@ from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.role import ROLE
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 from ..views.auth import next_after_login
 
 
@@ -240,7 +240,7 @@ def website_consent_script(patient_id):
         """
         validate_origin(redirect_url)
     user = current_user()
-    patient = get_user(patient_id)
+    patient = get_user_or_abort(patient_id)
     org = patient.first_top_organization()
     """
     NOTE, we are getting PATIENT's website consent terms here
