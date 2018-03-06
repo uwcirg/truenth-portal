@@ -684,6 +684,62 @@
       "ethnicity_codings": true,
       "extension": [
         {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 21500,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "en_AU",
+      "name": "Westmead Hospital",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 21600,
+      "identifier": [],
+      "indigenous_codings": true,
+      "language": "en_AU",
+      "name": "Macquarie University Hospital",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "race_codings": true,
+      "resourceType": "Organization",
+      "telecom": [
+        {
+          "system": "phone",
+          "use": "work",
+          "value": null
+        }
+      ],
+      "use_specific_codings": false
+    },
+    {
+      "address": [],
+      "ethnicity_codings": true,
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
