@@ -14,7 +14,7 @@ from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
 import time
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from .audit import Audit
 from .codeable_concept import CodeableConcept
@@ -1494,6 +1494,9 @@ def get_user_or_abort(uid):
     :returns: user if valid and found
 
     """
+    if uid is None:
+        raise BadRequest('expected user_id not found')
+
     try:
         user_id = int(uid)
     except ValueError:
