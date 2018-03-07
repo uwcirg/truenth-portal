@@ -455,15 +455,15 @@ def token_janitor():
                 client_url=url_for(
                     'auth.client_edit', client_id=client_id, _external=True)))
         current_app.logger.warn(body)
-        # Copy error account in case owner isn't paying attention
-        recpients = ", ".join(sponsor_email, current_app.config.get('ERROR_SENDTO_EMAIL'))
         em = EmailMessage(
-            recipients=recpients,
+            recipients=sponsor_email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             subject=subject,
             body=body)
         try:
-            em.send_message()
+            # Copy error account in case owner isn't paying attention
+            em.send_message(
+                cc_address=current_app.config.get('ERROR_SENDTO_EMAIL'))
         except SMTPRecipientsRefused as exc:
             msg = ("Error sending site summary email to {}: "
                    "{}".format(sponsor_email, exc))
