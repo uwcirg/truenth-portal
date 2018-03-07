@@ -24,7 +24,7 @@
                     {% for asset in results %}
                         {% if 'video' not in asset['tags'] %}
                             <li class="work-instruction-item">
-                                <a href="{{url_for('.work_instruction', tag=asset['tags'][1])}}" class="first-letter">{{asset['tags'][1] | replace('-', ' ')}}</a>
+                                <a href="{{url_for('.work_instruction', tag=asset['tags'][1])}}" class="first-letter">{{asset['title']}}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
