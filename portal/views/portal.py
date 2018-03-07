@@ -502,7 +502,11 @@ def admin():
 @portal.route('/invite', methods=('GET', 'POST'))
 @oauth.require_oauth()
 def invite():
-    """invite other users"""
+    """invite other users via form data
+
+    see also /api/user/{user_id}/invite
+
+    """
     if request.method == 'GET':
         return render_template('invite.html')
 
