@@ -2118,60 +2118,77 @@ var assembleContent = {
             var siteId = siteIdField.val();
 
 
-            if (hasStudyId || hasSiteId) {
-                var identifiers = null;
-                //get current identifier(s)
-                $.ajax ({
-                    type: "GET",
-                    url: "/api/demographics/"+userId,
-                    async: false
-                }).done(function(data) {
-                    if (data && data.identifier) {
-                        identifiers = [];
-                        (data.identifier).forEach(function(identifier) {
-                            if (identifier.system != SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
-                                identifier.system != SYSTEM_IDENTIFIER_ENUM["external_site_id"] &&
-                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) {
-                                identifiers.push(identifier);
-                            }
-                        });
-                    }
-                }).fail(function(xhr) {
-                   tnthAjax.reportError(userId, "api/demographics"+userId, xhr.responseText);
-                });
+            var identifiers = null;
+            /*
+             * get current identifier(s)
+             */
+            $.ajax ({
+                type: "GET",
+                url: "/api/demographics/"+userId,
+                async: false
+            }).done(function(data) {
+                if (data && data.identifier) {
+                    identifiers = [];
+                    (data.identifier).forEach(function(identifier) {
+                        identifiers.push(identifier);
+                    });
+                }
+            }).fail(function(xhr) {
+               tnthAjax.reportError(userId, "api/demographics"+userId, xhr.responseText);
+            });
 
+            /*
+             * NOTE: this will save study Id or site Id only if each has a value
+             * otherwise it will be purged from the identifiers
+             */
+
+            if (hasStudyId || hasSiteId) {
                 if (hasStudyId) {
                     studyId = $.trim(studyId);
-                    var studyIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
-                        use: "secondary",
-                        value: studyId
-                    };
+                    if (studyId) {
+                        var studyIdObj = {
+                            system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
+                            use: "secondary",
+                            value: studyId
+                        };
 
-                    if (identifiers) {
-                        identifiers.push(studyIdObj);
+                        if (identifiers) {
+                            identifiers.push(studyIdObj);
+                        } else {
+                            identifiers = [studyIdObj];
+                        }
                     } else {
-                        identifiers = [studyIdObj];
-                    };
+                        //filter out study ID since it is now empty
+                        identifiers = $.grep(identifiers, function(identifier) {
+                            return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"];
+                        });
+                    }
                 };
 
                 if (hasSiteId) {
                     siteId = $.trim(siteId);
-                    var siteIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
-                        use: "secondary",
-                        value: siteId
-                    };
+                    if (siteId) {
+                        var siteIdObj = {
+                            system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                            use: "secondary",
+                            value: siteId
+                        };
 
-                    if (identifiers) {
-                        identifiers.push(siteIdObj);
+                        if (identifiers) {
+                            identifiers.push(siteIdObj);
+                        } else {
+                            identifiers = [siteIdObj];
+                        }
                     } else {
-                        identifiers = [siteIdObj];
-                    };
+                        //filter out site ID since it is now empty
+                        identifiers = $.grep(identifiers, function(identifier) {
+                            return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
+                        });
+                    }
                 };
+            }
 
-                demoArray["identifier"] = identifiers;
-            };
+            demoArray["identifier"] = identifiers;
 
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
