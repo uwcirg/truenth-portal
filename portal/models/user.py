@@ -1487,8 +1487,10 @@ def get_user_or_abort(uid):
     attempting lookup.
 
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: w/o a uid
+
     :raises :py:exc:`werkzeug.exceptions.NotFound`: if the given uid isn't
         an integer, or if no matching user
+
     :raises :py:exc:`werkzeug.exceptions.Forbidden`: if the named user has
         been deleted
 
