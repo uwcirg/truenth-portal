@@ -240,6 +240,7 @@ STATIC_INTERVENTIONS = IterableUserDict({
     'community_of_wellness': 'Community of Wellness',
     'decision_support_p3p': 'Decision Support P3P',
     'decision_support_wisercare': 'Decision Support WiserCare',
+    'music': 'MUSIC Integration',
     'self_management': 'Self Management',
     'sexual_recovery': 'Sexual Recovery',
     'social_support': 'Social Support Network',
@@ -278,7 +279,16 @@ class _NamedInterventions(object):
     def __getattribute__(self, attr):
         if attr.startswith('_'):
             return object.__getattribute__(self, attr)
-        value = self.__dict__[attr.lower()].__call__(self)
+        # Catch KeyError in case it's a dynamically added intervention
+        # (i.e. not from static list)
+        try:
+            value = self.__dict__[attr.lower()].__call__(self)
+        except KeyError:
+            query = Intervention.query.filter_by(name=attr)
+            if not query.count():
+                raise ValueError(
+                    "Intervention {} not found".format(attr))
+            value = query.one()
         return value
 
     def __iter__(self):

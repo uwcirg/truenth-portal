@@ -203,8 +203,9 @@ def user_intervention_set(intervention_name):
           the token isn't sponsored by the named intervention owner.
 
     """
-    intervention = getattr(INTERVENTION, intervention_name)
-    if not intervention:
+    try:
+        intervention = getattr(INTERVENTION, intervention_name)
+    except ValueError:
         abort (404, 'no such intervention {}'.format(intervention_name))
 
     # service account being used must belong to the intervention owner
