@@ -2130,7 +2130,6 @@ var assembleContent = {
                 async: false
             }).done(function(data) {
                 if (data && data.identifier) {
-                    identifiers = [];
                     (data.identifier).forEach(function(identifier) {
                         identifiers.push(identifier);
                     });
@@ -2168,7 +2167,9 @@ var assembleContent = {
                 identifiers.push(siteIdObj);
             }
 
-            demoArray["identifier"] = identifiers;
+            if (identifiers.length > 0) {
+                demoArray["identifier"] = identifiers;
+            }
 
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
