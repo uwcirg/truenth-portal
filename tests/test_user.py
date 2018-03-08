@@ -1,6 +1,7 @@
 """Unit test module for user model and views"""
 from flask_webtest import SessionScope
-from werkzeug.exceptions import Unauthorized
+import pytest
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 import json
 import re
 import urllib
@@ -22,16 +23,29 @@ from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
-from portal.models.user import User, UserEthnicityExtension, user_extension_map
-from portal.models.user import UserRelationship, TimezoneExtension
-from portal.models.user import permanently_delete_user
-from portal.models.user import UserIndigenousStatusExtension
+from portal.models.user import (
+    get_user_or_abort,
+    User, UserEthnicityExtension, user_extension_map,
+    UserRelationship, TimezoneExtension,
+    permanently_delete_user,
+    UserIndigenousStatusExtension
+)
 from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
 from portal.system_uri import (
     TRUENTH_EXTENSTION_NHHD_291036,
     TRUENTH_USERNAME,
     TRUENTH_VALUESET_NHHD_291036
 )
+
+
+def test_null_id():
+    with pytest.raises(BadRequest):
+        get_user_or_abort(None)
+
+
+def test_empty_id():
+    with pytest.raises(NotFound):
+        get_user_or_abort('')
 
 
 class TestUser(TestCase):
