@@ -2120,7 +2120,7 @@ var assembleContent = {
             var siteId = siteIdField.val();
 
 
-            var identifiers = null;
+            var identifiers = [];
             /*
              * get current identifier(s)
              */
@@ -2142,14 +2142,6 @@ var assembleContent = {
             /*
              * NOTE: this will save study Id or site Id only if each has a value
              * otherwise if each is empty, it will be purged from the identifiers that had older value of each
-             */
-
-            if (!identifiers) {
-                identifiers = [];
-            }
-            /*
-             * NOTE: filter out existing study id/site id as we do not want to save duplicates
-             * ALSO, we should purge if the corresponding field value is empty
              */
             identifiers = $.grep(identifiers, function(identifier) {
                 return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
