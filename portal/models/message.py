@@ -99,10 +99,19 @@ class EmailMessage(db.Model):
         return u'{header}{body}{footer}'.format(
             header=EMAIL_HEADER, body=body, footer=EMAIL_FOOTER)
 
-    def send_message(self):
+    def send_message(self, cc_address=None):
+        """Send the message
+
+        :param cc_address: include valid email address to send a carbon copy
+
+        NB the cc isn't persisted with the rest of the record.
+
+        """
         message = Message(
             subject=self.subject,
             recipients=self.recipients.split())
+        if cc_address:
+            message.cc.append(cc_address)
         body = self.style_message(self.body)
         message.html = fill(body, width=280, break_long_words=False, break_on_hyphens=False)
         mail.send(message)
