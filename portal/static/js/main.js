@@ -2116,8 +2116,6 @@ var assembleContent = {
              * siteId field is only present in Truenth
              * studyId field is only present in Eproms
              */
-            var hasStudyIdField = studyIdField.length > 0 && studyIdField.is(":visible");
-            var hasSiteIdField = siteIdField.length > 0 && siteIdField.is(":visible");
             var studyId = studyIdField.val();
             var siteId = siteIdField.val();
 
@@ -2146,37 +2144,36 @@ var assembleContent = {
              * otherwise if each is empty, it will be purged from the identifiers that had older value of each
              */
 
-            if (hasStudyIdField || hasSiteIdField) {
-                if (!identifiers) {
-                    identifiers = [];
-                }
-                /*
-                 * filter out existing study id/site id as we do not want to save duplicates
-                 */
-                identifiers = $.grep(identifiers, function(identifier) {
-                    return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
-                           identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
-                });
+            if (!identifiers) {
+                identifiers = [];
+            }
+            /*
+             * NOTE: filter out existing study id/site id as we do not want to save duplicates
+             * ALSO, we should purge if the corresponding field value is empty
+             */
+            identifiers = $.grep(identifiers, function(identifier) {
+                return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
+                       identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
+            });
 
-                studyId = $.trim(studyId);
-                if (studyId) {
-                    var studyIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
-                        use: "secondary",
-                        value: studyId
-                    };
-                    identifiers.push(studyIdObj);
-                }
+            studyId = $.trim(studyId);
+            if (studyId) {
+                var studyIdObj = {
+                    system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
+                    use: "secondary",
+                    value: studyId
+                };
+                identifiers.push(studyIdObj);
+            }
 
-                siteId = $.trim(siteId);
-                if (siteId) {
-                    var siteIdObj = {
-                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
-                        use: "secondary",
-                        value: siteId
-                    };
-                    identifiers.push(siteIdObj);
-                }
+            siteId = $.trim(siteId);
+            if (siteId) {
+                var siteIdObj = {
+                    system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                    use: "secondary",
+                    value: siteId
+                };
+                identifiers.push(siteIdObj);
             }
 
             demoArray["identifier"] = identifiers;
