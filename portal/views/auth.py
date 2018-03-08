@@ -7,14 +7,16 @@ import json
 import requests
 from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError, ConfigError
-from flask import Blueprint, jsonify, redirect, current_app, make_response
-from flask import render_template, request, session, abort, url_for
+from flask import (
+    Blueprint, jsonify, redirect, current_app, make_response,
+    render_template, request, session, abort, url_for)
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import user_logged_in, user_registered
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, FormField, HiddenField, SelectField
-from wtforms import validators, TextField
+from wtforms import (
+    BooleanField, FormField, HiddenField, SelectField, StringField,
+    validators)
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
 from urlparse import urlparse
@@ -509,10 +511,10 @@ def logout(prevent_redirect=False, reason=None):
 class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""
     public_access = BooleanField('Public Access', default=True)
-    card_html = TextField('Card HTML')
-    link_label = TextField('Link Label')
-    link_url = TextField('Link URL')
-    status_text = TextField('Status Text')
+    card_html = StringField('Card HTML')
+    link_label = StringField('Link Label')
+    link_url = StringField('Link URL')
+    status_text = StringField('Status Text')
 
     def __init__(self, *args, **kwargs):
         """As a nested form, CSRF is handled by the parent"""
@@ -537,11 +539,11 @@ class ClientEditForm(FlaskForm):
     application_role = SelectField(
         'Application Role',
         choices=intervention_names,
-        validators=[validators.Required()])
-    application_origins = TextField(
+        validators=[validators.DataRequired()])
+    application_origins = StringField(
         'Application URL',
-        validators=[validators.Required()])
-    callback_url = TextField(
+        validators=[validators.DataRequired()])
+    callback_url = StringField(
         'Callback URL',
         validators=[validators.optional(), validators.URL(require_tld=False)])
     intervention_or_default = FormField(InterventionEditForm)
