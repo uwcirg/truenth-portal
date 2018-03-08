@@ -12,7 +12,8 @@ from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
-from portal.models.intervention import INTERVENTION, UserIntervention
+from portal.models.intervention import (
+    Intervention, INTERVENTION, UserIntervention)
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
@@ -1069,3 +1070,22 @@ class TestIntervention(TestCase):
         set1 = set((foo.email, boo.email))
         set2 = set(message.recipients.split())
         self.assertEquals(set1, set2)
+
+    def test_dynamic_intervention_access(self):
+        # Confirm interventions dynamically added still accessible
+        newbee = Intervention(name='newbee', description='test')
+        with SessionScope(db):
+            db.session.add(newbee)
+            db.session.commit()
+
+        self.assertEquals(INTERVENTION.newbee, db.session.merge(newbee))
+
+    def test_bogus_intervention_access(self):
+        with self.assertRaises(ValueError):
+            INTERVENTION.phoney
+
+        self.login()
+        self.promote_user(role_name=ROLE.SERVICE)
+        data = {'user_id': TEST_USER_ID, 'access': "granted"}
+        rv = self.client.put('/api/intervention/phoney', data=data)
+        self.assert404(rv)

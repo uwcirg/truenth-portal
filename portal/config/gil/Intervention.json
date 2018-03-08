@@ -102,6 +102,12 @@
       "name": "social_support",
       "public_access": false,
       "resourceType": "Intervention"
+    },
+    {
+      "description": "MUSIC Integration",
+      "name": "music",
+      "public_access": false,
+      "resourceType": "Intervention"
     }
   ],
   "id": "SitePersistence v0.2",
