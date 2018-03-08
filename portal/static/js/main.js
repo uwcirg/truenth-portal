@@ -2143,69 +2143,40 @@ var assembleContent = {
 
             /*
              * NOTE: this will save study Id or site Id only if each has a value
-             * otherwise if each is empty, it will be purged from the identifiers
+             * otherwise if each is empty, it will be purged from the identifiers that had older value of each
              */
 
             if (hasStudyIdField || hasSiteIdField) {
-                if (hasStudyIdField) {
-                    studyId = $.trim(studyId);
-                    if (studyId) {
-                        var studyIdObj = {
-                            system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
-                            use: "secondary",
-                            value: studyId
-                        };
+                if (!identifiers) {
+                    identifiers = [];
+                }
+                /*
+                 * filter out existing study id/site id as we do not want to save duplicates
+                 */
+                identifiers = $.grep(identifiers, function(identifier) {
+                    return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
+                           identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
+                });
 
-                        if (identifiers) {
-                            /*
-                             * filter out existing study id as we do not want to save duplicates
-                             */
-                            identifiers = $.grep(identifiers, function(identifier) {
-                                return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"];
-                            });
-                            identifiers.push(studyIdObj);
-                        } else {
-                            identifiers = [studyIdObj];
-                        }
-                    } else {
-                        //filter out study ID since it is now empty
-                        if (identifiers) {
-                            identifiers = $.grep(identifiers, function(identifier) {
-                                return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_study_id"];
-                            });
-                        }
-                    }
-                };
+                studyId = $.trim(studyId);
+                if (studyId) {
+                    var studyIdObj = {
+                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
+                        use: "secondary",
+                        value: studyId
+                    };
+                    identifiers.push(studyIdObj);
+                }
 
-                if (hasSiteIdField) {
-                    siteId = $.trim(siteId);
-                    if (siteId) {
-                        var siteIdObj = {
-                            system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
-                            use: "secondary",
-                            value: siteId
-                        };
-
-                        if (identifiers) {
-                            /*
-                             * filter out existing site id as we do not want to save duplicates
-                             */
-                            identifiers = $.grep(identifiers, function(identifier) {
-                                return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
-                            });
-                            identifiers.push(siteIdObj);
-                        } else {
-                            identifiers = [siteIdObj];
-                        }
-                    } else {
-                        //filter out site ID since it is now empty
-                        if (identifiers) {
-                            identifiers = $.grep(identifiers, function(identifier) {
-                                return identifier.system !== SYSTEM_IDENTIFIER_ENUM["external_site_id"];
-                            });
-                        }
-                    }
-                };
+                siteId = $.trim(siteId);
+                if (siteId) {
+                    var siteIdObj = {
+                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                        use: "secondary",
+                        value: siteId
+                    };
+                    identifiers.push(siteIdObj);
+                }
             }
 
             demoArray["identifier"] = identifiers;
