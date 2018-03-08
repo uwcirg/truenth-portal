@@ -197,9 +197,10 @@ class TestDemographics(TestCase):
             "system": "http://us.truenth.org/identity-codes/external-study-id",
             "use": "secondary", "value": ""}
         fhir['identifier'].append(study_id)
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(fhir))
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(fhir))
         self.assert400(rv)
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(user.identifiers.count(), 2)
