@@ -12,9 +12,11 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
+from ..models.app_text import app_text, MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
 from ..models.auth import Client, Token
+from ..models.communication import load_template_args
 from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -74,8 +76,8 @@ def me():
 
     """
     user = current_user()
-    return jsonify(id=user.id, username=user.username,
-                   email=user.email)
+    return jsonify(
+        id=user.id, username=user.username, email=user.email)
 
 
 @user_api.route('/account', methods=('POST',))
@@ -1980,6 +1982,86 @@ def set_table_preferences(user_id, table_name):
     db.session.commit()
 
     return jsonify(pref.as_json())
+
+
+@user_api.route('/user/<int:user_id>/invite', methods=('POST',))
+@oauth.require_oauth()  # for service token access, oauth must come first
+@roles_required([ROLE.SERVICE])
+def invite(user_id):
+    """Send invite email message to given user
+
+    It is expected that the named user has the expected roles and
+    affiliations such as organization to determine the appropriate
+    email context to send.
+
+    Include query param `?preview=True`
+    to have the email content generated but not sent.
+
+    Only available via service token.
+    ---
+    tags:
+      - User
+    operationId: user_invite
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: preview
+        in: query
+        description: Set to simply preview the message - don't send!
+        required: false
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns success of call (i.e. {message="sent"}, or JSON of the
+          generated message if `preview` is set.
+        schema:
+          id: user_invite
+          properties:
+            sender:
+              type: string
+              description: Email message sender
+            recipients:
+              type: string
+              description: Email message recipients
+            subject:
+              type: string
+              description: Email message subject
+            body:
+              type: string
+              description: Email message body, includes footer
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    user = get_user_or_abort(user_id)
+    if not user.email:
+        abort(400, "Can't email user's w/o email address")
+    sender = current_app.config.get("MAIL_DEFAULT_SENDER")
+    org = user.first_top_organization()
+    org_name = org.name if org else None
+    name_key = UserInviteEmail_ATMA.name_key(org=org_name)
+    args = load_template_args(user=user)
+    mail = MailResource(app_text(name_key), variables=args)
+    email = EmailMessage(
+        subject=mail.subject, body=mail.body, recipients=user.email,
+        sender=sender, user_id=user.id)
+    if request.args.get('preview'):
+        message = email.as_json()
+    else:
+        email.send_message()
+        db.session.add(email)
+        db.session.commit()
+        message = "okay"
+    return jsonify(message=message)
 
 
 @user_api.route('/user/<int:user_id>/messages')

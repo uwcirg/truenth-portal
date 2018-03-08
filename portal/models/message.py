@@ -1,7 +1,6 @@
 """Model classes for message data"""
 from datetime import datetime
 from textwrap import fill
-from flask import current_app
 from flask_mail import Message
 from flask_mail import email_dispatched
 
@@ -86,7 +85,8 @@ class EmailMessage(db.Model):
     user_id = db.Column(
         db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
 
-    def style_message(self, body):
+    @staticmethod
+    def style_message(body):
         """Implicitly called on send, to wrap body with style tags"""
         # Catch duplicate styling attempts
         restricted = (u'<!doctype', u'<html', u'<head', u'<body')
@@ -124,12 +124,9 @@ class EmailMessage(db.Model):
             self.subject, self.sent_at)
 
     def as_json(self):
-        d = {}
-        d['id'] = self.id
-        d['sender'] = self.sender
-        d['recipients'] = self.recipients
-        d['subject'] = self.subject
-        d['body'] = self.body
-        d['sent_at'] = self.sent_at
-        d['user_id'] = self.user_id
+        d = {
+            'id': self.id, 'sender': self.sender,
+            'recipients': self.recipients, 'subject': self.subject,
+            'body': self.body, 'sent_at': self.sent_at,
+            'user_id': self.user_id}
         return d

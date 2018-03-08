@@ -234,14 +234,20 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
     def name_key(**kwargs):
         """Generate AppText name key for User Invite Email Content
 
-        Not expecting any args at this time - may specialize per study
-        or organization in the future as needed.
-        TODO: Removing hardcoding of ePROMS org names
+        Some organizations supply customized content - which is indexed
+        by adding the org name to the key below.
+
+        To consider a custom invite for an org, extend config value
+        `ORGS_W_CUSTOM_INVITES` and add the app_text value.
+
+        :param org: Typically top level org name - used to look for
+        customized content.
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
+        if kwargs.get('org') in current_app.config.get(
+                'ORGS_W_CUSTOM_INVITES', []):
             return "profileSendEmail invite email {}".format(kwargs.get('org'))
         return "profileSendEmail invite email"
 
