@@ -2112,8 +2112,12 @@ var assembleContent = {
 
             var studyIdField = $("#profileStudyId");
             var siteIdField = $("#profileSiteId");
-            var hasStudyId = studyIdField.length > 0 && studyIdField.is(":visible");
-            var hasSiteId = siteIdField.length > 0 && siteIdField.is(":visible");
+            /*
+             * siteId field is only present in Truenth
+             * studyId field is only present in Eproms
+             */
+            var hasStudyIdField = studyIdField.length > 0 && studyIdField.is(":visible");
+            var hasSiteIdField = siteIdField.length > 0 && siteIdField.is(":visible");
             var studyId = studyIdField.val();
             var siteId = siteIdField.val();
 
@@ -2142,8 +2146,8 @@ var assembleContent = {
              * otherwise if each is empty, it will be purged from the identifiers
              */
 
-            if (hasStudyId || hasSiteId) {
-                if (hasStudyId) {
+            if (hasStudyIdField || hasSiteIdField) {
+                if (hasStudyIdField) {
                     studyId = $.trim(studyId);
                     if (studyId) {
                         var studyIdObj = {
@@ -2173,7 +2177,7 @@ var assembleContent = {
                     }
                 };
 
-                if (hasSiteId) {
+                if (hasSiteIdField) {
                     siteId = $.trim(siteId);
                     if (siteId) {
                         var siteIdObj = {
