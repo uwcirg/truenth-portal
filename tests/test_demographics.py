@@ -184,6 +184,26 @@ class TestDemographics(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(user.identifiers.count(), 5)
 
+    def test_bogus_identifiers(self):
+        # empty string values causing problems - prevent insertion
+        self.login()
+        rv = self.client.get('/api/demographics')
+
+        fhir = json.loads(rv.data)
+        self.assertEquals(len(fhir['identifier']), 2)
+
+        # put a study identifier
+        study_id = {
+            "system": "http://us.truenth.org/identity-codes/external-study-id",
+            "use": "secondary", "value": ""}
+        fhir['identifier'].append(study_id)
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(fhir))
+        self.assert400(rv)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.identifiers.count(), 2)
+
     def test_demographics_update_email(self):
         data = {"resourceType": "Patient",
                 "telecom": [
