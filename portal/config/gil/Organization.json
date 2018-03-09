@@ -1919,6 +1919,11 @@
           "value": "music"
         },
         {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "MUSIC"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MI"
@@ -1930,7 +1935,7 @@
         }
       ],
       "indigenous_codings": false,
-      "name": "MUSIC",
+      "name": "Michigan Urological Surgery Improvement Collaborative (MUSIC)",
       "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
