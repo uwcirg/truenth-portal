@@ -14,7 +14,7 @@ from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
 import time
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from .audit import Audit
 from .codeable_concept import CodeableConcept
@@ -1486,14 +1486,20 @@ def get_user_or_abort(uid):
     Safe to call with path or parameter info.  Confirms integer value before
     attempting lookup.
 
+    :raises :py:exc:`werkzeug.exceptions.BadRequest`: w/o a uid
+
     :raises :py:exc:`werkzeug.exceptions.NotFound`: if the given uid isn't
         an integer, or if no matching user
+
     :raises :py:exc:`werkzeug.exceptions.Forbidden`: if the named user has
         been deleted
 
     :returns: user if valid and found
 
     """
+    if uid is None:
+        raise BadRequest('expected user_id not found')
+
     try:
         user_id = int(uid)
     except ValueError:
