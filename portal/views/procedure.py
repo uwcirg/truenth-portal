@@ -6,12 +6,12 @@ from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxStartedConstants, TxNotStartedConstants
 
-
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
+
 
 @procedure_api.route('/patient/<int:patient_id>/procedure')
 @oauth.require_oauth()
@@ -51,10 +51,8 @@ def procedure(patient_id):
           to view requested patient
 
     """
-    patient = get_user(patient_id)
+    patient = get_user_or_abort(patient_id)
     current_user().check_role(permission='view', other_id=patient_id)
-    if patient.deleted:
-        abort(400, "deleted user - operation not permitted")
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
@@ -127,7 +125,8 @@ def post_procedure():
             request.json['resourceType'] != 'Procedure':
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
-    audit = Audit(user_id=current_user().id, subject_id=current_user().id,
+    audit = Audit(
+        user_id=current_user().id, subject_id=current_user().id,
         context='procedure')
     try:
         procedure = Procedure.from_fhir(request.json, audit)
@@ -141,10 +140,11 @@ def post_procedure():
     # check the permission now that we know the subject
     patient_id = procedure.user_id
     current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user(patient_id)
+    patient = get_user_or_abort(patient_id)
     patient.procedures.append(procedure)
     db.session.commit()
-    auditable_event("added {}".format(procedure), user_id=current_user().id,
+    auditable_event(
+        "added {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
     invalidate_assessment_status_cache(patient_id)
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
@@ -195,7 +195,8 @@ def procedure_delete(procedure_id):
     current_user().check_role(permission='edit', other_id=patient_id)
     db.session.delete(procedure)
     db.session.commit()
-    auditable_event("deleted {}".format(procedure), user_id=current_user().id,
+    auditable_event(
+        "deleted {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
     invalidate_assessment_status_cache(patient_id)
     return jsonify(message='deleted procedure')

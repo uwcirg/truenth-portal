@@ -340,7 +340,7 @@ select:not([multiple]) {
     transition: max-height .35s;
   }
   /* :checked */
-  label.tab-label.active ~ .tab-content,ß
+  label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
     max-height: 25em;
     margin: 1em auto;
@@ -370,6 +370,74 @@ select:not([multiple]) {
 }
 #mainDiv.profile .tabs-container {
   margin-bottom: 1.5em;
+}
+#resourcesContentContainer {
+  min-height: 50vh;
+  .tab-label {
+    font-size: 1.1em;
+    background: @featureBtnColor;
+    color: #FFF;
+    letter-spacing: 0.1em;
+  }
+  .tabs-container input.tab-input:checked+label.tab-label::after {
+    visibility: hidden;
+  }
+  .tab-content {
+    background: lighten(@featureBtnColor, 42%);
+    border: 0;
+    overflow: hidden;
+    ul {
+      padding: 1em 1em 0.5em;
+    }
+    li {
+      line-height: 3rem;
+      margin-left: 1em;
+    }
+  }
+}
+.work-instruction-title {
+  background: @featureBtnColor;
+  padding: 0.5em;
+  color: #FFF;
+  display: block;
+  position: relative;
+  & .pull-right {
+    position:absolute;
+    width: 125px;
+    right:0;
+    top: 2px;
+    & span {
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 12px;
+      &:hover {
+        cursor: pointer;
+        background: darken(@featureBtnColor, 5%);
+      }
+    }
+    & span:last-of-type {
+      margin-left: 0.1em;
+    }
+    & a {
+      color: #FFF;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.work-instruction-printicon {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.work-instruction-content-heading {
+  margin-bottom: 1.5em;
+}
+.work-instruction-content {
+  padding: 0 0.5em;
+  max-width: 100%;
+  overflow: auto;
 }
 .form-control {
   height: @inputHeight;
@@ -626,7 +694,7 @@ div.footer-wrapper.right-panel {
   padding: 1em 2.5em 2.5em 2.5em;
 }
 #termsText {
-  padding: 0 1em;
+  padding: 0;
 }
 #agreeLabel {
   margin-left: 2em;
@@ -645,7 +713,6 @@ div.footer-wrapper.right-panel {
     text-decoration: underline;
   }
   .terms-checkbox-container {
-    margin-left: 2em;
     margin-top: 0.5em;
   }
   .terms-checkbox-container i:hover {
@@ -667,9 +734,15 @@ div.footer-wrapper.right-panel {
   margin: 0.3em 0.5em 0 0;
 }
 .terms-tick-box-text {
-  width: 96.5%;
+  width: 93.5%;
   max-width: 100%;
+  margin-left: 2px;
   display: inline-block;
+}
+.edit-view {
+  .terms-tick-box-text {
+    margin-left: 4px;
+  }
 }
 .website-consent-script {
   .terms-tick-box-text {
@@ -2450,6 +2523,7 @@ input.clinic {
 .modal-footer {
   background-color: @modalBackgroundColor;
   color: #FFF;
+  letter-spacing: 1px;
 }
 .modal-body {
   font-size: @baseMobileFontSize;
@@ -2777,6 +2851,12 @@ div.timezone-warning.text-warning {
 .capitalize {
   text-transform: capitalize;
 }
+.first-letter {
+  display: block;
+  &::first-letter {
+    text-transform: capitalize;
+  }
+}
 
 #consentListTable,
 #profileAuditLogTable,
@@ -2789,6 +2869,9 @@ div.timezone-warning.text-warning {
 @media (min-width: 423px) {
   .portal-header {
     line-height: 50px;
+  }
+  #termsText {
+    padding: 0 1em;
   }
 }
 @media (min-width: 500px) {
@@ -3035,6 +3118,11 @@ div.timezone-warning.text-warning {
       flex-wrap: nowrap;
     }
   }
+  .work-instruction-title {
+    & .pull-right {
+      top: 4px
+    }
+  }
 }
 
 @media (min-width: 726px) {
@@ -3194,6 +3282,21 @@ div.timezone-warning.text-warning {
     }
     .form-group input[type=checkbox], .form-group  input[type=radio] {
       margin-top: 4px;
+    }
+  }
+
+  #topTerms {
+    .terms-checkbox-container {
+      margin-left: 1em;
+      .terms-tick-box-text {
+        margin-left: 0;
+        width: 96.5%;
+      }
+      .edit-view {
+        .terms-tick-box-text {
+          width: 94%;
+        }
+      }
     }
   }
 

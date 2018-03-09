@@ -12,7 +12,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 @baseFontSize:    16px;
 @baseMobileFontSize:  13.8px;
 @headlineSize:    1.30em;
@@ -434,6 +433,10 @@ select:not([multiple]) {
   display: none;
 }
 
+.resources-menu-item {
+  display: none;
+}
+
 #mainHolder {
   visibility: hidden;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
@@ -491,7 +494,10 @@ div.right-panel {
   background-color:@wellColor;
 }
 #termsText {
-  padding: 1em;
+  padding: 0.5em;
+  ol {
+    padding: 1em;
+  }
 }
 #agreeLabel {
   margin-left: 2em;
@@ -499,15 +505,12 @@ div.right-panel {
 #termsText.agreed {
   display: block;
 }
-#topTerms .well {
-  padding: 2em 1em 1em 1em;
-}
 #topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
 }
 #topTerms .terms-checkbox-container {
-  margin-left: 2em;
+  margin-left: 0;
   margin-top: 0.5em;
 }
 #termsCheckbox {
@@ -533,7 +536,8 @@ div.right-panel {
 }
 .terms-tick-box-text {
   float: left;
-  width: 94.5%;
+  margin-left: 4px;
+  width: 93%;
   max-width: 100%;
 }
 .box-consent-container {
@@ -3064,9 +3068,16 @@ div.timezone-warning.text-warning {
   }
   #topTerms {
     .terms-tick-box-text {
+      margin-left: 0;
       width: 96.5%;
     }
+    .terms-checkbox-container {
+      margin-left: 1em;
+    }
   }
+  #termsText {
+    padding: 1em;
+  } 
   #patientListOptions,
   #staffListOptions {
     display: flex;

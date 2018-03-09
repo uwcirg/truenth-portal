@@ -13,15 +13,28 @@ from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
-from portal.models.reporting import get_reporting_stats, overdue_stats_by_org
-from portal.models.reporting import generate_overdue_table_html
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
+from portal.views.reporting import generate_overdue_table_html
 from tests import TestCase
 
 
 class TestReporting(TestCase):
     """Reporting tests"""
+
+    def get_stats(self, invalidate=True):
+        """Cache free access for testing"""
+        from portal.models.reporting import get_reporting_stats
+        if invalidate:
+            dogpile_cache.invalidate(get_reporting_stats)
+        return get_reporting_stats()
+
+    def get_ostats(self, invalidate=True):
+        """Cache free access for testing"""
+        from portal.models.reporting import overdue_stats_by_org
+        if invalidate:
+            dogpile_cache.invalidate(overdue_stats_by_org)
+        return overdue_stats_by_org()
 
     def test_reporting_stats(self):
         user1 = self.add_user('test1')
@@ -63,9 +76,7 @@ class TestReporting(TestCase):
                 db.session.add(enc)
             db.session.commit()
 
-        # invalidate cache before testing
-        dogpile_cache.invalidate(get_reporting_stats)
-        stats = get_reporting_stats()
+        stats = self.get_stats()
 
         self.assertTrue('Decision Support P3P' not in stats['interventions'])
         self.assertEqual(stats['interventions']['Community of Wellness'], 1)
@@ -89,7 +100,7 @@ class TestReporting(TestCase):
             db.session.add(enc)
             db.session.commit()
 
-        stats2 = get_reporting_stats()
+        stats2 = self.get_stats(invalidate=False)
 
         # shold not have changed, if still using cached values
         self.assertEqual(len(stats2['encounters']['all']), 5)
@@ -104,7 +115,8 @@ class TestReporting(TestCase):
         rp = db.session.merge(rp)
         rp_id = rp.id
 
-        crv = Organization(name='CRV', research_protocol_id=rp_id)
+        crv = Organization(name='CRV')
+        crv.research_protocols.append(rp)
         epic26 = Questionnaire(name='epic26')
         with SessionScope(db):
             db.session.add(crv)
@@ -128,7 +140,7 @@ class TestReporting(TestCase):
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
         self.assertEqual(a_s.overall_status, 'Expired')
 
-        ostats = overdue_stats_by_org()
+        ostats = self.get_ostats()
         self.assertEqual(len(ostats), 0)
 
         # test user with status = 'Overdue' (should show up)
@@ -142,7 +154,7 @@ class TestReporting(TestCase):
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
         self.assertEqual(a_s.overall_status, 'Overdue')
 
-        ostats = overdue_stats_by_org()
+        ostats = self.get_ostats()
         self.assertEqual(len(ostats), 1)
         self.assertEqual(ostats[crv], [15])
 

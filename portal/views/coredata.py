@@ -7,12 +7,13 @@ from werkzeug.exceptions import Unauthorized
 from ..extensions import oauth
 from ..models.auth import validate_origin
 from ..models.coredata import Coredata
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
 
 OPTIONS = ('ethnicity', 'procedure', 'race')
+
 
 @coredata_api.route('/options', methods=('GET',))
 def options():
@@ -34,7 +35,8 @@ def validate_request_args(request):
                 accepted = ('paper', 'interview assisted')
                 v = request.args.get(k)
                 if v not in accepted:
-                    abort(400, '{} value `{}` not in {}'.format(k, v, accepted))
+                    abort(400, '{} value `{}` not in {}'.format(
+                        k, v, accepted))
                 d[k] = v
             else:
                 abort(400, 'unsupported query param {}'.format(k))
@@ -55,9 +57,9 @@ def still_needed(user_id):
         coredata elements still needed
     """
     current_user().check_role(permission='view', other_id=user_id)
-    user = get_user(user_id)
-    still_needed = Coredata().still_needed(user, **validate_request_args(request))
-    return jsonify(still_needed=still_needed)
+    user = get_user_or_abort(user_id)
+    needed = Coredata().still_needed(user, **validate_request_args(request))
+    return jsonify(still_needed=needed)
 
 
 @coredata_api.route('/user/<int:user_id>/required', methods=('GET',))
@@ -77,7 +79,7 @@ def requried(user_id):
 
     """
     current_user().check_role(permission='view', other_id=user_id)
-    user = get_user(user_id)
+    user = get_user_or_abort(user_id)
     required = Coredata().required(user, **validate_request_args(request))
     return jsonify(required=required)
 
@@ -99,9 +101,9 @@ def optional(user_id):
 
     """
     current_user().check_role(permission='view', other_id=user_id)
-    user = get_user(user_id)
-    optional = Coredata().optional(user, **validate_request_args(request))
-    return jsonify(optional=optional)
+    user = get_user_or_abort(user_id)
+    results = Coredata().optional(user, **validate_request_args(request))
+    return jsonify(optional=results)
 
 
 @coredata_api.route('/acquire', methods=('GET',))
@@ -201,5 +203,6 @@ def acquire():
                     urlencode(qs)
         return url
 
-    return render_template("coredata.html", user=current_user(),
+    return render_template(
+        "coredata.html", user=current_user(),
         require=require, return_address=clean_return_address(return_address))

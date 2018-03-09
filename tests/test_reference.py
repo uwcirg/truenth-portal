@@ -5,11 +5,13 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
+from portal.models.organization import Organization
 from portal.models.practitioner import Practitioner
 from portal.models.reference import Reference
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.system_uri import US_NPI
+
 
 class TestReference(TestCase):
 
@@ -22,6 +24,31 @@ class TestReference(TestCase):
         org = Reference.organization(0)
         self.assertEquals(
             org.as_fhir()['display'], 'none of the above')
+
+    def prep_org_w_identifier(self):
+        o = Organization(name='test org')
+        i = Identifier(system=US_NPI, value='123-45')
+        o.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(o)
+            db.session.commit()
+        o = db.session.merge(o)
+        return o
+
+    def test_org_w_identifier(self):
+        o = self.prep_org_w_identifier()
+        o_ref = Reference.organization(o.id)
+        self.assertEquals(
+            o_ref.as_fhir()['display'], 'test org')
+        self.assertEquals(
+            o_ref.as_fhir()['reference'],
+            'api/organization/{}'.format(o.id))
+
+    def test_org_w_identifier_parse(self):
+        o = self.prep_org_w_identifier()
+        ref = {'reference': 'api/organization/123-45?system={}'.format(US_NPI)}
+        parsed = Reference.parse(ref)
+        self.assertEquals(o, parsed)
 
     def test_questionnaire(self):
         q = Questionnaire(name='testy')

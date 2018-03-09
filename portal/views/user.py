@@ -23,8 +23,13 @@ from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user, permanently_delete_user
-from ..models.user import User, UserRelationship
+from ..models.user import (
+    current_user,
+    get_user_or_abort,
+    permanently_delete_user,
+    User,
+    UserRelationship
+)
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
 from .portal import check_int
@@ -69,8 +74,6 @@ def me():
 
     """
     user = current_user()
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
     return jsonify(id=user.id, username=user.username,
                    email=user.email)
 
@@ -303,11 +306,7 @@ def delete_user(user_id):
         description: if the user isn't found
 
     """
-    user = get_user(user_id)
-    if not user:
-        abort(404, "user not found")
-    if user.deleted:
-        abort(400, "user already deleted")
+    user = get_user_or_abort(user_id)
     try:
         user.delete_user(acting_user=current_user())
     except ValueError as v:
@@ -364,15 +363,13 @@ def access_url(user_id):
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
-    user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+    user = get_user_or_abort(user_id)
     not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
 
-    if set((ROLE.ACCESS_ON_VERIFY, ROLE.WRITE_ONLY)).isdisjoint(has):
+    if {ROLE.ACCESS_ON_VERIFY, ROLE.WRITE_ONLY}.isdisjoint(has):
         # KEEP this restriction.  Weak authentication (which the
         # returned URL provides) should only be available for these roles
         abort(
@@ -484,7 +481,7 @@ def user_consents(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
 
     return jsonify(consent_agreements=[c.as_json() for c in
                                        user.all_consents])
@@ -586,9 +583,7 @@ def set_user_consents(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
@@ -674,9 +669,7 @@ def withdraw_user_consent(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
@@ -775,9 +768,7 @@ def delete_user_consents(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     remove_uc = None
     try:
         id_to_delete = int(request.json['organization_id'])
@@ -845,7 +836,7 @@ def user_groups(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
 
     return jsonify(groups=[g.as_json() for g in user.groups])
 
@@ -924,9 +915,7 @@ def set_user_groups(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     if not request.json or 'groups' not in request.json:
         abort(400, "Requires 'groups' list")
 
@@ -1059,14 +1048,14 @@ def relationships(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
     results = []
     for r in user.relationships:
         results.append({'user': r.user_id,
                         'has the relationship': r.relationship.name,
                         'with': r.other_user_id})
     # add in any relationships where the user is on the predicate side
-    predicates = UserRelationship.query.filter_by(other_user_id=user_id)
+    predicates = UserRelationship.query.filter_by(other_user_id=user.id)
     for r in predicates:
         results.append({'user': r.user_id,
                         'has the relationship': r.relationship.name,
@@ -1159,9 +1148,7 @@ def set_relationships(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     if not request.json or 'relationships' not in request.json:
         abort(400, "Requires relationship list in JSON")
     # First confirm all the data is valid and the user has permission
@@ -1314,7 +1301,7 @@ def roles(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
     results = [{'name': r.name, 'description': r.description}
                for r in user.roles]
     return jsonify(roles=results)
@@ -1398,10 +1385,7 @@ def set_roles(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+        user = get_user_or_abort(user_id)
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
 
@@ -1572,7 +1556,7 @@ def user_documents(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
 
     doctype = request.args.get('document_type')
     if doctype:
@@ -1628,9 +1612,7 @@ def download_user_document(user_id, doc_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
 
     download_ud = None
     for ud in user.documents:
@@ -1706,9 +1688,7 @@ def upload_user_document(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
 
     def posted_filename(req):
         """Return file regardless of POST convention
@@ -1756,7 +1736,7 @@ def upload_user_document(user_id):
     db.session.add(doc)
     db.session.commit()
     auditable_event("patient report {} posted for user {}".format(
-        doc.uuid, user_id), user_id=current_user().id, subject_id=user_id,
+        doc.uuid, user_id), user_id=current_user().id, subject_id=user.id,
         context='assessment')
     return jsonify(message="ok")
 
@@ -1807,9 +1787,7 @@ def trigger_password_reset_email(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
     if user.email and "@" in user.email:
         try:
             user_manager.send_reset_password_email(user.email)
@@ -1889,12 +1867,10 @@ def get_table_preferences(user_id, table_name):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
 
-    pref = TablePreference.query.filter_by(table_name=table_name,
-                                           user_id=user_id).first()
+    pref = TablePreference.query.filter_by(
+        table_name=table_name, user_id=user.id).first()
     # 404 case handled by current_user() or check_role above.  Return
     # empty list if no preferences yet exist.
     if not pref:
@@ -1903,8 +1879,9 @@ def get_table_preferences(user_id, table_name):
     return jsonify(pref.as_json())
 
 
-@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>',
-                methods=('PUT','POST',))
+@user_api.route(
+    '/user/<int:user_id>/table_preferences/<string:table_name>',
+    methods=('PUT', 'POST'))
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
     """Add a consent agreement for the user with named organization
@@ -1990,15 +1967,12 @@ def set_table_preferences(user_id, table_name):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+        user = get_user_or_abort(user_id)
     if not request.json:
         abort(400, "no table preference data provided")
 
     req = request.json
-    req['user_id'] = user_id
+    req['user_id'] = user.id
     req['table_name'] = table_name
 
     pref = TablePreference.from_json(req)
@@ -2064,10 +2038,7 @@ def get_user_messages(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+        user = get_user_or_abort(user_id)
     messages = []
 
     # need to cycle through EmailMessages individually for proper validation
@@ -2119,12 +2090,10 @@ def get_current_user_qb(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+        user = get_user_or_abort(user_id)
 
     date = request.args.get('as_of_date')
-    date = datetime.strptime(date, '%Y-%m-%d') if date else None
+    date = datetime.strptime(date, '%Y-%m-%d') if date else datetime.utcnow()
 
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 

@@ -278,6 +278,40 @@
       </div>
     </div>
 {% endblock %}
+{# One-time system messages called Flash messages #}
+{% block flash_messages %}
+  {%- with messages = get_flashed_messages(with_categories=true) -%}
+      {% if messages %}
+          {# Hack to prevent modal if it's only successful login #}
+          {% set showMessages = true %}
+          {% if messages|first|last == "You have signed in successfully." %}
+              {% set showMessages = false %}
+          {% endif %}
+          {% if showMessages %}
+              {# Modal dialog for alerts #}
+              <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
+                <div class="modal-dialog">
+                  <div class="modal-content box-modal">
+                    <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
+                      <h4 class="box-modal__title">{{_("System Message")}}</h4>
+                      {% for category, message in messages -%}
+                          {% if category=='error' %}
+                              {% set category='danger' %}
+                          {% endif %}
+                          <p class="box-modal__copy text-{{category}}">{{ message|safe }}</p>
+                      {%- endfor %}
+                      <input type="hidden" id="showFlashMessageModal" value="true" />
+                    </div>
+                    <div class="box-modal__footer">
+                        <button class="button button--teal" data-dismiss="modal">{{_("OK")}}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          {% endif %}
+      {% endif %}
+  {%- endwith %}
+{% endblock %}
 {% block consent %}
   {% if consent_agreements %}
       <div id="consentContainer">

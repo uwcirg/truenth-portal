@@ -1,5 +1,5 @@
 """Unit test module for Intervention API"""
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
@@ -430,7 +430,12 @@ class TestIntervention(TestCase):
         """Test strategy with side effects - card_html update"""
         ae = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
-        self.bless_with_basics()
+
+        # Need a current date, adjusted slightly to test UTC boundary
+        # date rendering
+        dt = datetime.utcnow().replace(
+            hour=20, minute=0, second=0, microsecond=0)
+        self.bless_with_basics(setdate=dt)
 
         # generate questionnaire banks and associate user with
         # metastatic organization
@@ -447,16 +452,18 @@ class TestIntervention(TestCase):
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
-        user, ae = map(db.session.merge, (self.test_user, ae))
+        user, ae, metastatic_org = map(db.session.merge, (self.test_user, ae, metastatic_org))
 
-        # without completing an assessment, card_html should includ username
+        # without completing an assessment, card_html should include username
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
-        dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         # Add a fake assessments and see a change
+        m_qb = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == 'metastatic').filter(
+            QuestionnaireBank.classification == 'baseline').one()
         for i in metastatic_baseline_instruments:
-            mock_qr(instrument_id=i, timestamp=dt)
+            mock_qr(instrument_id=i, timestamp=dt, qb=m_qb)
         mi_qb = QuestionnaireBank.query.filter_by(
             name='metastatic_indefinite').first()
         mock_qr(instrument_id='irondemog', timestamp=dt, qb=mi_qb)
@@ -468,14 +475,17 @@ class TestIntervention(TestCase):
         self.assertTrue(ae.quick_access_check(user))
 
         # test datetime display based on user timezone
-        self.assertTrue("10 Jun 2017" in card_html)
+        today = datetime.strftime(dt, '%e %b %Y')
+        self.assertTrue(today in card_html)
         user.timezone = "Asia/Tokyo"
         with SessionScope(db):
             db.session.add(user)
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
         card_html = ae.display_for_user(user).card_html
-        self.assertTrue("11 Jun 2017" in card_html)
+        tomorrow = datetime.strftime(
+            dt + timedelta(days=1), '%e %b %Y')
+        self.assertTrue(tomorrow in card_html)
 
     def test_expired(self):
         """If baseline expired check message"""

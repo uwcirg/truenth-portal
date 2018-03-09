@@ -1,6 +1,6 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, jsonify, render_template, request
-from flask import current_app, url_for
+from flask import abort, Blueprint, jsonify, render_template
+from flask import current_app
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -12,13 +12,13 @@ from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import visit_name
 from ..models.role import Role, ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import User, current_user, get_user, UserRoles
+from ..models.user import User, current_user, get_user_or_abort, UserRoles
 from ..models.user_consent import UserConsent
 from .portal import check_int
 from datetime import datetime
 
-
 patients = Blueprint('patients', __name__, url_prefix='/patients')
+
 
 @patients.route('/')
 @roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
@@ -31,18 +31,13 @@ def patients_root():
 
     """
     user = current_user()
-
     patient_role_id = Role.query.filter(
-        Role.name==ROLE.PATIENT).with_entities(Role.id).first()
+        Role.name == ROLE.PATIENT).with_entities(Role.id).first()
 
     # empty patient query list to start, unionize with other relevant lists
-    patients = User.query.filter(User.id==-1)
-
+    patients = User.query.filter(User.id == -1)
     org_list = set()
-
     now = datetime.utcnow()
-    consented_users = []
-
     consent_query = UserConsent.query.filter(and_(
                          UserConsent.deleted_id.is_(None),
                          UserConsent.expires > now))
@@ -56,9 +51,9 @@ def patients_root():
         if pref and pref.filters:
             pref_org_list = pref.filters.get('orgs_filter_control')
 
-        # Build list of all organization ids, and their decendents, the
+        # Build list of all organization ids, and their descendants, the
         # user belongs to
-        OT = OrgTree()
+        ot = OrgTree()
 
         if pref_org_list:
             # for preferred filtered orgs
@@ -68,25 +63,25 @@ def patients_root():
                 if orgId == 0:  # None of the above doesn't count
                     continue
                 for org in user.organizations:
-                    if int(orgId) in OT.here_and_below_id(org.id):
+                    if int(orgId) in ot.here_and_below_id(org.id):
                         org_list.add(orgId)
                         break
         else:
             for org in user.organizations:
                 if org.id == 0:  # None of the above doesn't count
                     continue
-                org_list.update(OT.here_and_below_id(org.id))
+                org_list.update(ot.here_and_below_id(org.id))
 
         # Gather up all patients belonging to any of the orgs (and their
         # children) this (staff) user belongs to.
         org_patients = User.query.join(UserRoles).filter(
-            and_(User.id==UserRoles.user_id,
-                 UserRoles.role_id==patient_role_id,
+            and_(User.id == UserRoles.user_id,
+                 UserRoles.role_id == patient_role_id,
                  User.deleted_id.is_(None),
                  User.id.in_(consented_users)
                  )
             ).join(UserOrganization).filter(
-                and_(UserOrganization.user_id==User.id,
+                and_(UserOrganization.user_id == User.id,
                      UserOrganization.organization_id != 0,
                      UserOrganization.organization_id.in_(org_list)))
         patients = patients.union(org_patients)
@@ -98,12 +93,13 @@ def patients_root():
         # Gather up all patients belonging to any of the interventions
         # this intervention_staff user belongs to
         ui_patients = User.query.join(UserRoles).filter(
-            and_(User.id==UserRoles.user_id,
-                 UserRoles.role_id==patient_role_id,
+            and_(User.id == UserRoles.user_id,
+                 UserRoles.role_id == patient_role_id,
                  User.deleted_id.is_(None),
                  User.id.in_(consented_users))
                  ).join(UserIntervention).filter(
-                 and_(UserIntervention.user_id==User.id,
+                 and_(
+                     UserIntervention.user_id == User.id,
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
@@ -126,6 +122,7 @@ def patients_root():
         user=user, org_list=org_list,
         wide_container="true")
 
+
 @patients.route('/patient-profile-create')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
@@ -134,18 +131,19 @@ def patient_profile_create():
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "patient_profile_create.html", user = user,
+        "patient_profile_create.html", user=user,
         consent_agreements=consent_agreements,
         leaf_organizations=leaf_organizations)
 
 
-@patients.route('/session-report/<int:subject_id>/<instrument_id>/<authored_date>')
+@patients.route(
+    '/session-report/<int:subject_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
 def session_report(subject_id, instrument_id, authored_date):
     current_user().check_role("view", other_id=subject_id)
-    user = get_user(subject_id)
+    user = get_user_or_abort(subject_id)
     return render_template(
-        "sessionReport.html",user=user,
+        "sessionReport.html", user=user,
         current_user=current_user(), instrument_id=instrument_id,
         authored_date=authored_date)
 
@@ -157,18 +155,16 @@ def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
     user = current_user()
     user.check_role("edit", other_id=patient_id)
-    patient = get_user(patient_id)
-    if not patient:
-        abort(404, "Patient {} Not Found".format(patient_id))
+    patient = get_user_or_abort(patient_id)
     consent_agreements = Organization.consent_agreements()
 
     user_interventions = []
-    interventions =\
-            Intervention.query.order_by(Intervention.display_rank).all()
+    interventions = Intervention.query.order_by(
+        Intervention.display_rank).all()
     for intervention in interventions:
         display = intervention.display_for_user(patient)
         if (display.access and display.link_url is not None and
-            display.link_label is not None):
+                display.link_label is not None):
             user_interventions.append({"name": intervention.name})
 
     return render_template(
@@ -177,6 +173,7 @@ def patient_profile(patient_id):
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
 
+
 @patients.route('/treatment-options')
 @oauth.require_oauth()
 def treatment_options():
@@ -184,12 +181,12 @@ def treatment_options():
     if code_list:
         treatment_options = []
         for item in code_list:
-            code, system = item;
+            code, system = item
             treatment_options.append({
                 "code": code,
                 "system": system,
                 "text": Coding.display_lookup(code, system)
-            });
+            })
     else:
         abort(400, "Treatment options are not available.")
     return jsonify(treatment_options=treatment_options)

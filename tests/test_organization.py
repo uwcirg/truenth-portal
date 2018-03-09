@@ -1,4 +1,5 @@
 """Unit test module for organization model"""
+from datetime import datetime, timedelta
 from flask_webtest import SessionScope
 import json
 import os
@@ -17,7 +18,9 @@ from portal.models.organization import (
     LocaleExtension,
     Organization,
     OrganizationIdentifier,
-    OrgTree)
+    OrganizationResearchProtocol,
+    OrgTree,
+    ResearchProtocolExtension)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from tests import TestCase
@@ -118,6 +121,42 @@ class TestOrganization(TestCase):
         self.assertTrue(data['use_specific_codings'])
         self.assertFalse(data['race_codings'])
 
+    def test_multiple_rps_in_fhir(self):
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        lastyear = datetime.utcnow() - timedelta(days=365)
+        org = Organization(name='Testy')
+        rp1 = ResearchProtocol(name='rp1')
+        rp2 = ResearchProtocol(name='yesterday')
+        rp3 = ResearchProtocol(name='last year')
+        with SessionScope(db):
+            map(db.session.add, (org, rp1, rp2, rp3))
+            db.session.commit()
+        org, rp1, rp2, rp3 = map(db.session.merge, (org, rp1, rp2, rp3))
+        o_rp1 = OrganizationResearchProtocol(
+            research_protocol=rp1, organization=org)
+        o_rp2 = OrganizationResearchProtocol(
+            research_protocol=rp2, organization=org, retired_as_of=yesterday)
+        o_rp3 = OrganizationResearchProtocol(
+            research_protocol=rp3, organization=org, retired_as_of=lastyear)
+        with SessionScope(db):
+            map(db.session.add, (o_rp1, o_rp2, o_rp3))
+            db.session.commit()
+        org, rp1, rp2, rp3 = map(db.session.merge, (org, rp1, rp2, rp3))
+        data = org.as_fhir()
+        self.assertEquals(org.name, data['name'])
+        rps = [
+            extension for extension in data['extension']
+            if extension['url'] == ResearchProtocolExtension.extension_url]
+
+        self.assertEquals(len(rps), 1)
+        self.assertEquals(len(rps[0]['research_protocols']), 3)
+
+        # confirm the order is descending in the custom accessor method
+        results = [(rp, retired) for rp, retired in org.rps_w_retired()]
+        self.assertEquals(
+            [(rp1, None), (rp2, yesterday), (rp3, lastyear)],
+            results)
+
     def test_organization_get(self):
         self.login()
         org = Organization(name='test')
@@ -146,11 +185,29 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization?system={system}&value={value}'.format(
-            system=quote_plus(org_id_system), value=org_id_value))
+        rv = self.client.get(
+            '/api/organization?system={system}&value={value}'.format(
+                system=quote_plus(org_id_system), value=org_id_value))
         self.assert200(rv)
         self.assertEquals(rv.json['total'], 1)
         self.assertEquals(rv.json['entry'][0]['id'], 999)
+
+        # use alternative API to obtain organization
+        rv = self.client.get(
+            '/api/organization/{value}?system={system}'.format(
+                system=quote_plus(org_id_system), value=org_id_value))
+        self.assert200(rv)
+        fetched = Organization.from_fhir(rv.json)
+        org = db.session.merge(org)
+        self.assertEquals(org.id, fetched.id)
+        self.assertEquals(org.name, fetched.name)
+
+    def test_org_missing_identifier(self):
+        # should get 404 w/o finding a match
+        rv = self.client.get(
+            '/api/organization/{value}?system={system}'.format(
+                system=quote_plus('http://nonsense.org'), value='123-45'))
+        self.assert404(rv)
 
     def test_organization_list(self):
         count = Organization.query.count()
@@ -323,7 +380,7 @@ class TestOrganization(TestCase):
 
         en_AU = LocaleConstants().AustralianEnglish
 
-        # Populate db with complet org, and set many fields
+        # Populate db with complete org, and set many fields
         org = Organization(
             name='test', phone='800-800-5665', timezone='US/Pacific')
         org.identifiers.append(Identifier(
@@ -338,7 +395,7 @@ class TestOrganization(TestCase):
             db.session.commit()
         org, rp = map(db.session.merge, (org, rp))
         org_id, rp_id = org.id, rp.id
-        org.research_protocol_id = rp_id
+        org.research_protocols.append(rp)
         data = org.as_fhir()
         input = {k: v for k, v in data.items() if k in (
             'name', 'resourceType')}
@@ -365,7 +422,8 @@ class TestOrganization(TestCase):
         self.assertEquals(org.default_locale, 'en_AU')
         self.assertEquals(org.locales.count(), 0)
         self.assertEquals(org.timezone, 'US/Pacific')
-        self.assertEquals(org.research_protocol_id, rp_id)
+        self.assertEquals(
+            org.research_protocol(as_of_date=datetime.utcnow()).id, rp_id)
 
         # Confirm empty extension isn't included in result
         results = json.loads(rv.data)

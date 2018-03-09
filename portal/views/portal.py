@@ -1,4 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+import json
+import requests
 from celery.result import AsyncResult
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, make_response, redirect, request, session, url_for
@@ -44,7 +46,7 @@ from ..models.organization import Organization, OrganizationIdentifier, OrgTree,
 from ..models.reporting import get_reporting_stats
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user, User
+from ..models.user import current_user, get_user_or_abort, User
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import establish_trace, dump_trace, trace
 
@@ -140,9 +142,11 @@ def report_error():
 
 
 class ShortcutAliasForm(FlaskForm):
-    shortcut_alias = StringField('Code', validators=[validators.Required()])
+    shortcut_alias = StringField(
+        'Code', validators=[validators.DataRequired()])
 
-    def validate_shortcut_alias(form, field):
+    @staticmethod
+    def validate_shortcut_alias(field):
         """Custom validation to confirm an alias match"""
         if len(field.data.strip()):
             try:
@@ -199,8 +203,7 @@ def specific_clinic_landing(clinic_alias):
     # Top-level orgs with child orgs won't work, as the UI only lists the clinic level
     org = Organization.query.get(results.organization_id)
     if org.partOf_id is None:
-        OT = OrgTree()
-        orgs = OT.here_and_below_id(results.organization_id)
+        orgs = OrgTree().here_and_below_id(results.organization_id)
         for childOrg in orgs:
             # the org tree contains an org other than the alias org itself
             if childOrg != results.organization_id:
@@ -253,14 +256,12 @@ def access_via_token(token):
     user_id = verify_token(valid_seconds)
 
     # Valid token - confirm user id looks legit
-    user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
+    user = get_user_or_abort(user_id)
+    not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
-    if set((ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY)).intersection(has):
+    if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
 
@@ -360,26 +361,22 @@ def challenge_identity(
             validate_origin(form.next_url.data)
         if not form.user_id.data:
             abort(400, "missing user in identity challenge")
-        user = get_user(form.user_id.data)
-        if not user:
-            abort(400, "missing user in identity challenge")
+        user = get_user_or_abort(form.user_id.data)
     else:
-        user = get_user(user_id)
-        if not user:
-            abort(400, "missing user in identity challenge")
+        user = get_user_or_abort(user_id)
         form = ChallengeIdForm(
             next_url=next_url, user_id=user.id,
             merging_accounts=merging_accounts,
             access_on_verify=access_on_verify)
 
-    errorMessage = ""
+    error = ""
     if not form.validate_on_submit():
         return render_template(
-            'challenge_identity.html', form=form, errorMessage=errorMessage)
+            'challenge_identity.html', form=form, errorMessage=error)
 
     first_name = form.first_name.data
     last_name = form.last_name.data
-    birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y');
+    birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y')
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
@@ -398,23 +395,24 @@ def challenge_identity(
         return redirect(form.next_url.data)
 
     else:
-        auditable_event("Failed identity challenge tests with values:"
-                        "(first_name={}, last_name={}, birthdate={})".\
-                        format(first_name, last_name, birthdate),
-                        user_id=user.id, subject_id=user.id,
-                        context='authentication')
+        auditable_event(
+            "Failed identity challenge tests with values:"
+            "(first_name={}, last_name={}, birthdate={})".format(
+                first_name, last_name, birthdate),
+            user_id=user.id, subject_id=user.id,
+            context='authentication')
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
-            errorMessage = "Unable to match identity"
+            error = "Unable to match identity"
         if form.retry_count.data > 3:
             abort(404, "User Not Found")
 
         return render_template(
-            'challenge_identity.html', form=form, errorMessage=errorMessage)
+            'challenge_identity.html', form=form, errorMessage=error)
 
 
-@portal.route('/initial-queries', methods=['GET','POST'])
+@portal.route('/initial-queries', methods=['GET', 'POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
     user = current_user()
@@ -440,7 +438,6 @@ def initial_queries():
         current_app.logger.debug("GET initial_queries -> next_after_login")
         return next_after_login()
 
-    terms, consent_agreements = None, {}
     org = user.first_top_organization()
     role = None
     if not current_app.config.get('GIL'):
@@ -450,7 +447,7 @@ def initial_queries():
                 r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
                 role = r
     terms = get_terms(org, role)
-    #need this at all time now for ui
+    # need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
 
     return render_template(
@@ -497,8 +494,9 @@ def admin():
 
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users, wide_container="true",
-                           org_list=list(org_list), user=user)
+    return render_template(
+        'admin.html', users=users, wide_container="true",
+        org_list=list(org_list), user=user)
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
@@ -514,9 +512,9 @@ def invite():
     user = current_user()
     if not user.email:
         abort(400, "Users without an email address can't send email")
-    email = EmailMessage(subject=subject, body=body,
-            recipients=recipients, sender=user.email,
-            user_id=user.id)
+    email = EmailMessage(
+        subject=subject, body=body, recipients=recipients,
+        sender=user.email, user_id=user.id)
     email.send_message()
     db.session.add(email)
     db.session.commit()
@@ -545,7 +543,7 @@ def profile(user_id):
     template_file = 'profile/my_profile.html'
     if user_id and user_id != user.id:
         user.check_role("edit", other_id=user_id)
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
         # template file for view of other user's profile
         template_file = 'profile/user_profile.html'
     consent_agreements = Organization.consent_agreements()
@@ -562,7 +560,7 @@ def profile(user_id):
 def patient_invite_email(user_id):
     """Patient Invite Email Content"""
     if user_id:
-        user = get_user(user_id)
+        user = get_user_or_abort(user_id)
     else:
         user = current_user()
 
@@ -576,7 +574,7 @@ def patient_invite_email(user_id):
         item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
-        return ('', 204)
+        return '', 204
 
     return jsonify(subject=item.subject, body=item.body)
 
@@ -664,9 +662,7 @@ def settings():
         organization_consents = Organization.consent_agreements()
 
     if form.patient_id.data and form.timestamp.data:
-        patient = get_user(form.patient_id.data)
-        if not patient:
-            trace("Patient Not found {}".format(form.patient_id.data))
+        patient = get_user_or_abort(form.patient_id.data)
         try:
             dt = FHIR_datetime.parse(form.timestamp.data)
             for qnr in QuestionnaireResponse.query.filter_by(subject_id=patient.id):
@@ -696,18 +692,29 @@ def settings():
     return response
 
 
+@portal.route('/api/settings', defaults={'config_key': None})
 @portal.route('/api/settings/<string:config_key>')
 @oauth.require_oauth()
 def config_settings(config_key):
-    key = config_key.upper()
-    # handing out LifeRay keys at this time
-    if key.startswith('LR_'):
-        return jsonify({key: current_app.config.get(key)})
-    # handing out consent related keys e.g. consent_with_top_level_org
-    elif key.startswith('CONSENT_'):
+    # return selective keys - not all can be be viewed by users, e.g.secret key
+    config_prefix_whitelist = (
+        'LR_',
+        'CONSENT',
+        'REQUIRED_CORE_DATA',
+        'SYSTEM',
+    )
+    if config_key:
+        key = config_key.upper()
+        if not any(key.startswith(prefix) for prefix in config_prefix_whitelist):
+            abort(400, "Configuration key '{}' not available".format(key))
         return jsonify({key: current_app.config.get(key)})
     else:
-        abort(400, "Configuration key '{}' not available".format(key))
+        config_settings = {}
+        # return selective keys - not all can be be viewed by users, e.g.secret key
+        for key in current_app.config:
+            if any(key.startswith(prefix) for prefix in config_prefix_whitelist):
+                config_settings[key] = current_app.config.get(key)
+        return jsonify(config_settings)
 
 
 @portal.route('/research')
@@ -741,8 +748,9 @@ def reporting_dashboard():
                referral sources for new visitors, etc)
 
     """
-    return render_template('reporting_dashboard.html', now=datetime.utcnow(),
-                           counts=get_reporting_stats())
+    return render_template(
+        'reporting_dashboard.html', now=datetime.utcnow(),
+        counts=get_reporting_stats())
 
 
 @portal.route('/spec')
@@ -765,13 +773,13 @@ def spec():
             "title": current_app.config.metadata.summary,
             "description": current_app.config.metadata.description,
             "termsOfService": "http://cirg.washington.edu",
-            "contact":{
+            "contact": {
                 "name": "Clinical Informatics Research Group",
                 "email": "mcjustin@uw.edu",
                 "url": "http://cirg.washington.edu",
             },
         },
-        "schemes":("http", "https"),
+        "schemes": ("http", "https"),
     })
 
     # Fix swagger docs for paths with duplicate operationIds
@@ -787,11 +795,10 @@ def spec():
             operation_id = route['operationId']
 
             operations.setdefault(operation_id, [])
-            operations[operation_id].append({'path':path, 'method':method})
+            operations[operation_id].append({'path': path, 'method': method})
 
-
-
-    # Alter route-specific swagger info (using operations dict) to prevent non-unique operationId
+    # Alter route-specific swagger info (using operations dict) to prevent
+    # non-unique operationId
     for operation_id, routes in operations.items():
         if len(routes) == 1:
             continue
@@ -948,6 +955,7 @@ def post_result(task_id):
     r = AsyncResult(task_id, app=celery).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
 
+
 @portal.route("/legal/stock-org-consent/<org_name>")
 def stock_consent(org_name):
     """Simple view to render default consent with named organization
@@ -974,5 +982,54 @@ def stock_consent(org_name):
 def check_int(i):
     try:
         return int(i)
-    except ValueError, e:
+    except ValueError:
         abort(400, "invalid input '{}' - must be an integer".format(i))
+
+
+def get_asset(uuid):
+    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
+        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
+    data = requests.get(url).content
+    return json.JSONDecoder().decode(data)['asset']
+
+
+def get_any_tag_data(*anyTags):
+    """
+        query LR based on any tags
+        this is an OR condition
+        will match any tag specified
+        :param anyTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+    """
+    # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
+    liferay_qs_params = {
+        'anyTags': anyTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
+
+    return requests.get(url).content
+
+
+def get_all_tag_data(*allTags):
+    """
+        query LR based on all required tags
+        this is an AND condition
+        all required tags must be present
+        :param allTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+    """
+    # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
+    liferay_qs_params = {
+        'allTags': allTags,
+        'sort': 'true',
+        'sortType': 'DESC'
+    }
+    url = ''.join([current_app.config["LR_ORIGIN"],
+                   "/c/portal/truenth/asset/query?",
+                   requests.compat.urlencode(liferay_qs_params,
+                                             doseq=True,)])
+
+    return requests.get(url).content

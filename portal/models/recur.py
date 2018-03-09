@@ -1,5 +1,4 @@
 """Recur module"""
-from datetime import datetime
 from sqlalchemy import UniqueConstraint
 
 from ..database import db
@@ -90,7 +89,7 @@ class Recur(db.Model):
             has yet to begin (prior to start).
 
         """
-        as_of_date = as_of_date or datetime.utcnow()
+        assert(as_of_date)
         start_date = trigger_date + RelativeDelta(self.start)
         termination = (
             trigger_date + RelativeDelta(self.termination) if

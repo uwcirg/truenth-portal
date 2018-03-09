@@ -29,24 +29,3 @@
 {% block additional_scripts %}
 <script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
 {% endblock %}
-{% block document_ready %}
-  $("#mainDiv").addClass("profile");
-  var CONSENT_DATE_LABEL = "{{ app_text('consent date label') }}";
-  var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-  var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
-  var isTestPatient = {% if user.has_role(ROLE.PATIENT) and (current_user and not current_user.has_role(ROLE.PATIENT)) %}'{{config.get("SYSTEM.TYPE")}}'.toUpperCase() != "PRODUCTION"{% else %}false{% endif %};
-  var isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
-  var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-  var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-  var profileObj = new Profile("{{user.id}}", "{{current_user.id}}");
-  {% if user and user.has_role(ROLE.PATIENT) %}var patientId = {{user.id}};{% endif %}
-  profileObj.onBeforeSectionsLoad();
-  $(document).ready(function(){
-    profileObj.initSections(function() {
-      tnthAjax.getDemo($("#profileUserId").val());
-    });
-    {%- if user %}
-      profileObj.onSectionsDidLoad();
-    {% endif -%}
-  });
-{% endblock %}

@@ -1416,6 +1416,10 @@ $(document).ready(function(){
   if ($("main").attr("data-theme") === "white") {
     $("body").addClass("theme--intro-light");
   }
+
+  if (String($("#showFlashMessageModal").val()).toLowerCase() === "true") {
+    $("#alertModal").modal("show");
+  }
   window.app.upperBanner.handleAccess();
   window.app.upperBanner.handleWatermark();
   window.app.accessCodeObj.handleEvents();

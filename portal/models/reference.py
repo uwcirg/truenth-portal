@@ -151,7 +151,7 @@ class Reference(object):
                     reference_dict))
 
         lookup = (
-            (re.compile('[Oo]rganization/(\w+)\?[Ss]ystem=(\w+)'),
+            (re.compile('[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
              Organization, 'identifier'),
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
             (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),

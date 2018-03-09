@@ -59,7 +59,8 @@ class TestAssessmentEngine(TestCase):
         rp_id = rp.id
 
         qn = Questionnaire(name='epic26')
-        org = Organization(name="testorg", research_protocol_id=rp_id)
+        org = Organization(name="testorg")
+        org.research_protocols.append(rp)
         with SessionScope(db):
             db.session.add(qn)
             db.session.add(org)

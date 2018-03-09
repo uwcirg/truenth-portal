@@ -1,0 +1,15 @@
+{% extends "eproms/base.html" %}
+{% block main %}
+<h4 class="tnth-headline work-instruction-title">
+    <span>{{_("Work Instructions")}}</span>
+    <div class="pull-right work-instruction-icons hidden-print">
+         <span class="glyphicon glyphicon-print work-instruction-printicon" title="{{_('Print')}}"></span>
+        <a href="{{url_for('.resources')}}"><span class="glyphicon glyphicon-menu-left" title="{{_('Back to Resources')}}"></span></a>
+    </div>
+</h4>
+<div class="work-instruction-content">
+	<h3 class="work-instruction-content-heading first-letter">{{title | replace('-', ' ')}}</h3>
+	<div>{{content|safe}}</div>
+</div>
+<script src="{{url_for('.static', filename='js/resources.js')}}"></script>
+{% endblock %}

@@ -1,15 +1,16 @@
 """Views for audit"""
-from flask import abort, jsonify, Blueprint
+from flask import jsonify, Blueprint
 from flask_user import roles_required
 from sqlalchemy import or_
 
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user_or_abort
 from ..models.role import ROLE
 
 
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
+
 
 @audit_api.route('/user/<int:user_id>/audit')
 @roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
@@ -71,12 +72,10 @@ def get_audit(user_id):
           to view requested patient
 
     """
-    user = get_user(user_id)
-    if not user:
-        abort(404)
-    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user_or_abort(user_id)
+    current_user().check_role(permission='view', other_id=user.id)
     audits = Audit.query.filter(or_(
-        Audit.user_id == user_id,
-        Audit.subject_id == user_id))
+        Audit.user_id == user.id,
+        Audit.subject_id == user.id))
     results = [audit.as_fhir() for audit in audits]
     return jsonify(audits=results)

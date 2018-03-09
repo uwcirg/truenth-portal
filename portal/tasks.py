@@ -14,24 +14,18 @@ from functools import wraps
 import json
 from requests import Request, Session
 from requests.exceptions import RequestException
-from smtplib import SMTPRecipientsRefused
 from sqlalchemy import and_
 from traceback import format_exc
 
-from .audit import auditable_event
 from .database import db
 from .dogpile_cache import dogpile_cache
 from factories.celery import create_celery
 from factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
-from .models.app_text import app_text, MailResource, SiteSummaryEmail_ATMA
-from .models.communication import Communication, load_template_args
+from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
-from .models.message import EmailMessage
-from .models.organization import Organization, OrgTree
-from .models.reporting import get_reporting_stats, overdue_stats_by_org
-from .models.reporting import generate_overdue_table_html
+from .models.reporting import get_reporting_stats, generate_and_send_summaries
 from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.tou import update_tous
@@ -272,51 +266,6 @@ def send_questionnaire_summary(**kwargs):
                 '{}'.format(', '.join(error_emails)))
 
 
-def generate_and_send_summaries(cutoff_days, org_id):
-    ostats = overdue_stats_by_org()
-    cutoffs = [int(i) for i in cutoff_days.split(',')]
-    error_emails = set()
-
-    ot = OrgTree()
-    top_org = Organization.query.get(org_id)
-    if not top_org:
-        raise ValueError("No org with ID {} found.".format(org_id))
-    name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
-
-    for user in User.query.filter_by(deleted_id=None).all():
-        if (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
-                and (top_org in ot.find_top_level_org(user.organizations))):
-            args = load_template_args(user=user)
-            args['eproms_site_summary_table'] = generate_overdue_table_html(
-                cutoff_days=cutoffs,
-                overdue_stats=ostats,
-                user=user,
-                top_org=top_org)
-            summary_email = MailResource(app_text(name_key), variables=args)
-            em = EmailMessage(recipients=user.email,
-                              sender=current_app.config['MAIL_DEFAULT_SENDER'],
-                              subject=summary_email.subject,
-                              body=summary_email.body)
-            try:
-                em.send_message()
-            except SMTPRecipientsRefused as exc:
-                msg = ("Error sending site summary email to {}: "
-                       "{}".format(user.email, exc))
-
-                sys = User.query.filter_by(email='__system__').first()
-
-                auditable_event(message=msg,
-                                user_id=(sys.id if sys else user.id),
-                                subject_id=user.id,
-                                context="user")
-
-                current_app.logger.error(msg)
-                for email in exc[0]:
-                    error_emails.add(email)
-
-    return error_emails or None
-
-
 @celery.task
 @scheduled_task
 def update_tous_task(**kwargs):
@@ -326,3 +275,14 @@ def update_tous_task(**kwargs):
 
     """
     return update_tous(**kwargs)
+
+
+@celery.task
+@scheduled_task
+def token_watchdog(**kwargs):
+    """Clean up stale tokens and alert service sponsors if nearly expired"""
+    from models.auth import token_janitor
+    error_emails = token_janitor()
+    if error_emails:
+        return '\nUnable to reach recipient(s): {}'.format(
+            ', '.join(error_emails))

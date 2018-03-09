@@ -6,7 +6,9 @@ and healthcare services which are used to describe hospitals and clinics.
 from datetime import datetime
 from flask import current_app, url_for, abort
 from sqlalchemy import UniqueConstraint, and_
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
 from werkzeug.exceptions import Unauthorized
 
 import address
@@ -31,6 +33,7 @@ RACE_CODINGS_MASK = 0b0010
 ETHNICITY_CODINGS_MASK = 0b0100
 INDIGENOUS_CODINGS_MASK = 0b1000
 
+
 class Organization(db.Model):
     """Model representing a FHIR organization
 
@@ -47,24 +50,26 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(120))
-    phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
-                                      ondelete='cascade'))
-    type_id = db.Column(db.ForeignKey('codeable_concepts.id',
-                                      ondelete='cascade'))
+    phone_id = db.Column(
+        db.Integer, db.ForeignKey('contact_points.id', ondelete='cascade'))
+    type_id = db.Column(db.ForeignKey(
+        'codeable_concepts.id', ondelete='cascade'))
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
     coding_options = db.Column(db.Integer, nullable=False, default=0)
     default_locale_id = db.Column(db.ForeignKey('codings.id'))
     _timezone = db.Column('timezone', db.String(20))
-    research_protocol_id = db.Column(db.ForeignKey('research_protocols.id'))
 
-    addresses = db.relationship('Address', lazy='dynamic',
-            secondary="organization_addresses")
-    identifiers = db.relationship('Identifier', lazy='dynamic',
-            secondary="organization_identifiers")
-    locales = db.relationship('Coding', lazy='dynamic',
-            secondary="organization_locales")
-    _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
-            cascade="save-update")
+    addresses = db.relationship(
+        'Address', lazy='dynamic', secondary="organization_addresses")
+    identifiers = db.relationship(
+        'Identifier', lazy='dynamic', secondary="organization_identifiers")
+    locales = db.relationship(
+        'Coding', lazy='dynamic', secondary="organization_locales")
+    _phone = db.relationship(
+        'ContactPoint', foreign_keys=phone_id, cascade="save-update")
+    research_protocols = association_proxy(
+        "organization_research_protocols", "research_protocol",
+        creator=lambda rp: OrganizationResearchProtocol(research_protocol=rp))
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __init__(self, **kwargs):
@@ -205,15 +210,60 @@ class Organization(db.Model):
     def timezone(self, value):
         self._timezone = value
 
-    @property
-    def research_protocol(self):
+    def rps_w_retired(self):
+        """accessor to collate research protocols and retired_as_of values
+
+        The SQLAlchemy association proxy doesn't provide easy access to
+        `intermediary` table data - i.e. columns in the link table between
+        a many:many association.  This accessor collates the value stored
+        in the intermediary table, `retired_as_of` with the research protocols
+        for this organization.
+
+        :returns: ready query for use in iteration or count or other methods.
+         Query will produce a list of tuples (ResearchProtocol, retired_as_of)
+         associated with the organization, ordered by `retired_as_of` dates
+         with nulls last.
+
+        """
+        items = OrganizationResearchProtocol.query.join(
+            ResearchProtocol).filter(
+            OrganizationResearchProtocol.research_protocol_id ==
+            ResearchProtocol.id).filter(
+            OrganizationResearchProtocol.organization_id == self.id
+        ).with_entities(
+            ResearchProtocol,
+            OrganizationResearchProtocol.retired_as_of).order_by(
+            OrganizationResearchProtocol.retired_as_of.desc())
+        return items
+
+    def research_protocol(self, as_of_date):
+        """Lookup research protocol for this org valid at as_of_date
+
+        Complicated scenario as it may only be defined on the parent or
+        further up the tree.  Secondly, we keep history of research protocols
+        in case backdated entry is necessary.
+
+        :return: research protocol for org (or parent org) valid as_of_date
+
+        """
+        def rp_from_org(org):
+            best_candidate = None
+            for rp, retired_as_of in org.rps_w_retired():
+                if not retired_as_of:
+                    best_candidate = rp
+                elif retired_as_of > as_of_date:
+                    best_candidate = rp
+            return best_candidate
+
+        rp = rp_from_org(self)
+        if rp:
+            return rp
         org = self
-        if org.research_protocol_id:
-            return ResearchProtocol.query.get(org.research_protocol_id)
         while org.partOf_id:
             org = Organization.query.get(org.partOf_id)
-            if org.research_protocol_id:
-                return ResearchProtocol.query.get(org.research_protocol_id)
+            rp = rp_from_org(org)
+            if rp:
+                return rp
 
     @classmethod
     def from_fhir(cls, data):
@@ -394,6 +444,42 @@ class LocaleExtension(CCExtension):
         return self.organization.locales
 
 
+class OrganizationResearchProtocol(db.Model):
+    __tablename__ = 'organization_research_protocols'
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.ForeignKey(
+        'organizations.id', ondelete='CASCADE'), nullable=False)
+    research_protocol_id = db.Column(db.ForeignKey(
+        'research_protocols.id', ondelete='CASCADE'), nullable=False)
+    retired_as_of = db.Column(db.DateTime, nullable=True)
+
+    # bidirectional attribute/collection of
+    # "organization"/"organization_research_protocols"
+    organization = db.relationship(
+        Organization, backref=backref(
+            "organization_research_protocols", cascade="all, delete-orphan"))
+
+    # reference to the "ResearchProtocol" object
+    research_protocol = db.relationship("ResearchProtocol")
+
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'research_protocol_id',
+        name='_organization_research_protocol'),)
+
+    def __init__(self, research_protocol=None, organization=None, retired_as_of=None):
+        if research_protocol:
+            assert isinstance(research_protocol, ResearchProtocol)
+        if organization:
+            assert isinstance(organization, Organization)
+        self.organization = organization
+        self.research_protocol = research_protocol
+        self.retired_as_of = retired_as_of
+
+    def __repr__(self):
+        return 'OrganizationResearchProtocol({}:{})'.format(
+            self.organization, self.research_protocol)
+
+
 class ResearchProtocolExtension(CCExtension):
     def __init__(self, organization, extension):
         self.organization, self.extension = organization, extension
@@ -401,10 +487,14 @@ class ResearchProtocolExtension(CCExtension):
     extension_url = TRUENTH_RP_EXTENSION
 
     def as_fhir(self, include_empties=True):
-        rp = self.organization.research_protocol
-        if rp:
-            return {'url': self.extension_url,
-                    'research_protocol': rp.name}
+        rps = []
+        for rp, retired_as_of in self.organization.rps_w_retired():
+            d = {'name': rp.name}
+            if retired_as_of:
+                d['retired_as_of'] = FHIR_datetime.as_fhir(retired_as_of)
+            rps.append(d)
+        if rps:
+            return {'url': self.extension_url, 'research_protocols': rps}
         elif include_empties:
             return {'url': self.extension_url}
 
@@ -412,11 +502,42 @@ class ResearchProtocolExtension(CCExtension):
         if self.extension['url'] != self.extension_url:
             raise ValueError('invalid url for ResearchProtocolExtension')
 
-        name = self.extension.get('research_protocol')
-        rp = ResearchProtocol.query.filter_by(name=name).first()
-        if name and not rp:
-            abort(404, "ResearchProtocol with name {} not found".format(name))
-        self.organization.research_protocol_id = rp.id if rp else None
+        remove_if_not_requested = [
+            rp for rp in self.organization.research_protocols]
+        rps = self.extension.get('research_protocols', [])
+        for rp in rps:
+            name = rp.get('name')
+            if not name:
+                abort(400, "ResearchProtocol requires well defined name")
+            existing = ResearchProtocol.query.filter_by(name=name).first()
+            if not existing:
+                abort(
+                    404,
+                    "ResearchProtocol with name {} not found".format(name))
+            if existing not in self.organization.research_protocols:
+                # Add the intermediary table type to include the
+                # retired_as_of value.  Magic of association proxy, bringing
+                # one to life commits, and trying to add directly will fail
+                OrganizationResearchProtocol(
+                    research_protocol=existing, organization=self.organization,
+                    retired_as_of=FHIR_datetime.parse(
+                        rp.get('retired_as_of'), none_safe=True))
+            else:
+                remove_if_not_requested.remove(existing)
+
+                # Unfortunately, the association proxy requires we now query for the
+                # intermediary (link) table to check/set the value of `retired_as_of`
+
+                o_rp = OrganizationResearchProtocol.query.filter(
+                    OrganizationResearchProtocol.organization_id ==
+                    self.organization.id).filter(
+                    OrganizationResearchProtocol.research_protocol_id ==
+                    existing.id).one()
+                o_rp.retired_as_of = FHIR_datetime.parse(
+                    rp.get('retired_as_of'), none_safe=True)
+
+        for obsolete in remove_if_not_requested:
+            self.organization.research_protocols.remove(obsolete)
 
     @property
     def children(self):

@@ -33,7 +33,7 @@ from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.login import login_user
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
-from ..models.user import current_user, get_user, User
+from ..models.user import current_user, get_user_or_abort, User
 
 auth = Blueprint('auth', __name__)
 
@@ -408,7 +408,7 @@ def login_as(user_id, auth_method='staff_authenticated'):
     """
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
-    target_user = get_user(user_id)
+    target_user = get_user_or_abort(user_id)
 
     # Guard against abuse
     if not (target_user.has_role(role_name=ROLE.PATIENT) or

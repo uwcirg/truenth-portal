@@ -3,7 +3,7 @@ from flask import abort, jsonify, Blueprint, current_app
 from ..database import db
 from ..extensions import oauth
 from ..models.notification import UserNotification
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, get_user_or_abort
 from .portal import check_int
 
 
@@ -77,10 +77,7 @@ def get_user_notification(user_id):
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+        user = get_user_or_abort(user_id)
     notifs = [notif.as_json() for notif in user.notifications]
 
     return jsonify(notifications=notifs)
