@@ -15,7 +15,8 @@ from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
-from ..models.auth import Client, Token
+from ..models.auth import Token
+from ..models.client import Client, client_event_dispatch
 from ..models.communication import load_template_args
 from ..models.group import Group
 from ..models.intervention import Intervention
@@ -1740,6 +1741,12 @@ def upload_user_document(user_id):
     auditable_event("patient report {} posted for user {}".format(
         doc.uuid, user_id), user_id=current_user().id, subject_id=user.id,
         context='assessment')
+
+    # This is a notifiable event; trigger any applicable notifications
+    data.update({"document_id": doc.id})
+    del data['allowed_extensions']
+    client_event_dispatch(event="user_document_upload", user=user, **data)
+
     return jsonify(message="ok")
 
 

@@ -6,7 +6,7 @@
     <h1 class="tnth-headline">{{ _("TrueNTH OAuth 2.0 Client Applications") }}</h1>
 
     <div style="margin: 2em 1em 3em">
-        <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">{{ _("Create A New TrueNTH Client Application") }}</a>
+        <a class="btn-tnth-primary btn" href="{{ url_for('.client_reg') }}">{{ _("Create A New TrueNTH Client Application") }}</a>
     </div>
 
     {% if current_user.has_role('admin')%}

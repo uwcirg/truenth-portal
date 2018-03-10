@@ -26,7 +26,7 @@ from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.assessment_status import overall_assessment_status
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.fhir import (
     aggregate_responses,
     EC,

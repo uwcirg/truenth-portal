@@ -36,6 +36,10 @@
             site wide (settings can be overridden per user via the
             interventions API)</p>
 
+            {{ render_checkbox_field(
+                    form.intervention_or_default.subscribed_to_user_doc_event,
+                    tabindex=25, helpText="For users granted direct access to this intervention, send event on document upload") }}
+
             {{ render_field(form.intervention_or_default.card_html,
             tabindex=30, helpText="Text or HTML shown on the card for this
             intervention, other than the button / link settings that follow.") }}

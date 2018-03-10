@@ -1389,7 +1389,8 @@ class User(db.Model, UserMixin):
         :param acting_user: individual executing the command, for audit trail
 
         """
-        from .auth import Client, Token
+        from .client import Client
+        from .auth import Token
 
         if self == acting_user:
             raise ValueError("can't delete self")

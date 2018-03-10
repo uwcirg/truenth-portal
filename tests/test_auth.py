@@ -5,12 +5,13 @@ from flask_webtest import SessionScope
 from werkzeug.exceptions import Unauthorized
 
 from portal.extensions import db
-from portal.models.auth import Client, Token, create_service_token
-from portal.models.auth import validate_origin
+from portal.models.auth import Token, create_service_token
+from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import add_authomatic_user, add_role
 from portal.models.user import RoleError, User, UserRelationship
+
 
 class AuthomaticMock(object):
     """Simple container for mocking Authomatic response"""
