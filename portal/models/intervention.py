@@ -66,7 +66,7 @@ class Intervention(db.Model):
         return self.subscribed_events & LOGOUT_EVENT
 
     @subscribed_to_logout_event.setter
-    def subscribe_to_logout_event(self, value):
+    def subscribed_to_logout_event(self, value):
         if value:
             self.subscribed_events = self.subscribed_events | LOGOUT_EVENT
         else:
