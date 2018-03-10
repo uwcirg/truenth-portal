@@ -142,7 +142,9 @@ class Client(db.Model):
         sponsor_relationship = [r for r in self.user.relationships if
                                 r.relationship.name == RELATIONSHIP.SPONSOR]
         if sponsor_relationship:
-            assert len(sponsor_relationship) == 1
+            if len(sponsor_relationship) != 1:
+                raise ValueError(
+                    "Expecting exactly one owner:sponsor for service token")
             return Token.query.filter_by(
                 client_id=self.client_id,
                 user_id=sponsor_relationship[0].other_user_id).first()

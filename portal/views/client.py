@@ -281,7 +281,8 @@ def client_edit(client_id):
     # work around a testing bug in wtforms
     if current_app.config['TESTING']:
         form.client_id.data = client_id
-    assert form.client_id.data == client_id
+    if form.client_id.data != client_id:
+        raise RuntimeError("Form client doesn't match argument")
 
     def set_client_intervention(client, form):
         current_role = client.intervention
