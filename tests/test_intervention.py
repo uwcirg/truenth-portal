@@ -1073,7 +1073,8 @@ class TestIntervention(TestCase):
 
     def test_dynamic_intervention_access(self):
         # Confirm interventions dynamically added still accessible
-        newbee = Intervention(name='newbee', description='test')
+        newbee = Intervention(
+            name='newbee', description='test', subscribed_events=0)
         with SessionScope(db):
             db.session.add(newbee)
             db.session.commit()
