@@ -16,13 +16,17 @@ def as_fhir(obj):
     if hasattr(obj, 'as_fhir'):
         return obj.as_fhir()
     if isinstance(obj, datetime):
-        # Make SURE we only communicate unaware or UTC timezones
+        # Make SURE we only communicate UTC timezone aware objects
         tz = getattr(obj, 'tzinfo', None)
         if tz and tz != pytz.utc:
             current_app.logger.error("Datetime export of NON-UTC timezone")
-        return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
+        if not tz:
+            utc_included = obj.replace(tzinfo=pytz.UTC)
+        else:
+            utc_included = obj
+        return utc_included.isoformat()
     if isinstance(obj, date):
-        return obj.strftime('%Y-%m-%d')
+        return obj.isoformat()
 
 
 class FHIR_datetime(object):
