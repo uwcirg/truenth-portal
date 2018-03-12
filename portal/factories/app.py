@@ -22,6 +22,7 @@ from ..models.role import ROLE
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
 from ..views.auth import auth, capture_next_view_function
+from ..views.client import client_api
 from ..views.coredata import coredata_api
 from ..views.clinical import clinical_api
 from ..views.demographics import demographics_api
@@ -49,6 +50,7 @@ DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
     audit_api,
     auth,
+    client_api,
     coredata_api,
     clinical_api,
     csrf_blueprint,

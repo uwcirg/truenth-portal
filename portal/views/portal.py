@@ -34,7 +34,7 @@ from ..models.app_text import (
     VersionedResource
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.communication import load_template_args, Communication
 from ..models.coredata import Coredata
 from ..models.fhir import QuestionnaireResponse

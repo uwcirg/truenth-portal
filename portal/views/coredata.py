@@ -5,7 +5,7 @@ from urlparse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.coredata import Coredata
 from ..models.user import current_user, get_user_or_abort
 

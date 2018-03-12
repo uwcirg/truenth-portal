@@ -17,7 +17,7 @@ from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
-from portal.models.auth import Client
+from portal.models.client import Client
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.coredata import configure_coredata

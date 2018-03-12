@@ -9,7 +9,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.group import Group, UserGroup
 from ..models.intervention import access_types, INTERVENTION, UserIntervention
 from ..models.intervention_strategies import AccessStrategy
