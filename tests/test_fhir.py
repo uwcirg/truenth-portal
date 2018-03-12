@@ -124,28 +124,40 @@ class TestFHIR(TestCase):
         self.assertIn(str(qr.subject_id), qr_str)
         self.assertIn(str(qr.status), qr_str)
 
-    def test_tz_aware_conversion(self):
-        eastern = pytz.timezone('US/Eastern')
-        aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
-        parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
-        # FHIR_datetime converts to UTC and strips the tzinfo
-        # for safe comparisons with other tz unaware strings
-        self.assertEquals(parsed.tzinfo, None)
-        # Add it back in to confirm values match
-        parsed = parsed.replace(tzinfo=pytz.utc)
-        self.assertEquals(aware, parsed)
 
-    def test_tz_unaware_conversion(self):
-        unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
-        parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
-        self.assertEquals(unaware, parsed)
+def test_tz_aware_conversion():
+    eastern = pytz.timezone('US/Eastern')
+    aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
+    parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
+    # FHIR_datetime converts to UTC and strips the tzinfo
+    # for safe comparisons with other tz unaware strings
+    assert parsed.tzinfo is None
+    # Add it back in to confirm values match
+    parsed = parsed.replace(tzinfo=pytz.utc)
+    assert aware == parsed
 
-    def test_tz_aware_output(self):
-        """FHIR_datetime.as_fhir() should always be tz aware (UTC)"""
-        unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
-        parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
-        self.assertEquals(unaware, parsed)
 
-        # generate fhir - expect UTC tz info at end
-        isostring = FHIR_datetime.as_fhir(parsed)
-        self.assertEquals(isostring[-6:], '+00:00')
+def test_tz_unaware_conversion():
+    unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
+    parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
+    assert unaware == parsed
+
+
+def test_tz_aware_output():
+    """FHIR_datetime.as_fhir() should always be tz aware (UTC)"""
+    unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
+
+    # generate fhir - expect UTC tz info at end
+    isostring = FHIR_datetime.as_fhir(unaware)
+    assert isostring[-6:] == '+00:00'
+
+
+def test_dt_rounding():
+    """Microseconds should be rounded in FHIR output"""
+    sample = datetime.utcnow()
+    sample = sample.replace(tzinfo=pytz.utc)
+
+    assert sample.microsecond != 0
+    expected = sample.replace(microsecond=0)
+
+    assert expected.isoformat() == FHIR_datetime.as_fhir(sample)
