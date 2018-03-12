@@ -100,10 +100,10 @@ class TestTou(TestCase):
         rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
                              TEST_USER_ID))
         self.assert200(rv)
-        # result must be timezone aware isoformat
+        # result must be timezone aware isoformat, without microseconds
         tzaware = timestamp.replace(tzinfo=pytz.utc)
-        self.assertEquals(rv.json['accepted'],
-                          tzaware.isoformat())
+        wo_micro = tzaware.replace(microsecond=0)
+        self.assertEquals(rv.json['accepted'], wo_micro.isoformat())
         self.assertEquals(rv.json['type'], 'privacy policy')
 
     def test_deactivate_tous(self):
