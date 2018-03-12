@@ -83,7 +83,7 @@ requests==2.18.4
 requests-cache==0.4.13
 requests-oauthlib==0.8.0
 regex==2018.02.21
-selenium==3.10.0
+selenium==3.11.0
 simplegeneric==0.8.1
 six==1.11.0
 snowballstemmer==1.2.1
