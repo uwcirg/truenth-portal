@@ -2,6 +2,7 @@
 import json
 from datetime import datetime
 from flask_webtest import SessionScope
+import pytz
 
 from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
@@ -99,8 +100,10 @@ class TestTou(TestCase):
         rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
                              TEST_USER_ID))
         self.assert200(rv)
+        # result must be timezone aware isoformat
+        tzaware = timestamp.replace(tzinfo=pytz.utc)
         self.assertEquals(rv.json['accepted'],
-                          timestamp.strftime("%Y-%m-%dT%H:%M:%S"))
+                          tzaware.isoformat())
         self.assertEquals(rv.json['type'], 'privacy policy')
 
     def test_deactivate_tous(self):
