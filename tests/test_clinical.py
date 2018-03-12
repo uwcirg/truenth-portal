@@ -119,7 +119,7 @@ class TestClinical(TestCase):
         self.assert200(rv)
         clinical_data = json.loads(rv.data)
         self.assertEquals(clinical_data['status'], 'unknown')
-        self.assertEquals(clinical_data['issued'][:-6], new_issued)  # chop tz
+        self.assertEquals(clinical_data['issued'], new_issued+"+00:00")  # tz
         self.assertEquals(clinical_data['valueQuantity']['value'], 'false')
 
     def test_empty_clinical_get(self):
