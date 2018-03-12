@@ -152,12 +152,14 @@ def test_tz_aware_output():
     assert isostring[-6:] == '+00:00'
 
 
-def test_dt_rounding():
+def test_microsecond_truncation():
     """Microseconds should be rounded in FHIR output"""
     sample = datetime.utcnow()
     sample = sample.replace(tzinfo=pytz.utc)
 
-    assert sample.microsecond != 0
-    expected = sample.replace(microsecond=0)
+    if sample.microsecond == 0:
+        sample = sample.replace(microsecond=1234567890)
+    assert sample.isoformat() != FHIR_datetime.as_fhir(sample)
 
+    expected = sample.replace(microsecond=0)
     assert expected.isoformat() == FHIR_datetime.as_fhir(sample)
