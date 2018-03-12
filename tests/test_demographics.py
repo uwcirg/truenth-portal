@@ -68,7 +68,7 @@ class TestDemographics(TestCase):
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
-        dod = '2027-12-31T09:10:00'
+        dod = '2027-12-31T09:10:00+00:00'
         gender = 'Male'
         phone = "867-5309"
         alt_phone = "555-5555"

@@ -139,3 +139,13 @@ class TestFHIR(TestCase):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
         parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
         self.assertEquals(unaware, parsed)
+
+    def test_tz_aware_output(self):
+        """FHIR_datetime.as_fhir() should always be tz aware (UTC)"""
+        unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
+        parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
+        self.assertEquals(unaware, parsed)
+
+        # generate fhir - expect UTC tz info at end
+        isostring = FHIR_datetime.as_fhir(parsed)
+        self.assertEquals(isostring[-6:], '+00:00')
