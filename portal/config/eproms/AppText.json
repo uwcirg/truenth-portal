@@ -166,11 +166,6 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=174a16fb-53a4-1806-6756-e5fa25723a88",
-      "name": "profileSendEmail invite email MUSIC",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82",
       "name": "profileSendEmail invite email TrueNTH Global Registry",
       "resourceType": "AppText"
@@ -188,11 +183,6 @@
     {
       "custom_text": "TrueNTH Reminder",
       "name": "profileSendEmail option reminder",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
-      "name": "profileSendEmail option reminder MUSIC",
       "resourceType": "AppText"
     },
     {

@@ -9,6 +9,7 @@
         "PATIENT_LIST_ADDL_FIELDS = ['reports']\n",
         "PORTAL_STYLESHEET = '/static/css/portal.css'\n",
         "GIL = True\n",
+        "ORGS_W_CUSTOM_INVITES = ['MUSIC']\n",
         "SHOW_WELCOME = True\n",
         "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'consent', 'clinical_questions', 'intervention_reports', 'procedures', 'gender', 'interventions']\n",
         "USER_FORGOT_PASSWORD_EMAIL_TEMPLATE = 'flask_user/emails/truenth_forgot_password'\n",
