@@ -248,7 +248,7 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
         # See if content is available with the given org as the suffix
         if kwargs.get('org'):
             specialized = " ".join((default, kwargs.get('org')))
-            query = AppText.query.filter_by(name = specialized)
+            query = AppText.query.filter_by(name=specialized)
             if query.count() == 1:
                 return specialized
         return default
@@ -275,7 +275,7 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
         # See if content is available with the given org as the suffix
         if kwargs.get('org'):
             specialized = " ".join((default, kwargs.get('org')))
-            query = AppText.query.filter_by(name = specialized)
+            query = AppText.query.filter_by(name=specialized)
             if query.count() == 1:
                 return specialized
         return default
