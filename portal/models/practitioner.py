@@ -31,7 +31,11 @@ class Practitioner(db.Model):
     def display_name(self):
         if self.first_name and self.last_name:
             name = ' '.join((self.first_name, self.last_name))
-        name = name or 'Dr. {}'.format(self.last_name)
+        elif self.last_name:
+            name = self.last_name
+        else:
+            raise ValueError("No name fields for practitioner: {0.id}".format(
+                self))
         return escape(name)
 
     @property
