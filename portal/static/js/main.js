@@ -2612,48 +2612,49 @@ var Profile = function(subjectId, currentUserId) {
             event.preventDefault();
             var emailTypeElem = $("#profileEmailSelect");
             var selectedOption = emailTypeElem.children("option:selected");
-            var email = $("#email").val();
 
-            if (selectedOption.val() != "") {
-                var subject = "";
-                var body = "";
-                var clinicName = (function() {
-                    var cn = "";
-                    var selectedOrg = $("#userOrgs input[name='organization']:checked");
-                    if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
-                    if (!hasValue(cn)) cn = i18next.t("your clinic");
-                    return cn;
-                })();
-                if (selectedOption.val() == "invite"){
-                    var return_url = self.getAccessUrl();
-                    if (hasValue(return_url)) {
-                        $.ajax ({
-                            type: "GET",
-                            url: $("#patientRegistrationInviteEmailUrl").val(),
-                            cache: false,
-                            async: false
-                        }).done(function(data) {
-                            if (hasValue(data)) {
-                                subject = data["subject"];
-                                body = data["body"];
-                            };
-                        }).fail(function(xhr) {
+            if (selectedOption.val() !== "") {
+                var emailUrl = selectedOption.attr("data-url");
+                var email = $("#email").val();
+                var subject = "", body = "";
 
-                        });
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                    };
+                /*
+                 * get email content via API
+                 */
+                if (emailUrl) {
+                    $.ajax ({
+                        type: "GET",
+                        url: emailUrl,
+                        cache: false,
+                        async: false
+                    }).done(function(data) {
+                        if (data) {
+                            subject = data["subject"];
+                            body = data["body"];
+                        };
+                    }).fail(function(xhr) {
+                        //report error
+                        //helpful if for some reason the content couldn't be parsed by the backend, e.g. variables, etc.
+                        tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
+                    });
+                } else {
+                    $("#profileEmailMessage").append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
                 }
-                else { // reminder
-                    body = $("#patientReminderEmailBody").html().replace(/\(clinic name\)/g, clinicName);
-                    subject = $("#patientReminderEmailSubject").html().replace(/\(clinic name\)/g, clinicName);
-                }
+
                 if (hasValue(body) && hasValue(subject) && hasValue(email)) {
+
+                    if (selectedOption.val() === "invite" && !selectedOption.hasClass("inactive")){
+                        returnUrl = self.getAccessUrl();
+                        if (hasValue(returnUrl)) {
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                        }
+                    }
+
                     tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
                         if (!data.error) {
                             $("#profileEmailMessage").html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
                             $("#profileEmailSelect").val("");
                             $("#btnProfileSendEmail").addClass("disabled");
-
                             /*
                              * reload email audit log
                              */
@@ -2663,11 +2664,11 @@ var Profile = function(subjectId, currentUserId) {
                                 }, 100);
                             });
                         } else {
-                            $("#profileEmailMessage").text(i18next.t("Unable to send email"));
+                            $("#profileEmailMessage").append("<div>" + i18next.t("Unable to send email") + "</div>");
                         };
                     });
                 } else  {
-                    $("#profileEmailMessage").text(i18next.t("Unable to send email."));
+                    $("#profileEmailMessage").append("<div>" + i18next.t("Unable to send email.") + "</div>");
                     if (!hasValue(body)) $("#profileEmailMessage").append("<div>" + i18next.t("Email body content is missing.") + "</div>");
                     if (!hasValue(subject)) $("#profileEmailMessage").append("<div>" + i18next.t("Email subject is missing.") + "</div>");
                     if (!hasValue(email)) $("#profileEmailMessage").append("<div>" + i18next.t("Email address is missing.") + "</div>");
