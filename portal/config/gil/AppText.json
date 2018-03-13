@@ -76,6 +76,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=174a16fb-53a4-1806-6756-e5fa25723a88",
+      "name": "profileSendEmail invite email MUSIC",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "<p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>",
       "name": "profileSendEmail invite email_body",
       "resourceType": "AppText"
@@ -93,6 +98,11 @@
     {
       "custom_text": "TrueNTH Reminder",
       "name": "profileSendEmail option reminder",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
+      "name": "profileSendEmail option reminder MUSIC",
       "resourceType": "AppText"
     },
     {
