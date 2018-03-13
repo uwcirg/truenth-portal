@@ -315,7 +315,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user.practitioner_id = dr.id
 
         dd = load_template_args(user=user)
-        self.assertEquals(dd['practitioner_name'], 'Dr. Bob Jones')
+        self.assertEquals(dd['practitioner_name'], 'Bob Jones')
 
 
 class TestCommunicationTnth(TestQuestionnaireSetup):
