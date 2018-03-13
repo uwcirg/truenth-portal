@@ -71,7 +71,7 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e45bef79-e2c1-ff89-4834-137e6937dae3",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=6d96f16f-c6fc-4fda-fa54-4e21027c8261",
       "name": "patient invite email",
       "resourceType": "AppText"
     },
@@ -81,7 +81,7 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9057ec06-1d9f-b4a6-2d32-2102a596ac5f",
       "name": "patient reminder email",
       "resourceType": "AppText"
     },
