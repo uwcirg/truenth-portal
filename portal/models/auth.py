@@ -258,7 +258,7 @@ def token_janitor():
                 app=current_app.config.get('USER_APP_NAME'),
                 expires=expires,
                 client_url=url_for(
-                    'auth.client_edit', client_id=client_id, _external=True)))
+                    'client.client_edit', client_id=client_id, _external=True)))
         current_app.logger.warn(body)
         em = EmailMessage(
             recipients=sponsor_email,
