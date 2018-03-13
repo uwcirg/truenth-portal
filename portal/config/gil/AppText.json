@@ -72,12 +72,22 @@
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e45bef79-e2c1-ff89-4834-137e6937dae3",
-      "name": "profileSendEmail invite email",
+      "name": "patient invite email",
       "resourceType": "AppText"
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=174a16fb-53a4-1806-6756-e5fa25723a88",
-      "name": "profileSendEmail invite email MUSIC",
+      "name": "patient invite email Michigan Urological Surgery Improvement Collaborative (MUSIC)",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
+      "name": "patient reminder email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
+      "name": "patient reminder email Michigan Urological Surgery Improvement Collaborative (MUSIC)",
       "resourceType": "AppText"
     },
     {
@@ -98,11 +108,6 @@
     {
       "custom_text": "TrueNTH Reminder",
       "name": "profileSendEmail option reminder",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
-      "name": "profileSendEmail option reminder MUSIC",
       "resourceType": "AppText"
     },
     {
