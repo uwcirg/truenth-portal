@@ -24,7 +24,9 @@ def as_fhir(obj):
             utc_included = obj.replace(tzinfo=pytz.UTC)
         else:
             utc_included = obj
-        return utc_included.isoformat()
+        # Chop microseconds from return (some clients can't handle parsing)
+        final = utc_included.replace(microsecond=0)
+        return final.isoformat()
     if isinstance(obj, date):
         return obj.isoformat()
 
