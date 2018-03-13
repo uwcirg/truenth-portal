@@ -15,6 +15,7 @@ from ..date_tools import localize_datetime
 from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
+from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
 from ..trace import dump_trace, establish_trace, trace
 from .user import User
@@ -114,6 +115,10 @@ def load_template_args(user, questionnaire_bank_id=None):
         return (
             '<a href="{url}">Password Reset</a>'.format(
                 url=url_for('user.forgot_password', _external=True)))
+
+    def _lookup_practitioner_name():
+        practitioner = Practitioner.query.get(user.practitioner_id)
+        return practitioner.display_name
 
     def _lookup_questionnaire_due_date():
         if not questionnaire_bank_id:
