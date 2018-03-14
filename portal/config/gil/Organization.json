@@ -1948,7 +1948,6 @@
       "use_specific_codings": false
     },
     {
-      "address": [],
       "ethnicity_codings": true,
       "extension": [
         {
@@ -1976,17 +1975,9 @@
       },
       "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
       "use_specific_codings": false
     },
     {
-      "address": [],
       "ethnicity_codings": true,
       "extension": [
         {
@@ -2014,17 +2005,9 @@
       },
       "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
       "use_specific_codings": false
     },
     {
-      "address": [],
       "ethnicity_codings": true,
       "extension": [
         {
@@ -2052,13 +2035,6 @@
       },
       "race_codings": true,
       "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
       "use_specific_codings": false
     }
   ],
