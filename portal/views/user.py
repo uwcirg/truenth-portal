@@ -1512,7 +1512,7 @@ def user_documents(user_id):
         schema:
           id: user_documents
           properties:
-            documents:
+            user_documents:
               type: array
               items:
                 type: object
