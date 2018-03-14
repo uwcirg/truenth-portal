@@ -211,7 +211,7 @@ def validate_email(email):
     Furthermore, due to the complexity of valid email addresses, just
     look for some obvious signs - such as the '@' symbol and at least 6 chars.
 
-    :raises ValueError: if not obviously valid
+    :raises :py:exc:`werkzeug.exceptions.BadRequest`: if obviously invalid
 
     """
     if not email or '@' not in email or len(email) < 6:
