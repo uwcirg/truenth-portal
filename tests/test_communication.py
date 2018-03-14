@@ -1,6 +1,7 @@
 """Unit test module for communication"""
 from datetime import timedelta, datetime
 from flask_webtest import SessionScope
+import regex
 
 from portal.database import db
 from portal.models.audit import Audit
@@ -316,6 +317,18 @@ class TestCommunication(TestQuestionnaireSetup):
 
         dd = load_template_args(user=user)
         self.assertEquals(dd['practitioner_name'], 'Bob Jones')
+
+    def test_decision_support(self):
+        self.bless_with_basics()
+        self.add_system_user()
+        user = db.session.merge(self.test_user)
+        dd = load_template_args(user=user)
+
+        # expecting a URL of form <host>/access/token/decision_support
+        match = regex.match(
+            r'<a href=(.*)/access/(.*)/decision_support(.*)',
+            dd['decision_support_via_access_link'])
+        self.assertTrue(match)
 
 
 class TestCommunicationTnth(TestQuestionnaireSetup):

@@ -29,5 +29,3 @@ class NextStep(object):
 
         # Still here implies user doesn't meet requirements for any
         raise BadRequest("No decision support applicable to {}".format(user))
-
-
