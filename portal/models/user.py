@@ -201,6 +201,23 @@ def default_email(context=None):
     return value
 
 
+def validate_email(email):
+    """Not done at model level, as there are exceptions
+
+    We allow for placeholders and masks on email, so not all emails are valid.
+    This validation function is generally only used when an end user changing
+    an address or another use requires validation.
+
+    Furthermore, due to the complexity of valid email addresses, just
+    look for some obvious signs - such as the '@' symbol and at least 6 chars.
+
+    :raises :py:exc:`werkzeug.exceptions.BadRequest`: if obviously invalid
+
+    """
+    if not email or '@' not in email or len(email) < 6:
+        raise BadRequest("requires a valid email address")
+
+
 class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
