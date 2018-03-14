@@ -31,6 +31,7 @@ from ..models.app_text import (
     MailResource,
     UndefinedAppText,
     UserInviteEmail_ATMA,
+    UserReminderEmail_ATMA,
     VersionedResource
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
@@ -574,6 +575,31 @@ def patient_invite_email(user_id):
             name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserInviteEmail_ATMA.name_key()
+        args = load_template_args(user=user)
+        item = MailResource(app_text(name_key), variables=args)
+    except UndefinedAppText:
+        """return no content and 204 no content status"""
+        return '', 204
+
+    return jsonify(subject=item.subject, body=item.body)
+
+
+@portal.route('/patient-reminder-email/<int:user_id>')
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@oauth.require_oauth()
+def patient_reminder_email(user_id):
+    """Patient Reminder Email Content"""
+    if user_id:
+        user = get_user_or_abort(user_id)
+    else:
+        user = current_user()
+
+    try:
+        top_org = user.first_top_organization()
+        if top_org:
+            name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
+        else:
+            name_key = UserReminderEmail_ATMA.name_key()
         args = load_template_args(user=user)
         item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:

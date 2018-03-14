@@ -69,6 +69,10 @@ EMAIL_HEADER = (
     " .btn:hover {"
     " background-color: #576e76;"
     "}"
+    " .btn a {"
+    " color: #FFF;"
+    " text-decoration: none;"
+    "}"
     "</style></head><body>")
 EMAIL_FOOTER = u"</body></html>"
 
