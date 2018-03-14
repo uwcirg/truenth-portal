@@ -43,6 +43,7 @@ from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.login import login_user
 from ..models.message import EmailMessage
+from ..models.next_step import NextStep
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
@@ -218,8 +219,9 @@ def specific_clinic_landing(clinic_alias):
     return redirect(url_for('user.register'))
 
 
-@portal.route('/access/<string:token>')
-def access_via_token(token):
+@portal.route('/access/<string:token>', defaults={'next_step': None})
+@portal.route('/access/<string:token>/<string:next_step>')
+def access_via_token(token, next_step=None):
     """Limited access users enter here with special token as auth
 
     Tokens contain encrypted data including the user_id and timestamp
@@ -231,8 +233,9 @@ def access_via_token(token):
     * WRITE_ONLY users will be directly logged into the weak auth account
     * others will be given a chance to prove their identity
 
-    The tokens are intended to be single use, but the business rules
-    aren't clear yet. ... TODO
+    :param next_step: if the user is to be redirected following validation
+        and intial queries, include a value.  These come from a controlled
+        vocabulary - see `NextStep`
 
     """
     # logout current user if one is logged in.
@@ -262,6 +265,12 @@ def access_via_token(token):
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
+
+    # if provided, validate and store target in session
+    if next_step:
+        NextStep.validate(next_step)
+        session['next'] = getattr(NextStep, next_step)(user)
+
     if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
