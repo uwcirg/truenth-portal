@@ -1028,7 +1028,6 @@ class TestUser(TestCase):
             self.assertTrue(user.deceased)
             self.assertEquals(user.timezone, 'US/Central')
 
-
     def test_promote(self):
         with SessionScope(db):
             self.test_user.birthdate = '02-05-1968'
@@ -1054,7 +1053,6 @@ class TestUser(TestCase):
             self.assertEquals(user.password, 'phoney')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
-
 
     def test_password_reset(self):
         self.promote_user(role_name=ROLE.ADMIN)
@@ -1127,9 +1125,26 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-
         resp = self.client.get('/api/user/{}/messages'.format(TEST_USER_ID))
 
         self.assert200(resp)
         self.assertEquals(len(resp.json['messages']), 2)
         self.assertEquals(resp.json['messages'][0]['body'], 'Test message.')
+
+    def test_invite(self):
+        su = self.add_service_user()
+        self.login(su.id)
+
+        resp = self.client.post('/api/user/{}/invite'.format(TEST_USER_ID))
+        self.assert200(resp)
+
+        # without a valid email address, should get a friendly message
+        user = db.session.merge(self.test_user)
+        user.email = 'xxxxxxx'
+
+        with SessionScope(db):
+            db.session.commit()
+
+        resp = self.client.post('/api/user/{}/invite'.format(TEST_USER_ID))
+        self.assert400(resp)
+        self.assertTrue('requires a valid email' in resp.data)

@@ -31,7 +31,8 @@ from ..models.user import (
     get_user_or_abort,
     permanently_delete_user,
     User,
-    UserRelationship
+    UserRelationship,
+    validate_email
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
@@ -1452,8 +1453,7 @@ def unique_email():
 
     """
     email = request.args.get('email')
-    if not email or '@' not in email or len(email) < 6:
-        abort(400, "requires a valid email address")
+    validate_email(email)
     match = User.query.filter_by(email=email)
     assert (match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
@@ -2044,14 +2044,16 @@ def invite(user_id):
             body:
               type: string
               description: Email message body, includes footer
+      400:
+        description:
+          if given user lacks a legitimate looking email address
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     """
     user = get_user_or_abort(user_id)
-    if not user.email:
-        abort(400, "Can't email user's w/o email address")
+    validate_email(user.email)
     sender = current_app.config.get("MAIL_DEFAULT_SENDER")
     org = user.first_top_organization()
     org_name = org.name if org else None
