@@ -41,6 +41,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2836eccf-13c5-f249-6dac-8920060c3764&editorUrl=true",
+      "name": "Michigan Urological Surgery Improvement Collaborative (MUSIC) patient website consent URL",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "Consent Date",
       "name": "consent date label",
       "resourceType": "AppText"

@@ -304,14 +304,13 @@ class TestCase(Base):
             db.session.commit()
         self.init_data()
 
-        self.client = self._app.test_client()
-
-        # removed unwanted config items if present
-        for item in ('REQUIRED_CORE_DATA', 'LOCALIZED_AFFILIATE_ORG'):
+        # bootstrapping mysteries continue, config variables set during
+        # tests don't die; removed unwanted config items if present
+        for item in (
+                'REQUIRED_CORE_DATA', 'LOCALIZED_AFFILIATE_ORG',
+                'ACCEPT_TERMS_ON_NEXT_ORG'):
             if item in self.client.application.config:
                 del self.client.application.config[item]
-        # reload coredata config
-        configure_coredata(self.client.application)
 
     def tearDown(self):
         """Clean db session.

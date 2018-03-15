@@ -104,7 +104,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         self.initStartTime = new Date();
 
         self.getOrgTool();
-        
+
         /*
          * get user roles
          * note using the current user Id
@@ -1381,7 +1381,7 @@ var fillContent = {
                     }
                 }
 
-                if (item_found > 0 && (item_found == arrTypes.length)) {
+                if (item_found > 0) {
                     self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                     self.show().removeClass("tnth-hide");
                     self.attr("data-agree", "true");
@@ -1393,7 +1393,7 @@ var fillContent = {
                         self.show();
                         vs.show();
                         (self.find(".edit-view")).each(function() {
-                            $(this).hide();
+                           $(this).hide();
                         });
                     };
                 };
@@ -3345,7 +3345,7 @@ var Profile = function(subjectId, currentUserId) {
                 assessment_url += "&authored=" + completionDate;
             };
 
-            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() + 
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
             "&redirect_url=" + encodeURIComponent(assessment_url);
 
             self.manualEntryModalVis(true);
@@ -4354,27 +4354,48 @@ var tnthAjax = {
         this.sendRequest(__url, 'GET', userId, {sync: sync, cache: true}, function(data) {
             if (data) {
                 if (!data.error) {
-                    var __localizedFound = false;
-                    if ((data.still_needed).length > 0) $("#termsText").show();
-                    (data.still_needed).forEach(function(item) {
-                        if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
-                            $("#termsCheckbox [data-type='terms']").each(function() {
-                                var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
-                                dataTypes.forEach(function(type) {
-                                    if ($.trim(type) == $.trim(item)) {
-                                        self.show().removeClass("tnth-hide");
-                                        self.attr("data-required", "true");
-                                        var parentNode = self.closest("label.terms-label");
-                                        if (parentNode.length > 0) parentNode.show().removeClass("tnth-hide");
-                                    };
+                    /*
+                     * example data format:
+                     * [{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]
+                     */
+                    const ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT";
+                    var fields = (data.still_needed).map(function(item) {return item.field;});
+                    if ($("#topTerms").length > 0) {
+                        var acceptOnNextCheckboxes = [];
+                        (data.still_needed).forEach(function(item) {
+                            var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
+                            if (matchedTermsCheckbox.length > 0) {
+                                matchedTermsCheckbox.attr({"data-required":"true", "data-collection-method": item.collection_method});
+                                var parentNode = matchedTermsCheckbox.closest("label.terms-label");
+                                if (parentNode.length > 0) {
+                                    parentNode.show().removeClass("tnth-hide");
+                                    if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
+                                        parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                                        $("#termsCheckbox").addClass("tnth-hide");
+                                        $("#termsText").addClass("agreed");
+                                        $("#termsCheckbox_default").removeClass("tnth-hide");
+                                        acceptOnNextCheckboxes.push(parentNode);
+                                    }
+                                }
+                            }
+                        });
+                        /*
+                         * require for accept on next collection method
+                         */
+                        if (acceptOnNextCheckboxes.length > 0) {
+                            $("#next").on("click", function() {
+                                acceptOnNextCheckboxes.forEach(function(ckBox) {
+                                    ckBox.trigger("click");
                                 });
                             });
-                        };
-                        if (item == "localized") __localizedFound = true;
-                    });
-                    if (!__localizedFound) $("#patMeta").remove();
-                    else $("#patientQ").show();
-                    if (callback) callback(data.still_needed);
+                        }
+                    }
+                    if (fields.indexOf("localized") == -1) {
+                        $("#patMeta").remove();
+                    }
+                    if (callback) {
+                        callback(fields);
+                    }
                 } else {
                     if (callback) callback({"error": i18next.t("unable to get needed core data")});
                 };
@@ -5246,6 +5267,7 @@ var tnthAjax = {
                     $(".get-tou-error").html("");
                     if (data.url) {
                         $("#termsURL").attr("data-url", data.url);
+                        $("#termsCheckbox_default .terms-url").attr("href", data.url);
                         if (callback) callback({"url": data.url});
                     } else {
                         if (callback) callback({"error": i18next.t("no url returned")});

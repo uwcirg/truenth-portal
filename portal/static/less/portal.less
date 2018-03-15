@@ -493,6 +493,25 @@ div.right-panel {
   padding: 1em;
   background-color:@wellColor;
 }
+#termsCheckbox_default {
+  width: 100%;
+  max-width: 100%;
+  margin: auto;
+  .links-container {
+    display: flex;
+    justify-content: center;
+    a {
+      display: inline-block;
+      margin: 0.5em;
+      text-decoration: underline;
+    }
+  }
+}
+@media (min-width: 992px) {
+  #termsCheckbox_default {
+    width: 70%;
+  }
+}
 #termsText {
   padding: 0.5em;
   ol {
