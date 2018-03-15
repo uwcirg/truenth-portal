@@ -1,9 +1,10 @@
 """Coredata tests"""
 from flask_webtest import SessionScope
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
+from portal.models.organization import Organization
 from portal.models.role import ROLE
 
 
@@ -17,7 +18,7 @@ STORED_FORM = 'stored_website_consent_form'
 
 class TestCoredata(TestCase):
 
-    def config_as(self, system):
+    def config_as(self, system, **kwargs):
         """Set REQUIRED_CORE_DATA to match system under test"""
         # Ideally this would be read directly from the respective
         # site_persistence repos...
@@ -34,6 +35,9 @@ class TestCoredata(TestCase):
                 'ethnicity']
         else:
             raise ValueError("unsupported system {}".format(system))
+
+        for k, v in kwargs.items():
+            self.app.config[k] = v
 
         # reset coredata singleton, which already read in config
         # during bootstrap
@@ -79,7 +83,7 @@ class TestCoredata(TestCase):
         self.promote_user(role_name=ROLE.PATIENT)
         self.test_user = db.session.merge(self.test_user)
 
-        needed = Coredata().still_needed(self.test_user)
+        needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
         self.assertTrue(len(needed) > 1)
         self.assertTrue('dob' in needed)
         self.assertTrue('website_terms_of_use' in needed)
@@ -96,7 +100,7 @@ class TestCoredata(TestCase):
         self.promote_user(role_name=ROLE.STAFF)
         self.test_user = db.session.merge(self.test_user)
 
-        needed = Coredata().still_needed(self.test_user)
+        needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
         self.assertTrue(PRIVACY in needed)
         self.assertTrue(WEB_TOU in needed)
         self.assertFalse(SUBJ_CONSENT in needed)
@@ -108,7 +112,7 @@ class TestCoredata(TestCase):
         self.promote_user(role_name=ROLE.PATIENT)
         self.test_user = db.session.merge(self.test_user)
 
-        needed = Coredata().still_needed(self.test_user)
+        needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
         self.assertTrue(PRIVACY in needed)
         self.assertTrue(WEB_TOU in needed)
         self.assertTrue(SUBJ_CONSENT in needed)
@@ -123,8 +127,8 @@ class TestCoredata(TestCase):
         self.test_user, patient = map(
             db.session.merge, (self.test_user, patient))
 
-        needed = Coredata().still_needed(
-            patient, entry_method='interview assisted')
+        needed = [i['field'] for i in Coredata().still_needed(
+            patient, entry_method='interview assisted')]
         self.assertFalse(PRIVACY in needed)
         self.assertFalse(WEB_TOU in needed)
         self.assertTrue(SUBJ_CONSENT in needed)
@@ -139,9 +143,37 @@ class TestCoredata(TestCase):
         self.test_user, patient = map(
             db.session.merge, (self.test_user, patient))
 
-        needed = Coredata().still_needed(
-            patient, entry_method='paper')
+        needed = [i['field'] for i in Coredata().still_needed(
+            patient, entry_method='paper')]
         self.assertFalse(PRIVACY in needed)
         self.assertFalse(WEB_TOU in needed)
         self.assertTrue(SUBJ_CONSENT in needed)
         self.assertFalse(STORED_FORM in needed)
+
+    def test_music_exception(self):
+        "For patients with music org, the terms get special handling"
+        music_org = Organization(
+            name="Michigan Urological Surgery Improvement Collaborative (MUSIC)")
+        with SessionScope(db):
+            db.session.add(music_org)
+            db.session.commit()
+        music_org = db.session.merge(music_org)
+
+        self.config_as(
+            system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
+        self.test_user.organizations.append(music_org)
+        self.promote_user(role_name=ROLE.PATIENT)
+
+        user = db.session.merge(self.test_user)
+        needed = Coredata().still_needed(user)
+        self.assertTrue({'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"} in needed)
+
+        self.login()
+        resp = self.client.get('/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
+        self.assert200(resp)
+        passed = False
+        for entry in resp.json['still_needed']:
+            if entry['field'] == WEB_TOU:
+                self.assertEquals(entry['collection_method'], 'ACCEPT_ON_NEXT')
+                passed = True
+        self.assertTrue(passed)
