@@ -10,7 +10,6 @@
         }
       ],
       "id": 0,
-      "identifier": [],
       "indigenous_codings": true,
       "name": "none of the above",
       "race_codings": true,
@@ -91,7 +90,6 @@
         }
       ],
       "id": 11000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "AUA Local Data Center",
@@ -120,7 +118,6 @@
         }
       ],
       "id": 11100,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Urology Associates (AUA)",
@@ -161,7 +158,6 @@
         }
       ],
       "id": 13000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Queensland University of Technology LDC",
@@ -190,7 +186,6 @@
         }
       ],
       "id": 13100,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Wesley Urology Clinic",
@@ -219,7 +214,6 @@
         }
       ],
       "id": 13200,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Genesis Cancer Care Queensland",
@@ -248,7 +242,6 @@
         }
       ],
       "id": 13300,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre",
@@ -277,7 +270,6 @@
         }
       ],
       "id": 13400,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Gc Urology",
@@ -306,7 +298,6 @@
         }
       ],
       "id": 13500,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital",
@@ -335,7 +326,6 @@
         }
       ],
       "id": 13600,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Urology South Brisbane",
@@ -364,7 +354,6 @@
         }
       ],
       "id": 13700,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Department Of Urology, Princess Alexandra Hospital",
@@ -405,7 +394,6 @@
         }
       ],
       "id": 12000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "The Alfred",
@@ -491,7 +479,6 @@
         }
       ],
       "id": 21000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia (Region/Country Site)",
@@ -553,7 +540,6 @@
         }
       ],
       "id": 21200,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia Recruiting Site B",
@@ -581,7 +567,6 @@
         }
       ],
       "id": 21210,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 1",
@@ -609,7 +594,6 @@
         }
       ],
       "id": 21220,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 2",
@@ -637,7 +621,6 @@
         }
       ],
       "id": 21300,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre - Queensland",
@@ -665,7 +648,6 @@
         }
       ],
       "id": 21400,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Eastern Health",
@@ -693,7 +675,6 @@
         }
       ],
       "id": 21500,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Westmead Hospital",
@@ -721,7 +702,6 @@
         }
       ],
       "id": 21600,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_AU",
       "name": "Macquarie University Hospital",
@@ -767,7 +747,6 @@
         }
       ],
       "id": 22000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_US",
       "name": "USA (Region/Country Site)",
@@ -1033,7 +1012,6 @@
         }
       ],
       "id": 22300,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_US",
       "name": "Thomas Jefferson University",
@@ -1697,7 +1675,6 @@
         }
       ],
       "id": 23000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "en_US",
       "name": "Canada (Region/Country Site)",
@@ -1805,7 +1782,6 @@
         }
       ],
       "id": 24000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "sv_SE",
       "name": "Sweden (Region/Country Site)",
@@ -1879,7 +1855,6 @@
         }
       ],
       "id": 25000,
-      "identifier": [],
       "indigenous_codings": true,
       "language": "de_CH",
       "name": "Switzerland (Region/Country Site)",
