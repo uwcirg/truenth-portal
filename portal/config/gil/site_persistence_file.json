@@ -4,6 +4,7 @@
       "resourceType": "site.cfg",
       "results": [
         "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n",
+        "ACCEPT_TERMS_ON_NEXT_ORG = 'Michigan Urological Surgery Improvement Collaborative (MUSIC)'\n",
         "DEFAULT_LOCALE = 'en_US'\n",
         "NO_CHALLENGE_WO_DATA = True  # Grandfather in users missing data\n",
         "PATIENT_LIST_ADDL_FIELDS = ['reports']\n",
