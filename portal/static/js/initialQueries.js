@@ -750,9 +750,9 @@
               var theTerms = {};
               theTerms["agreement_url"] = hasValue(dataUrl) ? dataUrl : $("#termsURL").data().url;
               theTerms["type"] = type;
-              var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+              var org = $("#userOrgs input[name='organization']:checked"), userOrgId = org.val();
               /*** if UI for orgs is not present, need to get the user org from backend ***/
-              if (org.length === 0) {
+              if (!userOrgId) {
                 $.ajax ({
                   type: "GET",
                   url: "/api/demographics/" + userId,
@@ -760,17 +760,18 @@
                 }).done(function(data) {
                   if (data && data.careProvider) {
                     (data.careProvider).forEach(function(item) {
-                      userOrgId = item.reference.split("/").pop();
+                      if (!userOrgId) {
+                        userOrgId = item.reference.split("/").pop();
+                        return true;
+                      }
                     });
                   }
                 }).fail(function() {
 
                 });
-              } else {
-                 userOrgId = org.val();
-              };
+              }
 
-              if (hasValue(userOrgId) && parseInt(userOrgId) !== 0) {
+              if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                 var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
                 if (hasValue(topOrg)) {
                   theTerms["organization_id"] = topOrg;
