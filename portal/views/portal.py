@@ -450,12 +450,11 @@ def initial_queries():
 
     org = user.first_top_organization()
     role = None
-    if not current_app.config.get('GIL'):
-        for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
-            if user.has_role(r):
-                # treat staff_admins as staff for this lookup
-                r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
-                role = r
+    for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+        if user.has_role(r):
+            # treat staff_admins as staff for this lookup
+            r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+            role = r
     terms = get_terms(org, role)
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements()

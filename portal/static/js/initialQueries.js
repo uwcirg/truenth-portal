@@ -151,19 +151,24 @@
                 handleIncomplete: function() {
                   $("#aboutForm").addClass("full-size");
                   $("#topTerms").removeClass("hide-terms").show();
-                  if (window.performance) {
-                    if (performance.navigation.type === 1) {
-                      //page has been reloaded;
-                      var agreedCheckboxes = $("#topTerms .terms-label:visible i");
-                      if (agreedCheckboxes.length > 1) {
-                          $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-                      };
-                      if (agreedCheckboxes.length === 0) {
-                        $("#termsText").addClass("agreed");
+                  if (!$("#termsText").hasClass("agreed")) {
+                    if (window.performance) {
+                      if (performance.navigation.type === 1) {
+                        //page has been reloaded;
+                        var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
+                        if (agreedCheckboxes.length > 1) {
+                            $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
+                        }
+                        if (agreedCheckboxes.length === 0) {
+                          $("#termsText").addClass("agreed");
+                        }
+                        $("#termsReminderModal").modal("show");
                       }
-                      $("#termsReminderModal").modal("show");
-                    };
-                  };
+                    }
+                  } else {
+                    $("#aboutForm").removeClass("tnth-hide");
+                    self.continueToNext();
+                  }
                   setTimeout(function() { disableHeaderFooterLinks(); }, 1000);
                 }
             },
@@ -571,7 +576,9 @@
   }
 
   FieldsChecker.prototype.continueToNext = function(sectionId) {
-    this.setProgressBar(sectionId);
+    if (sectionId) {
+      this.setProgressBar(sectionId);
+    }
     $("#buttonsContainer").removeClass("continue");
     $("div.reg-complete-container").fadeOut();
     $("#next").removeAttr("disabled").addClass("open");
