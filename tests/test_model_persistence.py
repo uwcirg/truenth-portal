@@ -48,7 +48,11 @@ class TestModelPersistence(TestCase):
         currval = db.engine.execute(
             "SELECT CURRVAL('{}')".format(
                 'organizations_id_seq')).fetchone()[0]
-        self.assertTrue(currval > id)
+        nextval = db.engine.execute(
+            "SELECT NEXTVAL('{}')".format(
+                'organizations_id_seq')).fetchone()[0]
+        self.assertTrue(currval == id)
+        self.assertTrue(nextval > id)
 
     def test_identifier_lookup(self):
         # setup a minimal communication request
