@@ -1879,7 +1879,6 @@ var fillContent = {
     },
     "patientReport": function(data) {
         if (!data.error) {
-
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
@@ -2596,7 +2595,7 @@ var Profile = function(subjectId, currentUserId) {
         if (!$("#email").val()) {
             $("#profileEmailSelect").attr("disabled", true);
         };
-
+        
         if ($("#assessmentStatusContainer").length > 0) {
             tnthAjax.patientReport(self.subjectId, function(data) {
                 if (!data.error) {
@@ -2612,7 +2611,6 @@ var Profile = function(subjectId, currentUserId) {
                             $("#lbPatientRegEmail").addClass("active");
                         } 
                     }
-
                     /*
                      * show reports link to user if completed assessment
                      */
