@@ -2595,7 +2595,7 @@ var Profile = function(subjectId, currentUserId) {
         if (!$("#email").val()) {
             $("#profileEmailSelect").attr("disabled", true);
         };
-        
+
         if ($("#assessmentStatusContainer").length > 0) {
             tnthAjax.patientReport(self.subjectId, function(data) {
                 if (!data.error) {
@@ -2614,7 +2614,7 @@ var Profile = function(subjectId, currentUserId) {
                     /*
                      * show reports link to user if completed assessment
                      */
-                    if (hasReport) {
+                    if (hasReports) {
                         $(".email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
                         $("#btnProfileSendEmail").hide();
                     }

@@ -257,7 +257,7 @@
     {%- if person -%}
         <div id="sendEmailForm" data-profile-section-id="patientemailform">
             <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-            {% if person.first_top_organization().name == config.ACCEPT_TERMS_ON_NEXT_ORG %}
+            {% if person.first_top_organization() and (person.first_top_organization().name == config.ACCEPT_TERMS_ON_NEXT_ORG) %}
                 {% call render_emailSelector(prefix='assessment', status_title='P3P Assessment Status:', label='not available') %}
                     <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("Initial invite to complete P3P assessment")}}</option>
                     <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("Reminder to complete P3P assessment")}}</option>
