@@ -243,7 +243,7 @@
 {% macro render_emailSelector(prefix='registration', status_title=_('Registration Status:'), label=_('not registered')) -%}
     <div id="{{prefix}}StatusContainer" class="{{prefix}}-status-container">
         <span class="text-muted">{{status_title}}</span>
-        <h4 class="{{prefix}}-label text-warning">{{label}}S</h4>
+        <h4 class="{{prefix}}-label text-warning">{{label}}</h4>
         <div class="email-selector-container">
             <label id="sendEmailLabel" class="text-muted">{{_("Send email to patient")}}</label>
             <select id="profileEmailSelect" class="form-control bd-element {{prefix}}-email-selector" aria-labelledby="sendEmailLabel">
