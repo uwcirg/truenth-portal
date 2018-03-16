@@ -2627,16 +2627,11 @@ var Profile = function(subjectId, currentUserId) {
         }
 
         if ($("#registrationStatusContainer").length > 0) {
-            tnthAjax.getRoles(self.subjectId, false, function(data) {
-                if (data.roles) {
-                    var writeOnlyRole = $.grep(data.roles, function(role) {
-                        return String(role.name).toLowerCase() === "write_only";
-                    });
-                    $("#registrationStatusContainer .registration-label")
-                    .text(writeOnlyRole.length > 0 ? i18next.t("not registered") : i18next.t("registered"))
-                    .addClass(writeOnlyRole.length > 0 ? "text-warning": "text-success")
-                    .removeClass(writeOnlyRole.length > 0? "text-success": "text-warning");
-                }
+            tnthAjax.hasRole(self.subjectId, "write_only", function(data) {
+                $("#registrationStatusContainer .registration-label")
+                .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
+                .addClass(data.matched ? "text-warning": "text-success")
+                .removeClass(data.matched ? "text-success": "text-warning");
             });
         }
 
@@ -5118,6 +5113,27 @@ var tnthAjax = {
             };
         });
     },
+    "hasRole": function(userId, roleName, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User ID is required.")});
+            return false;
+        }
+        if (!roleName) {
+            callback({"error": i18next.t("Role must be provided")});
+            return false;
+        }
+        tnthAjax.getRoles(userId, false, function(data) {
+            if (data.roles) {
+                var matchedRole = $.grep(data.roles, function(role) {
+                    return String(role.name).toLowerCase() === String(roleName).toLowerCase();
+                });
+                callback({"matched": matchedRole.length > 0});
+            } else {
+                callback({"error": i18next.t("no roles found for user")});
+            }
+        }, {"sync": true});
+    },
     "getRoleList": function(callback) {
         this.sendRequest('/api/roles', 'GET', null, null, function(data) {
             if (data) {
@@ -5132,7 +5148,7 @@ var tnthAjax = {
             };
         });
     },
-    "getRoles": function(userId,isProfile,callback) {
+    "getRoles": function(userId,isProfile,callback,params) {
         callback = callback || function() {};
         var sessionStorageKey = "userRole_"+userId;
         if (sessionStorage.getItem(sessionStorageKey)) {
@@ -5142,7 +5158,7 @@ var tnthAjax = {
             }
             callback(data);
         } else {
-            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, null, function(data) {
+            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, params, function(data) {
                 if (data) {
                     if (!data.error) {
                         $(".get-roles-error").html("");
