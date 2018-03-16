@@ -10,14 +10,7 @@
       "id": 0,
       "name": "none of the above",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -52,11 +45,6 @@
         {
           "system": "email",
           "value": "contact.eproms@truenth.org"
-        },
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
         }
       ]
     },
@@ -87,14 +75,7 @@
         "reference": "api/organization/10000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -111,14 +92,7 @@
         "reference": "api/organization/11000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -147,14 +121,7 @@
         "reference": "api/organization/10000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -171,14 +138,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -195,14 +155,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -219,14 +172,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -243,14 +189,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -267,14 +206,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -291,14 +223,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -315,14 +240,7 @@
         "reference": "api/organization/13000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -351,14 +269,7 @@
         "reference": "api/organization/10000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -393,11 +304,6 @@
         {
           "system": "email",
           "value": "pcctcironmanregistry@mskcc.org"
-        },
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
         }
       ]
     },
@@ -427,14 +333,7 @@
         "reference": "api/organization/20000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -457,14 +356,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -480,14 +372,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -503,14 +388,7 @@
         "reference": "api/organization/21200"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -526,14 +404,7 @@
         "reference": "api/organization/21200"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -549,14 +420,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -572,14 +436,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -595,14 +452,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -618,14 +468,7 @@
         "reference": "api/organization/21000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -659,14 +502,7 @@
         "reference": "api/organization/20000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -689,14 +525,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -719,14 +548,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -749,14 +571,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -779,14 +594,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -809,14 +617,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -839,14 +640,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -869,14 +663,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -892,14 +679,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -922,14 +702,7 @@
         "reference": "api/organization/22300"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -952,14 +725,7 @@
         "reference": "api/organization/22300"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -982,14 +748,7 @@
         "reference": "api/organization/22300"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1012,14 +771,7 @@
         "reference": "api/organization/22300"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1042,14 +794,7 @@
         "reference": "api/organization/22300"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1072,14 +817,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1102,14 +840,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1139,14 +870,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1169,14 +893,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1199,14 +916,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1229,14 +939,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1259,14 +962,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1289,14 +985,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1319,14 +1008,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1349,14 +1031,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1379,14 +1054,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1409,14 +1077,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1439,14 +1100,7 @@
         "reference": "api/organization/22000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1479,14 +1133,7 @@
         "reference": "api/organization/20000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1509,14 +1156,7 @@
         "reference": "api/organization/23000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1539,14 +1179,7 @@
         "reference": "api/organization/23000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1574,14 +1207,7 @@
         "reference": "api/organization/20000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1604,14 +1230,7 @@
         "reference": "api/organization/24000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1639,14 +1258,7 @@
         "reference": "api/organization/20000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1669,14 +1281,7 @@
         "reference": "api/organization/25000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1699,14 +1304,7 @@
         "reference": "api/organization/25000"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

@@ -10,14 +10,7 @@
       "id": 0,
       "name": "none of the above",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -56,14 +49,7 @@
       ],
       "name": "University of Washington",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -106,14 +92,7 @@
         "reference": "api/organization/101"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -151,14 +130,7 @@
         "reference": "api/organization/101"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -196,14 +168,7 @@
         "reference": "api/organization/101"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -247,14 +212,7 @@
       ],
       "name": "UCSF Urologic Surgical Oncology Clinic",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -283,14 +241,7 @@
       ],
       "name": "University of California, San Francisco",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -319,14 +270,7 @@
       ],
       "name": "Karmanos Cancer Institute at Wayne State University",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -374,14 +318,7 @@
         "reference": "api/organization/302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -414,14 +351,7 @@
         "reference": "api/organization/302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -454,14 +384,7 @@
         "reference": "api/organization/302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -490,14 +413,7 @@
       ],
       "name": "University of Michigan",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -540,14 +456,7 @@
         "reference": "api/organization/402"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -576,14 +485,7 @@
       ],
       "name": "University of California, Davis",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -626,14 +528,7 @@
         "reference": "api/organization/502"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -662,14 +557,7 @@
       ],
       "name": "University of California, Los Angeles",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -717,14 +605,7 @@
         "reference": "api/organization/602"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -757,14 +638,7 @@
         "reference": "api/organization/602"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -793,14 +667,7 @@
       ],
       "name": "Emory University",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -848,14 +715,7 @@
         "reference": "api/organization/702"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -888,14 +748,7 @@
         "reference": "api/organization/702"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -919,14 +772,7 @@
       ],
       "name": "Moffitt Cancer Center",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -973,14 +819,7 @@
         "reference": "api/organization/802"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1009,14 +848,7 @@
       ],
       "name": "Dana-Farber Cancer Institute",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1064,14 +896,7 @@
         "reference": "api/organization/902"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1104,14 +929,7 @@
         "reference": "api/organization/902"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1135,14 +953,7 @@
       ],
       "name": "Memorial Sloan Kettering",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1184,14 +995,7 @@
         "reference": "api/organization/1002"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1210,14 +1014,7 @@
       ],
       "name": "Oregon Health & Science University",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1254,14 +1051,7 @@
         "reference": "api/organization/1102"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1290,14 +1080,7 @@
       ],
       "name": "University of Colorado, Denver",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1340,14 +1123,7 @@
         "reference": "api/organization/1202"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1376,14 +1152,7 @@
       ],
       "name": "Duke University",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1431,14 +1200,7 @@
         "reference": "api/organization/1302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1471,14 +1233,7 @@
         "reference": "api/organization/1302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1511,14 +1266,7 @@
         "reference": "api/organization/1302"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1547,14 +1295,7 @@
       ],
       "name": "Johns Hopkins University",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1602,14 +1343,7 @@
         "reference": "api/organization/1402"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1642,14 +1376,7 @@
         "reference": "api/organization/1402"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1678,14 +1405,7 @@
       ],
       "name": "University of North Carolina at Chapel Hill",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1728,14 +1448,7 @@
         "reference": "api/organization/1502"
       },
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
@@ -1770,14 +1483,7 @@
       "indigenous_codings": false,
       "name": "Michigan Urological Surgery Improvement Collaborative (MUSIC)",
       "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
