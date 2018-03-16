@@ -1879,6 +1879,7 @@ var fillContent = {
     },
     "patientReport": function(data) {
         if (!data.error) {
+
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
@@ -2592,7 +2593,54 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.initPatientEmailFormSection = function() {
         var self = this;
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+        if (!$("#email").val()) {
+            $("#profileEmailSelect").attr("disabled", true);
+        };
+
+        if ($("#assessmentStatusContainer").length > 0) {
+            tnthAjax.patientReport(self.subjectId, function(data) {
+                if (!data.error) {
+                    var pcpReports = data["user_documents"]? $.grep(data["user_documents"], function(document) {
+                        return /P3P/gi.test(document.filename);
+                    }): false;
+                    var hasReports = pcpReports && pcpReports.length > 0;
+                    /*
+                     * adjust select/send email UI only if email is available
+                     */
+                    if (hasValue($("#email").val())) {
+                        if (!hasReports) {
+                            $("#lbPatientRegEmail").addClass("active");
+                        } 
+                    }
+
+                    /*
+                     * show reports link to user if completed assessment
+                     */
+                    if (hasReport) {
+                        $(".email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
+                        $("#btnProfileSendEmail").hide();
+                    }
+                    $("#assessmentStatusContainer .assessment-label")
+                    .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
+                    .addClass(hasReports?"text-success":"text-warning")
+                    .removeClass(!hasReports?"text-success": "text-warning");
+                }
+            });
+        }
+
+        if ($("#registrationStatusContainer").length > 0) {
+            tnthAjax.getRoles(self.subjectId, false, function(data) {
+                if (data.roles) {
+                    var writeOnlyRole = $.grep(data.roles, function(role) {
+                        return String(role.name).toLowerCase() === "write_only";
+                    });
+                    $("#registrationStatusContainer .registration-label")
+                    .text(writeOnlyRole.length > 0 ? i18next.t("not registered") : i18next.t("registered"))
+                    .addClass(writeOnlyRole.length > 0 ? "text-warning": "text-success")
+                    .removeClass(writeOnlyRole.length > 0? "text-success": "text-warning");
+                }
+            });
+        }
 
         $("#profileEmailSelect").on("change", function() {
             var message = "";
