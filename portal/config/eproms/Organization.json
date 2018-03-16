@@ -1,22 +1,12 @@
 {
   "entry": [
     {
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 0,
       "name": "none of the above",
       "resourceType": "Organization"
     },
     {
       "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
         {
           "research_protocols": [
             {"name": "TNGR v1"}
@@ -260,10 +250,6 @@
     },
     {
       "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
         {
           "research_protocols": [
             {"name": "IRONMAN v2"}
