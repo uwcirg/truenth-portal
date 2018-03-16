@@ -9,7 +9,6 @@
       ],
       "id": 0,
       "name": "none of the above",
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -39,7 +38,6 @@
         }
       ],
       "name": "TrueNTH Global Registry",
-      "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
         {
@@ -74,7 +72,6 @@
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -91,7 +88,6 @@
         "display": "AUA Local Data Center",
         "reference": "api/organization/11000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -120,7 +116,6 @@
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -137,7 +132,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -154,7 +148,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -171,7 +164,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -188,7 +180,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -205,7 +196,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -222,7 +212,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -239,7 +228,6 @@
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -268,7 +256,6 @@
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -298,7 +285,6 @@
         }
       ],
       "name": "IRONMAN",
-      "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
         {
@@ -332,7 +318,6 @@
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -355,7 +340,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -371,7 +355,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -387,7 +370,6 @@
       "partOf": {
         "reference": "api/organization/21200"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -403,7 +385,6 @@
       "partOf": {
         "reference": "api/organization/21200"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -419,7 +400,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -435,7 +415,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -451,7 +430,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -467,7 +445,6 @@
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -501,7 +478,6 @@
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -524,7 +500,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -547,7 +522,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -570,7 +544,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -593,7 +566,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -616,7 +588,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -639,7 +610,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -662,7 +632,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -678,7 +647,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -701,7 +669,6 @@
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -724,7 +691,6 @@
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -747,7 +713,6 @@
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -770,7 +735,6 @@
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -793,7 +757,6 @@
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -816,7 +779,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -839,7 +801,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -869,7 +830,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -892,7 +852,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -915,7 +874,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -938,7 +896,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -961,7 +918,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -984,7 +940,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1007,7 +962,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1030,7 +984,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1053,7 +1006,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1076,7 +1028,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1099,7 +1050,6 @@
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1132,7 +1082,6 @@
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1155,7 +1104,6 @@
       "partOf": {
         "reference": "api/organization/23000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1178,7 +1126,6 @@
       "partOf": {
         "reference": "api/organization/23000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1206,7 +1153,6 @@
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1229,7 +1175,6 @@
       "partOf": {
         "reference": "api/organization/24000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1257,7 +1202,6 @@
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1280,7 +1224,6 @@
       "partOf": {
         "reference": "api/organization/25000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     },
     {
@@ -1303,7 +1246,6 @@
       "partOf": {
         "reference": "api/organization/25000"
       },
-      "race_codings": true,
       "resourceType": "Organization"
     }
   ],
