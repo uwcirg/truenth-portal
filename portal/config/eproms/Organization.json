@@ -8,7 +8,6 @@
         }
       ],
       "id": 0,
-      "indigenous_codings": true,
       "name": "none of the above",
       "race_codings": true,
       "resourceType": "Organization",
@@ -46,7 +45,6 @@
           "value": "crv"
         }
       ],
-      "indigenous_codings": true,
       "name": "TrueNTH Global Registry",
       "race_codings": true,
       "resourceType": "Organization",
@@ -82,7 +80,6 @@
         }
       ],
       "id": 11000,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AUA Local Data Center",
       "partOf": {
@@ -107,7 +104,6 @@
         }
       ],
       "id": 11100,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Urology Associates (AUA)",
       "partOf": {
@@ -144,7 +140,6 @@
         }
       ],
       "id": 13000,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Queensland University of Technology LDC",
       "partOf": {
@@ -169,7 +164,6 @@
         }
       ],
       "id": 13100,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Wesley Urology Clinic",
       "partOf": {
@@ -194,7 +188,6 @@
         }
       ],
       "id": 13200,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Genesis Cancer Care Queensland",
       "partOf": {
@@ -219,7 +212,6 @@
         }
       ],
       "id": 13300,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre",
       "partOf": {
@@ -244,7 +236,6 @@
         }
       ],
       "id": 13400,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Gc Urology",
       "partOf": {
@@ -269,7 +260,6 @@
         }
       ],
       "id": 13500,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital",
       "partOf": {
@@ -294,7 +284,6 @@
         }
       ],
       "id": 13600,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Urology South Brisbane",
       "partOf": {
@@ -319,7 +308,6 @@
         }
       ],
       "id": 13700,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Department Of Urology, Princess Alexandra Hospital",
       "partOf": {
@@ -356,7 +344,6 @@
         }
       ],
       "id": 12000,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "The Alfred",
       "partOf": {
@@ -399,7 +386,6 @@
           "value": "ironman_temp_id"
         }
       ],
-      "indigenous_codings": true,
       "name": "IRONMAN",
       "race_codings": true,
       "resourceType": "Organization",
@@ -435,7 +421,6 @@
         }
       ],
       "id": 21000,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia (Region/Country Site)",
       "partOf": {
@@ -466,7 +451,6 @@
           "value": "146-34"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Urology Associates (AUA)",
       "partOf": {
@@ -490,7 +474,6 @@
         }
       ],
       "id": 21200,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia Recruiting Site B",
       "partOf": {
@@ -514,7 +497,6 @@
         }
       ],
       "id": 21210,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 1",
       "partOf": {
@@ -538,7 +520,6 @@
         }
       ],
       "id": 21220,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 2",
       "partOf": {
@@ -562,7 +543,6 @@
         }
       ],
       "id": 21300,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre - Queensland",
       "partOf": {
@@ -586,7 +566,6 @@
         }
       ],
       "id": 21400,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Eastern Health",
       "partOf": {
@@ -610,7 +589,6 @@
         }
       ],
       "id": 21500,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Westmead Hospital",
       "partOf": {
@@ -634,7 +612,6 @@
         }
       ],
       "id": 21600,
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Macquarie University Hospital",
       "partOf": {
@@ -676,7 +653,6 @@
         }
       ],
       "id": 22000,
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "USA (Region/Country Site)",
       "partOf": {
@@ -707,7 +683,6 @@
           "value": "146-06"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Memorial Sloan Kettering Cancer Center",
       "partOf": {
@@ -738,7 +713,6 @@
           "value": "146-33"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Baylor College of Medicine",
       "partOf": {
@@ -769,7 +743,6 @@
           "value": "146-01"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Dana-Farber Cancer Institute",
       "partOf": {
@@ -800,7 +773,6 @@
           "value": "146-95"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of North Carolina",
       "partOf": {
@@ -831,7 +803,6 @@
           "value": "146-07"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Oregon Health and Sciences Cancer Center",
       "partOf": {
@@ -862,7 +833,6 @@
           "value": "146-07"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Robert H. Lurie Comprehensive Cancer Center Northwestern University",
       "partOf": {
@@ -893,7 +863,6 @@
           "value": "146-94"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Roswell Park Cancer Institute",
       "partOf": {
@@ -917,7 +886,6 @@
         }
       ],
       "id": 22300,
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Thomas Jefferson University",
       "partOf": {
@@ -948,7 +916,6 @@
           "value": "146-29"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Aria Health",
       "partOf": {
@@ -979,7 +946,6 @@
           "value": "146-30"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Doylestown Health",
       "partOf": {
@@ -1010,7 +976,6 @@
           "value": "146-31"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Easton Hospital",
       "partOf": {
@@ -1041,7 +1006,6 @@
           "value": "146-32"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Reading Health System",
       "partOf": {
@@ -1072,7 +1036,6 @@
           "value": "146-99"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Thomas Jefferson University",
       "partOf": {
@@ -1103,7 +1066,6 @@
           "value": "146-82"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Virgina (UVA)",
       "partOf": {
@@ -1134,7 +1096,6 @@
           "value": "146-09"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Washington",
       "partOf": {
@@ -1172,7 +1133,6 @@
           "value": "146-02"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Duke Comprehensive Cancer Center",
       "partOf": {
@@ -1203,7 +1163,6 @@
           "value": "146-03"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Sidney Kimmel Comprehensive Cancer Center",
       "partOf": {
@@ -1234,7 +1193,6 @@
           "value": "146-86"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Tulane University",
       "partOf": {
@@ -1265,7 +1223,6 @@
           "value": "146-84"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Alabama-Birmingham",
       "partOf": {
@@ -1296,7 +1253,6 @@
           "value": "146-89"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of California Los Angeles",
       "partOf": {
@@ -1327,7 +1283,6 @@
           "value": "146-26"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of California San Diego",
       "partOf": {
@@ -1358,7 +1313,6 @@
           "value": "146-11"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Chicago",
       "partOf": {
@@ -1389,7 +1343,6 @@
           "value": "146-35"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Illinois at Chicago",
       "partOf": {
@@ -1420,7 +1373,6 @@
           "value": "146-05"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Michigan",
       "partOf": {
@@ -1451,7 +1403,6 @@
           "value": "146-13"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Wayne St. University Karmanos Cancer Institute",
       "partOf": {
@@ -1482,7 +1433,6 @@
           "value": "146-96"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Weill Cornell Medical Center",
       "partOf": {
@@ -1523,7 +1473,6 @@
         }
       ],
       "id": 23000,
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Canada (Region/Country Site)",
       "partOf": {
@@ -1554,7 +1503,6 @@
           "value": "147-00-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "BC Cancer Agency",
       "partOf": {
@@ -1585,7 +1533,6 @@
           "value": "147-01-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
       "language": "fr_CA",
       "name": "CHU de Quebec - Universite Laval",
       "partOf": {
@@ -1621,7 +1568,6 @@
         }
       ],
       "id": 24000,
-      "indigenous_codings": true,
       "language": "sv_SE",
       "name": "Sweden (Region/Country Site)",
       "partOf": {
@@ -1652,7 +1598,6 @@
           "value": "147-02-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
       "language": "sv_SE",
       "name": "Skane University Hospital",
       "partOf": {
@@ -1688,7 +1633,6 @@
         }
       ],
       "id": 25000,
-      "indigenous_codings": true,
       "language": "de_CH",
       "name": "Switzerland (Region/Country Site)",
       "partOf": {
@@ -1719,7 +1663,6 @@
           "value": "147-03-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
       "language": "de_CH",
       "name": "Kantonsspital Chur",
       "partOf": {
@@ -1750,7 +1693,6 @@
           "value": "146-39"
         }
       ],
-      "indigenous_codings": true,
       "language": "de_CH",
       "name": "Kantonsspital St. Gallen",
       "partOf": {

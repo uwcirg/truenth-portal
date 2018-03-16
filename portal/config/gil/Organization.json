@@ -8,7 +8,6 @@
         }
       ],
       "id": 0,
-      "indigenous_codings": true,
       "name": "none of the above",
       "race_codings": true,
       "resourceType": "Organization",
@@ -55,7 +54,6 @@
           "value": "state:WA"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Washington",
       "race_codings": true,
       "resourceType": "Organization",
@@ -102,7 +100,6 @@
           "value": "UWMC"
         }
       ],
-      "indigenous_codings": true,
       "name": "UW Medicine (University of Washington)",
       "partOf": {
         "display": "University of Washington",
@@ -148,7 +145,6 @@
           "value": "SCCA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Seattle Cancer Care Alliance (SCCA) Urology Clinic",
       "partOf": {
         "display": "University of Washington",
@@ -194,7 +190,6 @@
           "value": "Harborview"
         }
       ],
-      "indigenous_codings": true,
       "name": "The Urology Clinic at Harborview",
       "partOf": {
         "display": "University of Washington",
@@ -250,7 +245,6 @@
           "value": "UCSF"
         }
       ],
-      "indigenous_codings": true,
       "name": "UCSF Urologic Surgical Oncology Clinic",
       "race_codings": true,
       "resourceType": "Organization",
@@ -287,7 +281,6 @@
           "value": "state:CA"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, San Francisco",
       "race_codings": true,
       "resourceType": "Organization",
@@ -324,7 +317,6 @@
           "value": "state:MI"
         }
       ],
-      "indigenous_codings": true,
       "name": "Karmanos Cancer Institute at Wayne State University",
       "race_codings": true,
       "resourceType": "Organization",
@@ -376,7 +368,6 @@
           "value": "UPG Urology"
         }
       ],
-      "indigenous_codings": true,
       "name": "Wayne State University Physician Group, Dearborn",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
@@ -417,7 +408,6 @@
           "value": "Weisberg Cancer Treatment Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
@@ -458,7 +448,6 @@
           "value": "Wertz Clinic"
         }
       ],
-      "indigenous_codings": true,
       "name": "Wertz Clinic at Karmanos Cancer Center",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
@@ -499,7 +488,6 @@
           "value": "1508001561"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Michigan",
       "race_codings": true,
       "resourceType": "Organization",
@@ -546,7 +534,6 @@
           "value": "The University of Michigan"
         }
       ],
-      "indigenous_codings": true,
       "name": "The University of Michigan Department of Urology",
       "partOf": {
         "display": "University of Michigan",
@@ -587,7 +574,6 @@
           "value": "1912987553"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, Davis",
       "race_codings": true,
       "resourceType": "Organization",
@@ -634,7 +620,6 @@
           "value": "UC Davis Health"
         }
       ],
-      "indigenous_codings": true,
       "name": "UC Davis Medical Center",
       "partOf": {
         "display": "University of California, Davis",
@@ -675,7 +660,6 @@
           "value": "1639306798"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, Los Angeles",
       "race_codings": true,
       "resourceType": "Organization",
@@ -727,7 +711,6 @@
           "value": "UCLA Health"
         }
       ],
-      "indigenous_codings": true,
       "name": "Clark Urology Center, Westwood",
       "partOf": {
         "display": "University of California, Los Angeles",
@@ -768,7 +751,6 @@
           "value": "uclasm"
         }
       ],
-      "indigenous_codings": true,
       "name": "Frank Clark Urology Center, Santa Monica",
       "partOf": {
         "display": "University of California, Los Angeles",
@@ -809,7 +791,6 @@
           "value": "state:GA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Emory University",
       "race_codings": true,
       "resourceType": "Organization",
@@ -861,7 +842,6 @@
           "value": "St. Joseph's Hospital"
         }
       ],
-      "indigenous_codings": true,
       "name": "Emory Saint Joseph's Hospital",
       "partOf": {
         "display": "Emory University",
@@ -902,7 +882,6 @@
           "value": "Winship"
         }
       ],
-      "indigenous_codings": true,
       "name": "Winship Cancer Institute of Emory University",
       "partOf": {
         "display": "Emory University",
@@ -938,7 +917,6 @@
           "value": "state:FL"
         }
       ],
-      "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
       "race_codings": true,
       "resourceType": "Organization",
@@ -990,7 +968,6 @@
           "value": "Moffitt Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
         "partOf": {
         "reference": "api/organization/802"
@@ -1030,7 +1007,6 @@
           "value": "state:MA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Dana-Farber Cancer Institute",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1082,7 +1058,6 @@
           "value": "Dana-Farber/Brigham and Women's Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Dana-Farber/Brigham and Women's Cancer Center",
       "partOf": {
         "display": "Dana-Farber Cancer Institute",
@@ -1123,7 +1098,6 @@
           "value": "Beth Israel Deaconess"
         }
       ],
-      "indigenous_codings": true,
       "name": "The Cancer Center at Beth Israel Deaconess Medical Center",
       "partOf": {
         "display": "Dana-Farber Cancer Institute",
@@ -1159,7 +1133,6 @@
           "value": "state:NY"
         }
       ],
-      "indigenous_codings": true,
       "name": "Memorial Sloan Kettering",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1206,7 +1179,6 @@
           "value": "Memorial Sloan Kettering"
         }
       ],
-      "indigenous_codings": true,
       "name": "Memorial Sloan Kettering Cancer Center",
       "partOf": {
         "reference": "api/organization/1002"
@@ -1236,7 +1208,6 @@
           "value": "state:OR"
         }
       ],
-      "indigenous_codings": true,
       "name": "Oregon Health & Science University",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1278,7 +1249,6 @@
           "value": "Oregon Health & Science University"
         }
       ],
-      "indigenous_codings": true,
       "name": "Oregon Health & Science University",
       "partOf": {
         "reference": "api/organization/1102"
@@ -1318,7 +1288,6 @@
           "value": "state:CO"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Colorado, Denver",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1365,7 +1334,6 @@
           "value": "CU Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Colorado Cancer Center - Anschutz",
       "partOf": {
         "display": "University of Colorado, Denver",
@@ -1406,7 +1374,6 @@
           "value": "state:NC"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke University",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1458,7 +1425,6 @@
           "value": "Duke Urology"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Urology",
       "partOf": {
         "display": "Duke University",
@@ -1499,7 +1465,6 @@
           "value": "The Duke Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Cancer Center",
       "partOf": {
         "display": "Duke University",
@@ -1540,7 +1505,6 @@
           "value": "dccnd"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Cancer Center North Durham",
       "partOf": {
         "display": "Duke University",
@@ -1581,7 +1545,6 @@
           "value": "state:MD"
         }
       ],
-      "indigenous_codings": true,
       "name": "Johns Hopkins University",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1633,7 +1596,6 @@
           "value": "Sibley"
         }
       ],
-      "indigenous_codings": true,
       "name": "Sibley Memorial Hospital",
       "partOf": {
         "display": "Johns Hopkins University",
@@ -1674,7 +1636,6 @@
           "value": "Suburban"
         }
       ],
-      "indigenous_codings": true,
       "name": "Surburban Hospital",
       "partOf": {
         "display": "Johns Hopkins University",
@@ -1715,7 +1676,6 @@
           "value": "1285689299"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of North Carolina at Chapel Hill",
       "race_codings": true,
       "resourceType": "Organization",
@@ -1762,7 +1722,6 @@
           "value": "Lineberger"
         }
       ],
-      "indigenous_codings": true,
       "name": "UNC Lineberger Comprehensive Cancer Center",
       "partOf": {
         "display": "University of North Carolina at Chapel Hill",
@@ -1840,7 +1799,6 @@
           "value": "Michigan Medicine - Department of Urology"
         }
       ],
-      "indigenous_codings": true,
       "name": "Michigan Medicine - Department of Urology",
       "partOf": {
         "reference": "api/organization/40001"
@@ -1868,7 +1826,6 @@
           "value": "Sherwood Medical Center, PC"
         }
       ],
-      "indigenous_codings": true,
       "name": "Sherwood Medical Center, PC",
       "partOf": {
         "reference": "api/organization/40001"
@@ -1896,7 +1853,6 @@
           "value": "Pinson Urology Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Pinson Urology Center",
       "partOf": {
         "reference": "api/organization/40001"
