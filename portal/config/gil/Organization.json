@@ -1,7 +1,6 @@
 {
   "entry": [
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -23,7 +22,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -72,7 +70,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -125,7 +122,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -173,7 +169,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -221,7 +216,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -275,7 +269,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -314,7 +307,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -353,7 +345,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -411,7 +402,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -454,7 +444,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -497,7 +486,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -536,7 +524,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -589,7 +576,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -628,7 +614,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -681,7 +666,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -720,7 +704,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -778,7 +761,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Denver",
@@ -821,7 +803,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -860,7 +841,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -918,7 +898,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -961,7 +940,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -995,7 +973,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1052,7 +1029,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1091,7 +1067,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1149,7 +1124,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1192,7 +1166,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1226,7 +1199,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1278,7 +1250,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1307,7 +1278,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1354,7 +1324,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1393,7 +1362,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1446,7 +1414,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1485,7 +1452,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1543,7 +1509,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1586,7 +1551,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1629,7 +1593,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1668,7 +1631,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1726,7 +1688,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1769,7 +1730,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "UTC",
@@ -1808,7 +1768,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1861,7 +1820,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1905,7 +1863,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1935,7 +1892,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1965,7 +1921,6 @@
       "use_specific_codings": false
     },
     {
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
