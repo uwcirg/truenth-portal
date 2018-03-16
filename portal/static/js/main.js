@@ -2603,20 +2603,19 @@ var Profile = function(subjectId, currentUserId) {
                         return /P3P/gi.test(document.filename);
                     }): false;
                     var hasReports = pcpReports && pcpReports.length > 0;
-                    /*
-                     * adjust select/send email UI only if email is available
-                     */
-                    if (hasValue($("#email").val())) {
-                        if (!hasReports) {
-                            $("#lbPatientRegEmail").addClass("active");
-                        } 
-                    }
-                    /*
-                     * show reports link to user if completed assessment
-                     */
                     if (hasReports) {
+                        /*
+                         * show reports link to user if completed assessment
+                         */
                         $(".email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
                         $("#btnProfileSendEmail").hide();
+                    } else {
+                        /*
+                         * adjust select/send email UI only if email is available
+                         */
+                        if (hasValue($("#email").val())) {
+                            $("#lbPatientRegEmail").addClass("active");
+                        }
                     }
                     $("#assessmentStatusContainer .assessment-label")
                     .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
