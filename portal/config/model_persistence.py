@@ -201,20 +201,13 @@ class ModelPersistence(object):
         to avoid unique constraint violations in the future.
 
         """
-        try:
-            max_known = db.engine.execute(
-                "SELECT MAX(id) FROM {table}".format(
-                    table=self.model.__tablename__)).fetchone()[0]
-            currval = db.engine.execute(
-                "SELECT CURRVAL('{}')".format(self.sequence_name))
-        except exc.OperationalError as oe:
-            if 'not yet defined' in str(oe):
-                currval = db.engine.execute(
-                    "SELECT NEXTVAL('{}')".format(self.sequence_name))
-        if currval.fetchone()[0] < max_known:
+        max_known = db.engine.execute(
+            "SELECT MAX(id) FROM {table}".format(
+                table=self.model.__tablename__)).fetchone()[0]
+        if max_known:
             db.engine.execute(
                 "SELECT SETVAL('{}', {})".format(
-                    self.sequence_name, max_known + 1))
+                    self.sequence_name, max_known))
 
 
 def export_model(cls, lookup_field, target_dir):
