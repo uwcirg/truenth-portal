@@ -926,6 +926,7 @@ div.pull-right {
           position: relative;
           margin: 0;
           left: -4px;
+          top: 6px;
         }
       }
       #fillOrgs {
@@ -2062,9 +2063,6 @@ div.noOrg-container {
   padding-right: 2em;
   max-width: 100%;
   width: 400px;
-  label{
-    font-size:@mediumText;
-  }
 }
 #profileEmailMessage {
   font-size: @mediumText;
@@ -2626,13 +2624,19 @@ div.org-container {
 div.biopsy-option:last-of-type{
   margin-top: 1px;
 }
-.registration-status-container {
+.registration-status-container,
+.assessment-status-container {
   margin:0 0 0.8em 0;
   font-size: @mediumText;
+  .report-link {
+    text-decoration: underline;
+  }
 }
-.registration-label {
+.registration-label,
+.assessment-label{
   display:inline-block;
   opacity: 0.7;
+  margin-bottom: 1em;
 }
 .timezone-container {
   padding-bottom: 0;

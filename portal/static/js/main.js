@@ -2592,7 +2592,47 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.initPatientEmailFormSection = function() {
         var self = this;
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+        if (!$("#email").val()) {
+            $("#profileEmailSelect").attr("disabled", true);
+        };
+
+        if ($("#assessmentStatusContainer").length > 0) {
+            tnthAjax.patientReport(self.subjectId, function(data) {
+                if (!data.error) {
+                    var pcpReports = data["user_documents"]? $.grep(data["user_documents"], function(document) {
+                        return /P3P/gi.test(document.filename);
+                    }): false;
+                    var hasReports = pcpReports && pcpReports.length > 0;
+                    if (hasReports) {
+                        /*
+                         * show reports link to user if completed assessment
+                         */
+                        $(".email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
+                        $("#btnProfileSendEmail").hide();
+                    } else {
+                        /*
+                         * adjust select/send email UI only if email is available
+                         */
+                        if (hasValue($("#email").val())) {
+                            $("#lbPatientRegEmail").addClass("active");
+                        }
+                    }
+                    $("#assessmentStatusContainer .assessment-label")
+                    .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
+                    .addClass(hasReports?"text-success":"text-warning")
+                    .removeClass(!hasReports?"text-success": "text-warning");
+                }
+            });
+        }
+
+        if ($("#registrationStatusContainer").length > 0) {
+            tnthAjax.hasRole(self.subjectId, "write_only", function(data) {
+                $("#registrationStatusContainer .registration-label")
+                .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
+                .addClass(data.matched ? "text-warning": "text-success")
+                .removeClass(data.matched ? "text-success": "text-warning");
+            });
+        }
 
         $("#profileEmailSelect").on("change", function() {
             var message = "";
@@ -5072,6 +5112,27 @@ var tnthAjax = {
             };
         });
     },
+    "hasRole": function(userId, roleName, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User ID is required.")});
+            return false;
+        }
+        if (!roleName) {
+            callback({"error": i18next.t("Role must be provided")});
+            return false;
+        }
+        tnthAjax.getRoles(userId, false, function(data) {
+            if (data.roles) {
+                var matchedRole = $.grep(data.roles, function(role) {
+                    return String(role.name).toLowerCase() === String(roleName).toLowerCase();
+                });
+                callback({"matched": matchedRole.length > 0});
+            } else {
+                callback({"error": i18next.t("no roles found for user")});
+            }
+        }, {"sync": true});
+    },
     "getRoleList": function(callback) {
         this.sendRequest('/api/roles', 'GET', null, null, function(data) {
             if (data) {
@@ -5086,7 +5147,7 @@ var tnthAjax = {
             };
         });
     },
-    "getRoles": function(userId,isProfile,callback) {
+    "getRoles": function(userId,isProfile,callback,params) {
         callback = callback || function() {};
         var sessionStorageKey = "userRole_"+userId;
         if (sessionStorage.getItem(sessionStorageKey)) {
@@ -5096,7 +5157,7 @@ var tnthAjax = {
             }
             callback(data);
         } else {
-            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, null, function(data) {
+            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, params, function(data) {
                 if (data) {
                     if (!data.error) {
                         $(".get-roles-error").html("");
