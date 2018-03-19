@@ -269,7 +269,14 @@ def access_via_token(token, next_step=None):
     # if provided, validate and store target in session
     if next_step:
         NextStep.validate(next_step)
-        session['next'] = getattr(NextStep, next_step)(user)
+        target_url = getattr(NextStep, next_step)(user)
+        if not target_url:
+            # Due to access strategies, the next step may not (yet) apply
+            abort(400, "Patient doesn't qualify for '{}', can't continue".format(next_step))
+        session['next'] = target_url
+        current_app.logger.debug(
+            "/access with next_step, storing in session['next']: {}".format(
+                session['next']))
 
     if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
         # write only users with special role skip the challenge protocol
