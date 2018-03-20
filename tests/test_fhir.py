@@ -95,6 +95,16 @@ class TestFHIR(TestCase):
         self.assertIn('widgets', vq_str)
         self.assertIn('10.0', vq_str)
 
+    def test_vq_true_boolean(self):
+        # units of `boolean` should convert ints to true/false
+        vq = ValueQuantity(units='boolean', system='unknown', value='-10')
+        self.assertEquals(True, vq.value)
+
+    def test_vq_false_boolean(self):
+        # units of `boolean` should convert ints to true/false
+        vq = ValueQuantity(units='boolean', system='unknown', value='0')
+        self.assertEquals(False, vq.value)
+
     def test_cc_format(self):
         c1 = Coding(system='http://test.org', code='66.5',
                              display='howdy')
