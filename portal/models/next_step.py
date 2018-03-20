@@ -24,6 +24,8 @@ class NextStep(object):
         # name pattern
         for option in Intervention.query.filter(
                 Intervention.name.like("decision_support%")):
+            if option.name == 'decision_support_unavailable':
+                continue
             if option.quick_access_check(user=user):
                 return option.link_url
 
