@@ -16,7 +16,7 @@ from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent
-from portal.system_uri import ICHOM
+from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from tests import TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr
 
@@ -487,7 +487,11 @@ class TestQuestionnaireBank(TestCase):
 
         resp = self.client.get('/api/questionnaire/{}'.format('epic26'))
         self.assert200(resp)
-        self.assertEquals(resp.json['questionnaire']['name'], 'epic26')
+        q_ids = [
+            ident for ident in resp.json['questionnaire']['identifier'] if
+            ident['system'] == TRUENTH_QUESTIONNAIRE_CODE_SYSTEM]
+        self.assertEquals(len(q_ids), 1)
+        self.assertEquals(q_ids[0]['value'], 'epic26')
 
         bank = QuestionnaireBank(name='CRV', research_protocol_id=rp_id,
                                  start='{"days": 7}',
