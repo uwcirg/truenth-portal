@@ -146,7 +146,7 @@ class TestQuestionnaireBank(TestCase):
     def test_org_trigger_date(self):
         # testing org-based QBs
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.add_questionnaire()
+        q = self.add_questionnaire(name='q')
         q, org, self.test_user = map(db.session.merge,
                                      (q, org, self.test_user))
         qb = QuestionnaireBank(

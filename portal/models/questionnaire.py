@@ -59,8 +59,8 @@ class Questionnaire(db.Model):
         if 'identifier' in data:
             # track current identifiers - must remove any not requested
             remove_if_not_requested = [i for i in self.identifiers]
-            for id in data['identifier']:
-                identifier = Identifier.from_fhir(id).add_if_not_found()
+            for i in data['identifier']:
+                identifier = Identifier.from_fhir(i).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
                 else:
