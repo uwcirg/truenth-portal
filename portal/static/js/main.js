@@ -1683,26 +1683,29 @@ var fillContent = {
         };
     },
     "reloadSendPatientEmailForm": function (userId) {
-         //handleEmailForm
+         /*
+          * update registration and assessment status email tiles in communications section
+          * this is needed when user change organization, etc.
+          */
         if ($("#sendPatientEmailTabContent").length > 0) {
             var self = this;
             $("#sendPatientEmailTabContent").animate({opacity: 0}, function() {
-            $(this).css('opacity', 1);
-            setTimeout(function(){
-                var checkedOrgInput = $("#userOrgs input[name='organization']:checked");
-                if (checkedOrgInput.attr("id") !== "noOrgs") {
-                    tnthAjax.setting("ACCEPT_TERMS_ON_NEXT_ORG", userId, false, function(data) {
-                        if (!data.error) {
-                            if (data.ACCEPT_TERMS_ON_NEXT_ORG && checkedOrgInput.attr("data-parent-name") === data.ACCEPT_TERMS_ON_NEXT_ORG) {
-                                $("#profileassessmentSendEmailContainer").addClass("active");
-                                self.registrationStatus(userId);
-                                self.assessmentStatus(userId);
-                            } else {
-                                $("#profileassessmentSendEmailContainer").removeClass("active");
+                $(this).css('opacity', 1);
+                setTimeout(function(){
+                    var checkedOrgInput = $("#userOrgs input[name='organization']:checked");
+                    if (checkedOrgInput.attr("id") !== "noOrgs") {
+                        tnthAjax.setting("ACCEPT_TERMS_ON_NEXT_ORG", userId, false, function(data) {
+                            if (!data.error) {
+                                if (data.ACCEPT_TERMS_ON_NEXT_ORG && checkedOrgInput.attr("data-parent-name") === data.ACCEPT_TERMS_ON_NEXT_ORG) {
+                                    $("#profileassessmentSendEmailContainer").addClass("active");
+                                    self.registrationStatus(userId);
+                                    self.assessmentStatus(userId);
+                                } else {
+                                    $("#profileassessmentSendEmailContainer").removeClass("active");
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
                 },500);
             });
         }
