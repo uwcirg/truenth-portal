@@ -14,20 +14,22 @@ from sqlalchemy.exc import IntegrityError
 
 from portal.factories.app import create_app
 from portal.config.config import TestConfig
-from portal.extensions import db
+from portal.database import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.client import Client
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
-from portal.models.coredata import configure_coredata
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
+from portal.models.identifier import Identifier
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.organization import Organization, add_static_organization
 from portal.models.organization import OrgTree
+from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
+from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
@@ -35,7 +37,7 @@ from portal.models.user import User, UserRoles, get_user
 from portal.models.user_consent import UserConsent, SEND_REMINDERS_MASK
 from portal.models.user_consent import STAFF_EDITABLE_MASK
 from portal.models.user_consent import INCLUDE_IN_REPORTS_MASK
-from portal.system_uri import SNOMED
+from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
@@ -125,6 +127,17 @@ class TestCase(Base):
             db.session.commit()
         return db.session.merge(client)
 
+    @staticmethod
+    def add_questionnaire(name):
+        q = Questionnaire()
+        i = Identifier(
+            system=TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, value=name)
+        q.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(q)
+            db.session.commit()
+        return db.session.merge(q)
+
     def add_service_user(self, sponsor=None):
         """create and return a service user for sponsor
 
@@ -163,6 +176,18 @@ class TestCase(Base):
             get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=timestamp)
+
+    @staticmethod
+    def add_practitioner(
+            first_name='first', last_name='last', id_value='12345'):
+        p = Practitioner(first_name=first_name, last_name=last_name)
+        i = Identifier(system=US_NPI, value=id_value)
+        p.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(p)
+            db.session.commit()
+        p = db.session.merge(p)
+        return p
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                       system=SNOMED, setdate=None):

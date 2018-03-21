@@ -31,7 +31,7 @@ models = (
     ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
     ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(Organization, 'organizations_id_seq', 'id'),
-    ModelDetails(Questionnaire, 'questionnaires_id_seq', 'name'),
+    ModelDetails(Questionnaire, 'questionnaires_id_seq', 'identifier'),
     ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
     ModelDetails(Intervention, 'interventions_id_seq', 'name'),
     ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),

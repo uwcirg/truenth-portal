@@ -7,10 +7,10 @@ from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
 from portal.models.fhir import CC
+from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.organization import OrganizationResearchProtocol
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
@@ -49,13 +49,6 @@ class TestQuestionnaireBank(TestCase):
             org, rp = map(db.session.merge, (org, rp))
         return (org, rp, rp.id)
 
-    def setup_q(self, name='q'):
-        q = Questionnaire(name=name)
-        with SessionScope(db):
-            db.session.add(q)
-            db.session.commit()
-        return db.session.merge(q)
-
     def setup_qb(self, questionnaire_name, qb_name, classification, rp_id):
         """Shortcut to setup a testing QB with given values
 
@@ -63,7 +56,7 @@ class TestQuestionnaireBank(TestCase):
         classification and research_protocol
 
         """
-        qn = self.setup_q(questionnaire_name)
+        qn = self.add_questionnaire(questionnaire_name)
         qb = QuestionnaireBank(
             name=qb_name,
             classification=classification,
@@ -81,7 +74,7 @@ class TestQuestionnaireBank(TestCase):
         org, rp, rp_id = self.setup_org_n_rp(
             org=org, org_name='CRV', rp_name=rp_name,
             retired_as_of=retired_as_of)
-        epic26 = Questionnaire(name='epic26_{}'.format(rp_name))
+        epic26 = self.add_questionnaire(name='epic26_{}'.format(rp_name))
         recur3 = Recur(
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
@@ -153,7 +146,7 @@ class TestQuestionnaireBank(TestCase):
     def test_org_trigger_date(self):
         # testing org-based QBs
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.setup_q()
+        q = self.add_questionnaire()
         q, org, self.test_user = map(db.session.merge,
                                      (q, org, self.test_user))
         qb = QuestionnaireBank(
@@ -184,7 +177,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_intervention_trigger_date(self):
         # testing intervention-based QBs
-        q = self.setup_q()
+        q = self.add_questionnaire()
         interv = Intervention(name='interv', description='test')
         with SessionScope(db):
             db.session.add(interv)
@@ -221,7 +214,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_intervention_in_progress(self):
         # testing intervention-based QBs
-        q = self.setup_q()
+        q = self.add_questionnaire()
         interv = Intervention(name='interv', description='test')
         with SessionScope(db):
             db.session.add(interv)
@@ -252,7 +245,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_start(self):
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.setup_q()
+        q = self.add_questionnaire()
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
             name='qb', research_protocol_id=rp_id, classification='baseline',
@@ -272,7 +265,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_due(self):
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.setup_q()
+        q = self.add_questionnaire()
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
             name='qb', research_protocol_id=rp_id, classification='baseline',
@@ -292,15 +285,18 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(due, expected_due)
 
     def test_questionnaire_serialize(self):
-        q1 = self.setup_q(name='q1')
+        q1 = self.add_questionnaire(name='q1')
         data = q1.as_fhir()
         self.assertEquals(data['resourceType'], "Questionnaire")
-        self.assertEquals(data['name'], 'q1')
+        expected = Identifier(
+            system=TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, value='q1')
+        self.assertEquals(
+            Identifier.from_fhir(data['identifier'][0]), expected)
 
     def test_serialize(self):
         org, rp, rp_id = self.setup_org_n_rp()
-        q1 = self.setup_q(name='q1')
-        q2 = self.setup_q(name='q2')
+        q1 = self.add_questionnaire(name='q1')
+        q2 = self.add_questionnaire(name='q2')
         q1, q2, org = map(db.session.merge, (q1, q2, org))
         qb = QuestionnaireBank(
             name='qb', research_protocol_id=rp_id, classification='baseline',
@@ -322,8 +318,8 @@ class TestQuestionnaireBank(TestCase):
     def test_import(self):
         org, rp, rp_id = self.setup_org_n_rp()
         rp_name = rp.name
-        q1 = self.setup_q(name='q1')
-        q2 = self.setup_q(name='q2')
+        q1 = self.add_questionnaire(name='q1')
+        q2 = self.add_questionnaire(name='q2')
         org, q1, q2 = map(db.session.merge, (org, q1, q2))
 
         data = {
@@ -357,8 +353,8 @@ class TestQuestionnaireBank(TestCase):
 
     def test_import_followup(self):
         intervention = Intervention(name='testy', description='simple')
-        q1 = self.setup_q(name='q1')
-        q2 = self.setup_q(name='q2')
+        q1 = self.add_questionnaire(name='q1')
+        q2 = self.add_questionnaire(name='q2')
         with SessionScope(db):
             db.session.add(intervention)
             db.session.commit()
@@ -393,14 +389,9 @@ class TestQuestionnaireBank(TestCase):
 
     def test_lookup_for_user(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
-        epic26 = Questionnaire(name='epic26')
-        eproms_add = Questionnaire(name='eproms_add')
-        comorb = Questionnaire(name='comorb')
-        with SessionScope(db):
-            db.session.add(epic26)
-            db.session.add(eproms_add)
-            db.session.add(comorb)
-            db.session.commit()
+        epic26 = self.add_questionnaire(name='epic26')
+        eproms_add = self.add_questionnaire(name='eproms_add')
+        comorb = self.add_questionnaire(name='comorb')
         crv, epic26, eproms_add, comorb = map(
             db.session.merge, (crv, epic26, eproms_add, comorb))
 
@@ -433,12 +424,10 @@ class TestQuestionnaireBank(TestCase):
 
     def test_lookup_with_intervention(self):
         intv = Intervention(name='TEST', description='Test Intervention')
-        epic26 = Questionnaire(name='epic26')
-        eproms_add = Questionnaire(name='eproms_add')
+        epic26 = self.add_questionnaire(name='epic26')
+        eproms_add = self.add_questionnaire(name='eproms_add')
         with SessionScope(db):
             db.session.add(intv)
-            db.session.add(epic26)
-            db.session.add(eproms_add)
             db.session.commit()
         intv, epic26, eproms_add = map(
             db.session.merge, (intv, epic26, eproms_add))
@@ -470,14 +459,9 @@ class TestQuestionnaireBank(TestCase):
 
     def test_questionnaire_gets(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
-        epic26 = Questionnaire(name='epic26')
-        eproms_add = Questionnaire(name='eproms_add')
-        comorb = Questionnaire(name='comorb')
-        with SessionScope(db):
-            db.session.add(epic26)
-            db.session.add(eproms_add)
-            db.session.add(comorb)
-            db.session.commit()
+        epic26 = self.add_questionnaire(name='epic26')
+        eproms_add = self.add_questionnaire(name='eproms_add')
+        comorb = self.add_questionnaire(name='comorb')
         crv, epic26, eproms_add, comorb = map(
             db.session.merge, (crv, epic26, eproms_add, comorb))
 
@@ -576,7 +560,7 @@ class TestQuestionnaireBank(TestCase):
     def test_outdated_inprogress_qb(self):
         # create base QB/RP
         org, rp, rp_id = self.setup_org_n_rp(org_name='testorg')
-        qn = self.setup_q(name='epic26')
+        qn = self.add_questionnaire(name='epic26')
         qn, org, self.test_user = map(
             db.session.merge, (qn, org, self.test_user))
         org_id = org.id
@@ -624,10 +608,9 @@ class TestQuestionnaireBank(TestCase):
             OrganizationResearchProtocol.research_protocol_id == rp_id).one()
         old_rp.retired_as_of = now - timedelta(days=1)
         rp2 = ResearchProtocol(name='new_proto')
-        qn2 = Questionnaire(name='epic27')
+        qn2 = self.add_questionnaire(name='epic27')
         with SessionScope(db):
             db.session.add(rp2)
-            db.session.add(qn2)
             db.session.commit()
         rp2 = db.session.merge(rp2)
         rp2_id = rp2.id
@@ -674,8 +657,8 @@ class TestQuestionnaireBank(TestCase):
         weekago = now - timedelta(days=7)
         org, rpv3, rpv3_id = self.setup_org_n_rp(rp_name='v3')
         org, rpv2, rpv2_id = self.setup_org_n_rp(org=org, rp_name='v2', retired_as_of=weekago)
-        qn3 = self.setup_q(name='epic26-v3')
-        qn2 = self.setup_q(name='epic26-v2')
+        qn3 = self.add_questionnaire(name='epic26-v3')
+        qn2 = self.add_questionnaire(name='epic26-v2')
         qb3 = QuestionnaireBank(
             name='Test Questionnaire Bank v3',
             classification='baseline',
