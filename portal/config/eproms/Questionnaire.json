@@ -1,15 +1,30 @@
 {
   "entry": [
     {
-      "name": "comorb",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "comorb"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
-      "name": "eortc",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "eortc"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
-      "name": "epic23",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "epic23"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
