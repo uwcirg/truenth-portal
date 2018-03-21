@@ -39,8 +39,6 @@ def upgrade():
     # prior to dropping name - need to insert and connect identifier for each
     # existing in order to maintain the same questionnaire.id (less deal with
     # the mess of fk constraints)
-    import pdb
-    pdb.set_trace()
     bind = op.get_bind()
     session = Session(bind=bind)
     for q_id, name in session.execute("SELECT id, name FROM questionnaires"):
