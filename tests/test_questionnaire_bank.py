@@ -333,14 +333,14 @@ class TestQuestionnaireBank(TestCase):
                 {
                     'rank': 2,
                     'questionnaire': {
-                        'reference': 'api/questionnaire/{}'.format(
-                            q1.name)}
+                        'reference': 'api/questionnaire/{}?system={}'.format(
+                            q1.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
                 },
                 {
                     'rank': 1,
                     'questionnaire': {
-                        'reference': 'api/questionnaire/{}'.format(
-                            q2.name)}
+                        'reference': 'api/questionnaire/{}?system={}'.format(
+                            q2.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
                 }
             ],
             'id': 1,
@@ -370,14 +370,14 @@ class TestQuestionnaireBank(TestCase):
                 {
                     'rank': 2,
                     'questionnaire': {
-                        'reference': 'api/questionnaire/{}'.format(
-                            q1.name)}
+                        'reference': 'api/questionnaire/{}?system={}'.format(
+                            q1.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
                 },
                 {
                     'rank': 1,
                     'questionnaire': {
-                        'reference': 'api/questionnaire/{}'.format(
-                            q2.name)}
+                        'reference': 'api/questionnaire/{}?system={}'.format(
+                            q2.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
                 }
             ],
             'id': 1,
@@ -469,7 +469,8 @@ class TestQuestionnaireBank(TestCase):
         self.assert200(resp)
         self.assertEquals(len(resp.json['entry']), 3)
 
-        resp = self.client.get('/api/questionnaire/{}'.format('epic26'))
+        resp = self.client.get('/api/questionnaire/{}?system={}'.format(
+            'epic26', TRUENTH_QUESTIONNAIRE_CODE_SYSTEM))
         self.assert200(resp)
         q_ids = [
             ident for ident in resp.json['questionnaire']['identifier'] if
