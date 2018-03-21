@@ -167,7 +167,7 @@ class TestPractitioner(TestCase):
     def test_practitioner_put(self):
         pract = self.add_practitioner(first_name="John", last_name="Watson")
         pract.phone = '555-1234'
-        pract.email='test1@notarealsite.com'
+        pract.email = 'test1@notarealsite.com'
         pract2 = self.add_practitioner(first_name="Indiana", last_name="Jones", id_value='testval')
         pract, pract2 = map(db.session.merge, (pract, pract2))
         pract_id = pract.id
