@@ -112,7 +112,9 @@ class EncounterConstants(object):
         assert coding in cc.codings
         return cc
 
+
 EC = EncounterConstants()
+
 
 class ValueQuantity(db.Model):
     __tablename__ = 'value_quantities'
@@ -121,6 +123,23 @@ class ValueQuantity(db.Model):
     units = db.Column(db.String(80))
     system = db.Column(db.String(255))
     code = db.Column(db.String(80))
+
+    def __init__(self, value=None, units=None, system=None, code=None):
+        self.value = value
+        self.units = units
+        self.system = system
+        self.code = code
+        if units == 'boolean':
+            # If given an integer (as some FHIR compliant libraries require
+            # for Value Quantity), and the units are set to boolean, convert
+            # based on classic truth value.
+            try:
+                self.value = int(value) != 0
+            except ValueError, e:
+                if value is None or isinstance(value, basestring):
+                    pass
+                else:
+                    raise e
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -210,7 +229,7 @@ class Observation(db.Model):
             v = data['valueQuantity']
             current_v = self.value_quantity
             vq = ValueQuantity(
-                value=v.get('value') or current_v.value,
+                value=v.get('value') if 'value' in v else current_v.value,
                 units=v.get('units') or current_v.units,
                 system=v.get('system') or current_v.system,
                 code=v.get('code') or current_v.code).add_if_not_found(True)
