@@ -32,12 +32,13 @@ from ..views.filters import filters_blueprint
 from ..views.group import group_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
+from ..views.organization import org_api
 from ..views.patient import patient_api
 from ..views.patients import patients
 from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
 from ..views.portal import portal
-from ..views.organization import org_api
+from ..views.questionnaire import questionnaire_api
 from ..views.reporting import reporting_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.staff import staff
@@ -66,6 +67,7 @@ DEFAULT_BLUEPRINTS = (
     practitioner_api,
     procedure_api,
     portal,
+    questionnaire_api,
     reporting_api,
     scheduled_job_api,
     staff,

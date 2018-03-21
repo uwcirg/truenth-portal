@@ -4,9 +4,9 @@ import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.identifier import Identifier
 from portal.models.practitioner import Practitioner
 from portal.models.role import ROLE
+from portal.system_uri import US_NPI
 from tests import TestCase
 
 
@@ -14,16 +14,12 @@ class TestPractitioner(TestCase):
     """Practitioner model and view tests"""
 
     def test_practitioner_search(self):
-        pract1 = Practitioner(first_name="Indiana", last_name="Jones")
-        pract2 = Practitioner(first_name="John", last_name="Watson")
-        pract3 = Practitioner(first_name="John", last_name="Zoidberg")
-        ident = Identifier(system="testsys", _value="testval")
-        pract1.identifiers.append(ident)
-        with SessionScope(db):
-            db.session.add(pract1)
-            db.session.add(pract2)
-            db.session.add(pract3)
-            db.session.commit()
+        pract1 = self.add_practitioner(
+            first_name="Indiana", last_name="Jones", id_value='ijones')
+        pract2 = self.add_practitioner(
+            first_name="John", last_name="Watson", id_value='jwatson')
+        pract3 = self.add_practitioner(
+            first_name="John", last_name="Zoidberg", id_value='jzoidberg')
 
         self.login()
 
@@ -52,7 +48,7 @@ class TestPractitioner(TestCase):
 
         # test query using identifier system/value
         resp = self.client.get(
-            '/api/practitioner?system=testsys&value=testval')
+            '/api/practitioner?system={}&value=ijones'.format(US_NPI))
         self.assert200(resp)
 
         self.assertEqual(resp.json['total'], 1)
@@ -68,15 +64,11 @@ class TestPractitioner(TestCase):
         self.assert404(resp)
 
     def test_practitioner_get(self):
-        pract = Practitioner(first_name="Indiana", last_name="Jones",
-                             phone='555-1234', email='test@notarealsite.com')
-        pract2 = Practitioner(first_name="John", last_name="Watson")
-        ident = Identifier(system='testsys', _value='testval')
-        pract2.identifiers.append(ident)
-        with SessionScope(db):
-            db.session.add(pract)
-            db.session.add(pract2)
-            db.session.commit()
+        pract = self.add_practitioner(first_name="Indiana", last_name="Jones")
+        pract.phone = '555-1234'
+        pract.email = 'test@notarealsite.com'
+        self.add_practitioner(
+            first_name="John", last_name="Watson", id_value='jwatson')
         pract = db.session.merge(pract)
 
         # test get by ID
@@ -92,7 +84,7 @@ class TestPractitioner(TestCase):
 
         # test get by external identifier
         resp = self.client.get(
-            '/api/practitioner/{}?system={}'.format('testval', 'testsys'))
+            '/api/practitioner/{}?system={}'.format('jwatson', US_NPI))
         self.assert200(resp)
 
         self.assertEqual(resp.json['resourceType'], 'Practitioner')
@@ -173,15 +165,10 @@ class TestPractitioner(TestCase):
         self.assertEqual(resp.status_code, 409)
 
     def test_practitioner_put(self):
-        pract = Practitioner(first_name="John", last_name="Watson",
-                             phone='555-1234', email='test1@notarealsite.com')
-        pract2 = Practitioner(first_name="Indiana", last_name="Jones")
-        ident = Identifier(system='testsys', _value='testval')
-        pract2.identifiers.append(ident)
-        with SessionScope(db):
-            db.session.add(pract)
-            db.session.add(pract2)
-            db.session.commit()
+        pract = self.add_practitioner(first_name="John", last_name="Watson")
+        pract.phone = '555-1234'
+        pract.email = 'test1@notarealsite.com'
+        pract2 = self.add_practitioner(first_name="Indiana", last_name="Jones", id_value='testval')
         pract, pract2 = map(db.session.merge, (pract, pract2))
         pract_id = pract.id
         pract2_id = pract2.id
@@ -239,7 +226,7 @@ class TestPractitioner(TestCase):
         }
 
         resp = self.client.put(
-            '/api/practitioner/{}?system={}'.format('testval', 'testsys'),
+            '/api/practitioner/{}?system={}'.format('testval', US_NPI),
             data=json.dumps(data),
             content_type='application/json')
         self.assert200(resp)
@@ -260,7 +247,7 @@ class TestPractitioner(TestCase):
             'resourceType': 'Practitioner',
             'identifier': [
                 {
-                    'system': 'testsys',
+                    'system': US_NPI,
                     'value': 'testval'
                 }
             ]
@@ -273,7 +260,7 @@ class TestPractitioner(TestCase):
 
         # test updating with same external identifier
         resp = self.client.put(
-            '/api/practitioner/{}?system={}'.format('testval', 'testsys'),
+            '/api/practitioner/{}?system={}'.format('testval', US_NPI),
             data=json.dumps(data),
             content_type='application/json')
         self.assert200(resp)

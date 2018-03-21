@@ -8,12 +8,12 @@ from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.user import get_user
 from portal.models.user_consent import UserConsent
 from tests import TestCase, TEST_USER_ID
+
 
 class TestAssessmentEngine(TestCase):
 
@@ -58,7 +58,7 @@ class TestAssessmentEngine(TestCase):
         rp = db.session.merge(rp)
         rp_id = rp.id
 
-        qn = Questionnaire(name='epic26')
+        qn = self.add_questionnaire(name='epic26')
         org = Organization(name="testorg")
         org.research_protocols.append(rp)
         with SessionScope(db):

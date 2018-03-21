@@ -1,19 +1,39 @@
 {
   "entry": [
     {
-      "name": "epic26",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "epic26"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
-      "name": "eq5d",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "eq5d"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
-      "name": "maxpc",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "maxpc"
+        }
+      ],
       "resourceType": "Questionnaire"
     },
     {
-      "name": "pam",
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "pam"
+        }
+      ],
       "resourceType": "Questionnaire"
     }
   ],

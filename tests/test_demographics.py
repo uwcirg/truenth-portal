@@ -14,9 +14,10 @@ from portal.models.auth import AuthProvider
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
-from portal.models.practitioner import Practitioner
+from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
+from portal.system_uri import US_NPI
 
 
 class TestDemographics(TestCase):
@@ -58,11 +59,7 @@ class TestDemographics(TestCase):
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
 
-        pract = Practitioner(first_name='Indiana', last_name='Jones')
-        with SessionScope(db):
-            db.session.add(pract)
-            db.session.commit()
-        pract = db.session.merge(pract)
+        pract = self.add_practitioner(first_name='Indiana', last_name='Jones')
         pract_id = pract.id
 
         family = 'User'
@@ -140,10 +137,7 @@ class TestDemographics(TestCase):
             [ext for ext in fhir['extension']
              if 'valueCodeableConcept' in ext]))
         self.assertEquals(3, len(fhir['careProvider']))
-        self.assertTrue(
-            {'display': 'Indiana Jones',
-             'reference': 'api/practitioner/{}'.format(pract_id)}
-            in fhir['careProvider'])
+        self.assertTrue(Reference.practitioner(pract_id).as_fhir() in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         self.assertTrue(user._email.startswith('__no_email__'))
@@ -362,24 +356,20 @@ class TestDemographics(TestCase):
         ident = Identifier(id=99,system=org_id_system,value=org_id_value)
         org_ident = OrganizationIdentifier(organization_id=org_id,
                                             identifier_id=99)
-
-        # create Practitioner and add Identifier
-        pract = Practitioner(first_name="Indiana", last_name="Jones")
-        ident2 = Identifier(system='practsys', value='practval')
-        pract.identifiers.append(ident2)
-
         with SessionScope(db):
-            db.session.add(pract)
             db.session.add(ident)
-            db.session.commit()
             db.session.add(org_ident)
             db.session.commit()
+
+        # create Practitioner and add Identifier
+        pract = self.add_practitioner(
+            first_name="Indiana", last_name="Jones", id_value='practval')
 
         data = {"careProvider": [
                     {"reference": "Organization/{}?system={}".format(
                         org_id_value, org_id_system)},
                     {"reference": "Practitioner/{}?system={}".format(
-                        'practval', 'practsys')}
+                        'practval', US_NPI)}
                 ],
                 "resourceType": "Patient",
                }

@@ -8,7 +8,6 @@ from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.practitioner import Practitioner
 from portal.models.reference import Reference
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.system_uri import US_NPI
 
@@ -51,10 +50,19 @@ class TestReference(TestCase):
         self.assertEquals(o, parsed)
 
     def test_questionnaire(self):
-        q = Questionnaire(name='testy')
+        q = self.add_questionnaire('epic1000')
         q_ref = Reference.questionnaire(q.name)
         self.assertEquals(
-            q_ref.as_fhir()['display'], 'testy')
+            q_ref.as_fhir()['display'], 'epic1000')
+
+    def test_questionnaire_parse(self):
+        q = self.add_questionnaire('epiclife')
+        ref = {
+            'reference':
+                'api/questionnaire/{0.value}?system={0.system}'.format(
+                    q.identifiers[0])}
+        parsed = Reference.parse(ref)
+        self.assertEquals(q, parsed)
 
     def test_questionnaire_bank(self):
         q = QuestionnaireBank(name='testy')
@@ -75,27 +83,17 @@ class TestReference(TestCase):
         i = Reference.parse(ref)
         self.assertEquals(i.name, 'self_management')
 
-    def prep_practitioner(self):
-        p = Practitioner(first_name='first', last_name='last')
-        i = Identifier(system=US_NPI, value='12345')
-        p.identifiers.append(i)
-        with SessionScope(db):
-            db.session.add(p)
-            db.session.commit()
-        p = db.session.merge(p)
-        return p
-
     def test_practioner(self):
-        p = self.prep_practitioner()
+        p = self.add_practitioner()
         p_ref = Reference.practitioner(p.id)
         self.assertEquals(
             p_ref.as_fhir()['display'], 'first last')
         self.assertEquals(
             p_ref.as_fhir()['reference'],
-            'api/practitioner/{}'.format(p.id))
+            'api/practitioner/12345?system={}'.format(US_NPI))
 
     def test_practitioner_parse(self):
-        p = self.prep_practitioner()
+        p = self.add_practitioner()
         ref = {'reference': 'api/practitioner/12345?system={}'.format(US_NPI)}
         parsed = Reference.parse(ref)
         self.assertEquals(p, parsed)

@@ -12,7 +12,6 @@ from portal.models.communication_request import CommunicationRequest
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
-from portal.models.practitioner import Practitioner
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.system_uri import ICHOM, TRUENTH_CR_NAME
@@ -308,7 +307,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
     def test_practitioner(self):
         self.bless_with_basics()
-        dr = Practitioner(first_name='Bob', last_name='Jones')
+        dr = self.add_practitioner(first_name='Bob', last_name='Jones')
         with SessionScope(db):
             db.session.add(dr)
             db.session.commit()

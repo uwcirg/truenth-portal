@@ -10,7 +10,6 @@ from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.research_protocol import ResearchProtocol
@@ -117,10 +116,9 @@ class TestReporting(TestCase):
 
         crv = Organization(name='CRV')
         crv.research_protocols.append(rp)
-        epic26 = Questionnaire(name='epic26')
+        epic26 = self.add_questionnaire(name='epic26')
         with SessionScope(db):
             db.session.add(crv)
-            db.session.add(epic26)
             db.session.commit()
         crv, epic26 = map(db.session.merge, (crv, epic26))
 

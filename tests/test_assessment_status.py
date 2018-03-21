@@ -131,14 +131,15 @@ def mock_eproms_questionnairebanks():
         start='{"years": 1}', cycle_length='{"years": 1}',
         termination='{"years": 3, "months": 3}')
 
+    for name in (localized_instruments.union(*(
+            metastatic_baseline_instruments,
+            metastatic_indefinite_instruments,
+            metastatic_3,
+            metastatic_4,
+            metastatic_6))):
+        TestCase.add_questionnaire(name=name)
+
     with SessionScope(db):
-        for name in (localized_instruments.union(*(
-                metastatic_baseline_instruments,
-                metastatic_indefinite_instruments,
-                metastatic_3,
-                metastatic_4,
-                metastatic_6))):
-            db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
         db.session.add(three_q_recur)
@@ -162,7 +163,7 @@ def mock_eproms_questionnairebanks():
         overdue='{"days": 7}',
         expired='{"months": 3}')
     for rank, instrument in enumerate(localized_instruments):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         l_qb.questionnaires.append(qbq)
 
@@ -175,7 +176,7 @@ def mock_eproms_questionnairebanks():
         overdue='{"days": 30}',
         expired='{"months": 3}')
     for rank, instrument in enumerate(metastatic_baseline_instruments):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mb_qb.questionnaires.append(qbq)
 
@@ -187,7 +188,7 @@ def mock_eproms_questionnairebanks():
         start='{"days": 0}',
         expired='{"years": 50}')
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mi_qb.questionnaires.append(qbq)
 
@@ -201,7 +202,7 @@ def mock_eproms_questionnairebanks():
         expired='{"months": 3}',
         recurs=[three_q_recur])
     for rank, instrument in enumerate(metastatic_3):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mr3_qb.questionnaires.append(qbq)
 
@@ -215,7 +216,7 @@ def mock_eproms_questionnairebanks():
         overdue='{"days": 30}',
         expired='{"months": 3}')
     for rank, instrument in enumerate(metastatic_4):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mr4_qb.questionnaires.append(qbq)
 
@@ -229,7 +230,7 @@ def mock_eproms_questionnairebanks():
         overdue='{"days": 30}',
         expired='{"months": 3}')
     for rank, instrument in enumerate(metastatic_6):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         mr6_qb.questionnaires.append(qbq)
 
@@ -244,10 +245,8 @@ def mock_eproms_questionnairebanks():
 
 
 def mock_tnth_questionnairebanks():
-    with SessionScope(db):
-        for name in (symptom_tracker_instruments):
-            db.session.add(Questionnaire(name=name))
-        db.session.commit()
+    for name in (symptom_tracker_instruments):
+        TestCase.add_questionnaire(name=name)
 
     # Symptom Tracker Baseline
     self_management = INTERVENTION.SELF_MANAGEMENT
@@ -259,7 +258,7 @@ def mock_tnth_questionnairebanks():
         expired='{"months": 3}'
     )
     for rank, instrument in enumerate(symptom_tracker_instruments):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         st_qb.questionnaires.append(qbq)
 
@@ -283,7 +282,7 @@ def mock_tnth_questionnairebanks():
         recurs=[st_recur]
     )
     for rank, instrument in enumerate(symptom_tracker_instruments):
-        q = Questionnaire.query.filter_by(name=instrument).one()
+        q = Questionnaire.find_by_name(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
         st_recur_qb.questionnaires.append(qbq)
     with SessionScope(db):
