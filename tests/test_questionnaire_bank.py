@@ -177,7 +177,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_intervention_trigger_date(self):
         # testing intervention-based QBs
-        q = self.add_questionnaire()
+        q = self.add_questionnaire('q')
         interv = Intervention(name='interv', description='test')
         with SessionScope(db):
             db.session.add(interv)
@@ -214,7 +214,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_intervention_in_progress(self):
         # testing intervention-based QBs
-        q = self.add_questionnaire()
+        q = self.add_questionnaire('q')
         interv = Intervention(name='interv', description='test')
         with SessionScope(db):
             db.session.add(interv)
@@ -245,7 +245,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_start(self):
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.add_questionnaire()
+        q = self.add_questionnaire('q')
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
             name='qb', research_protocol_id=rp_id, classification='baseline',
@@ -265,7 +265,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_due(self):
         org, rp, rp_id = self.setup_org_n_rp()
-        q = self.add_questionnaire()
+        q = self.add_questionnaire('q')
         q, org = map(db.session.merge, (q, org))
         qb = QuestionnaireBank(
             name='qb', research_protocol_id=rp_id, classification='baseline',
