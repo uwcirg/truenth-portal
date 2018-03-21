@@ -743,8 +743,9 @@ def settings():
 def config_settings(config_key):
     # return selective keys - not all can be be viewed by users, e.g.secret key
     config_prefix_whitelist = (
-        'LR_',
+        'ACCEPT_TERMS_ON_NEXT_ORG',
         'CONSENT',
+        'LR_',
         'REQUIRED_CORE_DATA',
         'SYSTEM',
     )

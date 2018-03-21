@@ -1682,6 +1682,67 @@ var fillContent = {
             $("#emailLogMessage").text(data.error);
         };
     },
+    "reloadSendPatientEmailForm": function (userId) {
+         //handleEmailForm
+        if ($("#sendPatientEmailTabContent").length > 0) {
+            var self = this;
+            $("#sendPatientEmailTabContent").animate({opacity: 0}, function() {
+            $(this).css('opacity', 1);
+            setTimeout(function(){
+                var checkedOrgInput = $("#userOrgs input[name='organization']:checked");
+                if (checkedOrgInput.attr("id") !== "noOrgs") {
+                    tnthAjax.setting("ACCEPT_TERMS_ON_NEXT_ORG", userId, false, function(data) {
+                        if (!data.error) {
+                            if (data.ACCEPT_TERMS_ON_NEXT_ORG && checkedOrgInput.attr("data-parent-name") === data.ACCEPT_TERMS_ON_NEXT_ORG) {
+                                $("#profileassessmentSendEmailContainer").addClass("active");
+                                self.registrationStatus(userId);
+                                self.assessmentStatus(userId);
+                            } else {
+                                $("#profileassessmentSendEmailContainer").removeClass("active");
+                            }
+                        }
+                    });
+                }
+                },500);
+            });
+        }
+    },
+    "registrationStatus": function(userId) {
+        tnthAjax.hasRole(userId, "write_only", function(data) {
+            $("#registrationStatusContainer .registration-label")
+            .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
+            .addClass(data.matched ? "text-warning": "text-success")
+            .removeClass(data.matched ? "text-success": "text-warning");
+        });
+    },
+    "assessmentStatus": function(userId) {
+        tnthAjax.patientReport(userId, function(data) {
+            if (!data.error) {
+                var pcpReports = data["user_documents"]? $.grep(data["user_documents"], function(document) {
+                    return /P3P/gi.test(document.filename);
+                }): false;
+                var hasReports = pcpReports && pcpReports.length > 0;
+                if (hasReports) {
+                    /*
+                     * show reports link to user if completed assessment
+                     */
+                    $("#assessmentStatusContainer .email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
+                    $("#btnProfileSendassessmentEmail").hide();
+                } else {
+                    /*
+                     * adjust select/send email UI only if email is available
+                     */
+                    if (hasValue($("#email").val())) {
+                        $("#lbPatientRegEmail").addClass("active");
+                    }
+                }
+                $("#assessmentStatusContainer .assessment-label")
+                .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
+                .addClass(hasReports?"text-success":"text-warning")
+                .removeClass(!hasReports?"text-success": "text-warning");
+            }
+        });
+    },
     "assessmentList": function(data) {
         if (!data.error) {
             var sessionListHTML = "";
@@ -2552,12 +2613,9 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.getAccessUrl = function() {
         var url = '';
-        tnthAjax.accessUrl( this.subjectId, true, function(data) {
+        tnthAjax.accessUrl(this.subjectId, true, function(data) {
             if (!data.error) {
                 url = data.url;
-                $("#profileEmailErrorMessage").text("");
-            } else {
-                $("#profileEmailErrorMessage").text(i18next.t("failed request to get email invite url"));
             }
         });
         return url;
@@ -2565,161 +2623,144 @@ var Profile = function(subjectId, currentUserId) {
     this.checkEmail = function(email) {
         if (hasValue(email)) {
             $("#btnPasswordResetEmail").attr("disabled", false);
-            $("#btnProfileSendEmail").attr("disabled", false);
-            $('#btnProfileSendEmail').removeClass('disabled');
+            $(".btn-send-email").attr("disabled", false).removeClass('disabled');
+            $(".email-selector").attr("disabled", false);
         } else {
             if ($("#email").get(0).validity.valid) {
                 $("#btnPasswordResetEmail").attr("disabled", true);
-                $("#btnProfileSendEmail").attr("disabled", true);
-                $('#btnProfileSendEmail').addClass('disabled');
-            };
-        };
+                $(".btn-send-email").attr("disabled", true).addClass('disabled');
+                $(".email-selector").attr("disabled", true);
+            }
+        }
     };
     this.initEmailSection = function() {
         var self = this;
         self.checkEmail($("#email").val());
         $("#email").on("blur, keyup", function() {
             self.checkEmail($(this).val());
-            if ($(this).val() !== "") {
-                $("#profileEmailSelect").attr("disabled", false);
-            } else {
-                $("#profileEmailSelect").val("").attr("disabled", true);
-            };
         });
         //in profile email is validated and updated after ajax call to check unique email
         $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
-        $("#btnProfileSendEmail").blur();
+        $(".btn-send-email").blur();
     };
     this.initPatientEmailFormSection = function() {
         var self = this;
-        if (!$("#email").val()) {
-            $("#profileEmailSelect").attr("disabled", true);
-        };
+        self.checkEmail($("#email").val());
 
-        if ($("#assessmentStatusContainer").length > 0) {
-            tnthAjax.patientReport(self.subjectId, function(data) {
-                if (!data.error) {
-                    var pcpReports = data["user_documents"]? $.grep(data["user_documents"], function(document) {
-                        return /P3P/gi.test(document.filename);
-                    }): false;
-                    var hasReports = pcpReports && pcpReports.length > 0;
-                    if (hasReports) {
-                        /*
-                         * show reports link to user if completed assessment
-                         */
-                        $(".email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
-                        $("#btnProfileSendEmail").hide();
-                    } else {
-                        /*
-                         * adjust select/send email UI only if email is available
-                         */
-                        if (hasValue($("#email").val())) {
-                            $("#lbPatientRegEmail").addClass("active");
-                        }
-                    }
-                    $("#assessmentStatusContainer .assessment-label")
-                    .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
-                    .addClass(hasReports?"text-success":"text-warning")
-                    .removeClass(!hasReports?"text-success": "text-warning");
-                }
-            });
+        if ($("#profileassessmentSendEmailContainer.active").length > 0) {
+            fillContent.assessmentStatus(self.subjectId);
         }
 
         if ($("#registrationStatusContainer").length > 0) {
-            tnthAjax.hasRole(self.subjectId, "write_only", function(data) {
-                $("#registrationStatusContainer .registration-label")
-                .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
-                .addClass(data.matched ? "text-warning": "text-success")
-                .removeClass(data.matched ? "text-success": "text-warning");
-            });
+            fillContent.registrationStatus(self.subjectId);
         }
 
-        $("#profileEmailSelect").on("change", function() {
+        $(".email-selector").off("change").on("change", function() {
             var message = "";
+            var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+            var btnEmail = $("#btnProfileSend"+emailType+"Email");
+            var messageContainer = $("#profile"+emailType+"EmailMessage");
             if (this.value != "" && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message = i18next.t("{emailType} email will be sent to {email}");
                 message = message.replace("{emailType}", $(this).children("option:selected").text())
                                 .replace("{email}", $("#email").val());
-                $("#profileEmailMessage").html(message);
-                $("#btnProfileSendEmail").removeClass("disabled");
+                messageContainer.html(message);
+                btnEmail.removeClass("disabled");
             } else {
-                $("#profileEmailMessage").text("");
-                $("#btnProfileSendEmail").addClass("disabled");
+                messageContainer.html("");
+                btnEmail.addClass("disabled");
             }
         });
 
-        $("#btnProfileSendEmail").on("click", function(event) {
-            event.preventDefault();
-            var emailTypeElem = $("#profileEmailSelect");
-            var selectedOption = emailTypeElem.children("option:selected");
+        $(".btn-send-email").off("click").on("click", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+                var emailTypeElem = $("#profile"+emailType+"EmailSelect");
+                var selectedOption = emailTypeElem.children("option:selected");
+                var infoMessageContainer = $("#profile"+emailType+"EmailMessage");
+                var errorMessageContainer = $("#profile"+emailType+"EmailErrorMessage");
+                var btnSelf = $(this);
 
-            if (selectedOption.val() !== "") {
-                var emailUrl = selectedOption.attr("data-url");
-                var email = $("#email").val();
-                var subject = "", body = "";
-
-                /*
-                 * get email content via API
-                 */
-                if (emailUrl) {
-                    $.ajax ({
-                        type: "GET",
-                        url: emailUrl,
-                        cache: false,
-                        async: false
-                    }).done(function(data) {
-                        if (data) {
-                            subject = data["subject"];
-                            body = data["body"];
-                        };
-                    }).fail(function(xhr) {
-                        //report error
-                        //helpful if for some reason the content couldn't be parsed by the backend, e.g. variables, etc.
-                        tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
-                    });
-                } else {
-                    $("#profileEmailMessage").append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
-                }
-
-                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
-
-                    if (selectedOption.val() === "invite" && !selectedOption.hasClass("inactive")){
-                        returnUrl = self.getAccessUrl();
-                        if (hasValue(returnUrl)) {
-                            body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
-                        }
+                if (selectedOption.val() !== "") {
+                    var emailUrl = selectedOption.attr("data-url");
+                    var email = $("#email").val();
+                    var subject = "", body = "";
+                    /*
+                     * get email content via API
+                     */
+                    if (emailUrl) {
+                        $.ajax ({
+                            type: "GET",
+                            url: emailUrl,
+                            cache: false,
+                            async: false
+                        }).done(function(data) {
+                            if (data) {
+                                subject = data["subject"];
+                                body = data["body"];
+                            };
+                        }).fail(function(xhr) {
+                            //report error
+                            //helpful if for some reason the content couldn't be parsed by the backend, e.g. variables, etc.
+                            tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
+                        });
+                    } else {
+                        errorMessageContainer.append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
                     }
 
-                    tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
-                        if (!data.error) {
-                            $("#profileEmailMessage").html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
-                            $("#profileEmailSelect").val("");
-                            $("#btnProfileSendEmail").addClass("disabled");
-                            /*
-                             * reload email audit log
-                             */
-                            tnthAjax.emailLog(subjectId, function(data) {
-                                setTimeout(function() {
-                                    fillContent.emailLog(self.subjectId, data);
-                                }, 100);
-                            });
+                    if (hasValue(body) && hasValue(subject) && hasValue(email)) {
+
+                        var inviteError = "";
+
+                        if (selectedOption.val() === "invite" && emailType === "registration"){
+                            returnUrl = self.getAccessUrl();
+                            if (hasValue(returnUrl)) {
+                                body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                            } else {
+                                inviteError = i18next.t("failed request to get email invite url");
+                            }
+                        }
+                        if (inviteError) {
+                            errorMessageContainer.html(inviteError);
                         } else {
-                            $("#profileEmailMessage").append("<div>" + i18next.t("Unable to send email") + "</div>");
-                        };
-                    });
-                } else  {
-                    $("#profileEmailMessage").append("<div>" + i18next.t("Unable to send email.") + "</div>");
-                    if (!hasValue(body)) $("#profileEmailMessage").append("<div>" + i18next.t("Email body content is missing.") + "</div>");
-                    if (!hasValue(subject)) $("#profileEmailMessage").append("<div>" + i18next.t("Email subject is missing.") + "</div>");
-                    if (!hasValue(email)) $("#profileEmailMessage").append("<div>" + i18next.t("Email address is missing.") + "</div>");
-                };
-            } else $("#profileEmailMessage").text(i18next.t("You must select a email type"));
-        });
+                            tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
+                                if (!data.error) {
+                                    infoMessageContainer.html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
+                                    emailTypeElem.val("");
+                                    btnSelf.addClass("disabled");
+                                    /*
+                                     * reload email audit log
+                                     */
+                                    tnthAjax.emailLog(subjectId, function(data) {
+                                        setTimeout(function() {
+                                            fillContent.emailLog(self.subjectId, data);
+                                        }, 100);
+                                    });
+                                } else {
+                                    errorMessageContainer.append("<div>" + i18next.t("Unable to send email") + "</div>");
+                                };
+                            });
+                        }
+                    } else  {
+                        errorMessageContainer.html("");
+                        errorMessageContainer.append("<div>" + i18next.t("Unable to send email.") + "</div>");
+                        if (!hasValue(body)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email body content is missing.") + "</div>");
+                        }
+                        if (!hasValue(subject)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email subject is missing.") + "</div>");
+                        }
+                        if (!hasValue(email)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email address is missing.") + "</div>");
+                        }
+                    }
+                } else errorMessageContainer.text(i18next.t("You must select a email type"));
+            });
     };
     this.initStaffRegistrationEmailSection = function() {
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
-
         var self = this;
+        self.checkEmail($("#email").val());
 
         $("#btnProfileSendEmail").on("click", function(event) {
             event.preventDefault();
@@ -3403,8 +3444,6 @@ var Profile = function(subjectId, currentUserId) {
     this.initCustomPatientDetailSection = function() {
         var subjectId = this.subjectId;
         var self = this;
-
-        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false);
 
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
@@ -4124,19 +4163,15 @@ OrgTool.prototype.handleEvent = function() {
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
                     $("#noOrgs").prop('checked',false);
-                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
                 } else {
                     $("#userOrgs input[name='organization']").each(function() {
-                        //console.log("in id: " + $(this).attr("id"))
                        if ($(this).attr("id") !== "noOrgs") {
                             $(this).prop('checked',false);
                        } else {
                             if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                        };
                     });
-                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                 };
-
             } else {
                 var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
                 if (!isChecked) {
@@ -4181,6 +4216,7 @@ OrgTool.prototype.handleEvent = function() {
             if ($("#locale").length > 0) {
                 tnthAjax.getLocale(userId);
             }
+            fillContent.reloadSendPatientEmailForm(userId);
         });
     });
 };

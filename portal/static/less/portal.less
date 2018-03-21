@@ -319,7 +319,7 @@ a.btn {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 50em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -1628,12 +1628,33 @@ div.pull-right {
     display: none
   }
 
-  #btnProfileSendEmail {
+  .email-form-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  #btnProfileSendEmail,
+  .btn-send-email {
     margin-top: 1em;
     font-size: @smallBtnSize;
+    display: block;
+  }
+  .profile-email-container {
+    .btn-send-email {
+      margin: auto;
+      width: 100%;
+      max-width: 100%;
+    }
   }
   #btnPasswordResetEmail {
     font-size: @smallBtnSize;
+  }
+
+  #profileassessmentSendEmailContainer {
+    display: none;
+    &.active {
+      display: block;
+    }
   }
 
   h4.detail-title {
@@ -2055,14 +2076,23 @@ div.noOrg-container {
   }
 }
 
-#profileSendEmailContainer {
+#profileSendEmailContainer,
+.profile-email-container {
   background-color: @wellColor;
   border-radius: 6px;
   border: 1px solid @wellBorderColor;
+  margin: 1em;
   padding-left: 2em;
   padding-right: 2em;
   max-width: 100%;
   width: 400px;
+  .email-selector-container {
+    margin-bottom: 1em;
+  }
+  .send-email-info,
+  .send-email-error {
+    margin-top: 1em;
+  }
 }
 #profileEmailMessage {
   font-size: @mediumText;
@@ -2628,6 +2658,8 @@ div.biopsy-option:last-of-type{
 .assessment-status-container {
   margin:0 0 0.8em 0;
   font-size: @mediumText;
+  width: 100%;
+  max-width: 100%;
   .report-link {
     text-decoration: underline;
   }
@@ -3100,7 +3132,7 @@ div.timezone-warning.text-warning {
   }
   #termsText {
     padding: 1em;
-  } 
+  }
   #patientListOptions,
   #staffListOptions {
     display: flex;

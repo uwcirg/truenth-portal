@@ -1900,10 +1900,14 @@ div.footer-wrapper.right-panel {
 }
 #btnPasswordResetEmail,
 #registrationEmailContainer #btnProfileSendEmail,
-.sm-btn {
+.sm-btn,
+.btn-send-email {
   font-size: @smallBtnSize;
   height: 2.9em;
   padding: 0 1em;
+}
+#profileassessmentSendEmailContainer {
+  display: none;
 }
 .communication-prompt {
   margin-bottom: 1em;
@@ -2156,7 +2160,8 @@ input.clinic {
 #emailInfoText {
   display: none;
 }
-#profileSendEmailContainer {
+#profileSendEmailContainer,
+.profile-email-container {
   padding-bottom: 5%;
   background-color: #f9f9f9;
   background-color: rgba(204, 204, 204, 0.3);
@@ -2174,7 +2179,7 @@ input.clinic {
 }
 
 
-#profileEmailMessage {
+.send-email-info {
   font-size: @smallText;
   margin-top: 1em;
   margin-left:0.5em;
@@ -2398,19 +2403,29 @@ input.clinic {
   h4 {
     margin-bottom: 1em;
   }
-  #profileEmailSelect {
+  .profile-email-container {
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    border: 0;
+    margin: 0;
+  }
+  #profileEmailSelect,
+  .email-selector {
       width: 280px;
       max-width: 100%;
       & option.inactive {
         display: none;
       }
   }
-  #btnProfileSendEmail, .custom-btn {
+  #btnProfileSendEmail, .custom-btn,
+  .btn-send-email{
       width: 280px;
       max-width: 100%;
       font-size: @smallBtnSize;
   }
-  #btnProfileSendEmail {
+  #btnProfileSendEmail,
+  .btn-send-email {
     margin-top: 0.5em;
   }
   .custom-btn {
@@ -3247,10 +3262,12 @@ div.timezone-warning.text-warning {
     .custom-container-item-right {
         width: 33%;
     }
-    #profileEmailSelect {
+    #profileEmailSelect,
+    .email-selector {
       width: 100%;
     }
-    #btnProfileSendEmail, .custom-btn {
+    #btnProfileSendEmail, .custom-btn,
+    .btn-send-email {
       width: 100%;
     }
   }
