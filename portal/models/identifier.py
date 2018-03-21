@@ -1,8 +1,8 @@
 """Identifier Model Module"""
-
-from ..database import db
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+
+from ..database import db
 
 
 identifier_use = ENUM('usual', 'official', 'temp', 'secondary',
