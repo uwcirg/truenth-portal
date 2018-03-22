@@ -473,7 +473,7 @@ class TestQuestionnaireBank(TestCase):
             'epic26', TRUENTH_QUESTIONNAIRE_CODE_SYSTEM))
         self.assert200(resp)
         q_ids = [
-            ident for ident in resp.json['questionnaire']['identifier'] if
+            ident for ident in resp.json['identifier'] if
             ident['system'] == TRUENTH_QUESTIONNAIRE_CODE_SYSTEM]
         self.assertEquals(len(q_ids), 1)
         self.assertEquals(q_ids[0]['value'], 'epic26')
