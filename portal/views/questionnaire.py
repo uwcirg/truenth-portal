@@ -104,4 +104,4 @@ def get_questionnaire(value):
                 TRUENTH_QUESTIONNAIRE_CODE_SYSTEM))
     ident = Identifier(_value=value, system=system).add_if_not_found()
     q = Questionnaire.find_by_identifier(identifier=ident)
-    return jsonify(questionnaire=q.as_fhir())
+    return jsonify(q.as_fhir())
