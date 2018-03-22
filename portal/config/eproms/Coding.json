@@ -6050,31 +6050,37 @@
     },
     {
       "code": "en_AU",
-      "display": "Australian English",
+      "display": "English (Australia)",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "en_GB",
+      "display": "English (United Kingdom)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     },
     {
       "code": "en_US",
-      "display": "American English",
+      "display": "English (United States)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     },
     {
       "code": "de_CH",
-      "display": "Swiss German",
+      "display": "German (Switzerland)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     },
     {
       "code": "es_US",
-      "display": "American Spanish",
+      "display": "Spanish (United States)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     },
     {
       "code": "fr_CA",
-      "display": "Canadian French",
+      "display": "French (Canada)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     },
