@@ -353,12 +353,9 @@ class TestDemographics(TestCase):
         # create OrganizationIdentifier and add to org
         org_id_system = "testsystem"
         org_id_value = "testval"
-        ident = Identifier(id=99,system=org_id_system,value=org_id_value)
-        org_ident = OrganizationIdentifier(organization_id=org_id,
-                                            identifier_id=99)
+        ident = Identifier(id=99, system=org_id_system, value=org_id_value)
+        org.identifiers.append(ident)
         with SessionScope(db):
-            db.session.add(ident)
-            db.session.add(org_ident)
             db.session.commit()
 
         # create Practitioner and add Identifier

@@ -1,5 +1,6 @@
 """Questionnaire module"""
 from flask import url_for
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -9,12 +10,19 @@ from .identifier import Identifier
 from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 
 
+status_types = ('draft', 'published', 'retired')
+status_types_enum = ENUM(
+    *status_types, name='questionnaire_status_enum', create_type=False)
+
+
 class Questionnaire(db.Model):
     __tablename__ = 'questionnaires'
     id = db.Column(db.Integer, primary_key=True)
     identifiers = db.relationship(
         'Identifier', lazy='dynamic', secondary="questionnaire_identifiers")
-    document = db.Column(JSONB)
+    status = db.Column(
+        'status', status_types_enum, server_default='draft', nullable=False)
+    group = db.Column(JSONB)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -67,6 +75,10 @@ class Questionnaire(db.Model):
                     remove_if_not_requested.remove(identifier)
             for obsolete in remove_if_not_requested:
                 self.identifiers.remove(obsolete)
+        if 'status' in data:
+            self.status = data.get('status')
+        if 'group' in data:
+            self.group = data.get('group')
         self = self.add_if_not_found(commit_immediately=True)
         return self
 
@@ -76,6 +88,10 @@ class Questionnaire(db.Model):
             d['identifier'] = []
         for i in self.identifiers:
             d['identifier'].append(i.as_fhir())
+        if self.status:
+            d['status'] = self.status
+        if self.group:
+            d['group'] = self.group
         return d
 
     def add_if_not_found(self, commit_immediately=False):
