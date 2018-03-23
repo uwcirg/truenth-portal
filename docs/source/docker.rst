@@ -27,15 +27,16 @@ Copy and edit the default environment file (from the project root)::
     # update SERVER_NAME to include port if not binding with 80/443
     # SERVER_NAME=localhost:8080
 
+.. note::
+    All docker-compose commands are run from the docker/ directory
+
 Download and run the generated images::
 
-    COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose up web
 
 By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
 
-    DOCKER_IMAGE_TAG='stable'
-    COMPOSE_FILE='docker/docker-compose.yaml'
+    export DOCKER_IMAGE_TAG='stable'
     docker-compose up web
 
 
@@ -49,34 +50,29 @@ Building a Debian Package
 
 To build a Debian package from the current branch of your local repo::
 
-    # Build debian package from local branch
-    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
-    docker-compose run builder
+    # Build debian package from current local branch
+    docker-compose -f docker-compose.build.yaml run builder
 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
 If you would like to create a package from a fork you can override the local repo and branch as below::
 
-    COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
-
     # Override default with environment variables
-    GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
+    export GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
 
     # Run the container (override defaults)
-    docker-compose run builder
+    docker-compose -f docker-compose.build.yaml run builder
 
 Building a Shared Services Docker Image
 ---------------------------------------
 
-
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Override default (Artifactory) docker repo to differentiate locally-built images
-    DOCKER_REPOSITORY=''
+    export DOCKER_REPOSITORY=''
 
     # Build the "web" service locally
-    COMPOSE_FILE='docker/docker-compose.yaml'
     docker-compose build web
 
     docker-compose up web
