@@ -1239,6 +1239,45 @@
         "reference": "api/organization/25000"
       },
       "resourceType": "Organization"
+    },
+    {
+      "id": 30000,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "TNG"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/symptom-tracker-group",
+          "use": "secondary",
+          "value": "self_management"
+        }
+      ],
+      "name": "TrueNTH Global",
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 30100,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-39"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Southampton",
+      "partOf": {
+        "reference": "api/organization/30000"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",
