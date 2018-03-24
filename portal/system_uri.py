@@ -34,6 +34,8 @@ TRUENTH_PROVIDER_SYSTEMS = tuple('{system}/{provider}'.format(
 
 DECISION_SUPPORT_GROUP = '{}/decision-support-group'.format(
     TRUENTH_IDENTITY_SYSTEM)
+SYMPTOM_TRACKER_GROUP = '{}/symptom-tracker-group'.format(
+    TRUENTH_IDENTITY_SYSTEM)
 PRACTICE_REGION = '{}/practice-region'.format(TRUENTH_IDENTITY_SYSTEM)
 SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)
 SHORTNAME_ID = '{}/shortname'.format(TRUENTH_IDENTITY_SYSTEM)
