@@ -55,7 +55,7 @@
       },
       "id": 1001,
       "intervention_name": "self_management",
-      "name": "Allow Self Management if patient not in Sexual Recovery",
+      "name": "Self Management Strategy",
       "resourceType": "AccessStrategy"
     }
   ],
