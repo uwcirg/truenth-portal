@@ -73,7 +73,7 @@ pycrypto==2.6.1
 pyflakes==1.6.0
 Pygments==2.2.0
 pytest==3.5.0
-python-dateutil==2.7.0
+python-dateutil==2.7.1
 python-editor==1.0.3
 python-Levenshtein==0.12.0
 pytz==2018.3
