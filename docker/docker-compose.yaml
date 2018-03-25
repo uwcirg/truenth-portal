@@ -48,6 +48,7 @@ services:
     image: "${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
     command: bash -c '
       env &&
+      wait-for-it --timeout=120 --host="web" --port="$$PORT" --strict &&
       celery beat
         --app portal.celery_worker.celery
         --schedule=/tmp/celerybeat-schedule.db
