@@ -9,6 +9,9 @@ from flask import Flask
 import redis
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
+# Hack - workaround to cyclic imports/missing SQLA models for docker
+from ..config.site_persistence import SitePersistence
+
 from ..audit import configure_audit_log
 from ..config.config import DefaultConfig, SITE_CFG
 from ..csrf import csrf, csrf_blueprint
