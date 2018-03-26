@@ -1,7 +1,7 @@
 ---
 version: "3.2"
 services:
-  # Base service; for extension only, not for direct use
+  # Base service; for extension only; not for direct use
   base: &service_base
     image: "${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
     build:
