@@ -1204,7 +1204,7 @@
         }
       ],
       "id": 25000,
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Switzerland (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
