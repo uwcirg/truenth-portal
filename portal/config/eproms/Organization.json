@@ -443,6 +443,11 @@
                 "code": "en_US",
                 "display": "American English",
                 "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "es_MX",
+                "display": "Spanish",
+                "system": "urn:ietf:bcp:47"
               }
             ]
           }
@@ -1127,6 +1132,11 @@
           "valueCodeableConcept": {
             "coding": [
               {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
                 "code": "sv_SE",
                 "display": "Swedish",
                 "system": "urn:ietf:bcp:47"
@@ -1140,7 +1150,7 @@
         }
       ],
       "id": 24000,
-      "language": "sv_SE",
+      "language": "en_GB",
       "name": "Sweden (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
@@ -1175,6 +1185,11 @@
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
               {
                 "code": "de_CH",
                 "display": "Swiss German",
