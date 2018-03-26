@@ -26,7 +26,8 @@ services:
   web:
     <<: *service_base
     ports:
-      - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
+      - target: "${PORT:-8008}"
+        published: "${EXTERNAL_PORT:-8080}"
     depends_on:
       - db
       - redis
@@ -63,12 +64,12 @@ services:
   redis:
     image: redis
     ports:
-      - "6379"
+      - target: "6379"
 
   db:
     image: postgres
     ports:
-      - "5432"
+      - target: "5432"
     environment:
       - POSTGRES_DB=${PGDATABASE:-portaldb}
     volumes:
