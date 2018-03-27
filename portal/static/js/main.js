@@ -4453,6 +4453,7 @@ var tnthAjax = {
                                         $("#termsCheckbox").addClass("tnth-hide");
                                         $("#termsText").addClass("agreed");
                                         $("#termsCheckbox_default").removeClass("tnth-hide");
+                                        $("#topTerms .terms-of-use-intro").addClass("tnth-hide");
                                         acceptOnNextCheckboxes.push(parentNode);
                                     }
                                 }
