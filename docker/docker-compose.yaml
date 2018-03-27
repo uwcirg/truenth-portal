@@ -42,8 +42,6 @@ services:
         --app portal.celery_worker.celery
         --loglevel debug
       '
-    environment:
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     depends_on:
       - redis
 
