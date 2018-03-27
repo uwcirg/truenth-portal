@@ -326,7 +326,7 @@
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
                             <div class="tab">
                               <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                              <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send invitaion and reminder emails to patient")}}</label>
+                              <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
                               <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
                                 {{profileSendEmail(person)}}
                               </div>
