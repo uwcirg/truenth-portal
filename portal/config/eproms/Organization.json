@@ -1118,7 +1118,7 @@
           "value": "147-01-PLACEHOLDER"
         }
       ],
-      "language": "fr_CA",
+      "language": "en_US",
       "name": "CHU de Quebec - Universite Laval",
       "partOf": {
         "reference": "api/organization/23000"
@@ -1172,7 +1172,7 @@
           "value": "147-02-PLACEHOLDER"
         }
       ],
-      "language": "sv_SE",
+      "language": "en_GB",
       "name": "Skane University Hospital",
       "partOf": {
         "reference": "api/organization/24000"
@@ -1226,7 +1226,7 @@
           "value": "147-03-PLACEHOLDER"
         }
       ],
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Kantonsspital Chur",
       "partOf": {
         "reference": "api/organization/25000"
@@ -1248,7 +1248,7 @@
           "value": "146-39"
         }
       ],
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Kantonsspital St. Gallen",
       "partOf": {
         "reference": "api/organization/25000"
