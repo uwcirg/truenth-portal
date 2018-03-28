@@ -15,12 +15,13 @@
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div id="termsCheckbox_default" class="tnth-hide">
-              <div class="links-container">
-                <a href="/privacy?disableLinks=true" target="_blank">{{_("Privacy Policy")}}</a>
-                <a href="/terms?disableLinks=true" target="_blank">{{_("Terms")}}</a>
-                <a href="" class="terms-url" target="_blank">{{_("General Terms of Use")}}</a>
-              </div>
-              <div class="text-warning">{{_("By clicking on the 'Next' button below, you are consenting to the TrueNTH terms referenced above.")}}</div>
+              {% trans
+                privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true"
+              %}
+                <div class="text-warning links-container">
+                  By clicking "NEXT" - you agree to the <a href="{{terms_url}}" target="_blank">Terms</a>, <a href="{{privacy_url}}" target="_blank">Privacy Policy</a>, and <a href="" class="terms-url" target="_blank">General Terms of Use</a> for the TrueNTH website.
+                </div>
+              {% endtrans %}
             </div>
             <div id="termsCheckbox">
                <div class="terms-checkbox-container">
