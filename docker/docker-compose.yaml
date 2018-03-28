@@ -49,15 +49,15 @@ services:
     <<: *service_base
     command: bash -c '
       env &&
-      wait-for-it --timeout=120 --host="web" --port="$$PORT" --strict &&
+      wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
       celery beat
         --app portal.celery_worker.celery
-        --schedule=/tmp/celerybeat-schedule.db
         --loglevel debug
-        --pidfile=/tmp/celerybeat.pid
+        --schedule /tmp/celerybeat-schedule.db
+        --pidfile /tmp/celerybeat.pid
       '
     depends_on:
-      - redis
+      - celery
 
   redis:
     image: redis
