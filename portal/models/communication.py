@@ -68,7 +68,7 @@ def load_template_args(user, questionnaire_bank_id=None):
 
     def _lookup_assessment_link():
         return (
-            '<a href="{ae_link}" class="btn">Complete Questionnaire</a>'.format(
+            '<a href="{ae_link}">Complete Questionnaire</a>'.format(
                 ae_link=ae_link()))
 
     def _lookup_clinic_name():
