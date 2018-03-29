@@ -317,6 +317,12 @@ class TestCommunication(TestQuestionnaireSetup):
         dd = load_template_args(user=user)
         self.assertEquals(dd['practitioner_name'], 'Bob Jones')
 
+    def test_missing_practitioner(self):
+        self.bless_with_basics()
+        user = db.session.merge(self.test_user)
+        dd = load_template_args(user=user)
+        self.assertEquals(dd['practitioner_name'], '')
+
     def test_decision_support(self):
         self.bless_with_basics()
         self.add_system_user()
