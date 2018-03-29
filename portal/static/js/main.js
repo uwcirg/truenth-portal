@@ -4454,6 +4454,10 @@ var tnthAjax = {
                                         $("#termsText").addClass("agreed");
                                         $("#termsCheckbox_default").removeClass("tnth-hide");
                                         $("#topTerms .terms-of-use-intro").addClass("tnth-hide");
+                                        /*
+                                         * note hiding thank you and continue button for accept on next collection method
+                                         */
+                                        $("#aboutForm .reg-complete-container").addClass("inactive");
                                         acceptOnNextCheckboxes.push(parentNode);
                                     }
                                 }

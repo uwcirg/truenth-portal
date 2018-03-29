@@ -556,6 +556,9 @@
   };
 
   FieldsChecker.prototype.continueToFinish = function() {
+    if ($("div.reg-complete-container").hasClass("inactive")) {
+      return false;
+    }
     this.setProgressBar();
     $("#buttonsContainer").addClass("continue");
     $("div.reg-complete-container").fadeIn();
@@ -693,7 +696,7 @@
     $("#next").on("click", function() {
         $(this).hide();
         $(".loading-message-indicator").show();
-        setTimeout(function() { window.location.reload(); }, 100);
+        setTimeout(function() { window.location.reload(); }, 300);
     });
 
     /*** event for the arrow in the header**/
