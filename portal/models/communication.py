@@ -133,6 +133,8 @@ def load_template_args(user, questionnaire_bank_id=None):
                 url=url_for('user.forgot_password', _external=True)))
 
     def _lookup_practitioner_name():
+        if not user.practitioner_id:
+            return ''
         practitioner = Practitioner.query.get(user.practitioner_id)
         return practitioner.display_name
 
