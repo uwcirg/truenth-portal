@@ -47,6 +47,12 @@ class BaseConfig(object):
     )
     REQUEST_CACHE_EXPIRE = 10
 
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'localhost')
+    MAIL_PORT = os.environ.get('MAIL_PORT', 25)
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
+
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
