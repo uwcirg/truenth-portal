@@ -1,37 +1,12 @@
 {
   "entry": [
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 0,
-      "identifier": [],
-      "indigenous_codings": true,
       "name": "none of the above",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
         {
           "research_protocols": [
             {"name": "TNGR v1"}
@@ -52,26 +27,16 @@
           "value": "crv"
         }
       ],
-      "indigenous_codings": true,
       "name": "TrueNTH Global Registry",
-      "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
         {
           "system": "email",
           "value": "contact.eproms@truenth.org"
-        },
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
         }
-      ],
-      "use_specific_codings": false
+      ]
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -91,28 +56,15 @@
         }
       ],
       "id": 11000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AUA Local Data Center",
       "partOf": {
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
@@ -120,28 +72,15 @@
         }
       ],
       "id": 11100,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Urology Associates (AUA)",
       "partOf": {
         "display": "AUA Local Data Center",
         "reference": "api/organization/11000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -161,28 +100,15 @@
         }
       ],
       "id": 13000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Queensland University of Technology LDC",
       "partOf": {
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -190,28 +116,15 @@
         }
       ],
       "id": 13100,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Wesley Urology Clinic",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -219,28 +132,15 @@
         }
       ],
       "id": 13200,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Genesis Cancer Care Queensland",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -248,28 +148,15 @@
         }
       ],
       "id": 13300,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -277,28 +164,15 @@
         }
       ],
       "id": 13400,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Gc Urology",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -306,28 +180,15 @@
         }
       ],
       "id": 13500,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -335,28 +196,15 @@
         }
       ],
       "id": 13600,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Urology South Brisbane",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -364,28 +212,15 @@
         }
       ],
       "id": 13700,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Department Of Urology, Princess Alexandra Hospital",
       "partOf": {
         "display": "Queensland University of Technology LDC",
         "reference": "api/organization/13000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -405,33 +240,16 @@
         }
       ],
       "id": 12000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "The Alfred",
       "partOf": {
         "display": "TrueNTH Global Registry",
         "reference": "api/organization/10000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
         {
           "research_protocols": [
             {"name": "IRONMAN v2"}
@@ -452,26 +270,16 @@
           "value": "ironman_temp_id"
         }
       ],
-      "indigenous_codings": true,
       "name": "IRONMAN",
-      "race_codings": true,
       "resourceType": "Organization",
       "telecom": [
         {
           "system": "email",
           "value": "pcctcironmanregistry@mskcc.org"
-        },
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
         }
-      ],
-      "use_specific_codings": false
+      ]
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -491,31 +299,25 @@
         }
       ],
       "id": 21000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21100,
@@ -526,26 +328,14 @@
           "value": "146-34"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Urology Associates (AUA)",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
@@ -553,27 +343,14 @@
         }
       ],
       "id": 21200,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australia Recruiting Site B",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
@@ -581,27 +358,14 @@
         }
       ],
       "id": 21210,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 1",
       "partOf": {
         "reference": "api/organization/21200"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
@@ -609,27 +373,14 @@
         }
       ],
       "id": 21220,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "AU B Child Site 2",
       "partOf": {
         "reference": "api/organization/21200"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Brisbane",
@@ -637,83 +388,58 @@
         }
       ],
       "id": 21300,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Australian Prostate Cancer Research Centre - Queensland",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21400,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Eastern Health",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21500,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Westmead Hospital",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Australia/Melbourne",
@@ -721,27 +447,14 @@
         }
       ],
       "id": 21600,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_AU",
       "name": "Macquarie University Hospital",
       "partOf": {
         "reference": "api/organization/21000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -750,6 +463,11 @@
               {
                 "code": "en_US",
                 "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "es_US",
+                "display": "Spanish",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -767,27 +485,14 @@
         }
       ],
       "id": 22000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "USA (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -802,26 +507,14 @@
           "value": "146-06"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Memorial Sloan Kettering Cancer Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
@@ -836,26 +529,14 @@
           "value": "146-33"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Baylor College of Medicine",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -870,30 +551,25 @@
           "value": "146-01"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Dana-Farber Cancer Institute",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22200,
@@ -904,26 +580,14 @@
           "value": "146-95"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of North Carolina",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -938,26 +602,14 @@
           "value": "146-07"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Oregon Health and Sciences Cancer Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
@@ -972,30 +624,25 @@
           "value": "146-07"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Robert H. Lurie Comprehensive Cancer Center Northwestern University",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v2", "retired_as_of": "2018-03-30T04:00:00Z"},
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22230,
@@ -1006,58 +653,47 @@
           "value": "146-94"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Roswell Park Cancer Institute",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22300,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Thomas Jefferson University",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22310,
@@ -1068,30 +704,25 @@
           "value": "146-29"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Aria Health",
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22320,
@@ -1102,30 +733,25 @@
           "value": "146-30"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Doylestown Health",
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22330,
@@ -1136,30 +762,25 @@
           "value": "146-31"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Easton Hospital",
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22340,
@@ -1170,30 +791,25 @@
           "value": "146-32"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Reading Health System",
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22350,
@@ -1204,30 +820,25 @@
           "value": "146-99"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Thomas Jefferson University",
       "partOf": {
         "reference": "api/organization/22300"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22400,
@@ -1238,26 +849,14 @@
           "value": "146-82"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Virgina (UVA)",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1272,26 +871,14 @@
           "value": "146-09"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Washington",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1313,26 +900,14 @@
           "value": "146-02"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Duke Comprehensive Cancer Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1347,26 +922,14 @@
           "value": "146-03"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Sidney Kimmel Comprehensive Cancer Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
@@ -1381,26 +944,14 @@
           "value": "146-86"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Tulane University",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
@@ -1415,26 +966,14 @@
           "value": "146-84"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Alabama-Birmingham",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1449,26 +988,14 @@
           "value": "146-89"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of California Los Angeles",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1483,30 +1010,25 @@
           "value": "146-26"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of California San Diego",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14611,
@@ -1517,30 +1039,24 @@
           "value": "146-11"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Chicago",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14635,
@@ -1551,26 +1067,14 @@
           "value": "146-35"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Illinois at Chicago",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1585,26 +1089,14 @@
           "value": "146-05"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "University of Michigan",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1619,26 +1111,14 @@
           "value": "146-13"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Wayne St. University Karmanos Cancer Institute",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1653,26 +1133,14 @@
           "value": "146-96"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Weill Cornell Medical Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
@@ -1697,27 +1165,14 @@
         }
       ],
       "id": 23000,
-      "identifier": [],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "Canada (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1732,26 +1187,14 @@
           "value": "147-00-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
       "language": "en_US",
       "name": "BC Cancer Agency",
       "partOf": {
         "reference": "api/organization/23000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1766,31 +1209,24 @@
           "value": "147-01-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
-      "language": "fr_CA",
+      "language": "en_US",
       "name": "CHU de Quebec - Universite Laval",
       "partOf": {
         "reference": "api/organization/23000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
               {
                 "code": "sv_SE",
                 "display": "Swedish",
@@ -1805,27 +1241,14 @@
         }
       ],
       "id": 24000,
-      "identifier": [],
-      "indigenous_codings": true,
-      "language": "sv_SE",
+      "language": "en_GB",
       "name": "Sweden (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Europe/Stockholm",
@@ -1840,31 +1263,24 @@
           "value": "147-02-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
-      "language": "sv_SE",
+      "language": "en_GB",
       "name": "Skane University Hospital",
       "partOf": {
         "reference": "api/organization/24000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
               {
                 "code": "de_CH",
                 "display": "Swiss German",
@@ -1879,27 +1295,14 @@
         }
       ],
       "id": 25000,
-      "identifier": [],
-      "indigenous_codings": true,
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Switzerland (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Europe/Zurich",
@@ -1914,26 +1317,14 @@
           "value": "147-03-PLACEHOLDER"
         }
       ],
-      "indigenous_codings": true,
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Kantonsspital Chur",
       "partOf": {
         "reference": "api/organization/25000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "Europe/Zurich",
@@ -1948,22 +1339,51 @@
           "value": "146-39"
         }
       ],
-      "indigenous_codings": true,
-      "language": "de_CH",
+      "language": "en_GB",
       "name": "Kantonsspital St. Gallen",
       "partOf": {
         "reference": "api/organization/25000"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
+      "resourceType": "Organization"
+    },
+    {
+      "id": 30000,
+      "identifier": [
         {
-          "system": "phone",
-          "use": "work",
-          "value": null
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "TNG"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/symptom-tracker-group",
+          "use": "secondary",
+          "value": "self_management"
         }
       ],
-      "use_specific_codings": false
+      "name": "TrueNTH Global",
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 30100,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-39"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Southampton",
+      "partOf": {
+        "reference": "api/organization/30000"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

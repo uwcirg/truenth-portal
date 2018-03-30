@@ -151,19 +151,24 @@
                 handleIncomplete: function() {
                   $("#aboutForm").addClass("full-size");
                   $("#topTerms").removeClass("hide-terms").show();
-                  if (window.performance) {
-                    if (performance.navigation.type === 1) {
-                      //page has been reloaded;
-                      var agreedCheckboxes = $("#topTerms .terms-label:visible i");
-                      if (agreedCheckboxes.length > 1) {
-                          $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-                      };
-                      if (agreedCheckboxes.length === 0) {
-                        $("#termsText").addClass("agreed");
+                  if (!$("#termsText").hasClass("agreed")) {
+                    if (window.performance) {
+                      if (performance.navigation.type === 1) {
+                        //page has been reloaded;
+                        var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
+                        if (agreedCheckboxes.length > 1) {
+                            $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
+                        }
+                        if (agreedCheckboxes.length === 0) {
+                          $("#termsText").addClass("agreed");
+                        }
+                        $("#termsReminderModal").modal("show");
                       }
-                      $("#termsReminderModal").modal("show");
-                    };
-                  };
+                    }
+                  } else {
+                    $("#aboutForm").removeClass("tnth-hide");
+                    self.continueToNext();
+                  }
                   setTimeout(function() { disableHeaderFooterLinks(); }, 1000);
                 }
             },
@@ -551,6 +556,9 @@
   };
 
   FieldsChecker.prototype.continueToFinish = function() {
+    if ($("div.reg-complete-container").hasClass("inactive")) {
+      return false;
+    }
     this.setProgressBar();
     $("#buttonsContainer").addClass("continue");
     $("div.reg-complete-container").fadeIn();
@@ -571,7 +579,9 @@
   }
 
   FieldsChecker.prototype.continueToNext = function(sectionId) {
-    this.setProgressBar(sectionId);
+    if (sectionId) {
+      this.setProgressBar(sectionId);
+    }
     $("#buttonsContainer").removeClass("continue");
     $("div.reg-complete-container").fadeOut();
     $("#next").removeAttr("disabled").addClass("open");
@@ -686,7 +696,7 @@
     $("#next").on("click", function() {
         $(this).hide();
         $(".loading-message-indicator").show();
-        setTimeout(function() { window.location.reload(); }, 100);
+        setTimeout(function() { window.location.reload(); }, 300);
     });
 
     /*** event for the arrow in the header**/
@@ -743,9 +753,9 @@
               var theTerms = {};
               theTerms["agreement_url"] = hasValue(dataUrl) ? dataUrl : $("#termsURL").data().url;
               theTerms["type"] = type;
-              var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+              var org = $("#userOrgs input[name='organization']:checked"), userOrgId = org.val();
               /*** if UI for orgs is not present, need to get the user org from backend ***/
-              if (org.length === 0) {
+              if (!userOrgId) {
                 $.ajax ({
                   type: "GET",
                   url: "/api/demographics/" + userId,
@@ -753,17 +763,18 @@
                 }).done(function(data) {
                   if (data && data.careProvider) {
                     (data.careProvider).forEach(function(item) {
-                      userOrgId = item.reference.split("/").pop();
+                      if (!userOrgId) {
+                        userOrgId = item.reference.split("/").pop();
+                        return true;
+                      }
                     });
                   }
                 }).fail(function() {
 
                 });
-              } else {
-                 userOrgId = org.val();
-              };
+              }
 
-              if (hasValue(userOrgId) && parseInt(userOrgId) !== 0) {
+              if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                 var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
                 if (hasValue(topOrg)) {
                   theTerms["organization_id"] = topOrg;

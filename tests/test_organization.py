@@ -540,6 +540,10 @@ class TestOrganization(TestCase):
         self.assertTrue(10032 in leaves)
         self.assertTrue(10031 in leaves)
 
+    def test_top_names(self):
+        self.deepen_org_tree()
+        self.assertEquals(set(['101', '102']), set(OrgTree().top_level_names()))
+
     def test_staff_leaves(self):
         # test staff with several org associations produces correct list
         self.deepen_org_tree()

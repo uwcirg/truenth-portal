@@ -240,42 +240,56 @@
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
-{% macro profileEmailForm(person) -%}
-    {%- if person -%}
-        <div id="sendEmailForm" data-profile-section-id="patientemailform">
-            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-            <div class="registration-status-container">
-                <span class="text-muted">{{_('Registration status:')}}</span>
-                {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
-                {%- else -%}
-                <h4 class="text-success registration-label">{{_('registered')}}</h4>
-                {%- endif -%}
-            </div>
-            <label id="sendEmailLabel" class="text-muted">
-                {%-if person and person.has_role(ROLE.PATIENT)-%}
-                    {{_("Send email to patient")}}
-                {%-else-%}
-                    {{_("Send email to user")}}
-                {%-endif-%}
-            </label>
-            <select  id="profileEmailSelect" class="form-control bd-element" aria-labelledby="sendEmailLabel">
-                <option value="">{{ _("Select Email...") }}</option>
-                {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
-                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+{% macro render_emailSelector(prefix='registration', status_title=_('Registration Status:'), label=_('not registered')) -%}
+    <div id="{{prefix}}StatusContainer" class="{{prefix}}-status-container">
+        <span class="text-muted">{{status_title}}</span>
+        <h4 class="{{prefix}}-label text-warning">{{label}}</h4>
+        <div class="email-selector-container">
+            <label id="sendEmailLabel" class="text-muted">{{_("Send email to patient")}}</label>
+            <select id="profileEmailSelect" class="form-control bd-element {{prefix}}-email-selector" aria-labelledby="sendEmailLabel">
+                <option value="">{{_("Select Email...")}}</option>
+                {{caller()}}
             </select>
-            <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
-            <div id="profileEmailMessage" class="text-info"></div>
-            <div id="profileEmailErrorMessage" class="text-danger"></div>
-            <input type="hidden" id="patientRegistrationInviteEmailUrl" value="{{url_for('portal.patient_invite_email', user_id=person.id)}}" />
-            <div id="patientReminderEmailBody" class="tnth-hide">{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}</div>
-            <div id="patientReminderEmailSubject" class="tnth-hide">{{ app_text('profileSendEmail reminder email_subject') }}</div>
         </div>
-    {%- endif -%}
+    </div>
+{%- endmacro %}
+{% macro profileEmailForm(prefix='registration', status_title=_('Registration Status:'), status_label=_('not registered'), class='') -%}
+    <div class="form-group well profile-email-container {{class}}" id="profile{{prefix}}SendEmailContainer" data-profile-section-id="patientemailform" data-email-type="{{prefix}}">
+       <div id="{{prefix}}StatusContainer" class="{{prefix}}-status-container">
+            <span class="text-muted">{{status_title}}</span>
+            <h4 class="{{prefix}}-label text-warning">{{status_label}}</h4>
+            <div class="email-selector-container">
+                <label id="send{{prefix}}EmailLabel" class="text-muted">{{_("Send email to patient")}}</label>
+                <select id="profile{{prefix}}EmailSelect" class="form-control bd-element {{prefix}}-email-selector email-selector" aria-labelledby="sendEmailLabel">
+                    <option value="">{{_("Select Email...")}}</option>
+                    {{caller()}}
+                </select>
+            </div>
+        </div>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
+        <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info"></div>
+        <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger"></div>
+    </div>
 {%- endmacro %}
 {% macro profileSendEmail(person) -%}
     {%- if person -%}
-        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
-    {% endif %}
+        <div class="email-form-container">
+            {% call profileEmailForm() %}
+                {%if person.has_role('write_only')%}
+                    <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("TrueNTH Invite")}}</option>
+                {%endif %}
+                <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
+            {% endcall %}
+            <!--
+                set P3P invite/reminder tile visibility based on whether user's org matches config variable, ACCEPT_TERMS_ON_NEXT_ORG - this is the case of MUSIC patient
+            -->
+            {% set cssClass %}{%- if person.first_top_organization() and (person.first_top_organization().name == config.ACCEPT_TERMS_ON_NEXT_ORG) -%}active{%-endif-%}{% endset %}
+            {% call profileEmailForm(prefix='assessment', status_title=_('P3P Assessment Status:'), status_label=_('not available'), class=cssClass) %}
+                <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("Initial invite to complete P3P assessment")}}</option>
+                <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("Reminder to complete P3P assessment")}}</option>
+            {% endcall %}
+        </div>
+    {%- endif -%}
 {%- endmacro %}
 {% macro profileStaffRegistrationEmail(person) -%}
     {%- if person -%}
@@ -288,7 +302,7 @@
             <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn disabled">{{ _("Send registration email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email disabled">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
         <input type="hidden" id="staffRegistrationEmailUrl" value="{{url_for('staff.staff_registration_email', user_id=person.id)}}" />
@@ -310,13 +324,13 @@
                           </div>
                         </div>
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                        <div class="tab">
-                          <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send registration email to patient")}}</label>
-                          <div class="tab-content">
-                            <div id="registrationEmailContainer">{{profileSendEmail(person)}}</div>
-                          </div>
-                        </div>
+                            <div class="tab">
+                              <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                              <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if person and person.has_role('write_only') %}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
+                              <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
+                                {{profileSendEmail(person)}}
+                              </div>
+                            </div>
                         {%- endif %}
                         {% if current_user and (current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
                          <div class="tab">
@@ -817,7 +831,7 @@
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
                     <br/>
-                    <div>{{profileEmailForm(person)}}</div>
+                    <div>{{profileSendEmail(person)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>

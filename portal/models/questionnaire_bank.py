@@ -198,7 +198,7 @@ class QuestionnaireBank(db.Model):
             'link': {
                 'rel': 'self',
                 'href': url_for(
-                    'assessment_engine_api.questionnaire_bank_list',
+                    'questionnaire_api.questionnaire_bank_list',
                     _external=True),
             },
             'entry': objs,

@@ -9,6 +9,54 @@
       "intervention_name": "assessment_engine",
       "name": "fix assessment_engine link_url and update on completion",
       "resourceType": "AccessStrategy"
+    },
+    {
+      "description": "Confirm patient associated with an org with self_management identifier",
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "all"
+          },
+          {
+            "name": "strategy_1",
+            "value": "in_role_list"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "role_list",
+                "value": [
+                  "patient"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "limit_by_clinic_w_id"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "identifier_value",
+                "value": "self_management"
+              },
+              {
+                "name": "identifier_system",
+                "value": "http://us.truenth.org/identity-codes/symptom-tracker-group"
+              }
+            ]
+          }
+        ]
+      },
+      "id": 1001,
+      "intervention_name": "self_management",
+      "name": "Self Management Strategy",
+      "resourceType": "AccessStrategy"
     }
   ],
   "id": "SitePersistence v0.2",

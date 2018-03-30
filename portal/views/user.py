@@ -12,9 +12,12 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
+from ..models.app_text import app_text, MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
-from ..models.auth import Client, Token
+from ..models.auth import Token
+from ..models.client import Client, client_event_dispatch
+from ..models.communication import load_template_args
 from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -28,7 +31,8 @@ from ..models.user import (
     get_user_or_abort,
     permanently_delete_user,
     User,
-    UserRelationship
+    UserRelationship,
+    validate_email
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
@@ -74,8 +78,8 @@ def me():
 
     """
     user = current_user()
-    return jsonify(id=user.id, username=user.username,
-                   email=user.email)
+    return jsonify(
+        id=user.id, username=user.username, email=user.email)
 
 
 @user_api.route('/account', methods=('POST',))
@@ -1449,8 +1453,7 @@ def unique_email():
 
     """
     email = request.args.get('email')
-    if not email or '@' not in email or len(email) < 6:
-        abort(400, "requires a valid email address")
+    validate_email(email)
     match = User.query.filter_by(email=email)
     assert (match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
@@ -1509,7 +1512,7 @@ def user_documents(user_id):
         schema:
           id: user_documents
           properties:
-            documents:
+            user_documents:
               type: array
               items:
                 type: object
@@ -1738,6 +1741,12 @@ def upload_user_document(user_id):
     auditable_event("patient report {} posted for user {}".format(
         doc.uuid, user_id), user_id=current_user().id, subject_id=user.id,
         context='assessment')
+
+    # This is a notifiable event; trigger any applicable notifications
+    data.update({"document_id": doc.id})
+    del data['allowed_extensions']
+    client_event_dispatch(event="user_document_upload", user=user, **data)
+
     return jsonify(message="ok")
 
 
@@ -1980,6 +1989,88 @@ def set_table_preferences(user_id, table_name):
     db.session.commit()
 
     return jsonify(pref.as_json())
+
+
+@user_api.route('/user/<int:user_id>/invite', methods=('POST',))
+@oauth.require_oauth()  # for service token access, oauth must come first
+@roles_required([ROLE.SERVICE])
+def invite(user_id):
+    """Send invite email message to given user
+
+    It is expected that the named user has the expected roles and
+    affiliations such as organization to determine the appropriate
+    email context to send.
+
+    Include query param `?preview=True`
+    to have the email content generated but not sent.
+
+    Only available via service token.
+    ---
+    tags:
+      - User
+    operationId: user_invite
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: preview
+        in: query
+        description: Set to simply preview the message - don't send!
+        required: false
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns success of call (i.e. {message="sent"}, or JSON of the
+          generated message if `preview` is set.
+        schema:
+          id: user_invite
+          properties:
+            sender:
+              type: string
+              description: Email message sender
+            recipients:
+              type: string
+              description: Email message recipients
+            subject:
+              type: string
+              description: Email message subject
+            body:
+              type: string
+              description: Email message body, includes footer
+      400:
+        description:
+          if given user lacks a legitimate looking email address
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    user = get_user_or_abort(user_id)
+    validate_email(user.email)
+    sender = current_app.config.get("MAIL_DEFAULT_SENDER")
+    org = user.first_top_organization()
+    org_name = org.name if org else None
+    name_key = UserInviteEmail_ATMA.name_key(org=org_name)
+    args = load_template_args(user=user)
+    mail = MailResource(app_text(name_key), variables=args)
+    email = EmailMessage(
+        subject=mail.subject, body=mail.body, recipients=user.email,
+        sender=sender, user_id=user.id)
+    if request.args.get('preview'):
+        message = email.as_json()
+    else:
+        email.send_message()
+        db.session.add(email)
+        db.session.commit()
+        message = "okay"
+    return jsonify(message=message)
 
 
 @user_api.route('/user/<int:user_id>/messages')

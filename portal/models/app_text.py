@@ -234,16 +234,51 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
     def name_key(**kwargs):
         """Generate AppText name key for User Invite Email Content
 
-        Not expecting any args at this time - may specialize per study
-        or organization in the future as needed.
-        TODO: Removing hardcoding of ePROMS org names
+        Some organizations supply customized content - which is indexed
+        by adding the org name to the end of the app_text pattern
+        `patient invite email`
+
+        :param org: Typically top level org name - used to look for
+        customized content.
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
-            return "profileSendEmail invite email {}".format(kwargs.get('org'))
-        return "profileSendEmail invite email"
+        default = "patient invite email"
+        # See if content is available with the given org as the suffix
+        if kwargs.get('org'):
+            specialized = " ".join((default, kwargs.get('org')))
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
+        return default
+
+
+class UserReminderEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for User Reminder Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for User Reminder Email Content
+
+        Some organizations supply customized content - which is indexed
+        by adding the org name to the end of the app_text pattern
+        `patient reminder email`
+
+        :param org: Typically top level org name - used to look for
+        customized content.
+
+        :returns: string for AppText.name field
+
+        """
+        default = "patient reminder email"
+        # See if content is available with the given org as the suffix
+        if kwargs.get('org'):
+            specialized = " ".join((default, kwargs.get('org')))
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
+        return default
 
 
 class SiteSummaryEmail_ATMA(AppTextModelAdapter):

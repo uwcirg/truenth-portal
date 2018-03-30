@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
+import os
 from tests import TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr, mock_questionnairebanks
 from tests.test_assessment_status import metastatic_baseline_instruments
@@ -12,7 +13,8 @@ from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
-from portal.models.intervention import INTERVENTION, UserIntervention
+from portal.models.intervention import (
+    Intervention, INTERVENTION, UserIntervention)
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
@@ -1069,3 +1071,77 @@ class TestIntervention(TestCase):
         set1 = set((foo.email, boo.email))
         set2 = set(message.recipients.split())
         self.assertEquals(set1, set2)
+
+    def test_dynamic_intervention_access(self):
+        # Confirm interventions dynamically added still accessible
+        newbee = Intervention(
+            name='newbee', description='test', subscribed_events=0)
+        with SessionScope(db):
+            db.session.add(newbee)
+            db.session.commit()
+
+        self.assertEquals(INTERVENTION.newbee, db.session.merge(newbee))
+
+    def test_bogus_intervention_access(self):
+        with self.assertRaises(ValueError):
+            INTERVENTION.phoney
+
+        self.login()
+        self.promote_user(role_name=ROLE.SERVICE)
+        data = {'user_id': TEST_USER_ID, 'access': "granted"}
+        rv = self.client.put('/api/intervention/phoney', data=data)
+        self.assert404(rv)
+
+
+class TestEpromsStrategies(TestCase):
+    """Tests relying on eproms config"""
+
+    def setUp(self):
+        super(TestEpromsStrategies, self).setUp()
+
+        from portal.config.model_persistence import ModelPersistence
+        from portal.config.site_persistence import models
+        from portal.models.fhir import Coding
+        from portal.models.research_protocol import ResearchProtocol
+
+        eproms_config_dir = os.path.join(
+            os.path.dirname(__file__), "../portal/config/eproms")
+
+        # Load minimal set of persistence files for access_strategy, in same
+        # order defined in site_persistence
+        needed = {
+            ResearchProtocol,
+            Coding,
+            Organization,
+            AccessStrategy,
+            Intervention}
+
+        for model in models:
+            if model.cls not in needed:
+                continue
+            mp = ModelPersistence(
+                model_class=model.cls, sequence_name=model.sequence_name,
+                lookup_field=model.lookup_field)
+            mp.import_(keep_unmentioned=False, target_dir=eproms_config_dir)
+
+    def test_self_mgmt(self):
+        """Patient w/ Southampton org should get access to self_mgmt"""
+        self.promote_user(role_name=ROLE.PATIENT)
+        southampton = Organization.query.filter_by(name='Southampton').one()
+        self.test_user.organizations.append(southampton)
+        self_mgmt = Intervention.query.filter_by(name='self_management').one()
+        self.assertTrue(self_mgmt.quick_access_check(self.test_user))
+
+    def test_self_mgmt_user_denied(self):
+        """Non-patient w/ Southampton org should NOT get self_mgmt access"""
+        southampton = Organization.query.filter_by(name='Southampton').one()
+        self.test_user.organizations.append(southampton)
+        self_mgmt = Intervention.query.filter_by(name='self_management').one()
+        self.assertFalse(self_mgmt.quick_access_check(self.test_user))
+
+    def test_self_mgmt_org_denied(self):
+        """Patient w/o Southampton org should NOT get self_mgmt access"""
+        self.promote_user(role_name=ROLE.PATIENT)
+        self_mgmt = Intervention.query.filter_by(name='self_management').one()
+        user = db.session.merge(self.test_user)
+        self.assertFalse(self_mgmt.quick_access_check(user))

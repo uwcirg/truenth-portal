@@ -41,6 +41,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2836eccf-13c5-f249-6dac-8920060c3764&editorUrl=true",
+      "name": "Michigan Urological Surgery Improvement Collaborative (MUSIC) patient website consent URL",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "Consent Date",
       "name": "consent date label",
       "resourceType": "AppText"
@@ -71,8 +76,23 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e45bef79-e2c1-ff89-4834-137e6937dae3",
-      "name": "profileSendEmail invite email",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=6d96f16f-c6fc-4fda-fa54-4e21027c8261",
+      "name": "patient invite email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=174a16fb-53a4-1806-6756-e5fa25723a88",
+      "name": "patient invite email Michigan Urological Surgery Improvement Collaborative (MUSIC)",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9057ec06-1d9f-b4a6-2d32-2102a596ac5f",
+      "name": "patient reminder email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96",
+      "name": "patient reminder email Michigan Urological Surgery Improvement Collaborative (MUSIC)",
       "resourceType": "AppText"
     },
     {

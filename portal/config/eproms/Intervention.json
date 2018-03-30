@@ -7,6 +7,7 @@
       "name": "assessment_engine",
       "public_access": true,
       "resourceType": "Intervention",
+      "subscribed_events": 1,
       "status_text": ""
     },
     {
@@ -15,6 +16,7 @@
       "link_label": "Care Plan",
       "name": "care_plan",
       "public_access": false,
+      "subscribed_events": 1,
       "resourceType": "Intervention"
     },
     {
@@ -22,6 +24,7 @@
       "description": "Community of Wellness",
       "name": "community_of_wellness",
       "public_access": false,
+      "subscribed_events": 1,
       "resourceType": "Intervention"
     },
     {
@@ -31,6 +34,7 @@
       "link_label": "Go to Decision Support",
       "name": "decision_support_p3p",
       "public_access": false,
+      "subscribed_events": 1,
       "resourceType": "Intervention"
     },
     {
@@ -38,6 +42,7 @@
       "description": "Decision Support WiserCare",
       "name": "decision_support_wisercare",
       "public_access": false,
+      "subscribed_events": 1,
       "resourceType": "Intervention"
     },
     {
@@ -46,6 +51,7 @@
       "name": "default",
       "public_access": false,
       "resourceType": "Intervention",
+      "subscribed_events": 1,
       "status_text": ""
     },
     {
@@ -56,6 +62,7 @@
       "name": "self_management",
       "public_access": false,
       "resourceType": "Intervention",
+      "subscribed_events": 1,
       "status_text": ""
     },
     {
@@ -65,6 +72,7 @@
       "name": "sexual_recovery",
       "public_access": false,
       "resourceType": "Intervention",
+      "subscribed_events": 1,
       "status_text": ""
     },
     {
@@ -72,6 +80,14 @@
       "description": "Social Support Network",
       "name": "social_support",
       "public_access": false,
+      "subscribed_events": 1,
+      "resourceType": "Intervention"
+    },
+    {
+      "description": "MUSIC Integration",
+      "name": "music",
+      "public_access": false,
+      "subscribed_events": 3,
       "resourceType": "Intervention"
     }
   ],

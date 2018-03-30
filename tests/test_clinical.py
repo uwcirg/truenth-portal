@@ -119,7 +119,23 @@ class TestClinical(TestCase):
         self.assert200(rv)
         clinical_data = json.loads(rv.data)
         self.assertEquals(clinical_data['status'], 'unknown')
-        self.assertEquals(clinical_data['issued'], new_issued)
+        self.assertEquals(clinical_data['issued'], new_issued+"+00:00")  # tz
+        self.assertEquals(clinical_data['valueQuantity']['value'], 'false')
+
+    def test_clinical0forFalse(self):
+        self.prep_db_for_clinical()
+        self.login()
+        obs = Observation.query.first()
+        new_issued = '2016-06-06T06:06:06'
+        data = {'status': 'unknown', 'issued': new_issued}
+        data['valueQuantity'] = {'units': 'boolean', 'value': 0}
+        rv = self.client.put('/api/patient/{}/clinical/{}'.format(
+            TEST_USER_ID, obs.id), content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+        clinical_data = json.loads(rv.data)
+        self.assertEquals(clinical_data['status'], 'unknown')
+        self.assertEquals(clinical_data['issued'], new_issued+"+00:00")  # tz
         self.assertEquals(clinical_data['valueQuantity']['value'], 'false')
 
     def test_empty_clinical_get(self):

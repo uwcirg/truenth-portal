@@ -157,17 +157,22 @@
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82",
-      "name": "profileSendEmail invite email",
+      "name": "patient invite email",
       "resourceType": "AppText"
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23",
-      "name": "profileSendEmail invite email IRONMAN",
+      "name": "patient invite email IRONMAN",
       "resourceType": "AppText"
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82",
-      "name": "profileSendEmail invite email TrueNTH Global Registry",
+      "name": "patient invite email TrueNTH Global Registry",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=8e562c71-e77e-8eb3-7716-152da4a59a32",
+      "name": "patient reminder email",
       "resourceType": "AppText"
     },
     {

@@ -7,6 +7,7 @@ from flask_webtest import SessionScope
 import os
 
 from tests import TestCase, TEST_USER_ID
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.auth import create_service_token
 from portal.models.intervention import INTERVENTION
@@ -18,24 +19,33 @@ class TestUserDocument(TestCase):
     """User Document tests"""
 
     def test_get_user_documents(self):
-        #tests whether we can successfully get the list of user documents for a user
-        ud1 = UserDocument(document_type="TestFile", uploaded_at=datetime.utcnow(),
-                          filename="test_file_1.txt", filetype="txt", uuid="012345")
-        ud2 = UserDocument(document_type="AlternateTestFile", uploaded_at=datetime.utcnow(),
-                          filename="test_file_2.txt", filetype="txt", uuid="098765")
+        """tests get the list of user documents for a user"""
+        now = datetime.utcnow()
+        ud1 = UserDocument(
+            document_type="TestFile", uploaded_at=now,
+            filename="test_file_1.txt", filetype="txt", uuid="012345")
+        ud2 = UserDocument(
+            document_type="AlternateTestFile", uploaded_at=now,
+            filename="test_file_2.txt", filetype="txt", uuid="098765")
         self.test_user.documents.append(ud1)
         self.test_user.documents.append(ud2)
         with SessionScope(db):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.client.get('/api/user/{}/user_documents'.format(TEST_USER_ID))
+        rv = self.client.get(
+            '/api/user/{}/user_documents'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['user_documents']), 2)
         # tests document_type filter
-        rv = self.client.get('/api/user/{}/user_documents?document_type=TestFile'.format(TEST_USER_ID))
+        rv = self.client.get(
+            '/api/user/{}/user_documents?document_type=TestFile'.format(
+                TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['user_documents']), 1)
+        self.assertEquals(
+            rv.json['user_documents'][0]['uploaded_at'],
+            FHIR_datetime.as_fhir(now))
 
 
     def test_post_patient_report(self):
@@ -91,4 +101,3 @@ class TestUserDocument(TestCase):
                             TEST_USER_ID,udoc.id))
         self.assert200(rv)
         self.assertEqual(rv.data,test_contents)
-

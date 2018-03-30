@@ -23,7 +23,7 @@ from ..models.app_text import (
     VersionedResource,
     WebsiteDeclarationForm_ATMA
 )
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.coredata import Coredata
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage

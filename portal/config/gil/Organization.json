@@ -1,32 +1,11 @@
 {
   "entry": [
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 0,
-      "identifier": [],
-      "indigenous_codings": true,
       "name": "none of the above",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -61,22 +40,10 @@
           "value": "state:WA"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Washington",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -111,26 +78,14 @@
           "value": "UWMC"
         }
       ],
-      "indigenous_codings": true,
       "name": "UW Medicine (University of Washington)",
       "partOf": {
         "display": "University of Washington",
         "reference": "api/organization/101"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -160,26 +115,14 @@
           "value": "SCCA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Seattle Cancer Care Alliance (SCCA) Urology Clinic",
       "partOf": {
         "display": "University of Washington",
         "reference": "api/organization/101"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -209,26 +152,14 @@
           "value": "Harborview"
         }
       ],
-      "indigenous_codings": true,
       "name": "The Urology Clinic at Harborview",
       "partOf": {
         "display": "University of Washington",
         "reference": "api/organization/101"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -268,28 +199,10 @@
           "value": "UCSF"
         }
       ],
-      "indigenous_codings": true,
       "name": "UCSF Urologic Surgical Oncology Clinic",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 202,
       "identifier": [
         {
@@ -308,22 +221,10 @@
           "value": "state:CA"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, San Francisco",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -348,22 +249,10 @@
           "value": "state:MI"
         }
       ],
-      "indigenous_codings": true,
       "name": "Karmanos Cancer Institute at Wayne State University",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -403,26 +292,14 @@
           "value": "UPG Urology"
         }
       ],
-      "indigenous_codings": true,
       "name": "Wayne State University Physician Group, Dearborn",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -447,26 +324,14 @@
           "value": "Weisberg Cancer Treatment Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -491,26 +356,14 @@
           "value": "Wertz Clinic"
         }
       ],
-      "indigenous_codings": true,
       "name": "Wertz Clinic at Karmanos Cancer Center",
       "partOf": {
         "display": "Karmanos Cancer Institute at Wayne State University",
         "reference": "api/organization/302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -535,22 +388,10 @@
           "value": "1508001561"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Michigan",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -585,32 +426,14 @@
           "value": "The University of Michigan"
         }
       ],
-      "indigenous_codings": true,
       "name": "The University of Michigan Department of Urology",
       "partOf": {
         "display": "University of Michigan",
         "reference": "api/organization/402"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 502,
       "identifier": [
         {
@@ -629,22 +452,10 @@
           "value": "1912987553"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, Davis",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -679,26 +490,14 @@
           "value": "UC Davis Health"
         }
       ],
-      "indigenous_codings": true,
       "name": "UC Davis Medical Center",
       "partOf": {
         "display": "University of California, Davis",
         "reference": "api/organization/502"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -723,22 +522,10 @@
           "value": "1639306798"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of California, Los Angeles",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -778,26 +565,14 @@
           "value": "UCLA Health"
         }
       ],
-      "indigenous_codings": true,
       "name": "Clark Urology Center, Westwood",
       "partOf": {
         "display": "University of California, Los Angeles",
         "reference": "api/organization/602"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Denver",
@@ -822,26 +597,14 @@
           "value": "uclasm"
         }
       ],
-      "indigenous_codings": true,
       "name": "Frank Clark Urology Center, Santa Monica",
       "partOf": {
         "display": "University of California, Los Angeles",
         "reference": "api/organization/602"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -866,22 +629,10 @@
           "value": "state:GA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Emory University",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -921,26 +672,14 @@
           "value": "St. Joseph's Hospital"
         }
       ],
-      "indigenous_codings": true,
       "name": "Emory Saint Joseph's Hospital",
       "partOf": {
         "display": "Emory University",
         "reference": "api/organization/702"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -965,26 +704,14 @@
           "value": "Winship"
         }
       ],
-      "indigenous_codings": true,
       "name": "Winship Cancer Institute of Emory University",
       "partOf": {
         "display": "Emory University",
         "reference": "api/organization/702"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1004,28 +731,10 @@
           "value": "state:FL"
         }
       ],
-      "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 801,
       "identifier": [
         {
@@ -1059,31 +768,13 @@
           "value": "Moffitt Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Moffitt Cancer Center",
         "partOf": {
         "reference": "api/organization/802"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 902,
       "identifier": [
         {
@@ -1102,28 +793,10 @@
           "value": "state:MA"
         }
       ],
-      "indigenous_codings": true,
       "name": "Dana-Farber Cancer Institute",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 901,
       "identifier": [
         {
@@ -1157,32 +830,14 @@
           "value": "Dana-Farber/Brigham and Women's Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Dana-Farber/Brigham and Women's Cancer Center",
       "partOf": {
         "display": "Dana-Farber Cancer Institute",
         "reference": "api/organization/902"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 903,
       "identifier": [
         {
@@ -1201,26 +856,14 @@
           "value": "Beth Israel Deaconess"
         }
       ],
-      "indigenous_codings": true,
       "name": "The Cancer Center at Beth Israel Deaconess Medical Center",
       "partOf": {
         "display": "Dana-Farber Cancer Institute",
         "reference": "api/organization/902"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1240,28 +883,10 @@
           "value": "state:NY"
         }
       ],
-      "indigenous_codings": true,
       "name": "Memorial Sloan Kettering",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1001,
       "identifier": [
         {
@@ -1290,25 +915,13 @@
           "value": "Memorial Sloan Kettering"
         }
       ],
-      "indigenous_codings": true,
       "name": "Memorial Sloan Kettering Cancer Center",
       "partOf": {
         "reference": "api/organization/1002"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -1323,28 +936,10 @@
           "value": "state:OR"
         }
       ],
-      "indigenous_codings": true,
       "name": "Oregon Health & Science University",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1101,
       "identifier": [
         {
@@ -1368,31 +963,13 @@
           "value": "Oregon Health & Science University"
         }
       ],
-      "indigenous_codings": true,
       "name": "Oregon Health & Science University",
       "partOf": {
         "reference": "api/organization/1102"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1202,
       "identifier": [
         {
@@ -1411,28 +988,10 @@
           "value": "state:CO"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Colorado, Denver",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1201,
       "identifier": [
         {
@@ -1461,32 +1020,14 @@
           "value": "CU Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of Colorado Cancer Center - Anschutz",
       "partOf": {
         "display": "University of Colorado, Denver",
         "reference": "api/organization/1202"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1302,
       "identifier": [
         {
@@ -1505,28 +1046,10 @@
           "value": "state:NC"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke University",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1301,
       "identifier": [
         {
@@ -1560,32 +1083,14 @@
           "value": "Duke Urology"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Urology",
       "partOf": {
         "display": "Duke University",
         "reference": "api/organization/1302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1303,
       "identifier": [
         {
@@ -1604,32 +1109,14 @@
           "value": "The Duke Cancer Center"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Cancer Center",
       "partOf": {
         "display": "Duke University",
         "reference": "api/organization/1302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1304,
       "identifier": [
         {
@@ -1648,32 +1135,14 @@
           "value": "dccnd"
         }
       ],
-      "indigenous_codings": true,
       "name": "Duke Cancer Center North Durham",
       "partOf": {
         "display": "Duke University",
         "reference": "api/organization/1302"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1402,
       "identifier": [
         {
@@ -1692,28 +1161,10 @@
           "value": "state:MD"
         }
       ],
-      "indigenous_codings": true,
       "name": "Johns Hopkins University",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1401,
       "identifier": [
         {
@@ -1747,32 +1198,14 @@
           "value": "Sibley"
         }
       ],
-      "indigenous_codings": true,
       "name": "Sibley Memorial Hospital",
       "partOf": {
         "display": "Johns Hopkins University",
         "reference": "api/organization/1402"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1403,
       "identifier": [
         {
@@ -1791,32 +1224,14 @@
           "value": "Suburban"
         }
       ],
-      "indigenous_codings": true,
       "name": "Surburban Hospital",
       "partOf": {
         "display": "Johns Hopkins University",
         "reference": "api/organization/1402"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
-      "extension": [
-        {
-          "timezone": "UTC",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
       "id": 1502,
       "identifier": [
         {
@@ -1835,22 +1250,10 @@
           "value": "1285689299"
         }
       ],
-      "indigenous_codings": true,
       "name": "University of North Carolina at Chapel Hill",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1885,26 +1288,14 @@
           "value": "Lineberger"
         }
       ],
-      "indigenous_codings": true,
       "name": "UNC Lineberger Comprehensive Cancer Center",
       "partOf": {
         "display": "University of North Carolina at Chapel Hill",
         "reference": "api/organization/1502"
       },
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "phone",
-          "use": "work",
-          "value": null
-        }
-      ],
-      "use_specific_codings": false
+      "resourceType": "Organization"
     },
     {
-      "address": [],
-      "ethnicity_codings": true,
       "extension": [
         {
           "timezone": "America/New_York",
@@ -1919,6 +1310,11 @@
           "value": "music"
         },
         {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "MUSIC"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/practice-region",
           "use": "secondary",
           "value": "state:MI"
@@ -1930,17 +1326,86 @@
         }
       ],
       "indigenous_codings": false,
-      "name": "MUSIC",
-      "race_codings": true,
-      "resourceType": "Organization",
-      "telecom": [
+      "name": "Michigan Urological Surgery Improvement Collaborative (MUSIC)",
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
         {
-          "system": "phone",
-          "use": "work",
-          "value": null
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
-      "use_specific_codings": false
+      "id": 40002,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Michigan Medicine - Department of Urology"
+        }
+      ],
+      "name": "Michigan Medicine - Department of Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40003,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Sherwood Medical Center, PC"
+        }
+      ],
+      "name": "Sherwood Medical Center, PC",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40004,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Pinson Urology Center"
+        }
+      ],
+      "name": "Pinson Urology Center",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

@@ -15,6 +15,7 @@ from ..date_tools import localize_datetime
 from ..extensions import user_manager
 from .intervention import INTERVENTION
 from .message import EmailMessage
+from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
 from ..trace import dump_trace, establish_trace, trace
 from .user import User
@@ -76,6 +77,22 @@ def load_template_args(user, questionnaire_bank_id=None):
             return org.name
         return ""
 
+    def _lookup_decision_support_via_access_button():
+        return make_button(_lookup_decision_support_via_access_link())
+
+    def _lookup_decision_support_via_access_link():
+        token = user_manager.token_manager.generate_token(user.id)
+        url = url_for(
+            'portal.access_via_token', token=token,
+            next_step='decision_support', _external=True)
+        system_user = User.query.filter_by(email='__system__').one()
+        auditable_event(
+            "generated access token for user {} to embed in email".format(
+                user.id),
+            user_id=system_user.id, subject_id=user.id,
+            context='authentication')
+        return '<a href="{url}">TrueNTH P3P</a>'.format(url=url)
+
     def _lookup_debug_slot():
         """Special slot added when configuration DEBUG_EMAIL is set"""
         open_div = '<div style="background-color: #D3D3D3">'
@@ -114,6 +131,12 @@ def load_template_args(user, questionnaire_bank_id=None):
         return (
             '<a href="{url}">Password Reset</a>'.format(
                 url=url_for('user.forgot_password', _external=True)))
+
+    def _lookup_practitioner_name():
+        if not user.practitioner_id:
+            return ''
+        practitioner = Practitioner.query.get(user.practitioner_id)
+        return practitioner.display_name
 
     def _lookup_questionnaire_due_date():
         if not questionnaire_bank_id:

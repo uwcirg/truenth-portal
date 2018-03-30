@@ -5,7 +5,7 @@ from urlparse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.coredata import Coredata
 from ..models.user import current_user, get_user_or_abort
 
@@ -54,7 +54,9 @@ def still_needed(user_id):
         `enter manually - interview assisted`
 
     :returns: simple JSON struct with a list (potentially empty) of the
-        coredata elements still needed
+        coredata elements still needed as 'field' elements, with an optional
+        'collection_method' defined if needed.
+
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user_or_abort(user_id)

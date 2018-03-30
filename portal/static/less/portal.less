@@ -319,7 +319,7 @@ a.btn {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 50em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -492,6 +492,22 @@ div.right-panel {
   overflow: auto;
   padding: 1em;
   background-color:@wellColor;
+}
+#termsCheckbox_default {
+  width: 100%;
+  max-width: 100%;
+  margin: auto;
+  .links-container {
+    a {
+      display: inline-block;
+      text-decoration: underline;
+    }
+  }
+}
+@media (min-width: 992px) {
+  #termsCheckbox_default {
+    width: 85%;
+  }
 }
 #termsText {
   padding: 0.5em;
@@ -907,6 +923,7 @@ div.pull-right {
           position: relative;
           margin: 0;
           left: -4px;
+          top: 6px;
         }
       }
       #fillOrgs {
@@ -1608,12 +1625,33 @@ div.pull-right {
     display: none
   }
 
-  #btnProfileSendEmail {
+  .email-form-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  #btnProfileSendEmail,
+  .btn-send-email {
     margin-top: 1em;
     font-size: @smallBtnSize;
+    display: block;
+  }
+  .profile-email-container {
+    .btn-send-email {
+      margin: auto;
+      width: 100%;
+      max-width: 100%;
+    }
   }
   #btnPasswordResetEmail {
     font-size: @smallBtnSize;
+  }
+
+  #profileassessmentSendEmailContainer {
+    display: none;
+    &.active {
+      display: block;
+    }
   }
 
   h4.detail-title {
@@ -2035,16 +2073,22 @@ div.noOrg-container {
   }
 }
 
-#profileSendEmailContainer {
+#profileSendEmailContainer,
+.profile-email-container {
   background-color: @wellColor;
   border-radius: 6px;
   border: 1px solid @wellBorderColor;
+  margin: 1em;
   padding-left: 2em;
   padding-right: 2em;
   max-width: 100%;
   width: 400px;
-  label{
-    font-size:@mediumText;
+  .email-selector-container {
+    margin-bottom: 1em;
+  }
+  .send-email-info,
+  .send-email-error {
+    margin-top: 1em;
   }
 }
 #profileEmailMessage {
@@ -2607,13 +2651,21 @@ div.org-container {
 div.biopsy-option:last-of-type{
   margin-top: 1px;
 }
-.registration-status-container {
+.registration-status-container,
+.assessment-status-container {
   margin:0 0 0.8em 0;
   font-size: @mediumText;
+  width: 100%;
+  max-width: 100%;
+  .report-link {
+    text-decoration: underline;
+  }
 }
-.registration-label {
+.registration-label,
+.assessment-label{
   display:inline-block;
   opacity: 0.7;
+  margin-bottom: 1em;
 }
 .timezone-container {
   padding-bottom: 0;
@@ -3077,7 +3129,7 @@ div.timezone-warning.text-warning {
   }
   #termsText {
     padding: 1em;
-  } 
+  }
   #patientListOptions,
   #staffListOptions {
     display: flex;

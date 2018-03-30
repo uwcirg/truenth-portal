@@ -4,11 +4,13 @@
       "resourceType": "site.cfg",
       "results": [
         "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n",
+        "ACCEPT_TERMS_ON_NEXT_ORG = 'Michigan Urological Surgery Improvement Collaborative (MUSIC)'\n",
         "DEFAULT_LOCALE = 'en_US'\n",
         "NO_CHALLENGE_WO_DATA = True  # Grandfather in users missing data\n",
         "PATIENT_LIST_ADDL_FIELDS = ['reports']\n",
         "PORTAL_STYLESHEET = '/static/css/portal.css'\n",
         "GIL = True\n",
+        "ORGS_W_CUSTOM_INVITES = ['MUSIC']\n",
         "SHOW_WELCOME = True\n",
         "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'consent', 'clinical_questions', 'intervention_reports', 'procedures', 'gender', 'interventions']\n",
         "USER_FORGOT_PASSWORD_EMAIL_TEMPLATE = 'flask_user/emails/truenth_forgot_password'\n",

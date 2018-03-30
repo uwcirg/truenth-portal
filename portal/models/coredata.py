@@ -68,17 +68,22 @@ class Coredata(object):
             return True
 
         def still_needed(self, user, **kwargs):
-            # Returns list of registered still needing data
+            # Returns list of {field, collection_method} still needed
             needed = []
             for cls in self._registered:
                 instance = cls()
                 if not instance.required(user, **kwargs):
                     continue
                 if not instance.hasdata(user, **kwargs):
-                    needed.append(instance.id)
+                    d = {'field': instance.id}
+                    method = instance.collection_method(user, **kwargs)
+                    if method:
+                        d['collection_method'] = method
+                    needed.append(d)
             if needed:
                 current_app.logger.debug(
-                    'intial still needed for {}'.format(needed))
+                    'initial still needed for {}'.format(
+                        [i['field'] for i in needed]))
             return needed
 
     instance = None
@@ -156,6 +161,10 @@ class CoredataPoint(object):
         """Returns identifier for class - namely lowercase w/o Data suffix"""
         name = self.__class__.__name__
         return name[:-4].lower()
+
+    def collection_method(self, user, **kwargs):
+        """Returns None unless the item has a specialized method"""
+        return None
 
 
 def CP_user(user):
@@ -375,6 +384,19 @@ class TOU_core(CoredataPoint):
             Audit.subject_id == user.id,
             ToU.type == self.tou_type,
             ToU.active.is_(True)).count() > 0
+
+    def collection_method(self, user, **kwargs):
+        """TOU collection may be specialized"""
+
+        # if the user's top_level_org is associated with
+        # ACCEPT_TERMS_ON_NEXT_ORG - the collection method
+        # is "ACCEPT_ON_NEXT"
+        org = current_app.config.get('ACCEPT_TERMS_ON_NEXT_ORG')
+        if org:
+            org = Organization.query.filter_by(name=org).one()
+        if org and user.first_top_organization() == org:
+            return "ACCEPT_ON_NEXT"
+        return None
 
 
 class Website_Terms_Of_UseData(TOU_core):

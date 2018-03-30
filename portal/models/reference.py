@@ -5,6 +5,7 @@ from sqlalchemy import and_
 from ..database import db
 from .identifier import Identifier
 from .intervention import Intervention
+from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 
 class MissingReference(Exception):
@@ -104,7 +105,7 @@ class Reference(object):
         # Due to cyclic import problems, keep these local
         from .organization import Organization, OrganizationIdentifier
         from .practitioner import Practitioner, PractitionerIdentifier
-        from .questionnaire import Questionnaire
+        from .questionnaire import Questionnaire, QuestionnaireIdentifier
         from .questionnaire_bank import QuestionnaireBank
         from .research_protocol import ResearchProtocol
         from .user import User
@@ -126,6 +127,15 @@ class Reference(object):
                         PractitionerIdentifier.practitioner_id,
                         Identifier.id ==
                         PractitionerIdentifier.identifier_id,
+                        Identifier.system == system,
+                        Identifier._value == value))
+            elif obj == Questionnaire:
+                query = obj.query.join(QuestionnaireIdentifier).join(
+                    Identifier).filter(and_(
+                        Questionnaire.id ==
+                        QuestionnaireIdentifier.questionnaire_id,
+                        Identifier.id ==
+                        QuestionnaireIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
             else:
@@ -154,7 +164,8 @@ class Reference(object):
             (re.compile('[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
              Organization, 'identifier'),
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
-            (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),
+            (re.compile('[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
+             Questionnaire, 'identifier'),
             (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
@@ -181,7 +192,7 @@ class Reference(object):
                 if attribute == 'id':
                     try:
                         value = int(value)
-                    except:
+                    except ValueError:
                         raise ValueError('ID not found in reference {}'.format(
                             reference_text))
                 with db.session.no_autoflush:
@@ -213,13 +224,16 @@ class Reference(object):
             ref = "api/patient/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name
         if hasattr(self, 'practitioner_id'):
-            ref = "api/practitioner/{}".format(self.practitioner_id)
-            display = Practitioner.query.get(self.practitioner_id).display_name
+            p = Practitioner.query.get(self.practitioner_id)
+            i = [i for i in p.identifiers if i.system == US_NPI][0]
+            ref = "api/practitioner/{}?system={}".format(i.value, i.system)
+            display = p.display_name
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
             display = Organization.query.get(self.organization_id).name
         if hasattr(self, 'questionnaire_name'):
-            ref = "api/questionnaire/{}".format(self.questionnaire_name)
+            ref = "api/questionnaire/{}?system={}".format(
+                self.questionnaire_name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)
             display = self.questionnaire_name
         if hasattr(self, 'questionnaire_bank_name'):
             ref = "api/questionnaire_bank/{}".format(

@@ -1,11 +1,15 @@
 """Intervention Module"""
 from UserDict import IterableUserDict
 from sqlalchemy import and_
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..dict_tools import strip_empties
 from .lazy import query_by_name
+
+LOGOUT_EVENT = 0b001
+USER_DOC_EVENT = 0b010
 
 
 class DisplayDetails(object):
@@ -47,13 +51,37 @@ class Intervention(db.Model):
     status_text = db.Column(db.Text)
     public_access = db.Column(db.Boolean, default=True)
     display_rank = db.Column(db.Integer)
+    subscribed_events = db.Column(db.Integer, nullable=False, default=0)
 
-    client = db.relationship('Client',
+    client = db.relationship(
+        'Client',
         primaryjoin="Client.client_id==Intervention.client_id",
         uselist=False, backref='Client')
 
     access_strategies = db.relationship(
         'AccessStrategy', order_by="AccessStrategy.rank")
+
+    @hybrid_property
+    def subscribed_to_logout_event(self):
+        return self.subscribed_events & LOGOUT_EVENT
+
+    @subscribed_to_logout_event.setter
+    def subscribed_to_logout_event(self, value):
+        if value:
+            self.subscribed_events = self.subscribed_events | LOGOUT_EVENT
+        else:
+            self.subscribed_events = self.subscribed_events & ~LOGOUT_EVENT
+
+    @hybrid_property
+    def subscribed_to_user_doc_event(self):
+        return self.subscribed_events & USER_DOC_EVENT
+
+    @subscribed_to_user_doc_event.setter
+    def subscribed_to_user_doc_event(self, value):
+        if value:
+            self.subscribed_events = self.subscribed_events | USER_DOC_EVENT
+        else:
+            self.subscribed_events = self.subscribed_events & ~USER_DOC_EVENT
 
     def as_json(self):
         """Returns the 'safe to export' portions of an intervention
@@ -65,7 +93,8 @@ class Intervention(db.Model):
         """
         d = {'resourceType': 'Intervention'}
         for attr in ('name', 'description', 'card_html', 'link_label',
-                     'status_text', 'public_access', 'display_rank'):
+                     'status_text', 'public_access', 'display_rank',
+                     'subscribed_events'):
             if getattr(self, attr, None) is not None:
                 d[attr] = getattr(self, attr)
 
@@ -81,7 +110,8 @@ class Intervention(db.Model):
             raise ValueError("required 'name' field not found")
 
         for attr in ('name', 'description', 'card_html', 'link_label',
-                     'status_text', 'public_access', 'display_rank'):
+                     'status_text', 'public_access', 'display_rank',
+                     'subscribed_events'):
             setattr(self, attr, data.get(attr))
 
         # static_link_url is special - generally we don't pull links
@@ -192,7 +222,8 @@ class Intervention(db.Model):
                 "card_html: {0.card_html}, "
                 "link_label: {0.link_label}, "
                 "link_url: {0.link_url}, "
-                "status_text: {0.status_text}".format(self))
+                "status_text: {0.status_text},"
+                "subscribed_events: {0.subscribed_events}".format(self))
 
 
 access_types = ('forbidden', 'granted')
@@ -240,6 +271,7 @@ STATIC_INTERVENTIONS = IterableUserDict({
     'community_of_wellness': 'Community of Wellness',
     'decision_support_p3p': 'Decision Support P3P',
     'decision_support_wisercare': 'Decision Support WiserCare',
+    'music': 'MUSIC Integration',
     'self_management': 'Self Management',
     'sexual_recovery': 'Sexual Recovery',
     'social_support': 'Social Support Network',
@@ -255,7 +287,8 @@ def add_static_interventions():
     for name, description in STATIC_INTERVENTIONS.items():
         if not Intervention.query.filter_by(name=name).first():
             intervention = Intervention(
-                name=name, description=description, card_html=description)
+                name=name, description=description, card_html=description,
+                subscribed_events=LOGOUT_EVENT)
             db.session.add(intervention)
 
 
@@ -278,7 +311,16 @@ class _NamedInterventions(object):
     def __getattribute__(self, attr):
         if attr.startswith('_'):
             return object.__getattribute__(self, attr)
-        value = self.__dict__[attr.lower()].__call__(self)
+        # Catch KeyError in case it's a dynamically added intervention
+        # (i.e. not from static list)
+        try:
+            value = self.__dict__[attr.lower()].__call__(self)
+        except KeyError:
+            query = Intervention.query.filter_by(name=attr)
+            if not query.count():
+                raise ValueError(
+                    "Intervention {} not found".format(attr))
+            value = query.one()
         return value
 
     def __iter__(self):

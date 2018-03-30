@@ -7,7 +7,7 @@ from ..audit import auditable_event
 from ..extensions import oauth
 from ..csrf import csrf
 from .crossdomain import crossdomain
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.user import current_user
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')

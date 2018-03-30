@@ -1,14 +1,8 @@
 """Auth related model classes """
-import base64
-import hashlib
-import hmac
-import json
-import time
-from flask import abort, current_app, url_for
+from flask import current_app, url_for
 from datetime import datetime, timedelta
 from smtplib import SMTPRecipientsRefused
 from sqlalchemy.dialects.postgresql import ENUM
-from urlparse import urlparse
 
 from ..database import db
 from ..extensions import oauth
@@ -17,8 +11,6 @@ from .role import Role, ROLE
 from .relationship import Relationship, RELATIONSHIP
 from .user import User, UserRoles, UserRelationship
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
-from ..factories.celery import create_celery
-
 from .user import current_user
 
 providers_list = ENUM(
@@ -37,164 +29,11 @@ class AuthProvider(db.Model):
     def as_fhir(self):
         # produce a FHIR identifier entry for the provider
         # helps interventions with support, i.e. user authentication used
-        d = {}
-        d['use'] = 'secondary'
-        d['system'] = '{system}/{provider}'.format(
-            system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider)
-        d['value'] = self.provider_id
-        return d
-
-
-class Client(db.Model):
-    __tablename__ = 'clients'  # Override default 'client'
-    client_id = db.Column(db.String(40), primary_key=True)
-    client_secret = db.Column(db.String(55), nullable=False)
-
-    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship('User')
-
-    _redirect_uris = db.Column(db.Text)
-    _default_scopes = db.Column(db.Text)
-    callback_url = db.Column(db.Text)
-
-    intervention = db.relationship(
-        'Intervention',
-        primaryjoin="Client.client_id==Intervention.client_id",
-        uselist=False, backref='Intervention')
-
-    grants = db.relationship('Grant', cascade='delete')
-
-    @property
-    def intervention_or_default(self):
-        """To use the WTForm classes, always need a live intervention
-
-        if there isn't an intervention assigned to this client, return
-        the default
-
-        """
-        from .intervention import INTERVENTION
-        if self.intervention:
-            return self.intervention
-        return INTERVENTION.DEFAULT
-
-    def __str__(self):
-        """print details needed in audit logs"""
-        return "Client: {0}, redirects: {1}, callback: {2} {3}".format(
-            self.client_id, self._redirect_uris, self.callback_url,
-            self.intervention_or_default)
-
-    @property
-    def redirect_uris(self):
-        if self._redirect_uris:
-            # OAuth 2 spec requires a full path to the authorize URL
-            # but in practice, this is too high of a bar (at least for
-            # Liferay).  Only comparing by origin (scheme:hostname:port)
-            # in validate_redirect_uri - so that's all we return
-
-            # Whitelist any redirects to shared services
-            uris = [
-                "https://%s" % current_app.config['SERVER_NAME'],
-                "http://%s" % current_app.config['SERVER_NAME'],
-            ]
-            for uri in self._redirect_uris.split():
-                parsed = urlparse(uri)
-                uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
-            return uris
-        return []
-
-    @property
-    def application_origins(self):
-        """One or more application origins, white space delimited"""
-        return self._redirect_uris
-
-    @application_origins.setter
-    def application_origins(self, values):
-        "Set application origins, single string of space delimited URLs"
-        self._redirect_uris = values
-
-    @property
-    def default_redirect_uri(self):
-        return self.redirect_uris[0]
-
-    @property
-    def default_scopes(self):
-        if self._default_scopes:
-            return self._default_scopes.split()
-        return []
-
-    def notify(self, data):
-        """POST data to client's callback_url if defined
-
-        Clients can register a callback URL.  Events such as
-        logout are then reported to the client via POST.
-
-        A "signed_request" is POSTed, of the following form
-           encoded_signature.payload
-
-        The "payload" is a base64 url encoded string.
-        The "encoded signature" is a HMAC_SHA256 hash using
-        the client's secret key to encode the payload.
-
-        Data should be a dictionary.  Additional fields (algorithm,
-        issued_at) will be added before transmission.
-
-        """
-        if not self.callback_url:
-            return
-
-        data['algorithm'] = 'HMAC-SHA256'
-        data['issued_at'] = int(time.time())
-        payload = base64.urlsafe_b64encode(json.dumps(data))
-        sig = hmac.new(
-            str(self.client_secret), msg=payload,
-            digestmod=hashlib.sha256).digest()
-        encoded_sig = base64.urlsafe_b64encode(sig)
-
-        formdata = {
-            'signed_request': "{0}.{1}".format(encoded_sig, payload)}
-        current_app.logger.debug(
-            "POSTing event to %s", self.callback_url)
-
-        # Use celery asynchronous task 'post_request'
-        kwargs = {'url': self.callback_url, 'data': formdata}
-        celery = create_celery(current_app)
-
-        res = celery.send_task('tasks.post_request', kwargs=kwargs)
-
-        context = {
-            "id": res.task_id,
-            "url": self.callback_url,
-            "formdata": formdata,
-            "data": data,
-        }
-        current_app.logger.debug(str(context))
-
-    def lookup_service_token(self):
-        sponsor_relationship = [r for r in self.user.relationships if
-                                r.relationship.name == RELATIONSHIP.SPONSOR]
-        if (sponsor_relationship):
-            assert len(sponsor_relationship) == 1
-            return Token.query.filter_by(
-                client_id=self.client_id,
-                user_id=sponsor_relationship[0].other_user_id).first()
-        return None
-
-    def validate_redirect_uri(self, redirect_uri):
-        """Validate the redirect_uri from the OAuth Token request
-
-        The RFC requires exact match on the redirect_uri.  In practice
-        this is too great of a burden for the interventions.  Make
-        sure it's from the same scheme:://host:port the client
-        registered with
-
-        http://tools.ietf.org/html/rfc6749#section-4.1.3
-
-        """
-        parsed = urlparse(redirect_uri)
-        redirect_uri = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
-        if redirect_uri not in self.redirect_uris:
-            return False
-        return True
+        return {
+            'use': 'secondary',
+            'system': '{system}/{provider}'.format(
+                system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider),
+            'value': self.provider_id}
 
 
 class Grant(db.Model):
@@ -276,11 +115,6 @@ class Token(db.Model):
         return []
 
 
-@oauth.clientgetter
-def load_client(client_id):
-    return Client.query.filter_by(client_id=client_id).first()
-
-
 @oauth.grantgetter
 def load_grant(client_id, code):
     return Grant.query.filter_by(client_id=client_id, code=code).first()
@@ -317,7 +151,7 @@ def save_token(token, request, *args, **kwargs):
         client_id=request.client.client_id,
         user_id=request.user.id
     )
-    # make sure that every client has only one token connected to a user
+    # delete any existing; allow one token per client:user
     for t in toks:
         db.session.delete(t)
 
@@ -339,34 +173,6 @@ def save_token(token, request, *args, **kwargs):
     return tok
 
 
-def validate_origin(origin):
-    """Validate the origin is one we recognize
-
-    For CORS, limit the requesting origin to the list we know about,
-    namely any origins belonging to our OAuth clients, or the local server
-
-    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't
-      find a match.
-
-    """
-    if not origin:
-        current_app.logger.warning("Can't validate missing origin")
-        abort(401, "Can't validate missing origin")
-
-    po = urlparse(origin)
-    if po.netloc and po.netloc == current_app.config.get("SERVER_NAME"):
-        return True
-    if not po.scheme and not po.netloc and po.path:
-        return True
-
-    for client in Client.query.all():
-        if client.validate_redirect_uri(origin):
-            return True
-
-    current_app.logger.warning("Failed to validate origin: %s", origin)
-    abort(401, "Failed to validate origin %s" % origin)
-
-
 class Mock(object):
     pass
 
@@ -381,10 +187,9 @@ def create_service_token(client, user):
     role 'service'.
 
     """
-    # TODO: bring this test back after debugging.  user.roles is not
-    # defined in production
-    # if len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE:
-    #    raise ValueError("only service users can create service tokens")
+    if not current_app.config.get('TESTING') and (
+            len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE):
+        raise ValueError("only service users can create service tokens")
 
     # Hacking a backdoor into the OAuth protocol to generate a valid token
     # Mock the request and validation needed to pass
@@ -453,7 +258,7 @@ def token_janitor():
                 app=current_app.config.get('USER_APP_NAME'),
                 expires=expires,
                 client_url=url_for(
-                    'auth.client_edit', client_id=client_id, _external=True)))
+                    'client.client_edit', client_id=client_id, _external=True)))
         current_app.logger.warn(body)
         em = EmailMessage(
             recipients=sponsor_email,

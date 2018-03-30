@@ -12,6 +12,8 @@ TRUENTH_NAMESPACE = 'http://us.truenth.org'
 TRUENTH_CLINICAL_CODE_SYSTEM = '{}/clinical-codes'.format(TRUENTH_NAMESPACE)
 TRUENTH_ENCOUNTER_CODE_SYSTEM = '{}/encounter-types'.format(TRUENTH_NAMESPACE)
 
+TRUENTH_QUESTIONNAIRE_CODE_SYSTEM = '{}/questionnaire'.format(TRUENTH_NAMESPACE)
+
 # Auth identities - typically used with suffix for provider (i.e. google)
 # or to name identity type (i.e. TrueNTH-username)
 TRUENTH_IDENTITY_SYSTEM = '{}/identity-codes'.format(TRUENTH_NAMESPACE)
@@ -31,6 +33,8 @@ TRUENTH_PROVIDER_SYSTEMS = tuple('{system}/{provider}'.format(
     provider in SUPPORTED_OAUTH_PROVIDERS)
 
 DECISION_SUPPORT_GROUP = '{}/decision-support-group'.format(
+    TRUENTH_IDENTITY_SYSTEM)
+SYMPTOM_TRACKER_GROUP = '{}/symptom-tracker-group'.format(
     TRUENTH_IDENTITY_SYSTEM)
 PRACTICE_REGION = '{}/practice-region'.format(TRUENTH_IDENTITY_SYSTEM)
 SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)

@@ -104,7 +104,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         self.initStartTime = new Date();
 
         self.getOrgTool();
-        
+
         /*
          * get user roles
          * note using the current user Id
@@ -1363,6 +1363,11 @@ var fillContent = {
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type, "active")) {
                         item_found++;
+                        /* 
+                         * set the data-agree attribute for the corresponding consent item 
+                         */
+                        $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
+
                     };
                 });
 
@@ -1381,21 +1386,22 @@ var fillContent = {
                     }
                 }
 
-                if (item_found > 0 && (item_found == arrTypes.length)) {
-                    self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                if (item_found > 0) {
+                    /*
+                     * make sure that all items are agreed upon before checking the box
+                     */
+                    if (!($(this).find("[data-agree='false']").length > 0)) {
+                        self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                        var vs = self.find(".display-view");
+                        if (vs.length > 0) {
+                            self.show();
+                            vs.show();
+                            (self.find(".edit-view")).each(function() {
+                               $(this).hide();
+                            });
+                        }
+                    }
                     self.show().removeClass("tnth-hide");
-                    self.attr("data-agree", "true");
-                    self.find("[data-type='terms']").each(function() {
-                        $(this).attr("data-agree", "true");
-                    });
-                    var vs = self.find(".display-view");
-                    if (vs.length > 0) {
-                        self.show();
-                        vs.show();
-                        (self.find(".edit-view")).each(function() {
-                            $(this).hide();
-                        });
-                    };
                 };
             });
 
@@ -1681,6 +1687,70 @@ var fillContent = {
         } else {
             $("#emailLogMessage").text(data.error);
         };
+    },
+    "reloadSendPatientEmailForm": function (userId) {
+         /*
+          * update registration and assessment status email tiles in communications section
+          * this is needed when user change organization, etc.
+          */
+        if ($("#sendPatientEmailTabContent").length > 0) {
+            var self = this;
+            $("#sendPatientEmailTabContent").animate({opacity: 0}, function() {
+                $(this).css('opacity', 1);
+                setTimeout(function(){
+                    var checkedOrgInput = $("#userOrgs input[name='organization']:checked");
+                    if (checkedOrgInput.attr("id") !== "noOrgs") {
+                        tnthAjax.setting("ACCEPT_TERMS_ON_NEXT_ORG", userId, false, function(data) {
+                            if (!data.error) {
+                                if (data.ACCEPT_TERMS_ON_NEXT_ORG && checkedOrgInput.attr("data-parent-name") === data.ACCEPT_TERMS_ON_NEXT_ORG) {
+                                    $("#profileassessmentSendEmailContainer").addClass("active");
+                                    self.registrationStatus(userId);
+                                    self.assessmentStatus(userId);
+                                } else {
+                                    $("#profileassessmentSendEmailContainer").removeClass("active");
+                                }
+                            }
+                        });
+                    }
+                },500);
+            });
+        }
+    },
+    "registrationStatus": function(userId) {
+        tnthAjax.hasRole(userId, "write_only", function(data) {
+            $("#registrationStatusContainer .registration-label")
+            .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
+            .addClass(data.matched ? "text-warning": "text-success")
+            .removeClass(data.matched ? "text-success": "text-warning");
+        });
+    },
+    "assessmentStatus": function(userId) {
+        tnthAjax.patientReport(userId, function(data) {
+            if (!data.error) {
+                var pcpReports = data["user_documents"]? $.grep(data["user_documents"], function(document) {
+                    return /P3P/gi.test(document.filename);
+                }): false;
+                var hasReports = pcpReports && pcpReports.length > 0;
+                if (hasReports) {
+                    /*
+                     * show reports link to user if completed assessment
+                     */
+                    $("#assessmentStatusContainer .email-selector-container").html("<a href='#profilePatientReportTable' class='report-link'>" + i18next.t("View reports") + "</a>");
+                    $("#btnProfileSendassessmentEmail").hide();
+                } else {
+                    /*
+                     * adjust select/send email UI only if email is available
+                     */
+                    if (hasValue($("#email").val())) {
+                        $("#lbPatientRegEmail").addClass("active");
+                    }
+                }
+                $("#assessmentStatusContainer .assessment-label")
+                .html(hasReports?i18next.t("complete"):i18next.t("incomplete"))
+                .addClass(hasReports?"text-success":"text-warning")
+                .removeClass(!hasReports?"text-success": "text-warning");
+            }
+        });
     },
     "assessmentList": function(data) {
         if (!data.error) {
@@ -2552,12 +2622,9 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.getAccessUrl = function() {
         var url = '';
-        tnthAjax.accessUrl( this.subjectId, true, function(data) {
+        tnthAjax.accessUrl(this.subjectId, true, function(data) {
             if (!data.error) {
                 url = data.url;
-                $("#profileEmailErrorMessage").text("");
-            } else {
-                $("#profileEmailErrorMessage").text(i18next.t("failed request to get email invite url"));
             }
         });
         return url;
@@ -2565,120 +2632,144 @@ var Profile = function(subjectId, currentUserId) {
     this.checkEmail = function(email) {
         if (hasValue(email)) {
             $("#btnPasswordResetEmail").attr("disabled", false);
-            $("#btnProfileSendEmail").attr("disabled", false);
-            $('#btnProfileSendEmail').removeClass('disabled');
+            $(".btn-send-email").attr("disabled", false).removeClass('disabled');
+            $(".email-selector").attr("disabled", false);
         } else {
             if ($("#email").get(0).validity.valid) {
                 $("#btnPasswordResetEmail").attr("disabled", true);
-                $("#btnProfileSendEmail").attr("disabled", true);
-                $('#btnProfileSendEmail').addClass('disabled');
-            };
-        };
+                $(".btn-send-email").attr("disabled", true).addClass('disabled');
+                $(".email-selector").attr("disabled", true);
+            }
+        }
     };
     this.initEmailSection = function() {
         var self = this;
         self.checkEmail($("#email").val());
         $("#email").on("blur, keyup", function() {
             self.checkEmail($(this).val());
-            if ($(this).val() !== "") {
-                $("#profileEmailSelect").attr("disabled", false);
-            } else {
-                $("#profileEmailSelect").val("").attr("disabled", true);
-            };
         });
         //in profile email is validated and updated after ajax call to check unique email
         $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
-        $("#btnProfileSendEmail").blur();
+        $(".btn-send-email").blur();
     };
     this.initPatientEmailFormSection = function() {
         var self = this;
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+        self.checkEmail($("#email").val());
 
-        $("#profileEmailSelect").on("change", function() {
+        if ($("#profileassessmentSendEmailContainer.active").length > 0) {
+            fillContent.assessmentStatus(self.subjectId);
+        }
+
+        if ($("#registrationStatusContainer").length > 0) {
+            fillContent.registrationStatus(self.subjectId);
+        }
+
+        $(".email-selector").off("change").on("change", function() {
             var message = "";
+            var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+            var btnEmail = $("#btnProfileSend"+emailType+"Email");
+            var messageContainer = $("#profile"+emailType+"EmailMessage");
             if (this.value != "" && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message = i18next.t("{emailType} email will be sent to {email}");
                 message = message.replace("{emailType}", $(this).children("option:selected").text())
                                 .replace("{email}", $("#email").val());
-                $("#profileEmailMessage").html(message);
-                $("#btnProfileSendEmail").removeClass("disabled");
+                messageContainer.html(message);
+                btnEmail.removeClass("disabled");
             } else {
-                $("#profileEmailMessage").text("");
-                $("#btnProfileSendEmail").addClass("disabled");
+                messageContainer.html("");
+                btnEmail.addClass("disabled");
             }
         });
 
-        $("#btnProfileSendEmail").on("click", function(event) {
-            event.preventDefault();
-            var emailTypeElem = $("#profileEmailSelect");
-            var selectedOption = emailTypeElem.children("option:selected");
-            var email = $("#email").val();
+        $(".btn-send-email").off("click").on("click", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+                var emailTypeElem = $("#profile"+emailType+"EmailSelect");
+                var selectedOption = emailTypeElem.children("option:selected");
+                var infoMessageContainer = $("#profile"+emailType+"EmailMessage");
+                var errorMessageContainer = $("#profile"+emailType+"EmailErrorMessage");
+                var btnSelf = $(this);
 
-            if (selectedOption.val() != "") {
-                var subject = "";
-                var body = "";
-                var clinicName = (function() {
-                    var cn = "";
-                    var selectedOrg = $("#userOrgs input[name='organization']:checked");
-                    if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
-                    if (!hasValue(cn)) cn = i18next.t("your clinic");
-                    return cn;
-                })();
-                if (selectedOption.val() == "invite"){
-                    var return_url = self.getAccessUrl();
-                    if (hasValue(return_url)) {
+                if (selectedOption.val() !== "") {
+                    var emailUrl = selectedOption.attr("data-url");
+                    var email = $("#email").val();
+                    var subject = "", body = "";
+                    /*
+                     * get email content via API
+                     */
+                    if (emailUrl) {
                         $.ajax ({
                             type: "GET",
-                            url: $("#patientRegistrationInviteEmailUrl").val(),
+                            url: emailUrl,
                             cache: false,
                             async: false
                         }).done(function(data) {
-                            if (hasValue(data)) {
+                            if (data) {
                                 subject = data["subject"];
                                 body = data["body"];
                             };
                         }).fail(function(xhr) {
-
+                            //report error
+                            //helpful if for some reason the content couldn't be parsed by the backend, e.g. variables, etc.
+                            tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
                         });
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                    };
-                }
-                else { // reminder
-                    body = $("#patientReminderEmailBody").html().replace(/\(clinic name\)/g, clinicName);
-                    subject = $("#patientReminderEmailSubject").html().replace(/\(clinic name\)/g, clinicName);
-                }
-                if (hasValue(body) && hasValue(subject) && hasValue(email)) {
-                    tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
-                        if (!data.error) {
-                            $("#profileEmailMessage").html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
-                            $("#profileEmailSelect").val("");
-                            $("#btnProfileSendEmail").addClass("disabled");
+                    } else {
+                        errorMessageContainer.append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
+                    }
 
-                            /*
-                             * reload email audit log
-                             */
-                            tnthAjax.emailLog(subjectId, function(data) {
-                                setTimeout(function() {
-                                    fillContent.emailLog(self.subjectId, data);
-                                }, 100);
-                            });
+                    if (hasValue(body) && hasValue(subject) && hasValue(email)) {
+
+                        var inviteError = "";
+
+                        if (selectedOption.val() === "invite" && emailType === "registration"){
+                            returnUrl = self.getAccessUrl();
+                            if (hasValue(returnUrl)) {
+                                body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                            } else {
+                                inviteError = i18next.t("failed request to get email invite url");
+                            }
+                        }
+                        if (inviteError) {
+                            errorMessageContainer.html(inviteError);
                         } else {
-                            $("#profileEmailMessage").text(i18next.t("Unable to send email"));
-                        };
-                    });
-                } else  {
-                    $("#profileEmailMessage").text(i18next.t("Unable to send email."));
-                    if (!hasValue(body)) $("#profileEmailMessage").append("<div>" + i18next.t("Email body content is missing.") + "</div>");
-                    if (!hasValue(subject)) $("#profileEmailMessage").append("<div>" + i18next.t("Email subject is missing.") + "</div>");
-                    if (!hasValue(email)) $("#profileEmailMessage").append("<div>" + i18next.t("Email address is missing.") + "</div>");
-                };
-            } else $("#profileEmailMessage").text(i18next.t("You must select a email type"));
-        });
+                            tnthAjax.invite(self.subjectId, {"subject": subject, "recipients": email, "body": body}, function(data) {
+                                if (!data.error) {
+                                    infoMessageContainer.html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
+                                    emailTypeElem.val("");
+                                    btnSelf.addClass("disabled");
+                                    /*
+                                     * reload email audit log
+                                     */
+                                    tnthAjax.emailLog(subjectId, function(data) {
+                                        setTimeout(function() {
+                                            fillContent.emailLog(self.subjectId, data);
+                                        }, 100);
+                                    });
+                                } else {
+                                    errorMessageContainer.append("<div>" + i18next.t("Unable to send email") + "</div>");
+                                };
+                            });
+                        }
+                    } else  {
+                        errorMessageContainer.html("");
+                        errorMessageContainer.append("<div>" + i18next.t("Unable to send email.") + "</div>");
+                        if (!hasValue(body)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email body content is missing.") + "</div>");
+                        }
+                        if (!hasValue(subject)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email subject is missing.") + "</div>");
+                        }
+                        if (!hasValue(email)) {
+                            errorMessageContainer.append("<div>" + i18next.t("Email address is missing.") + "</div>");
+                        }
+                    }
+                } else errorMessageContainer.text(i18next.t("You must select a email type"));
+            });
     };
     this.initStaffRegistrationEmailSection = function() {
-        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
-
         var self = this;
+        self.checkEmail($("#email").val());
 
         $("#btnProfileSendEmail").on("click", function(event) {
             event.preventDefault();
@@ -2762,6 +2853,10 @@ var Profile = function(subjectId, currentUserId) {
         };
         $("#btnPasswordResetEmail").on("click", function(event) {
             event.preventDefault();
+            /* 
+             * stop bubbling of events
+             */
+            event.stopImmediatePropagation();
             email = $("#email").val();
             if (email) {
                 tnthAjax.passwordReset(self.subjectId, function(data) {
@@ -3344,7 +3439,7 @@ var Profile = function(subjectId, currentUserId) {
                 assessment_url += "&authored=" + completionDate;
             };
 
-            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() + 
+            var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
             "&redirect_url=" + encodeURIComponent(assessment_url);
 
             self.manualEntryModalVis(true);
@@ -3362,8 +3457,6 @@ var Profile = function(subjectId, currentUserId) {
     this.initCustomPatientDetailSection = function() {
         var subjectId = this.subjectId;
         var self = this;
-
-        $("#profileEmailSelect").attr("disabled", !hasValue($("#email").val())? true: false);
 
         $("#loginAsButton").on("click", function(e) {
             e.preventDefault();
@@ -4083,19 +4176,15 @@ OrgTool.prototype.handleEvent = function() {
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
                     $("#noOrgs").prop('checked',false);
-                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
                 } else {
                     $("#userOrgs input[name='organization']").each(function() {
-                        //console.log("in id: " + $(this).attr("id"))
                        if ($(this).attr("id") !== "noOrgs") {
                             $(this).prop('checked',false);
                        } else {
                             if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                        };
                     });
-                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                 };
-
             } else {
                 var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
                 if (!isChecked) {
@@ -4140,6 +4229,7 @@ OrgTool.prototype.handleEvent = function() {
             if ($("#locale").length > 0) {
                 tnthAjax.getLocale(userId);
             }
+            fillContent.reloadSendPatientEmailForm(userId);
         });
     });
 };
@@ -4353,27 +4443,53 @@ var tnthAjax = {
         this.sendRequest(__url, 'GET', userId, {sync: sync, cache: true}, function(data) {
             if (data) {
                 if (!data.error) {
-                    var __localizedFound = false;
-                    if ((data.still_needed).length > 0) $("#termsText").show();
-                    (data.still_needed).forEach(function(item) {
-                        if ($.inArray(item, ["website_terms_of_use","subject_website_consent","privacy_policy"]) != -1) {
-                            $("#termsCheckbox [data-type='terms']").each(function() {
-                                var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
-                                dataTypes.forEach(function(type) {
-                                    if ($.trim(type) == $.trim(item)) {
-                                        self.show().removeClass("tnth-hide");
-                                        self.attr("data-required", "true");
-                                        var parentNode = self.closest("label.terms-label");
-                                        if (parentNode.length > 0) parentNode.show().removeClass("tnth-hide");
-                                    };
+                    /*
+                     * example data format:
+                     * [{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]
+                     */
+                    const ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT";
+                    var fields = (data.still_needed).map(function(item) {return item.field;});
+                    if ($("#topTerms").length > 0) {
+                        var acceptOnNextCheckboxes = [];
+                        (data.still_needed).forEach(function(item) {
+                            var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
+                            if (matchedTermsCheckbox.length > 0) {
+                                matchedTermsCheckbox.attr({"data-required":"true", "data-collection-method": item.collection_method});
+                                var parentNode = matchedTermsCheckbox.closest("label.terms-label");
+                                if (parentNode.length > 0) {
+                                    parentNode.show().removeClass("tnth-hide");
+                                    if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
+                                        parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                                        $("#termsCheckbox").addClass("tnth-hide");
+                                        $("#termsText").addClass("agreed");
+                                        $("#termsCheckbox_default").removeClass("tnth-hide");
+                                        $("#topTerms .terms-of-use-intro").addClass("tnth-hide");
+                                        /*
+                                         * note hiding thank you and continue button for accept on next collection method
+                                         */
+                                        $("#aboutForm .reg-complete-container").addClass("inactive");
+                                        acceptOnNextCheckboxes.push(parentNode);
+                                    }
+                                }
+                            }
+                        });
+                        /*
+                         * require for accept on next collection method
+                         */
+                        if (acceptOnNextCheckboxes.length > 0) {
+                            $("#next").on("click", function() {
+                                acceptOnNextCheckboxes.forEach(function(ckBox) {
+                                    ckBox.trigger("click");
                                 });
                             });
-                        };
-                        if (item == "localized") __localizedFound = true;
-                    });
-                    if (!__localizedFound) $("#patMeta").remove();
-                    else $("#patientQ").show();
-                    if (callback) callback(data.still_needed);
+                        }
+                    }
+                    if (fields.indexOf("localized") == -1) {
+                        $("#patMeta").remove();
+                    }
+                    if (callback) {
+                        callback(fields);
+                    }
                 } else {
                     if (callback) callback({"error": i18next.t("unable to get needed core data")});
                 };
@@ -5050,6 +5166,27 @@ var tnthAjax = {
             };
         });
     },
+    "hasRole": function(userId, roleName, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User ID is required.")});
+            return false;
+        }
+        if (!roleName) {
+            callback({"error": i18next.t("Role must be provided")});
+            return false;
+        }
+        tnthAjax.getRoles(userId, false, function(data) {
+            if (data.roles) {
+                var matchedRole = $.grep(data.roles, function(role) {
+                    return String(role.name).toLowerCase() === String(roleName).toLowerCase();
+                });
+                callback({"matched": matchedRole.length > 0});
+            } else {
+                callback({"error": i18next.t("no roles found for user")});
+            }
+        }, {"sync": true});
+    },
     "getRoleList": function(callback) {
         this.sendRequest('/api/roles', 'GET', null, null, function(data) {
             if (data) {
@@ -5064,7 +5201,7 @@ var tnthAjax = {
             };
         });
     },
-    "getRoles": function(userId,isProfile,callback) {
+    "getRoles": function(userId,isProfile,callback,params) {
         callback = callback || function() {};
         var sessionStorageKey = "userRole_"+userId;
         if (sessionStorage.getItem(sessionStorageKey)) {
@@ -5074,7 +5211,7 @@ var tnthAjax = {
             }
             callback(data);
         } else {
-            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, null, function(data) {
+            this.sendRequest("/api/user/"+userId+"/roles", "GET", userId, params, function(data) {
                 if (data) {
                     if (!data.error) {
                         $(".get-roles-error").html("");
@@ -5245,6 +5382,7 @@ var tnthAjax = {
                     $(".get-tou-error").html("");
                     if (data.url) {
                         $("#termsURL").attr("data-url", data.url);
+                        $("#termsCheckbox_default .terms-url").attr("href", data.url);
                         if (callback) callback({"url": data.url});
                     } else {
                         if (callback) callback({"error": i18next.t("no url returned")});

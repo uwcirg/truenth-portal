@@ -31,10 +31,11 @@ from ..models.app_text import (
     MailResource,
     UndefinedAppText,
     UserInviteEmail_ATMA,
+    UserReminderEmail_ATMA,
     VersionedResource
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.auth import validate_origin
+from ..models.client import validate_origin
 from ..models.communication import load_template_args, Communication
 from ..models.coredata import Coredata
 from ..models.fhir import QuestionnaireResponse
@@ -42,6 +43,7 @@ from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.login import login_user
 from ..models.message import EmailMessage
+from ..models.next_step import NextStep
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.reporting import get_reporting_stats
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
@@ -217,8 +219,9 @@ def specific_clinic_landing(clinic_alias):
     return redirect(url_for('user.register'))
 
 
-@portal.route('/access/<string:token>')
-def access_via_token(token):
+@portal.route('/access/<string:token>', defaults={'next_step': None})
+@portal.route('/access/<string:token>/<string:next_step>')
+def access_via_token(token, next_step=None):
     """Limited access users enter here with special token as auth
 
     Tokens contain encrypted data including the user_id and timestamp
@@ -230,8 +233,9 @@ def access_via_token(token):
     * WRITE_ONLY users will be directly logged into the weak auth account
     * others will be given a chance to prove their identity
 
-    The tokens are intended to be single use, but the business rules
-    aren't clear yet. ... TODO
+    :param next_step: if the user is to be redirected following validation
+        and intial queries, include a value.  These come from a controlled
+        vocabulary - see `NextStep`
 
     """
     # logout current user if one is logged in.
@@ -261,6 +265,19 @@ def access_via_token(token):
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
+
+    # if provided, validate and store target in session
+    if next_step:
+        NextStep.validate(next_step)
+        target_url = getattr(NextStep, next_step)(user)
+        if not target_url:
+            # Due to access strategies, the next step may not (yet) apply
+            abort(400, "Patient doesn't qualify for '{}', can't continue".format(next_step))
+        session['next'] = target_url
+        current_app.logger.debug(
+            "/access with next_step, storing in session['next']: {}".format(
+                session['next']))
+
     if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
@@ -440,12 +457,11 @@ def initial_queries():
 
     org = user.first_top_organization()
     role = None
-    if not current_app.config.get('GIL'):
-        for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
-            if user.has_role(r):
-                # treat staff_admins as staff for this lookup
-                r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
-                role = r
+    for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+        if user.has_role(r):
+            # treat staff_admins as staff for this lookup
+            r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+            role = r
     terms = get_terms(org, role)
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
@@ -502,7 +518,11 @@ def admin():
 @portal.route('/invite', methods=('GET', 'POST'))
 @oauth.require_oauth()
 def invite():
-    """invite other users"""
+    """invite other users via form data
+
+    see also /api/user/{user_id}/invite
+
+    """
     if request.method == 'GET':
         return render_template('invite.html')
 
@@ -570,6 +590,31 @@ def patient_invite_email(user_id):
             name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserInviteEmail_ATMA.name_key()
+        args = load_template_args(user=user)
+        item = MailResource(app_text(name_key), variables=args)
+    except UndefinedAppText:
+        """return no content and 204 no content status"""
+        return '', 204
+
+    return jsonify(subject=item.subject, body=item.body)
+
+
+@portal.route('/patient-reminder-email/<int:user_id>')
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@oauth.require_oauth()
+def patient_reminder_email(user_id):
+    """Patient Reminder Email Content"""
+    if user_id:
+        user = get_user_or_abort(user_id)
+    else:
+        user = current_user()
+
+    try:
+        top_org = user.first_top_organization()
+        if top_org:
+            name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
+        else:
+            name_key = UserReminderEmail_ATMA.name_key()
         args = load_template_args(user=user)
         item = MailResource(app_text(name_key), variables=args)
     except UndefinedAppText:
@@ -698,8 +743,9 @@ def settings():
 def config_settings(config_key):
     # return selective keys - not all can be be viewed by users, e.g.secret key
     config_prefix_whitelist = (
-        'LR_',
+        'ACCEPT_TERMS_ON_NEXT_ORG',
         'CONSENT',
+        'LR_',
         'REQUIRED_CORE_DATA',
         'SYSTEM',
     )

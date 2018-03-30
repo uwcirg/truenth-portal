@@ -3,15 +3,13 @@
 Difficult scenario to test - want to confirm we can read in a site
 from a persistence file, and see proper function of a few high level
 integration tests.  For example, does a complicated strategy come
-to life and properly control the visiblity of a intervention card?
+to life and properly control the visibility of a intervention card?
 
 """
 from datetime import datetime
 from flask_webtest import SessionScope
 import os
 from tests import TestCase, TEST_USER_ID
-from tests.test_assessment_status import mock_questionnairebanks
-from tempfile import NamedTemporaryFile
 
 from portal.extensions import db
 from portal.config.site_persistence import SitePersistence
@@ -21,7 +19,6 @@ from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
@@ -131,7 +128,7 @@ class TestSitePersistence(TestCase):
 
         metastatic_org = Organization(name='metastatic')
         metastatic_org.research_protocols.append(rp)
-        questionnaire = Questionnaire(name='test_q')
+        questionnaire = self.add_questionnaire(name='test_q')
         with SessionScope(db):
             db.session.add(initial_recur)
             db.session.add(every_six_thereafter)
