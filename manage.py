@@ -34,6 +34,7 @@ app = create_app()
 MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
 migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
 
+
 @app.cli.command()
 def runserver():
     # Todo: figure out how to override default host in `flask run`
@@ -102,6 +103,7 @@ def sync():
 def seed_command(keep_unmentioned):
     seed(keep_unmentioned)
 
+
 def seed(keep_unmentioned=False):
     """Seed database with required data"""
 
@@ -167,7 +169,6 @@ def add_user(email, role, password):
     auditable_event(
         "new account generated (via cli) for {}".format(user),
         user_id=user.id, subject_id=user.id, context='account')
-
 
 
 @click.option('--email', '-e', help='Email of user to purge.')
