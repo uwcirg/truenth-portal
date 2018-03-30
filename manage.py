@@ -9,17 +9,24 @@ import json
 import redis
 
 import alembic.config
+from sqlalchemy.orm.exc import NoResultFound
 from flask_migrate import Migrate
 
 from portal.factories.app import create_app
-from portal.extensions import db
+from portal.extensions import db, user_manager
+from portal.audit import auditable_event
 from portal.models.i18n import smartling_upload, smartling_download
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
-from portal.models.role import add_static_roles
-from portal.models.user import permanently_delete_user, flag_test
+from portal.models.role import add_static_roles, Role
+from portal.models.user import (
+    flag_test,
+    permanently_delete_user,
+    User,
+    validate_email
+)
 from portal.config.site_persistence import SitePersistence
 
 app = create_app()
@@ -132,6 +139,35 @@ def export_site(dir):
 
     """
     SitePersistence().export(dir)
+
+
+@click.option('--email', '-e', help="email address for new user")
+@click.option('--role', '-r', help="Comma separated role(s) for new user")
+@click.option('--password', '-p', help="password for new user")
+@app.cli.command()
+def add_user(email, role, password):
+    """Add new user as specified """
+    validate_email(email)
+    if not password or len(str(password)) < 5:
+        raise ValueError("requires a password")
+
+    pw = user_manager.hash_password(password)
+    user = User(email=email, password=pw)
+    db.session.add(user)
+    roles = role.split(',') if role else []
+    try:
+        role_list = [
+            Role.query.filter_by(name=r).one() for r in roles]
+        user.update_roles(role_list, acting_user=user)
+    except NoResultFound:
+        raise ValueError(
+            "one or more roles ill defined {}".format(roles))
+
+    db.session.commit()
+    auditable_event(
+        "new account generated (via cli) for {}".format(user),
+        user_id=user.id, subject_id=user.id, context='account')
+
 
 
 @click.option('--email', '-e', help='Email of user to purge.')
