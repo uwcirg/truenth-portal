@@ -1342,25 +1342,10 @@ var fillContent = {
                 return found;
             };
             $("#termsCheckbox label.terms-label").each(function() {
-                var arrTypes = [];
                 var item_found  = 0;
                 var self = $(this);
-
-                if (self.attr("data-tou-type")) {
-                    var o = ($(this).attr("data-tou-type")).split(",");
-                    o.forEach(function(item) {
-                        arrTypes.push(item);
-                    });
-                } else {
-                    self.find("[data-type='terms']").each(function() {
-                        var o = ($(this).attr("data-tou-type")).split(",");
-                        o.forEach(function(item) {
-                            arrTypes.push(item);
-                        });
-                    });
-                };
-
-                arrTypes.forEach(function(type) {
+                self.find("[data-type='terms']").each(function() {
+                    var type = $(this).attr("data-tou-type");
                     if (typeInTous(type, "active")) {
                         item_found++;
                         /* 
@@ -1368,29 +1353,17 @@ var fillContent = {
                          */
                         $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
 
-                    };
-                });
-
-                var arrReconsent = $.grep(arrTypes, function(type) {
-                    return typeInTous(type, "inactive");
-                });
-
-                /*
-                 *  note display of checked checkbox when re-consenting is controlled by css
-                 */
-                if (arrReconsent.length > 0) {
-                    self.attr("data-reconsent", "true");
-                    if (!setReconsentDisplay) {
-                        $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
-                        setReconsentDisplay = true;
                     }
-                }
-
+                    if (typeInTous(type, "inactive")) {
+                        self.attr("data-reconsent", "true");
+                        self.closest("#termsCheckbox").attr("data-reconsent", "true");
+                    }
+                });
                 if (item_found > 0) {
                     /*
                      * make sure that all items are agreed upon before checking the box
                      */
-                    if (!($(this).find("[data-agree='false']").length > 0)) {
+                    if (!(self.find("[data-agree='false']").length > 0)) {
                         self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                         var vs = self.find(".display-view");
                         if (vs.length > 0) {
