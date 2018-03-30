@@ -58,14 +58,14 @@
                         <!-- display message specific to patient who has already consented - possible in EPROMs -->
                         {% if user.has_role(ROLE.PATIENT) %}
                           <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
-                        {% endif %}
                           <input type="hidden"
                           data-agree="false"
                           data-type="terms"
                           data-tou-type="subject website consent"
                           data-core-data-type="subject_website_consent"
                           data-url="{{tou_url}}" />
-                          <input type="hidden"
+                        {% endif %}
+                        <input type="hidden"
                           data-agree="false"
                           data-type="terms"
                           data-tou-type="website terms of use"

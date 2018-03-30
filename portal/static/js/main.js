@@ -1363,6 +1363,11 @@ var fillContent = {
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type, "active")) {
                         item_found++;
+                        /* 
+                         * set the data-agree attribute for the corresponding consent item 
+                         */
+                        $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
+
                     };
                 });
 
@@ -1382,20 +1387,21 @@ var fillContent = {
                 }
 
                 if (item_found > 0) {
-                    self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    /*
+                     * make sure that all items are agreed upon before checking the box
+                     */
+                    if (!($(this).find("[data-agree='false']").length > 0)) {
+                        self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                        var vs = self.find(".display-view");
+                        if (vs.length > 0) {
+                            self.show();
+                            vs.show();
+                            (self.find(".edit-view")).each(function() {
+                               $(this).hide();
+                            });
+                        }
+                    }
                     self.show().removeClass("tnth-hide");
-                    self.attr("data-agree", "true");
-                    self.find("[data-type='terms']").each(function() {
-                        $(this).attr("data-agree", "true");
-                    });
-                    var vs = self.find(".display-view");
-                    if (vs.length > 0) {
-                        self.show();
-                        vs.show();
-                        (self.find(".edit-view")).each(function() {
-                           $(this).hide();
-                        });
-                    };
                 };
             });
 
@@ -2847,6 +2853,10 @@ var Profile = function(subjectId, currentUserId) {
         };
         $("#btnPasswordResetEmail").on("click", function(event) {
             event.preventDefault();
+            /* 
+             * stop bubbling of events
+             */
+            event.stopImmediatePropagation();
             email = $("#email").val();
             if (email) {
                 tnthAjax.passwordReset(self.subjectId, function(data) {
