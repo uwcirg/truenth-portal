@@ -28,7 +28,7 @@ Copy and edit the default environment file (from the project root)::
     # SERVER_NAME=localhost:8080
 
 .. note::
-    All docker-compose commands are run from the docker/ directory
+    All docker-compose commands are run from the ``docker/`` directory
 
 Download and run the generated images::
 
@@ -53,10 +53,14 @@ To build a Debian package from the current branch of your local repo::
     # Build debian package from current local branch
     docker-compose -f docker-compose.build.yaml run builder
 
+<<<<<<< HEAD
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
 If you would like to create a package from a fork you can override the local repo and branch as below::
+=======
+If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
+>>>>>>> Fix notes
 
     # Override default with environment variables
     export GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
