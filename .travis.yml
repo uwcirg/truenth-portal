@@ -31,7 +31,6 @@ env:
     - GIT_TAG="$TRAVIS_TAG"
     - GIT_HASH="$TRAVIS_COMMIT"
 
-    - BRANCH="$GIT_BRANCH"
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
     - DOCKER_REPOSITORY=""

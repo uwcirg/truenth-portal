@@ -17,7 +17,6 @@ Usage:
     Docker build helper script
 
     Optional overrides:
-        "\${BRANCH}" - Build debian package from given local branch
         "\${GIT_REPO}" - URL of git repository to build from (defaults to current repo)
 USAGE
    exit 1
@@ -38,7 +37,6 @@ export COMPOSE_FILE="${COMPOSE_FILE:-${root_path}/docker/docker-compose.yaml:${r
 
 
 # Build debian package from current repo and branch
-BRANCH="${BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
 docker-compose run builder
 
 # Build portal docker image from debian package

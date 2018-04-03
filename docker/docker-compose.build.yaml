@@ -7,7 +7,6 @@ services:
       dockerfile: docker/Dockerfile.build
     environment:
       - GIT_REPO=${GIT_REPO:-/mnt/git_repo}
-      - BRANCH=${BRANCH:-develop}
     volumes:
       - source: ../debian/artifacts
         target: /tmp/artifacts
