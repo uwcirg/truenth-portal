@@ -47,28 +47,24 @@ Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build docker ima
 Building a Debian Package
 -------------------------
 
-To build a Debian package from your local ``develop`` branch::
+To build a Debian package from the current branch of your local repo::
 
-    # Build debian package from local develop branch
+    # Build debian package from local branch
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
     docker-compose run builder
 
 .. note::
     All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
-If you would like to create a package from a topic branch or fork you can override the local repo and branch as below::
+If you would like to create a package from a fork you can override the local repo and branch as below::
 
     COMPOSE_FILE='docker/docker-compose.yaml:docker/docker-compose.build.yaml'
 
-    # Override defaults with environment variables
-    BRANCH='feature/feature-branch-name'
+    # Override default with environment variables
     GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
 
     # Run the container (override defaults)
     docker-compose run builder
-
-.. note::
-    The branch specified must exist on Github
 
 Building a Shared Services Docker Image
 ---------------------------------------
