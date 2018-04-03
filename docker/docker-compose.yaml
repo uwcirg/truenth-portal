@@ -62,12 +62,12 @@ services:
   redis:
     image: redis
     ports:
-      - target: "6379"
+      - target: 6379
 
   db:
     image: postgres
     ports:
-      - target: "5432"
+      - target: 5432
     environment:
       - POSTGRES_DB=${PGDATABASE:-portaldb}
     volumes:
