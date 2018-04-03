@@ -8,7 +8,7 @@ Docker
 Background
 ==========
 
-Docker is an open-source project that automates the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
+Docker is an open-source project that can automate the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
 
 Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environment variables (ENV) that may be overridden.
 
@@ -30,11 +30,11 @@ Copy and edit the default environment file (from the project root)::
 .. note::
     All docker-compose commands are run from the ``docker/`` directory
 
-Download and run the generated images::
+Download and run the ``latest`` images::
 
     docker-compose up web
 
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use an image with another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
 
     export DOCKER_IMAGE_TAG='stable'
     docker-compose up web
@@ -43,7 +43,7 @@ By default, the ``portal_web`` image with the ``latest`` tag is downloaded and u
 Docker Images
 =============
 
-Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build docker images capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
+Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a docker image capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
 
 Building a Debian Package
 -------------------------
@@ -89,14 +89,14 @@ Environment variables defined in the ``portal.env`` environment file are only pa
 An
 `additional environment file <https://docs.docker.com/compose/environment-variables/#the-env-file>`__, specifically named ``.env``, in current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
 
-One use for these more "global" environmental variables is overriding the default ``COMPOSE_PROJECT_NAME`` which is used to namespace applications running under docker-compose. In production deployments ``COMPOSE_PROJECT_NAME`` is set to correspond to the domain being served.
+One use for these more "global" environmental variables is overriding the default ``COMPOSE_PROJECT_NAME`` which can be used to namespace multiple deployments running on the same host. In production deployments ``COMPOSE_PROJECT_NAME`` is set to correspond to the domain being served.
 
 Continuous Delivery
 ===================
 
 Our continuous integration setup leverages TravisCI's docker support and deployment integration to create and deploy Debian packages and Docker images for every commit.
 
-Packages and images are built in a separate :term:`job` (named "build") that corresponds with a tox environment that does nothing and that's allowed to fail without delaying the build or affecting its status.
+Packages and images are built in a separate :term:`job` (named "build-artifacts") that corresponds with a tox environment that does nothing and that's allowed to fail without delaying the build or affecting its status.
 
 If credentials are configured, packages and images will be uploaded to their corresponding repository after the build process. Otherwise, artifacts will only be built, but not uploaded or deployed.
 
