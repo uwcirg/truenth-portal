@@ -26,8 +26,8 @@ services:
   web:
     <<: *service_base
     ports:
-      - target: "${PORT:-8008}"
-        published: "${EXTERNAL_PORT:-8080}"
+      - target: ${PORT:-8008}
+        published: ${EXTERNAL_PORT:-8080}
     depends_on:
       - db
       - redis
