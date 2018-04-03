@@ -57,7 +57,6 @@ matrix:
         sauce_connect: true
   allow_failures:
     - env: TOXENV=ui
-    - env: TOXENV=build-artifacts
 
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
