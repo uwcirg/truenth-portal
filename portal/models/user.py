@@ -726,7 +726,8 @@ class User(db.Model, UserMixin):
         codeable_concept = codeable_concept.add_if_not_found()
         matching_observations = [
             obs for obs in self.observations if
-            obs.codeable_concept_id == codeable_concept.id]
+            obs.codeable_concept_id == codeable_concept.id and
+            obs.issued is not None]
         if not matching_observations:
             return None
         newest = max(o.issued for o in matching_observations
