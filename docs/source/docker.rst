@@ -45,7 +45,7 @@ By default, the ``portal_web`` image with the ``latest`` tag is downloaded and u
 Docker Images
 =============
 
-Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a docker image capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
+Two Dockerfiles (``Dockerfile.build`` and ``Dockerfile``) define how to build a docker image capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
 
 Building a Debian Package
 -------------------------
@@ -97,7 +97,7 @@ Continuous Delivery
 
 Our continuous integration setup leverages TravisCI's docker support and deployment integration to create and deploy Debian packages and Docker images for every commit.
 
-Packages and images are built in a separate :term:`job` (named "build-artifacts") that corresponds with a tox environment that does nothing and that's allowed to fail without delaying the build or affecting its status.
+Packages and images are built in a separate :term:`job` (named ``build-artifacts``) that corresponds with a tox environment that does nothing and that's allowed to fail without delaying the build or affecting its status.
 
 If credentials are configured, packages and images will be uploaded to their corresponding repository after the build process. Otherwise, artifacts will only be built, but not uploaded or deployed.
 
