@@ -70,7 +70,7 @@ the following commands:
     $ sudo -u postgres createdb truenth-dev --owner truenth-dev
 
 Building the schema and populating with basic configured values is done via
-the ``sync`` command.  See details below.
+the :ref:`flask sync <flask-sync>` command.  See details below.
 
 Update pip
 ^^^^^^^^^^
@@ -113,6 +113,8 @@ Write to the respective GOOGLE\_CONSUMER\_KEY and
 GOOGLE\_CONSUMER\_SECRET variables in the same ``application.cfg``
 configuration file.
 
+.. _pip:
+
 Install the Latest Package and Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -148,6 +150,8 @@ To use or view the usage of the available commands:
 
 .. note:: All ``flask`` commands mentioned within this document require the
     first two steps listed above.
+
+.. _flask-sync:
 
 Sync Database and Config Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +191,7 @@ Install the Latest Package, Dependencies and Synchronize DB (via script)
 
 To update your Shared Services installation run the ``deploy.sh`` script
 (this process wraps together pulling the latest from the repository, the
-**pip** and **flask sync** commands listed above).
+:ref:`pip <pip>` and :ref:`flask sync <flask-sync>` commands listed above).
 
 This script will:
 
@@ -259,7 +263,7 @@ managed and run.
 
     flask db stamp head
 
-NB - use of the ``flask sync`` command covers this step automatically.
+.. note:: The :ref:`flask sync <flask-sync>` command covers this step automatically.
 
 Upgrade
 ^^^^^^^
@@ -275,7 +279,7 @@ that already received the upgrade.
 
     flask db upgrade
 
-NB - use of the ``flask sync`` command covers this step automatically.
+.. note:: The :ref:`flask sync <flask-sync>` command covers this step automatically.
 
 Schema Changes
 ^^^^^^^^^^^^^^
