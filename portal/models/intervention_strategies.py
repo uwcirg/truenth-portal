@@ -670,11 +670,14 @@ class AccessStrategy(db.Model):
 
     @classmethod
     def from_json(cls, data):
-        obj = cls()
+        strat = cls()
+        return strat.update_from_json(data)
+
+    def update_from_json(self, data):
         try:
-            obj.name = data['name']
+            self.name = data['name']
             if 'id' in data:
-                obj.id = data['id']
+                self.id = data['id']
             if 'intervention_name' in data:
                 intervention = Intervention.query.filter_by(
                     name=data['intervention_name']).first()
@@ -683,19 +686,19 @@ class AccessStrategy(db.Model):
                         'Intervention not found {}.  (NB: new interventions '
                         'require `seed -i` to import)'.format(
                             data['intervention_name']))
-                obj.intervention_id = intervention.id
+                self.intervention_id = intervention.id
             if 'description' in data:
-                obj.description = data['description']
+                self.description = data['description']
             if 'rank' in data:
-                obj.rank = data['rank']
-            obj.function_details = json.dumps(data['function_details'])
+                self.rank = data['rank']
+            self.function_details = json.dumps(data['function_details'])
 
             # validate the given details by attempting to instantiate
-            obj.instantiate()
+            self.instantiate()
         except Exception, e:
             raise ValueError("AccessStrategy instantiation error: {}".format(
                 e))
-        return obj
+        return self
 
     def as_json(self):
         """Return self in JSON friendly dictionary"""
