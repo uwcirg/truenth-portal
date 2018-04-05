@@ -464,11 +464,6 @@
                 "code": "en_US",
                 "display": "American English",
                 "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "es_US",
-                "display": "Spanish",
-                "system": "urn:ietf:bcp:47"
               }
             ]
           }
