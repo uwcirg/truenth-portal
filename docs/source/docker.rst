@@ -10,9 +10,9 @@ Background
 
 Docker is an open-source project that can be used to automate the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
 
-Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environment variables (ENV) that may be overridden.
+Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (``ARG``) and environment variables (``ENV``) that may be overridden.
 
-Docker-compose (through docker-compose.yaml) defines the relationship (exposed ports, volume mapping) between the Shared Services web container and the other services it depends on (redis, postgresql).
+Docker-compose (through ``docker-compose.yaml``) defines the relationship (exposed ports, volume mappings) between the Shared Services web container and the other services it depends on (redis, postgresql).
 
 Getting Started
 ===============
@@ -66,7 +66,7 @@ If you would like to create a package from a remote repository you can override 
 Building a Shared Services Docker Image
 ---------------------------------------
 
-If you would like to build a Shared Services container, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
+If you would like to build a Shared Services image, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Override default (Artifactory) docker repo to differentiate locally-built images
     export DOCKER_REPOSITORY=''
