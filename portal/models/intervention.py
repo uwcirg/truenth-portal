@@ -272,6 +272,7 @@ STATIC_INTERVENTIONS = IterableUserDict({
     'decision_support_p3p': 'Decision Support P3P',
     'decision_support_wisercare': 'Decision Support WiserCare',
     'music': 'MUSIC Integration',
+    'psa_tracker': 'PSA Tracker',
     'self_management': 'Self Management',
     'sexual_recovery': 'Sexual Recovery',
     'social_support': 'Social Support Network',
