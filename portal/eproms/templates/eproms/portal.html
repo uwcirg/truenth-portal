@@ -6,7 +6,7 @@
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Explore TrueNTH") }}</h2>
         <p>{{ _("Discover online tools to guide you through the cancer journey.") }}</p>
-        <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">{{ _("Learn More") }}</a>
+        <a class="btn-lg btn-tnth-primary" href="{{url_for('portal.explore')}}">{{ _("Learn More") }}</a>
     </div>
 {%- endif -%}
 #}
@@ -44,7 +44,7 @@
 {% block additional_scripts %}<script src="{{ url_for('.static', filename='js/portal.js') }}"></script>{% endblock %}
 {% macro render_card_content(intervention, display, class='') -%}
     <div class="portal-description {{class}}">
-        {%- if intervention.description and intervention.description != "" -%}<h2 class="tnth-subhead title">{{ intervention.description }}</h2>{% endif %}
+        {%- if intervention.description -%}<h2 class="tnth-subhead title">{{ intervention.description }}</h2>{% endif %}
         {{ caller() }}
         <div class="button-container">
             {%- if not display.link_url -%}
