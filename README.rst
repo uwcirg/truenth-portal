@@ -43,6 +43,8 @@ installed anywhere, using the nested 'env' pattern here.
 
     $ virtualenv $PROJECT_HOME/env
 
+.. _activate-venv:
+
 Activate the Virtual Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -67,11 +69,14 @@ the following commands:
     $ sudo -u postgres createuser truenth-dev --pwprompt # enter password at prompt
     $ sudo -u postgres createdb truenth-dev --owner truenth-dev
 
+Building the schema and populating with basic configured values is done via
+the :ref:`flask sync <flask-sync>` command.  See details below.
+
 Update pip
 ^^^^^^^^^^
 
-The OS default version of pip is often out of date and may need to be
-updated before it is able to install other project dependencies:
+The default version of pip provided in the virtual environment is often out
+of date.  Best to update first, for optimal results:
 
 .. code:: bash
 
@@ -108,8 +113,10 @@ Write to the respective GOOGLE\_CONSUMER\_KEY and
 GOOGLE\_CONSUMER\_SECRET variables in the same ``application.cfg``
 configuration file.
 
-Install the Lastest Package and Dependencies (by hand)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _pip:
+
+Install the Latest Package and Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instruct ``pip`` to install the correct version of all dependencies into the
 virtual environment. This idempotent step can be run anytime to confirm the
@@ -119,8 +126,35 @@ correct libraries are installed:
 
     pip install -r requirements.txt
 
-Sync Database and Config Files (by hand)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+COMMAND LINE INTERFACE
+----------------------
+
+A number of built in and custom extensions for command line interaction are
+available via the `click command line interface <http://click.pocoo.org/>`_,
+several of which are documented below.
+
+To use or view the usage of the available commands:
+
+1. :ref:`activate-venv`
+2. Set **FLASK_APP** environment variable to point at **manage.py**
+
+.. code:: bash
+
+    export FLASK_APP=manage.py
+
+3. Issue the ``flask --help`` or ``flask <cmd> --help`` commands for more details
+
+.. code:: bash
+
+    flask sync --help
+
+.. note:: All ``flask`` commands mentioned within this document require the
+    first two steps listed above.
+
+.. _flask-sync:
+
+Sync Database and Config Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The idempotent ``sync`` function takes necessary steps to build tables,
 upgrade the database schema and run ``seed`` to populate with static data.
@@ -128,13 +162,36 @@ Safe to run on existing or brand new databases.
 
 .. code:: bash
 
-    FLASK_APP=manage.py flask sync
+    flask sync
 
-Install the Lastest Package, Dependencies and Syncronize DB (via script)
+Add User
+~~~~~~~~
+
+Especially useful in bootstrapping a new install, a user may be added and
+blessed with the admin role from the command line.  Be sure to use a secure
+password.
+
+.. code:: bash
+
+    flask --email user@server.com --password reDacted! --role admin
+
+Password Reset
+~~~~~~~~~~~~~~
+
+Users who forget their passwords should be encouraged to use the **forgot
+password** link from the login page.  In rare instances when direct password
+reset is necessary, an admin may perform the following:
+
+.. code:: bash
+
+    flask --email forgotten_user@server.com --password newPassword --actor <admin's email>
+
+Install the Latest Package, Dependencies and Synchronize DB (via script)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To update your Shared Services installation run the ``deploy.sh`` script
-(this step replaces the two previous hand run steps).
+(this process wraps together pulling the latest from the repository, the
+:ref:`pip <pip>` and :ref:`flask sync <flask-sync>` commands listed above).
 
 This script will:
 
@@ -159,7 +216,7 @@ Run the Central Services Server
 
 .. code:: bash
 
-    $ FLASK_APP=manage.py flask runserver
+    $ flask runserver
 
 Run the Celery Worker
 ---------------------
@@ -168,9 +225,11 @@ Run the Celery Worker
 
     $ celery worker --app portal.celery_worker.celery --loglevel=info
 
-Alternatively, install an init script and configure. See `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
+Alternatively, install an init script and configure. See
+`Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
 
-Should the need ever arise to purge the queue of jobs, run the following destructive command
+Should the need ever arise to purge the queue of jobs, run the following
+**destructive** command
 
 .. code:: bash
 
@@ -180,7 +239,15 @@ DATABASE
 --------
 
 The value of ``SQLALCHEMY_DATABASE_URI`` defines which database engine
-and database to use. At this time, only PostgreSQL is supported.
+and database to use.  Alternatively, the following environment
+variables may be used (and if defined, will be preferred):
+
+#. PGDATABASE
+#. PGUSER
+#. PGPASSWORD
+#. PGHOST
+
+At this time, only PostgreSQL is supported.
 
 Migrations
 ~~~~~~~~~~
@@ -194,7 +261,9 @@ managed and run.
 
 .. code:: bash
 
-    FLASK_APP=manage.py flask db stamp head
+    flask db stamp head
+
+.. note:: The :ref:`flask sync <flask-sync>` command covers this step automatically.
 
 Upgrade
 ^^^^^^^
@@ -208,7 +277,9 @@ that already received the upgrade.
 
 .. code:: bash
 
-    FLASK_APP=manage.py flask db upgrade
+    flask db upgrade
+
+.. note:: The :ref:`flask sync <flask-sync>` command covers this step automatically.
 
 Schema Changes
 ^^^^^^^^^^^^^^
@@ -219,13 +290,13 @@ the code changes and generate the necessary migration steps:
 
 .. code:: bash
 
-    FLASK_APP=manage.py flask db migrate
+    flask db migrate
 
 Then execute the upgrade as previously mentioned:
 
 .. code:: bash
 
-    FLASK_APP=manage.py flask db upgrade
+    flask db upgrade
 
 Testing
 -------

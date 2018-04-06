@@ -20,7 +20,7 @@ from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
-from portal.models.role import add_static_roles, Role
+from portal.models.role import add_static_roles, Role, ROLE
 from portal.models.user import (
     flag_test,
     permanently_delete_user,
@@ -169,6 +169,35 @@ def add_user(email, role, password):
     auditable_event(
         "new account generated (via cli) for {}".format(user),
         user_id=user.id, subject_id=user.id, context='account')
+
+
+@click.option('--email', '-e', help="target user email for password reset")
+@click.option('--password', '-p', help="new password")
+@click.option(
+    '--actor', '-a',
+    help='Email of user taking this action (must be admin)'
+)
+@app.cli.command()
+def password_reset(email, password, actor):
+    """Reset given user's password """
+    try:
+        acting_user = User.query.filter(User.email == actor).one()
+    except NoResultFound:
+        raise ValueError("email for acting user not found")
+    try:
+        target_user = User.query.filter(User.email == email).one()
+    except NoResultFound:
+        raise ValueError("email for target user not found")
+    if not acting_user.has_role(ROLE.ADMIN):
+        raise ValueError("Actor must be an admin")
+    if not password or len(str(password)) < 8:
+        raise ValueError("requires a valid password")
+
+    target_user.password = user_manager.hash_password(password)
+    db.session.commit()
+    auditable_event(
+        "cli password reset for {}".format(target_user),
+        user_id=acting_user.id, subject_id=target_user.id, context='account')
 
 
 @click.option('--email', '-e', help='Email of user to purge.')
