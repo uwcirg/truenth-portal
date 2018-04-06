@@ -211,9 +211,9 @@ class TestClinical(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'false')
 
-        # Confirm the db is clean
+        # Confirm history is retained
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.observations.count(), 1)
+        self.assertEquals(user.observations.count(), 2)
 
     def test_clinical_biopsy_unknown(self):
         """Shortcut API - biopsy data w status unknown"""
@@ -258,9 +258,9 @@ class TestClinical(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'false')
 
-        # Confirm the db is clean
+        # Confirm history is retained
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.observations.count(), 1)
+        self.assertEquals(user.observations.count(), 2)
 
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""

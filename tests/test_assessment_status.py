@@ -647,10 +647,10 @@ class TestTnthAssessmentStatus(TestQuestionnaireSetup):
         # toggle default setup - set biopsy false for test user
         self.login()
         self.test_user = db.session.merge(self.test_user)
-        self.test_user.save_constrained_observation(
+        self.test_user.save_observation(
             codeable_concept=CC.BIOPSY, value_quantity=CC.FALSE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='final')
+            status='final', issued=None)
         self.assertFalse(
             QuestionnaireBank.qbs_for_user(
                 self.test_user, 'baseline', as_of_date=now))
