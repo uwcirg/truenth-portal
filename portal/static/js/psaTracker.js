@@ -355,7 +355,7 @@
                             .attr("class", "legend-text");
 
                     var ylegend = graphArea.append("g")
-                                .attr("transform", "translate(" + (-margin.left + margin.left/3) + "," + (height/3) + ")")
+                                .attr("transform", "translate(" + (-margin.left + margin.left/3) + "," + (height/3) + ")");
 
                     ylegend.append("text")
                         .attr("transform", "rotate(90)")
