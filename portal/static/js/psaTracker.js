@@ -79,7 +79,7 @@
                     }
                     this.addErrorMessage = "";
                     var existingItem = $.grep(this.items, function(item) {
-                        return item.date == newDate;
+                        return String(item.date) === String(newDate);
                     });
                     if (existingItem.length > 0) {
                         this.newItem.id = existingItem[0].id;
@@ -158,7 +158,6 @@
                     }
 
                     tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
-                        console.log(data);
                         if (data.error) {
                             self.addErrorMessage = i18next.t("Server error occurred adding PSA result.");
                         }
