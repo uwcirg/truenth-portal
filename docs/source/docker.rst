@@ -22,6 +22,9 @@ Install `docker-compose` as per environment.  For example, from a debian system:
     sudo usermod -aG docker $USER
     sudo pip install docker_compose
 
+.. note::
+    A clean environment and fresh git checkout are recommended, but not required
+
 Copy and edit the default environment file (from the project root)::
 
     cp docker/portal.env.default docker/portal.env
