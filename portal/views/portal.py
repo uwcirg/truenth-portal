@@ -654,6 +654,13 @@ def contact_sent(message_id):
     return render_template('contact_sent.html', message=message)
 
 
+@portal.route('/psa-tracker')
+@roles_required(ROLE.PATIENT)
+@oauth.require_oauth()
+def psa_tracker():
+    return render_template('psa_tracker.html', user=current_user())
+
+
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
                            validators=[validators.DataRequired()])

@@ -1509,12 +1509,15 @@ div.footer-wrapper.right-panel {
   background: rgba(95, 103, 110, 1);
   overflow-x: hidden;
   overflow-y: auto;
-  min-height: 92.5vh;
+  height: 93.5vh;
 }
 @media (min-width: 992px) {
   #mainDiv.portal {
-    min-height: 85.25vh;
+    height: 88vh;
   }
+}
+#mainDiv.portal::-webkit-scrollbar {
+  display: none;
 }
 #mainDiv.portal .container {
   max-width: 1100px;
@@ -1525,6 +1528,7 @@ div.footer-wrapper.right-panel {
   margin-bottom: 1em;
 }
 .portal-body {
+  margin-top: 1em;
   min-height: 60vh;
   display: flex;
   align-items: center;
@@ -1645,7 +1649,7 @@ div.footer-wrapper.right-panel {
 .portal-description-body {
   margin-top: 1em;
   text-align: center;
-  font-size: @baseFontSize*0.99;
+  font-size: @baseFontSize*0.95;
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {

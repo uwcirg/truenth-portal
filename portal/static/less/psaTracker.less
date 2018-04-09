@@ -1,0 +1,202 @@
+
+@psaTrackerBorderColor: #eff0f1;
+@psaTrackerTableHeaderBgColor: #496470;
+@psaTrackerStrokeColor: #777;
+@psaTrackerHoverBgColor: #eff0f1;
+@legendTextColor: #333;
+
+#mainPsaApp {
+    margin-top: 1em;
+}
+#mainPsaApp section {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+.psa-tracker-title {
+	background-color: #374550;
+    color: #FFF;
+    margin: 1em 0;
+    padding: 1em;
+    letter-spacing: 1px;
+    .heading {
+        margin: 0.5em 0 1em;
+        border-bottom: 1px solid darken(@psaTrackerBorderColor, 50%);
+        padding-bottom: 2px;
+        letter-spacing: 2px;
+    }
+}
+.psa-tracker-table-header {
+	background: @psaTrackerTableHeaderBgColor;
+	color: #FFF;
+}
+#psaTrackerResultsContainer {
+	margin-top: 2em;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 1.5em 0;
+    border-left: 1px solid @psaTrackerBorderColor;
+    border-top: 1px solid @psaTrackerBorderColor;
+    box-shadow: 2px 1px 1px 1px @psaTrackerBorderColor;
+    overflow-y: auto;
+    min-height: 400px;
+}
+
+@media (min-width: 992px) {
+    #psaTrackerResultsTable {
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
+    }
+    #psaTrackerResultsContainer {
+        overflow-y: hidden;
+    }
+}
+#psaTrackerResultsTable {
+    TH, TD {
+        padding: 0.5em 1em;
+        border: 1px solid @psaTrackerStrokeColor;
+    }
+    TH {
+        letter-spacing: 1px;
+        padding: 0.8em;
+    }
+    TR.result-row:hover {
+        background-color: @psaTrackerHoverBgColor;
+    }
+    .result-cell{
+        input {
+            height: 2.2em;
+        }
+        span {
+            display: block;
+            width: 100px;
+            &:hover {
+                cursor:pointer;
+                text-decoration: underline;
+                color: #496470;
+                cursor: pointer;
+            }
+        }
+    }
+}
+#psaTrackerAddTable {
+    TD {
+	   padding: 1em;
+    }
+    input {
+	   height: 2.2em;
+       min-width: 260px;
+       padding: 0.5em;
+    }
+}
+#addPSAModal {
+    .body-content {
+        width: 480px;
+        max-width: 100%;
+        margin: auto;
+    }
+    .modal-body {
+        width: 520px;
+        max-width: 100%;
+        padding: 1em 0;
+    }
+    table {
+        word-wrap: break-word;
+        margin: auto;
+    }
+    .error-message {
+        text-align: center;
+    }
+}
+.psaTrackerLoader {
+    position: absolute;
+    z-index: 500;
+    background-color: hsla(0, 25%, 97%, 0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    i {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 501;
+    }
+}
+#psaTrackerNoResultContainer {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background: @psaTrackerHoverBgColor;
+    min-height: 10em;
+    padding: 4.25em 1em;
+}
+#psaTrackerButtonsContainer {
+    padding: 1em 0;
+    margin-top: 1em;
+}
+#psaTrackerGraphContainer {
+    padding: 1em 0.5em 0.5em;
+    background: hsla(201, 3%, 83%, 0.1);
+    margin-top: 2em;
+    height: 400px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    path {
+        stroke: @psaTrackerStrokeColor;
+        stroke-width: 1.5;
+        fill: none;
+    }
+    .x-axis path,
+    .y-axis path {
+        stroke-width: 0
+    }
+    .axis-stroke {
+        font-size: 12px;
+        stroke: @psaTrackerStrokeColor;
+        stroke-width: 0.5;
+        shape-rendering: crispEdges;
+    }
+    .grid {
+        line {
+            stroke: #d2cdcd;
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+        path {
+            stroke-width: 0;
+        }
+    }
+    .grid-y g:last-of-type line.tick {
+        stroke-opacity: 0;
+    }
+    .legend-text {
+        font-size: 10px;
+        stroke: @legendTextColor;
+        letter-spacing: 2px;
+        opacity: 0.6;
+        font-weight: 300;
+    }
+    .circle {
+        fill: #FFF;
+        stroke: @psaTrackerStrokeColor;
+    }
+    .circle-hi {
+        fill: @psaTrackerStrokeColor;
+        stroke: @psaTrackerStrokeColor;
+    }
+    .circle-lo {
+        fill: @psaTrackerStrokeColor;
+        stroke: @psaTrackerStrokeColor;
+    }
+    .graph-caption {
+        font-size: 18px;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+}
+@media (min-width: 992px) {
+    #psaTrackerGraphContainer {
+        margin-top: 1em;
+    }
+}
