@@ -112,6 +112,9 @@
                                 results = results.sort(function(a, b) {
                                     return new Date(b.date) - new Date(a.date);
                                 });
+                                /*
+                                 * display only 10 most recent results
+                                 */
                                 if (results.length > 10) {
                                     results = results.slice(0, 10);
                                 }
@@ -136,7 +139,7 @@
                     var self = this;
                     if (this.newItem.date) {
                         var dt = new Date(this.newItem.date);
-                        //2017-07-06T22:04:50 format
+                        // in 2017-07-06T12:00:00 format
                         cDate = [dt.getFullYear(), (dt.getMonth()+1), dt.getDate()].join("-");
                         cDate = cDate + "T12:00:00";
                     }
@@ -215,27 +218,26 @@
                         var interval = Math.ceil(diff/9);
                         var startTime = new Date(t0),
                             endTime= new Date(t1), times = [];
-                            startTime.setUTCDate(startTime.getUTCDate());
-                            endTime.setUTCDate(endTime.getUTCDate());
-                            while (startTime < endTime && startTime <= endTime) {
-                                var dateTime = new Date(startTime);
-                                startTime.setUTCDate(startTime.getUTCDate() + interval);
-                                var lastInterval = (new Date(startTime) - new Date(endTime)) / day;
-                                if (startTime > endTime) {
-                                    times.push(new Date(endTime));
-                                    if (lastInterval < interval/2) {
-                                        times.push(dateTime);
-                                    }
-                                } else {
+                        startTime.setUTCDate(startTime.getUTCDate());
+                        endTime.setUTCDate(endTime.getUTCDate());
+                        while (startTime < endTime && startTime <= endTime) {
+                            var dateTime = new Date(startTime);
+                            startTime.setUTCDate(startTime.getUTCDate() + interval);
+                            var lastInterval = (new Date(startTime) - new Date(endTime)) / day;
+                            if (startTime > endTime) {
+                                times.push(new Date(endTime));
+                                if (lastInterval < interval/2) {
                                     times.push(dateTime);
                                 }
+                            } else {
+                                times.push(dateTime);
                             }
-                            return times;
                         }
+                        return times;
+                    }
 
                     // Scale the range of the data
                     var endY = Math.max(10, d3.max(data, function(d) { return d.result; }));
-
 
                     if (data.length === 1) {
                         var dataArray = [];
@@ -282,7 +284,6 @@
                         .style("fill", "#ececec");
 
                     var graphArea = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 
                     // Add the X Axis
                     graphArea.append("g")
@@ -361,7 +362,6 @@
                         .attr("transform", "rotate(90)")
                         .attr("class", "legend-text")
                         .text(i18next.t("Result (ng/ml)"));
-
 
                 }
             }
