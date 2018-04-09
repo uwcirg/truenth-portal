@@ -40,7 +40,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 {% raw %}
-                <div class="modal-header-title">{{ newItem.edit ? editTitle: addTitle}}</div>
+                	<div class="modal-header-title">{{ newItem.edit ? editTitle: addTitle}}</div>
                 {% endraw %}
             </div>
             <div class="modal-body">
@@ -52,7 +52,7 @@
                         </tr>
                         <tr>
                             <td>{{_("PSA Test Date")}}</td>
-                            <td><input id="psaDate" type="text" v-model="newItem.date" class="form-control" placeholder="{{_('d M yyyy, example: 1 Jan, 2017')}}"/></td>
+                            <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" placeholder="{{_('d M yyyy, example: 1 Jan, 2017')}}"/></td>
                         </tr>
                     </table>
                     <br/>
@@ -71,8 +71,7 @@
 </main>
 {% endblock %}
 {% block additional_scripts %}
-<!-- todo - switch over to production version after done -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.min.js"></script>
-<script src="{{url_for('static', filename='js/psaTracker.js')}}" ></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.min.js"></script>
+	<script src="{{url_for('static', filename='js/psaTracker.js')}}" ></script>
 {% endblock %}
