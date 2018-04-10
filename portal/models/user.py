@@ -345,7 +345,7 @@ class User(db.Model, UserMixin):
         for any users with these roles.
 
         """
-        non_registered_roles = {current_app.config['PRE_REGISTERED_ROLES']}
+        non_registered_roles = set(current_app.config['PRE_REGISTERED_ROLES'])
         current_roles = {r.name for r in self.roles}
         disjoint = current_roles.isdisjoint(non_registered_roles)
 
