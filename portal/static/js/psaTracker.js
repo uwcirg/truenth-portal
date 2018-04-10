@@ -3,6 +3,7 @@
             el: "#mainPsaApp",
             data: {
                 userId: "",
+                userIdKey: "psaTracker_currentUser",
                 clinicalCode: "666",
                 clinicalDisplay: "psa",
                 clinicalSystem: "http://us.truenth.org/clinical-codes",
@@ -30,7 +31,8 @@
                     for (var prop in dependencies) {
                         self[prop] = dependencies[prop];
                     }
-                    self.getData();
+                    sessionStorage.removeItem(this.userIdKey);
+                    this.getData();
                     setTimeout(function() {
                         self.initElementsEvents();
                     }, 300);
@@ -89,6 +91,19 @@
                         self.clearNew();
                     });
                 },
+                getCurrentUserId: function() {
+                    var self = this;
+                    if (!sessionStorage.getItem(this.userIdKey)) {
+                        this.tnthAjax.sendRequest("/api/me", "GET", "", {sync:true}, function(data) {
+                            if (!data.error) {
+                                sessionStorage.setItem(self.userIdKey, data.id);
+                            } else {
+                                sessionStorage.setItem(self.userIdKey, $("#psaTracker_currentUser").val());
+                            }
+                        });
+                    }
+                    return sessionStorage.getItem(this.userIdKey);
+                },
                 getExistingItemByDate: function(newDate) {
                     return $.grep(this.items, function(item) {
                         return String(item.date) === String(newDate);
@@ -124,7 +139,7 @@
                 getData: function() {
                     var self = this;
                     this.loading = true;
-                    this.tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
+                    this.tnthAjax.getClinical(this.getCurrentUserId(), function(data) {
                         if (data.error) {
                             $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         } else {
@@ -169,9 +184,9 @@
                     });
                 },
                 postData: function() {
-                    var userId = $("#psaTrackerUserId").val();
                     var cDate = "";
                     var self = this;
+                    var userId = this.getCurrentUserId();
                     if (this.newItem.date) {
                         var dt = new Date(this.newItem.date);
                         // in 2017-07-06T12:00:00 format
@@ -218,7 +233,7 @@
                     var self = this;
                     var d3 = self.d3;
                     var i18next = self.i18next;
-                    const WIDTH = 660, HEIGHT = 430, TOP = 50, RIGHT = 10, BOTTOM = 110, LEFT = 60, TIME_FORMAT = "%d %b %Y";
+                    const WIDTH = 550, HEIGHT = 430, TOP = 50, RIGHT = 20, BOTTOM = 110, LEFT = 60, TIME_FORMAT = "%d %b %Y";
 
                     // Set the dimensions of the canvas / graph
                     var margin = {top: TOP, right: RIGHT, bottom: BOTTOM, left: LEFT},
@@ -282,7 +297,7 @@
                     }
 
                     x.domain(xDomain);
-                    y.domain([0, endY + (endY/(data.length+1)) ]);
+                    y.domain([0, parseInt(endY + (endY/(data.length+1))) ]);
 
                     // Define the axes
                     var xAxis = d3.svg.axis()
