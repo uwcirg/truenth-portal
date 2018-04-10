@@ -45,7 +45,7 @@
                             if ($(this).val()) {
                                 var isValid = self.tnthDates.isValidDefaultDateFormat($(this).val());
                                 if (!isValid) {
-                                    self.addErrorMessage = i18next.t("Date must in the valid format.");
+                                    self.addErrorMessage = self.i18next.t("Date must in the valid format.");
                                     return false;
                                 } else {
                                     self.newItem.date = $(this).val();
@@ -69,6 +69,7 @@
                 onAdd: function(event) {
                     var newDate = this.newItem.date;
                     var newResult = this.newItem.result;
+                    var i18next = self.i18next;
                     if (newDate) {
                         var dt = new Date(newDate);
                         var isValid = self.tnthDates.isValidDefaultDateFormat(newDate);
@@ -95,7 +96,7 @@
                     self.loading = true;
                     self.tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
                         if (data.error) {
-                            $("#psaTrackerErrorMessageContainer").html(i18next.t("Error occurred retrieving PSA result data"));
+                            $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         } else {
                             if (data.entry) {
                                 var results = (data.entry).map(function(item) {
@@ -128,7 +129,7 @@
                                 }, 500);
                                 $("#psaTrackerErrorMessageContainer").html("");
                             } else {
-                                $("#psaTrackerErrorMessageContainer").html(i18next.t("No result data found"));
+                                $("#psaTrackerErrorMessageContainer").html(self.i18next.t("No result data found"));
                             }
                         }
                         setTimeout(function() {
