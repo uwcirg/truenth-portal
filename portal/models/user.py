@@ -331,6 +331,40 @@ class User(db.Model, UserMixin):
                     name, self))
         return super(User, self).__setattr__(name, value)
 
+    def is_registered(self):
+        """Returns True if user has completed registration
+
+        Not to be confused with the ``registered`` column (which captures
+        the moment when the account was created), ``is_registered`` returns
+        true once the user has blessed their account with login credentials,
+        such as a password or auth_provider access.
+
+        Roles are considered in this check - special roles such as
+        ``access_on_verify`` and ``write_only`` should never exist on
+        registered users, and therefore this method will return False
+        for any users with these roles.
+
+        """
+        non_registered_roles = set(current_app.config['PRE_REGISTERED_ROLES'])
+        current_roles = {r.name for r in self.roles}
+        disjoint = current_roles.isdisjoint(non_registered_roles)
+
+        if self.password or self.auth_providers.count():
+            # Looks registered, confirm non-registered roles aren't present
+            if disjoint:
+                return True
+            else:
+                raise RuntimeError(
+                    "Registered user {} has a restricted role from {}".format(
+                        self, non_registered_roles))
+
+        # Still here implies not yet registered, enforce role presence
+        if not disjoint:
+            return False
+        else:
+            raise RuntimeError(
+                "Non registered user {} lacking special role".format(self))
+
     @property
     def all_consents(self):
         """Access to all consents including deleted and expired"""
@@ -1227,10 +1261,10 @@ class User(db.Model, UserMixin):
             other_entity = getattr(other, relationship)
             if relationship == 'roles':
                 # We don't copy over the roles used to mark the weak account
-                append_list = [item for item in other_entity if item not in
-                               self_entity and item.name not in
-                               ('write_only',
-                                'promote_without_identity_challenge')]
+                append_list = [
+                    item for item in other_entity if item not in self_entity
+                    and item.name not in
+                    current_app.config['PRE_REGISTERED_ROLES']]
             elif relationship == '_identifiers':
                 # Don't copy internal identifiers
                 append_list = [item for item in other_entity if item not in

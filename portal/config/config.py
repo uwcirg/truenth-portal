@@ -68,6 +68,7 @@ class BaseConfig(object):
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
+    PRE_REGISTERED_ROLES = ['access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
