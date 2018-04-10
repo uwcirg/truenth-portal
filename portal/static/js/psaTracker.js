@@ -32,28 +32,67 @@
                     }
                     self.getData();
                     setTimeout(function() {
-                        $("#psaDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": new Date(), "maxViewMode": 2, "autoclose": true
-                        }).on("hide", function() {
-                            $("#psaDate").trigger("blur");
-                        });
-                        $('#addPSAModal').on('shown.bs.modal', function(e) {
-                            $("#psaResult").focus();
-                        }).on('hidden.bs.modal', function(e) {
-                            self.clearNew();
-                        });
-                        $("#psaDate").on("blur", function(e) {
-                            if ($(this).val()) {
-                                var isValid = self.tnthDates.isValidDefaultDateFormat($(this).val());
-                                if (!isValid) {
-                                    self.addErrorMessage = self.i18next.t("Date must in the valid format.");
-                                    return false;
-                                } else {
-                                    self.newItem.date = $(this).val();
-                                    self.addErrorMessage = "";
-                                }
-                            }
-                        });
+                        self.initElementsEvents();
                     }, 300);
+                },
+                validateResult: function(val) {
+                    var isValid = !(isNaN(val) || parseInt(val) < 0);
+                    if (!isValid) {
+                        this.addErrorMessage = this.i18next.t("Result must be a number.");
+                    } else {
+                        this.addErrorMessage = "";
+                    }
+                    return isValid;
+                },
+                validateDate: function(date) {
+                    var isValid = this.tnthDates.isValidDefaultDateFormat(date);
+                    if (!isValid) {
+                        this.addErrorMessage = this.i18next.t("Date must be in the valid format.");
+                    } else {
+                        this.addErrorMessage = "";
+                    }
+                    return isValid;
+                },
+                formatDateString: function(date, format) {
+                    return this.tnthDates.formatDateString(date, format);
+                },
+                initElementsEvents: function() {
+                    var self = this;
+                    /*
+                     * date picker events
+                     */
+                    $("#psaDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": new Date(), "maxViewMode": 2, "autoclose": true
+                    }).on("hide", function() {
+                        $("#psaDate").trigger("blur");
+                    });
+                    $("#psaDate").on("blur", function(e) {
+                        var newDate = $(this).val();
+                        if (newDate) {
+                            var isValid = self.validateDate(newDate);
+                            if (self.validateDate(newDate)) {
+                                self.newItem.date = newDate;
+                            }
+                        }
+                    });
+                    /*
+                     * new result field event
+                     */
+                    $("#psaResult").on("change", function() {
+                        self.validateResult($(this).val());
+                    });
+                    /*
+                     * modal event
+                     */
+                    $("#addPSAModal").on("shown.bs.modal", function(e) {
+                        $("#psaResult").focus();
+                    }).on("hidden.bs.modal", function(e) {
+                        self.clearNew();
+                    });
+                },
+                getExistingItemByDate: function(newDate) {
+                    return $.grep(this.items, function(item) {
+                        return String(item.date) === String(newDate);
+                    });
                 },
                 onEdit: function(item) {
                     var self = this;
@@ -67,25 +106,18 @@
                     }
                 },
                 onAdd: function(event) {
-                    var newDate = this.newItem.date;
-                    var newResult = this.newItem.result;
+                    var self = this;
+                    var newDate = self.newItem.date;
+                    var newResult = self.newItem.result;
                     var i18next = self.i18next;
-                    if (newDate) {
-                        var dt = new Date(newDate);
-                        var isValid = self.tnthDates.isValidDefaultDateFormat(newDate);
-                        if (!isValid) {
-                            this.addErrorMessage = i18next.t("Date must in the valid format.");
-                            return false;
-                        }
+                    if (self.newItem.date && !self.validateDate(self.newItem.date)) {
+                        return false;
                     }
-                    if (isNaN(newResult) || parseInt(newResult) < 0) {
-                        this.addErrorMessage = i18next.t("Result must be a valid number.");
+                    if (self.newItem.result && !self.validateResult(self.newItem.result)) {
                         return false;
                     }
                     this.addErrorMessage = "";
-                    var existingItem = $.grep(this.items, function(item) {
-                        return String(item.date) === String(newDate);
-                    });
+                    var existingItem = self.getExistingItemByDate(newDate);
                     if (existingItem.length > 0) {
                         this.newItem.id = existingItem[0].id;
                     }
@@ -104,8 +136,8 @@
                                     dataObj.id = content.id;
                                     dataObj.code = contentCoding.code;
                                     dataObj.display = contentCoding.display;
-                                    dataObj.updated = self.tnthDates.formatDateString(item.updated.substring(0,19), "yyyy-mm-dd hh:mm:ss");
-                                    dataObj.date = self.tnthDates.formatDateString(content.issued.substring(0,19), "d M y");
+                                    dataObj.updated = self.formatDateString(item.updated.substring(0,19), "yyyy-mm-dd hh:mm:ss");
+                                    dataObj.date = self.formatDateString(content.issued.substring(0,19), "d M y");
                                     dataObj.result = content.valueQuantity.value;
                                     dataObj.edit = true;
                                     return dataObj;
@@ -142,7 +174,6 @@
                     var userId = $("#psaTrackerUserId").val();
                     var cDate = "";
                     var self = this;
-                    var i18next = self.i18next;
                     if (this.newItem.date) {
                         var dt = new Date(this.newItem.date);
                         // in 2017-07-06T12:00:00 format
@@ -165,7 +196,7 @@
 
                     self.tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
                         if (data.error) {
-                            self.addErrorMessage = i18next.t("Server error occurred adding PSA result.");
+                            self.addErrorMessage = self.i18next.t("Server error occurred adding PSA result.");
                         }
                         else {
                             $("#addPSAModal").modal("hide");
