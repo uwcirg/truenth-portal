@@ -277,7 +277,7 @@
                             var lastInterval = (new Date(startTime) - new Date(endTime)) / day;
                             if (startTime > endTime) {
                                 times.push(new Date(endTime));
-                                if (lastInterval < interval/2) {
+                                if (Math.ceil(lastInterval) < interval/2) {
                                     times.push(dateTime);
                                 }
                             } else {
