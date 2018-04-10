@@ -76,7 +76,7 @@
                         if (!isValid) {
                             this.addErrorMessage = i18next.t("Date must in the valid format.");
                             return false;
-                        };
+                        }
                     }
                     if (isNaN(newResult) || parseInt(newResult) < 0) {
                         this.addErrorMessage = i18next.t("Result must be a valid number.");
