@@ -12,8 +12,8 @@ from flask import (
     render_template, request, session, abort, url_for)
 from flask_login import logout_user
 from flask_user import roles_required
-from flask_user.signals import user_logged_in, user_registered
-
+from flask_user.signals import (
+    user_logged_in, user_registered, user_changed_password)
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -83,9 +83,23 @@ def flask_user_registered_event(app, user, **extra):
         context='account')
 
 
+def flask_user_changed_password(app, user, **extra):
+    auditable_event(
+        "local user changed password", user_id=user.id, subject_id=user.id,
+        context='account')
+    # As any user, including those not yet registered, may be changing
+    # their password via the `forgot password` email loop, remove any
+    # special roles left on the account.
+    keepers = [
+        r for r in user.roles if r.name not in
+        current_app.config['PRE_REGISTERED_ROLES']]
+    user.update_roles(role_list=keepers, acting_user=user)
+
+
 # Register functions to receive signals from flask_user
 user_logged_in.connect(flask_user_login_event)
 user_registered.connect(flask_user_registered_event)
+user_changed_password.connect(flask_user_changed_password)
 
 
 def capture_next_view_function(real_function):
