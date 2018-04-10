@@ -8,7 +8,7 @@
                 clinicalSystem: "http://us.truenth.org/clinical-codes",
                 loading: false,
                 addErrorMessage: "",
-                noResultMessage: i18next.t("No PSA Result To Display"),
+                noResultMessage: this.i18next.t("No PSA Result To Display"),
                 newItem: {
                     id: "",
                     result: "",
@@ -16,16 +16,20 @@
                     edit: false
                 },
                 headers: [
-                    i18next.t("PSA (ng/ml)"),
-                    i18next.t("Date")
+                    this.i18next.t("PSA (ng/ml)"),
+                    this.i18next.t("Date")
                 ],
                 items: [],
-                editTitle: i18next.t("Edit PSA Result"),
-                addTitle: i18next.t("Add PSA Result")
+                editTitle: this.i18next.t("Edit PSA Result"),
+                addTitle: this.i18next.t("Add PSA Result")
             },
             methods: {
-                init: function() {
+                init: function(dependencies) {
                     var self = this;
+                    dependencies = dependencies || {};
+                    for (var prop in dependencies) {
+                        self[prop] = dependencies[prop];
+                    }
                     self.getData();
                     setTimeout(function() {
                         $("#psaDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": new Date(), "maxViewMode": 2, "autoclose": true
@@ -39,7 +43,7 @@
                         });
                         $("#psaDate").on("blur", function(e) {
                             if ($(this).val()) {
-                                var isValid = tnthDates.isValidDefaultDateFormat($(this).val());
+                                var isValid = self.tnthDates.isValidDefaultDateFormat($(this).val());
                                 if (!isValid) {
                                     self.addErrorMessage = i18next.t("Date must in the valid format.");
                                     return false;
@@ -67,7 +71,7 @@
                     var newResult = this.newItem.result;
                     if (newDate) {
                         var dt = new Date(newDate);
-                        var isValid = tnthDates.isValidDefaultDateFormat(newDate);
+                        var isValid = self.tnthDates.isValidDefaultDateFormat(newDate);
                         if (!isValid) {
                             this.addErrorMessage = i18next.t("Date must in the valid format.");
                             return false;
@@ -89,7 +93,7 @@
                 getData: function() {
                     var self = this;
                     self.loading = true;
-                    tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
+                    self.tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
                         if (data.error) {
                             $("#psaTrackerErrorMessageContainer").html(i18next.t("Error occurred retrieving PSA result data"));
                         } else {
@@ -99,8 +103,8 @@
                                     dataObj.id = content.id;
                                     dataObj.code = contentCoding.code;
                                     dataObj.display = contentCoding.display;
-                                    dataObj.updated = tnthDates.formatDateString(item.updated.substring(0,19), "yyyy-mm-dd hh:mm:ss");
-                                    dataObj.date = tnthDates.formatDateString(content.issued.substring(0,19), "d M y");
+                                    dataObj.updated = self.tnthDates.formatDateString(item.updated.substring(0,19), "yyyy-mm-dd hh:mm:ss");
+                                    dataObj.date = self.tnthDates.formatDateString(content.issued.substring(0,19), "d M y");
                                     dataObj.result = content.valueQuantity.value;
                                     dataObj.edit = true;
                                     return dataObj;
@@ -137,6 +141,7 @@
                     var userId = $("#psaTrackerUserId").val();
                     var cDate = "";
                     var self = this;
+                    var i18next = self.i18next;
                     if (this.newItem.date) {
                         var dt = new Date(this.newItem.date);
                         // in 2017-07-06T12:00:00 format
@@ -157,7 +162,7 @@
                         url = url + "/" + this.newItem.id;
                     }
 
-                    tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
+                    self.tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
                         if (data.error) {
                             self.addErrorMessage = i18next.t("Server error occurred adding PSA result.");
                         }
@@ -181,7 +186,9 @@
                      */
                     $("#psaTrackerGraph").html("");
                     var self = this;
-                    const WIDTH = 660, HEIGHT = 450, TOP = 50, RIGHT = 10, BOTTOM = 150, LEFT = 60, TIME_FORMAT = "%d %b %Y";
+                    var d3 = self.d3;
+                    var i18next = self.i18next;
+                    const WIDTH = 660, HEIGHT = 430, TOP = 50, RIGHT = 10, BOTTOM = 110, LEFT = 60, TIME_FORMAT = "%d %b %Y";
 
                     // Set the dimensions of the canvas / graph
                     var margin = {top: TOP, right: RIGHT, bottom: BOTTOM, left: LEFT},
@@ -259,7 +266,7 @@
                                 .scale(y)
                                 .orient("left")
                                 .tickSize(0, 0, 0)
-                                .ticks(10);
+                                .ticks(5);
 
                     // Define the line
                     var valueline = d3.svg.line()
@@ -348,7 +355,7 @@
 
                     //add axis legends
                     var xlegend = graphArea.append("g")
-                                .attr("transform", "translate(" + (width/2-margin.left+margin.right) + "," + (height + margin.bottom - margin.bottom/3) + ")");
+                                .attr("transform", "translate(" + (width/2-margin.left+margin.right) + "," + (height + margin.bottom - margin.bottom/8 + 5) + ")");
 
                     xlegend.append("text")
                             .text(i18next.t("PSA Test Date"))
@@ -366,6 +373,6 @@
             }
         });
     $(function() {
-        psaApp.init();
+        psaApp.init({tnthDates: tnthDates, tnthAjax: tnthAjax, i18next: i18next, d3: d3});
     });
 })();
