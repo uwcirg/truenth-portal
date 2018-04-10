@@ -106,18 +106,16 @@
                     }
                 },
                 onAdd: function(event) {
-                    var self = this;
-                    var newDate = self.newItem.date;
-                    var newResult = self.newItem.result;
-                    var i18next = self.i18next;
-                    if (self.newItem.date && !self.validateDate(self.newItem.date)) {
+                    var newDate = this.newItem.date;
+                    var newResult = this.newItem.result;
+                    if (newDate && !this.validateDate(newDate)) {
                         return false;
                     }
-                    if (self.newItem.result && !self.validateResult(self.newItem.result)) {
+                    if (newResult && !this.validateResult(newResult)) {
                         return false;
                     }
                     this.addErrorMessage = "";
-                    var existingItem = self.getExistingItemByDate(newDate);
+                    var existingItem = this.getExistingItemByDate(newDate);
                     if (existingItem.length > 0) {
                         this.newItem.id = existingItem[0].id;
                     }
@@ -125,8 +123,8 @@
                 },
                 getData: function() {
                     var self = this;
-                    self.loading = true;
-                    self.tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
+                    this.loading = true;
+                    this.tnthAjax.getClinical($("#psaTrackerUserId").val(), function(data) {
                         if (data.error) {
                             $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         } else {
@@ -194,7 +192,7 @@
                         url = url + "/" + this.newItem.id;
                     }
 
-                    self.tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
+                    this.tnthAjax.sendRequest(url, method, userId, {data: JSON.stringify(obsArray)}, function(data) {
                         if (data.error) {
                             self.addErrorMessage = self.i18next.t("Server error occurred adding PSA result.");
                         }
@@ -296,9 +294,9 @@
 
                     var yAxis = d3.svg.axis()
                                 .scale(y)
+                                .ticks(5)
                                 .orient("left")
-                                .tickSize(0, 0, 0)
-                                .ticks(5);
+                                .tickSize(0, 0, 0);
 
                     // Define the line
                     var valueline = d3.svg.line()
