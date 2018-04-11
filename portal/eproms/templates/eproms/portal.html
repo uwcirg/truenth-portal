@@ -2,7 +2,7 @@
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
 {#
-{%- if not user.has_role('write_only') -%}
+{%- if not user.is_registered()) -%}
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Explore TrueNTH") }}</h2>
         <p>{{ _("Discover online tools to guide you through the cancer journey.") }}</p>

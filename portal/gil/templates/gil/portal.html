@@ -52,7 +52,7 @@
             {% endif %}
         {% endfor %}
         </div>
-        {% if user.has_role('write_only') %}
+        {% if not user.is_registered() %}
             <div class="icon-box-group home--registraion-wrapper">
                 <div class="home--registration-container">
                     <h4 class="icon-box__lowhead">{{ _("Complete Registration") }}</h4>

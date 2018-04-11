@@ -1689,14 +1689,6 @@ var fillContent = {
             });
         }
     },
-    "registrationStatus": function(userId) {
-        tnthAjax.hasRole(userId, "write_only", function(data) {
-            $("#registrationStatusContainer .registration-label")
-            .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
-            .addClass(data.matched ? "text-warning": "text-success")
-            .removeClass(data.matched ? "text-success": "text-warning");
-        });
-    },
     "assessmentStatus": function(userId) {
         tnthAjax.patientReport(userId, function(data) {
             if (!data.error) {
@@ -2631,10 +2623,6 @@ var Profile = function(subjectId, currentUserId) {
 
         if ($("#profileassessmentSendEmailContainer.active").length > 0) {
             fillContent.assessmentStatus(self.subjectId);
-        }
-
-        if ($("#registrationStatusContainer").length > 0) {
-            fillContent.registrationStatus(self.subjectId);
         }
 
         $(".email-selector").off("change").on("change", function() {
