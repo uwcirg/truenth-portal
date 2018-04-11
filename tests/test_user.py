@@ -1030,6 +1030,7 @@ class TestUser(TestCase):
 
     def test_promote(self):
         with SessionScope(db):
+            self.test_user.password = None  # mock pre-registered user
             self.test_user.birthdate = '02-05-1968'
             self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY)
             other = self.add_user('other@foo.com', first_name='newFirst',
