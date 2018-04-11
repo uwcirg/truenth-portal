@@ -19,6 +19,9 @@ services:
       PGDATABASE: ${PGDATABASE:-portaldb}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
 
+      - source: upload-data
+        target: "${PROJECT_DIR:-/opt/venvs/portal}/lib/python2.7/site-packages/portal/uploads"
+        type: volume
   web:
     <<: *service_base
     ports:
@@ -73,3 +76,4 @@ services:
 
 volumes:
     postgres-data: {}
+    upload-data: {}
