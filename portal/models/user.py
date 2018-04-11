@@ -362,6 +362,8 @@ class User(db.Model, UserMixin):
         if not disjoint:
             return False
         else:
+            if not current_roles:
+                return False
             raise RuntimeError(
                 "Non registered user {} lacking special role".format(self))
 
