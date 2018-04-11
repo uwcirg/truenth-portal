@@ -53,8 +53,7 @@ class BaseConfig(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
-    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', TESTING)
-
+    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
 
@@ -151,6 +150,7 @@ class DefaultConfig(BaseConfig):
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
+    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
