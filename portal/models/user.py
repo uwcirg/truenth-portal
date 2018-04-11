@@ -359,10 +359,11 @@ class User(db.Model, UserMixin):
                         self, non_registered_roles))
 
         # Still here implies not yet registered, enforce role presence
-        if not current_roles:
+        if not disjoint:
             return False
-        raise RuntimeError(
-            "Non registered user {} lacking special role".format(self))
+        else:
+            raise RuntimeError(
+                "Non registered user {} lacking special role".format(self))
 
     @property
     def all_consents(self):
