@@ -79,7 +79,6 @@ class BaseConfig(object):
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = best_sql_url()
-    SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
 
@@ -161,3 +160,4 @@ class TestConfig(BaseConfig):
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
+    SECRET_KEY = 'testing key'
