@@ -63,7 +63,7 @@ class BaseConfig(object):
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
-    LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
+    LOG_FOLDER = os.environ.get('LOG_FOLDER')
     LOG_LEVEL = 'DEBUG'
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
@@ -102,10 +102,10 @@ class BaseConfig(object):
     STAFF_BULK_DATA_ACCESS = True
     PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
 
-    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
-    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
-    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
-    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
+    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY')
+    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET')
+    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY')
+    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'
@@ -121,13 +121,13 @@ class BaseConfig(object):
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'
 
-    SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID', None)
-    SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET', None)
-    SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', None)
+    SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID')
+    SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET')
+    SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID')
 
     RECAPTCHA_ENABLED = True
-    RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', None)
-    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
+    RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')
+    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     TREATMENT_OPTIONS = [
