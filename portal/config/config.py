@@ -19,6 +19,7 @@ def best_sql_url():
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
+    TESTING = False
 
     SERVER_NAME = os.environ.get(
         'SERVER_NAME',
@@ -52,7 +53,7 @@ class BaseConfig(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
-    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND')
+    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', TESTING)
 
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
@@ -91,7 +92,6 @@ class BaseConfig(object):
     # config values aren't typically objects...
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
-    TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
