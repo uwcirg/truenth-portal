@@ -320,7 +320,7 @@ class QuestionnaireBank(db.Model):
         return results
 
     @staticmethod
-    def most_current_qb(user, as_of_date):
+    def most_current_qb(user, as_of_date, prev_next=None):
         """Return namedtuple (QBD) for user representing their most current QB
 
         Return namedtuple of QB Details for user, containing the current QB,
@@ -328,6 +328,10 @@ class QuestionnaireBank(db.Model):
         recurrence iteration number. Values are set as None if N/A.
 
         :param as_of_date: utc time value for computation, i.e. utcnow()
+        :param prev_next: None implies current WRT as_of_date.  'previous'
+            returns the previous QB Details (if there is one, i.e. current
+            isn't baseline).  'next' returns the subsequent, again if one
+            is well defined.
 
         Ideally, return the one current QuestionnaireBank that applies
         to the user 'as_of_date'.  If none, return the most recently
@@ -338,6 +342,8 @@ class QuestionnaireBank(db.Model):
 
         """
         assert(as_of_date)
+        if prev_next and prev_next not in ('previous', 'next'):
+            raise ValueError('expect only `previous` or `next` for prev_next')
         baseline = QuestionnaireBank.qbs_for_user(
             user, 'baseline', as_of_date=as_of_date)
         if not baseline:
@@ -592,9 +598,8 @@ class QuestionnaireBankQuestionnaire(db.Model):
         return self
 
 
-def visit_name(qbd):
-    if not qbd.questionnaire_bank:
-        return None
+def months_from_start(qbd):
+    """Return approximate months (integer) from start for QBD"""
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
         sm = srd.months or 0
@@ -603,5 +608,65 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
+        return total
+    srd = RelativeDelta(qbd.questionnaire_bank.start)
+    sm = srd.months or 0
+    sm += (srd.years * 12) if srd.years else 0
+    return sm
+
+
+def visit_name(qbd):
+    """Return descriptive string for given QBD
+
+    i.e. 'Baseline' or 'Month 36'
+    """
+    if not qbd.questionnaire_bank:
+        return None
+    if qbd.recur:
+        total = months_from_start(qbd)
         return "Month {}".format(total)
     return qbd.questionnaire_bank.classification.title()
+
+
+def sorted_qbds(user, as_of_date):
+    """Generate time sorted QBDs for a user
+
+    As recurrences overlap, lookup of previous or next qb is challenging.
+    This function returns a sorted list of all qbd applicable to a user.
+
+    Returns an ascending sorted list of tuples, [(number_of_months, QBD)]
+
+    """
+    results = []
+    baseline = QuestionnaireBank.qbs_for_user(
+        user, 'baseline', as_of_date=as_of_date)
+
+    if not baseline:
+        trace("no baseline questionnaire_bank, can't continue")
+        return []
+    baseline_qbd = QBD(
+        relative_start=None, iteration=None, recur=None,
+        questionnaire_bank=baseline)
+    results.append((months_from_start(baseline_qbd), baseline_qbd))
+
+    trigger_date = baseline[0].trigger_date(user)
+    if not trigger_date:
+        return []
+
+    r_qbs = QuestionnaireBank.qbs_for_user(
+        user, 'recurring', as_of_date=as_of_date)
+    for qb in r_qbs:
+        for recurrence in qb.recurrs:
+            iteration_count = 0
+            while True:
+                qbd = QBD(
+                    relative_start=None, iteration=iteration_count,
+                    recur=recurrence, questionnaire_bank=qb)
+                results.append((months_from_start(qbd), qbd))
+                iteration_count += 1
+                if iteration_count > 10:
+                    break
+
+    # return sorting on the first element of the tuple, the
+    # number of months from start
+    return sorted(results, key=lambda tup: tup[0])

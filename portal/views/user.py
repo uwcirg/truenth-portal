@@ -2165,6 +2165,15 @@ def get_current_user_qb(user_id):
         required: false
         type: string
         format: date-time
+      - name: include_adjacent
+        in: query
+        description:
+          Optional request to include the ``previous`` and ``next`` as well
+          as the ``current`` QuestionnaireBanks, if available.
+          This **modifies** the return type, nesting the results in a
+          dictionary keyed on **{previous, current, next}**
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -2186,30 +2195,54 @@ def get_current_user_qb(user_id):
     date = request.args.get('as_of_date')
     date = datetime.strptime(date, '%Y-%m-%d') if date else datetime.utcnow()
 
-    qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
+    include_adjacent = request.args.get('include_adjacent', False)
 
-    qbd_json = {}
+    def qb_summary(prev_next=None):
+        summary = {}
+        qbd = QuestionnaireBank.most_current_qb(
+            user=user, as_of_date=date, prev_next=prev_next)
+        expiry = (
+            qbd.questionnaire_bank.calculated_expiry(
+                qbd.questionnaire_bank.trigger_date(user), as_of_date=date)
+            if qbd.questionnaire_bank else None)
+    
+        if qbd.relative_start and (date.date() < qbd.relative_start.date()):
+            # Hasn't started yet
+            summary['questionnaire_bank'] = None
+        elif expiry and (date.date() >= expiry.date()):
+            # Expired
+            summary['questionnaire_bank'] = None
+        else:
+            summary['questionnaire_bank'] = (
+                qbd.questionnaire_bank.as_json() if qbd.questionnaire_bank
+                else None)
+            summary['recur'] = qbd.recur.as_json() if qbd.recur else None
+            summary['relative_start'] = (
+                FHIR_datetime.as_fhir(qbd.relative_start)
+                if qbd.relative_start else None)
+            summary['relative_expired'] = (
+                FHIR_datetime.as_fhir(expiry) if expiry else None)
+            summary['iteration'] = qbd.iteration
+        return summary
 
-    qbd_questionnaire_bank = qbd.questionnaire_bank if qbd.questionnaire_bank else None
+    def qbd_match(qbd, qbd_summary):
+        if qbd.questionnaire_bank != qbd_summary.get('questionnaire_bank'):
+            return False
+        if qbd.iteration != qbd_summary.get('iteration'):
+            return False
+        raise NotImplementedError('finish me')
 
-    expiry = None
-
-    if qbd_questionnaire_bank:
-        expiry = qbd_questionnaire_bank.calculated_expiry(
-            qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
-
-    if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
-        qbd_json['questionnaire_bank'] = None
-    elif date and expiry and (date.date() >= expiry.date()):
-        qbd_json['questionnaire_bank'] = None
+    results = {}
+    if include_adjacent:
+        from ..models.questionnaire_bank import sorted_qbds
+        current = qb_summary()
+        users_qbds = sorted_qbds(user, as_of_date=date)
+        current_index = [
+            i for i, d in enumerate(users_qbds) if
+            qbd_match(d[1], current)]
+        results['previous'] = users_qbds[current_index-1][1]
+        results['current'] = current
+        results['next'] = users_qbds[current_index+1][1]
     else:
-        qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
-                                          if qbd_questionnaire_bank else None)
-        qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
-        qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
-                                      if qbd.relative_start else None)
-        qbd_json['relative_expired'] = (FHIR_datetime.as_fhir(expiry)
-                                        if expiry else None)
-        qbd_json['iteration'] = qbd.iteration
-
-    return jsonify(qbd_json)
+        results = qb_summary()
+    return jsonify(results)
