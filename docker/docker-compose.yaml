@@ -18,10 +18,6 @@ services:
       - PGHOST=${PGHOST:-db}
       - PGDATABASE=${PGDATABASE:-portaldb}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-    volumes:
-      - source: ../instance
-        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
-        type: bind
 
   web:
     <<: *service_base
