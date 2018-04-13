@@ -1,0 +1,18 @@
+# docker-compose production overrides
+---
+version: "3.2"
+services:
+  web:
+    restart: unless-stopped
+
+  celery:
+    restart: unless-stopped
+
+  celerybeat:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  db:
+    restart: unless-stopped
