@@ -1,8 +1,11 @@
 """Unit test module for access URLs"""
+from datetime import datetime
 from flask import url_for
+from flask_webtest import SessionScope
 
 from portal.extensions import db, user_manager
 from portal.models.role import ROLE
+from portal.models.user_document import UserDocument
 from tests import TestCase
 
 
@@ -47,3 +50,40 @@ class TestAccessUrl(TestCase):
 
         rv = self.client.get(access_url)
         self.assert404(rv)
+
+    def test_verify_access_url(self):
+        """The current flow forces access to the challenge page"""
+        onetime = self.add_user(
+            'one@time.com', first_name='first', last_name='last')
+        onetime.birthdate = '01-31-1969'  # verify requires DOB
+        self.promote_user(user=onetime, role_name=ROLE.ACCESS_ON_VERIFY)
+        onetime = db.session.merge(onetime)
+
+        token = user_manager.token_manager.generate_token(onetime.id)
+        access_url = url_for('portal.access_via_token', token=token)
+
+        rv = self.client.get(access_url)
+        self.assert_redirects(rv, url_for('portal.challenge_identity'))
+
+    def test_verify_access_url_with_doc(self):
+        """access_on_verify plus user doc sends to register post challenge"""
+        onetime = self.add_user(
+            'one@time.com', first_name='first', last_name='last')
+        onetime.birthdate = '01-31-1969'  # verify requires DOB
+        self.promote_user(user=onetime, role_name=ROLE.ACCESS_ON_VERIFY)
+        onetime = db.session.merge(onetime)
+        ud = UserDocument(
+            user_id=onetime.id,
+            document_type="TestFile", uploaded_at=datetime.utcnow(),
+            filename="test_file_1.txt", filetype="txt", uuid="012345")
+        onetime.documents.append(ud)
+        with SessionScope(db):
+            db.session.add(ud)
+            db.session.commit()
+        onetime = db.session.merge(onetime)
+
+        token = user_manager.token_manager.generate_token(onetime.id)
+        access_url = url_for('portal.access_via_token', token=token)
+
+        rv = self.client.get(access_url)
+        self.assert_redirects(rv, url_for('portal.challenge_identity'))
