@@ -119,6 +119,7 @@ class BaseConfig(object):
 
     # Only set cookies over "secure" channels (HTTPS) for non-dev deployments
     SESSION_COOKIE_SECURE = SYSTEM_TYPE.lower() != 'development'
+    PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'http')
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'
 
