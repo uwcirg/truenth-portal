@@ -58,7 +58,7 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
             --no-acl \
             --no-owner \
             --encoding utf8 '\
-            > "/tmp/${dump_filename}.sql"
+    > "/tmp/${dump_filename}.sql"
 fi
 
 docker-compose pull
