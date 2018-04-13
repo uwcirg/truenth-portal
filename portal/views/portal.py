@@ -754,6 +754,7 @@ def config_settings(config_key):
         'CONSENT',
         'LR_',
         'REQUIRED_CORE_DATA',
+        'PRE_REGISTERED_ROLES',
         'SYSTEM',
     )
     if config_key:
