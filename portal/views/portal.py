@@ -310,9 +310,41 @@ def access_via_token(token, next_step=None):
             abort(400, "invalid state - can't continue")
 
         if ROLE.ACCESS_ON_VERIFY in has:
-            # Send user to verify, and then follow post login flow
-            session['challenge.access_on_verify'] = True
-            session['challenge.next_url'] = url_for('auth.next_after_login')
+            def time_for_reg():
+                """Offer registration if user has completed their assessments
+
+                Users are given accounts with the access_on_verify role,
+                to minimize overhead of entering the system and completing
+                their initial assessments.  Once they have a report on file
+                we want to redirect them and offer account registration.
+
+                Not detailing the lookup beyond any user documents at this
+                point.  Extend as needed.
+
+                :returns: True if criteria is met and registration should
+                be offered, False otherwise.
+
+                """
+                if user.documents.count():
+                    return True
+                return False
+
+            if time_for_reg():
+                auditable_event(
+                    "sending 'access_on_verify' user to challenge, "
+                    "then registration given user report on file",
+                    user_id=user.id, subject_id=user.id, context='account')
+                session['challenge.next_after_login'] = url_for(
+                    'user.register', email=user.email)
+                session['challenge.merging_accounts'] = True
+            else:
+                # Send user to verify, and then follow post login flow
+                auditable_event(
+                    "sending 'access_on_verify' user to challenge, then "
+                    "grant access", user_id=user.id, subject_id=user.id,
+                    context='account')
+                session['challenge.access_on_verify'] = True
+                session['challenge.next_url'] = url_for('auth.next_after_login')
         else:
             # Still here implies a WRITE_ONLY user in process of registration.
             # Preserve the invited user id, should we need to
