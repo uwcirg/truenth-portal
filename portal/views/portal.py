@@ -337,6 +337,7 @@ def access_via_token(token, next_step=None):
                 session['challenge.next_after_login'] = url_for(
                     'user.register', email=user.email)
                 session['challenge.merging_accounts'] = True
+                session['registration.invite_post_p3p'] = True
             else:
                 # Send user to verify, and then follow post login flow
                 auditable_event(
