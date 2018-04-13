@@ -47,11 +47,17 @@ set -o allexport # export all new env vars by default
 
 if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.pgdump"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}"
 
     echo "Backing up current database..."
-    docker-compose exec --user postgres db pg_dump --format c portaldb > "/tmp/${dump_filename}"
+    docker-compose exec --user postgres db bash -c '\
+        pg_dump \
+            --dbname $POSTGRES_DB \
+            --no-acl \
+            --no-owner \
+            --encoding utf8 '\
+            > "/tmp/${dump_filename}.sql"
 fi
 
 docker-compose pull
-docker-compose up -d
+docker-compose up -d web

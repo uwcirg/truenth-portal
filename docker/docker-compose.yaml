@@ -12,16 +12,12 @@ services:
     env_file:
       - portal.env
     environment:
-      - PERSISTENCE_DIR=${PERSISTENCE_DIR:-gil}
-      - PGUSER=${PGUSER:-postgres}
-      - PGPASSWORD=${PGPASSWORD:-""}
-      - PGHOST=${PGHOST:-db}
-      - PGDATABASE=${PGDATABASE:-portaldb}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-    volumes:
-      - source: ../instance
-        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
-        type: bind
+      PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-""}
+      PGHOST: ${PGHOST:-db}
+      PGDATABASE: ${PGDATABASE:-portaldb}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
 
   web:
     <<: *service_base
@@ -69,7 +65,7 @@ services:
     ports:
       - target: 5432
     environment:
-      - POSTGRES_DB=${PGDATABASE:-portaldb}
+      POSTGRES_DB: ${PGDATABASE:-portaldb}
     volumes:
       - source: postgres-data
         target: /var/lib/postgresql/data
