@@ -54,4 +54,4 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
 fi
 
 docker-compose pull
-docker-compose up -d
+docker-compose up -d web
