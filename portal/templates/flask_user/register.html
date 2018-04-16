@@ -4,7 +4,7 @@
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate" style="margin-left: 1em">
     <div class="row">
-        {% set custom_invite_check = (not form.email.errors) and session.get('registration.invite_post_p3p', '') %}
+        {% set custom_invite_check = (not form.email.errors) and session.get('registration.invite_post_p3p') %}
         {% if custom_invite_check %}
             <div class="col-md-push-2 col-md-8 col-xs-11">
                 <div id="registerationMessageContainer">
