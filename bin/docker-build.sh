@@ -37,7 +37,9 @@ export COMPOSE_FILE="${COMPOSE_FILE:-${root_path}/docker/docker-compose.yaml:${r
 
 
 # Build debian package from current repo and branch
+echo "Building debian package..."
 docker-compose run builder
 
+echo "Building portal docker image..."
 # Build portal docker image from debian package
 docker-compose build web
