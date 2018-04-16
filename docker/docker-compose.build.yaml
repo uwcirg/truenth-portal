@@ -2,6 +2,7 @@
 version: "3.2"
 services:
   builder:
+    image: "uwcirg-portal-docker.jfrog.io/deb_builder:latest"
     build:
       context: ..
       dockerfile: docker/Dockerfile.build
