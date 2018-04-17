@@ -9,7 +9,7 @@
                 clinicalSystem: "http://us.truenth.org/clinical-codes",
                 loading: false,
                 addErrorMessage: "",
-                noResultMessage: this.i18next.t("No PSA Result To Display"),
+                noResultMessage: this.i18next.t("No PSA results to display"),
                 newItem: {
                     id: "",
                     result: "",
@@ -407,10 +407,10 @@
                             .attr("class", "legend-text");
 
                     var ylegend = graphArea.append("g")
-                                .attr("transform", "translate(" + (-margin.left + margin.left/3) + "," + (height/3) + ")");
+                                .attr("transform", "translate(" + (-margin.left + margin.left/3) + "," + (height/2 + height/6) + ")");
 
                     ylegend.append("text")
-                        .attr("transform", "rotate(90)")
+                        .attr("transform", "rotate(270)")
                         .attr("class", "legend-text")
                         .text(i18next.t("Result (ng/ml)"));
 
