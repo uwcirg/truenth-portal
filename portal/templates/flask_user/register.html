@@ -42,7 +42,7 @@
             </div>
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
-                     <p class="profile-item-title">{{ _("Register using:")}}</p>
+                    <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <!-- hiding this temporarily -->
                     <div class="tnth-hide">
                         <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
