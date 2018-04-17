@@ -105,6 +105,16 @@ To interact with the running database container, started via the ``docker-compos
 
     docker-compose exec db psql --username postgres
 
+Account Bootstrapping
+---------------------
+To bootstrap an admin account after a fresh install, run the below ``flask`` CLI command::
+
+    docker-compose exec web \
+        flask add_user \
+            --email 'admin_email@example.com' \
+            --password 'exampleP@$$W0RD' \
+            --role admin
+
 Advanced Configuration
 ======================
 

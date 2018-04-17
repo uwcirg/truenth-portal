@@ -45,6 +45,8 @@ export COMPOSE_FILE="${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yam
 set -o allexport # export all new env vars by default
 . "${GIT_WORK_TREE}/docker/.env"
 
+cd "${GIT_WORK_TREE}/docker"
+
 if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     web_image_id="$(docker-compose images -q web)"
     dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}"
@@ -56,7 +58,7 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
             --no-acl \
             --no-owner \
             --encoding utf8 '\
-            > "/tmp/${dump_filename}.sql"
+    > "/tmp/${dump_filename}.sql"
 fi
 
 docker-compose pull
