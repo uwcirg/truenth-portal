@@ -4,28 +4,7 @@
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate" style="margin-left: 1em">
     <div class="row">
-        {% set custom_invite_check = (not form.email.errors) and session.get('registration.invite_post_p3p') %}
-        {% if custom_invite_check %}
-            <div class="col-md-push-2 col-md-8 col-xs-11">
-                <div id="registerationMessageContainer">
-                    <h4 class="tnth-headline reg-title">{{_("Register Your TrueNTH Account")}}</h4>
-                    <p>{{_("Now that you've finished P3P, this is a good time to make sure your TrueNTH account is fully set up.")}}</p>
-                        <p><b>{{_("Registering your account allows you to come back to P3P at any time to view or download your report, as many times as you like.")}}</b></p>
-                        <p>{{_("Registering your account also gives you access to:")}}</p>
-                        <ul>
-                            <li>{{_("Powerful tools for managing symptoms and side effects of treatment")}}</li>
-                            <li>{{_("Real advice from doctors and other men on working through challenges")}}</li>
-                            <li>{{_("Grocery shopping tips and recipes for making healthy meals at home")}}</li>
-                            <li>{{_("Exercise guidance to customize your workout routine")}}</li>
-                            <li>{{_('Insightful "lived experience" videos from men and their loved ones, where they share details about their prostate cancer journey')}}</li>
-                        </ul>
-                        <p>{{_("All of this can be accessed with your TrueNTH account, so just click below to finish your registration.")}}</p>
-                        <br/>
-                        <div class="button-container"><button id="regContinueButton" class="btn btn-tnth-primary">{{_("Register")}}</button></div>
-                </div>
-            </div>
-        {% endif %}
-        <div id="registrationMainContainer" class="col-md-push-3 col-md-5 col-xs-11 {% if custom_invite_check %}tnth-hide{%endif%}">
+        <div class="col-md-push-3 col-md-5 col-xs-11">
              <div class="btn-social-container">
                 <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
                 {{ form.hidden_tag() }}
@@ -63,7 +42,7 @@
             </div>
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
-                     <p class="profile-item-title">{{ _("Register using:")}}</p>
+                    <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <!-- hiding this temporarily -->
                     <div class="tnth-hide">
                         <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
@@ -132,19 +111,6 @@ function checkValidity(submit) {
 }
 
 $(document).ready(function(){
-    /*
-     * this is only applicable when session variable, registration.invite_post_p3p is set
-     * clicking on the registration button will show the section that allows user to enter password, etc
-     */
-    //TODO move JS to a separate file
-    $("#regContinueButton").on("click", function(e) {
-        e.preventDefault();
-        event.stopImmediatePropagation();
-        $("#registerationMessageContainer").hide();
-        $(".form-group").removeClass("has-error");
-        $(".help-block").html("");
-        $("#registrationMainContainer").removeClass("tnth-hide");
-    });
     // Need to properly form attribute name
     $("[data-match_error]").each(function(){
         var theMsg = $(this).attr("data-match_error");
