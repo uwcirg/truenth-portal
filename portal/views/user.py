@@ -1082,10 +1082,12 @@ def register_now():
     """Target for triggering registration of account
 
     Some flows generate accounts that are not yet ``registered``,
-    such as when given the ``access_on_verify`` role.  When
-    such a user is "logged in" (that is, given access after
-    verifying basic information), redirect to this endpoint
-    to trigger promotion to a registered account.
+    such as when given the ``access_on_verify`` role.
+
+    When it's desirable to promote the user to a registered account
+    (eg when they've completed a flow like MUSIC P3P, where stakeholders
+    wanted to avoid the potential disruption of registration), redirect
+    to this endpoint to trigger promotion to a registered account.
 
     Session variables capture the state, and redirect the user
     through the common registration mechanism.
