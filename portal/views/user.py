@@ -1094,7 +1094,6 @@ def register_now():
     tags:
       - User
     operationId: registernow
-    parameters:
     produces:
       - application/json
     responses:
