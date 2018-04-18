@@ -163,7 +163,9 @@ def next_after_login():
 
     # Look for an invited user scenario.  Landing here with:
     #   `invited_verified_user_id` set indicates a fresh
-    #   registered account for a user who followed an invite email.
+    #   registered account for a user who followed an invite email,
+    #   or a non-registered account now being promoted to a registered
+    #   one (i.e. via the `access_on_verify` role)
     #
     #   `login_as_id` set indicates a fresh registered account during
     #   a login-as session.  In such a case, ignore when the user first

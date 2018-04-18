@@ -1127,7 +1127,7 @@ def register_now():
     db.session.commit()
     session['invited_verified_user_id'] = user.id
 
-    return redirect(url_for('user.register'))
+    return redirect(url_for('user.register', email=user.email))
 
 
 @user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
