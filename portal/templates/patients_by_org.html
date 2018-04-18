@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
   <div id="patientList">
-    <h4 class="tnth-headline">Patient List</h4>
+    <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
     <br/>
     <div id="patientListOptions">
       {%- if user.has_role(ROLE.STAFF) -%}
@@ -143,7 +143,10 @@ var sortObj = AT.getTablePreference({{user.id}});
 $("#adminTable").bootstrapTable({
   formatShowingRows: function (pageFrom, pageTo, totalRows) {
       var thisId = $(this).attr("tableId");
-      var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
+      var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+        replace("{pageFrom}", pageFrom).
+        replace("{pageTo}", pageTo).
+        replace("{totalRows}", totalRows);
       $("#tableCount"+thisId).html(rowInfo);
       return rowInfo;
   },
