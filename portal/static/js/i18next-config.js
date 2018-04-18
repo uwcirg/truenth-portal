@@ -24,17 +24,22 @@ var __i18next = window.__i18next = (function() {
             /*
              * consuming translation json from each corresponding locale
              */
-            var source = options.loadPath? options.loadPath : '/static/files/locales/{{lng}}/translation.json';
+            var source = options.loadPath? options.loadPath : "/static/files/locales/{{lng}}/translation.json";
 
             i18next.use(i18nextXHRBackend)
                     .use(i18nextBrowserLanguageDetector)
                     .init({
-                    fallbackLng: options.fallbackLng ? options.fallbackLng : 'en-US',
+                    /*
+                     * language abbrev in underscore format e.g. en_US as set by portal, is not recognized by i18next so need to make sure 
+                     * to replace _ with - which it recognizes
+                     */
+                    fallbackLng: options.fallbackLng ? options.fallbackLng.replace("_", "-") : "en-US",
+                    lng: options.lng? options.lng.replace("_", "-"): "en-US",
                     debug: options.debug ? options.debug : (getQueryString["debugi18next"]? true: false),
-                    ns: options.ns ? options.ns : ['translation'],
-                    defaultNS: 'translation',
+                    ns: options.ns ? options.ns : ["translation"],
+                    defaultNS: "translation",
                     initImmediate: options.initImmediate ? options.initImmediate : false,
-                    load: 'currentOnly', //this reads language code in en-US, en-AU format
+                    load: "currentOnly", //this reads language code in en-US, en-AU format
                     returnEmptyString: false,
                     returnNull: false,
                     saveMissing: true,
