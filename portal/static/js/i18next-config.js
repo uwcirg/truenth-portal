@@ -52,6 +52,7 @@ var __i18next = window.__i18next = (function() {
                      }
                   }, function(err, t) {
                     if (callback) callback();
+                    __NOT_PROVIDED_TEXT = i18next.t("not provided");
                   });
     };
 
