@@ -1,6 +1,5 @@
 /*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
 
-var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
 var DELAY_LOADING = false;
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
@@ -5843,10 +5842,829 @@ var tnthAjax = {
         }
     }
 };
+var tnthDates = {
+    /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
+     ** params: month, day and year fields and error field ID
+     ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
+     ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
+    "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
+        var m = $(monthField).val();
+        var d = $(dayField).val();
+        var y = $(yearField).val();
+        if (hasValue(m) && hasValue(d) && hasValue(y)) {
+            if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
+                m = parseInt(m);
+                d = parseInt(d);
+                y = parseInt(y);
+                var errorField = $("#" + errorFieldId);
 
+                if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+                    var today = new Date();
+                    // Check to see if this is a real date
+                    var date = new Date(y,m-1,d);
+                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                        errorField.html(i18next.t("Invalid date. Please try again.")).show();
+                        return false;
+                    }
+                    else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
+                        return false; //shouldn't be in the future
+                    }
+                    else if (y < 1900) {
+                        errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
+                        return false;
+                    }
+
+                    errorField.html("").hide();
+
+                    return true;
+
+                } else return false;
+            } else {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+    },
+    /***
+     * changeFormat - changes date format, particularly for submitting to server
+     * @param currentDate - date to change
+     * @param reverse - use to switch from yyyy-mm-dd to dd/mm/yyyy
+     * @param shorten - removes padding from zeroes (only in reverse)
+     * @returns - a date as a string
+     *
+     * Examples:
+     * changeFormat("29/04/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
+     * changeFormat("2016-04-29",true) returns "29/04/2016"
+     * changeFormat("2016-04-29",true,true) returns "29/04/2016"
+     ***/
+    "changeFormat": function(currentDate,reverse,shorten) {
+        if (currentDate == null || currentDate == "") {
+            return null;
+        }
+        var yearToPass, convertDate, dateFormatArray;
+        if (reverse) {
+            dateFormatArray = currentDate.split("-");
+            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
+            yearToPass = dateFormatArray[0];
+            if (shorten) {
+                dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
+                dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, '');
+            }
+            convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
+        } else {
+            dateFormatArray = currentDate.split("/");
+            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
+            // If patient manuals enters two digit year, then add 19 or 20 to year.
+            // TODO - this is susceptible to Y2K for 2100s. Be better to force
+            // user to type 4 digits.
+            var currentTime = new Date();
+            if (dateFormatArray[2].length == 2) {
+                var shortYear = currentTime.getFullYear().toString().substr(2,2);
+                if (dateFormatArray[2] > shortYear) {
+                    yearToPass = '19'+dateFormatArray[2];
+                } else {
+                    yearToPass = '20'+dateFormatArray[2];
+                }
+            } else {
+                yearToPass = dateFormatArray[2];
+            }
+            convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0];
+            // add T according to timezone
+            var tzOffset = currentTime.getTimezoneOffset();//minutes
+            tzOffset /= 60;//hours
+            if (tzOffset < 10) tzOffset = "0" + tzOffset;
+            convertDate += "T" + tzOffset + ":00:00";
+        }
+        return convertDate;
+    },
+    /**
+     * Simply swaps:
+     *      a/b/cdef to b/a/cdef
+     *      (single & double digit permutations accepted...)
+     *      ab/cd/efgh to cd/ab/efgh
+     * Does not check for valid dates on input or output!
+     * @param currentDate string eg 7/4/1976
+     * @returns string eg 4/7/1976
+     */
+    "swap_mm_dd": function(currentDate) {
+        var splitDate = currentDate.split('/');
+        return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
+    },
+     /**
+     * Convert month string to numeric
+     *
+     */
+
+     "convertMonthNumeric": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+             month_map = {
+                "jan":1,
+                "feb":2,
+                "mar":3,
+                "apr":4,
+                "may":5,
+                "jun":6,
+                "jul":7,
+                "aug":8,
+                "sep":9,
+                "oct":10,
+                "nov":11,
+                "dec":12,
+            };
+            var m = month_map[month.toLowerCase()];
+            return hasValue(m) ? m : "";
+        }
+     },
+    /**
+     * Convert month string to text
+     *
+     */
+     "convertMonthString": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+            numeric_month_map = {
+                1:"Jan",
+                2:"Feb",
+                3:"Mar",
+                4:"Apr",
+                5:"May",
+                6:"Jun",
+                7:"Jul",
+                8:"Aug",
+                9:"Sep",
+                10:"Oct",
+                11:"Nov",
+                12:"Dec"
+            };
+            var m = numeric_month_map[parseInt(month)];
+            return hasValue(m)? m : "";
+        }
+     },
+     "isDate": function(obj) {
+        return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
+     },
+     "displayDateString": function(m, d, y) {
+        var s = "";
+        if (hasValue(d)) s = parseInt(d);
+        if (hasValue(m)) s += (hasValue(s) ? " ": "") + this.convertMonthString(m);
+        if (hasValue(y)) s += (hasValue(s) ? " ": "") + y;
+        return s;
+     },
+    /***
+     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
+     * @param date - the date to be converted
+     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800
+     * @param padZero - if true, will add padded zero to month and date
+     * @param keepTime - if true, will output the time as part of the date
+     * @param blankText - pass a value to display if date is null
+     * @returns date as a string with optional time
+     *
+     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "24/2/2016 3:28pm"
+     */
+    "parseDate": function(date,noReplace,padZero,keepTime,blankText) {
+        if(date == null) {
+            if (blankText) {
+                return blankText;
+            } else {
+                return "";
+            }
+        }
+        // Put date in proper javascript format
+        if (noReplace == null) {
+            date = date.replace(" ", "T");
+        }
+        // Need to reformat dates b/c of date format issues in Safari (and others?)
+        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+        var a = date.split(/[^0-9]/);
+        var toConvert;
+        if (a[3]) {
+            toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
+        } else {
+            toConvert=new Date (a[0],a[1]-1,a[2]);
+        }
+
+        // Switch date to mm/dd/yyyy
+        //var toConvert = new Date(Date.parse(date));
+        var month = toConvert.getMonth() + 1;
+        var day = toConvert.getDate();
+        if (padZero) {
+            if (month <= 9)
+                month = '0' + month;
+            if (day <= 9)
+                day = '0' + day;
+        }
+        if (keepTime) {
+            var amPm = "am";
+            var hour = a[3];
+            if (a[3] > 11) {
+                amPm = "pm";
+                if (a[3] > 12) {
+                    hour = (a[3]-12);
+                }
+            }
+            return day + "/" + month + "/" + toConvert.getFullYear()+" "+hour+":"+a[4]+amPm;
+        } else {
+            return day + "/" + month + "/" + toConvert.getFullYear();
+        }
+    },
+    /***
+     * parseForSorting - changes date to a YYYYMMDDHHMMSS string for sorting (note that this is a string rather than a number)
+     * @param date - the date to be converted
+     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800. Adding T indicates UTC time
+     * @returns date as a string used by system for sorting
+     *
+     * parseDate("2016-02-24T15:28:09-0800",true) returns "201600224152809"
+     */
+    "parseForSorting": function(date,noReplace) {
+        if (date == null) {
+            return "";
+        }
+        // Put date in proper javascript format
+        if (noReplace == null) {
+            date = date.replace(" ", "T");
+        }
+        // Need to reformat dates b/c of date format issues in Safari (and others?)
+        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+        var a = date.split(/[^0-9]/);
+        var toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
+        // Switch date to mm/dd/yyyy
+        //var toConvert = new Date(Date.parse(date));
+        var month = toConvert.getMonth() + 1;
+        var day = toConvert.getDate();
+        if (month <= 9)
+            month = '0' + month;
+        if (day <= 9)
+            day = '0' + day;
+        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5];
+
+    },
+    /***
+     * spellDate - spells out date in a format based on language/local. Currently not in use.
+     * @param passDate - date to use. If empty, defaults to today.
+     * @param ymdFormat - false by default. false = dd/mm/yyyy. true = yyyy-mm-dd
+     * @returns spelled out date, localized
+     */
+    "spellDate": function(passDate,ymdFormat) {
+        var todayDate = new Date();
+        if (passDate) {
+            // ymdFormat is true, we are assuming it's being received as YYYY-MM-DD
+            if (ymdFormat) {
+                todayDate = passDate.split("-");
+                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1]);
+            } else {
+                // Otherwide dd/mm/yyyy
+                todayDate = passDate.split("/");
+                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0]);
+            }
+        }
+        var returnDate;
+        var monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        // If user's language is Spanish then use dd/mm/yyyy format and changes words
+        if (userSetLang !== undefined && userSetLang == 'es_MX') {
+            monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio", "agosto","septiembre","octubre","noviembre","diciembre"];
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear();
+        } else if(userSetLang !== undefined && userSetLang == "en_AU") {
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear();
+        } else {
+            returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear();
+        }
+        return returnDate;
+    },
+    /***
+     * Calculates number of days between two dates. Used in mPOWEr for surgery/discharge
+     * @param startDate - required. Assumes YYYY-MM-DD. This is typically the date of surgery or discharge
+     * @param dateToCalc - optional. If empty, then assumes today's date
+     * @returns number of days
+     */
+    "getDateDiff": function(startDate,dateToCalc) {
+        var a = startDate.split(/[^0-9]/);
+        var dateTime = new Date(a[0], a[1]-1, a[2]).getTime();
+        var d;
+        if (dateToCalc) {
+            var c = dateToCalc.split(/[^0-9]/);
+            d = new Date(c[0], c[1]-1, c[2]).getTime();
+        } else {
+            // If no baseDate, then use today to find the number of days between dateToCalc and today
+            d = new Date().getTime();
+        }
+        // Round down to floor so we don't add an extra day if session is 12+ hours into the day
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24));
+    },
+    "getAge": function (birthDate, otherDate) {
+        birthDate = new Date(birthDate);
+        // Use today's date to calc, unless otherwise specified
+        var secondDate = new Date();
+        if (otherDate) {
+            secondDate = new Date(otherDate);
+        }
+        var years = (secondDate.getFullYear() - birthDate.getFullYear());
+
+        if (secondDate.getMonth() < birthDate.getMonth() ||
+            secondDate.getMonth() == birthDate.getMonth() && secondDate.getDate() < birthDate.getDate()) {
+            years--;
+        }
+        return years;
+    },
+    /***
+     * Simple function to add "days" label to a number of days. Not localized, used for mPOWEr
+     * @param dateVal - required. Often derived via getDateDiff
+     * @returns {string}
+     */
+    "addDays": function(dateVal) {
+        var toReturn = "N/A";
+        if (dateVal && typeof dateVal != undefined) {
+            if (dateVal == 1) {
+                toReturn = "1 day";
+            } else if (dateVal < 0) {
+                toReturn = "--";
+            } else {
+                toReturn = dateVal + " days";
+            }
+        } else if (dateVal === 0) {
+            toReturn = "Today";
+        }
+        return toReturn;
+    },
+    "isValidDefaultDateFormat": function(date, errorField) {
+        if (!hasValue(date)) return false;
+        if (date.length < 10) return false;
+        var dArray = $.trim(date).split(" ");
+        if (dArray.length < 3) return false;
+        var day = dArray[0], month = dArray[1], year = dArray[2];
+        if (day.length < 1) return false;
+        if (month.length < 3) return false;
+        if (year.length < 4) return false;
+        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
+        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
+        if (!/(19|20)\d{2}/.test(year)) return false;
+        var dt = new Date(date);
+        if (!this.isDateObj(dt)) return false;
+        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
+            return false;
+        } else {
+          var today = new Date(), errorMsg = "";
+          if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
+          // Only allow if date is before today
+          if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+              errorMsg = "The date must not be in the future.";
+          }
+          if (hasValue(errorMsg)) {
+            if (errorField) $(errorField).text(errorMsg);
+            return false;
+          } else {
+            if (errorField) $(errorField).text("");
+            return true;
+          }
+        }
+    },
+    "isDateObj": function(d) {
+        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
+    },
+    "isValidDate": function(y, m, d) {
+        var date = this.getDateObj(y, m, d);
+        var convertedDate = this.getConvertedDate(date);
+        var givenDate = this.getGivenDate(y, m, d);
+        return ( givenDate == convertedDate);
+    },
+    /*
+     * method does not check for valid numbers, will return NaN if conversion failed
+     */
+    "getDateObj": function(y, m, d, h, mi, s) {
+        if (!h) h = 0;
+        if (!mi) mi = 0;
+        if (!s) s = 0;
+        return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
+    },
+    "getConvertedDate": function(dateObj) {
+        if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
+        else return "";
+    },
+    "getGivenDate":function(y, m, d) {
+        return ""+y+m+d;
+    },
+    /*
+     * NB
+     * For dateString in ISO-8601 format date as returned from server
+     * e.g. '2011-06-29T16:52:48'*/
+
+    "formatDateString": function(dateString, format) {
+        if (dateString) {
+               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
+               var d = new Date(dateString);
+               var ap, day, month, year, hours, minutes, seconds, nd;
+               //note instantiating ios formatted date using Date object resulted in error in IE
+               if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) return "";
+               if (iosDateTest.test(dateString)) {
+                   //IOS date, no need to convert again to date object, just parse it as is
+                   //issue when passing it into Date object, the output date is inconsistent across from browsers
+                   var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
+                   year = dArray[0];
+                   month = dArray[1];
+                   day = dArray[2];
+                   hours = dArray[3] || "0";
+                   minutes = dArray[4] || "0";
+                   seconds = dArray[5] || "0";
+                }
+                else {
+                   day = d.getDate();
+                   month = d.getMonth() + 1;
+                   year = d.getFullYear();
+                   hours = d.getHours();
+                   minutes = d.getMinutes();
+                   seconds = d.getSeconds();
+                   nd = "";
+                }
+
+               day = pad(day);
+               month = pad(month);
+               hours = pad(hours);
+               minutes = pad(minutes);
+               seconds = pad(seconds);
+
+               switch(format) {
+                    case "mm/dd/yyyy":
+                        nd = month + "/" + day + "/" + year;
+                        break;
+                    case "mm-dd-yyyy":
+                        nd = month + "-" + day + "-" + year;
+                        break;
+                    case "mm-dd-yyyy hh:mm:ss":
+                        nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd/mm/yyyy":
+                        nd = day + "/" + month + "/" + year;
+                        break;
+                    case "dd/mm/yyyy hh:mm:ss":
+                        nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd-mm-yyyy":
+                        nd = day + "-" + month + "-" + year;
+                        break;
+                    case "dd-mm-yyyy hh:mm:ss":
+                        nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "iso-short":
+                    case "yyyy-mm-dd":
+                        nd = year + "-" + month + "-" + day;
+                        break;
+                    case "iso":
+                    case "yyyy-mm-dd hh:mm:ss":
+                        nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "d M y hh:mm:ss":
+                        nd = this.displayDateString(month, day, year);
+                        nd = nd + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "d M y":
+                        nd = this.displayDateString(month, day, year);
+                        break;
+                    default:
+                        //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
+                        nd = this.displayDateString(month, day, year);
+                        break;
+               }
+
+           return nd;
+        } else return "";
+    },
+    "convertToLocalTime": function (dateString) {
+        var convertedDate = "";
+        //assuming dateString is UTC date/time
+        if (hasValue(dateString)) {
+            var d = new Date(dateString);
+            var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
+            var offset = d.getTimezoneOffset() / 60;
+            var hours = d.getHours();
+            newDate.setHours(hours - offset);
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            convertedDate = newDate.toLocaleString(options);
+        }
+        return convertedDate;
+    },
+    "convertUserDateTimeByLocaleTimeZone": function (dateString, timeZone, locale) {
+        //firefox does not support Intl API
+        //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
+
+        if (!dateString) return "";
+        else {
+            var errorMessage = "";
+            if (!hasValue(timeZone)) timeZone = "UTC";
+            if (!hasValue(locale))  locale = "en-us";
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
+            //locale needs to be in this format - us-en
+            //month: 'numeric', day: 'numeric',
+            locale = locale.replace("_", "-").toLowerCase();
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            options.timeZone =  timeZone;
+            //older browsers don't support this
+            var convertedDate = dateString;
+            try {
+                if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
+                    convertedDate = new Date(dateString).toLocaleString(locale, options);
+                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide();});
+                } else {
+                    if (timeZone != "UTC") {
+                        convertedDate = convertToLocalTime(dateString);
+                        $(".timezone-warning").addClass("text-warning").html(i18next.t("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead."));
+                        $(".gmt").each(function() { $(this).hide();});
+                    }
+                }
+            } catch(e) {
+                errorMessage = i18next.t("Error occurred when converting timezone: ") + e.message;
+            }
+            if (hasValue(errorMessage)) {
+                $(".timezone-error").each(function() {
+                    $(this).addClass("text-danger").html(errorMessage);
+                });
+            }
+            return convertedDate.replace(/\,/g, "");
+        }
+    },
+    "getUserTimeZone": function (userId) {
+        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
+        var userTimeZone = "";
+        if (selectVal == "") {
+            if (userId) {
+                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
+                    if (!data.error) {
+                        if (data) {
+                          data.extension.forEach(
+                              function(item, index) {
+                                if (item.url === SYSTEM_IDENTIFIER_ENUM.timezone) {
+                                  userTimeZone = item.timezone;
+                                }
+                              });
+                        }
+                    } else {
+                        userTimeZone = "UTC";
+                    }
+                });
+            }
+        } else {
+            userTimeZone = selectVal;
+        }
+
+        return hasValue(userTimeZone) ? userTimeZone : "UTC";
+    },
+    "getUserLocale": function (userId) {
+        var sessionKey = "currentUserLocale";
+        var sessionLocale = sessionStorage.getItem(sessionKey);
+        if (sessionLocale) {
+            return sessionLocale;
+        } else {
+            var locale = "en_us";
+            var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
+            if (localeSelect) {
+                locale = localeSelect;
+            } else {
+                if (!userId) {
+                    $.ajax ({
+                        type: "GET",
+                        url: "/api/me",
+                        async: false
+                    }).done(function(data) {
+                        if (data) {
+                            userId = data.id;
+                        }
+                        if (userId) {
+                            tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                                if (!data.error) {
+                                    if (data && data.communication) {
+                                        data.communication.forEach(function(item) {
+                                            if (item.language) {
+                                                locale = item.language.coding[0].code;
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    locale="en_us";
+                                }
+                            });
+                        }
+                    }).fail(function(xhr) {
+                        
+                    });
+                }
+            }
+            sessionStorage.setItem(sessionKey, locale);
+            return locale;
+        }
+    },
+    getDateWithTimeZone: function(dObj) {
+        /*
+         * param is a date object
+         * calculating UTC date using Date object's timezoneOffset method
+         * the method return offset in minutes, so need to convert it to miliseconds
+         * adding the resulting offset will be the UTC date/time
+         */
+        var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
+        //I believe this is a valid python date format, will save it as GMT date/time
+        //NOTE, conversion already occurred, so there will be no need for backend to convert it again
+        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
+    },
+    /*
+     * return object containing today's date/time information
+     */
+    getTodayDateObj: function() {
+        var today = new Date();
+        var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
+        var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+        var gmtToday = this.getDateWithTimeZone(this.getDateObj(ty,tm,td,th,tmi,ts));
+
+        return {
+            date: today,
+            day: td,
+            month: tm,
+            year: ty,
+            hour: th,
+            minute: tmi,
+            second: ts,
+            displayDay: pad(td),
+            displayMonth: pad(tm),
+            displayYear: pad(ty),
+            displayHour: pad(th),
+            displayMinute: pad(tmi),
+            displaySecond: pad(ts),
+            gmtDate: gmtToday
+        };
+    },
+    /*
+     * parameters: day, month and year values in numeric
+     * boolean value for restrictToPresent, true if the date needs to be before today, false is the default
+     */
+    dateValidator: function(day, month, year, restrictToPresent) {
+        var errorMessage = "";
+        if (hasValue(day) && hasValue(month) && hasValue(year)) {
+            // Check to see if this is a real date
+            var iy = parseInt(year), im = parseInt(month), iid=parseInt(day);
+            var date = new Date(iy,im-1,iid);
+
+            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                if (iy < 1900) {
+                    errorMessage = i18next.t("Year must be after 1900");
+                }
+                // Only allow if date is before today
+                if (restrictToPresent) {
+                    var today = new Date();
+                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                        errorMessage = i18next.t("The date must not be in the future.");
+                    }
+                }
+            } else {
+                errorMessage = i18next.t("Invalid Date. Please enter a valid date.");
+            }
+        } else {
+            errorMessage = i18next.t("Missing value.");
+        }
+        return errorMessage;
+    }
+
+};
+
+/***
+ * Bootstrap datatables functions
+ * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
+ ****/
+
+var tnthTables = {
+    /***
+     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksSorter": function(a,b) {
+        a = $(a).text();
+        b = $(b).text();
+        var aa = parseFloat(a);
+        var bb = parseFloat(b);
+        //if (aa > bb) return 1;
+        //if (aa < bb) return -1;
+        //return 0;
+        return  bb - aa;
+    },
+    /***
+     * Quick way to sort when text is wrapped in an <a href> or other tag
+     * NOTE for text that is NOT number
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksTextSorter": function(a,b) {
+        var aa = $(a).text();
+        var bb = $(b).text();
+        if(aa < bb) return -1;
+        if(aa > bb) return 1;
+        return 0;
+    },
+    /***
+     * sorting date string,
+     * @param a,b - the two items to compare - note, this assumes that the parameters
+     * are in valid date format e.g. 3 August 2017
+     * @returns 1,-1 or 0 for sorting
+     */
+    "dateSorter": function(a,b) {
+        if (!hasValue(a)) a = 0;
+        if (!hasValue(b)) b = 0;
+        /*
+         * make sure the string passed in does not have line break element
+         * if so it is a possible mult-line text, split it up and use
+         * the first item in the resulting array
+         */
+        var regex = /<br\s*[\/]?>/gi;
+        a = a.replace(regex, "\n");
+        b = b.replace(regex, "\n");
+        var ar = a.split("\n");
+        if (ar.length > 0) a = ar[0];
+        var br = b.split("\n");
+        if (br.length > 0) b = br[0];
+        /* note getTime return returns the numeric value
+         * corresponding to the time for the specified date according to universal time
+         * therefore, can be used for sorting
+         */
+        var a_d = (new Date(a)).getTime();
+        var b_d = (new Date(b)).getTime();
+
+        if (isNaN(a_d)) a_d = 0;
+        if (isNaN(b_d)) b_d = 0;
+
+        return  b_d - a_d;
+    },
+    /***
+     * sorting alpha numeric string
+     */
+     "alphanumericSorter": function (a, b) {
+        /*
+         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
+         */
+        return alphanum(a, b);
+    }
+};
+var FieldLoaderHelper = function () {
+    this.delayDuration = 600;
+    this.showLoader = function(targetField) {
+        if(targetField && targetField.length > 0) {
+           $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
+        };
+    };
+
+    this.showUpdate = function(targetField) {
+        targetField = targetField || $(targetField);
+        var __timeout = this.delayDuration;
+        if(targetField && targetField.length > 0) {
+            setTimeout(function() { (function(targetField) {
+                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
+                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
+                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
+                errorField.text("").css("opacity", 0);
+                successField.text("success");
+                loadingField.animate({"opacity": 0}, __timeout, function() {
+                    successField.animate({"opacity": 1}, __timeout, function() {
+                        setTimeout(function() { successField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
+                });
+             });
+            })(targetField); }, __timeout);
+        };
+    };
+
+    this.showError = function(targetField) {
+        targetField = targetField || $(targetField);
+        var __timeout = this.delayDuration;
+        if(targetField && targetField.length > 0) {
+            setTimeout(function() { (function(targetField) {
+                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
+                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
+                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
+                errorField.text("Unable to update. System/Server Error.");
+                successField.text("").css("opacity", 0);
+                loadingField.animate({"opacity": 0}, __timeout, function() {
+                    errorField.animate({"opacity": 1}, __timeout, function() {
+                        setTimeout(function() { errorField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
+                });
+             });
+            })(targetField); }, __timeout);
+        };
+    };
+};
+
+var userSetLang = tnthDates.getUserLocale();
 __i18next.init({
     "debug": false,
-    "initImmediate": false
+    "initImmediate": false,
+    "lng": userSetLang
 });
 
 $(document).ready(function() {
@@ -5861,6 +6679,10 @@ $(document).ready(function() {
 
     var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
     if (LOGIN_AS_PATIENT) {
+        /*
+         * need to clear current user locale in session storage when logging in as patient
+         */
+        sessionStorage.removeItem("currentUserLocale");
         if (typeof history !== "undefined" && history.pushState) {
             history.pushState(null, null, location.href);
         }
@@ -6050,804 +6872,5 @@ $(document).ready(function() {
     }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
-
-var tnthDates = {
-    /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
-     ** params: month, day and year fields and error field ID
-     ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
-     ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
-        var m = $(monthField).val();
-        var d = $(dayField).val();
-        var y = $(yearField).val();
-        if (hasValue(m) && hasValue(d) && hasValue(y)) {
-            if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
-                m = parseInt(m);
-                d = parseInt(d);
-                y = parseInt(y);
-                var errorField = $("#" + errorFieldId);
-
-                if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
-                    var today = new Date();
-                    // Check to see if this is a real date
-                    var date = new Date(y,m-1,d);
-                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                        errorField.html(i18next.t("Invalid date. Please try again.")).show();
-                        return false;
-                    }
-                    else if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                        errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
-                        return false; //shouldn't be in the future
-                    }
-                    else if (y < 1900) {
-                        errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
-                        return false;
-                    };
-
-                    errorField.html("").hide();
-
-                    return true;
-
-                } else return false;
-            } else {
-                return false;
-            }
-
-        } else {
-            return false;
-        };
-    },
-    /***
-     * changeFormat - changes date format, particularly for submitting to server
-     * @param currentDate - date to change
-     * @param reverse - use to switch from yyyy-mm-dd to dd/mm/yyyy
-     * @param shorten - removes padding from zeroes (only in reverse)
-     * @returns - a date as a string
-     *
-     * Examples:
-     * changeFormat("29/04/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
-     * changeFormat("2016-04-29",true) returns "29/04/2016"
-     * changeFormat("2016-04-29",true,true) returns "29/04/2016"
-     ***/
-    "changeFormat": function(currentDate,reverse,shorten) {
-        if (currentDate == null || currentDate == "") {
-            return null;
-        }
-        var yearToPass, convertDate, dateFormatArray;
-        if (reverse) {
-            dateFormatArray = currentDate.split("-");
-            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
-            yearToPass = dateFormatArray[0];
-            if (shorten) {
-                dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
-                dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, '');
-            }
-            convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
-        } else {
-            dateFormatArray = currentDate.split("/");
-            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
-            // If patient manuals enters two digit year, then add 19 or 20 to year.
-            // TODO - this is susceptible to Y2K for 2100s. Be better to force
-            // user to type 4 digits.
-            var currentTime = new Date();
-            if (dateFormatArray[2].length == 2) {
-                var shortYear = currentTime.getFullYear().toString().substr(2,2);
-                if (dateFormatArray[2] > shortYear) {
-                    yearToPass = '19'+dateFormatArray[2];
-                } else {
-                    yearToPass = '20'+dateFormatArray[2];
-                }
-            } else {
-                yearToPass = dateFormatArray[2];
-            }
-            convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
-            // add T according to timezone
-            var tzOffset = currentTime.getTimezoneOffset();//minutes
-            tzOffset /= 60;//hours
-            if (tzOffset < 10) tzOffset = "0" + tzOffset;
-            convertDate += "T" + tzOffset + ":00:00";
-        }
-        return convertDate
-    },
-    /**
-     * Simply swaps:
-     *      a/b/cdef to b/a/cdef
-     *      (single & double digit permutations accepted...)
-     *      ab/cd/efgh to cd/ab/efgh
-     * Does not check for valid dates on input or output!
-     * @param currentDate string eg 7/4/1976
-     * @returns string eg 4/7/1976
-     */
-    "swap_mm_dd": function(currentDate) {
-        var splitDate = currentDate.split('/');
-        return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
-    },
-     /**
-     * Convert month string to numeric
-     *
-     */
-
-     "convertMonthNumeric": function(month) {
-        if (!hasValue(month)) return "";
-        else {
-             month_map = {
-                "jan":1,
-                "feb":2,
-                "mar":3,
-                "apr":4,
-                "may":5,
-                "jun":6,
-                "jul":7,
-                "aug":8,
-                "sep":9,
-                "oct":10,
-                "nov":11,
-                "dec":12,
-            };
-            var m = month_map[month.toLowerCase()];
-            return hasValue(m) ? m : "";
-        };
-     },
-    /**
-     * Convert month string to text
-     *
-     */
-     "convertMonthString": function(month) {
-        if (!hasValue(month)) return "";
-        else {
-            numeric_month_map = {
-                1:"Jan",
-                2:"Feb",
-                3:"Mar",
-                4:"Apr",
-                5:"May",
-                6:"Jun",
-                7:"Jul",
-                8:"Aug",
-                9:"Sep",
-                10:"Oct",
-                11:"Nov",
-                12:"Dec"
-            };
-            var m = numeric_month_map[parseInt(month)];
-            return hasValue(m)? m : "";
-        };
-     },
-     "isDate": function(obj) {
-        return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
-     },
-     "displayDateString": function(m, d, y) {
-        var s = "";
-        if (hasValue(d)) s = parseInt(d);
-        if (hasValue(m)) s += (hasValue(s) ? " ": "") + this.convertMonthString(m);
-        if (hasValue(y)) s += (hasValue(s) ? " ": "") + y;
-        return s;
-     },
-    /***
-     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
-     * @param date - the date to be converted
-     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800
-     * @param padZero - if true, will add padded zero to month and date
-     * @param keepTime - if true, will output the time as part of the date
-     * @param blankText - pass a value to display if date is null
-     * @returns date as a string with optional time
-     *
-     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "24/2/2016 3:28pm"
-     */
-    "parseDate": function(date,noReplace,padZero,keepTime,blankText) {
-        if(date == null) {
-            if (blankText) {
-                return blankText;
-            } else {
-                return "";
-            }
-        }
-        // Put date in proper javascript format
-        if (noReplace == null) {
-            date = date.replace(" ", "T");
-        }
-        // Need to reformat dates b/c of date format issues in Safari (and others?)
-        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        var a = date.split(/[^0-9]/);
-        var toConvert;
-        if (a[3]) {
-            toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
-        } else {
-            toConvert=new Date (a[0],a[1]-1,a[2]);
-        }
-
-        // Switch date to mm/dd/yyyy
-        //var toConvert = new Date(Date.parse(date));
-        var month = toConvert.getMonth() + 1;
-        var day = toConvert.getDate();
-        if (padZero) {
-            if (month <= 9)
-                month = '0' + month;
-            if (day <= 9)
-                day = '0' + day;
-        }
-        if (keepTime) {
-            var amPm = "am";
-            var hour = a[3];
-            if (a[3] > 11) {
-                amPm = "pm";
-                if (a[3] > 12) {
-                    hour = (a[3]-12);
-                }
-            }
-            return day + "/" + month + "/" + toConvert.getFullYear()+" "+hour+":"+a[4]+amPm;
-        } else {
-            return day + "/" + month + "/" + toConvert.getFullYear();
-        }
-    },
-    /***
-     * parseForSorting - changes date to a YYYYMMDDHHMMSS string for sorting (note that this is a string rather than a number)
-     * @param date - the date to be converted
-     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800. Adding T indicates UTC time
-     * @returns date as a string used by system for sorting
-     *
-     * parseDate("2016-02-24T15:28:09-0800",true) returns "201600224152809"
-     */
-    "parseForSorting": function(date,noReplace) {
-        if (date == null) {
-            return ""
-        }
-        // Put date in proper javascript format
-        if (noReplace == null) {
-            date = date.replace(" ", "T");
-        }
-        // Need to reformat dates b/c of date format issues in Safari (and others?)
-        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        var a = date.split(/[^0-9]/);
-        var toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
-        // Switch date to mm/dd/yyyy
-        //var toConvert = new Date(Date.parse(date));
-        var month = toConvert.getMonth() + 1;
-        var day = toConvert.getDate();
-        if (month <= 9)
-            month = '0' + month;
-        if (day <= 9)
-            day = '0' + day;
-        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5]
-
-    },
-    /***
-     * spellDate - spells out date in a format based on language/local. Currently not in use.
-     * @param passDate - date to use. If empty, defaults to today.
-     * @param ymdFormat - false by default. false = dd/mm/yyyy. true = yyyy-mm-dd
-     * @returns spelled out date, localized
-     */
-    "spellDate": function(passDate,ymdFormat) {
-        var todayDate = new Date();
-        if (passDate) {
-            // ymdFormat is true, we are assuming it's being received as YYYY-MM-DD
-            if (ymdFormat) {
-                todayDate = passDate.split("-");
-                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
-            } else {
-                // Otherwide dd/mm/yyyy
-                todayDate = passDate.split("/");
-                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0])
-            }
-        }
-        var returnDate;
-        var monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ]
-        // If user's language is Spanish then use dd/mm/yyyy format and changes words
-        if (userSetLang !== undefined && userSetLang == 'es_MX') {
-            monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio", "agosto","septiembre","octubre","noviembre","diciembre"];
-            returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear()
-        } else if(userSetLang !== undefined && userSetLang == "en_AU") {
-            returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear()
-        } else {
-            returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear()
-        }
-        return returnDate
-    },
-    /***
-     * Calculates number of days between two dates. Used in mPOWEr for surgery/discharge
-     * @param startDate - required. Assumes YYYY-MM-DD. This is typically the date of surgery or discharge
-     * @param dateToCalc - optional. If empty, then assumes today's date
-     * @returns number of days
-     */
-    "getDateDiff": function(startDate,dateToCalc) {
-        var a = startDate.split(/[^0-9]/);
-        var dateTime = new Date(a[0], a[1]-1, a[2]).getTime();
-        var d;
-        if (dateToCalc) {
-            var c = dateToCalc.split(/[^0-9]/);
-            d = new Date(c[0], c[1]-1, c[2]).getTime()
-        } else {
-            // If no baseDate, then use today to find the number of days between dateToCalc and today
-            d = new Date().getTime()
-        }
-        // Round down to floor so we don't add an extra day if session is 12+ hours into the day
-        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
-    },
-    "getAge": function (birthDate, otherDate) {
-        birthDate = new Date(birthDate);
-        // Use today's date to calc, unless otherwise specified
-        var secondDate = new Date();
-        if (otherDate) {
-            secondDate = new Date(otherDate);
-        }
-        var years = (secondDate.getFullYear() - birthDate.getFullYear());
-
-        if (secondDate.getMonth() < birthDate.getMonth() ||
-            secondDate.getMonth() == birthDate.getMonth() && secondDate.getDate() < birthDate.getDate()) {
-            years--;
-        }
-        return years;
-    },
-    /***
-     * Simple function to add "days" label to a number of days. Not localized, used for mPOWEr
-     * @param dateVal - required. Often derived via getDateDiff
-     * @returns {string}
-     */
-    "addDays": function(dateVal) {
-        var toReturn = "N/A";
-        if (dateVal && typeof dateVal != undefined) {
-            if (dateVal == 1) {
-                toReturn = "1 day";
-            } else if (dateVal < 0) {
-                toReturn = "--";
-            } else {
-                toReturn = dateVal + " days";
-            }
-        } else if (dateVal === 0) {
-            toReturn = "Today";
-        }
-        return toReturn
-    },
-    "isValidDefaultDateFormat": function(date, errorField) {
-        if (!hasValue(date)) return false;
-        if (date.length < 10) return false;
-        var dArray = $.trim(date).split(" ");
-        if (dArray.length < 3) return false;
-        var day = dArray[0], month = dArray[1], year = dArray[2];
-        if (day.length < 1) return false;
-        if (month.length < 3) return false;
-        if (year.length < 4) return false;
-        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
-        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
-        if (!/(19|20)\d{2}/.test(year)) return false;
-        var dt = new Date(date);
-        if (!this.isDateObj(dt)) return false;
-        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
-            return false;
-        } else {
-          var today = new Date(), errorMsg = "";
-          if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
-          // Only allow if date is before today
-          if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-              errorMsg = "The date must not be in the future.";
-          };
-          if (hasValue(errorMsg)) {
-            if (errorField) $(errorField).text(errorMsg);
-            return false;
-          } else {
-            if (errorField) $(errorField).text("");
-            return true;
-          }
-        };
-    },
-    "isDateObj": function(d) {
-        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
-    },
-    "isValidDate": function(y, m, d) {
-        var date = this.getDateObj(y, m, d);
-        var convertedDate = this.getConvertedDate(date);
-        var givenDate = this.getGivenDate(y, m, d);
-        return ( givenDate == convertedDate);
-    },
-    /*
-     * method does not check for valid numbers, will return NaN if conversion failed
-     */
-    "getDateObj": function(y, m, d, h, mi, s) {
-        if (!h) h = 0;
-        if (!mi) mi = 0;
-        if (!s) s = 0;
-        return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
-    },
-    "getConvertedDate": function(dateObj) {
-        if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
-        else return "";
-    },
-    "getGivenDate":function(y, m, d) {
-        return ""+y+m+d;
-    },
-    /*
-     * NB
-     * For dateString in ISO-8601 format date as returned from server
-     * e.g. '2011-06-29T16:52:48'*/
-
-    "formatDateString": function(dateString, format) {
-        if (dateString) {
-               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
-               var d = new Date(dateString);
-               var ap, day, month, year, hours, minutes, seconds, nd;
-               //note instantiating ios formatted date using Date object resulted in error in IE
-               if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) return "";
-               if (iosDateTest.test(dateString)) {
-                   //IOS date, no need to convert again to date object, just parse it as is
-                   //issue when passing it into Date object, the output date is inconsistent across from browsers
-                   var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
-                   year = dArray[0];
-                   month = dArray[1];
-                   day = dArray[2];
-                   hours = dArray[3] || "0";
-                   minutes = dArray[4] || "0";
-                   seconds = dArray[5] || "0";
-                }
-                else {
-                   day = d.getDate();
-                   month = d.getMonth() + 1;
-                   year = d.getFullYear();
-                   hours = d.getHours();
-                   minutes = d.getMinutes();
-                   seconds = d.getSeconds();
-                   nd = "";
-                };
-
-               day = pad(day);
-               month = pad(month);
-               hours = pad(hours);
-               minutes = pad(minutes);
-               seconds = pad(seconds);
-
-               switch(format) {
-                    case "mm/dd/yyyy":
-                        nd = month + "/" + day + "/" + year;
-                        break;
-                    case "mm-dd-yyyy":
-                        nd = month + "-" + day + "-" + year;
-                        break;
-                    case "mm-dd-yyyy hh:mm:ss":
-                        nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
-                        break;
-                    case "dd/mm/yyyy":
-                        nd = day + "/" + month + "/" + year;
-                        break;
-                    case "dd/mm/yyyy hh:mm:ss":
-                        nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
-                        break;
-                    case "dd-mm-yyyy":
-                        nd = day + "-" + month + "-" + year;
-                        break;
-                    case "dd-mm-yyyy hh:mm:ss":
-                        nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
-                        break;
-                    case "iso-short":
-                    case "yyyy-mm-dd":
-                        nd = year + "-" + month + "-" + day;
-                        break;
-                    case "iso":
-                    case "yyyy-mm-dd hh:mm:ss":
-                        nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
-                        break;
-                    case "d M y hh:mm:ss":
-                        nd = this.displayDateString(month, day, year);
-                        nd = nd + " " + hours + ":" + minutes + ":" + seconds;
-                        break;
-                    case "d M y":
-                    default:
-                        //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
-                        nd = this.displayDateString(month, day, year);
-                        break;
-               };
-
-           return nd;
-        } else return "";
-    },
-    "convertToLocalTime": function (dateString) {
-        var convertedDate = "";
-        //assuming dateString is UTC date/time
-        if (hasValue(dateString)) {
-            var d = new Date(dateString);
-            var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
-            var offset = d.getTimezoneOffset() / 60;
-            var hours = d.getHours();
-            newDate.setHours(hours - offset);
-            var options = {
-                year: 'numeric', day: 'numeric', month: 'short',
-                hour: 'numeric', minute: 'numeric', second: 'numeric',
-                hour12: false
-            };
-            convertedDate = newDate.toLocaleString(options);
-        };
-        return convertedDate;
-    },
-    "convertUserDateTimeByLocaleTimeZone": function (dateString, timeZone, locale) {
-        //firefox does not support Intl API
-        //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
-
-        if (!dateString) return "";
-        else {
-            var errorMessage = "";
-            if (!hasValue(timeZone)) timeZone = "UTC";
-            if (!hasValue(locale))  locale = "en-us";
-            $(".timezone-error").html("");
-            $(".timezone-warning").html("");
-            //locale needs to be in this format - us-en
-            //month: 'numeric', day: 'numeric',
-            locale = locale.replace("_", "-").toLowerCase();
-            var options = {
-                year: 'numeric', day: 'numeric', month: 'short',
-                hour: 'numeric', minute: 'numeric', second: 'numeric',
-                hour12: false
-            };
-            options.timeZone =  timeZone;
-            //older browsers don't support this
-            var convertedDate = dateString;
-            try {
-                if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
-                    convertedDate = new Date(dateString).toLocaleString(locale, options);
-                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
-                } else {
-                    if (timeZone != "UTC") {
-                        convertedDate = convertToLocalTime(dateString);
-                        $(".timezone-warning").addClass("text-warning").html(i18next.t("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead."));
-                        $(".gmt").each(function() { $(this).hide()});
-                    };
-                }
-            } catch(e) {
-                errorMessage = i18next.t("Error occurred when converting timezone: ") + e.message;
-            };
-            if (hasValue(errorMessage)) {
-                $(".timezone-error").each(function() {
-                    $(this).addClass("text-danger").html(errorMessage);
-                });
-            };
-            return convertedDate.replace(/\,/g, "");
-        };
-    },
-    "getUserTimeZone": function (userId) {
-        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
-        var userTimeZone = "";
-        if (selectVal == "") {
-            if (userId) {
-                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
-                    if (!data.error) {
-                        if (data) {
-                            data.extension.forEach(
-                                function(item, index) {
-                                    if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
-                                        userTimeZone = item.timezone;
-                                    };
-                                });
-                            };
-                    } else {
-                        userTimeZone = "UTC";
-                    };
-                });
-            };
-        } else {
-            userTimeZone = selectVal;
-        };
-
-        return hasValue(userTimeZone) ? userTimeZone : "UTC";
-    },
-    "getUserLocale": function (userId) {
-      var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-      var locale = "";
-
-      if (!localeSelect) {
-            if (userId) {
-                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-                    if (!data.error) {
-                        if (data && data.communication) {
-                                data.communication.forEach(
-                                    function(item, index) {
-                                        if (item.language) {
-                                            locale = item["language"]["coding"][0].code;
-                                        };
-                                });
-                            };
-                    } else {
-                        locale="en-us";
-                    };
-                });
-            };
-       } else locale = localeSelect;
-
-       //console.log("locale? " + locale)
-       return locale ? locale : "en-us";
-    },
-    getDateWithTimeZone: function(dObj) {
-        /*
-         * param is a date object
-         * calculating UTC date using Date object's timezoneOffset method
-         * the method return offset in minutes, so need to convert it to miliseconds
-         * adding the resulting offset will be the UTC date/time
-         */
-        var utcDate = new Date(dObj.getTime()+(dObj.getTimezoneOffset())*60*1000);
-        //I believe this is a valid python date format, will save it as GMT date/time
-        //NOTE, conversion already occurred, so there will be no need for backend to convert it again
-        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
-    },
-    /*
-     * return object containing today's date/time information
-     */
-    getTodayDateObj: function() {
-        var today = new Date();
-        var td = today.getDate(), tm = today.getMonth()+1, ty = today.getFullYear();
-        var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-        var gmtToday = this.getDateWithTimeZone(this.getDateObj(ty,tm,td,th,tmi,ts));
-
-        return {
-            date: today,
-            day: td,
-            month: tm,
-            year: ty,
-            hour: th,
-            minute: tmi,
-            second: ts,
-            displayDay: pad(td),
-            displayMonth: pad(tm),
-            displayYear: pad(ty),
-            displayHour: pad(th),
-            displayMinute: pad(tmi),
-            displaySecond: pad(ts),
-            gmtDate: gmtToday
-        }
-    },
-    /*
-     * parameters: day, month and year values in numeric
-     * boolean value for restrictToPresent, true if the date needs to be before today, false is the default
-     */
-    dateValidator: function(day, month, year, restrictToPresent) {
-        var errorMessage = "";
-        if (hasValue(day) && hasValue(month) && hasValue(year)) {
-            // Check to see if this is a real date
-            var iy = parseInt(year), im = parseInt(month), iid=parseInt(day);
-            var date = new Date(iy,im-1,iid);
-
-            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                if (iy < 1900) {
-                    errorMessage = i18next.t("Year must be after 1900");
-                };
-                // Only allow if date is before today
-                if (restrictToPresent) {
-                    var today = new Date();
-                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                        errorMessage = i18next.t("The date must not be in the future.");
-                    };
-                };
-            } else {
-                errorMessage = i18next.t("Invalid Date. Please enter a valid date.");
-            };
-        } else {
-            errorMessage = i18next.t("Missing value.");
-        };
-        return errorMessage;
-    }
-
-};
-/***
- * Bootstrap datatables functions
- * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
- ****/
-
-var tnthTables = {
-    /***
-     * Quick way to sort when text is wrapper in an <a href> or other tag
-     * @param a,b - the two items to compare
-     * @returns 1,-1 or 0 for sorting
-     */
-    "stripLinksSorter": function(a,b) {
-        a = $(a).text();
-        b = $(b).text();
-        var aa = parseFloat(a);
-        var bb = parseFloat(b);
-        //if (aa > bb) return 1;
-        //if (aa < bb) return -1;
-        //return 0;
-        return  bb - aa;
-    },
-    /***
-     * Quick way to sort when text is wrapped in an <a href> or other tag
-     * NOTE for text that is NOT number
-     * @param a,b - the two items to compare
-     * @returns 1,-1 or 0 for sorting
-     */
-    "stripLinksTextSorter": function(a,b) {
-        var aa = $(a).text();
-        var bb = $(b).text();
-        if(aa < bb) return -1;
-        if(aa > bb) return 1;
-        return 0;
-    },
-    /***
-     * sorting date string,
-     * @param a,b - the two items to compare - note, this assumes that the parameters
-     * are in valid date format e.g. 3 August 2017
-     * @returns 1,-1 or 0 for sorting
-     */
-    "dateSorter": function(a,b) {
-        if (!hasValue(a)) a = 0;
-        if (!hasValue(b)) b = 0;
-        /*
-         * make sure the string passed in does not have line break element
-         * if so it is a possible mult-line text, split it up and use
-         * the first item in the resulting array
-         */
-        var regex = /<br\s*[\/]?>/gi;
-        a = a.replace(regex, "\n");
-        b = b.replace(regex, "\n");
-        var ar = a.split("\n");
-        if (ar.length > 0) a = ar[0];
-        var br = b.split("\n");
-        if (br.length > 0) b = br[0];
-        /* note getTime return returns the numeric value
-         * corresponding to the time for the specified date according to universal time
-         * therefore, can be used for sorting
-         */
-        var a_d = (new Date(a)).getTime();
-        var b_d = (new Date(b)).getTime();
-
-        if (isNaN(a_d)) a_d = 0;
-        if (isNaN(b_d)) b_d = 0;
-
-        return  b_d - a_d;
-    },
-    /***
-     * sorting alpha numeric string
-     */
-     "alphanumericSorter": function (a, b) {
-        /*
-         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
-         */
-        return alphanum(a, b);
-    }
-};
-var FieldLoaderHelper = function () {
-    this.delayDuration = 600;
-    this.showLoader = function(targetField) {
-        if(targetField && targetField.length > 0) {
-           $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
-        };
-    };
-
-    this.showUpdate = function(targetField) {
-        targetField = targetField || $(targetField);
-        var __timeout = this.delayDuration;
-        if(targetField && targetField.length > 0) {
-            setTimeout(function() { (function(targetField) {
-                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
-                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
-                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
-                errorField.text("").css("opacity", 0);
-                successField.text("success");
-                loadingField.animate({"opacity": 0}, __timeout, function() {
-                    successField.animate({"opacity": 1}, __timeout, function() {
-                        setTimeout(function() { successField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
-                });
-             });
-            })(targetField); }, __timeout);
-        };
-    };
-
-    this.showError = function(targetField) {
-        targetField = targetField || $(targetField);
-        var __timeout = this.delayDuration;
-        if(targetField && targetField.length > 0) {
-            setTimeout(function() { (function(targetField) {
-                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
-                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
-                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
-                errorField.text("Unable to update. System/Server Error.");
-                successField.text("").css("opacity", 0);
-                loadingField.animate({"opacity": 0}, __timeout, function() {
-                    errorField.animate({"opacity": 1}, __timeout, function() {
-                        setTimeout(function() { errorField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
-                });
-             });
-            })(targetField); }, __timeout);
-        };
-    };
-};
-
-
 
 
