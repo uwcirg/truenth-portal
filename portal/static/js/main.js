@@ -6427,7 +6427,7 @@ var tnthDates = {
         if (sessionLocale) {
             return sessionLocale;
         } else {
-            var locale = "en_us";
+            var locale = "";
             var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
             if (localeSelect) {
                 locale = localeSelect;
@@ -6461,7 +6461,11 @@ var tnthDates = {
                     });
                 }
             }
-            sessionStorage.setItem(sessionKey, locale);
+            if (locale) {
+                sessionStorage.setItem(sessionKey, locale);
+            } else {
+                locale = "en_us";
+            }
             return locale;
         }
     },
