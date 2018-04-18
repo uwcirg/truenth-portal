@@ -1,6 +1,7 @@
 """Unit test module for auth"""
 import datetime
 from tests import TestCase, TEST_USER_ID
+from flask import url_for
 from flask_webtest import SessionScope
 from werkzeug.exceptions import Unauthorized
 
@@ -42,6 +43,15 @@ class TestAuth(TestCase):
         self.assertEquals(rv.status_code, 302)
         new_user = User.query.filter_by(username=data['email']).first()
         self.assertEquals(new_user.active, True)
+
+    def test_register_now(self):
+        """Initiate process to register exiting account"""
+        self.test_user.password = None
+        self.promote_user(role_name=ROLE.ACCESS_ON_VERIFY)
+        self.login()
+
+        rv = self.client.get('/api/user/register-now')
+        self.assertRedirects(rv, url_for('user.register'))
 
     def test_client_add(self):
         """Test adding a client application"""

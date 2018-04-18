@@ -1,7 +1,16 @@
 """User API view functions"""
 from datetime import datetime
-from flask import abort, Blueprint, jsonify, url_for, current_app
-from flask import request, make_response
+from flask import (
+    abort,
+    Blueprint,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    request,
+    session,
+    url_for
+)
 from flask_user import roles_required
 from sqlalchemy import and_
 from sqlalchemy.orm import make_transient
@@ -1065,6 +1074,52 @@ def relationships(user_id):
                         'has the relationship': r.relationship.name,
                         'with': r.other_user_id})
     return jsonify(relationships=results)
+
+
+@user_api.route('/user/register-now')
+@oauth.require_oauth()
+def register_now():
+    """Target for triggering registration of account
+
+    Some flows generate accounts that are not yet ``registered``,
+    such as when given the ``access_on_verify`` role.
+
+    When it's desirable to promote the user to a registered account
+    (eg when they've completed a flow like MUSIC P3P, where stakeholders
+    wanted to avoid the potential disruption of registration), redirect
+    to this endpoint to trigger promotion to a registered account.
+
+    Session variables capture the state, and redirect the user
+    through the common registration mechanism.
+
+    ---
+    tags:
+      - User
+    operationId: registernow
+    produces:
+      - application/json
+    responses:
+      302:
+        description:
+          Redirects user-agent to user.registration after validation
+          and state storage.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+      400:
+        description:
+          if user is already registered or not eligible for some reason
+
+    """
+    user = current_user()
+    if user.is_registered():
+        abort(400, "User already registered")
+    user.mask_email()
+    db.session.commit()
+    session['invited_verified_user_id'] = user.id
+
+    return redirect(url_for('user.register'))
 
 
 @user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
