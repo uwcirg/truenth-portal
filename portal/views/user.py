@@ -17,6 +17,7 @@ from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
+from .auth import logout
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -1115,6 +1116,13 @@ def register_now():
     user = current_user()
     if user.is_registered():
         abort(400, "User already registered")
+    # Need to logout current user, or the opportunity to register
+    # isn't available.  This also clears the session, so do this
+    # step first
+    logout(
+        prevent_redirect=True,
+        reason='give un-registered chance to register new account')
+
     user.mask_email()
     db.session.commit()
     session['invited_verified_user_id'] = user.id
