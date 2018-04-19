@@ -381,7 +381,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
             + '</div>'
             + '<div class="modal-body" style="padding: 0 2em">'
-            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+            + '<br/><h4><span>' + i18next.t("Current consent date:") + '</span><span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
             + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
             + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
             + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
@@ -6876,6 +6876,6 @@ __i18next.init({
             }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
         });
 
-    }, 150);
+    }, 50);
 });
 

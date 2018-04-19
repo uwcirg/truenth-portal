@@ -35,6 +35,8 @@ var __i18next = window.__i18next = (function() {
                         ns: options.ns ? options.ns : ["translation"],
                         defaultNS: "translation",
                         initImmediate: options.initImmediate ? options.initImmediate : false,
+                        keySeparator: "----",
+                        nsSeparator: "----",
                         load: "currentOnly", //this reads language code in en-US, en-AU format
                         returnEmptyString: false,
                         returnNull: false,
@@ -49,6 +51,7 @@ var __i18next = window.__i18next = (function() {
                             var sessionData = sessionStorage.getItem("i18nextData_"+this.lng);
                             if (sessionData) {
                                 var data;
+
                                 try {
                                     data = JSON.parse(sessionData);
                                     if (data && data[key]) return data[key];
@@ -67,7 +70,7 @@ var __i18next = window.__i18next = (function() {
                                  * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
                                  */
                                 var sessionItemKey = "i18nextData_"+options.language;
-                                
+
                                 if (data && (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
                                     if (!cache) {
                                         data['_t'] = new Date();
