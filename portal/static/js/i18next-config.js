@@ -1,8 +1,6 @@
 /*** wrapper object to initalize i18next ***/
 var __i18next = window.__i18next = (function() {
-
     function init(options, callback) {
-
             var getQueryString = (function(a) {
             if (a == "") return {};
             var b = {};
@@ -21,6 +19,7 @@ var __i18next = window.__i18next = (function() {
                 if (window.localStorage.getItem("i18nextLng")) window.localStorage.removeItem("i18nextLng");
             };
             if (!options) options = {};
+            if (options.lng) options.lng = options.lng.replace("_", "-");
             /*
              * consuming translation json from each corresponding locale
              */
@@ -29,30 +28,26 @@ var __i18next = window.__i18next = (function() {
             i18next.use(i18nextXHRBackend)
                     .use(i18nextBrowserLanguageDetector)
                     .init({
-                    /*
-                     * language abbrev in underscore format e.g. en_US as set by portal, is not recognized by i18next so need to make sure 
-                     * to replace _ with - which it recognizes
-                     */
-                    fallbackLng: options.fallbackLng ? options.fallbackLng.replace("_", "-") : "en-US",
-                    lng: options.lng? options.lng.replace("_", "-"): "en-US",
-                    debug: options.debug ? options.debug : (getQueryString["debugi18next"]? true: false),
-                    ns: options.ns ? options.ns : ["translation"],
-                    defaultNS: "translation",
-                    initImmediate: options.initImmediate ? options.initImmediate : false,
-                    load: "currentOnly", //this reads language code in en-US, en-AU format
-                    returnEmptyString: false,
-                    returnNull: false,
-                    saveMissing: true,
-                    missingKeyHandler: function(lng, ns, key, fallbackValue) {
-                        if (options.missingKeyHandler) options.missingKeyHandler(lng, ns, key, fallbackValue);
-                    },
-                    backend: {
-                       // load from static file
-                       loadPath: source
-                     }
+                        fallbackLng: options.fallbackLng ? options.fallbackLng.replace("_", "-") : "en-US",
+                        lng: options.lng? options.lng: "en-US",
+                        preload: options.lng? [options.lng] : false,
+                        debug: options.debug ? options.debug : (getQueryString["debugi18next"]? true: false),
+                        ns: options.ns ? options.ns : ["translation"],
+                        defaultNS: "translation",
+                        initImmediate: options.initImmediate ? options.initImmediate : false,
+                        load: "currentOnly", //this reads language code in en-US, en-AU format
+                        returnEmptyString: false,
+                        returnNull: false,
+                        saveMissing: true,
+                        missingKeyHandler: function(lng, ns, key, fallbackValue) {
+                            if (options.missingKeyHandler) options.missingKeyHandler(lng, ns, key, fallbackValue);
+                        },
+                        backend: {
+                           // load from static file
+                           loadPath: source
+                        }
                   }, function(err, t) {
-                    if (callback) callback();
-                    __NOT_PROVIDED_TEXT = i18next.t("not provided");
+                    if (callback) callback(t);
                   });
     };
 
