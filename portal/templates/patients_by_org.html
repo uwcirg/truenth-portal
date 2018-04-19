@@ -131,37 +131,40 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
+
+  var AT, sortObj;
+
+  AT = new window.portal.AdminTool({{user.id}}, "patientList", {
+        "tnthAjax": tnthAjax,
+        "i18next": i18next,
+        "tnthDates": tnthDates
+  });
+  sortObj = AT.getTablePreference({{user.id}});
+  /*
+  * initializing bootstrapTable
+  */
+  $("#adminTable").bootstrapTable({
+    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+      var rowInfo;
+      setTimeout(function() {
+        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+        replace("{pageFrom}", pageFrom).
+        replace("{pageTo}", pageTo).
+        replace("{totalRows}", totalRows);
+        $(".pagination-detail .pagination-info").html(rowInfo);
+      }, 150);
+    },
+    sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
+    sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
+    filterBy: sortObj,
+    exportOptions: {
+        fileName: __getExportFileName('{{_("PatientList_")}}')
+    }
+  });
   __i18next.init({
       "lng": tnthDates.getUserLocale()
   }, function() {
     setTimeout(function() {
-      var AT = new window.portal.AdminTool({{user.id}}, "patientList", {
-        "tnthAjax": tnthAjax,
-        "i18next": i18next,
-        "tnthDates": tnthDates
-      });
-      var sortObj = AT.getTablePreference({{user.id}});
-      /*
-      * initializing bootstrapTable
-      */
-      $("#adminTable").bootstrapTable({
-        formatShowingRows: function (pageFrom, pageTo, totalRows) {
-            var thisId = $(this).attr("tableId");
-            var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-              replace("{pageFrom}", pageFrom).
-              replace("{pageTo}", pageTo).
-              replace("{totalRows}", totalRows);
-            $("#tableCount"+thisId).html(rowInfo);
-            return rowInfo;
-        },
-        sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
-        sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
-        filterBy: sortObj,
-        exportOptions: {
-            fileName: __getExportFileName("PatientList_")
-        }
-      });
-
       $(document).ready(function() {
         /*
         *  scroll to the top of page on each page change
