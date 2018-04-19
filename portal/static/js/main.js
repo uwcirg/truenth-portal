@@ -2918,7 +2918,6 @@ var Profile = function(subjectId, currentUserId) {
             saveLoaderDiv("profileForm", $("#"+fn).attr("data-save-container-id"));
             var fd = $("#" + fn);
             var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
-            var self = this;
             fd.on(triggerEvent, function() {
                  var d = $("#deathDay");
                  var m = $("#deathMonth");
