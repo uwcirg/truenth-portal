@@ -48,10 +48,12 @@ class TestAuth(TestCase):
         """Initiate process to register exiting account"""
         self.test_user.password = None
         self.promote_user(role_name=ROLE.ACCESS_ON_VERIFY)
+        user = db.session.merge(self.test_user)
+        email = user.email
         self.login()
 
         rv = self.client.get('/api/user/register-now')
-        self.assertRedirects(rv, url_for('user.register'))
+        self.assertRedirects(rv, url_for('user.register', email=email))
 
     def test_client_add(self):
         """Test adding a client application"""
