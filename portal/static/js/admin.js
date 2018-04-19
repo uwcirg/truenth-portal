@@ -388,8 +388,9 @@
                 setTimeout(function() { showLoader(); location.reload(); }, 150);
               });
             });
-
-          $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Select All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Clear All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Close") + "</span></label></div>");
+          if ($("#orglist-footer-container").length === 0) {
+            $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Select All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Clear All") + "</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>" + i18next.t("Close") + "</span></label></div>");
+          }
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
               var orgsList = [];

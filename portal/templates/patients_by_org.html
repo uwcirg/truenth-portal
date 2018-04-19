@@ -131,77 +131,84 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-var AT = new window.portal.AdminTool({{user.id}}, "patientList", {
-  "tnthAjax": tnthAjax,
-  "i18next": i18next,
-  "tnthDates": tnthDates
-});
-var sortObj = AT.getTablePreference({{user.id}});
-/*
-* initializing bootstrapTable
-*/
-$("#adminTable").bootstrapTable({
-  formatShowingRows: function (pageFrom, pageTo, totalRows) {
-      var thisId = $(this).attr("tableId");
-      var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-        replace("{pageFrom}", pageFrom).
-        replace("{pageTo}", pageTo).
-        replace("{totalRows}", totalRows);
-      $("#tableCount"+thisId).html(rowInfo);
-      return rowInfo;
-  },
-  sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
-  sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
-  filterBy: sortObj,
-  exportOptions: {
-      fileName: __getExportFileName("PatientList_")
-  }
-});
-
-$(document).ready(function() {
-	/*
-	*  scroll to the top of page on each page change
-	*/
- 	$("#adminTable").on("page-change.bs.table", function() {
-    	if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
- 	}).on("sort.bs.table", function(e, name, order) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}, AT.tableIdentifier, name, order); }, 10);
- 	}).on("column-search.bs.table", function(e, name, text) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
-	}).on("column-switch.bs.table", function(e, field, checked) {
-    	setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
-	});
-
-  AT.init(function() {
-    /*
-     *  hide checkbox for hidden id field from side menu
-     */
-    $("input[data-field='id']:checkbox").hide();
-     /*
-      * add placeholder text for filter controls
+  __i18next.init({
+      "lng": tnthDates.getUserLocale()
+  }, function() {
+    setTimeout(function() {
+      var AT = new window.portal.AdminTool({{user.id}}, "patientList", {
+        "tnthAjax": tnthAjax,
+        "i18next": i18next,
+        "tnthDates": tnthDates
+      });
+      var sortObj = AT.getTablePreference({{user.id}});
+      /*
+      * initializing bootstrapTable
       */
-    (function() {
-       function addFilterPlaceHolders() {
-         $("#adminTable .filterControl input").attr("placeholder", "{{_('Enter Text')}}");
-         $("#adminTable .filterControl select option[value='']").text("Select");
-       }
-       $("#adminTable").on("reset-view.bs.table", function() {
-          addFilterPlaceHolders();
-       });
-       addFilterPlaceHolders();
-    })();
-    AT.rowLinkEvent();
-    AT.setColumnSelections();
-    AT.initOrgsList(false, "patients");
-    setTimeout(function() { AT.fadeLoader(); }, 2500);
+      $("#adminTable").bootstrapTable({
+        formatShowingRows: function (pageFrom, pageTo, totalRows) {
+            var thisId = $(this).attr("tableId");
+            var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+              replace("{pageFrom}", pageFrom).
+              replace("{pageTo}", pageTo).
+              replace("{totalRows}", totalRows);
+            $("#tableCount"+thisId).html(rowInfo);
+            return rowInfo;
+        },
+        sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
+        sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
+        filterBy: sortObj,
+        exportOptions: {
+            fileName: __getExportFileName("PatientList_")
+        }
+      });
+
+      $(document).ready(function() {
+        /*
+        *  scroll to the top of page on each page change
+        */
+        $("#adminTable").on("page-change.bs.table", function() {
+            if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+        }).on("sort.bs.table", function(e, name, order) {
+            setTimeout(function() { AT.setTablePreference({{user.id}}, AT.tableIdentifier, name, order); }, 10);
+        }).on("column-search.bs.table", function(e, name, text) {
+            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
+        }).on("column-switch.bs.table", function(e, field, checked) {
+            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
+        });
+
+        AT.init(function() {
+          /*
+           *  hide checkbox for hidden id field from side menu
+           */
+          $("input[data-field='id']:checkbox").hide();
+           /*
+            * add placeholder text for filter controls
+            */
+          (function() {
+             function addFilterPlaceHolders() {
+               $("#adminTable .filterControl input").attr("placeholder", "{{_('Enter Text')}}");
+               $("#adminTable .filterControl select option[value='']").text("Select");
+             }
+             $("#adminTable").on("reset-view.bs.table", function() {
+                addFilterPlaceHolders();
+             });
+             addFilterPlaceHolders();
+          })();
+          AT.rowLinkEvent();
+          AT.setColumnSelections();
+          AT.initOrgsList(false, "patients");
+          setTimeout(function() { AT.fadeLoader(); }, 550);
+        });
+
+        {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
+          $("#patientReportLoader").html( __getLoaderHTML());
+          $("#patientReportModal").modal({"show": false});
+        {% endif %}
+
+      });
+
+    }, 50);
+
   });
-
-  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-    $("#patientReportLoader").html( __getLoaderHTML());
-    $("#patientReportModal").modal({"show": false});
-  {% endif %}
-
-});
-
 {% endblock %}
 

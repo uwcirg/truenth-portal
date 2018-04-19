@@ -75,46 +75,50 @@
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block document_ready %}
-var AT = new window.portal.AdminTool(
-{{user.id}},
-"adminList",
-{
-  "tnthAjax": tnthAjax,
-  "i18next": i18next,
-  "tnthDates": tnthDates
-});
-$("#adminTable").bootstrapTable({
-    formatShowingRows: function (pageFrom, pageTo, totalRows) {
-        var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-          replace("{pageFrom}", pageFrom).
-          replace("{pageTo}", pageTo).
-          replace("{totalRows}", totalRows);
-        $("#tableCount").html(rowInfo);
-        return rowInfo;
-    },
-    exportOptions: {
-        fileName: __getExportFileName("StaffList_")
-    }
-});
+ __i18next.init({
+  "lng": tnthDates.getUserLocale()
+}, function() {
+  setTimeout(function() {
+    var AT = new window.portal.AdminTool(
+    {{user.id}},
+    "adminList",
+    {
+      "tnthAjax": tnthAjax,
+      "i18next": i18next,
+      "tnthDates": tnthDates
+    });
+    $("#adminTable").bootstrapTable({
+        formatShowingRows: function (pageFrom, pageTo, totalRows) {
+            var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+              replace("{pageFrom}", pageFrom).
+              replace("{pageTo}", pageTo).
+              replace("{totalRows}", totalRows);
+            $("#tableCount").html(rowInfo);
+            return rowInfo;
+        },
+        exportOptions: {
+            fileName: __getExportFileName("StaffList_")
+        }
+    });
 
-/*
- * add placeholder text for filter controls
- */
-(function() {
-  function addFilterPlaceHolders() {
-    $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
-    $("#adminTable .filterControl select option[value='']").text("Select");
-  }
-  $("#adminTable").on("reset-view.bs.table", function() {
-    addFilterPlaceHolders();
-  });
-  addFilterPlaceHolders();
-})();
-$(document).ready(function() {
-  setTimeout(function() { AT.fadeLoader(); }, 100);
+    /*
+     * add placeholder text for filter controls
+     */
+    (function() {
+      function addFilterPlaceHolders() {
+        $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
+        $("#adminTable .filterControl select option[value='']").text("Select");
+      }
+      $("#adminTable").on("reset-view.bs.table", function() {
+        addFilterPlaceHolders();
+      });
+      addFilterPlaceHolders();
+    })();
+    $(document).ready(function() {
+      setTimeout(function() { AT.fadeLoader(); }, 100);
+    });
+  }, 150);
 });
-
-
 /** Example of how we could have a select to limit to a particular role. Needs more work
 because only looks at entire field
 $("#adminTableToolbar").on("click",function(){
