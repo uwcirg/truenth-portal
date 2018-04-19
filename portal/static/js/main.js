@@ -921,6 +921,64 @@ var fillContent = {
             });
         };
     },
+    "footer": function() {
+        if ($("#homeFooter .logo-link").length > 0) {
+            $("#homeFooter .logo-link").each(function() {
+                if (!$.trim($(this).attr("href"))) {
+                    $(this).removeAttr("target");
+                    $(this).on("click", function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                }
+            });
+        }
+
+        // Reveal footer after load to avoid any flashes will above content loads
+        setTimeout(function() { $("#homeFooter").show(); }, 100);
+
+        setTimeout(function() {
+            var userLocale = $("#copyrightLocaleCode").val();
+            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
+            var getContent = function(cc) {
+                var content = "";
+                switch(String(cc.toUpperCase())) {
+                    case "US":
+                    case "EN_US":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                        break;
+                    case "AU":
+                    case "EN_AU":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                        break;
+                    case "NZ":
+                    case "EN_NZ":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                        break;
+                    default:
+                        content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+
+                }
+                return content;
+
+            };
+            if (userLocale) {
+                $(footerElements).html(getContent(userLocale));
+            } else {
+                $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
+                    if (data && data.country_code) {
+                        //country code
+                        //Australia AU
+                        //New Zealand NZ
+                        //USA US
+                        $(footerElements).html(getContent(data.country_code));
+                    } else {
+                        $(footerElements).html(getContent());
+                    }
+                });
+            }
+        }, 500);
+    },
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
@@ -6669,212 +6727,158 @@ __i18next.init({
     "debug": false,
     "initImmediate": false,
     "lng": userSetLang
-});
+}, function() {
+    setTimeout(function() {
+        $(document).ready(function() {
 
-$(document).ready(function() {
-
-    var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
-    if (PORTAL_NAV_PAGE) {
-        loader(true);
-        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
-    } else {
-        loader();
-    }
-
-    var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-    if (LOGIN_AS_PATIENT) {
-        /*
-         * need to clear current user locale in session storage when logging in as patient
-         */
-        sessionStorage.removeItem("currentUserLocale");
-        if (typeof history !== "undefined" && history.pushState) {
-            history.pushState(null, null, location.href);
-        }
-        window.addEventListener("popstate", function(event) {
-            if (typeof history !== "undefined" && history.pushState) {
-                history.pushState(null, null, location.href);
+            var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
+            if (PORTAL_NAV_PAGE) {
+                loader(true);
+                fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
             } else {
-                window.history.forward(1);
+                loader();
             }
-        });
-    }
-
-    if ($("#homeFooter .logo-link").length > 0) {
-        $("#homeFooter .logo-link").each(function() {
-            if (!$.trim($(this).attr("href"))) {
-                $(this).removeAttr("target");
-                $(this).on("click", function(e) {
-                    e.preventDefault();
-                    return false;
+            var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+            if (LOGIN_AS_PATIENT) {
+                /*
+                 * need to clear current user locale in session storage when logging in as patient
+                 */
+                sessionStorage.removeItem("currentUserLocale");
+                if (typeof history !== "undefined" && history.pushState) {
+                    history.pushState(null, null, location.href);
+                }
+                window.addEventListener("popstate", function(event) {
+                    if (typeof history !== "undefined" && history.pushState) {
+                        history.pushState(null, null, location.href);
+                    } else {
+                        window.history.forward(1);
+                    }
                 });
             }
-        });
-    }
 
-    // Reveal footer after load to avoid any flashes will above content loads
-    setTimeout(function() { $("#homeFooter").show(); }, 100);
+            tnthAjax.beforeSend();
 
-    setTimeout(function() {
-        var userLocale = $("#copyrightLocaleCode").val();
-        var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
-        var getContent = function(cc) {
-            var content = "";
-            switch(String(cc.toUpperCase())) {
-                case "US":
-                case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
-                    break;
-                case "AU":
-                case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
-                    break;
-                case "NZ":
-                case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
-                    break;
-                default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+            fillContent.footer();
 
+            if ($("#termsContainer.website-consent-script").length > 0) {
+                fillContent.websiteConsentScript();
             }
-            return content;
 
-        };
-        if (userLocale) {
-            $(footerElements).html(getContent(userLocale));
-        } else {
-            $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
-                if (data && data.country_code) {
-                    //country code
-                    //Australia AU
-                    //New Zealand NZ
-                    //USA US
-                    $(footerElements).html(getContent(data.country_code));
-                } else {
-                    $(footerElements).html(getContent());
-                }
-            });
-        }
-    }, 500);
+            __NOT_PROVIDED_TEXT = i18next.t("not provided");
 
-    tnthAjax.beforeSend();
+            var profileObj;
+            if ($("#profileForm").length > 0) {
+                profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
+                profileObj.init();
+            } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
+                /*
+                 * initial queries  - only selected sections
+                 */
+                profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
+                profileObj.initSection("orgsstateselector");
+                profileObj.initSection("biopsy");
+            } else if ($("#createProfileForm").length > 0) {
+                profileObj = new Profile("", $("#currentStaffUserId").val());
+                profileObj.initSections();
+            }
 
-
-    if ($("#termsContainer.website-consent-script").length > 0) {
-        fillContent.websiteConsentScript();
-    }
-
-    __NOT_PROVIDED_TEXT = i18next.t("not provided");
-
-    var profileObj;
-    if ($("#profileForm").length > 0) {
-        profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
-        profileObj.init();
-    } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
-        /*
-         * initial queries  - only selected sections
-         */
-        profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
-        profileObj.initSection("orgsstateselector");
-        profileObj.initSection("biopsy");
-    } else if ($("#createProfileForm").length > 0) {
-        profileObj = new Profile("", $("#currentStaffUserId").val());
-        profileObj.initSections();
-    }
-
-    //setTimeout('LRKeyEvent();', 1500);
-    // To validate a form, add class to <form> and validate by ID.
-    $('form.to-validate').validator({
-        custom: {
-            birthday: function($el) {
-                var m = parseInt($("#month").val());
-                var d = parseInt($("#date").val());
-                var y = parseInt($("#year").val());
-                // If all three have been entered, run check
-                var goodDate = true;
-                var errorMsg = "";
-                // If NaN then the values haven't been entered yet, so we
-                // validate as true until other fields are entered
-                if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                    $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
-                    goodDate = false;
-                } else if (isNaN(d)) {
-                    errorMsg = i18next.t("Please enter a valid date.");
-                } else if (isNaN(m)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
-                } else if (isNaN(y)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
-                };
-
-                if (hasValue(errorMsg)) {
-                    $("#errorbirthday").html(errorMsg).show();
-                    $("#birthday").val("");
-                    goodDate = false;
-                }
-                //}
-                //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
-                if (goodDate) {
-                    $("#errorbirthday").html("").hide();
-                };
-
-                return goodDate;
-            },
-            customemail: function($el) {
-                var emailVal = $.trim($el.val());
-                var update = function($el) {
-                    if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
-                        assembleContent.demo($el.attr("data-user-id"),true, $el);
-                    };
-                };
-                if (emailVal === "") {
-                    if ($el.attr("data-optional")) {
-                        /*
-                        * if email address is optional, update it as is
-                        */
-                        update($el);
-                        return true;
-                    } else {
-                        return false;
-                    };
-                }
-                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                // Add user_id to api call (used on patient_profile page so that staff can edit)
-                var addUserId = "";
-                if (hasValue($el.attr("data-user-id"))) {
-                    addUserId = "&user_id="+ $el.attr("data-user-id");
-                }
-                // If this is a valid address, then use unique_email to check whether it's already in use
-                if (emailReg.test(emailVal)) {
-                    tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
-                        if (!data.error) {
-                            if (data.unique) {
-                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                update($el);
-                            } else {
-                                $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                            };
-
-                        } else {
-                            console.log(i18next.t("Problem retrieving data from server."));
+            //setTimeout('LRKeyEvent();', 1500);
+            // To validate a form, add class to <form> and validate by ID.
+            $('form.to-validate').validator({
+                custom: {
+                    birthday: function($el) {
+                        var m = parseInt($("#month").val());
+                        var d = parseInt($("#date").val());
+                        var y = parseInt($("#year").val());
+                        // If all three have been entered, run check
+                        var goodDate = true;
+                        var errorMsg = "";
+                        // If NaN then the values haven't been entered yet, so we
+                        // validate as true until other fields are entered
+                        if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                            $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
+                            goodDate = false;
+                        } else if (isNaN(d)) {
+                            errorMsg = i18next.t("Please enter a valid date.");
+                        } else if (isNaN(m)) {
+                            errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
+                        } else if (isNaN(y)) {
+                            errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
                         };
-                    });
-                }
-                return emailReg.test(emailVal);
-            },
-            htmltags: function($el) {
-                var invalid = containHtmlTags($el.val());
-                if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
-                else $("#error" + $el.attr("id")).html("");
-                return !invalid;
-            }
-        },
-        errors: {
-            htmltags: i18next.t("Please remove invalid characters and try again."),
-            birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
-            customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
-        },
-        disable: false
-    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
+                        if (hasValue(errorMsg)) {
+                            $("#errorbirthday").html(errorMsg).show();
+                            $("#birthday").val("");
+                            goodDate = false;
+                        }
+                        //}
+                        //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
+                        if (goodDate) {
+                            $("#errorbirthday").html("").hide();
+                        };
+
+                        return goodDate;
+                    },
+                    customemail: function($el) {
+                        var emailVal = $.trim($el.val());
+                        var update = function($el) {
+                            if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
+                                assembleContent.demo($el.attr("data-user-id"),true, $el);
+                            };
+                        };
+                        if (emailVal === "") {
+                            if ($el.attr("data-optional")) {
+                                /*
+                                * if email address is optional, update it as is
+                                */
+                                update($el);
+                                return true;
+                            } else {
+                                return false;
+                            };
+                        }
+                        var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        // Add user_id to api call (used on patient_profile page so that staff can edit)
+                        var addUserId = "";
+                        if (hasValue($el.attr("data-user-id"))) {
+                            addUserId = "&user_id="+ $el.attr("data-user-id");
+                        }
+                        // If this is a valid address, then use unique_email to check whether it's already in use
+                        if (emailReg.test(emailVal)) {
+                            tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
+                                if (!data.error) {
+                                    if (data.unique) {
+                                        $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                        update($el);
+                                    } else {
+                                        $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
+                                    };
+
+                                } else {
+                                    console.log(i18next.t("Problem retrieving data from server."));
+                                };
+                            });
+                        }
+                        return emailReg.test(emailVal);
+                    },
+                    htmltags: function($el) {
+                        var invalid = containHtmlTags($el.val());
+                        if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                        else $("#error" + $el.attr("id")).html("");
+                        return !invalid;
+                    }
+                },
+                errors: {
+                    htmltags: i18next.t("Please remove invalid characters and try again."),
+                    birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
+                    customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
+                },
+                disable: false
+            }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+        });
+
+    }, 150);
 });
+
 
 
