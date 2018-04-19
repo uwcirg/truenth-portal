@@ -153,6 +153,7 @@
         replace("{totalRows}", totalRows);
         $(".pagination-detail .pagination-info").html(rowInfo);
       }, 50);
+      return rowInfo;
     },
     formatRecordsPerPage: function(pageNumber) {
       return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
