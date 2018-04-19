@@ -68,7 +68,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_assessment_link())
 
     def _lookup_assessment_link():
-        label = _(u'Compete Questionnaire')
+        label = _(u'Complete Questionnaire')
         return (
             '<a href="{ae_link}">{label}</a>'.format(
                 ae_link=ae_link(), label=label))
