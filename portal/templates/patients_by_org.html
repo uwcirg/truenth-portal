@@ -152,7 +152,10 @@
         replace("{pageTo}", pageTo).
         replace("{totalRows}", totalRows);
         $(".pagination-detail .pagination-info").html(rowInfo);
-      }, 150);
+      }, 50);
+    },
+    formatRecordsPerPage: function(pageNumber) {
+      return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
     },
     sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
     sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",

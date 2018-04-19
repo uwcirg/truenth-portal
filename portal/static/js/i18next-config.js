@@ -42,9 +42,76 @@ var __i18next = window.__i18next = (function() {
                         missingKeyHandler: function(lng, ns, key, fallbackValue) {
                             if (options.missingKeyHandler) options.missingKeyHandler(lng, ns, key, fallbackValue);
                         },
+                        parseMissingKeyHandler: function(key) {
+                            /*
+                             * allow lookup for translated text for missing key
+                             */
+                            var sessionData = sessionStorage.getItem("i18nextData_"+this.lng);
+                            if (sessionData) {
+                                var data;
+                                try {
+                                    data = JSON.parse(sessionData);
+                                    if (data && data[key]) return data[key];
+                                } catch(e) {
+                                    return key;
+                                }
+                            }
+                            return key;
+                        },
                         backend: {
-                           // load from static file
-                           loadPath: source
+                            // load from static file
+                            language: options.lng,
+                            loadPath: source,
+                            ajax: function(url, options, callback, data, cache) {
+                                /*
+                                 * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
+                                 */
+                                 var sessionItemKey = "i18nextData_"+options.language;
+                                if (data && (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+                                    if (!cache) {
+                                        data['_t'] = new Date();
+                                    }
+                                    // URL encoded form data must be in querystring format
+                                    data = addQueryString('', data).slice(1);
+                                }
+
+                                if (options.queryStringParams) {
+                                    url = addQueryString(url, options.queryStringParams);
+                                }
+
+                                try {
+                                    var x;
+                                    if (XMLHttpRequest) {
+                                        x = new XMLHttpRequest();
+                                    } else {
+                                        x = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+                                    }
+                                    //use sync
+                                    x.open(data ? 'POST' : 'GET', url, 0);
+                                    if (!options.crossDomain) {
+                                        x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                                    }
+                                    x.withCredentials = !!options.withCredentials;
+                                    if (data) {
+                                        x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                                    }
+                                    if (x.overrideMimeType) {
+                                        x.overrideMimeType("application/json");
+                                    }
+                                    var h = options.customHeaders;
+                                    if (h) {
+                                      for (var i in h) {
+                                        x.setRequestHeader(i, h[i]);
+                                      }
+                                    }
+                                    x.onreadystatechange = function () {
+                                        x.readyState > 3 && callback && callback(x.responseText, x) && sessionStorage.setItem(sessionItemKey, JSON.stringify(x.responseText));
+                                    };
+                                    x.send(data);
+                                } catch (e) {
+                                    console && console.log(e);
+                                }
+                            }
                         }
                   }, function(err, t) {
                     if (callback) callback(t);
