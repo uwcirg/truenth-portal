@@ -411,10 +411,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.login()
         self.add_required_clinical_data(backdate=timedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
-        self.test_user.save_constrained_observation(
+        self.test_user.save_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.FALSE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='final')
+            status='final', issued=None)
 
         # Confirm test user doesn't qualify for ST QB
         self.assertFalse(QuestionnaireBank.qbs_for_user(

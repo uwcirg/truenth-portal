@@ -733,9 +733,8 @@ class User(db.Model, UserMixin):
     def fetch_value_status_for_concept(self, codeable_concept):
         """Return matching ValueQuantity & status for this user
 
-        Expected to be used on constrained concepts, where a user
-        should have zero or one defined.  More than one will raise
-        a value error
+        Given the possibility of multiple matching observations, returns
+        the most current info available.
 
         :returns: (value_quantity, status) tuple for the observation
          if found on the user, else (None, None)
@@ -749,11 +748,20 @@ class User(db.Model, UserMixin):
             obs.codeable_concept_id == codeable_concept.id]
         if not matching_obs:
             return None, None
+
         if len(matching_obs) > 1:
-            raise ValueError(
-                "multiple observations for {} on constrianed {}".format(
-                    self, codeable_concept))
-        return matching_obs[0].value_quantity, matching_obs[0].status
+            # Given multiple matches, select the most recent from the set
+            newest = UserObservation.query.join(Audit).filter(and_(
+                UserObservation.user_id == self.id,
+                UserObservation.observation_id.in_(
+                    [o.id for o in matching_obs]),
+                UserObservation.audit_id == Audit.id)).order_by(
+                Audit.timestamp.desc()).first()
+            bestmatch = [o for o in matching_obs if o.id == newest.observation_id][0]
+        else:
+            bestmatch = matching_obs[0]
+
+        return bestmatch.value_quantity, bestmatch.status
 
     def fetch_datetime_for_concept(self, codeable_concept):
         """Return newest issued timestamp from matching observation"""
@@ -768,57 +776,27 @@ class User(db.Model, UserMixin):
                      if o.issued is not None)
         return newest
 
-    def save_constrained_observation(
-            self, codeable_concept, value_quantity, audit, status,
-            issued=None):
-        """Add or update the value for given concept as observation
-
-        We can store any number of observations for a patient, and
-        for a given concept, any number of values.  BUT sometimes we
-        just want to update the value and retain a single observation
-        for the concept.  Use this method is such a case, i.e. for
-        a user's 'biopsy' status.
-
-        """
-        # User may not have persisted concept or value - CYA
-        codeable_concept = codeable_concept.add_if_not_found()
-        value_quantity = value_quantity.add_if_not_found()
-
-        existing = [obs for obs in self.observations if
-                    obs.codeable_concept_id == codeable_concept.id]
-        assert len(existing) < 2  # it's a constrained concept afterall
-
-        if existing:
-            if existing[0].value_quantity_id == value_quantity.id:
-                # perfect match -- update audit info, setting status
-                # and issued as given
-                existing[0].status = status
-                if issued:
-                    existing[0].issued = issued
-                existing[0].audit = audit
-                return
-            else:
-                # We don't want multiple observations for this concept
-                # with different values.  Delete old and add new
-                self.observations.remove(existing[0])
-
-        self.save_observation(codeable_concept, value_quantity, audit, status, issued)
-
-    def save_observation(self, cc, vq, audit, status, issued):
+    def save_observation(
+            self, codeable_concept, value_quantity, audit, status, issued):
         """Helper method for creating new observations"""
         # avoid cyclical imports
         from .assessment_status import invalidate_assessment_status_cache
 
+        # User may not have persisted concept or value - CYA
+        codeable_concept = codeable_concept.add_if_not_found()
+        value_quantity = value_quantity.add_if_not_found()
+
         observation = Observation(
-            codeable_concept_id=cc.id,
+            codeable_concept_id=codeable_concept.id,
             status=status,
             issued=issued,
-            value_quantity_id=vq.id).add_if_not_found(True)
+            value_quantity_id=value_quantity.id).add_if_not_found(True)
         # The audit defines the acting user, to which the current
         # encounter is attached.
         encounter = get_user(audit.user_id).current_encounter
-        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
-                        observation_id=observation.id).add_if_not_found()
+        db.session.add(UserObservation(
+            user_id=self.id, encounter=encounter, audit=audit,
+            observation_id=observation.id))
         invalidate_assessment_status_cache(self.id)
         return observation
 

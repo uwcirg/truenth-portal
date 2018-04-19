@@ -274,31 +274,12 @@ class UserObservation(db.Model):
         db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
-
     audit = db.relationship('Audit', cascade="save-update, delete")
-
     encounter = db.relationship('Encounter', cascade='delete')
-
-    __table_args__ = (UniqueConstraint('user_id', 'observation_id',
-        name='_user_observation'),)
-
-    def add_if_not_found(self):
-        """Add self to database, or return existing
-
-        Queries for matching, existing UserObservation.
-        Populates self.id if found, adds to database first if not.
-
-        """
-        if self.id:
-            return self
-
-        match = self.query.filter_by(user_id=self.user_id,
-                observation_id=self.observation_id).first()
-        if not match:
-            db.session.add(self)
-        elif self is not match:
-            self = db.session.merge(match)
-        return self
+    # There was a time when UserObservations were constrained to
+    # one per (user_id, observation_id).  As history is important
+    # and the same observation may be made twice, this constraint
+    # was removed.
 
 
 class UserIndigenous(db.Model):

@@ -179,7 +179,7 @@ class TestCase(Base):
         if backdate:
             timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-            get_user(TEST_USER_ID).save_constrained_observation(
+            get_user(TEST_USER_ID).save_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=timestamp)
 
