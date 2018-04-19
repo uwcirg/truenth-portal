@@ -36,19 +36,36 @@ def time_request(url):
     return response
 
 
-def get_terms(org=None, role=None):
+def get_terms(locale_code, org=None, role=None):
     """Shortcut to lookup correct terms given org and role"""
     if org:
         try:
-            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.
-                                               name_key(organization=org, role=role)))
+            terms = VersionedResource(
+                app_text(WebsiteConsentTermsByOrg_ATMA.name_key(
+                    organization=org, role=role)),
+                locale_code=locale_code)
         except UndefinedAppText:
-            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+            terms = VersionedResource(
+                app_text(InitialConsent_ATMA.name_key()),
+                locale_code=locale_code)
 
     else:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+        terms = VersionedResource(
+            app_text(InitialConsent_ATMA.name_key()),
+            locale_code=locale_code)
 
     return terms
+
+
+def localize_url(url, locale_code):
+    """Append language tag to URL and return"""
+    if not locale_code:
+        return url
+    if url and 'languageId' not in url:
+        delimiter = '&' if '?' in url else '?'
+        return "{url}{delimiter}languageId={locale_code}".format(
+                url=url, delimiter=delimiter, locale_code=locale_code)
+    return url
 
 
 class AppText(db.Model):
@@ -393,7 +410,7 @@ class UnversionedResource(object):
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    def __init__(self, url, variables=None):
+    def __init__(self, url, locale_code, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch the asset, permanent version of URL and link
@@ -403,6 +420,7 @@ class VersionedResource(object):
         will be defined, and returned in a request for the asset attribute.
 
         :param url: the URL to pull details and asset from
+        :param locale_code: typically the user's preferred language
 
         :attribute asset: will contain the html asset downloaed, found in the
             cache, or the error message if that fails.
@@ -412,13 +430,13 @@ class VersionedResource(object):
 
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
-        self.url = url
+        self.url = localize_url(url, locale_code)
         self.variables = variables or {}
         try:
-            response = time_request(url)
+            response = time_request(self.url)
             self._asset = response.json().get('asset')
             self.url = self._permanent_url(
-                generic_url=url, version=response.json().get('version'))
+                generic_url=self.url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
         except MissingSchema:
             if current_app.config.get('TESTING'):
@@ -439,7 +457,7 @@ class VersionedResource(object):
                 "reached")
 
         if self.error_msg:
-            current_app.logger.error(self.error_msg + ": {}".format(url))
+            current_app.logger.error(self.error_msg + ": {}".format(self.url))
 
     @property
     def asset(self):
@@ -484,7 +502,7 @@ class VersionedResource(object):
 class MailResource(object):
     """Helper to manage versioned mail resource URLs (typically on Liferay)"""
 
-    def __init__(self, url, variables=None):
+    def __init__(self, url, locale_code, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch the mail fields, permanent version of URL and link
@@ -494,6 +512,7 @@ class MailResource(object):
         will be defined, and returned in a request for the asset attribute.
 
         :param url: the URL to pull details and asset from
+        :param locale_code: typically the user's preferred language
 
         :attribute subject: will contain the email subject download, found
             in the cache, or the error message if that fails.
@@ -506,17 +525,17 @@ class MailResource(object):
         """
         self._subject, self._body, self._footer = None, None, None
         self.error_msg, self.editor_url = None, None
-        self.url = url
+        self.url = localize_url(url, locale_code)
         self.variables = variables or {}
         try:
-            response = time_request(url)
+            response = time_request(self.url)
             self._subject = response.json().get('subject')
             self._body = response.json().get('body')
             if current_app.config.get("DEBUG_EMAIL", False):
                 self._body += '{debug_slot}'
             self._footer = response.json().get('footer')
             self.url = self._permanent_url(
-                generic_url=url, version=response.json().get('version'))
+                generic_url=self.url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
         except MissingSchema:
             if current_app.config.get('TESTING'):
@@ -540,7 +559,7 @@ class MailResource(object):
                 "reached")
 
         if self.error_msg:
-            current_app.logger.error(self.error_msg + ": {}".format(url))
+            current_app.logger.error(self.error_msg + ": {}".format(self.url))
 
     @property
     def subject(self):

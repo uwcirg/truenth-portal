@@ -65,7 +65,7 @@ class TestAppText(TestCase):
             '{origin}/c/portal/truenth/asset?uuid={uuid}&'
             'version={version}'.format(**args))
 
-        result = VersionedResource(sample)._permanent_url(
+        result = VersionedResource(sample, locale_code='en_AU')._permanent_url(
             generic_url=sample, version=args['version'])
         self.assertTrue(Url(result) == Url(expected))
 
@@ -85,7 +85,7 @@ class TestAppText(TestCase):
         sample_url = "https://notarealwebsitebeepboop.com"
         sample_error = (
             "Could not retrieve remove content - Server could not be reached")
-        result = VersionedResource(sample_url)
+        result = VersionedResource(sample_url, locale_code=None)
         self.assertEquals(result.error_msg, sample_error)
         self.assertEquals(result.url, sample_url)
         # self.asset should still work (and equal the error text)
@@ -117,7 +117,7 @@ class TestAppText(TestCase):
                     "bodykey1": u'\u2713',
                     "bodykey2": "456",
                     "footerkey": "foot"}
-        tmr = MailResource(None, variables=testvars)
+        tmr = MailResource(None, locale_code='en_AU', variables=testvars)
 
         self.assertEquals(tmr.subject, "TESTING SUBJECT")
         self.assertEquals(tmr.body.splitlines()[0], "TESTING BODY")

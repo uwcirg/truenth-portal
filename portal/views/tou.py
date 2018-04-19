@@ -32,7 +32,8 @@ def get_current_tou_url():
           system configuration in simple json {url:"http..."}
 
     """
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    terms = VersionedResource(
+        app_text(InitialConsent_ATMA.name_key()), locale_code=None)
     return jsonify(url=terms.url)
 
 

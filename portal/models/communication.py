@@ -198,7 +198,7 @@ class Communication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column('status', event_status_types, nullable=False)
 
-    # FHIR Communication spec says `basedOn` can retur to any
+    # FHIR Communication spec says `basedOn` can return to any
     # object.  For current needs, this is always a CommunicationRequest
     communication_request_id = db.Column(
         db.ForeignKey('communication_requests.id'), nullable=False)
@@ -239,6 +239,7 @@ class Communication(db.Model):
 
         mailresource = MailResource(
             url=self.communication_request.content_url,
+            locale_code=user.locale_code,
             variables=args)
 
         missing = set(mailresource.variable_list) - set(args)
