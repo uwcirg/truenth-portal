@@ -117,7 +117,8 @@ def home():
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
 
-    consent_agreements = Organization.consent_agreements()
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
 
     return render_template(
         'gil/portal.html', user=user,
@@ -188,7 +189,9 @@ def gil_shortcut_alias_validation(clinic_alias):
 def privacy():
     """ privacy use page"""
     user = current_user()
-    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    privacy_resource = VersionedResource(
+        app_text(PrivacyATMA.name_key()),
+        locale_code=user.locale_code)
     return render_template(
         'gil/privacy.html', content=privacy_resource.asset, user=user,
         editorUrl=privacy_resource.editor_url)
@@ -204,10 +207,12 @@ def terms_and_conditions():
             role = ROLE.STAFF
         elif user.has_role(ROLE.PATIENT):
             role = ROLE.PATIENT
-        terms = VersionedResource(app_text(Terms_ATMA.name_key(
-            role=role)))
+        terms = VersionedResource(
+            app_text(Terms_ATMA.name_key(role=role)),
+            locale_code=user.locale_code)
     else:
-        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+        terms = VersionedResource(
+            app_text(Terms_ATMA.name_key()), locale_code=None)
     return render_template('gil/terms.html', content=terms.asset,
                            editorUrl=terms.editor_url, user=user)
 
@@ -215,13 +220,16 @@ def terms_and_conditions():
 @gil.route('/about')
 def about():
     """main TrueNTH about page"""
+    user = current_user()
+    locale_code = user.locale_code if user else None
     about_tnth = VersionedResource(
-        app_text(AboutATMA.name_key(subject='TrueNTH')))
+        app_text(AboutATMA.name_key(subject='TrueNTH')),
+        locale_code=locale_code)
     return render_template(
         'gil/about.html',
         about_tnth=about_tnth.asset,
         about_tnth_editorUrl=about_tnth.editor_url,
-        user=current_user())
+        user=user)
 
 
 @gil.route('/contact', methods=('GET', 'POST'))

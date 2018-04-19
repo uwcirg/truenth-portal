@@ -135,7 +135,8 @@ def privacy():
             role, organization = None, None
 
         privacy_resource = VersionedResource(app_text(
-            PrivacyATMA.name_key(role=role, organization=organization)))
+            PrivacyATMA.name_key(role=role, organization=organization)),
+            locale_code=user.locale_code)
     else:
         abort(400, "No publicly viewable privacy policy page available")
 
@@ -160,9 +161,11 @@ def terms_and_conditions():
             role, organization = None, None
 
         terms = VersionedResource(app_text(Terms_ATMA.name_key(
-            role=role, organization=organization)))
+            role=role, organization=organization)),
+            locale_code=user.locale_code)
     else:
-        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+        terms = VersionedResource(
+            app_text(Terms_ATMA.name_key()), locale_code=None)
     return render_template(
         'eproms/terms.html', content=terms.asset, editorUrl=terms.editor_url, user=user)
 
@@ -170,13 +173,16 @@ def terms_and_conditions():
 @eproms.route('/about')
 def about():
     """main TrueNTH about page"""
+    user = current_user()
+    locale_code = user.locale_code if user else None
     about_tnth = VersionedResource(
-        app_text(AboutATMA.name_key(subject='TrueNTH')))
+        app_text(AboutATMA.name_key(subject='TrueNTH')),
+        locale_code=locale_code)
     return render_template(
         'eproms/about.html',
         about_tnth=about_tnth.asset,
         about_tnth_editorUrl=about_tnth.editor_url,
-        user=current_user())
+        user=user)
 
 
 @eproms.route('/contact', methods=('GET', 'POST'))
@@ -248,10 +254,11 @@ def website_consent_script(patient_id):
     NOTE, we are getting PATIENT's website consent terms here
     as STAFF member needs to read the terms to the patient
     """
-    terms = get_terms(org, ROLE.PATIENT)
+    terms = get_terms(user.locale_code, org, ROLE.PATIENT)
     top_org = patient.first_top_organization()
-    declaration_form = VersionedResource(app_text(WebsiteDeclarationForm_ATMA.
-                                                  name_key(organization=top_org)))
+    declaration_form = VersionedResource(
+        app_text(WebsiteDeclarationForm_ATMA.name_key(organization=top_org)),
+        locale_code=user.locale_code)
     return render_template(
         'eproms/website_consent_script.html', user=user,
         terms=terms, top_organization=top_org,

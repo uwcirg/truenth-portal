@@ -2122,7 +2122,8 @@ def invite(user_id):
     org_name = org.name if org else None
     name_key = UserInviteEmail_ATMA.name_key(org=org_name)
     args = load_template_args(user=user)
-    mail = MailResource(app_text(name_key), variables=args)
+    mail = MailResource(
+        app_text(name_key), locale_code=user.locale_code, variables=args)
     email = EmailMessage(
         subject=mail.subject, body=mail.body, recipients=user.email,
         sender=sender, user_id=user.id)
