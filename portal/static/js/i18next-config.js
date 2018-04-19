@@ -66,7 +66,8 @@ var __i18next = window.__i18next = (function() {
                                 /*
                                  * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
                                  */
-                                 var sessionItemKey = "i18nextData_"+options.language;
+                                var sessionItemKey = "i18nextData_"+options.language;
+                                
                                 if (data && (typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
                                     if (!cache) {
                                         data['_t'] = new Date();
@@ -105,7 +106,10 @@ var __i18next = window.__i18next = (function() {
                                       }
                                     }
                                     x.onreadystatechange = function () {
-                                        x.readyState > 3 && callback && callback(x.responseText, x) && sessionStorage.setItem(sessionItemKey, JSON.stringify(x.responseText));
+                                        if (x.readyState > 3 && x.responseText && !sessionStorage.getItem(sessionItemKey)) {
+                                            sessionStorage.setItem(sessionItemKey, JSON.stringify(x.responseText));
+                                        }
+                                        x.readyState > 3 && callback && callback(x.responseText, x);
                                     };
                                     x.send(data);
                                 } catch (e) {

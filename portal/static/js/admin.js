@@ -216,7 +216,7 @@
                           }).fail(function(xhr) {
                               self.setStatusLoadingVis("hide");
                               $("div.export button").attr("disabled", false);
-                              $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
+                              $("#admin-table-error-message").text(i18next.t("Server error occurred updating row data."));
                           });
           self.ajaxRequests.push(ajaxRequest);
           return ajaxRequest;
