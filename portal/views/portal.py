@@ -1030,7 +1030,7 @@ def stock_consent(org_name):
     :param org_name: the org_name to include in the agreement text
 
     """
-    body = _(u"I consent to sharing information with {org_name}",
+    body = _(u"I consent to sharing information with %(org_name)s",
              org_name=_(org_name))
     return render_template_string(
         """<!doctype html>
