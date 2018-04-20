@@ -234,8 +234,8 @@ def update_card_html_on_completion():
         def thank_you_block(name, registry):
             greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                u"You've completed the {} questionnaire"
-                ".").format(registry)
+                u"You've completed the %(registry)s questionnaire.",
+                registry=_(registry))
             reminder = _(
                 u"You will be notified when the next "
                 "questionnaire is ready to complete.")
@@ -283,18 +283,19 @@ def update_card_html_on_completion():
                         trigger_date, as_of_date=now) or utc_start
                     expired_date = localize_datetime(utc_expired, user)
                     reminder = _(
-                        u"Please complete your {} "
+                        u"Please complete your %(assigning_authority)s "
                         "questionnaire as soon as possible. It will expire "
-                        "on {}.").format(
-                            assessment_status.assigning_authority,
-                            expired_date.strftime('%-d %b %Y'))
+                        "on %(expired_date)s.",
+                        assigning_authority=_(
+                            assessment_status.assigning_authority),
+                        expired_date=expired_date)
                 else:
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
-                        u"Please complete your {} "
-                        "questionnaire by {}.").format(
-                            assessment_status.assigning_authority,
-                            due_date.strftime('%-d %b %Y'))
+                        u"Please complete your %(assigning_authority)s "
+                        "questionnaire by %(due_date)s.",
+                        assigning_authority=assessment_status.assigning_authority,
+                        due_date=due_date)
 
                 return u"""
                     <div class="portal-header-container">
@@ -310,9 +311,9 @@ def update_card_html_on_completion():
             if any(indefinite_questionnaires):
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} "
-                    "questionnaire at your convenience.").format(
-                        assessment_status.assigning_authority)
+                    u"Please complete your %(assigning_authority)s "
+                    "questionnaire at your convenience.",
+                    assigning_authority=assessment_status.assigning_authority)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -365,8 +366,8 @@ def update_card_html_on_completion():
                 utc_comp_date = assessment_status.completed_date
                 comp_date = localize_datetime(utc_comp_date, user)
                 message = _(
-                    u"View questionnaire completed on {}").format(
-                        comp_date.strftime('%-d %b %Y'))
+                    u"View questionnaire completed on %(comp_date)s",
+                    comp_date=comp_date)
                 return completed_html.format(
                     header=header, message=message,
                     recent_survey_link=url_for(
