@@ -1668,7 +1668,7 @@ var fillContent = {
             if (data.messages && data.messages.length > 0) {
                 (data.messages).forEach(function(item) {
                     item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
-                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + i18next.t(item["subject"]) + "</u></a>";
                 });
                 $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                 $('#profileEmailLogTable').bootstrapTable( {
@@ -1689,6 +1689,18 @@ var fillContent = {
                           };
                     },
                     undefinedText: '--',
+                    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                        var rowInfo;
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+                        replace("{pageFrom}", pageFrom).
+                        replace("{pageTo}", pageTo).
+                        replace("{totalRows}", totalRows);
+                        $(".pagination-detail .pagination-info").html(rowInfo);
+                        return rowInfo;
+                    },
+                    formatRecordsPerPage: function(pageNumber) {
+                        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
+                    },
                     columns: [
                         {
                             field: 'sent_at',
@@ -2637,6 +2649,7 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.initLocaleSection = function() {
         $('#locale').on('change', function() {
+            tnthDates.setUserLocale($(this).val());
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
@@ -6478,8 +6491,13 @@ var tnthDates = {
 
         return hasValue(userTimeZone) ? userTimeZone : "UTC";
     },
+    "sessionLocaleKey": "currentUserLocale",
+    "setUserLocale": function(locale) {
+        locale = locale||"en_us";
+        sessionStorage.setItem(this.sessionLocaleKey, locale);
+    },
     "getUserLocale": function (userId) {
-        var sessionKey = "currentUserLocale";
+        var sessionKey = this.sessionLocaleKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         if (sessionLocale) {
             return sessionLocale;
