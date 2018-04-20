@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: portal 18.3.28.2.dev156+ng7d46168\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-19 16:36-0700\n"
+"POT-Creation-Date: 2018-04-20 12:07-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -239,12 +239,34 @@ msgstr ""
 msgid "Back to Resources"
 msgstr ""
 
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L71
+msgid "Complete Questionnaire"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L96
+msgid "TrueNTH P3P"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L134
+msgid "Password Reset"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L167
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L35
+msgid "Symptom Tracker"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L184
+msgid "Verify Account"
+msgstr ""
+
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L235
 msgid "Thank you, {}."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L236
-msgid "You've completed the {} questionnaire."
+#, python-format
+msgid "You've completed the %(registry)s questionnaire."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L239
@@ -256,60 +278,64 @@ msgid "Log out"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L271
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L311
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L312
 msgid "Hi {}"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L285
-msgid "Please complete your {} questionnaire as soon as possible. It will expire on {}."
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L293
-msgid "Please complete your {} questionnaire by {}."
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L294
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L312
-msgid "Please complete your {} questionnaire at your convenience."
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L335
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L364
-msgid "Completed Questionnaires"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L313
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L336
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L365
+msgid "Completed Questionnaires"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L337
 msgid "When you are done, completed questionnaires will be shown here."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L367
-msgid "View questionnaire completed on {}"
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L368
+#, python-format
+msgid "View questionnaire completed on %(comp_date)s"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L384
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L412
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L385
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L413
 msgid "Go to questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L387
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L410
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L388
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L411
 msgid "Continue questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L390
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L414
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L437
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L391
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L415
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L438
 msgid "Open Questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L435
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L436
 msgid "View previous questionnaire"
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L438
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L439
 msgid "No questionnaire is due."
 msgstr ""
 
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L476
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L477
 msgid ""
 "The assessment is no longer available.\n"
 "A research staff member will contact you for assistance."
@@ -734,7 +760,7 @@ msgstr ""
 msgid ""
 "\n"
 "                <div class=\"text-warning links-container\">\n"
-"                  By clicking \"NEXT\" you agree to the <a href=\"%(terms_url)s\" target=\"_blank\">Terms</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">Privacy Policy</a>, and <a href=\"\" class=\"terms-url\" target=\"_blank\">General Terms of Use</a> for the TrueNTH website.\n"
+"                  By clicking \"NEXT\" you agree to the <a href=\"%(terms_url)s\" target=\"_blank\">Terms</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">Privacy Policy</a>, and <a href=\"\" class=\"terms-url\" target=\"_blank\">General Terms of Use</a> for the TrueNTH USA website.\n"
 "                </div>\n"
 "              "
 msgstr ""
@@ -762,7 +788,7 @@ msgstr ""
 msgid ""
 "\n"
 "                          <span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and\n"
-"                            <a href=\"%(terms_url)s\" class=\"required-link\">terms</a></span>\n"
+"                            <a href=\"%(terms_url)s\" class=\"required-link\">terms</a>.</span>\n"
 "                        "
 msgstr ""
 
@@ -1127,10 +1153,6 @@ msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L34
 msgid "Decision Support"
-msgstr ""
-
-#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L35
-msgid "Symptom Tracker"
 msgstr ""
 
 #: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L38
