@@ -2649,7 +2649,6 @@ var Profile = function(subjectId, currentUserId) {
     };
     this.initLocaleSection = function() {
         $('#locale').on('change', function() {
-            tnthDates.setUserLocale($(this).val());
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
@@ -6503,38 +6502,33 @@ var tnthDates = {
             return sessionLocale;
         } else {
             var locale = "";
-            var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-            if (localeSelect) {
-                locale = localeSelect;
-            } else {
-                if (!userId) {
-                    $.ajax ({
-                        type: "GET",
-                        url: "/api/me",
-                        async: false
-                    }).done(function(data) {
-                        if (data) {
-                            userId = data.id;
-                        }
-                        if (userId) {
-                            tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-                                if (!data.error) {
-                                    if (data && data.communication) {
-                                        data.communication.forEach(function(item) {
-                                            if (item.language) {
-                                                locale = item.language.coding[0].code;
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    locale="en_us";
+            if (!userId) {
+                $.ajax ({
+                    type: "GET",
+                    url: "/api/me",
+                    async: false
+                }).done(function(data) {
+                    if (data) {
+                        userId = data.id;
+                    }
+                    if (userId) {
+                        tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                            if (!data.error) {
+                                if (data && data.communication) {
+                                    data.communication.forEach(function(item) {
+                                        if (item.language) {
+                                            locale = item.language.coding[0].code;
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    }).fail(function(xhr) {
-                        
-                    });
-                }
+                            } else {
+                                locale="en_us";
+                            }
+                        });
+                    }
+                }).fail(function(xhr) {
+                    
+                });
             }
             if (locale) {
                 sessionStorage.setItem(sessionKey, locale);
