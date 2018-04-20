@@ -155,7 +155,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         due_date = localize_datetime(due, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
-        return due_date.strftime('%-d %b %Y') if due_date else ''
+        return due_date
 
     def _lookup_registrationlink():
         return 'url_placeholder'
