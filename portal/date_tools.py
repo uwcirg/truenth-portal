@@ -3,6 +3,7 @@ from datetime import date, datetime
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from flask import abort, current_app
+from flask_babel import gettext as _
 import json
 import pytz
 
@@ -121,8 +122,19 @@ class RelativeDelta(relativedelta):
 
 
 def localize_datetime(dt, user):
-    if dt and user and user.timezone:
+    """Localize given dt both in timezone and language
+
+    :returns: datetime string in localized, printable format
+      or empty string if given dt is None
+
+    """
+    if not dt:
+        return ''
+    if user and user.timezone:
         local = pytz.utc.localize(dt)
         tz = pytz.timezone(user.timezone)
-        return local.astimezone(tz)
-    return dt
+        best = local.astimezone(tz)
+    else:
+        best = dt
+    d, m, y = best.strftime('%-d %b %Y').split()
+    return ' '.join((d, _(m), y))

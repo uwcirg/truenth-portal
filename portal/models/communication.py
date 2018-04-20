@@ -2,6 +2,7 @@
 from collections import MutableMapping
 from datetime import datetime
 from flask import current_app, url_for
+from flask_babel import gettext as _
 import regex
 from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
@@ -67,14 +68,15 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_assessment_link())
 
     def _lookup_assessment_link():
+        label = _(u'Complete Questionnaire')
         return (
-            '<a href="{ae_link}">Complete Questionnaire</a>'.format(
-                ae_link=ae_link()))
+            '<a href="{ae_link}">{label}</a>'.format(
+                ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
         org = user.organizations.first()
         if org:
-            return org.name
+            return _(org.name)
         return ""
 
     def _lookup_decision_support_via_access_button():
@@ -91,7 +93,8 @@ def load_template_args(user, questionnaire_bank_id=None):
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
-        return '<a href="{url}">TrueNTH P3P</a>'.format(url=url)
+        label = _(u'TrueNTH P3P')
+        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     def _lookup_debug_slot():
         """Special slot added when configuration DEBUG_EMAIL is set"""
@@ -121,16 +124,18 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_parent_org():
         org = user.first_top_organization()
         if org:
-            return org.name
+            return _(org.name)
         return ""
 
     def _lookup_password_reset_button():
         return make_button(_lookup_password_reset_link())
 
     def _lookup_password_reset_link():
+        label = _(u'Password Reset')
         return (
-            '<a href="{url}">Password Reset</a>'.format(
-                url=url_for('user.forgot_password', _external=True)))
+            '<a href="{url}">{label}</a>'.format(
+                url=url_for('user.forgot_password', _external=True),
+                label=label))
 
     def _lookup_practitioner_name():
         if not user.practitioner_id:
@@ -150,7 +155,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         due_date = localize_datetime(due, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
-        return due_date.strftime('%-d %b %Y') if due_date else ''
+        return due_date
 
     def _lookup_registrationlink():
         return 'url_placeholder'
@@ -159,8 +164,9 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_st_link())
 
     def _lookup_st_link():
-        return '<a href="{0.link_url}">Symptom Tracker</a>'.format(
-            INTERVENTION.SELF_MANAGEMENT)
+        label = _(u"Symptom Tracker")
+        return '<a href="{0.link_url}">{label}</a>'.format(
+            INTERVENTION.SELF_MANAGEMENT, label=label)
 
     def _lookup_verify_account_button():
         return make_button(_lookup_verify_account_link())
@@ -175,7 +181,8 @@ def load_template_args(user, questionnaire_bank_id=None):
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
-        return '<a href="{url}">Verify Account</a>'.format(url=url)
+        label = _(u'Verify Account')
+        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     # Load all functions from the local space with the `_lookup_` prefix
     # into the args instance
