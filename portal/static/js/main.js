@@ -6534,7 +6534,6 @@ var tnthDates = {
         }
         if (!locale) {
             locale = "en_us";
-            //sessionStorage.setItem(sessionKey, locale);
         }
         return locale;
     },
