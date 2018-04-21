@@ -2648,7 +2648,9 @@ var Profile = function(subjectId, currentUserId) {
         this.__convertToNumericField($("#date, #year"));
     };
     this.initLocaleSection = function() {
+        var self = this;
         $('#locale').on('change', function() {
+            tnthDates.clearSessionLocale();
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
@@ -4498,7 +4500,7 @@ var tnthAjax = {
                                          */
                                         $("#aboutForm .reg-complete-container").addClass("inactive");
                                         acceptOnNextCheckboxes.push(parentNode);
-                                    }
+                                    } else $("#aboutForm .reg-complete-container").removeClass("inactive");
                                 }
                             }
                         });
@@ -6490,53 +6492,50 @@ var tnthDates = {
 
         return hasValue(userTimeZone) ? userTimeZone : "UTC";
     },
-    "sessionLocaleKey": "currentUserLocale",
-    "setUserLocale": function(locale) {
-        locale = locale||"en_us";
-        sessionStorage.setItem(this.sessionLocaleKey, locale);
+    "localeSessionKey": "currentUserLocale",
+    "clearSessionLocale": function() {
+        sessionStorage.removeItem(this.localeSessionKey);
     },
-    "getUserLocale": function (userId) {
-        var sessionKey = this.sessionLocaleKey;
+    "getUserLocale": function (force) {
+        var sessionKey = this.localeSessionKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
-        if (sessionLocale) {
+        var locale = "";
+        if (!force && sessionLocale) {
             return sessionLocale;
         } else {
-            var locale = "";
-            if (!userId) {
-                $.ajax ({
-                    type: "GET",
-                    url: "/api/me",
-                    async: false
-                }).done(function(data) {
-                    if (data) {
-                        userId = data.id;
-                    }
-                    if (userId) {
-                        tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-                            if (!data.error) {
-                                if (data && data.communication) {
-                                    data.communication.forEach(function(item) {
-                                        if (item.language) {
-                                            locale = item.language.coding[0].code;
-                                        }
-                                    });
-                                }
-                            } else {
-                                locale="en_us";
+            this.clearSessionLocale();
+            $.ajax ({
+                type: "GET",
+                url: "/api/me",
+                async: false
+            }).done(function(data) {
+                if (data) {
+                    userId = data.id;
+                }
+                if (userId) {
+                    tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                        if (!data.error) {
+                            if (data && data.communication) {
+                                data.communication.forEach(function(item) {
+                                    if (item.language) {
+                                        locale = item.language.coding[0].code;
+                                        sessionStorage.setItem(sessionKey, locale);
+                                    }
+                                });
                             }
-                        });
-                    }
-                }).fail(function(xhr) {
-                    
-                });
-            }
-            if (locale) {
-                sessionStorage.setItem(sessionKey, locale);
-            } else {
-                locale = "en_us";
-            }
-            return locale;
+                        } else {
+                            locale="en_us";
+                        }
+                    });
+                }
+            }).fail(function(xhr) {
+                
+            });
         }
+        if (!locale) {
+            locale = "en_us";
+        }
+        return locale;
     },
     getDateWithTimeZone: function(dObj) {
         /*
@@ -6739,155 +6738,151 @@ __i18next.init({
     "initImmediate": false,
     "lng": userSetLang
 }, function() {
-    setTimeout(function() {
-        $(document).ready(function() {
-
-            var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
-            if (PORTAL_NAV_PAGE) {
-                loader(true);
-                fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
-            } else {
-                loader();
+    $(document).ready(function() {
+        var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
+        if (PORTAL_NAV_PAGE) {
+            loader(true);
+            fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
+        } else {
+            loader();
+        }
+        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+        if (LOGIN_AS_PATIENT) {
+            /*
+             * need to clear current user locale in session storage when logging in as patient
+             */
+            tnthDates.getUserLocale(true);
+            if (typeof history !== "undefined" && history.pushState) {
+                history.pushState(null, null, location.href);
             }
-            var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-            if (LOGIN_AS_PATIENT) {
-                /*
-                 * need to clear current user locale in session storage when logging in as patient
-                 */
-                sessionStorage.removeItem("currentUserLocale");
+            window.addEventListener("popstate", function(event) {
                 if (typeof history !== "undefined" && history.pushState) {
                     history.pushState(null, null, location.href);
+                } else {
+                    window.history.forward(1);
                 }
-                window.addEventListener("popstate", function(event) {
-                    if (typeof history !== "undefined" && history.pushState) {
-                        history.pushState(null, null, location.href);
-                    } else {
-                        window.history.forward(1);
+            });
+        }
+
+        tnthAjax.beforeSend();
+
+        fillContent.footer();
+
+        if ($("#termsContainer.website-consent-script").length > 0) {
+            fillContent.websiteConsentScript();
+        }
+
+        __NOT_PROVIDED_TEXT = i18next.t("not provided");
+
+        var profileObj;
+        if ($("#profileForm").length > 0) {
+            profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
+            profileObj.init();
+        } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
+            /*
+             * initial queries  - only selected sections
+             */
+            profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
+            profileObj.initSection("orgsstateselector");
+            profileObj.initSection("biopsy");
+        } else if ($("#createProfileForm").length > 0) {
+            profileObj = new Profile("", $("#currentStaffUserId").val());
+            profileObj.initSections();
+        }
+
+        //setTimeout('LRKeyEvent();', 1500);
+        // To validate a form, add class to <form> and validate by ID.
+        $('form.to-validate').validator({
+            custom: {
+                birthday: function($el) {
+                    var m = parseInt($("#month").val());
+                    var d = parseInt($("#date").val());
+                    var y = parseInt($("#year").val());
+                    // If all three have been entered, run check
+                    var goodDate = true;
+                    var errorMsg = "";
+                    // If NaN then the values haven't been entered yet, so we
+                    // validate as true until other fields are entered
+                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                        $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
+                        goodDate = false;
+                    } else if (isNaN(d)) {
+                        errorMsg = i18next.t("Please enter a valid date.");
+                    } else if (isNaN(m)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
+                    } else if (isNaN(y)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
+                    };
+
+                    if (hasValue(errorMsg)) {
+                        $("#errorbirthday").html(errorMsg).show();
+                        $("#birthday").val("");
+                        goodDate = false;
                     }
-                });
-            }
+                    //}
+                    //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
+                    if (goodDate) {
+                        $("#errorbirthday").html("").hide();
+                    };
 
-            tnthAjax.beforeSend();
-
-            fillContent.footer();
-
-            if ($("#termsContainer.website-consent-script").length > 0) {
-                fillContent.websiteConsentScript();
-            }
-
-            __NOT_PROVIDED_TEXT = i18next.t("not provided");
-
-            var profileObj;
-            if ($("#profileForm").length > 0) {
-                profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
-                profileObj.init();
-            } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
-                /*
-                 * initial queries  - only selected sections
-                 */
-                profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
-                profileObj.initSection("orgsstateselector");
-                profileObj.initSection("biopsy");
-            } else if ($("#createProfileForm").length > 0) {
-                profileObj = new Profile("", $("#currentStaffUserId").val());
-                profileObj.initSections();
-            }
-
-            //setTimeout('LRKeyEvent();', 1500);
-            // To validate a form, add class to <form> and validate by ID.
-            $('form.to-validate').validator({
-                custom: {
-                    birthday: function($el) {
-                        var m = parseInt($("#month").val());
-                        var d = parseInt($("#date").val());
-                        var y = parseInt($("#year").val());
-                        // If all three have been entered, run check
-                        var goodDate = true;
-                        var errorMsg = "";
-                        // If NaN then the values haven't been entered yet, so we
-                        // validate as true until other fields are entered
-                        if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                            $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
-                            goodDate = false;
-                        } else if (isNaN(d)) {
-                            errorMsg = i18next.t("Please enter a valid date.");
-                        } else if (isNaN(m)) {
-                            errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
-                        } else if (isNaN(y)) {
-                            errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
+                    return goodDate;
+                },
+                customemail: function($el) {
+                    var emailVal = $.trim($el.val());
+                    var update = function($el) {
+                        if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
+                            assembleContent.demo($el.attr("data-user-id"),true, $el);
                         };
-
-                        if (hasValue(errorMsg)) {
-                            $("#errorbirthday").html(errorMsg).show();
-                            $("#birthday").val("");
-                            goodDate = false;
-                        }
-                        //}
-                        //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
-                        if (goodDate) {
-                            $("#errorbirthday").html("").hide();
+                    };
+                    if (emailVal === "") {
+                        if ($el.attr("data-optional")) {
+                            /*
+                            * if email address is optional, update it as is
+                            */
+                            update($el);
+                            return true;
+                        } else {
+                            return false;
                         };
-
-                        return goodDate;
-                    },
-                    customemail: function($el) {
-                        var emailVal = $.trim($el.val());
-                        var update = function($el) {
-                            if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
-                                assembleContent.demo($el.attr("data-user-id"),true, $el);
-                            };
-                        };
-                        if (emailVal === "") {
-                            if ($el.attr("data-optional")) {
-                                /*
-                                * if email address is optional, update it as is
-                                */
-                                update($el);
-                                return true;
-                            } else {
-                                return false;
-                            };
-                        }
-                        var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                        // Add user_id to api call (used on patient_profile page so that staff can edit)
-                        var addUserId = "";
-                        if (hasValue($el.attr("data-user-id"))) {
-                            addUserId = "&user_id="+ $el.attr("data-user-id");
-                        }
-                        // If this is a valid address, then use unique_email to check whether it's already in use
-                        if (emailReg.test(emailVal)) {
-                            tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
-                                if (!data.error) {
-                                    if (data.unique) {
-                                        $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                        update($el);
-                                    } else {
-                                        $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                                    };
-
+                    }
+                    var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    // Add user_id to api call (used on patient_profile page so that staff can edit)
+                    var addUserId = "";
+                    if (hasValue($el.attr("data-user-id"))) {
+                        addUserId = "&user_id="+ $el.attr("data-user-id");
+                    }
+                    // If this is a valid address, then use unique_email to check whether it's already in use
+                    if (emailReg.test(emailVal)) {
+                        tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
+                            if (!data.error) {
+                                if (data.unique) {
+                                    $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                    update($el);
                                 } else {
-                                    console.log(i18next.t("Problem retrieving data from server."));
+                                    $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                                 };
-                            });
-                        }
-                        return emailReg.test(emailVal);
-                    },
-                    htmltags: function($el) {
-                        var invalid = containHtmlTags($el.val());
-                        if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
-                        else $("#error" + $el.attr("id")).html("");
-                        return !invalid;
-                    }
-                },
-                errors: {
-                    htmltags: i18next.t("Please remove invalid characters and try again."),
-                    birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
-                    customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
-                },
-                disable: false
-            }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
-        });
 
-    }, 50);
+                            } else {
+                                console.log(i18next.t("Problem retrieving data from server."));
+                            };
+                        });
+                    }
+                    return emailReg.test(emailVal);
+                },
+                htmltags: function($el) {
+                    var invalid = containHtmlTags($el.val());
+                    if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                    else $("#error" + $el.attr("id")).html("");
+                    return !invalid;
+                }
+            },
+            errors: {
+                htmltags: i18next.t("Please remove invalid characters and try again."),
+                birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
+                customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
+            },
+            disable: false
+        }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    });
 });
 
