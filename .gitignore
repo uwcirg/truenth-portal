@@ -25,3 +25,11 @@ docker/portal.env
 .settings/
 .pydevproject
 .project
+
+# translation files
+portal/translations/
+
+# nodeJS virtual environment and files
+node_env/
+portal/node_modules/
+portal/package-lock.json

@@ -1668,7 +1668,7 @@ var fillContent = {
             if (data.messages && data.messages.length > 0) {
                 (data.messages).forEach(function(item) {
                     item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
-                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + i18next.t(item["subject"]) + "</u></a>";
                 });
                 $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                 $('#profileEmailLogTable').bootstrapTable( {
@@ -1689,6 +1689,18 @@ var fillContent = {
                           };
                     },
                     undefinedText: '--',
+                    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                        var rowInfo;
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+                        replace("{pageFrom}", pageFrom).
+                        replace("{pageTo}", pageTo).
+                        replace("{totalRows}", totalRows);
+                        $(".pagination-detail .pagination-info").html(rowInfo);
+                        return rowInfo;
+                    },
+                    formatRecordsPerPage: function(pageNumber) {
+                        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
+                    },
                     columns: [
                         {
                             field: 'sent_at',
@@ -6478,45 +6490,45 @@ var tnthDates = {
 
         return hasValue(userTimeZone) ? userTimeZone : "UTC";
     },
+    "sessionLocaleKey": "currentUserLocale",
+    "setUserLocale": function(locale) {
+        locale = locale||"en_us";
+        sessionStorage.setItem(this.sessionLocaleKey, locale);
+    },
     "getUserLocale": function (userId) {
-        var sessionKey = "currentUserLocale";
+        var sessionKey = this.sessionLocaleKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         if (sessionLocale) {
             return sessionLocale;
         } else {
             var locale = "";
-            var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-            if (localeSelect) {
-                locale = localeSelect;
-            } else {
-                if (!userId) {
-                    $.ajax ({
-                        type: "GET",
-                        url: "/api/me",
-                        async: false
-                    }).done(function(data) {
-                        if (data) {
-                            userId = data.id;
-                        }
-                        if (userId) {
-                            tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-                                if (!data.error) {
-                                    if (data && data.communication) {
-                                        data.communication.forEach(function(item) {
-                                            if (item.language) {
-                                                locale = item.language.coding[0].code;
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    locale="en_us";
+            if (!userId) {
+                $.ajax ({
+                    type: "GET",
+                    url: "/api/me",
+                    async: false
+                }).done(function(data) {
+                    if (data) {
+                        userId = data.id;
+                    }
+                    if (userId) {
+                        tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                            if (!data.error) {
+                                if (data && data.communication) {
+                                    data.communication.forEach(function(item) {
+                                        if (item.language) {
+                                            locale = item.language.coding[0].code;
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    }).fail(function(xhr) {
-                        
-                    });
-                }
+                            } else {
+                                locale="en_us";
+                            }
+                        });
+                    }
+                }).fail(function(xhr) {
+                    
+                });
             }
             if (locale) {
                 sessionStorage.setItem(sessionKey, locale);
