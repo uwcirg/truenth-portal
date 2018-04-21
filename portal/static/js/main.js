@@ -5856,6 +5856,7 @@ var tnthAjax = {
     },
     "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
         callback = callback || function() {};
+        var self = this;
         if (!userId) {
             callback({"error": i18next.t("User id is required.")});
             return false;
@@ -5868,12 +5869,10 @@ var tnthAjax = {
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             if (setConfigInUI) {
-                var data = JSON.parse(sessionStorage.getItem(sessionConfigKey))
                 self.setConfigurationUI(configVar, data[configVar]+"");
             }
             callback(data);
         } else {
-            var self = this;
             this.sendRequest("/api/settings/"+configVar, "GET", userId, (params||{}), function(data) {
                 if (data) {
                     callback(data);
