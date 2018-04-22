@@ -36,7 +36,7 @@ def staff_registration_email(user_id):
     try:
         name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
         item = MailResource(
-            app_text(name_key), locale_code=user.local_code, variables=args)
+            app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return '', 204
