@@ -203,6 +203,9 @@ def client_event_dispatch(event, user, **kwargs):
             # If the client is associated with an intervention, respect
             # subscription bit
             if not c.intervention or c.intervention.subscribed_to_logout_event:
+                # Include the refresh_token when available  as some clients
+                # use to uniquely identify session.
+                data['refresh_token'] = token.refresh_token
                 c.notify(data)
             # Invalidate the access token by deletion
             db.session.delete(token)

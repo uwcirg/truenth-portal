@@ -9,23 +9,31 @@ import json
 import redis
 
 import alembic.config
+from sqlalchemy.orm.exc import NoResultFound
 from flask_migrate import Migrate
 
 from portal.factories.app import create_app
-from portal.extensions import db
+from portal.extensions import db, user_manager
+from portal.audit import auditable_event
 from portal.models.i18n import smartling_upload, smartling_download
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
-from portal.models.role import add_static_roles
-from portal.models.user import permanently_delete_user, flag_test
+from portal.models.role import add_static_roles, Role, ROLE
+from portal.models.user import (
+    flag_test,
+    permanently_delete_user,
+    User,
+    validate_email
+)
 from portal.config.site_persistence import SitePersistence
 
 app = create_app()
 
 MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
 migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
+
 
 @app.cli.command()
 def runserver():
@@ -95,6 +103,7 @@ def sync():
 def seed_command(keep_unmentioned):
     seed(keep_unmentioned)
 
+
 def seed(keep_unmentioned=False):
     """Seed database with required data"""
 
@@ -132,6 +141,63 @@ def export_site(dir):
 
     """
     SitePersistence().export(dir)
+
+
+@click.option('--email', '-e', help="email address for new user")
+@click.option('--role', '-r', help="Comma separated role(s) for new user")
+@click.option('--password', '-p', help="password for new user")
+@app.cli.command()
+def add_user(email, role, password):
+    """Add new user as specified """
+    validate_email(email)
+    if not password or len(str(password)) < 5:
+        raise ValueError("requires a password")
+
+    pw = user_manager.hash_password(password)
+    user = User(email=email, password=pw)
+    db.session.add(user)
+    roles = role.split(',') if role else []
+    try:
+        role_list = [
+            Role.query.filter_by(name=r).one() for r in roles]
+        user.update_roles(role_list, acting_user=user)
+    except NoResultFound:
+        raise ValueError(
+            "one or more roles ill defined {}".format(roles))
+
+    db.session.commit()
+    auditable_event(
+        "new account generated (via cli) for {}".format(user),
+        user_id=user.id, subject_id=user.id, context='account')
+
+
+@click.option('--email', '-e', help="target user email for password reset")
+@click.option('--password', '-p', help="new password")
+@click.option(
+    '--actor', '-a',
+    help='Email of user taking this action (must be admin)'
+)
+@app.cli.command()
+def password_reset(email, password, actor):
+    """Reset given user's password """
+    try:
+        acting_user = User.query.filter(User.email == actor).one()
+    except NoResultFound:
+        raise ValueError("email for acting user not found")
+    try:
+        target_user = User.query.filter(User.email == email).one()
+    except NoResultFound:
+        raise ValueError("email for target user not found")
+    if not acting_user.has_role(ROLE.ADMIN):
+        raise ValueError("Actor must be an admin")
+    if not password or len(str(password)) < 8:
+        raise ValueError("requires a valid password")
+
+    target_user.password = user_manager.hash_password(password)
+    db.session.commit()
+    auditable_event(
+        "cli password reset for {}".format(target_user),
+        user_id=acting_user.id, subject_id=target_user.id, context='account')
 
 
 @click.option('--email', '-e', help='Email of user to purge.')

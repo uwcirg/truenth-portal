@@ -22,11 +22,10 @@ RUN \
 # Allow repo and branch to be overridden with environment variable
 ENV \
     GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
-    BRANCH="${BRANCH:-develop}" \
     ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
 
 RUN \
-    pip install --upgrade pip setuptools && \
+    pip install --upgrade setuptools && \
     pip install wheel && \
     pip install make-deb && \
     mkdir --parents "${ARTIFACT_DIR}"
@@ -34,7 +33,7 @@ RUN \
 WORKDIR /root/portal
 
 CMD \
-    git clone --verbose --branch "${BRANCH}" "${GIT_REPO}" . && \
+    git clone --verbose "${GIT_REPO}" . && \
     yes | make-deb && \
     git checkout debian/rules && \
 

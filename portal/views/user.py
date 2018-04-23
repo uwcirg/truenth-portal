@@ -1,13 +1,23 @@
 """User API view functions"""
 from datetime import datetime
-from flask import abort, Blueprint, jsonify, url_for, current_app
-from flask import request, make_response
+from flask import (
+    abort,
+    Blueprint,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    request,
+    session,
+    url_for
+)
 from flask_user import roles_required
 from sqlalchemy import and_
 from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
+from .auth import logout
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -1067,6 +1077,59 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
+@user_api.route('/user/register-now')
+@oauth.require_oauth()
+def register_now():
+    """Target for triggering registration of account
+
+    Some flows generate accounts that are not yet ``registered``,
+    such as when given the ``access_on_verify`` role.
+
+    When it's desirable to promote the user to a registered account
+    (eg when they've completed a flow like MUSIC P3P, where stakeholders
+    wanted to avoid the potential disruption of registration), redirect
+    to this endpoint to trigger promotion to a registered account.
+
+    Session variables capture the state, and redirect the user
+    through the common registration mechanism.
+
+    ---
+    tags:
+      - User
+    operationId: registernow
+    produces:
+      - application/json
+    responses:
+      302:
+        description:
+          Redirects user-agent to user.registration after validation
+          and state storage.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+      400:
+        description:
+          if user is already registered or not eligible for some reason
+
+    """
+    user = current_user()
+    if user.is_registered():
+        abort(400, "User already registered")
+    # Need to logout current user, or the opportunity to register
+    # isn't available.  This also clears the session, so do this
+    # step first
+    logout(
+        prevent_redirect=True,
+        reason='give un-registered chance to register new account')
+
+    user.mask_email()
+    db.session.commit()
+    session['invited_verified_user_id'] = user.id
+
+    return redirect(url_for('user.register', email=user.email))
+
+
 @user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
 @oauth.require_oauth()
 def set_relationships(user_id):
@@ -2059,7 +2122,8 @@ def invite(user_id):
     org_name = org.name if org else None
     name_key = UserInviteEmail_ATMA.name_key(org=org_name)
     args = load_template_args(user=user)
-    mail = MailResource(app_text(name_key), variables=args)
+    mail = MailResource(
+        app_text(name_key), locale_code=user.locale_code, variables=args)
     email = EmailMessage(
         subject=mail.subject, body=mail.body, recipients=user.email,
         sender=sender, user_id=user.id)

@@ -35,7 +35,8 @@ def staff_registration_email(user_id):
 
     try:
         name_key = StaffRegistrationEmail_ATMA.name_key(organization=org)
-        item = MailResource(app_text(name_key), variables=args)
+        item = MailResource(
+            app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return '', 204
@@ -47,8 +48,9 @@ def staff_registration_email(user_id):
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
 def staff_profile_create():
-    consent_agreements = Organization.consent_agreements()
     user = current_user()
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
 
     # compiling org list for staff
     # org list should include all orgs under the current user's org(s)
@@ -71,8 +73,11 @@ def staff_profile_create():
 def staff_profile(user_id):
     """staff profile view function"""
     user = get_user_or_abort(user_id)
-    consent_agreements = Organization.consent_agreements()
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
+    terms = VersionedResource(
+        app_text(InitialConsent_ATMA.name_key()),
+        locale_code=user.locale_code)
 
     # compiling org list for staff admin user
     # org list should include all orgs under the current user's org(s)

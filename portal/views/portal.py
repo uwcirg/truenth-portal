@@ -462,9 +462,10 @@ def initial_queries():
             # treat staff_admins as staff for this lookup
             r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
             role = r
-    terms = get_terms(org, role)
+    terms = get_terms(user.locale_code, org, role)
     # need this at all time now for ui
-    consent_agreements = Organization.consent_agreements()
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
 
     return render_template(
         'initial_queries.html', user=user, terms=terms,
@@ -566,8 +567,11 @@ def profile(user_id):
         user = get_user_or_abort(user_id)
         # template file for view of other user's profile
         template_file = 'profile/user_profile.html'
-    consent_agreements = Organization.consent_agreements()
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
+    terms = VersionedResource(
+        app_text(InitialConsent_ATMA.name_key()),
+        locale_code=user.locale_code)
 
     return render_template(template_file, user=user, terms=terms,
                            current_user=current_user(),
@@ -591,7 +595,8 @@ def patient_invite_email(user_id):
         else:
             name_key = UserInviteEmail_ATMA.name_key()
         args = load_template_args(user=user)
-        item = MailResource(app_text(name_key), variables=args)
+        item = MailResource(
+            app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return '', 204
@@ -616,7 +621,8 @@ def patient_reminder_email(user_id):
         else:
             name_key = UserReminderEmail_ATMA.name_key()
         args = load_template_args(user=user)
-        item = MailResource(app_text(name_key), variables=args)
+        item = MailResource(
+            app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return '', 204
@@ -654,6 +660,13 @@ def contact_sent(message_id):
     return render_template('contact_sent.html', message=message)
 
 
+@portal.route('/psa-tracker')
+@roles_required(ROLE.PATIENT)
+@oauth.require_oauth()
+def psa_tracker():
+    return render_template('psa_tracker.html', user=current_user())
+
+
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
                            validators=[validators.DataRequired()])
@@ -668,7 +681,9 @@ class SettingsForm(FlaskForm):
 def settings():
     """settings panel for admins"""
     # load all top level orgs and consent agreements
-    organization_consents = Organization.consent_agreements()
+    user = current_user()
+    organization_consents = Organization.consent_agreements(
+        locale_code=user.locale_code)
 
     # load all app text values - expand when possible
     apptext = {}
@@ -704,7 +719,8 @@ def settings():
 
         # Purge cached data and reload.
         OrgTree().invalidate_cache()
-        organization_consents = Organization.consent_agreements()
+        organization_consents = Organization.consent_agreements(
+            locale_code=user.locale_code)
 
     if form.patient_id.data and form.timestamp.data:
         patient = get_user_or_abort(form.patient_id.data)
@@ -747,6 +763,7 @@ def config_settings(config_key):
         'CONSENT',
         'LR_',
         'REQUIRED_CORE_DATA',
+        'PRE_REGISTERED_ROLES',
         'SYSTEM',
     )
     if config_key:
@@ -1013,16 +1030,18 @@ def stock_consent(org_name):
     :param org_name: the org_name to include in the agreement text
 
     """
+    body = _(u"I consent to sharing information with %(org_name)s",
+             org_name=_(org_name))
     return render_template_string(
         """<!doctype html>
         <html>
             <head>
             </head>
             <body>
-                <p>I consent to sharing information with {{ org_name }}</p>
+                <p>{{ body }}</p>
             </body>
         </html>""",
-        org_name=org_name)
+        body=body)
 
 
 def check_int(i):

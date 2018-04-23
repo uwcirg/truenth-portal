@@ -127,8 +127,9 @@ def patients_root():
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def patient_profile_create():
-    consent_agreements = Organization.consent_agreements()
     user = current_user()
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
     leaf_organizations = user.leaf_organizations()
     return render_template(
         "patient_profile_create.html", user=user,
@@ -156,7 +157,8 @@ def patient_profile(patient_id):
     user = current_user()
     user.check_role("edit", other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    consent_agreements = Organization.consent_agreements()
+    consent_agreements = Organization.consent_agreements(
+        locale_code=user.locale_code)
 
     user_interventions = []
     interventions = Intervention.query.order_by(

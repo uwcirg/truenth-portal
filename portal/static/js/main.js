@@ -1,6 +1,5 @@
 /*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
 
-var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
 var DELAY_LOADING = false;
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
@@ -382,7 +381,7 @@ var ConsentUIHelper = function(consentItems, userId) {
             + '<h5 class="modal-title">' + i18next.t("Consent Date Editor") + '</h5>'
             + '</div>'
             + '<div class="modal-body" style="padding: 0 2em">'
-            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+            + '<br/><h4><span>' + i18next.t("Current consent date:") + '</span><span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
             + '<p>' + i18next.t("Modify the consent date") + ' <span class="text-muted">' + i18next.t("(GMT 24-hour format)") + '</span> ' + i18next.t("for this agreement to:") +  '</p>'
             + '<div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
             + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
@@ -922,6 +921,64 @@ var fillContent = {
             });
         };
     },
+    "footer": function() {
+        if ($("#homeFooter .logo-link").length > 0) {
+            $("#homeFooter .logo-link").each(function() {
+                if (!$.trim($(this).attr("href"))) {
+                    $(this).removeAttr("target");
+                    $(this).on("click", function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                }
+            });
+        }
+
+        // Reveal footer after load to avoid any flashes will above content loads
+        setTimeout(function() { $("#homeFooter").show(); }, 100);
+
+        setTimeout(function() {
+            var userLocale = $("#copyrightLocaleCode").val();
+            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
+            var getContent = function(cc) {
+                var content = "";
+                switch(String(cc.toUpperCase())) {
+                    case "US":
+                    case "EN_US":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                        break;
+                    case "AU":
+                    case "EN_AU":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                        break;
+                    case "NZ":
+                    case "EN_NZ":
+                        content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                        break;
+                    default:
+                        content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+
+                }
+                return content;
+
+            };
+            if (userLocale) {
+                $(footerElements).html(getContent(userLocale));
+            } else {
+                $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
+                    if (data && data.country_code) {
+                        //country code
+                        //Australia AU
+                        //New Zealand NZ
+                        //USA US
+                        $(footerElements).html(getContent(data.country_code));
+                    } else {
+                        $(footerElements).html(getContent());
+                    }
+                });
+            }
+        }, 500);
+    },
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
@@ -1342,25 +1399,10 @@ var fillContent = {
                 return found;
             };
             $("#termsCheckbox label.terms-label").each(function() {
-                var arrTypes = [];
                 var item_found  = 0;
                 var self = $(this);
-
-                if (self.attr("data-tou-type")) {
-                    var o = ($(this).attr("data-tou-type")).split(",");
-                    o.forEach(function(item) {
-                        arrTypes.push(item);
-                    });
-                } else {
-                    self.find("[data-type='terms']").each(function() {
-                        var o = ($(this).attr("data-tou-type")).split(",");
-                        o.forEach(function(item) {
-                            arrTypes.push(item);
-                        });
-                    });
-                };
-
-                arrTypes.forEach(function(type) {
+                self.find("[data-type='terms']").each(function() {
+                    var type = $(this).attr("data-tou-type");
                     if (typeInTous(type, "active")) {
                         item_found++;
                         /* 
@@ -1368,29 +1410,17 @@ var fillContent = {
                          */
                         $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
 
-                    };
-                });
-
-                var arrReconsent = $.grep(arrTypes, function(type) {
-                    return typeInTous(type, "inactive");
-                });
-
-                /*
-                 *  note display of checked checkbox when re-consenting is controlled by css
-                 */
-                if (arrReconsent.length > 0) {
-                    self.attr("data-reconsent", "true");
-                    if (!setReconsentDisplay) {
-                        $(this).closest("#termsCheckbox").attr("data-reconsent", "true");
-                        setReconsentDisplay = true;
                     }
-                }
-
+                    if (typeInTous(type, "inactive")) {
+                        self.attr("data-reconsent", "true");
+                        self.closest("#termsCheckbox").attr("data-reconsent", "true");
+                    }
+                });
                 if (item_found > 0) {
                     /*
                      * make sure that all items are agreed upon before checking the box
                      */
-                    if (!($(this).find("[data-agree='false']").length > 0)) {
+                    if (!(self.find("[data-agree='false']").length > 0)) {
                         self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                         var vs = self.find(".display-view");
                         if (vs.length > 0) {
@@ -1638,7 +1668,7 @@ var fillContent = {
             if (data.messages && data.messages.length > 0) {
                 (data.messages).forEach(function(item) {
                     item["sent_at"] = tnthDates.formatDateString(item["sent_at"], "iso");
-                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + item["subject"] + "</u></a>";
+                    item["subject"] = "<a onclick='fillContent.emailContent(" + userId + "," + item["id"] + ")'><u>" + i18next.t(item["subject"]) + "</u></a>";
                 });
                 $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                 $('#profileEmailLogTable').bootstrapTable( {
@@ -1659,6 +1689,18 @@ var fillContent = {
                           };
                     },
                     undefinedText: '--',
+                    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                        var rowInfo;
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+                        replace("{pageFrom}", pageFrom).
+                        replace("{pageTo}", pageTo).
+                        replace("{totalRows}", totalRows);
+                        $(".pagination-detail .pagination-info").html(rowInfo);
+                        return rowInfo;
+                    },
+                    formatRecordsPerPage: function(pageNumber) {
+                        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
+                    },
                     columns: [
                         {
                             field: 'sent_at',
@@ -1715,14 +1757,6 @@ var fillContent = {
                 },500);
             });
         }
-    },
-    "registrationStatus": function(userId) {
-        tnthAjax.hasRole(userId, "write_only", function(data) {
-            $("#registrationStatusContainer .registration-label")
-            .text(data.matched ? i18next.t("not registered") : i18next.t("registered"))
-            .addClass(data.matched ? "text-warning": "text-success")
-            .removeClass(data.matched ? "text-success": "text-warning");
-        });
     },
     "assessmentStatus": function(userId) {
         tnthAjax.patientReport(userId, function(data) {
@@ -2614,7 +2648,9 @@ var Profile = function(subjectId, currentUserId) {
         this.__convertToNumericField($("#date, #year"));
     };
     this.initLocaleSection = function() {
+        var self = this;
         $('#locale').on('change', function() {
+            tnthDates.clearSessionLocale();
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
@@ -2658,10 +2694,6 @@ var Profile = function(subjectId, currentUserId) {
 
         if ($("#profileassessmentSendEmailContainer.active").length > 0) {
             fillContent.assessmentStatus(self.subjectId);
-        }
-
-        if ($("#registrationStatusContainer").length > 0) {
-            fillContent.registrationStatus(self.subjectId);
         }
 
         $(".email-selector").off("change").on("change", function() {
@@ -2900,7 +2932,6 @@ var Profile = function(subjectId, currentUserId) {
             saveLoaderDiv("profileForm", $("#"+fn).attr("data-save-container-id"));
             var fd = $("#" + fn);
             var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
-            var self = this;
             fd.on(triggerEvent, function() {
                  var d = $("#deathDay");
                  var m = $("#deathMonth");
@@ -4469,7 +4500,7 @@ var tnthAjax = {
                                          */
                                         $("#aboutForm .reg-complete-container").addClass("inactive");
                                         acceptOnNextCheckboxes.push(parentNode);
-                                    }
+                                    } else $("#aboutForm .reg-complete-container").removeClass("inactive");
                                 }
                             }
                         });
@@ -5825,6 +5856,7 @@ var tnthAjax = {
     },
     "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
         callback = callback || function() {};
+        var self = this;
         if (!userId) {
             callback({"error": i18next.t("User id is required.")});
             return false;
@@ -5837,12 +5869,10 @@ var tnthAjax = {
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             if (setConfigInUI) {
-                var data = JSON.parse(sessionStorage.getItem(sessionConfigKey))
                 self.setConfigurationUI(configVar, data[configVar]+"");
             }
             callback(data);
         } else {
-            var self = this;
             this.sendRequest("/api/settings/"+configVar, "GET", userId, (params||{}), function(data) {
                 if (data) {
                     callback(data);
@@ -5882,214 +5912,6 @@ var tnthAjax = {
         }
     }
 };
-
-__i18next.init({
-    "debug": false,
-    "initImmediate": false
-});
-
-$(document).ready(function() {
-
-    var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
-    if (PORTAL_NAV_PAGE) {
-        loader(true);
-        fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
-    } else {
-        loader();
-    }
-
-    var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-    if (LOGIN_AS_PATIENT) {
-        if (typeof history !== "undefined" && history.pushState) {
-            history.pushState(null, null, location.href);
-        }
-        window.addEventListener("popstate", function(event) {
-            if (typeof history !== "undefined" && history.pushState) {
-                history.pushState(null, null, location.href);
-            } else {
-                window.history.forward(1);
-            }
-        });
-    }
-
-    if ($("#homeFooter .logo-link").length > 0) {
-        $("#homeFooter .logo-link").each(function() {
-            if (!$.trim($(this).attr("href"))) {
-                $(this).removeAttr("target");
-                $(this).on("click", function(e) {
-                    e.preventDefault();
-                    return false;
-                });
-            }
-        });
-    }
-
-    // Reveal footer after load to avoid any flashes will above content loads
-    setTimeout(function() { $("#homeFooter").show(); }, 100);
-
-    setTimeout(function() {
-        var userLocale = $("#copyrightLocaleCode").val();
-        var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
-        var getContent = function(cc) {
-            var content = "";
-            switch(String(cc.toUpperCase())) {
-                case "US":
-                case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
-                    break;
-                case "AU":
-                case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
-                    break;
-                case "NZ":
-                case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
-                    break;
-                default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
-
-            }
-            return content;
-
-        };
-        if (userLocale) {
-            $(footerElements).html(getContent(userLocale));
-        } else {
-            $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
-                if (data && data.country_code) {
-                    //country code
-                    //Australia AU
-                    //New Zealand NZ
-                    //USA US
-                    $(footerElements).html(getContent(data.country_code));
-                } else {
-                    $(footerElements).html(getContent());
-                }
-            });
-        }
-    }, 500);
-
-    tnthAjax.beforeSend();
-
-
-    if ($("#termsContainer.website-consent-script").length > 0) {
-        fillContent.websiteConsentScript();
-    }
-
-    __NOT_PROVIDED_TEXT = i18next.t("not provided");
-
-    var profileObj;
-    if ($("#profileForm").length > 0) {
-        profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
-        profileObj.init();
-    } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
-        /*
-         * initial queries  - only selected sections
-         */
-        profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
-        profileObj.initSection("orgsstateselector");
-        profileObj.initSection("biopsy");
-    } else if ($("#createProfileForm").length > 0) {
-        profileObj = new Profile("", $("#currentStaffUserId").val());
-        profileObj.initSections();
-    }
-
-    //setTimeout('LRKeyEvent();', 1500);
-    // To validate a form, add class to <form> and validate by ID.
-    $('form.to-validate').validator({
-        custom: {
-            birthday: function($el) {
-                var m = parseInt($("#month").val());
-                var d = parseInt($("#date").val());
-                var y = parseInt($("#year").val());
-                // If all three have been entered, run check
-                var goodDate = true;
-                var errorMsg = "";
-                // If NaN then the values haven't been entered yet, so we
-                // validate as true until other fields are entered
-                if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                    $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
-                    goodDate = false;
-                } else if (isNaN(d)) {
-                    errorMsg = i18next.t("Please enter a valid date.");
-                } else if (isNaN(m)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
-                } else if (isNaN(y)) {
-                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
-                };
-
-                if (hasValue(errorMsg)) {
-                    $("#errorbirthday").html(errorMsg).show();
-                    $("#birthday").val("");
-                    goodDate = false;
-                }
-                //}
-                //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
-                if (goodDate) {
-                    $("#errorbirthday").html("").hide();
-                };
-
-                return goodDate;
-            },
-            customemail: function($el) {
-                var emailVal = $.trim($el.val());
-                var update = function($el) {
-                    if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
-                        assembleContent.demo($el.attr("data-user-id"),true, $el);
-                    };
-                };
-                if (emailVal === "") {
-                    if ($el.attr("data-optional")) {
-                        /*
-                        * if email address is optional, update it as is
-                        */
-                        update($el);
-                        return true;
-                    } else {
-                        return false;
-                    };
-                }
-                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                // Add user_id to api call (used on patient_profile page so that staff can edit)
-                var addUserId = "";
-                if (hasValue($el.attr("data-user-id"))) {
-                    addUserId = "&user_id="+ $el.attr("data-user-id");
-                }
-                // If this is a valid address, then use unique_email to check whether it's already in use
-                if (emailReg.test(emailVal)) {
-                    tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
-                        if (!data.error) {
-                            if (data.unique) {
-                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                update($el);
-                            } else {
-                                $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                            };
-
-                        } else {
-                            console.log(i18next.t("Problem retrieving data from server."));
-                        };
-                    });
-                }
-                return emailReg.test(emailVal);
-            },
-            htmltags: function($el) {
-                var invalid = containHtmlTags($el.val());
-                if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
-                else $("#error" + $el.attr("id")).html("");
-                return !invalid;
-            }
-        },
-        errors: {
-            htmltags: i18next.t("Please remove invalid characters and try again."),
-            birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
-            customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
-        },
-        disable: false
-    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
-
-});
-
 var tnthDates = {
     /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
      ** params: month, day and year fields and error field ID
@@ -6121,7 +5943,7 @@ var tnthDates = {
                     else if (y < 1900) {
                         errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
                         return false;
-                    };
+                    }
 
                     errorField.html("").hide();
 
@@ -6134,7 +5956,7 @@ var tnthDates = {
 
         } else {
             return false;
-        };
+        }
     },
     /***
      * changeFormat - changes date format, particularly for submitting to server
@@ -6179,14 +6001,14 @@ var tnthDates = {
             } else {
                 yearToPass = dateFormatArray[2];
             }
-            convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
+            convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0];
             // add T according to timezone
             var tzOffset = currentTime.getTimezoneOffset();//minutes
             tzOffset /= 60;//hours
             if (tzOffset < 10) tzOffset = "0" + tzOffset;
             convertDate += "T" + tzOffset + ":00:00";
         }
-        return convertDate
+        return convertDate;
     },
     /**
      * Simply swaps:
@@ -6225,7 +6047,7 @@ var tnthDates = {
             };
             var m = month_map[month.toLowerCase()];
             return hasValue(m) ? m : "";
-        };
+        }
      },
     /**
      * Convert month string to text
@@ -6250,7 +6072,7 @@ var tnthDates = {
             };
             var m = numeric_month_map[parseInt(month)];
             return hasValue(m)? m : "";
-        };
+        }
      },
      "isDate": function(obj) {
         return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
@@ -6329,7 +6151,7 @@ var tnthDates = {
      */
     "parseForSorting": function(date,noReplace) {
         if (date == null) {
-            return ""
+            return "";
         }
         // Put date in proper javascript format
         if (noReplace == null) {
@@ -6347,7 +6169,7 @@ var tnthDates = {
             month = '0' + month;
         if (day <= 9)
             day = '0' + day;
-        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5]
+        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5];
 
     },
     /***
@@ -6362,27 +6184,27 @@ var tnthDates = {
             // ymdFormat is true, we are assuming it's being received as YYYY-MM-DD
             if (ymdFormat) {
                 todayDate = passDate.split("-");
-                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
+                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1]);
             } else {
                 // Otherwide dd/mm/yyyy
                 todayDate = passDate.split("/");
-                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0])
+                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0]);
             }
         }
         var returnDate;
         var monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
-        ]
+        ];
         // If user's language is Spanish then use dd/mm/yyyy format and changes words
         if (userSetLang !== undefined && userSetLang == 'es_MX') {
             monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio", "agosto","septiembre","octubre","noviembre","diciembre"];
-            returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear()
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear();
         } else if(userSetLang !== undefined && userSetLang == "en_AU") {
-            returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear()
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear();
         } else {
-            returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear()
+            returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear();
         }
-        return returnDate
+        return returnDate;
     },
     /***
      * Calculates number of days between two dates. Used in mPOWEr for surgery/discharge
@@ -6396,13 +6218,13 @@ var tnthDates = {
         var d;
         if (dateToCalc) {
             var c = dateToCalc.split(/[^0-9]/);
-            d = new Date(c[0], c[1]-1, c[2]).getTime()
+            d = new Date(c[0], c[1]-1, c[2]).getTime();
         } else {
             // If no baseDate, then use today to find the number of days between dateToCalc and today
-            d = new Date().getTime()
+            d = new Date().getTime();
         }
         // Round down to floor so we don't add an extra day if session is 12+ hours into the day
-        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24));
     },
     "getAge": function (birthDate, otherDate) {
         birthDate = new Date(birthDate);
@@ -6437,7 +6259,7 @@ var tnthDates = {
         } else if (dateVal === 0) {
             toReturn = "Today";
         }
-        return toReturn
+        return toReturn;
     },
     "isValidDefaultDateFormat": function(date, errorField) {
         if (!hasValue(date)) return false;
@@ -6461,7 +6283,7 @@ var tnthDates = {
           // Only allow if date is before today
           if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
               errorMsg = "The date must not be in the future.";
-          };
+          }
           if (hasValue(errorMsg)) {
             if (errorField) $(errorField).text(errorMsg);
             return false;
@@ -6469,7 +6291,7 @@ var tnthDates = {
             if (errorField) $(errorField).text("");
             return true;
           }
-        };
+        }
     },
     "isDateObj": function(d) {
         return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
@@ -6503,7 +6325,7 @@ var tnthDates = {
 
     "formatDateString": function(dateString, format) {
         if (dateString) {
-               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
+               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
                var d = new Date(dateString);
                var ap, day, month, year, hours, minutes, seconds, nd;
                //note instantiating ios formatted date using Date object resulted in error in IE
@@ -6527,7 +6349,7 @@ var tnthDates = {
                    minutes = d.getMinutes();
                    seconds = d.getSeconds();
                    nd = "";
-                };
+                }
 
                day = pad(day);
                month = pad(month);
@@ -6570,11 +6392,13 @@ var tnthDates = {
                         nd = nd + " " + hours + ":" + minutes + ":" + seconds;
                         break;
                     case "d M y":
+                        nd = this.displayDateString(month, day, year);
+                        break;
                     default:
                         //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
                         nd = this.displayDateString(month, day, year);
                         break;
-               };
+               }
 
            return nd;
         } else return "";
@@ -6594,7 +6418,7 @@ var tnthDates = {
                 hour12: false
             };
             convertedDate = newDate.toLocaleString(options);
-        };
+        }
         return convertedDate;
     },
     "convertUserDateTimeByLocaleTimeZone": function (dateString, timeZone, locale) {
@@ -6622,24 +6446,24 @@ var tnthDates = {
             try {
                 if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
                     convertedDate = new Date(dateString).toLocaleString(locale, options);
-                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide();});
                 } else {
                     if (timeZone != "UTC") {
                         convertedDate = convertToLocalTime(dateString);
                         $(".timezone-warning").addClass("text-warning").html(i18next.t("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead."));
-                        $(".gmt").each(function() { $(this).hide()});
-                    };
+                        $(".gmt").each(function() { $(this).hide();});
+                    }
                 }
             } catch(e) {
                 errorMessage = i18next.t("Error occurred when converting timezone: ") + e.message;
-            };
+            }
             if (hasValue(errorMessage)) {
                 $(".timezone-error").each(function() {
                     $(this).addClass("text-danger").html(errorMessage);
                 });
-            };
+            }
             return convertedDate.replace(/\,/g, "");
-        };
+        }
     },
     "getUserTimeZone": function (userId) {
         var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
@@ -6649,49 +6473,68 @@ var tnthDates = {
                 tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data){
                     if (!data.error) {
                         if (data) {
-                            data.extension.forEach(
-                                function(item, index) {
-                                    if (item.url === SYSTEM_IDENTIFIER_ENUM["timezone"]) {
-                                        userTimeZone = item.timezone;
-                                    };
-                                });
-                            };
+                          data.extension.forEach(
+                              function(item, index) {
+                                if (item.url === SYSTEM_IDENTIFIER_ENUM.timezone) {
+                                  userTimeZone = item.timezone;
+                                }
+                              });
+                        }
                     } else {
                         userTimeZone = "UTC";
-                    };
+                    }
                 });
-            };
+            }
         } else {
             userTimeZone = selectVal;
-        };
+        }
 
         return hasValue(userTimeZone) ? userTimeZone : "UTC";
     },
-    "getUserLocale": function (userId) {
-      var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-      var locale = "";
-
-      if (!localeSelect) {
-            if (userId) {
-                tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
-                    if (!data.error) {
-                        if (data && data.communication) {
-                                data.communication.forEach(
-                                    function(item, index) {
-                                        if (item.language) {
-                                            locale = item["language"]["coding"][0].code;
-                                        };
+    "localeSessionKey": "currentUserLocale",
+    "clearSessionLocale": function() {
+        sessionStorage.removeItem(this.localeSessionKey);
+    },
+    "getUserLocale": function (force) {
+        var sessionKey = this.localeSessionKey;
+        var sessionLocale = sessionStorage.getItem(sessionKey);
+        var locale = "";
+        if (!force && sessionLocale) {
+            return sessionLocale;
+        } else {
+            this.clearSessionLocale();
+            $.ajax ({
+                type: "GET",
+                url: "/api/me",
+                async: false
+            }).done(function(data) {
+                if (data) {
+                    userId = data.id;
+                }
+                if (userId) {
+                    tnthAjax.sendRequest('/api/demographics/'+userId, 'GET', userId, {sync: true}, function(data) {
+                        if (!data.error) {
+                            if (data && data.communication) {
+                                data.communication.forEach(function(item) {
+                                    if (item.language) {
+                                        locale = item.language.coding[0].code;
+                                        sessionStorage.setItem(sessionKey, locale);
+                                    }
                                 });
-                            };
-                    } else {
-                        locale="en-us";
-                    };
-                });
-            };
-       } else locale = localeSelect;
-
-       //console.log("locale? " + locale)
-       return locale ? locale : "en-us";
+                            }
+                        } else {
+                            locale="en_us";
+                        }
+                    });
+                }
+            }).fail(function(xhr) {
+                
+            });
+        }
+        if (!locale) {
+            locale = "en_us";
+        }
+        return locale;
     },
     getDateWithTimeZone: function(dObj) {
         /*
@@ -6729,7 +6572,7 @@ var tnthDates = {
             displayMinute: pad(tmi),
             displaySecond: pad(ts),
             gmtDate: gmtToday
-        }
+        };
     },
     /*
      * parameters: day, month and year values in numeric
@@ -6745,24 +6588,25 @@ var tnthDates = {
             if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
                 if (iy < 1900) {
                     errorMessage = i18next.t("Year must be after 1900");
-                };
+                }
                 // Only allow if date is before today
                 if (restrictToPresent) {
                     var today = new Date();
                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
                         errorMessage = i18next.t("The date must not be in the future.");
-                    };
-                };
+                    }
+                }
             } else {
                 errorMessage = i18next.t("Invalid Date. Please enter a valid date.");
-            };
+            }
         } else {
             errorMessage = i18next.t("Missing value.");
-        };
+        }
         return errorMessage;
     }
 
 };
+
 /***
  * Bootstrap datatables functions
  * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
@@ -6887,6 +6731,157 @@ var FieldLoaderHelper = function () {
     };
 };
 
+var userSetLang = tnthDates.getUserLocale();
+__i18next.init({
+    "debug": false,
+    "initImmediate": false,
+    "lng": userSetLang
+}, function() {
+    $(document).ready(function() {
+        var PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
+        if (PORTAL_NAV_PAGE) {
+            loader(true);
+            fillContent.initPortalWrapper(PORTAL_NAV_PAGE);
+        } else {
+            loader();
+        }
+        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+        if (LOGIN_AS_PATIENT) {
+            /*
+             * need to clear current user locale in session storage when logging in as patient
+             */
+            tnthDates.getUserLocale(true);
+            if (typeof history !== "undefined" && history.pushState) {
+                history.pushState(null, null, location.href);
+            }
+            window.addEventListener("popstate", function(event) {
+                if (typeof history !== "undefined" && history.pushState) {
+                    history.pushState(null, null, location.href);
+                } else {
+                    window.history.forward(1);
+                }
+            });
+        }
 
+        tnthAjax.beforeSend();
 
+        fillContent.footer();
+
+        if ($("#termsContainer.website-consent-script").length > 0) {
+            fillContent.websiteConsentScript();
+        }
+
+        __NOT_PROVIDED_TEXT = i18next.t("not provided");
+
+        var profileObj;
+        if ($("#profileForm").length > 0) {
+            profileObj = new Profile($("#profileUserId").val(), $("#profileCurrentUserId").val());
+            profileObj.init();
+        } else if ($("#aboutForm").length > 0 || $("#topTerms").length > 0){
+            /*
+             * initial queries  - only selected sections
+             */
+            profileObj = new Profile($("#iq_userId").val(), $("#iq_userId").val());
+            profileObj.initSection("orgsstateselector");
+            profileObj.initSection("biopsy");
+        } else if ($("#createProfileForm").length > 0) {
+            profileObj = new Profile("", $("#currentStaffUserId").val());
+            profileObj.initSections();
+        }
+
+        //setTimeout('LRKeyEvent();', 1500);
+        // To validate a form, add class to <form> and validate by ID.
+        $('form.to-validate').validator({
+            custom: {
+                birthday: function($el) {
+                    var m = parseInt($("#month").val());
+                    var d = parseInt($("#date").val());
+                    var y = parseInt($("#year").val());
+                    // If all three have been entered, run check
+                    var goodDate = true;
+                    var errorMsg = "";
+                    // If NaN then the values haven't been entered yet, so we
+                    // validate as true until other fields are entered
+                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                        $("#errorbirthday").html(i18next.t('All fields must be complete.')).hide();
+                        goodDate = false;
+                    } else if (isNaN(d)) {
+                        errorMsg = i18next.t("Please enter a valid date.");
+                    } else if (isNaN(m)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid month.");
+                    } else if (isNaN(y)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + i18next.t("Please enter a valid year.");
+                    };
+
+                    if (hasValue(errorMsg)) {
+                        $("#errorbirthday").html(errorMsg).show();
+                        $("#birthday").val("");
+                        goodDate = false;
+                    }
+                    //}
+                    //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
+                    if (goodDate) {
+                        $("#errorbirthday").html("").hide();
+                    };
+
+                    return goodDate;
+                },
+                customemail: function($el) {
+                    var emailVal = $.trim($el.val());
+                    var update = function($el) {
+                        if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
+                            assembleContent.demo($el.attr("data-user-id"),true, $el);
+                        };
+                    };
+                    if (emailVal === "") {
+                        if ($el.attr("data-optional")) {
+                            /*
+                            * if email address is optional, update it as is
+                            */
+                            update($el);
+                            return true;
+                        } else {
+                            return false;
+                        };
+                    }
+                    var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    // Add user_id to api call (used on patient_profile page so that staff can edit)
+                    var addUserId = "";
+                    if (hasValue($el.attr("data-user-id"))) {
+                        addUserId = "&user_id="+ $el.attr("data-user-id");
+                    }
+                    // If this is a valid address, then use unique_email to check whether it's already in use
+                    if (emailReg.test(emailVal)) {
+                        tnthAjax.sendRequest("/api/unique_email?email="+encodeURIComponent(emailVal)+addUserId, "GET", "", null, function(data) {
+                            if (!data.error) {
+                                if (data.unique) {
+                                    $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                    update($el);
+                                } else {
+                                    $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
+                                };
+
+                            } else {
+                                console.log(i18next.t("Problem retrieving data from server."));
+                            };
+                        });
+                    }
+                    return emailReg.test(emailVal);
+                },
+                htmltags: function($el) {
+                    var invalid = containHtmlTags($el.val());
+                    if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                    else $("#error" + $el.attr("id")).html("");
+                    return !invalid;
+                }
+            },
+            errors: {
+                htmltags: i18next.t("Please remove invalid characters and try again."),
+                birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
+                customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
+            },
+            disable: false
+        }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    });
+});
 

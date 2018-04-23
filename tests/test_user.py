@@ -1030,7 +1030,9 @@ class TestUser(TestCase):
 
     def test_promote(self):
         with SessionScope(db):
+            self.test_user.password = None  # mock pre-registered user
             self.test_user.birthdate = '02-05-1968'
+            self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY)
             other = self.add_user('other@foo.com', first_name='newFirst',
                                   last_name='Better')
             other.password = 'phoney'
@@ -1042,9 +1044,11 @@ class TestUser(TestCase):
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
             old_regtime = user.registered
+            self.assertFalse(user.is_registered())
             user.promote_to_registered(other)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
+            self.assertTrue(user.is_registered())
             self.assertNotEqual(user.registered, old_regtime)
             self.assertTrue(other.deleted)
             self.assertEquals(user.first_name, 'newFirst')

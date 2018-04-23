@@ -91,6 +91,7 @@
           {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('scheduled_job_api.jobs_list')}}">{{_("Scheduled Jobs")}}</a></li>
               <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{url_for('gil.decision_support')}}">

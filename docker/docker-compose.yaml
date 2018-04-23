@@ -1,85 +1,75 @@
 ---
 version: "3.2"
 services:
-  web:
+  # Base service; for extension only, not for direct use
+  base: &service_base
     image: "${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
     build:
       context: ..
       dockerfile: docker/Dockerfile
       args:
         - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
-    ports:
-      - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     env_file:
       - portal.env
     environment:
-      - PERSISTENCE_DIR=${PERSISTENCE_DIR:-gil}
-      - PGUSER=${PGUSER:-postgres}
-      - PGPASSWORD=${PGPASSWORD:-""}
-      - PGHOST=${PGHOST:-db}
-      - PGDATABASE=${PGDATABASE:-portaldb}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-    volumes:
-      - source: ../instance
-        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
-        type: bind
+      PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-""}
+      PGHOST: ${PGHOST:-db}
+      PGDATABASE: ${PGDATABASE:-portaldb}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+
+  web:
+    <<: *service_base
+    ports:
+      - target: ${PORT:-8008}
+        published: ${EXTERNAL_PORT:-8080}
     depends_on:
       - db
       - redis
       - celery
       - celerybeat
+
   celery:
-    image: "${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
+    <<: *service_base
     command: bash -c '
       env &&
       celery worker
         --app portal.celery_worker.celery
         --loglevel debug
       '
-    environment:
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-    volumes:
-      - source: ../instance
-        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
-        type: bind
     depends_on:
       - redis
+
   celerybeat:
-    image: "${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
+    <<: *service_base
     command: bash -c '
       env &&
-      wait-for-it --timeout=120 --host="web" --port="$$PORT" --strict &&
+      wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
       celery beat
         --app portal.celery_worker.celery
-        --schedule=/tmp/celerybeat-schedule.db
         --loglevel debug
-        --pidfile=/tmp/celerybeat.pid
+        --schedule /tmp/celerybeat-schedule.db
+        --pidfile /tmp/celerybeat.pid
       '
-    environment:
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - PGUSER=${PGUSER:-postgres}
-      - PGPASSWORD=${PGPASSWORD:-""}
-      - PGHOST=${PGHOST:-db}
-      - PGDATABASE=${PGDATABASE:-portaldb}
-    volumes:
-      - source: ../instance
-        target: "${PROJECT_DIR:-/opt/venvs/portal}/var/portal-instance/"
-        type: bind
     depends_on:
-      - redis
+      - celery
+
   redis:
     image: redis
     ports:
-      - "6379"
+      - target: 6379
+
   db:
     image: postgres
     ports:
-      - "5432"
+      - target: 5432
     environment:
-      - POSTGRES_DB=${PGDATABASE:-portaldb}
+      POSTGRES_DB: ${PGDATABASE:-portaldb}
     volumes:
       - source: postgres-data
         target: /var/lib/postgresql/data
         type: volume
+
 volumes:
     postgres-data: {}

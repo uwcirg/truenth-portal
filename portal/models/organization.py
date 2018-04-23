@@ -390,8 +390,10 @@ class Organization(db.Model):
         return bundle
 
     @staticmethod
-    def consent_agreements():
+    def consent_agreements(locale_code):
         """Return consent agreements for all top level organizations
+
+        :param locale_code: preferred locale, typically user's.
 
         :return: dictionary keyed by top level organization id containing
           a VersionedResource for each organization IFF the organization
@@ -407,7 +409,7 @@ class Organization(db.Model):
             # include only those with such defined
             try:
                 url = app_text(ConsentByOrg_ATMA.name_key(organization=org))
-                resource = VersionedResource(url)
+                resource = VersionedResource(url, locale_code=locale_code)
             except UndefinedAppText:
                 # no consent found for this organization, provide
                 # the dummy template

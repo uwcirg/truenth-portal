@@ -79,10 +79,16 @@ class TestCase(Base):
         else:
             self.test_user = test_user
 
-    def add_user(self, username, first_name="", last_name="", image_url=None):
+    def add_user(
+            self, username, first_name="", last_name="", image_url=None,
+            pre_registered=False):
         """Create a user and add to test db, and return it"""
-        test_user = User(username=username, first_name=first_name,
-                last_name=last_name, image_url=image_url)
+        # Unless testing a pre_registered case, give the user a fake password
+        # so they appear registered
+        password = None if pre_registered else 'fakePa$$'
+        test_user = User(
+            username=username, first_name=first_name, last_name=last_name,
+            image_url=image_url, password=password)
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
@@ -173,7 +179,7 @@ class TestCase(Base):
         if backdate:
             timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-            get_user(TEST_USER_ID).save_constrained_observation(
+            get_user(TEST_USER_ID).save_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=timestamp)
 

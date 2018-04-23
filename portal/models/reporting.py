@@ -147,7 +147,8 @@ def generate_and_send_summaries(cutoff_days, org_id):
             overdue_stats=ostats,
             user=user,
             top_org=top_org)
-        summary_email = MailResource(app_text(name_key), variables=args)
+        summary_email = MailResource(
+            app_text(name_key), locale_code=user.locale_code, variables=args)
         em = EmailMessage(recipients=user.email,
                           sender=current_app.config['MAIL_DEFAULT_SENDER'],
                           subject=summary_email.subject,

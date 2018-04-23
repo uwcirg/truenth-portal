@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block head %}
+	{{super()}}
+	 <link rel="stylesheet" href="{{ url_for('static', filename='css/psaTracker.css') }}">
+{% endblock %}
+{% block main %}
+<main id="mainPsaApp">
+    <input type="hidden" id="psaTrackerUserId" value="{{user.id}}"/>
+    <section class="psa-tracker-title">
+        <h2 class="tnth-header heading">{{_("Track Your PSA")}}</h2>
+        {{_("Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood.")}}
+        <div id="psaTrackerButtonsContainer">
+            <button class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{_('ADD NEW PSA RESULT')}}</button>
+        </div>
+    </section>
+    <section>
+        {% raw %}
+            <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">{{noResultMessage}}</div>
+            <div id="psaTrackerResultsContainer" v-if="items.length">
+                <div class="psaTrackerLoader" v-bind:class="{ 'tnth-hide': !loading }"><i class="fa fa-spinner fa-spin fa-3x"></i></div>
+                <table id="psaTrackerResultsTable" v-bind:class="{ 'tnth-hide': loading }">
+                    <THEAD class="psa-tracker-table-header">
+                        <th v-for="item in headers">{{item}}</th>
+                    </THEAD>
+                    <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" class="result-row">
+                        <td class="result-cell"><span v-on:click="onEdit(item)">{{item.result}}</span></td>
+                        <td class="result-cell"><span v-on:click="onEdit(item)">{{item.date}}</span></td>
+                    </tr>
+                </table>
+                <div id="psaTrackerGraphContainer" v-bind:class="{ 'tnth-hide': loading }" v-if="items.length > 0">
+                    <div id="psaTrackerGraph"></div>
+                </div>
+            </div>
+            <div id="psaTrackerErrorMessageContainer" class="error-message"></div>
+        {% endraw %}
+    </section>
+    <div class="modal fade" id="addPSAModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                {% raw %}
+                	<div class="modal-header-title">{{ newItem.edit ? editTitle: addTitle}}</div>
+                {% endraw %}
+            </div>
+            <div class="modal-body">
+                <div class="body-content">
+                    <table id="psaTrackerAddTable">
+                        <tr>
+                            <td>{{_("PSA (ng/ml)")}}</td>
+                            <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" placeholder="{{_('Enter a number')}}"/></td>
+                        </tr>
+                        <tr>
+                            <td>{{_("PSA Test Date")}}</td>
+                            <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" placeholder="{{_('d M yyyy, example: 1 Jan, 2017')}}"/></td>
+                        </tr>
+                    </table>
+                    <br/>
+                    {% raw %}
+                        <div class="error-message text-center">{{addErrorMessage}}</div>
+                    {% endraw %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!newItem.result || !newItem.date">{{_("Save")}}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+            </div>
+          </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+{% block additional_scripts %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.min.js"></script>
+	<script src="{{url_for('static', filename='js/psaTracker.js')}}" ></script>
+{% endblock %}

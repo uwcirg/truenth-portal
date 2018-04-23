@@ -750,6 +750,12 @@
             var arrTypes = types.split(",");
             var dataUrl = $(this).attr("data-url");
             arrTypes.forEach(function(type) {
+              /*
+               * if already agreed, don't post again
+               */
+              if ($("#termsCheckbox [data-agree='true'][data-tou-type='"+type+"']").length > 0) {
+                return true;
+              }
               var theTerms = {};
               theTerms["agreement_url"] = hasValue(dataUrl) ? dataUrl : $("#termsURL").data().url;
               theTerms["type"] = type;

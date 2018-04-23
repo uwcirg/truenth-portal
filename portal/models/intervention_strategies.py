@@ -234,8 +234,8 @@ def update_card_html_on_completion():
         def thank_you_block(name, registry):
             greeting = _(u"Thank you, {}.").format(name)
             confirm = _(
-                u"You've completed the {} questionnaire"
-                ".").format(registry)
+                u"You've completed the %(registry)s questionnaire.",
+                registry=_(registry))
             reminder = _(
                 u"You will be notified when the next "
                 "questionnaire is ready to complete.")
@@ -283,18 +283,19 @@ def update_card_html_on_completion():
                         trigger_date, as_of_date=now) or utc_start
                     expired_date = localize_datetime(utc_expired, user)
                     reminder = _(
-                        u"Please complete your {} "
+                        u"Please complete your %(assigning_authority)s "
                         "questionnaire as soon as possible. It will expire "
-                        "on {}.").format(
-                            assessment_status.assigning_authority,
-                            expired_date.strftime('%-d %b %Y'))
+                        "on %(expired_date)s.",
+                        assigning_authority=_(
+                            assessment_status.assigning_authority),
+                        expired_date=expired_date)
                 else:
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
-                        u"Please complete your {} "
-                        "questionnaire by {}.").format(
-                            assessment_status.assigning_authority,
-                            due_date.strftime('%-d %b %Y'))
+                        u"Please complete your %(assigning_authority)s "
+                        "questionnaire by %(due_date)s.",
+                        assigning_authority=assessment_status.assigning_authority,
+                        due_date=due_date)
 
                 return u"""
                     <div class="portal-header-container">
@@ -310,9 +311,9 @@ def update_card_html_on_completion():
             if any(indefinite_questionnaires):
                 greeting = _(u"Hi {}").format(user.display_name)
                 reminder = _(
-                    u"Please complete your {} "
-                    "questionnaire at your convenience.").format(
-                        assessment_status.assigning_authority)
+                    u"Please complete your %(assigning_authority)s "
+                    "questionnaire at your convenience.",
+                    assigning_authority=assessment_status.assigning_authority)
                 return u"""
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -365,8 +366,8 @@ def update_card_html_on_completion():
                 utc_comp_date = assessment_status.completed_date
                 comp_date = localize_datetime(utc_comp_date, user)
                 message = _(
-                    u"View questionnaire completed on {}").format(
-                        comp_date.strftime('%-d %b %Y'))
+                    u"View questionnaire completed on %(comp_date)s",
+                    comp_date=comp_date)
                 return completed_html.format(
                     header=header, message=message,
                     recent_survey_link=url_for(
@@ -670,11 +671,14 @@ class AccessStrategy(db.Model):
 
     @classmethod
     def from_json(cls, data):
-        obj = cls()
+        strat = cls()
+        return strat.update_from_json(data)
+
+    def update_from_json(self, data):
         try:
-            obj.name = data['name']
+            self.name = data['name']
             if 'id' in data:
-                obj.id = data['id']
+                self.id = data['id']
             if 'intervention_name' in data:
                 intervention = Intervention.query.filter_by(
                     name=data['intervention_name']).first()
@@ -683,19 +687,19 @@ class AccessStrategy(db.Model):
                         'Intervention not found {}.  (NB: new interventions '
                         'require `seed -i` to import)'.format(
                             data['intervention_name']))
-                obj.intervention_id = intervention.id
+                self.intervention_id = intervention.id
             if 'description' in data:
-                obj.description = data['description']
+                self.description = data['description']
             if 'rank' in data:
-                obj.rank = data['rank']
-            obj.function_details = json.dumps(data['function_details'])
+                self.rank = data['rank']
+            self.function_details = json.dumps(data['function_details'])
 
             # validate the given details by attempting to instantiate
-            obj.instantiate()
+            self.instantiate()
         except Exception, e:
             raise ValueError("AccessStrategy instantiation error: {}".format(
                 e))
-        return obj
+        return self
 
     def as_json(self):
         """Return self in JSON friendly dictionary"""
