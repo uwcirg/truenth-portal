@@ -135,7 +135,7 @@ class ValueQuantity(db.Model):
             # based on classic truth value.
             try:
                 self.value = int(value) != 0
-            except ValueError, e:
+            except (TypeError, ValueError), e:
                 if value is None or isinstance(value, basestring):
                     pass
                 else:
