@@ -253,7 +253,7 @@ class Communication(db.Model):
         if missing:
             raise ValueError(
                 "{} contains unknown varables: {}".format(
-                    self.communication_request.content_url,
+                    mailresource.url,
                     ','.join(missing)))
 
         msg = EmailMessage(
