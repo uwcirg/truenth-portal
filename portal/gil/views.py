@@ -189,9 +189,9 @@ def gil_shortcut_alias_validation(clinic_alias):
 def privacy():
     """ privacy use page"""
     user = current_user()
+    locale_code = user.locale_code if user else None
     privacy_resource = VersionedResource(
-        app_text(PrivacyATMA.name_key()),
-        locale_code=user.locale_code)
+        app_text(PrivacyATMA.name_key()), locale_code=locale_code)
     return render_template(
         'gil/privacy.html', content=privacy_resource.asset, user=user,
         editorUrl=privacy_resource.editor_url)
