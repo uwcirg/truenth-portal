@@ -25,10 +25,10 @@ def upgrade():
     # Kill those with set passwords
     session.execute("""
             DELETE FROM user_roles WHERE id IN (
-            SELECT user_roles.id FROM users 
-            JOIN user_roles ON users.id = user_id 
-            JOIN roles ON roles.id = role_id         
-            WHERE password IS NOT NULL 
+            SELECT user_roles.id FROM users
+            JOIN user_roles ON users.id = user_id
+            JOIN roles ON roles.id = role_id
+            WHERE password IS NOT NULL
             AND roles.name IN ('access_on_verify', 'write_only',
             'promote_without_identity_challenge'))""")
 
