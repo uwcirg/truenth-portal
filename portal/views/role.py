@@ -115,6 +115,104 @@ def roles(user_id):
     return jsonify(roles=results)
 
 
+@role_api.route('/api/user/<int:user_id>/roles', methods=('POST',))
+@oauth.require_oauth()
+def add_roles(user_id):
+    """Add roles to user, returns simple JSON defining user roles
+
+    Used to add role(s) to a user.  See the PUT version for the idempotent
+    mechanism to define the complete set of roles for a user.  This
+    endpoint will only POST a new role (or multiple roles) on a user.
+
+    If any of the roles POSTed are already defined for the user, a 409
+    will be raised.
+
+    Only the 'name' field of the roles is referenced.  Must match
+    current roles in the system.
+
+    Returns a list of all roles user belongs to after change.
+    ---
+    tags:
+      - User
+      - Role
+    operationId: addRoles
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: nested_roles
+          properties:
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    description:
+                      The string defining the name of each role the user should
+                      belong to.  Must exist as an available role in the system.
+    responses:
+      200:
+        description:
+          Returns a list of all roles user belongs to after change.
+        schema:
+          id: nested_roles
+          properties:
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    description:
+                      Role name, always a lower case string with no white space.
+                  description:
+                    type: string
+                    description: Plain text describing the role.
+      400:
+        description: if the request includes an unknown role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+      409:
+        if any of the given roles are already assigned to the user
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user_or_abort(user_id)
+    if not request.json or 'roles' not in request.json:
+        abort(400, "Requires role list")
+
+    role_list = [Role.query.filter_by(name=role.get('name')).one()
+                 for role in request.json.get('roles')]
+    user.add_roles(role_list, acting_user=current_user())
+    db.session.commit()
+
+    # Return user's updated role list
+    results = [{'name': r.name, 'description': r.description}
+               for r in user.roles]
+    return jsonify(roles=results)
+
+
 @role_api.route('/api/user/<int:user_id>/roles', methods=('PUT',))
 @oauth.require_oauth()
 def set_roles(user_id):
