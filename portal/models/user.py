@@ -1039,6 +1039,25 @@ class User(db.Model, UserMixin):
         self.update_roles(
             role_list=role_list+self.roles, acting_user=acting_user)
 
+    def delete_roles(self, role_list, acting_user):
+        """Delete one or more roles from user's existing roles
+
+        :param role_list: list of role objects defining what roles to remove
+        :param acting_user: user performing action, for permissions, etc.
+
+        :raises: 409 if any named roles are not currently assigned to the user
+
+        """
+        if (len(set(self.roles).intersection(set(role_list))) !=
+                len(role_list)):
+            abort(409, "Request to delete role not currently applied to user")
+
+        # reuse update_roles() by including the current set now that input
+        # has been validated
+        self.update_roles(
+            role_list=[role for role in self.roles if role not in role_list],
+            acting_user=acting_user)
+
     def update_roles(self, role_list, acting_user):
         """Update user's roles
 
