@@ -1,6 +1,6 @@
 """Questionnaire Bank module"""
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, MAXYEAR
 from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ENUM
@@ -310,11 +310,35 @@ class QuestionnaireBank(db.Model):
             results = in_progress
         else:
             # combine current with in-progress
-            # maintain order (in-progress first) for most_current_qb filtering
+            # maintain order by relative start for most_current_qb filtering
+            # in-progress takes precedence
             in_progress_set = set(in_progress)  # O(n)
             others = set(by_org + by_intervention)
             results = in_progress + [
                 e for e in others if e not in in_progress_set]
+
+            # additional sort is necessary in case of both as in_progress
+            # wasn't necessarily all inclusive (i.e. user may have skipped
+            # one or more).  such gaps break most_current_qb filtering
+            if all((in_progress, others)):
+                someday = datetime(year=MAXYEAR, month=12, day=31)
+                sort_results = {}
+                for qb in results:
+                    trigger_date = qb.trigger_date(user=user)
+                    start = (
+                        qb.calculated_start(
+                            trigger_date=trigger_date,
+                            as_of_date=as_of_date).relative_start or someday)
+
+                    if start not in sort_results:
+                        sort_results[start] = qb
+                results = [
+                    sort_results[k] for k in sorted(sort_results.iterkeys())]
+            else:
+                in_progress_set = set(in_progress)  # O(n)
+                others = set(by_org + by_intervention)
+                results = in_progress + [
+                    e for e in others if e not in in_progress_set]
 
         validate_classification_count(results)
         return results
@@ -393,6 +417,9 @@ class QuestionnaireBank(db.Model):
     def calculated_start(self, trigger_date, as_of_date):
         """Return namedtuple (QBD) for QB
 
+        :param trigger_date: initial trigger utc time value
+        :param as_of_date: utc time value for computation, i.e. utcnow()
+
         Returns namdetuple (QBD) containing the calculated start date in UTC
         for the QB, the QB's recurrence, and the iteration count.  Generally
         trigger date plus the QB.start.  For recurring, the iteration count may
@@ -403,7 +430,7 @@ class QuestionnaireBank(db.Model):
             QBD(None, None, None, self) if N/A
 
         """
-        # On recurring QB, deligate to recur for date
+        # On recurring QB, delegate to recur for date
         if len(self.recurs):
             for recurrence in self.recurs:
                 (relative_start, ic) = recurrence.active_interval_start(
