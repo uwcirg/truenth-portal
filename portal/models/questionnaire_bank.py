@@ -314,7 +314,8 @@ class QuestionnaireBank(db.Model):
             # in-progress takes precedence
             in_progress_set = set(in_progress)  # O(n)
             others = set(by_org + by_intervention)
-            results = in_progress + (others - in_progress_set)
+            results = in_progress + [
+                e for e in others if e not in in_progress_set]
 
             # additional sort is necessary in case of both as in_progress
             # wasn't necessarily all inclusive (i.e. user may have skipped
