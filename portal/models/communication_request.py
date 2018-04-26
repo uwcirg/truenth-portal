@@ -261,6 +261,8 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         return
     trace("computed start {} for this questionnaire_bank".format(
         start))
+    trace("computed expiry {} for this questionnaire_bank".format(
+        start + RelativeDelta(questionnaire_bank.expired)))
 
     newly_crafted = []  # holds tuples (notify_date, communication)
     if not len(questionnaire_bank.communication_requests):
