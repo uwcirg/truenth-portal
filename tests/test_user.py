@@ -551,6 +551,24 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
 
+    def test_roles_post(self):
+        data = {"roles": [
+                {"name": ROLE.APPLICATION_DEVELOPER},
+                {"name": ROLE.PATIENT}
+                ]}
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+        rv = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), 3)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), len(doc['roles']))
+
     def test_roles_duplicate_add(self):
         data = {"roles": [
                 {"name": ROLE.APPLICATION_DEVELOPER},
@@ -570,7 +588,24 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles),  1)
 
-    def test_roles_delete(self):
+    def test_roles_duplicate_post(self):
+        """POST shouldn't allow duplicates"""
+        data = {"roles": [
+                {"name": ROLE.APPLICATION_DEVELOPER},
+                ]}
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.login()
+        rv = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 409)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), 2)
+
+    def test_roles_delete_via_put(self):
         "delete via PUT of less than all current roles"
         self.promote_user(role_name=ROLE.PATIENT)
         self.promote_user(role_name=ROLE.ADMIN)
@@ -584,6 +619,23 @@ class TestUser(TestCase):
         rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), 2)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), 2)
+
+    def test_roles_delete(self):
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        data = {"roles": [{"name": ROLE.PATIENT}]}
+
+        self.login()
+        rv = self.client.delete(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         self.assertEquals(rv.status_code, 200)
         doc = json.loads(rv.data)
