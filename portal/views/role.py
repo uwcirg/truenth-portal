@@ -38,7 +38,6 @@ def system_roles():
                 type: object
                 required:
                   - name
-                  - description
                 properties:
                   name:
                     type: string
@@ -83,23 +82,7 @@ def roles(user_id):
         description:
           Returns the list of roles the requested user belongs to.
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                  - description
-                properties:
-                  name:
-                    type: string
-                    description:
-                      Role name, always a lower case string with no white space.
-                  description:
-                    type: string
-                    description: Plain text describing the role.
+          $ref: "#/definitions/nested_roles"
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -148,41 +131,13 @@ def add_roles(user_id):
       - in: body
         name: body
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      The string defining the name of each role the user should
-                      belong to.  Must exist as an available role in the system.
+          $ref: "#/definitions/nested_roles"
     responses:
       200:
         description:
           Returns a list of all roles user belongs to after change.
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      Role name, always a lower case string with no white space.
-                  description:
-                    type: string
-                    description: Plain text describing the role.
+          $ref: "#/definitions/nested_roles"
       400:
         description: if the request includes an unknown role.
       401:
@@ -192,7 +147,7 @@ def add_roles(user_id):
       404:
         description: if user_id doesn't exist
       409:
-        if any of the given roles are already assigned to the user
+        description: if any of the given roles are already assigned to the user
 
     """
     user = current_user()
@@ -245,42 +200,13 @@ def delete_roles(user_id):
       - in: body
         name: body
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      The string defining the name of each role the user
-                      should no longer belong to.  Must exist as an available
-                      role in the system.
+          $ref: "#/definitions/nested_roles"
     responses:
       200:
         description:
           Returns a list of all roles user belongs to after change.
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      Role name, always a lower case string with no white space.
-                  description:
-                    type: string
-                    description: Plain text describing the role.
+          $ref: "#/definitions/nested_roles"
       400:
         description: if the request includes an unknown role.
       401:
@@ -290,7 +216,7 @@ def delete_roles(user_id):
       404:
         description: if user_id doesn't exist
       409:
-        if any of the given roles are not currently assigned to the user
+        description: if any of the given roles are not currently assigned to the user
 
     """
     user = current_user()
@@ -341,41 +267,13 @@ def set_roles(user_id):
       - in: body
         name: body
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      The string defining the name of each role the user should
-                      belong to.  Must exist as an available role in the system.
+          $ref: "#/definitions/nested_roles"
     responses:
       200:
         description:
           Returns a list of all roles user belongs to after change.
         schema:
-          id: nested_roles
-          properties:
-            roles:
-              type: array
-              items:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                    description:
-                      Role name, always a lower case string with no white space.
-                  description:
-                    type: string
-                    description: Plain text describing the role.
+          $ref: "#/definitions/nested_roles"
       400:
         description: if the request includes an unknown role.
       401:
