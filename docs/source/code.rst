@@ -24,7 +24,7 @@ Examples
 --------
 
 Schema Reuse
-************
+^^^^^^^^^^^^
 
 Open API schemas can be defined once and referenced by any other document. For example, the ``FHIRPatient`` ``schema`` defined in the body of one request ...::
 
