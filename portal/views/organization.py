@@ -9,9 +9,9 @@ from ..database import db
 from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
-from ..models.reference import MissingReference
+from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
-from ..models.user import current_user
+from ..models.user import current_user, get_user_or_abort
 from ..system_uri import PRACTICE_REGION
 
 
@@ -385,3 +385,131 @@ def organization_put(organization_id):
         subject_id=current_user().id, context='organization')
     OrgTree.invalidate_cache()
     return jsonify(org.as_fhir(include_empties=False))
+
+
+@org_api.route('/user/<int:user_id>/organization')
+@oauth.require_oauth()
+def user_organizations(user_id):
+    """Obtain list of organization references currently associated with user
+
+    ---
+    tags:
+      - User
+      - Organization
+    operationId: user_organizations
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: return list of user's organizations by reference
+        schema:
+          id: organization_references
+          properties:
+            organizations:
+              type: array
+              items:
+                type: object
+                required:
+                  - reference
+                properties:
+                  reference:
+                    type: string
+                    description: FHIR compliant reference to an organization
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user_or_abort(user_id)
+
+    # Return current organizations
+
+    return jsonify(organizations=[
+        Reference.organization(org.id).as_fhir()
+        for org in user.organizations])
+
+
+@org_api.route('/user/<int:user_id>/organization', methods=('POST',))
+@oauth.require_oauth()
+def add_user_organizations(user_id):
+    """Associate organization with user via reference
+
+    POST a list of references to each existing organization to associate with
+    given user.  These will be added to the user's current organizations.
+
+    Both organization reference formats are supported, i.e.:
+
+        {'organizations': [
+            {'reference': 'api/organization/1001'},
+            {'reference': 'api/organization/123-45?system=http://pcctc.org/'}
+        ]}
+
+    If user is already associated with one or more of the posted organizations,
+    a 409 will be raised.
+    ---
+    tags:
+      - User
+      - Organization
+    operationId: add_user_organizations
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          $ref: "#/definitions/organization_references"
+    responses:
+      200:
+        description:
+          return list of user's organizations by reference after change
+        schema:
+          $ref: "#/definitions/organization_references"
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+      409:
+        description: if any of the given identifiers are already assigned to the user
+
+    """
+    current_user().check_role(permission='edit', other_id=user_id)
+    user = get_user_or_abort(user_id)
+    if not request.json or 'organizations' not in request.json:
+        abort(400, "Requires `organizations` list")
+
+    for item in request.json.get('organizations'):
+        org = Reference.parse(item)
+        if not isinstance(org, Organization):
+            raise(400, "Expecting only `Organization` references")
+        if org in user.organizations:
+            abort(
+                409,
+                "POST restricted to organizations not already assigned to "
+                "user")
+        user.organizations.append(org)
+    db.session.commit()
+
+    # Return current organizations
+
+    return jsonify(organizations=[
+        Reference.organization(org.id).as_fhir()
+        for org in user.organizations])
