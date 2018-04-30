@@ -24,16 +24,6 @@ class TestReference(TestCase):
         self.assertEquals(
             org.as_fhir()['display'], 'none of the above')
 
-    def prep_org_w_identifier(self):
-        o = Organization(name='test org')
-        i = Identifier(system=US_NPI, value='123-45')
-        o.identifiers.append(i)
-        with SessionScope(db):
-            db.session.add(o)
-            db.session.commit()
-        o = db.session.merge(o)
-        return o
-
     def test_org_w_identifier(self):
         o = self.prep_org_w_identifier()
         o_ref = Reference.organization(o.id)
