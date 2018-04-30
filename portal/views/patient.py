@@ -4,7 +4,7 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
-from flask import abort, Blueprint, request
+from flask import abort, Blueprint, jsonify, request
 import json
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
@@ -14,13 +14,13 @@ from .demographics import demographics
 from ..extensions import oauth
 from ..models.identifier import Identifier, UserIdentifier
 from ..models.role import ROLE
-from ..models.user import current_user, User
+from ..models.user import current_user, get_user_or_abort, User
 
 
-patient_api = Blueprint('patient_api', __name__, url_prefix='/api/patient')
+patient_api = Blueprint('patient_api', __name__)
 
 
-@patient_api.route('/')
+@patient_api.route('/api/patient/')
 @oauth.require_oauth()
 def patient_search():
     """Looks up patient from given parameters, returns FHIR Patient if found
@@ -111,3 +111,72 @@ def patient_search():
                             context='authentication')
             abort(404)
     abort(404)
+
+
+@patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
+@oauth.require_oauth()
+def post_patient_deceased(patient_id):
+    """POST deceased datetime or status for a patient
+
+    This convenience API wraps the ability to set a patient's
+    deceased status and deceased date time - generally the /api/demographics
+    API should be preferred.
+
+    ---
+    operationId: deceased
+    tags:
+      - Patient
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: deceased_details
+          properties:
+            deceasedBoolean:
+              type: string
+              description:
+                true or false.  Implicitly true with deceasedDateTime value
+            deceasedDateTime:
+              type: string
+              description: valid FHIR datetime string defining time of death
+    responses:
+      200:
+        description:
+          Returns updated [FHIR patient
+          resource](http://www.hl7.org/fhir/patient.html) in JSON.
+      400:
+        description:
+          if given parameters don't function, such as a false deceasedBoolean AND
+          a deceasedDateTime value.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+      409:
+        description:
+          if attempting to POST new deceased data for a patient whom already
+          has a defined deceased value.
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user_or_abort(patient_id)
+    if not request.json and set(request.json.keys()).isdisjoint(
+            {'deceasedDateTime', 'deceasedBoolean'}):
+        abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
+
+    if patient.deceased and (
+            request.json.get('deceasedBoolean') or
+            request.json.get('deceasedDateTime')):
+        abort(409, "Deceased value already set for patient {}".format(
+            patient_id))
+
+    patient.update_deceased(request.json)
+    return jsonify(patient.as_fhir(include_empties=False))

@@ -1094,6 +1094,41 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='role')
             db.session.add(audit)
 
+    def update_deceased(self, fhir):
+        if 'deceasedDateTime' in fhir:
+            dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
+                                     error_subject='deceasedDataTime')
+            if self.deceased_id:
+                # only update if the datetime is different
+                if dt == self.deceased.timestamp:
+                    return  # short circuit out of here
+            # Given a time, store and mark as "time of death"
+            audit = Audit(
+                user_id=current_user().id, timestamp=dt,
+                subject_id=self.id, context='user',
+                comment="time of death for user {}".format(self.id))
+            self.deceased = audit
+        elif 'deceasedBoolean' in fhir:
+            if fhir['deceasedBoolean'] is False:
+                if self.deceased_id:
+                    # Remove deceased record from the user, but maintain
+                    # the old audit row.
+                    self.deceased_id = None
+                    audit = Audit(
+                        user_id=current_user().id,
+                        subject_id=self.id, context='user',
+                        comment=("Remove existing deceased from "
+                                 "user {}".format(self.id)))
+                    db.session.add(audit)
+            else:
+                # still marked with an audit, but without the special
+                # comment syntax and using default (current) time.
+                audit = Audit(
+                    user_id=current_user().id, subject_id=self.id,
+                    comment=("Marking user {} as "
+                             "deceased".format(self.id)), context='user')
+                self.deceased = audit
+
     def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
@@ -1105,40 +1140,6 @@ class User(db.Model, UserMixin):
         :param acting_user: user requesting the change
 
         """
-        def update_deceased(fhir):
-            if 'deceasedDateTime' in fhir:
-                dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
-                                         error_subject='deceasedDataTime')
-                if self.deceased_id:
-                    # only update if the datetime is different
-                    if dt == self.deceased.timestamp:
-                        return  # short circuit out of here
-                # Given a time, store and mark as "time of death"
-                audit = Audit(
-                    user_id=current_user().id, timestamp=dt,
-                    subject_id=self.id, context='user',
-                    comment="time of death for user {}".format(self.id))
-                self.deceased = audit
-            elif 'deceasedBoolean' in fhir:
-                if fhir['deceasedBoolean'] is False:
-                    if self.deceased_id:
-                        # Remove deceased record from the user, but maintain
-                        # the old audit row.
-                        self.deceased_id = None
-                        audit = Audit(
-                            user_id=current_user().id,
-                            subject_id=self.id, context='user',
-                            comment=("Remove existing deceased from "
-                                     "user {}".format(self.id)))
-                        db.session.add(audit)
-                else:
-                    # still marked with an audit, but without the special
-                    # comment syntax and using default (current) time.
-                    audit = Audit(
-                        user_id=current_user().id, subject_id=self.id,
-                        comment=("Marking user {} as "
-                                 "deceased".format(self.id)), context='user')
-                    self.deceased = audit
 
         def update_identifiers(fhir):
             """Given FHIR defines identifiers, but we never remove implicit
@@ -1209,7 +1210,7 @@ class User(db.Model, UserMixin):
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
-        update_deceased(fhir)
+        self.update_deceased(fhir)
         update_identifiers(fhir)
         update_care_providers(fhir)
         if 'gender' in fhir:
