@@ -1,8 +1,11 @@
 """Test module for patient specific APIs"""
+from datetime import datetime
 from flask_webtest import SessionScope
 import json
 
 from portal.extensions import db
+from portal.date_tools import FHIR_datetime
+from portal.models.audit import Audit
 from portal.models.identifier import Identifier, UserIdentifier
 from portal.models.role import ROLE
 from tests import TestCase, TEST_USERNAME, TEST_USER_ID
@@ -85,3 +88,35 @@ class TestPatient(TestCase):
             '/api/patient?identifier=system"http://example.com",value="testy"',
             follow_redirects=True)
         self.assert400(rv)
+
+    def test_deceased(self):
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        now = FHIR_datetime.as_fhir(datetime.utcnow())
+        data = {'deceasedDateTime': now}
+        rv = self.client.post(
+            '/api/patient/{}/deceased'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+        self.assertTrue(user.deceased)
+
+    def test_deceased_again(self):
+        """POST shouldn't take deceased if already deceased"""
+        self.promote_user(role_name=ROLE.PATIENT)
+        d_audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, context='user',
+            comment="time of death for user {}".format(TEST_USER_ID))
+        with SessionScope(db):
+            db.session.add(d_audit)
+            db.session.commit()
+        self.test_user, d_audit = map(db.session.merge, (self.test_user, d_audit))
+        self.test_user.deceased = d_audit
+        self.login()
+        data = {}
+        rv = self.client.post(
+            '/api/patient/{}/deceased'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assertTrue(rv.status_code, 409)
