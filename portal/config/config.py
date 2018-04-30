@@ -112,8 +112,8 @@ class BaseConfig(object):
     FILE_UPLOAD_DIR = 'uploads'
 
     LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://stg-lr7.us.truenth.org')
-    LR_GROUP = os.environ.get('LR_GROUP', 20144)
-    LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 32149)
+    LR_GROUP = os.environ.get('LR_GROUP', 20145)
+    LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 35564)
 
     SYSTEM_TYPE = os.environ.get('SYSTEM_TYPE', 'development')
 
