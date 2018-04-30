@@ -33,6 +33,7 @@ from ..views.extend_flask_user import reset_password_view_function
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
+from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
 from ..views.organization import org_api
@@ -63,6 +64,7 @@ DEFAULT_BLUEPRINTS = (
     fhir_api,
     filters_blueprint,
     group_api,
+    identifier_api,
     intervention_api,
     notification_api,
     org_api,
