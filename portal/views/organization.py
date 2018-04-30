@@ -499,7 +499,7 @@ def add_user_organizations(user_id):
     for item in request.json.get('organizations'):
         org = Reference.parse(item)
         if not isinstance(org, Organization):
-            raise(400, "Expecting only `Organization` references")
+            abort(400, "Expecting only `Organization` references")
         if org in user.organizations:
             abort(
                 409,
