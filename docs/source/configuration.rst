@@ -4,16 +4,18 @@ Configuration
 TruenNTH Shared Services can be configured in a number of fashions, to support
 a variety of use cases.
 
-Four primary mechanims are in place to setup the system as desired:
+Three primary mechanisms are in place to setup the system as desired:
 
-- `application.cfg`_
+- `Flask Configuration Files`_
 - `Site Persistence`_
-- `site.cfg`_
 - `AppText`_
 
-application.cfg
-===============
+Flask Configuration Files
+=========================
+Flask configuration files (``.cfg``) are simple python files used to set Flask configuration parameters.
 
+application.cfg
+---------------
 This primary configuration file lives in the `instance` source directory.
 See `README <readme_link.html>`__ for initial setup of ``application.cfg``.
 
@@ -27,7 +29,7 @@ including:
 All others should likely be handled by `Site Persistence`_.
 
 Values with defaults are typically defined in the ``portal.config.BaseConfig``
-class.  Most are self explanitory or include inline comments for clarification.
+class.  Most are self explanatory or include inline comments for clarification.
 
 Of special note, the one used to control which set of values are pulled in
 by `Site Persistence`_.
@@ -46,6 +48,40 @@ PERSISTENCE_DIR::
     For ePROMs:
 
         PERSISTENCE_DIR='eproms'
+
+site.cfg
+--------
+This configuration file also lives in the `instance` source directory, but
+unlike `application.cfg`_, it is managed by `Site Persistence`_.  It houses
+the configuration variables used to define the look of the site, such as
+those use to differentiate `ePROMs` from `TrueNTH`.
+
+A few worthy of special mention for the task of customizing Shared Services.
+
+REQUIRED_CORE_DATA::
+
+    Set to control what portions of data are considered *required* prior
+    to allowing the user to transition beyond initial_queries.  Expects
+    a list, with the following options:
+
+    REQUIRED_CORE_DATA = ['name', 'dob', 'role', 'org', 'clinical', 'tou']
+
+PORTAL_STYLESHEET::
+
+    Define which stylesheet to include.  Defaults to 'css/portal.css'
+
+    For ePROMs:
+
+    PORTAL_STYLESHEET = 'css/eproms.css'
+
+To update the ``site.cfg`` file contents, edit the
+``site_persistence_file.json`` file or use the ``FLASK_APP=manage.py flask export_site``
+command and commit the changed ``site_persistence_file.json`` to the
+appropriate repository.
+
+base.cfg
+--------
+An optional configuration file loaded before `application.cfg`_, useful for setting infrastructure-specific defaults.
 
 Site Persistence
 ================
@@ -77,7 +113,7 @@ Database tables included:
 Both importing and exporting use the value of ``PERSISTENCE_DIR``.
 Its value is initially looked for as an environment variable, and if not
 found, the configuration value of 'GIL' is used.  (With 'GIL' set, the `gil`
-configuration directory is used, othersise, `eproms`).
+configuration directory is used, otherwise, `eproms`).
 
 Export
 ------
@@ -101,36 +137,6 @@ Detailed logging will inform the user of changes made.
     It may be wise to back up the existing database prior to running ``python
     manage.py seed`` in the unlikely event of unwanted overwrites or deletes.
 
-site.cfg
-========
-
-This configuration file also lives in the `instance` source directory, but
-unlike `application.cfg`_, it is managed by `Site Persistence`_.  It houses
-the configuration variables used to define the look of the site, such as
-those use to differentiate `ePROMs` from `TrueNTH`.
-
-A few worthy of special mention for the task of customizing Shared Services.
-
-REQUIRED_CORE_DATA::
-
-    Set to control what portions of data are considered *required* prior
-    to allowing the user to transition beyond initial_queries.  Expects
-    a list, with the following options:
-
-    REQUIRED_CORE_DATA = ['name', 'dob', 'role', 'org', 'clinical', 'tou']
-
-PORTAL_STYLESHEET::
-
-    Define which stylesheet to include.  Defaults to 'css/portal.css'
-
-    For ePROMs:
-
-    PORTAL_STYLESHEET = 'css/eproms.css'
-
-To update the ``site.cfg`` file contents, edit the
-``site_persistence_file.json`` file or use the ``FLASK_APP=manage.py flask export_site``
-command and commit the changed ``site_persistence_file.json`` to the
-appropriate repository.
 
 AppText
 =======

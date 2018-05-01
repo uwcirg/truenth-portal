@@ -106,6 +106,7 @@ def create_app(config=None, app_name=None, blueprints=None):
 def configure_app(app, config):
     """Load successive configs - overriding defaults"""
     app.config.from_object(DefaultConfig)
+    app.config.from_pyfile('base.cfg', silent=True)
     app.config.from_pyfile(SITE_CFG, silent=True)
     app.config.from_pyfile('application.cfg', silent=True)
 
