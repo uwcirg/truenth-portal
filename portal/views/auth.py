@@ -13,7 +13,10 @@ from flask import (
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import (
-    user_logged_in, user_registered, user_changed_password)
+    user_changed_password,
+    user_logged_in,
+    user_registered,
+    user_reset_password)
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -100,6 +103,7 @@ def flask_user_changed_password(app, user, **extra):
 user_logged_in.connect(flask_user_login_event)
 user_registered.connect(flask_user_registered_event)
 user_changed_password.connect(flask_user_changed_password)
+user_reset_password.connect(flask_user_changed_password)
 
 
 def capture_next_view_function(real_function):
@@ -185,6 +189,7 @@ def next_after_login():
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
         assert (invited_user == current_user())
+        assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY))
         user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
