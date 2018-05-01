@@ -29,7 +29,7 @@ including:
 All others should likely be handled by `Site Persistence`_.
 
 Values with defaults are typically defined in the ``portal.config.BaseConfig``
-class.  Most are self explanitory or include inline comments for clarification.
+class.  Most are self explanatory or include inline comments for clarification.
 
 Of special note, the one used to control which set of values are pulled in
 by `Site Persistence`_.
@@ -110,7 +110,7 @@ Database tables included:
 Both importing and exporting use the value of ``PERSISTENCE_DIR``.
 Its value is initially looked for as an environment variable, and if not
 found, the configuration value of 'GIL' is used.  (With 'GIL' set, the `gil`
-configuration directory is used, othersise, `eproms`).
+configuration directory is used, otherwise, `eproms`).
 
 Export
 ------
