@@ -79,6 +79,9 @@ To update the ``site.cfg`` file contents, edit the
 command and commit the changed ``site_persistence_file.json`` to the
 appropriate repository.
 
+base.cfg
+--------
+An optional configuration file loaded before `application.cfg`_, useful for setting infrastructure-specific defaults.
 
 Site Persistence
 ================
