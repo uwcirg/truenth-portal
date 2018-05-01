@@ -65,6 +65,7 @@ def user_intervention_get(intervention_name, user_id):
               enum:
                 - forbidden
                 - granted
+                - subscribed
             card_html:
               type: string
               description:
@@ -130,6 +131,10 @@ def user_intervention_set(intervention_name):
     NB - for `access`, interventions have a global 'public_access' setting.
     Only when public_access is unset are individual accounts consulted.
 
+    Set `access = subscribed` to only include user in subscribed events.
+    `access = granted` will present the user with the intervention's tile
+    (card) as well as include them in subscribed events.
+
     ---
     operationId: user_intervention_set
     tags:
@@ -158,6 +163,7 @@ def user_intervention_set(intervention_name):
               enum:
                 - forbidden
                 - granted
+                - subscribed
             card_html:
               type: string
               description:

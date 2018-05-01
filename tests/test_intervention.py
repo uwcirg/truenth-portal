@@ -46,7 +46,7 @@ class TestIntervention(TestCase):
 
         data = {
             'user_id': TEST_USER_ID,
-            'access': "granted",
+            'access': "subscribed",
             'card_html': "unique HTML set via API",
             'link_label': 'link magic',
             'link_url': 'http://safe.com',
