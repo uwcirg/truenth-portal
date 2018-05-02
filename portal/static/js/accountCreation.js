@@ -40,7 +40,6 @@ var AccountCreationObj = function (roles, dependencies) {
 
     var i18next = this.__getDependency("i18next");
     var tnthAjax = this.__getDependency("tnthAjax");
-    //var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
     var OT = this.__getDependency("OrgTool");
     var leafOrgs = this.__getDependency("leafOrgs");
     var orgList = this.__getDependency("orgList");
