@@ -385,13 +385,92 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21300,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-42"
+        }
+      ],
       "language": "en_AU",
-      "name": "Australian Prostate Cancer Research Centre - Queensland",
+      "name": "Australian Prostate Cancer Research Centre-Qld (QUT)",
       "partOf": {
         "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Australia/Brisbane",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14643,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-43"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Princess Alexandra Hospital",
+      "partOf": {
+        "reference": "api/organization/21300"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Australia/Brisbane",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14644,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-44"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Queen Elizabeth II Jubilee Hospital",
+      "partOf": {
+        "reference": "api/organization/21300"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Australia/Brisbane",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 14645,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-45"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Redland Hospital",
+      "partOf": {
+        "reference": "api/organization/21300"
       },
       "resourceType": "Organization"
     },
