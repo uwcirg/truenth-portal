@@ -127,7 +127,7 @@ gulp.task("portalLess", function () {
     .pipe(sourcemaps.write("../maps"))
     .pipe(gulp.dest("static/css"));
     setTimeout(function() {
-      replaceStd("PORTAL+"".css.map");
+      replaceStd(PORTAL+".css.map");
     }, 500);
   return true;
 });

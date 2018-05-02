@@ -11,200 +11,10 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "language": "http://hl7.org/fhir/valueset/languages",
     "shortname": "http://us.truenth.org/identity-codes/shortname"
 };
-
-var Global = {
-    "registerModules": function() {
-        //TODO use webpack or requireJS to import modules? 
-        if (!window.portalModules) {
-            window.portalModules = {};
-        }
-        window.portalModules.tnthAjax = tnthAjax;
-        window.portalModules.tnthDates = tnthDates;
-        window.portalModules.assembleContent = assembleContent;
-        window.portalModules.orgTool = OrgTool;
-        window.portalModules.i18next = i18next;
-    },
-    "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
-        var isIE = getIEVersion();
-        callback = callback || function() {};
-        if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, function(data) { //support IE9 or earlier
-                embed_page(data);
-                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
-                    Global.notifications(data);
-                });
-                callback();
-            }, true);
-        } else {
-            funcWrapper(PORTAL_NAV_PAGE, function(data) {
-                embed_page(data);
-                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
-                    Global.notifications(data);
-                });
-                callback();
-            });
-        }
-    },
-    "loginAs": function() {
-        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-        if (LOGIN_AS_PATIENT) {
-            sessionStorage.clear();
-            /*
-             * need to clear current user locale in session storage when logging in as patient
-             */
-            tnthDates.getUserLocale(true);
-            if (typeof history !== "undefined" && history.pushState) {
-                history.pushState(null, null, location.href);
-            }
-            window.addEventListener("popstate", function() {
-                if (typeof history !== "undefined" && history.pushState) {
-                    history.pushState(null, null, location.href);
-                } else {
-                    window.history.forward(1);
-                }
-            });
-        }
-    },
-    "footer": function() {
-        var logoLinks = $("#homeFooter .logo-link");
-        if (logoLinks.length > 0) {
-            logoLinks.each(function() {
-                if (!$.trim($(this).attr("href"))) {
-                    $(this).removeAttr("target");
-                    $(this).on("click", function(e) {
-                        e.preventDefault();
-                        return false;
-                    });
-                }
-            });
-        }
-        setTimeout(function() { //Reveal footer after load to avoid any flashes will above content loads
-            $("#homeFooter").show();
-        }, 100);
-
-        setTimeout(function() {
-            var userLocale = $("#copyrightLocaleCode").val();
-            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
-            var getContent = function(cc) {
-                var content = "";
-                switch (String(cc.toUpperCase())) {
-                case "US":
-                case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
-                    break;
-                case "AU":
-                case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
-                    break;
-                case "NZ":
-                case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
-                    break;
-                default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
-
-                }
-                return content;
-
-            };
-            if (userLocale) {
-                $(footerElements).html(getContent(userLocale));
-            } else {
-                $.getJSON("//freegeoip.net/json/?callback=?", function(data) {
-                    if (data && data.country_code) { //country code Australia AU New Zealand NZ USA US
-                        $(footerElements).html(getContent(data.country_code));
-                    } else {
-                        $(footerElements).html(getContent());
-                    }
-                });
-            }
-        }, 500);
-    },
-    "notifications": function(data) {
-        if (data && data.notifications) {
-            var notificationText = "";
-            (data.notifications).forEach(function(notice) {
-                notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
-            });
-            var setVis = function() {
-                var allVisited = true;
-                var doHideCloseButton = true;
-                $("#notificationBanner [data-id]").each(function() {
-                    var actionRequired = $(this).find("[data-action-required]").length > 0;
-                    if (!actionRequired) { //close button should not be hidden if there is any link that does not require user action
-                        if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
-                            allVisited = false;
-                        }
-                        if (!$(this).attr("data-visited")) { //don't hide the close button if there one link that hasn't been visited
-                            doHideCloseButton = false;
-                        }
-                    } else {
-                        allVisited = false;
-                    }
-                });
-                if (allVisited) {
-                    $("#notificationBanner").hide();
-                } else {
-                    if (doHideCloseButton) {
-                        $("#notificationBanner .close").removeClass("active");
-                    }
-                }
-            };
-            if (notificationText) {
-                $("#notificationBanner .content").html(notificationText);
-                $("#notificationBanner .notification").addClass("active");
-                $("#notificationBanner").show();
-                $("#notificationBanner [data-id] a").each(function() {
-                    $(this).on("click", function() {
-                        var parentElement = $(this).closest(".notification");
-                        /*
-                         *  adding the attribute data-visited will hide the notification entry
-                         */
-                        parentElement.attr("data-visited", "true");
-                        //delete relevant notification
-                        tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
-                    });
-                });
-                $("#notificationBanner [data-id]").each(function() {
-                    var actionRequired = $(this).find("[data-action-required]").length > 0;
-                    if (!actionRequired) {
-                        /*
-                         * adding the class of active will allow close button to display
-                         */
-                        $("#notificationBanner .close").addClass("active");
-                    }
-                    $(this).on("click", function(e) {
-                        e.stopPropagation();
-                        setVis();
-                    });
-                });
-                $("#notificationBanner .close").on("click", function(e) {
-                    //closing the banner
-                    e.stopPropagation();
-                    $("#notificationBanner [data-id]").each(function() {
-                        var actionRequired = $(this).find("[data-action-required]").length > 0;
-                        if (!actionRequired) {
-                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
-                            $(this).attr("data-visited", "true");
-                        }
-                    });
-                    setVis();
-                });
-            } else {
-                $("#notificationBanner").hide();
-            }
-        } else {
-            $("#notificationBanner").hide();
-        }
-    }
-};
-
 var assembleContent = {
     "demo": function(userId, onProfile, targetField, sync, callback) {
-
         var demoArray = {};
         demoArray.resourceType = "Patient";
-
         var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
 
         demoArray.name = {
@@ -212,8 +22,7 @@ var assembleContent = {
             "family": $.trim(lname)
         };
 
-        var bdFieldVal = "";
-        var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+        var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
         if (y & m & d) {
             bdFieldVal = y + "-" + m + "-" + d;
         }
@@ -222,7 +31,6 @@ var assembleContent = {
         }
 
         var preselectClinic = $("#preselectClinic").val();
-
         if (preselectClinic) {
             var parentOrg = $("#userOrgs input[name='organization'][value='" + preselectClinic + "']").attr("data-parent-id");
             if (!parentOrg) {
@@ -254,15 +62,16 @@ var assembleContent = {
                 topLevelOrgs.each(function() {
                     var tOrg = $(this).attr("orgid");
                     if (tOrg) {
-                        if (!demoArray.careProvider) demoArray.careProvider = [];
+                        if (!demoArray.careProvider) {
+                            demoArray.careProvider = [];
+                        }
                         demoArray.careProvider.push({reference: "api/organization/" + tOrg});
                     }
                 });
             }
         }
 
-        //don't update org to none if there are top level org affiliation above
-        if (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0)) {
+        if (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0)) { //don't update org to none if there are top level org affiliation above
             if ($("#aboutForm").length === 0) {
                 demoArray.careProvider = [{reference: "api/organization/" + 0}];
             }
@@ -276,7 +85,9 @@ var assembleContent = {
             if ($("#boolDeath").length > 0) {
                 if ($("#boolDeath").prop("checked")) {
                     demoArray.deceasedBoolean = true;
-                } else demoArray.deceasedBoolean = false;
+                } else {
+                    demoArray.deceasedBoolean = false;
+                }
             }
         }
 
@@ -355,8 +166,7 @@ var assembleContent = {
                 }
             }
 
-            var studyIdField = $("#profileStudyId");
-            var siteIdField = $("#profileSiteId");
+            var studyIdField = $("#profileStudyId"), siteIdField = $("#profileSiteId");
             var studyId = studyIdField.val(); //studyId field is only present in Eproms
             var siteId = siteIdField.val(); //siteId field is only present in Truenth
             var identifiers = [];
@@ -374,10 +184,7 @@ var assembleContent = {
                 tnthAjax.reportError(userId, "api/demographics" + userId, xhr.responseText);
             });
 
-            /*
-             * NOTE: this will save study Id or site Id only if each has a value otherwise if each is empty, it will be purged from the identifiers that had older value of each
-             */
-            identifiers = $.grep(identifiers, function(identifier) {
+            identifiers = $.grep(identifiers, function(identifier) { //this will save study Id or site Id only if each has a value otherwise if each is empty, it will be purged from the identifiers that had older value of each
                 return identifier.system !== SYSTEM_IDENTIFIER_ENUM.external_study_id &&
                     identifier.system !== SYSTEM_IDENTIFIER_ENUM.external_site_id;
             });
@@ -406,9 +213,7 @@ var assembleContent = {
                 demoArray.identifier = identifiers;
             }
 
-
             demoArray.gender = $("input[name=sex]:checked").val();
-
             demoArray.telecom = [];
 
             var emailVal = $("input[name=email]").val();
@@ -418,8 +223,7 @@ var assembleContent = {
                     "value": $.trim(emailVal)
                 });
             } else {
-                //'__no_email__'
-                demoArray.telecom.push({
+                demoArray.telecom.push({ //'__no_email__'
                     "system": "email",
                     "value": "__no_email__"
                 });
@@ -447,7 +251,6 @@ var assembleContent = {
             callback(demoArray);
         }
         tnthAjax.putDemo(userId, demoArray, targetField, sync);
-
     },
     "coreData": function(userId) {
         var demoArray = {};
@@ -553,7 +356,9 @@ OrgTool.prototype.inArray = function(n, array) {
     if (n && array && Array.isArray(array)) {
         var found = false;
         for (var index = 0; !found && index < array.length; index++) {
-            if (array[index] == n) found = true;
+            if (array[index] == n) {
+                found = true;
+            }
         }
         return found;
     } else return false;
@@ -562,14 +367,18 @@ OrgTool.prototype.getElementParentOrg = function(o) {
     var parentOrg;
     if (o) {
         parentOrg = $(o).attr("data-parent-id");
-        if (!parentOrg) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        if (!parentOrg) {
+            parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        }
     }
     return parentOrg;
 };
 OrgTool.prototype.getTopLevelOrgs = function() {
     var ml = this.getOrgsList(), orgList = [];
     for (var org in ml) {
-        if (ml[org].isTopLevel) orgList.push(org);
+        if (ml[org].isTopLevel) {
+            orgList.push(org);
+        }
     }
     return orgList;
 };
@@ -577,8 +386,12 @@ OrgTool.prototype.getOrgsList = function() {
     return this.orgsList;
 };
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
-    if (!leafOrgs) return false;
-    if (leafOrgs.length == 0) return false;
+    if (!leafOrgs) {
+        return false;
+    }
+    if (leafOrgs.length === 0) {
+        return false;
+    }
     var self = this;
     $("input[name='organization']").each(function() {
         if (!self.inArray($(this).val(), leafOrgs)) {
@@ -607,14 +420,16 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
                 subOrgs.each(function() {
                     var isVisible = false;
                     $(this).find("input[name='organization']").each(function() {
-                        if ($(this).is(":visible") || $(this).css("display") != "none") {
+                        if ($(this).is(":visible") || $(this).css("display") !== "none") {
                             isVisible = true;
                             allChildrenHidden = false;
                         }
                     });
                     if (!isVisible) {
                         $(this).hide();
-                    } else allSubOrgsHidden = false;
+                    } else {
+                        allSubOrgsHidden = false;
+                    }
                 });
                 if (allSubOrgsHidden) {
                     $(this).children("label").hide();
@@ -638,7 +453,9 @@ OrgTool.prototype.findOrg = function(entry, orgId) {
     if (entry && orgId) {
         entry.forEach(function(item) {
             if (!org) {
-                if (item.id == orgId) org = item;
+                if (parseInt(item.id) === parseInt(orgId)) {
+                    org = item;
+                }
             }
         });
     }
@@ -718,10 +535,8 @@ OrgTool.prototype.populateUI = function() {
         return s;
     }
 
-    var keys = Object.keys(orgsList);
+    var keys = Object.keys(orgsList), parentOrgsArray = [];
     keys = keys.sort();
-    var parentOrgsArray = [];
-
     keys.forEach(function(org) { //draw parent orgs first
         if (orgsList[org].isTopLevel) {
             parentOrgsArray.push(org);
@@ -761,15 +576,10 @@ OrgTool.prototype.populateUI = function() {
         }
     });
 
-    /*
-     * draw child orgs
-     */
-    keys.forEach(function(org) {
-        // Fill in each child clinic
-        if (orgsList[org].children.length > 0) {
+    keys.forEach(function(org) { //draw child orgs
+        if (orgsList[org].children.length > 0) { // Fill in each child clinic
             var childClinic = "";
-            // sort child clinic in alphabetical order
-            var items = orgsList[org].children.sort(function(a, b) {
+            var items = orgsList[org].children.sort(function(a, b) { // sort child clinic in alphabetical order
                 if (a.name < b.name) return -1;
                 if (a.name > b.name) return 1;
                 return 0;
@@ -1029,25 +839,26 @@ OrgTool.prototype.handleEvent = function() {
 OrgTool.prototype.getCommunicationArray = function() {
     var arrCommunication = [],self = this;
     $("#userOrgs input:checked").each(function() {
-        if ($(this).val() == 0) return true; //don't count none
-        var oList = self.getOrgsList();
-        var oi = oList[$(this).val()];
-        if (!oi) return true;
+        if (parseInt($(this).val()) === 0) {
+            return true; //don't count none
+        }
+        var oList = self.getOrgsList(), oi = oList[$(this).val()];
+        if (!oi) {
+            return true;
+        }
         if (oi.language) {
             arrCommunication.push({
-                "language": {
-                    "coding": [{"code": oi.language,"system": "urn:ietf:bcp:47"}]
-                }
+                "language": {"coding": [{"code": oi.language,"system": "urn:ietf:bcp:47"}]}
             });
         } else if (oi.extension && oi.extension.length > 0) {
             (oi.extension).forEach(function(ex) {
-                if (ex.url == SYSTEM_IDENTIFIER_ENUM.language && ex.valueCodeableConcept.coding) arrCommunication.push({
-                    "language": { "coding": ex.valueCodeableConcept.coding}
-                });
+                if (String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding) {
+                    arrCommunication.push({"language": { "coding": ex.valueCodeableConcept.coding}});
+                }
             });
         }
     });
-    if (arrCommunication.length == 0) {
+    if (arrCommunication.length === 0) {
         var defaultLocale = $("#sys_default_locale").val();
         if (defaultLocale) arrCommunication.push({
             "language": {
@@ -1087,7 +898,7 @@ OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
     } else return false;
 };
 OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
-    if (!orgs || (orgs.length == 0)) {
+    if (!orgs || (orgs.length === 0)) {
         return orgList;
     } else {
         if (!orgList) orgList = [];
@@ -1108,9 +919,7 @@ OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
     }
 };
 OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
-    var mainOrgsList = this.getOrgsList(),
-        self = this;
-    var here_below_orgs = [];
+    var mainOrgsList = this.getOrgsList(), self = this, here_below_orgs = [];
     if (!userOrgs) {
         var selectedOrg = this.getSelectedOrg();
         if (selectedOrg.length > 0) {
@@ -1123,8 +932,7 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
     if (userOrgs) {
         userOrgs.forEach(function(orgId) {
             here_below_orgs.push(orgId);
-            var co = mainOrgsList[orgId];
-            var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+            var co = mainOrgsList[orgId], cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
             if (cOrgs && cOrgs.length > 0) {
                 here_below_orgs = here_below_orgs.concat(cOrgs);
             }
@@ -1133,8 +941,7 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
     return here_below_orgs;
 };
 OrgTool.prototype.morphPatientOrgs = function() {
-    var checkedOrgs = {};
-    var orgs = $("#userOrgs input[name='organization']");
+    var checkedOrgs = {}, orgs = $("#userOrgs input[name='organization']");
     orgs.each(function() {
         $(this).closest("label").addClass("radio-label");
         if ($(this).prop("checked")) {
@@ -1220,10 +1027,7 @@ var tnthAjax = {
         }
     },
     "reportError": function(userId, page_url, message, sync) {
-        //params need to contain the following:
-        //:subject_id: User on which action is being attempted
-        //:message: Details of the error event
-        //:page_url: The page requested resulting in the error
+        //params need to contain the following: subject_id: User on which action is being attempted message: Details of the error event page_url: The page requested resulting in the error
         var params = {};
         params.subject_id = userId ? userId : 0;
         params.page_url = page_url ? page_url : window.location.href;
@@ -1303,8 +1107,7 @@ var tnthAjax = {
         var __url = "/api/coredata/user/" + userId + "/still_needed" + (entry_method ? "?entry_method=" + (entry_method).replace(/\_/g, " ") : "");
         this.sendRequest(__url, "GET", userId, {sync: sync,cache: true}, function(data) {
             if (data) {
-                if (!data.error) {
-                    /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
+                if (!data.error) { /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
                     var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT";
                     var fields = (data.still_needed).map(function(item) {
                         return item.field;
@@ -1341,7 +1144,7 @@ var tnthAjax = {
                             });
                         }
                     }
-                    if (fields.indexOf("localized") == -1) {
+                    if (fields.indexOf("localized") === -1) {
                         $("#patMeta").remove();
                     }
                     callback(fields);
@@ -1498,8 +1301,7 @@ var tnthAjax = {
             params.org = orgId;
             params.agreementUrl = agreementUrl;
             this.setConsent(userId, params, "default");
-            //need to remove all other consents associated w un-selected org(s)
-            setTimeout(function() {
+            setTimeout(function() { //need to remove all other consents associated w un-selected org(s)
                 tnthAjax.removeObsoleteConsent();
             }, 100);
             tnthAjax.reloadConsentList(userId);
@@ -1590,7 +1392,9 @@ var tnthAjax = {
     hasConsent: function(userId, orgId, filterStatus) {  /****** NOTE - this will return the latest updated consent entry *******/
         if (!userId) return false;
         if (!orgId) return false;
-        if (filterStatus == "default") return false;
+        if (String(filterStatus) === "default") {
+            return false;
+        }
         var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
         var __url = "/api/user/" + userId + "/consent";
         var self = this;
@@ -3317,6 +3121,189 @@ var tnthTables = {
          * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
          */
         return alphanum(a, b);
+    }
+};
+
+var Global = {
+    "registerModules": function() { //TODO use webpack or requireJS to import modules? 
+        if (!window.portalModules) {
+            window.portalModules = {};
+        }
+        window.portalModules.tnthAjax = tnthAjax;
+        window.portalModules.tnthDates = tnthDates;
+        window.portalModules.assembleContent = assembleContent;
+        window.portalModules.orgTool = OrgTool;
+        window.portalModules.i18next = i18next;
+    },
+    "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
+        var isIE = getIEVersion();
+        callback = callback || function() {};
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, function(data) { //support IE9 or earlier
+                embed_page(data);
+                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
+                    Global.notifications(data);
+                });
+                callback();
+            }, true);
+        } else {
+            funcWrapper(PORTAL_NAV_PAGE, function(data) {
+                embed_page(data);
+                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
+                    Global.notifications(data);
+                });
+                callback();
+            });
+        }
+    },
+    "loginAs": function() {
+        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+        if (LOGIN_AS_PATIENT) {
+            sessionStorage.clear();
+            tnthDates.getUserLocale(true); //need to clear current user locale in session storage when logging in as patient
+            if (typeof history !== "undefined" && history.pushState) {
+                history.pushState(null, null, location.href);
+            }
+            window.addEventListener("popstate", function() {
+                if (typeof history !== "undefined" && history.pushState) {
+                    history.pushState(null, null, location.href);
+                } else {
+                    window.history.forward(1);
+                }
+            });
+        }
+    },
+    "footer": function() {
+        var logoLinks = $("#homeFooter .logo-link");
+        if (logoLinks.length > 0) {
+            logoLinks.each(function() {
+                if (!$.trim($(this).attr("href"))) {
+                    $(this).removeAttr("target");
+                    $(this).on("click", function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                }
+            });
+        }
+        setTimeout(function() { //Reveal footer after load to avoid any flashes will above content loads
+            $("#homeFooter").show();
+        }, 100);
+
+        setTimeout(function() {
+            var userLocale = $("#copyrightLocaleCode").val();
+            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
+            var getContent = function(cc) {
+                var content = "";
+                switch (String(cc.toUpperCase())) {
+                case "US":
+                case "EN_US":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                    break;
+                case "AU":
+                case "EN_AU":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                    break;
+                case "NZ":
+                case "EN_NZ":
+                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                    break;
+                default:
+                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+
+                }
+                return content;
+
+            };
+            if (userLocale) {
+                $(footerElements).html(getContent(userLocale));
+            } else {
+                $.getJSON("//freegeoip.net/json/?callback=?", function(data) {
+                    if (data && data.country_code) { //country code Australia AU New Zealand NZ USA US
+                        $(footerElements).html(getContent(data.country_code));
+                    } else {
+                        $(footerElements).html(getContent());
+                    }
+                });
+            }
+        }, 500);
+    },
+    "notifications": function(data) {
+        if (data && data.notifications) {
+            var notificationText = "";
+            (data.notifications).forEach(function(notice) {
+                notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
+            });
+            var setVis = function() {
+                var allVisited = true;
+                var doHideCloseButton = true;
+                $("#notificationBanner [data-id]").each(function() {
+                    var actionRequired = $(this).find("[data-action-required]").length > 0;
+                    if (!actionRequired) { //close button should not be hidden if there is any link that does not require user action
+                        if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
+                            allVisited = false;
+                        }
+                        if (!$(this).attr("data-visited")) { //don't hide the close button if there one link that hasn't been visited
+                            doHideCloseButton = false;
+                        }
+                    } else {
+                        allVisited = false;
+                    }
+                });
+                if (allVisited) {
+                    $("#notificationBanner").hide();
+                } else {
+                    if (doHideCloseButton) {
+                        $("#notificationBanner .close").removeClass("active");
+                    }
+                }
+            };
+            if (notificationText) {
+                $("#notificationBanner .content").html(notificationText);
+                $("#notificationBanner .notification").addClass("active");
+                $("#notificationBanner").show();
+                $("#notificationBanner [data-id] a").each(function() {
+                    $(this).on("click", function() {
+                        var parentElement = $(this).closest(".notification");
+                        /*
+                         *  adding the attribute data-visited will hide the notification entry
+                         */
+                        parentElement.attr("data-visited", "true");
+                        //delete relevant notification
+                        tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
+                    });
+                });
+                $("#notificationBanner [data-id]").each(function() {
+                    var actionRequired = $(this).find("[data-action-required]").length > 0;
+                    if (!actionRequired) {
+                        /*
+                         * adding the class of active will allow close button to display
+                         */
+                        $("#notificationBanner .close").addClass("active");
+                    }
+                    $(this).on("click", function(e) {
+                        e.stopPropagation();
+                        setVis();
+                    });
+                });
+                $("#notificationBanner .close").on("click", function(e) {
+                    //closing the banner
+                    e.stopPropagation();
+                    $("#notificationBanner [data-id]").each(function() {
+                        var actionRequired = $(this).find("[data-action-required]").length > 0;
+                        if (!actionRequired) {
+                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                            $(this).attr("data-visited", "true");
+                        }
+                    });
+                    setVis();
+                });
+            } else {
+                $("#notificationBanner").hide();
+            }
+        } else {
+            $("#notificationBanner").hide();
+        }
     }
 };
 

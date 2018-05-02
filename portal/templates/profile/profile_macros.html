@@ -610,10 +610,12 @@
                                 <span class="text-success small-text eproms-tou-table-text"><a v-bind:href="item.agreement_url" target="_blank">{{item.eproms_agreement_text}}</a></span>
                                 <span class="text-success small-text truenth-tou-table-text">{{item.truenth_agreement_text}}</span>
                             </td>
-                            <td class="consentlist-cell">
+                            <td class="consentlist-cell agreement">
                                 <span class="eproms-tou-table-text text-capitalize"><a v-bind:href="item.agreement_url" target="_blank">{{item.eproms_url_text}}</a></span>
-                                <span class="truenth-tou-table-text">{{item.truenth_url_text}}</span>
-                                <span class="agreement" v-bind:class="{'tnth-hide':!isConsentWithTopLevelOrg()}">&nbsp;<a v-bind:href="item.agreement_url" target="_blank"><em>{{item.view}}</em></a></span>
+                                <span class="truenth-tou-table-text">
+                                    {{item.truenth_url_text}}
+                                    <span>&nbsp;<a v-bind:href="item.agreement_url" target="_blank"><em>{{item.view}}</em></a></span>
+                                </span>
                             </td>
                             <td class="consentlist-cell">{{item.accepted}}</td>
                         </tr>

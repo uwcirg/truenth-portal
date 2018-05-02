@@ -272,7 +272,9 @@
                             data.communication.forEach(function(o) {
                                 if (o.language && o.language.coding) {
                                     o.language.coding.forEach(function(item) {
-                                        if (item.display) item.display = i18next.t(item.display);
+                                        if (item.display) {
+                                            item.display = i18next.t(item.display);
+                                        }
                                         self.demo.data.language = item;
                                         self.demo.data.languageCode = item.code;
                                         self.demo.data.languageDisplay = item.display;
@@ -284,16 +286,24 @@
                             (data.extension).forEach(function(item) {
                                 if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity") {
                                     item.valueCodeableConcept.coding.forEach(function(ethnicity) {
-                                        if (ethnicity.display) ethnicity.display = i18next.t(ethnicity.display);
-                                        if (!self.demo.data.ethnicity) self.demo.data.ethnicity = [];
+                                        if (ethnicity.display) {
+                                            ethnicity.display = i18next.t(ethnicity.display);
+                                        }
+                                        if (!self.demo.data.ethnicity) {
+                                            self.demo.data.ethnicity = [];
+                                        }
                                         self.demo.data.ethnicity.push(ethnicity);
                                         self.demo.data.ethnicityCodes = ethnicity.code;
                                     });
                                 }
                                 if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-race") {
                                     item.valueCodeableConcept.coding.forEach(function(race) {
-                                        if (race.display) race.display = i18next.t(race.display);
-                                        if (!self.demo.data.race) self.demo.data.race = [];
+                                        if (race.display) {
+                                            race.display = i18next.t(race.display);
+                                        }
+                                        if (!self.demo.data.race) {
+                                            self.demo.data.race = [];
+                                        }
                                         self.demo.data.race.push(race);
                                     });
                                     if (self.demo.data.race) self.demo.data.raceCodes = self.demo.data.race.map(function(item) {
@@ -305,7 +315,9 @@
                                 }
                             });
                         }
-                        if (!self.demo.data.raceCodes) self.demo.data.raceCodes = []; 
+                        if (!self.demo.data.raceCodes) {
+                            self.demo.data.raceCodes = [];
+                        }
                     }
                     callback(data);
                 });
@@ -332,7 +344,9 @@
                     callback = callback || function() {};
                     this.orgTool = new (this.modules.orgTool) ();
                     this.orgTool.init(function(data) {
-                        if (data && !data.error) self.orgsData = data;
+                        if (data && !data.error) {
+                            self.orgsData = data;
+                        }
                         callback(data);
                     });
                     this.orgsList = this.orgTool.getOrgsList();
@@ -382,7 +396,9 @@
                                     }
                                     $(this).attr("data-save-container-id", attachId);
                                     var triggerEvent = $(this).attr("data-trigger-event");
-                                    if (!triggerEvent) triggerEvent = $(this).attr("type") === "text" ? "blur" : "change";
+                                    if (!triggerEvent) {
+                                        triggerEvent = $(this).attr("type") === "text" ? "blur" : "change";
+                                    }
                                     $(this).on(triggerEvent, function(e) {
                                         e.stopPropagation();
                                         var valid = this.validity ? this.validity.valid : true;
@@ -482,7 +498,7 @@
                                         btn.show();
                                     } else {
                                         sectionElement.hide();
-                                        if (visibleRows == 0) {
+                                        if (visibleRows === 0) {
                                             noDataContainer.html("<p class='text-muted'>" + i18next.t("No information available") + "</p>");
                                             btn.hide();
                                         }
@@ -495,7 +511,9 @@
                 }
             },
             fillSectionView: function(sectionID) {
-                if (sectionID && this.fillViews[sectionID]) this.fillViews[sectionID]();
+                if (sectionID && this.fillViews[sectionID]) {
+                    this.fillViews[sectionID]();
+                }
             },
             setView: function() {
                 var self = this;
@@ -526,14 +544,15 @@
                             var f = $("#patBiopsy input[name='biopsy']:checked");
                             var a = f.val();
                             var biopsyDate = $("#biopsyDate").val();
-                            if (a == "true" && biopsyDate) {
+                            if (String(a) === "true" && biopsyDate) {
                                 var displayDate = "";
                                 if ($.trim($("#biopsy_month option:selected").val() + $("#biopsy_year").val() + $("#biopsy_day").val())) {
                                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
                                 }
-                                if (!displayDate) displayDate = i18next.t("not provided");
-                                content = f.closest("label").text();
-                                content += "&nbsp;&nbsp;" + displayDate;
+                                if (!displayDate) {
+                                    displayDate = i18next.t("not provided");
+                                }
+                                content = f.closest("label").text() + "&nbsp;&nbsp;" + displayDate;
                             } else {
                                 content = f.closest("label").text();
                             }
@@ -762,7 +781,7 @@
                 this.modules.tnthAjax.emailLog(userId, function(data) {
                     if (data.messages) {
                         (data.messages).forEach(function(item) {
-                            if (item.id == messageId) {
+                            if (parseInt(item.id) === parseInt(messageId)) {
                                 $("#emailBodyModal .body-content").html(item.body);
                                 $("#emailBodyModal .body-content a").each(function() { // email content contains clickable link/button - need to prevent click event of those from being triggered
                                     $(this).on("click", function(e) {
@@ -949,7 +968,9 @@
                                 errorMessageContainer.append("<div>" + i18next.t("Email address is missing.") + "</div>");
                             }
                         }
-                    } else errorMessageContainer.text(i18next.t("You must select a email type"));
+                    } else {
+                        errorMessageContainer.text(i18next.t("You must select a email type"));
+                    }
                 });
             },
             initStaffRegistrationEmailSection: function() {
@@ -962,13 +983,11 @@
                         if (orgs.length > 0) {
                             orgs.each(function() {
                                 if (!parentName) {
-                                    parentName = $(this).attr("data-parent-name");
-                                    if (!parentName) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                                    parentName = $(this).attr("data-parent-name") || $(this).closest(".org-container[data-parent-id]").attr("data-parent-name") ;
                                 }
                             });
                         }
-                        var cn = parentName ? parentName : i18next.t("your clinic");
-                        return cn;
+                        return parentName ? parentName : i18next.t("your clinic");
                     })();
                     $.ajax({
                         type: "GET",
@@ -999,7 +1018,9 @@
                             $("#profileEmailMessage").text(i18next.t("invite email sent to {email}").replace("{email}", email));
                             $("#btnProfileSendEmail").attr("disabled", true);
                         } else {
-                            if (data.error) $("#profileEmailErrorMessage").text(i18next.t("Unable to send email."));
+                            if (data.error) {
+                                $("#profileEmailErrorMessage").text(i18next.t("Unable to send email."));
+                            }
                         }
                     });
                 });
@@ -1067,15 +1088,19 @@
                     $("#boolDeath").prop("checked", false);
                 }
                 if (deceasedBoolean) {
-                    if (String(deceasedBoolean).toLowerCase() == "true") {
+                    if (String(deceasedBoolean).toLowerCase() === "true") {
                         $("#boolDeath").prop("checked", true);
-                    } else $("#boolDeath").prop("checked", false);
+                    } else {
+                        $("#boolDeath").prop("checked", false);
+                    }
                 }
                 this.fillSectionView("deceased");
             },
             initDeceasedSection: function() {
                 var self = this;
-                if (this.demo.data.deceasedDateTime || this.demo.data.hasOwnProperty("deceasedBoolean")) this.updateDeceasedSection(this.demo.data.deceasedDateTime, this.demo.data.deceasedBoolean);
+                if (this.demo.data.deceasedDateTime || this.demo.data.hasOwnProperty("deceasedBoolean")) {
+                    this.updateDeceasedSection(this.demo.data.deceasedDateTime, this.demo.data.deceasedBoolean);
+                }
                 else {
                     this.modules.tnthAjax.getDemo(this.subjectId, false, false, function(data) {
                         self.updateDeceasedSection(data.deceasedDateTime, data.deceasedBoolean);
@@ -1097,10 +1122,10 @@
                 ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
                     saveLoaderDiv("profileForm", $("#" + fn).attr("data-save-container-id"));
                     var fd = $("#" + fn);
-                    var triggerEvent = fd.attr("type") == "text" ? "blur" : "change";
+                    var triggerEvent = fd.attr("type") === "text" ? "blur" : "change";
                     fd.on(triggerEvent, function() {
                         var d = $("#deathDay"), m = $("#deathMonth"), y = $("#deathYear");
-                        if (d.val() != "" && m.val() != "" && y.val() != "") {
+                        if (d.val() && m.val() && y.val()) {
                             if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
                                 var errorMsg = self.modules.tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
                                 if (errorMsg === "") {
@@ -1147,7 +1172,7 @@
                                 rowStyle: function rowStyle(row, index) {
                                     return {
                                         css: {
-                                            "background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")
+                                            "background-color": (index % 2 !== 0 ? "#F9F9F9" : "#FFF")
                                         }
                                     };
                                 },
@@ -2532,7 +2557,7 @@
                         $("#consentListTable").animate({
                             opacity: 1
                         });
-                    }, 0);
+                    }, 150);
                     if (self.isEditable() && self.consent.hasConsentHistory) {
                         $("#viewConsentHistoryButton").on("click", function(e) {
                             e.preventDefault();

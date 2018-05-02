@@ -234,14 +234,18 @@
                     if (!hasValue($("#iqPatientEditable").val())) {
                         tnthAjax.getOrgs($("#iq_userId").val(), true, function() {
                             var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
-                            if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
+                            if (userOrgs.length === 0) {
+                                userOrgs = $("#userOrgs input[name='organization']");
+                            }
                             var checkedOrgs = {};
                             userOrgs.each(function() {
                                 if ($(this).prop("checked")) {
                                     checkedOrgs[$(this).val()] = true;
                                 }
                                 $(this).attr("type", "radio");
-                                if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+                                if (checkedOrgs[$(this).val()]) {
+                                    $(this).prop("checked", true);
+                                }
                             });
                             $("#clinics").attr("loaded", true);
                         });
@@ -270,7 +274,6 @@
                 self = this;
             var fields = field.elements;
             $(fields).each(function() {
-                if ($(this).attr("id") == "biopsyDate") return true;
                 switch (subSectionId) {
                 case "termsCheckbox":
                     self.termsCheckboxEvent([$(this)]);

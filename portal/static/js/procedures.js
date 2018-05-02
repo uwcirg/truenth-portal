@@ -101,6 +101,7 @@
         subjectId: $("#profileProcSubjectId").val(),
         currentUserId: $("#profileProcCurrentUserId").val(),
         entries: [],
+        initCounts: 0,
         init: function() {
             if ($("#profileProcedureContainer").length > 0) {
                 this.getOptions();
@@ -128,12 +129,14 @@
             }).fail(function() {});
         },
         getUserProcedures: function(newEntry) {
-            if (!this.subjectId) return false;
+            if (!this.subjectId) {
+                return false;
+            }
             $.ajax({
                 type: "GET",
                 url: "/api/patient/" + this.subjectId + "/procedure"
             }).done(function(data) {
-                if (data.entry.length == 0) {
+                if (data.entry.length === 0) {
                     $("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({
                         opacity: 1
                     });
@@ -149,19 +152,21 @@
                 $.each(data.entry, function(i, val) {
                     var code = val.resource.code.coding[0].code;
                     var procID = val.resource.id;
-                    if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
+                    if (code !== CANCER_TREATMENT_CODE && code !== NONE_TREATMENT_CODE) {
                         var displayText = val.resource.code.coding[0].display;
                         var performedDateTime = val.resource.performedDateTime;
                         var deleteInvocation = "";
                         var creatorDisplay = val.resource.meta.by.display;
                         var creator = val.resource.meta.by.reference;
                         creator = creator.match(/\d+/)[0]; // just the user ID, not eg "api/patient/46";
-                        if (creator == currentUserId) {
+                        if (String(creator) === String(currentUserId)) {
                             creator = i18next.t("you");
                             deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
                         } else if (creator == subjectId) {
                             creator = i18next.t("this patient");
-                        } else creator = i18next.t("staff member") + ", <span class='creator'>" + (creatorDisplay ? creatorDisplay : creator) + "</span>, ";
+                        } else {
+                            creator = i18next.t("staff member") + ", <span class='creator'>" + (creatorDisplay ? creatorDisplay : creator) + "</span>, ";
+                        }
                         var dtEdited = val.resource.meta.lastUpdated, dateEdited = new Date(dtEdited);
                         var creationText = i18next.t("(date entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString("en-GB", {
                             day: "numeric",
@@ -188,12 +193,13 @@
                     proceduresHtml += "</table>";
                     $("#userProcedures").html(proceduresHtml);
                     $("#pastTreatmentsContainer").fadeIn();
-
                 } else {
                     $("#pastTreatmentsContainer").fadeOut();
                 }
 
-                if (otherHtml) $("#userProcedures").append(otherHtml);
+                if (otherHtml) {
+                    $("#userProcedures").append(otherHtml);
+                }
 
                 if (newEntry) { //// If newEntry, then add icon to what we just added
                     $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added!") + "</em></small>");
@@ -217,7 +223,6 @@
         }
     };
     $(document).ready(function() {
-
         procApp.init();
 
         function __convertToNumericField(field) {
@@ -239,7 +244,7 @@
             if (!isNaN(parseInt(d))) {
                 if (parseInt(d) > 0 && parseInt(d) < 10) d = "0" + d;
             }
-            var dTest = procDateReg.test(d), mTest = (m != ""), yTest = procYearReg.test(y);
+            var dTest = procDateReg.test(d), mTest = (String(m) !== ""), yTest = procYearReg.test(y);
             var errorText = i18next.t("The procedure date must be valid and in required format.");
             var dgField = $("#procDateGroup"), deField = $("#procDateErrorContainer"), errorColor = "#a94442", validColor = "#777";
 
@@ -352,7 +357,7 @@
         $("input[id^='tnthproc-date']").on('change', function() {
             var passedDate = $(this).val(); // eg "11/20/2016"
             var dateFormatted; // Change dates to YYYY-MM-DD and make sure date is in dd/mm/yyyy format before reformat
-            if (passedDate && passedDate !=  "" && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
+            if (passedDate && passedDate !==  "" && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
                 $("button[id^='tnthproc-submit']").attr("data-date-read", passedDate);
                 dateFormatted = tnthDates.swap_mm_dd(passedDate);
                 $("button[id^='tnthproc-submit']").attr("data-date", dateFormatted);

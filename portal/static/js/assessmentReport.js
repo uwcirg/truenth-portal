@@ -1,4 +1,5 @@
 (function() {
+    var i18next = window.portalModules.i18next, tnthDates = window.portalModules.tnthDates;
     var AssessmentReportObj = new Vue({
         el: "#userSessionReportMainContainer",
         data: {
@@ -77,7 +78,9 @@
                                 if (!q && !a) {
                                     q = entry.linkId;
                                     (entry.answer).forEach(function(item) {
-                                        if (item.valueCoding && item.valueCoding.code) a += (a ? "<br/>" : "") + item.valueCoding.code;
+                                        if (item.valueCoding && item.valueCoding.code) {
+                                            a += (a ? "<br/>" : "") + item.valueCoding.code;
+                                        }
                                     });
                                 }
 
