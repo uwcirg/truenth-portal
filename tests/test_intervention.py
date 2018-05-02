@@ -69,6 +69,25 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.status_text, data['status_text'])
         self.assertEquals(ui.staff_html, data['staff_html'])
 
+    def test_music_hack(self):
+        client = self.add_client()
+        client.intervention = INTERVENTION.MUSIC
+        client.application_origins = 'http://safe.com'
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        data = {'user_id': TEST_USER_ID, 'access': "granted"}
+
+        rv = self.client.put(
+            '/api/intervention/music',
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+
+        ui = UserIntervention.query.one()
+        self.assertEquals(ui.user_id, data['user_id'])
+        self.assertEquals(ui.access, 'subscribed')
+
     def test_intervention_partial_put(self):
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY

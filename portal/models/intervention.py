@@ -226,7 +226,7 @@ class Intervention(db.Model):
                 "subscribed_events: {0.subscribed_events}".format(self))
 
 
-access_types = ('forbidden', 'granted')
+access_types = ('forbidden', 'granted', 'subscribed')
 access_types_enum = ENUM(*access_types, name='access', create_type=False)
 
 

@@ -187,7 +187,7 @@ def client_event_dispatch(event, user, **kwargs):
     rely only on a valid callback URL, as the user may not have logged
     into the subscribed intervention.
 
-    :param event: occuring event to dispatch
+    :param event: occurring event to dispatch
     :param user: subject user behind event
     :param kwargs: any additional data to be bundled and sent to client
 
@@ -211,8 +211,9 @@ def client_event_dispatch(event, user, **kwargs):
             db.session.delete(token)
         db.session.commit()
     elif event == 'user_document_upload':
-        # Inform interventions subscribed to this event, with specific
-        # access granted for this user
+        # Inform interventions subscribed to this event, if there's a
+        # matching row for the (user, intervention), with specific
+        # access of `granted` or `subscribed`.
         for intervention in Intervention.query.filter(
                 Intervention.name != 'default'):
             if intervention.subscribed_to_user_doc_event:
@@ -220,7 +221,7 @@ def client_event_dispatch(event, user, **kwargs):
                     UserIntervention.intervention_id ==
                     intervention.id).filter(
                     UserIntervention.user_id == user.id).first()
-                if ui and ui.access == 'granted':
+                if ui and ui.access in ('granted', 'subscribed'):
                     intervention.client.notify(data)
     else:
         raise ValueError("Unexpected event: {}".format(event))
