@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "admin_base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
 <div id="staffList">
@@ -66,13 +66,6 @@
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
-{% endblock %}
-{% block script %}
-<script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}" async></script>
-{% endblock %}
-{% block table_export_filter_script %}
-{{super()}}
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block document_ready %}
 var AT = new window.portal.AdminTool(

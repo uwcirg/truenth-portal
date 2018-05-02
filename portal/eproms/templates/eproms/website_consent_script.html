@@ -14,9 +14,21 @@
         <button id="continue" type="button" class="btn btn-lg btn-tnth-primary">{{ _("Continue to TrueNTH") }}</button>
       </div>
     </div>
-    <div class="post-tou-error hidden-print"></div>
 {% endblock %}
 {% block footer %}
 {%- from "flask_user/_macros.html" import footer -%}
 {{footer(user=user)}}
+{% endblock %}
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/initialQueries.js') }}"></script>
+{% endblock %}
+{% block document_ready %}
+var fc = new window.FieldsChecker("{{user.id}}", false,
+                            {i18next: i18next,
+                             tnthAjax: tnthAjax,
+                             orgTool: new OrgTool(),
+                             assembleContent: assembleContent,
+                             tnthDates: tnthDates
+                            });
+fc.handleWebsiteConsentScript();
 {% endblock %}

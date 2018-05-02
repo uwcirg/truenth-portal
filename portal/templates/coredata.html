@@ -104,12 +104,7 @@ $(document).ready(function(){
     {% if ('race' in require) or ('ethnicity' in require) %}
     tnthAjax.getDemo({{ user.id }});
     {% endif %}
-    {% if 'procedure' in require %}
-    tnthAjax.getProc({{ user.id }}, false);
-    var profileObj = new Profile("{{user.id}}", "{{user.id}}");
-    profileObj.initSection("procedure");
-    {% endif %}
-
+    //NOTE: procedure section is initialized if needed in procedures.js
     {% if ('race' in require) or ('ethnicity' in require) %}
     // If there's any change to an input, assembleContent
     $("#profileForm").on("change", "input", function() {

@@ -62,7 +62,7 @@ def staff_profile_create():
         org_list.update(ot.here_and_below_id(org.id))
 
     return render_template(
-        "staff_profile_create.html", user=user,
+        "profile/staff_profile_create.html", user=user,
         consent_agreements=consent_agreements,
         org_list=list(org_list))
 

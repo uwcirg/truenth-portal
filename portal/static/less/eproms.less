@@ -563,7 +563,6 @@ select:not([multiple]) {
     }
   }
   #manualEntryCompletionDateContainer {
-    display: none;
     margin-top: 1em
   }
   #study_id_view {
@@ -1404,7 +1403,7 @@ div.footer-wrapper.right-panel {
   &.box-min-500 {
     min-height: 500px;
     max-height: 660px;
-    margin: 2em;
+    margin: auto;
     overflow: hidden;
   }
   &.box-min-400 {
@@ -1417,6 +1416,7 @@ div.footer-wrapper.right-panel {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
   padding: 18px 0 18px;
 }
 #fullSizeLogo {
@@ -2625,6 +2625,9 @@ input.clinic {
       padding: 0.1em 1.5em;
     }
   }
+  .loading-message-indicator {
+    display: block;
+  }
 }
 #emailBodyModal .body-content {
   overflow: hidden;
@@ -2742,6 +2745,16 @@ div.biopsy-option:last-of-type{
   label:first-of-type {
     margin-bottom: -0.1em;
   }
+}
+#consentDateModal {
+    .form-control {
+      margin: 0.5em 0;
+    }
+    .consent-hour,
+    .consent-minute,
+    .consent-second {
+      width: 60px;
+    }
 }
 #profileConsentList,
 #profileConsentHistory {

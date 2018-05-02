@@ -40,7 +40,7 @@ var AccountCreationObj = function (roles, dependencies) {
 
     var i18next = this.__getDependency("i18next");
     var tnthAjax = this.__getDependency("tnthAjax");
-    var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
+    //var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
     var OT = this.__getDependency("OrgTool");
     var leafOrgs = this.__getDependency("leafOrgs");
     var orgList = this.__getDependency("orgList");
@@ -149,11 +149,10 @@ var AccountCreationObj = function (roles, dependencies) {
                 _demoArray["communication"] = arrCommunication;
             };
 
-            /*** SYSTEM uri is defined by SYSTEM_IDENTIFIER_ENUM, see main.js for details **/
             var studyId = $("#profileStudyId").val();
             if (hasValue(studyId)) {
                 var studyIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
+                    system: "http://us.truenth.org/identity-codes/external-study-id",
                     use: "secondary",
                     value: studyId
                 };
@@ -166,7 +165,7 @@ var AccountCreationObj = function (roles, dependencies) {
             var siteId = $("#profileSiteId").val();
             if (hasValue(siteId)) {
                 var siteIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                    system: "http://us.truenth.org/identity-codes/external-site-id",
                     use: "secondary",
                     value: siteId
                 };
@@ -175,7 +174,7 @@ var AccountCreationObj = function (roles, dependencies) {
                 };
                 _demoArray["identifier"].push(siteIdObj);
             };
-            
+
             self.__request({"apiUrl":"/api/demographics/"+this.userId, "requestType": "PUT", "requestData": JSON.stringify(_demoArray), "sync": true, "callback":
                 function(data){
                     if (data.error) {
@@ -573,7 +572,7 @@ $(document).ready(function(){
                 var today = new Date();
                 var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
                 var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-             
+
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
                 if (isValid) {
                 /*
