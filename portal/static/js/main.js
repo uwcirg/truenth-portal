@@ -3781,20 +3781,27 @@ var OrgTool = function() {
 };
 OrgTool.prototype.init = function (callback) {
     var self = this, callback = callback||function() {};
-    $.ajax ({
-        type: "GET",
-        url: "/api/organization",
-        async: false
-    }).done(function(data) {
-        if (data && data.entry) {
-            self.populateOrgsList(data.entry);
-            callback(data.entry);
-        };
-    }).fail(function(xhr) {
-        callback({"error": xhr.responseText});
-        tnthAjax.sendError(xhr, "/api/organization");
-    });
-}
+    if (sessionStorage.orgsData) {
+        var orgsData = JSON.parse(sessionStorage.orgsData);
+        self.populateOrgsList(orgsData);
+        callback(orgsData);
+    } else {
+        $.ajax ({
+            type: "GET",
+            url: "/api/organization",
+            async: false
+        }).done(function(data) {
+            if (data && data.entry) {
+                self.populateOrgsList(data.entry);
+                sessionStorage.setItem("orgsData", JSON.stringify(data.entry));
+                callback(data.entry);
+            };
+        }).fail(function(xhr) {
+            callback({"error": xhr.responseText});
+            tnthAjax.sendError(xhr, "/api/organization");
+        });
+    }
+};
 OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     if (userId) {
         this.setUserId(userId);
