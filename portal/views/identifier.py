@@ -133,7 +133,7 @@ def add_identifier(user_id):
             abort(
                 409,
                 "POST restricted to identifiers not already assigned to user")
-        user.identifiers.append(ident)
+        user._identifiers.append(ident)
     db.session.commit()
 
     # Return current identifiers after change
