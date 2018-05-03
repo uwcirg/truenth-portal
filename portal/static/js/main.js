@@ -872,7 +872,10 @@ var fillViews = {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
                 $("#deathDate_view").text(i18next.t(displayString));
             };
-        } else $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+        } else {
+            $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+            $("#deathDate_view").text("");
+        }
     },
     "locale": function() {
         if ($("#locale").length > 0) {
@@ -2142,7 +2145,10 @@ var assembleContent = {
             if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
          };
 
+         console.log("deceased? ", $("#deathDate").val())
+
         if (hasValue($("#deathDate").val())) {
+            console.log("wtf??")
             demoArray["deceasedDateTime"] = $("#deathDate").val();
         };
 
@@ -2946,7 +2952,7 @@ var Profile = function(subjectId, currentUserId) {
         var self = this;
         var saveLoaderDiv = self.getSaveLoaderDiv;
         saveLoaderDiv("profileForm", "boolDeathGroup");
-        $("#boolDeath").on("change", function() {
+        $("#boolDeath").on("click", function() {
             if (!($(this).is(":checked"))) {
                 $("#deathYear").val("");
                 $("#deathDay").val("");
