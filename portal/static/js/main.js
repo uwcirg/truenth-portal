@@ -436,6 +436,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
         //and also website terms of use
         // WILL NEED TO CLARIFY
+        self.touObj = [];
         tnthAjax.getTerms(this.userId, "", true, function(data) {
             if (data && data.tous) {
                 (data.tous).forEach(function(item) {
@@ -871,7 +872,10 @@ var fillViews = {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
                 $("#deathDate_view").text(i18next.t(displayString));
             };
-        } else $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+        } else {
+            $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+            $("#deathDate_view").text("");
+        }
     },
     "locale": function() {
         if ($("#locale").length > 0) {
@@ -983,7 +987,9 @@ var fillContent = {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
-            //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
+            var clinicalUnit = val.content.valueQuantity.units;
+            var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
+            var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
             var status = val.content.status;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
@@ -997,8 +1003,14 @@ var fillContent = {
                 if(!$radios.is(':checked')) {
                     if (status == "unknown") $radios.filter('[data-status="unknown"]').prop('checked', true);
                     else $radios.filter('[value='+clinicalValue+']').not("[data-status='unknown']").prop('checked', true);
+                    if (truesyValue) {
+                        $radios.filter('[value=true]').prop("checked", true);
+                    }
+                    else if (falsyValue) {
+                        $radios.filter('[value=false]').prop("checked", true);
+                    }
                     if (clinicalItem == "biopsy") {
-                        if (clinicalValue == "true") {
+                        if (String(clinicalValue) === "true" || truesyValue) {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
                                 var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
@@ -1405,8 +1417,8 @@ var fillContent = {
                     var type = $(this).attr("data-tou-type");
                     if (typeInTous(type, "active")) {
                         item_found++;
-                        /* 
-                         * set the data-agree attribute for the corresponding consent item 
+                        /*
+                         * set the data-agree attribute for the corresponding consent item
                          */
                         $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
 
@@ -1691,7 +1703,7 @@ var fillContent = {
                     undefinedText: '--',
                     formatShowingRows: function (pageFrom, pageTo, totalRows) {
                         var rowInfo;
-                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} records").
                         replace("{pageFrom}", pageFrom).
                         replace("{pageTo}", pageTo).
                         replace("{totalRows}", totalRows);
@@ -2010,6 +2022,18 @@ var fillContent = {
                           return {
                             css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                           };
+                    },
+                    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                        var rowInfo;
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} records").
+                        replace("{pageFrom}", pageFrom).
+                        replace("{pageTo}", pageTo).
+                        replace("{totalRows}", totalRows);
+                        $(".pagination-detail .pagination-info").html(rowInfo);
+                        return rowInfo;
+                    },
+                    formatRecordsPerPage: function(pageNumber) {
+                        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
                     },
                     undefinedText: "--",
                     columns: [
@@ -2478,9 +2502,16 @@ var Profile = function(subjectId, currentUserId) {
         }, 1000);
     }
     this.initSections = function(callback) {
-        var self = this;
+        var self = this, existingSections = {}, initCount = 0;
         $("[data-profile-section-id]").each(function() {
-            self.initSection($(this).attr("data-profile-section-id"));
+            var sectionId = $(this).attr("data-profile-section-id");
+            if (!existingSections[sectionId]) {
+                setTimeout(function() {
+                    self.initSection(sectionId);
+                }, initCount);
+                initCount += 50;
+                existingSections[sectionId] = true;
+            }
         });
         if (callback) {
             setTimeout(function() {
@@ -2885,7 +2916,7 @@ var Profile = function(subjectId, currentUserId) {
         };
         $("#btnPasswordResetEmail").on("click", function(event) {
             event.preventDefault();
-            /* 
+            /*
              * stop bubbling of events
              */
             event.stopImmediatePropagation();
@@ -2918,7 +2949,7 @@ var Profile = function(subjectId, currentUserId) {
         var self = this;
         var saveLoaderDiv = self.getSaveLoaderDiv;
         saveLoaderDiv("profileForm", "boolDeathGroup");
-        $("#boolDeath").on("change", function() {
+        $("#boolDeath").on("click", function() {
             if (!($(this).is(":checked"))) {
                 $("#deathYear").val("");
                 $("#deathDay").val("");
@@ -6528,7 +6559,7 @@ var tnthDates = {
                     });
                 }
             }).fail(function(xhr) {
-                
+
             });
         }
         if (!locale) {
