@@ -11,7 +11,7 @@ from portal.models.user import User
 class TestIdentifier(TestCase):
 
     def testGET(self):
-        expected = self.test_user.identifiers.count()
+        expected = len(self.test_user.identifiers)
         self.login()
         rv = self.client.get('/api/user/{}/identifier'.format(TEST_USER_ID))
         self.assert200(rv)
@@ -19,7 +19,7 @@ class TestIdentifier(TestCase):
 
     def testPOST(self):
         """Add an existing and fresh identifier - confirm it sticks"""
-        expected = self.test_user.identifiers.count() + 2
+        expected = len(self.test_user.identifiers) + 2
         existing = Identifier(system='http://notreal.com', value='unique')
         with SessionScope(db):
             db.session.add(existing)
@@ -33,6 +33,5 @@ class TestIdentifier(TestCase):
             content_type='application/json', data=json.dumps(data))
         self.assert200(rv)
         self.assertEquals(len(rv.json['identifiers']), expected)
-        print rv.json
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.identifiers.count(), expected)
+        self.assertEquals(len(user.identifiers), expected)
