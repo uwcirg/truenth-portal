@@ -26,12 +26,10 @@
             this.onBeforeSectionsLoad();
             this.initStartTime = new Date();
             var self = this;
-            if (this.subjectId) {
-                this.initChecks.push({done: false});
-                this.setDemoData(function() {
-                    self.onInitChecksDone();
-                });
-            }
+            this.initChecks.push({done: false});
+            this.setDemoData(function() {
+                self.onInitChecksDone();
+            });
             if (this.currentUserId) { //get user roles - note using the current user Id - so we can determine: if user is an admin, if he/she can edit the consent, etc.
                 this.initChecks.push({done: false});
                 this.modules.tnthAjax.getRoles(this.currentUserId, false, function(data) {
@@ -91,7 +89,7 @@
             currentUserRoles: [],
             userRoles: [],
             mode: "profile",
-            demo: { //skeleton 
+            demo: { //skeleton
                 data: {
                     email: "",
                     name: {given: "",family: ""},
@@ -176,7 +174,7 @@
             modules: {}
         },
         computed: {
-    
+
         },
         methods: {
             registerDependencies: function() {
@@ -198,7 +196,8 @@
             setDemoData: function(callback) {
                 var self = this;
                 callback = callback || function() {};
-                if (!this.subjectId) {
+                var targetUserId = this.subjectId||this.currentUserId;
+                if (!targetUserId) {
                     callback();
                     return false;
                 }
@@ -397,22 +396,30 @@
                                     $(this).attr("data-save-container-id", attachId);
                                     var triggerEvent = $(this).attr("data-trigger-event");
                                     if (!triggerEvent) {
-                                        triggerEvent = $(this).attr("type") === "text" ? "blur" : "change";
+                                        triggerEvent = "change";
                                     }
                                     $(this).on(triggerEvent, function(e) {
                                         e.stopPropagation();
                                         var valid = this.validity ? this.validity.valid : true;
                                         if (valid) {
-                                            var hasError = false;
-                                            if ($(this).attr("data-error-field")) {
-                                                var customErrorField = $("#" + $(this).attr("data-error-field"));
-                                                if (customErrorField.length > 0) {
-                                                    hasError = (customErrorField.text() !== "");
+                                            var o = $(this);
+                                            setTimeout(function() {
+                                                var hasError = false;
+                                                if (o.attr("data-error-field")) {
+                                                    var customErrorField = $("#" + o.attr("data-error-field"));
+                                                    if (customErrorField.length > 0) {
+                                                        hasError = (customErrorField.text() !== "");
+                                                    }
                                                 }
-                                            }
-                                            if (!hasError && !$(this).attr("data-update-on-validated")) {
-                                                self.modules.assembleContent.demo(self.subjectId, true, $(this));
-                                            }
+                                                if (!hasError && !$(this).attr("data-update-on-validated")) {
+                                                    self.modules.assembleContent.demo(self.subjectId, true, o, function(data) {
+                                                        if (data) { //temporarily setting demo data??
+                                                            self.demo.data = $.extend({}, self.demo.data, data);
+                                                        }
+                                                    });
+                                                }
+
+                                            }, 250);
                                         }
                                     });
                                 });
@@ -438,8 +445,14 @@
                                 container.toggleClass("edit");
                                 $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
                                 if (!container.hasClass("edit")) {
-                                    container.find(".form-group").removeClass("has-error");
-                                    container.find(".help-block.with-errors").html("");
+                                    var formGroup = container.find(".form-group").not(".data-update-on-validated");
+                                    formGroup.removeClass("has-error");
+                                    formGroup.find(".help-block.with-errors").html("");
+                                    var focusedFields = container.find(":focus");
+                                    if (focusedFields.length > 0) {
+                                        console.log("focused field ", focusedFields)
+                                        focusedFields.trigger("blur");
+                                    }
                                     self.setDemoData();
                                     self.fillSectionView(container.attr("data-sections"));
                                     self.handleOptionalCoreData();
@@ -737,10 +750,21 @@
                 var self = this;
                 $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
                 $(".btn-send-email").blur();
+                $("#email").on("change", function() {
+                    var o = $(this);
+                    setTimeout(function() {
+                        var hasError = $("#emailGroup").hasClass("has-error");
+                        console.log("has error? " + hasError + " demo email? " + self.demo.data.email)
+                        if (!hasError) {
+                            self.demo.data.email = o.val();
+                            $("#email_view").html("<p>" + o.val() + "</p>");
+                        }
+                    }, 350);
+                });
             },
             "reloadSendPatientEmailForm": function(userId) {
                 if ($("#sendPatientEmailTabContent").length > 0) { //update registration and assessment status email tiles in communications section, needed when org changes
-                    var self = this; 
+                    var self = this;
                     $("#sendPatientEmailTabContent").animate({opacity: 0}, function() {
                         $(this).css("opacity", 1);
                         setTimeout(function() {
@@ -1908,7 +1932,7 @@
                         self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
                     }
                 });
-                
+
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
 
 

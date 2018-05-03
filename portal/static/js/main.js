@@ -23,7 +23,7 @@ var assembleContent = {
         };
 
         var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
-        if (y & m & d) {
+        if (y && m && d) {
             bdFieldVal = y + "-" + m + "-" + d;
         }
         if (bdFieldVal) {
@@ -231,13 +231,8 @@ var assembleContent = {
 
             var phone = $.trim($("input[name=phone]").val());
             if (phone) {
-                demoArray.telecom.push({
-                    "system": "phone",
-                    "use": "mobile",
-                    "value": phone
-                });
+                demoArray.telecom.push({"system": "phone","use": "mobile","value": phone});
             }
-
             var altphone = $.trim($("input[name=altPhone]").val());
             if (altphone) {
                 demoArray.telecom.push({
@@ -3125,7 +3120,7 @@ var tnthTables = {
 };
 
 var Global = {
-    "registerModules": function() { //TODO use webpack or requireJS to import modules? 
+    "registerModules": function() { //TODO use webpack or requireJS to import modules?
         if (!window.portalModules) {
             window.portalModules = {};
         }
