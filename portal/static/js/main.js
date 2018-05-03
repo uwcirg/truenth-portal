@@ -2145,10 +2145,7 @@ var assembleContent = {
             if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
          };
 
-         console.log("deceased? ", $("#deathDate").val())
-
         if (hasValue($("#deathDate").val())) {
-            console.log("wtf??")
             demoArray["deceasedDateTime"] = $("#deathDate").val();
         };
 
