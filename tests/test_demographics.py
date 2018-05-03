@@ -176,7 +176,7 @@ class TestDemographics(TestCase):
                 content_type='application/json',
                 data=json.dumps(fhir))
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.identifiers.count(), 5)
+        self.assertEquals(len(user.identifiers), 5)
 
     def test_bogus_identifiers(self):
         # empty string values causing problems - prevent insertion
@@ -197,7 +197,7 @@ class TestDemographics(TestCase):
             data=json.dumps(fhir))
         self.assert400(rv)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.identifiers.count(), 2)
+        self.assertEquals(len(user.identifiers), 2)
 
     def test_demographics_update_email(self):
         data = {"resourceType": "Patient",
@@ -215,21 +215,6 @@ class TestDemographics(TestCase):
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(user.email, 'updated@email.com')
-
-    def test_demographics_bogus_identifiers_update(self):
-        # Users can't update email via identifier - confirm 400
-        data = {"resourceType": "Patient",
-                "identifier": [{
-                    "system": "http://us.truenth.org/identity-codes/TrueNTH-username",
-                    "use": "secondary",
-                    "value": "updated@email.com"}]
-               }
-
-        self.login()
-        rv = self.client.put(
-            '/api/demographics/%s' % TEST_USER_ID,
-            content_type='application/json', data=json.dumps(data))
-        self.assert400(rv)
 
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
