@@ -98,7 +98,7 @@ def demographics_set(patient_id):
     'deceasedDateTime' - preferring deceasedDateTime if it is known.
 
     At some point this may be extended to consume a more role specific FHIR
-    resource.  At this time, all users, regarless of role, work with the
+    resource.  At this time, all users, regardless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's role.
     Use the /api/roles endpoints for that purpose.
 

@@ -17,13 +17,10 @@ var assembleContent = {
         demoArray.resourceType = "Patient";
         var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
 
-        demoArray.name = {
-            "given": $.trim(fname),
-            "family": $.trim(lname)
-        };
+        demoArray.name = {"given": $.trim(fname), "family": $.trim(lname)};
 
         var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
-        if (y && m && d) {
+        if (y & m & d) {
             bdFieldVal = y + "-" + m + "-" + d;
         }
         if (bdFieldVal) {
@@ -231,8 +228,13 @@ var assembleContent = {
 
             var phone = $.trim($("input[name=phone]").val());
             if (phone) {
-                demoArray.telecom.push({"system": "phone","use": "mobile","value": phone});
+                demoArray.telecom.push({
+                    "system": "phone",
+                    "use": "mobile",
+                    "value": phone
+                });
             }
+
             var altphone = $.trim($("input[name=altPhone]").val());
             if (altphone) {
                 demoArray.telecom.push({
@@ -260,9 +262,7 @@ var assembleContent = {
             }).get();
             demoArray.extension.push({
                 "url": SYSTEM_IDENTIFIER_ENUM.ethnicity,
-                "valueCodeableConcept": {
-                    "coding": ethnicityIDs
-                }
+                "valueCodeableConcept": {"coding": ethnicityIDs}
             });
         }
         if ($("#userRace").length > 0) {
@@ -274,9 +274,7 @@ var assembleContent = {
             }).get();
             demoArray.extension.push({
                 "url": SYSTEM_IDENTIFIER_ENUM.race,
-                "valueCodeableConcept": {
-                    "coding": raceIDs
-                }
+                "valueCodeableConcept": {"coding": raceIDs}
             });
         }
         tnthAjax.putDemo(userId, demoArray);
@@ -334,7 +332,6 @@ OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     $("#userOrgs input[name='organization']").each(function() {
         $(this).prop("checked", false);
     });
-    this.handlePreSelectedClinic();
     this.handleEvent();
     $("#clinics").attr("loaded", true);
 };
@@ -515,7 +512,6 @@ OrgTool.prototype.getShortName = function(orgId) {
 };
 OrgTool.prototype.populateUI = function() {
     var self = this, container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
-
     function getState(item) {
         var s = "",
             found = false;
@@ -715,41 +711,6 @@ OrgTool.prototype.getDefaultModal = function(o) {
         });
     }
     return $("#" + orgId + "_defaultConsentModal");
-};
-OrgTool.prototype.handlePreSelectedClinic = function() {
-    var preselectClinic = $("#preselectClinic").val();
-    if (preselectClinic) {
-        var ob = $("#userOrgs input[value='" + preselectClinic + "']");
-        var self = this;
-        if (ob.length > 0) {
-            ob.prop("checked", true);
-            var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-            var userId = this.getUserId();
-            if (!tnthAjax.hasConsent(userId, parentOrg)) {
-                var __modal = self.getConsentModal();
-                if (__modal) {
-                    ob.attr("data-require-validate", "true");
-                    __modal.on("hidden.bs.modal", function() {
-                        if ($(this).find("input[name='toConsent']:checked").length > 0) {
-                            $("#userOrgs input[name='organization']").each(function() {
-                                $(this).removeAttr("data-require-validate");
-                            });
-                        }
-                    });
-                } else {
-                    tnthAjax.setDefaultConsent(userId, parentOrg);
-                }
-            }
-            var stateContainer = ob.closest(".state-container");
-            if (stateContainer.length > 0) {
-                var st = stateContainer.attr("state");
-                if (st) {
-                    $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
-                    stateContainer.show();
-                }
-            }
-        }
-    }
 };
 OrgTool.prototype.getSelectedOrg = function() {
     return $("#userOrgs input[name='organization']:checked");
@@ -1553,9 +1514,7 @@ var tnthAjax = {
             if (!data.error) {
                 $(".put-demo-error").html("");
             } else {
-                var errorMessage = i18next.t("Server error occurred setting demographics information.");
-                if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
-                else $(".put-demo-error").html(errorMessage);
+                $(".put-demo-error").html(i18next.t("Server error occurred setting demographics information."));
             }
         });
     },
@@ -2435,63 +2394,8 @@ var tnthDates = {
             return false;
         }
     },
-    /***
-     * changeFormat - changes date format, particularly for submitting to server
-     * @param currentDate - date to change
-     * @param reverse - use to switch from yyyy-mm-dd to dd/mm/yyyy
-     * @param shorten - removes padding from zeroes (only in reverse)
-     * @returns - a date as a string
-     *
-     * Examples:
-     * changeFormat("29/04/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
-     * changeFormat("2016-04-29",true) returns "29/04/2016"
-     * changeFormat("2016-04-29",true,true) returns "29/04/2016"
-     ***/
-    "changeFormat": function(currentDate, reverse, shorten) {
-        if (currentDate == null || currentDate == "") {
-            return null;
-        }
-        var yearToPass, convertDate, dateFormatArray;
-        if (reverse) {
-            dateFormatArray = currentDate.split("-");
-            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
-            yearToPass = dateFormatArray[0];
-            if (shorten) {
-                dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, "");
-                dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, "");
-            }
-            convertDate = dateFormatArray[2] + "/" + dateFormatArray[1] + "/" + yearToPass;
-        } else {
-            dateFormatArray = currentDate.split("/");
-            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
-            // If patient manuals enters two digit year, then add 19 or 20 to year.
-            // TODO - this is susceptible to Y2K for 2100s. Be better to force
-            // user to type 4 digits.
-            var currentTime = new Date();
-            if (dateFormatArray[2].length == 2) {
-                var shortYear = currentTime.getFullYear().toString().substr(2, 2);
-                if (dateFormatArray[2] > shortYear) {
-                    yearToPass = "19" + dateFormatArray[2];
-                } else {
-                    yearToPass = "20" + dateFormatArray[2];
-                }
-            } else {
-                yearToPass = dateFormatArray[2];
-            }
-            convertDate = yearToPass + "-" + dateFormatArray[1] + "-" + dateFormatArray[0];
-            // add T according to timezone
-            var tzOffset = currentTime.getTimezoneOffset(); //minutes
-            tzOffset /= 60; //hours
-            if (tzOffset < 10) tzOffset = "0" + tzOffset;
-            convertDate += "T" + tzOffset + ":00:00";
-        }
-        return convertDate;
-    },
     /**
-     * Simply swaps:
-     *      a/b/cdef to b/a/cdef
-     *      (single & double digit permutations accepted...)
-     *      ab/cd/efgh to cd/ab/efgh
+     * Simply swaps: a/b/cdef to b/a/cdef (single & double digit permutations accepted...)
      * Does not check for valid dates on input or output!
      * @param currentDate string eg 7/4/1976
      * @returns string eg 4/7/1976
@@ -2500,53 +2404,18 @@ var tnthDates = {
         var splitDate = currentDate.split("/");
         return splitDate[1] + "/" + splitDate[0] + "/" + splitDate[2];
     },
-    /**
-     * Convert month string to numeric
-     *
-     */
-
-    "convertMonthNumeric": function(month) {
+    "convertMonthNumeric": function(month) { //Convert month string to numeric
         if (!month) return "";
         else {
-            var month_map = {
-                "jan": 1,
-                "feb": 2,
-                "mar": 3,
-                "apr": 4,
-                "may": 5,
-                "jun": 6,
-                "jul": 7,
-                "aug": 8,
-                "sep": 9,
-                "oct": 10,
-                "nov": 11,
-                "dec": 12,
-            };
+            var month_map = {"jan": 1,"feb": 2,"mar": 3,"apr": 4,"may": 5,"jun": 6,"jul": 7,"aug": 8,"sep": 9,"oct": 10,"nov": 11,"dec": 12};
             var m = month_map[month.toLowerCase()];
             return m ? m : "";
         }
     },
-    /**
-     * Convert month string to text
-     *
-     */
-    "convertMonthString": function(month) {
+    "convertMonthString": function(month) { //Convert month string to text
         if (!month) return "";
         else {
-            var numeric_month_map = {
-                1: "Jan",
-                2: "Feb",
-                3: "Mar",
-                4: "Apr",
-                5: "May",
-                6: "Jun",
-                7: "Jul",
-                8: "Aug",
-                9: "Sep",
-                10: "Oct",
-                11: "Nov",
-                12: "Dec"
-            };
+            var numeric_month_map = {1: "Jan",2: "Feb",3: "Mar",4: "Apr",5: "May",6: "Jun",7: "Jul",8: "Aug",9: "Sep",10: "Oct",11: "Nov",12: "Dec"};
             var m = numeric_month_map[parseInt(month)];
             return m ? m : "";
         }
@@ -2560,128 +2429,6 @@ var tnthDates = {
         if (m) s += (s ? " " : "") + this.convertMonthString(m);
         if (y) s += (s ? " " : "") + y;
         return s;
-    },
-    /***
-     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
-     * @param date - the date to be converted
-     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800
-     * @param padZero - if true, will add padded zero to month and date
-     * @param keepTime - if true, will output the time as part of the date
-     * @param blankText - pass a value to display if date is null
-     * @returns date as a string with optional time
-     *
-     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "24/2/2016 3:28pm"
-     */
-    "parseDate": function(date, noReplace, padZero, keepTime, blankText) {
-        if (date == null) {
-            if (blankText) {
-                return blankText;
-            } else {
-                return "";
-            }
-        }
-        // Put date in proper javascript format
-        if (noReplace == null) {
-            date = date.replace(" ", "T");
-        }
-        // Need to reformat dates b/c of date format issues in Safari (and others?)
-        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        var a = date.split(/[^0-9]/);
-        var toConvert;
-        if (a[3]) {
-            toConvert = new Date(a[0], a[1] - 1, a[2], a[3], a[4], a[5]);
-        } else {
-            toConvert = new Date(a[0], a[1] - 1, a[2]);
-        }
-
-        // Switch date to mm/dd/yyyy
-        //var toConvert = new Date(Date.parse(date));
-        var month = toConvert.getMonth() + 1;
-        var day = toConvert.getDate();
-        if (padZero) {
-            if (month <= 9)
-                month = "0" + month;
-            if (day <= 9)
-                day = "0" + day;
-        }
-        if (keepTime) {
-            var amPm = "am";
-            var hour = a[3];
-            if (a[3] > 11) {
-                amPm = "pm";
-                if (a[3] > 12) {
-                    hour = (a[3] - 12);
-                }
-            }
-            return day + "/" + month + "/" + toConvert.getFullYear() + " " + hour + ":" + a[4] + amPm;
-        } else {
-            return day + "/" + month + "/" + toConvert.getFullYear();
-        }
-    },
-    /***
-     * parseForSorting - changes date to a YYYYMMDDHHMMSS string for sorting (note that this is a string rather than a number)
-     * @param date - the date to be converted
-     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800. Adding T indicates UTC time
-     * @returns date as a string used by system for sorting
-     *
-     * parseDate("2016-02-24T15:28:09-0800",true) returns "201600224152809"
-     */
-    "parseForSorting": function(date, noReplace) {
-        if (date == null) {
-            return "";
-        }
-        // Put date in proper javascript format
-        if (noReplace == null) {
-            date = date.replace(" ", "T");
-        }
-        // Need to reformat dates b/c of date format issues in Safari (and others?)
-        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        var a = date.split(/[^0-9]/);
-        var toConvert = new Date(a[0], a[1] - 1, a[2], a[3], a[4], a[5]);
-        // Switch date to mm/dd/yyyy
-        //var toConvert = new Date(Date.parse(date));
-        var month = toConvert.getMonth() + 1;
-        var day = toConvert.getDate();
-        if (month <= 9)
-            month = "0" + month;
-        if (day <= 9)
-            day = "0" + day;
-        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5];
-
-    },
-    /***
-     * spellDate - spells out date in a format based on language/local. Currently not in use.
-     * @param passDate - date to use. If empty, defaults to today.
-     * @param ymdFormat - false by default. false = dd/mm/yyyy. true = yyyy-mm-dd
-     * @returns spelled out date, localized
-     */
-    "spellDate": function(passDate, ymdFormat) {
-        var todayDate = new Date();
-        if (passDate) {
-            // ymdFormat is true, we are assuming it's being received as YYYY-MM-DD
-            if (ymdFormat) {
-                todayDate = passDate.split("-");
-                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1]);
-            } else {
-                // Otherwide dd/mm/yyyy
-                todayDate = passDate.split("/");
-                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0]);
-            }
-        }
-        var returnDate;
-        var monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
-        // If user's language is Spanish then use dd/mm/yyyy format and changes words
-        if (userSetLang !== undefined && userSetLang == "es_MX") {
-            monthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-            returnDate = ("0" + todayDate.getDate()).slice(-2) + " de " + monthNames[todayDate.getMonth()] + " de " + todayDate.getFullYear();
-        } else if (userSetLang !== undefined && userSetLang == "en_AU") {
-            returnDate = ("0" + todayDate.getDate()).slice(-2) + " " + monthNames[todayDate.getMonth()] + " " + todayDate.getFullYear();
-        } else {
-            returnDate = monthNames[todayDate.getMonth()] + " " + ("0" + todayDate.getDate()).slice(-2) + ", " + todayDate.getFullYear();
-        }
-        return returnDate;
     },
     /***
      * Calculates number of days between two dates. Used in mPOWEr for surgery/discharge
@@ -2703,43 +2450,8 @@ var tnthDates = {
         // Round down to floor so we don't add an extra day if session is 12+ hours into the day
         return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24));
     },
-    "getAge": function(birthDate, otherDate) {
-        birthDate = new Date(birthDate);
-        // Use today's date to calc, unless otherwise specified
-        var secondDate = new Date();
-        if (otherDate) {
-            secondDate = new Date(otherDate);
-        }
-        var years = (secondDate.getFullYear() - birthDate.getFullYear());
-
-        if (secondDate.getMonth() < birthDate.getMonth() ||
-            secondDate.getMonth() == birthDate.getMonth() && secondDate.getDate() < birthDate.getDate()) {
-            years--;
-        }
-        return years;
-    },
-    /***
-     * Simple function to add "days" label to a number of days. Not localized, used for mPOWEr
-     * @param dateVal - required. Often derived via getDateDiff
-     * @returns {string}
-     */
-    "addDays": function(dateVal) {
-        var toReturn = "N/A";
-        if (dateVal && typeof dateVal != undefined) {
-            if (dateVal == 1) {
-                toReturn = "1 day";
-            } else if (dateVal < 0) {
-                toReturn = "--";
-            } else {
-                toReturn = dateVal + " days";
-            }
-        } else if (dateVal === 0) {
-            toReturn = "Today";
-        }
-        return toReturn;
-    },
     "isValidDefaultDateFormat": function(date, errorField) {
-        if (!hasValue(date)) return false;
+        if (!date) return false;
         if (date.length < 10) return false;
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) return false;
@@ -2777,9 +2489,7 @@ var tnthDates = {
         return Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime());
     },
     "isValidDate": function(y, m, d) {
-        var date = this.getDateObj(y, m, d);
-        var convertedDate = this.getConvertedDate(date);
-        var givenDate = this.getGivenDate(y, m, d);
+        var date = this.getDateObj(y, m, d), convertedDate = this.getConvertedDate(date), givenDate = this.getGivenDate(y, m, d);
         return (givenDate == convertedDate);
     },
     /*
@@ -2880,22 +2590,13 @@ var tnthDates = {
     },
     "convertToLocalTime": function(dateString) {
         var convertedDate = "";
-        //assuming dateString is UTC date/time
-        if (dateString) {
+        if (dateString) { //assuming dateString is UTC date/time
             var d = new Date(dateString);
             var newDate = new Date(d.getTime() + d.getTimezoneOffset() * 60 * 1000);
             var offset = d.getTimezoneOffset() / 60;
             var hours = d.getHours();
             newDate.setHours(hours - offset);
-            var options = {
-                year: "numeric",
-                day: "numeric",
-                month: "short",
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false
-            };
+            var options = {year: "numeric", day: "numeric", month: "short", hour: "numeric", minute: "numeric", second: "numeric", hour12: false};
             convertedDate = newDate.toLocaleString(options);
         }
         return convertedDate;
@@ -2987,12 +2688,8 @@ var tnthDates = {
      */
     getTodayDateObj: function() {
         var today = new Date();
-        var td = today.getDate(),
-            tm = today.getMonth() + 1,
-            ty = today.getFullYear();
-        var th = today.getHours(),
-            tmi = today.getMinutes(),
-            ts = today.getSeconds();
+        var td = today.getDate(), tm = today.getMonth() + 1, ty = today.getFullYear();
+        var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
         var gmtToday = this.getDateWithTimeZone(this.getDateObj(ty, tm, td, th, tmi, ts));
         var pad = function(n) {n = parseInt(n); return (n < 10) ? "0" + n : n;};
         return {
@@ -3047,10 +2744,8 @@ var tnthDates = {
 };
 
 /***
- * Bootstrap datatables functions
- * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
+ * Bootstrap datatables functions - Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
  ****/
-
 var tnthTables = {
     /***
      * Quick way to sort when text is wrapper in an <a href> or other tag
@@ -3065,8 +2760,7 @@ var tnthTables = {
         return bb - aa;
     },
     /***
-     * Quick way to sort when text is wrapped in an <a href> or other tag
-     * NOTE for text that is NOT number
+     * Quick way to sort when text is wrapped in an <a href> or other tag - NOTE for text that is NOT number
      * @param a,b - the two items to compare
      * @returns 1,-1 or 0 for sorting
      */
@@ -3079,16 +2773,14 @@ var tnthTables = {
     },
     /***
      * sorting date string,
-     * @param a,b - the two items to compare - note, this assumes that the parameters
-     * are in valid date format e.g. 3 August 2017
+     * @param a,b - the two items to compare - note, this assumes that the parameters are in valid date format e.g. 3 August 2017
      * @returns 1,-1 or 0 for sorting
      */
     "dateSorter": function(a, b) {
         if (!(a)) a = 0;
         if (!(b)) b = 0;
         /*
-         * make sure the string passed in does not have line break element if so it is a possible mult-line text, split it up and use
-         * the first item in the resulting array
+         * make sure the string passed in does not have line break element if so it is a possible mult-line text, split it up and use the first item in the resulting array
          */
         var regex = /<br\s*[\/]?>/gi;
         a = a.replace(regex, "\n");
@@ -3281,8 +2973,7 @@ var Global = {
                         setVis();
                     });
                 });
-                $("#notificationBanner .close").on("click", function(e) {
-                    //closing the banner
+                $("#notificationBanner .close").on("click", function(e) { //closing the banner
                     e.stopPropagation();
                     $("#notificationBanner [data-id]").each(function() {
                         var actionRequired = $(this).find("[data-action-required]").length > 0;
@@ -3318,7 +3009,6 @@ __i18next.init({
         Global.loginAs();
 
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
-
         if (PORTAL_NAV_PAGE) {
             loader(true);
             Global.initPortalWrapper(PORTAL_NAV_PAGE);
@@ -3329,14 +3019,9 @@ __i18next.init({
         $("form.to-validate").validator({
             custom: {
                 birthday: function() {
-                    var m = parseInt($("#month").val());
-                    var d = parseInt($("#date").val());
-                    var y = parseInt($("#year").val());
-                    // If all three have been entered, run check
-                    var goodDate = true;
-                    var errorMsg = "";
-                    // If NaN then the values haven't been entered yet, so we
-                    // validate as true until other fields are entered
+                    var m = parseInt($("#month").val()), d = parseInt($("#date").val()), y = parseInt($("#year").val());
+                    var goodDate = true, errorMsg = "";
+                    // If NaN then the values haven't been entered yet, so we, validate as true until other fields are entered
                     if (isNaN(y) || (isNaN(d) && isNaN(y))) {
                         $("#errorbirthday").html(i18next.t("All fields must be complete.")).hide();
                         goodDate = false;
@@ -3363,14 +3048,11 @@ __i18next.init({
                     var emailVal = $.trim($el.val());
                     var update = function($el) {
                         if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
-                            assembleContent.demo($el.attr("data-user-id"), true, $el);
+                            $el.trigger("postEventUpdate");
                         }
                     };
                     if (emailVal === "") {
-                        if ($el.attr("data-optional")) {
-                            /*
-                             * if email address is optional, update it as is
-                             */
+                        if ($el.attr("data-optional")) { //if email address is optional, update it as is
                             update($el);
                             return true;
                         } else {

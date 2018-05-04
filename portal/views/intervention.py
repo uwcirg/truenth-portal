@@ -65,6 +65,7 @@ def user_intervention_get(intervention_name, user_id):
               enum:
                 - forbidden
                 - granted
+                - subscribed
             card_html:
               type: string
               description:
@@ -112,6 +113,26 @@ def user_intervention_get(intervention_name, user_id):
     return jsonify(ui.as_json(include_empties=False))
 
 
+def integration_delay_hack(intervention, key, value):
+    """Workaround until the MUSIC group can push a change to production
+
+    MUSIC doesn't have a tile/card to display to the end user and
+    only adds user_intervention rows to subscribe to user events.
+
+    For MUSIC and only the MUSIC intervention, when they request:
+      access = granted
+    quietly promote that to the desired:
+      access = subscribed
+
+    See also TN-1041
+
+    """
+    if (intervention.name == 'music' and
+            key == 'access' and value == 'granted'):
+        return "subscribed"
+    return value
+
+
 @intervention_api.route('/intervention/<string:intervention_name>',
                         methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
@@ -129,6 +150,10 @@ def user_intervention_set(intervention_name):
 
     NB - for `access`, interventions have a global 'public_access' setting.
     Only when public_access is unset are individual accounts consulted.
+
+    Set `access = subscribed` to only include user in subscribed events.
+    `access = granted` will present the user with the intervention's tile
+    (card) as well as include them in subscribed events.
 
     ---
     operationId: user_intervention_set
@@ -158,6 +183,7 @@ def user_intervention_set(intervention_name):
               enum:
                 - forbidden
                 - granted
+                - subscribed
             card_html:
               type: string
               description:
@@ -246,7 +272,9 @@ def user_intervention_set(intervention_name):
             'link_url', 'access', 'card_html', 'link_label', 'status_text',
             'staff_html'):
         if attr in request.json:
-            complete[attr] = request.json.get(attr)
+            value = integration_delay_hack(
+                intervention=intervention, key=attr, value=request.json.get(attr))
+            complete[attr] = value
     ui.update_from_json(complete)
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(
