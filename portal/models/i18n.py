@@ -310,7 +310,7 @@ def get_locale():
         return current_user().locale_code
 
     # look for session variable in pre-logged-in state
-    if 'locale_code' in session:
+    if 'locale_code' in session and session.get('locale_code'):
         return session['locale_code']
 
     return current_app.config.get("DEFAULT_LOCALE")
