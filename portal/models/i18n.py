@@ -7,7 +7,7 @@ import tempfile
 
 from collections import defaultdict
 from cStringIO import StringIO
-from flask import current_app
+from flask import current_app, session
 from polib import pofile
 from subprocess import check_call
 from zipfile import ZipFile
@@ -308,4 +308,9 @@ def merge_po_into_master(po_path, language, fname):
 def get_locale():
     if current_user() and current_user().locale_code:
         return current_user().locale_code
+
+    # look for session variable in pre-logged-in state
+    if 'locale_code' in session:
+        return session['locale_code']
+
     return current_app.config.get("DEFAULT_LOCALE")
