@@ -425,8 +425,8 @@ var ConsentUIHelper = function(consentItems, userId) {
             /*
              * note terms of use text is hidden/unhidden using respective project's stylesheet
              */
-            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + (i18next.t("Agreed to {document_type}").replace("{document_type}", capitalize(item.display_type))) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{project name} Terms of Use").replace("{project name}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + (i18next.t("Agreed to {documentType}").replace("{documentType}", capitalize(item.display_type))) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{projectName} Terms of Use").replace("{projectName}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
         return touContent;
