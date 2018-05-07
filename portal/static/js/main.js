@@ -4487,8 +4487,8 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        //don't think we want to translate message sent back to the server here
-        params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
+        //don't think we want to translate message sent back to the server here, for some reason quotation marks weren't encoded, causing problem
+        params.message = "Error generated in JS - " + (hasValue(message) ? message.replace(/['"]/g, "") : "no detail available");
 
         if (window.console) {
             console.log("Errors occurred.....");
