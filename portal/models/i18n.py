@@ -7,7 +7,7 @@ import tempfile
 
 from collections import defaultdict
 from cStringIO import StringIO
-from flask import current_app, session
+from flask import current_app, has_request_context, session
 from polib import pofile
 from subprocess import check_call
 from zipfile import ZipFile
@@ -310,7 +310,8 @@ def get_locale():
         return current_user().locale_code
 
     # look for session variable in pre-logged-in state
-    if 'locale_code' in session and session.get('locale_code'):
+    # confirm request context - not available from celery tasks
+    if has_request_context() and session.get('locale_code'):
         return session['locale_code']
 
     return current_app.config.get("DEFAULT_LOCALE")
