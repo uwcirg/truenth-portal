@@ -46,7 +46,7 @@
     </div>
 {%- endmacro %}
 {% macro profileDemoDetail(person, current_user) -%}
-    <div class="row" data-profile-section-id="demodetail">
+    <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail">
         <div class="col-md-12 col-xs-12">
           <div class="profile-item-container patient-detail-container editable" data-sections="detail">
                 <h4 id="patientDetailLoc" class="profile-item-title index-item">
@@ -100,10 +100,10 @@
     <div class="form-group profile-section" id="bdGroup" data-profile-section-id="birthday">
         <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-bind:value="demo.data.birthDay" lazy required />
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
-                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" v-bind:value="demo.data.birthMonth" lazy required>
+                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" v-model.lazy="demo.data.birthMonth" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -120,7 +120,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-bind:value="demo.data.birthYear" lazy required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear"  required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -148,14 +148,14 @@
     <div class="row profile-section name-section" data-profile-section-id="name">
         <div id="firstNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname" v-model="demo.data.name.given" lazy/>
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname" v-model.lazy="demo.data.name.given"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorfirstname" class="error-message"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true" v-model="demo.data.name.family" lazy/>
+                <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true" v-model.lazy="demo.data.name.family"/>
                 <div class="help-block with-errors"></div>
                 <div id="errorlastname" class="error-message"></div>
             </div>
@@ -168,15 +168,15 @@
         <label id="genderLabel">{{ _("Gender") }}</label>
         <div id="profile-gender-list" class="profile-radio-list" data-loader-container="true">
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexM" value="male" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "male"}}/>
+                <input type="radio" name="sex" id="sexM" value="male" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexF" value="female" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "female"}}/>
+                <input type="radio" name="sex" id="sexF" value="female" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "female"}}/>
                 {{ _("Female") }}
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexO" value="other" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "other"}}/>
+                <input type="radio" name="sex" id="sexO" value="other" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "other"}}/>
                 {{ _("Other") }}
             </label>
         </div>
@@ -196,32 +196,32 @@
             <div class="profile-radio-list">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="1002-5" v-model="demo.data.raceCodes">{{ _("American Indian or Alaska Native") }}
+                        <input type="checkbox" name="race" value="1002-5" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("American Indian or Alaska Native") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2028-9" v-model="demo.data.raceCodes">{{ _("Asian") }}
+                        <input type="checkbox" name="race" value="2028-9" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Asian") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2054-5" v-model="demo.data.raceCodes">{{ _("Black or African American") }}
+                        <input type="checkbox" name="race" value="2054-5" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Black or African American") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2076-8" v-model="demo.data.raceCodes">{{ _("Native Hawaiian or Other Pacific Islander") }}
+                        <input type="checkbox" name="race" value="2076-8" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Native Hawaiian or Other Pacific Islander") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2106-3" v-model="demo.data.raceCodes">{{ _("White") }}
+                        <input type="checkbox" name="race" value="2106-3" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("White") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2131-1" v-model="demo.data.raceCodes">{{ _("Other") }}
+                        <input type="checkbox" name="race" value="2131-1" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Other") }}
                     </label>
                 </div>
             </div>
@@ -236,12 +236,12 @@
             <div class="profile-radio-list">
                 <div class="radio">
                     <label>
-                        <input type="radio" name="ethnicity" value="2135-2" v-model="demo.data.ethnicityCodes">{{ _("Hispanic or Latino") }}
+                        <input type="radio" name="ethnicity" value="2135-2" data-trigger-event="click" v-model="demo.data.ethnicityCodes">{{ _("Hispanic or Latino") }}
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="ethnicity" value="2186-5" v-model="demo.data.ethnicityCodes">{{ _("Not Hispanic or Latino") }}
+                        <input type="radio" name="ethnicity" value="2186-5" data-trigger-event="click" v-model="demo.data.ethnicityCodes">{{ _("Not Hispanic or Latino") }}
                     </label>
                 </div>
             </div>
@@ -415,7 +415,7 @@
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="phone">
         <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone" v-model="demo.data.cellPhone" lazy/>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone" v-model.lazy="demo.data.cellPhone"/>
         <div class="help-block with-errors"></div>
     </div>
     <div id="errorphone" class="error-message"></div>
@@ -424,7 +424,7 @@
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="altphone">
         <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
-        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone" v-model="demo.data.homePhone" lazy/>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone" v-model.lazy="demo.data.homePhone"/>
         <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
     </div>
@@ -471,6 +471,7 @@
                 </div>
                <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
                <div id="defaultConsentContainer"></div>
+               <div>{{default_consent_modal()}}</div>
                {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
             </div>
         </div>
@@ -479,7 +480,6 @@
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
 {%- endmacro %}
-
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div id="userOrgs_view" class="view-container">
@@ -505,6 +505,7 @@
                 {%- endif -%}
                 </div>
                 <div id="defaultConsentContainer" data-profile-section-id="consent"></div>
+                <div>{{default_consent_modal()}}</div>
                 {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
                 <div class="help-block with-errors"></div>
             </div>
@@ -519,14 +520,45 @@
     <input type="hidden" id="requireMorph" value="true" />
     {%- endif -%}
 {%- endmacro %}
+{% macro default_consent_modal() -%}
+    {% raw %}
+        <div class="modal fade" id="defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="defaultConsentModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="{close}"><span aria-hidden='true'>&times;</span></button>
+                        <h4 class="modal-title">{title}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <div class="main-content tnth-hide">
+                            <p>{consentText}</p>
+                            <div id="{orgId}defaultConsentAgreementRadioList" class="profile-radio-list">
+                                <label class="radio-inline"><input type="radio" name="toConsent" id="{orgId}_consent_yes" data-org="{orgId}" value="yes"/>{yes}</label>
+                                <br/>
+                                <label class="radio-inline"><input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>
+                            </div>
+                        </div>
+                        <div id="{orgId}_consentAgreementMessage" class="error-message"></div>
+                    </div>
+                    <br/>
+                    <div class="modal-footer" >
+                        <div id="{orgId}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <button type="button" class="btn btn-default btn-consent-close" data-org="{orgId}" data-dismiss="modal" aria-label="{close}">{close}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endraw %}
+{%- endmacro %}
 {% macro consent_modal(person, consent_agreement, org) -%}
     {%- if person and consent_agreement and org -%}
         <div class="modal fade consent-modal" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
                     <div class="modal-body">
                         <div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
@@ -543,23 +575,16 @@
                                 {% endtrans %}
                             </p>
                             <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                                  {{ _("Yes") }}
-                              </label>
+                              <label class="radio-inline"><input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>{{ _("Yes") }}</label>
                               <br/>
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                                  {{ _("No") }}
-                              </label>
+                              <label class="radio-inline"><input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>{{ _("No") }}</label>
                             </div>
                         </div>
                         <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
                      </div>
                      <br/>
                      <div class="modal-footer" >
-                        <div id="{{org}}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-                        <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                        <div id="{{org}}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div><button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
                      </div>
                 </div>
             </div>
@@ -675,8 +700,7 @@
                             <div id="#profileConsentListModalErrorMessage" class="text-danger"></div>
                         </div>
                         <br/><br/>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+                        <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
                         </div>
                 </div>
             </div>
@@ -897,21 +921,24 @@
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="deceased" data-profile-section-id="deceased">
-                <h4 id="deathLoc" class="profile-item-title index-item">{{ _("Deceased Status") }}</h4>
+                <h4 id="deathLoc" class="profile-item-title index-item">{{_("Deceased Status")}}</h4>
                 <input type="hidden" id="deathDate" value=""/>
                 <div class="view-container">
-                    <div id="boolDeath_view"></div>
-                    <div id="deathDate_view"></div>
+                    <div id="boolDeath_view" v-show="demo.data.deceasedBoolean">{{_("Patient is deceased")}}</div>
+                    <div id="deathDate_view" v-show="demo.data.deceasedDateTime">
+                        <p>{{_("Patient is deceased")}}</p>
+                        {% raw %}
+                            <p>{{demo.data.displayDeceasedDate}}</p>
+                        {% endraw %}
+                    </div>
                 </div>
                 <div class="edit-container">
                     <div class="checkbox" id="boolDeathGroup">
-                        <label>
-                            <input type="checkbox" name="boolDeath" id="boolDeath" value="1" data-save-container-id="boolDeathGroup"/>{{ _("Has the patient passed away?") }}
-                        </label>
+                        <label><input type="checkbox" name="boolDeath" id="boolDeath" value="1" data-save-container-id="boolDeathGroup"/>{{_("Has the patient passed away?")}}</label>
                     </div>
                     <hr/>
                     <div class="form-group">
-                        <label class="text-muted">{{ _("Deceased Date") }}</label>
+                        <label class="text-muted">{{_("Deceased Date")}}</label>
                     </div>
                     <div class="row deceased-date-container">
                         <div class="col-md-3 col-xs-6">
@@ -957,7 +984,7 @@
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="studyid">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model="demo.data.studyId" lazy />
+        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" />
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
     </div>
@@ -965,7 +992,7 @@
 {% macro profileSiteID(current_user) -%}
     <div id="profileSiteIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="siteid">
         <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
-        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId" v-model="demo.data.siteId" lazy/>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId" v-model.lazy="demo.data.siteId"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>

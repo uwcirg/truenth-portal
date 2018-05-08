@@ -143,7 +143,7 @@ var AccountCreationObj = function (roles, dependencies) {
 
             _demoArray["careProvider"] = orgIDs;
 
-            var arrCommunication = OT.getCommunicationArray();
+            var arrCommunication = self.getCommunicationArray();
             if (arrCommunication.length > 0) {
                 _demoArray["communication"] = arrCommunication;
             };
@@ -469,6 +469,30 @@ var AccountCreationObj = function (roles, dependencies) {
         } else {
             $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
         };
+    };
+    this.getCommunicationArray = function() {
+        var arrCommunication = [];
+        $("#userOrgs input:checked").each(function() {
+            if (parseInt($(this).val()) === 0) {
+                return true; //don't count none
+            }
+            var oList = OT.getOrgsList(), oi = oList[$(this).val()];
+            if (!oi) {
+                return true;
+            }
+            if (oi.language) {
+                arrCommunication.push({
+                    "language": {"coding": [{"code": oi.language,"system": "urn:ietf:bcp:47"}]}
+                });
+            } else if (oi.extension && oi.extension.length > 0) {
+                (oi.extension).forEach(function(ex) {
+                    if (String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding) {
+                        arrCommunication.push({"language": { "coding": ex.valueCodeableConcept.coding}});
+                    }
+                });
+            }
+        });
+        return arrCommunication;
     };
     this.getConsents = function() {
         var orgs = {}, consents = [], self = this;

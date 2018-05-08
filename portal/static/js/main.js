@@ -5,280 +5,13 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "external_site_id": "http://us.truenth.org/identity-codes/external-site-id",
     "practice_region": "http://us.truenth.org/identity-codes/practice-region",
     "race": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+    "race_system": "http://hl7.org/fhir/v3/Race",
     "ethnicity": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+    "ethnicity_system": "http://hl7.org/fhir/v3/Ethnicity",
     "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
     "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
     "language": "http://hl7.org/fhir/valueset/languages",
     "shortname": "http://us.truenth.org/identity-codes/shortname"
-};
-var assembleContent = {
-    "demo": function(userId, onProfile, targetField, sync, callback) {
-        var demoArray = {};
-        demoArray.resourceType = "Patient";
-        var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
-
-        demoArray.name = {"given": $.trim(fname), "family": $.trim(lname)};
-
-        var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
-        if (y & m & d) {
-            bdFieldVal = y + "-" + m + "-" + d;
-        }
-        if (bdFieldVal) {
-            demoArray.birthDate = bdFieldVal;
-        }
-
-        var preselectClinic = $("#preselectClinic").val();
-        if (preselectClinic) {
-            var parentOrg = $("#userOrgs input[name='organization'][value='" + preselectClinic + "']").attr("data-parent-id");
-            if (!parentOrg) {
-                parentOrg = preselectClinic;
-            }
-            if (tnthAjax.hasConsent(userId, parentOrg)) {
-                demoArray.careProvider = [{reference: "api/organization/" + preselectClinic}];
-            }
-        } else {
-
-            if ($("#userOrgs input[name='organization']").length > 0) {
-                var orgIDs;
-                orgIDs = $("#userOrgs input[name='organization']").map(function() {
-                    if ($(this).prop("checked")) {
-                        return {reference: "api/organization/" + $(this).val()};
-                    }
-                }).get();
-
-                if (orgIDs) {
-                    if (orgIDs.length > 0) {
-                        demoArray.careProvider = orgIDs;
-                    }
-                }
-            }
-
-            /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
-            var topLevelOrgs = $("#fillOrgs legend[data-checked]");
-            if (topLevelOrgs.length > 0) {
-                topLevelOrgs.each(function() {
-                    var tOrg = $(this).attr("orgid");
-                    if (tOrg) {
-                        if (!demoArray.careProvider) {
-                            demoArray.careProvider = [];
-                        }
-                        demoArray.careProvider.push({reference: "api/organization/" + tOrg});
-                    }
-                });
-            }
-        }
-
-        if (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0)) { //don't update org to none if there are top level org affiliation above
-            if ($("#aboutForm").length === 0) {
-                demoArray.careProvider = [{reference: "api/organization/" + 0}];
-            }
-        }
-
-        if ($("#deathDate").val()) {
-            demoArray.deceasedDateTime = $("#deathDate").val();
-        }
-
-        if (!$("#deathDate").val()) {
-            if ($("#boolDeath").length > 0) {
-                if ($("#boolDeath").prop("checked")) {
-                    demoArray.deceasedBoolean = true;
-                } else {
-                    demoArray.deceasedBoolean = false;
-                }
-            }
-        }
-
-        if (onProfile) {
-            // Grab profile field values - looks for regular and hidden, can be checkbox or radio
-            var e = $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus"), tz = $("#profileTimeZone");
-            var ethnicityIDs, raceIDs, indigenousIDs, tzID;
-
-            demoArray.extension = [];
-
-            if (e.length > 0) {
-                ethnicityIDs = $("#userEthnicity input:checked").map(function() {
-                    return {code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity"};
-                }).get();
-
-                if (ethnicityIDs) {
-                    demoArray.extension.push({
-                        "url": SYSTEM_IDENTIFIER_ENUM.ethnicity,
-                        "valueCodeableConcept": {
-                            "coding": ethnicityIDs
-                        }
-                    });
-                }
-            }
-            if (r.length > 0) {
-                raceIDs = $("#userRace input:checkbox:checked").map(function() {
-                    return {code: $(this).val(),system: "http://hl7.org/fhir/v3/Race"};
-                }).get();
-                if (raceIDs) {
-                    demoArray.extension.push({
-                        "url": SYSTEM_IDENTIFIER_ENUM.race,
-                        "valueCodeableConcept": {
-                            "coding": raceIDs
-                        }
-                    });
-                }
-            }
-
-            if (i.length > 0) {
-                indigenousIDs = $("#userIndigenousStatus input[type='radio']:checked").map(function() {
-                    return {
-                        code: $(this).val(),
-                        system: SYSTEM_IDENTIFIER_ENUM.indigenous
-                    };
-                }).get();
-                if (indigenousIDs) {
-                    demoArray.extension.push({
-                        "url": SYSTEM_IDENTIFIER_ENUM.indigenous,
-                        "valueCodeableConcept": {
-                            "coding": indigenousIDs
-                        }
-                    });
-                }
-            }
-
-            if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
-                var selectedLocale = $("#locale").find("option:selected");
-                demoArray.communication = [{
-                    "language": {
-                        "coding": [{
-                            "code": selectedLocale.val(),
-                            "display": selectedLocale.text(),
-                            "system": "urn:ietf:bcp:47"
-                        }]
-                    }
-                }];
-            }
-
-            if (tz.length > 0) {
-                tzID = $("#profileTimeZone option:selected").val();
-                if (tzID) {
-                    demoArray.extension.push({
-                        timezone: tzID,
-                        url: SYSTEM_IDENTIFIER_ENUM.timezone
-                    });
-                }
-            }
-
-            var studyIdField = $("#profileStudyId"), siteIdField = $("#profileSiteId");
-            var studyId = studyIdField.val(); //studyId field is only present in Eproms
-            var siteId = siteIdField.val(); //siteId field is only present in Truenth
-            var identifiers = [];
-            $.ajax({ //get current identifier(s)
-                type: "GET",
-                url: "/api/demographics/" + userId,
-                async: false
-            }).done(function(data) {
-                if (data && data.identifier) {
-                    (data.identifier).forEach(function(identifier) {
-                        identifiers.push(identifier);
-                    });
-                }
-            }).fail(function(xhr) {
-                tnthAjax.reportError(userId, "api/demographics" + userId, xhr.responseText);
-            });
-
-            identifiers = $.grep(identifiers, function(identifier) { //this will save study Id or site Id only if each has a value otherwise if each is empty, it will be purged from the identifiers that had older value of each
-                return identifier.system !== SYSTEM_IDENTIFIER_ENUM.external_study_id &&
-                    identifier.system !== SYSTEM_IDENTIFIER_ENUM.external_site_id;
-            });
-
-            studyId = $.trim(studyId);
-            if (studyId) {
-                var studyIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM.external_study_id,
-                    use: "secondary",
-                    value: studyId
-                };
-                identifiers.push(studyIdObj);
-            }
-
-            siteId = $.trim(siteId);
-            if (siteId) {
-                var siteIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM.external_site_id,
-                    use: "secondary",
-                    value: siteId
-                };
-                identifiers.push(siteIdObj);
-            }
-
-            if (identifiers.length > 0) {
-                demoArray.identifier = identifiers;
-            }
-
-            demoArray.gender = $("input[name=sex]:checked").val();
-            demoArray.telecom = [];
-
-            var emailVal = $("input[name=email]").val();
-            if ($.trim(emailVal)) {
-                demoArray.telecom.push({
-                    "system": "email",
-                    "value": $.trim(emailVal)
-                });
-            } else {
-                demoArray.telecom.push({ //'__no_email__'
-                    "system": "email",
-                    "value": "__no_email__"
-                });
-            }
-
-            var phone = $.trim($("input[name=phone]").val());
-            if (phone) {
-                demoArray.telecom.push({
-                    "system": "phone",
-                    "use": "mobile",
-                    "value": phone
-                });
-            }
-
-            var altphone = $.trim($("input[name=altPhone]").val());
-            if (altphone) {
-                demoArray.telecom.push({
-                    "system": "phone",
-                    "use": "home",
-                    "value": altphone
-                });
-            }
-        }
-        if (callback) {
-            callback(demoArray);
-        }
-        tnthAjax.putDemo(userId, demoArray, targetField, sync);
-    },
-    "coreData": function(userId) {
-        var demoArray = {};
-        demoArray.resourceType = "Patient";
-        demoArray.extension = [];
-        if ($("#userEthnicity").length > 0) {
-            var ethnicityIDs = $("#userEthnicity input:checked").map(function() {
-                return {
-                    code: $(this).val(),
-                    system: "http://hl7.org/fhir/v3/Ethnicity"
-                };
-            }).get();
-            demoArray.extension.push({
-                "url": SYSTEM_IDENTIFIER_ENUM.ethnicity,
-                "valueCodeableConcept": {"coding": ethnicityIDs}
-            });
-        }
-        if ($("#userRace").length > 0) {
-            var raceIDs = $("#userRace input:checkbox:checked").map(function() {
-                return {
-                    code: $(this).val(),
-                    system: "http://hl7.org/fhir/v3/Race"
-                };
-            }).get();
-            demoArray.extension.push({
-                "url": SYSTEM_IDENTIFIER_ENUM.race,
-                "valueCodeableConcept": {"coding": raceIDs}
-            });
-        }
-        tnthAjax.putDemo(userId, demoArray);
-    }
 };
 
 var OrgObj = function(orgId, orgName, parentOrg) {
@@ -332,7 +65,6 @@ OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     $("#userOrgs input[name='organization']").each(function() {
         $(this).prop("checked", false);
     });
-    this.handleEvent();
     $("#clinics").attr("loaded", true);
 };
 
@@ -591,16 +323,28 @@ OrgTool.prototype.populateUI = function() {
                     "<span>{{itemName}}</span>" +
                     "</label>" +
                     "</div>";
+                var attrObj = {dataAttributes:(' data-parent-id="' + topLevelOrgId + '"  data-parent-name="' + orgsList[topLevelOrgId].name + '" '), containerClass: "", textClass: ""};
+                if (_isTopLevel) {
+                    attrObj.dataAttributes = (' data-parent-id="' + _parentOrgId + '"  data-parent-name="' + _parentOrg.name + '" ');
+                }
+                if (orgsList[item.id].children.length > 0) {
+                    if (_isTopLevel) {
+                        attrObj.containerClass = "sub-org-container";
+                        attrObj.textClass = "text-muted";
+                    } else {
+                        attrObj.textClass = "text-muter";
+                    }
+                }
                 childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
                     .replace(/\{\{itemName\}\}/g, item.name)
                     .replace(/\{\{shortName\}\}/g, (item.shortname || item.name))
                     .replace(/\{\{state\}\}/g, state ? state : "")
-                    .replace(/\{\{dataAttributes\}\}/g, (_isTopLevel ? (' data-parent-id="' + _parentOrgId + '"  data-parent-name="' + _parentOrg.name + '" ') : (' data-parent-id="' + topLevelOrgId + '"  data-parent-name="' + orgsList[topLevelOrgId].name + '" ')))
-                    .replace("{{containerClass}}", (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "sub-org-container" : "") : ""))
-                    .replace(/\{\{textClasses\}\}/g, (orgsList[item.id].children.length > 0 ? (_isTopLevel ? "text-muted" : "text-muter") : ""));
-
-                if ($("#" + _parentOrgId + "_container").length > 0) {
-                    $("#" + _parentOrgId + "_container").append(childClinic);
+                    .replace(/\{\{dataAttributes\}\}/g, attrObj.dataAttributes)
+                    .replace("{{containerClass}}", attrObj.containerClass)
+                    .replace(/\{\{textClasses\}\}/g, attrObj.textClass);
+                var parentOrgContainer = $("#" + _parentOrgId + "_container");
+                if (parentOrgContainer.length > 0) {
+                    parentOrgContainer.append(childClinic);
                 } else {
                     container.append(childClinic);
                 }
@@ -611,223 +355,8 @@ OrgTool.prototype.populateUI = function() {
         container.html(i18next.t("No organizations available"));
     }
 };
-OrgTool.prototype.getDefaultModal = function(o) {
-    if (!o) {
-        return false;
-    }
-    var self = this, orgsList = self.getOrgsList(), orgId = self.getElementParentOrg(o),
-        orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : ($(o).attr("data-parent-name") || $(o).closest("label").text());
-    var title = i18next.t("Consent to share information");
-    var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
-    if (orgId && $("#" + orgId + "_defaultConsentModal").length === 0) {
-        var s = '<div class="modal fade" id="{orgId}_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="{orgId}_defaultConsentModal">' +
-            '<div class="modal-dialog" role="document">' +
-            '<div class="modal-content">' +
-            '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-label="{close}">' + "<span aria-hidden='true'>&times;</span></button>" +
-            '<h4 class="modal-title">{title}</h4>' +
-            '</div>' +
-            '<div class="modal-body">' +
-            '<div class="content-loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-            '<div class="main-content tnth-hide">' +
-            '<p>{consentText}</p>' +
-            '<div id="{orgId}defaultConsentAgreementRadioList" class="profile-radio-list">' +
-            '<label class="radio-inline">' +
-            '<input type="radio" name="toConsent" id="{orgId}_consent_yes" data-org="{orgId}" value="yes"/>{yes}</label>' +
-            '<br/>' +
-            '<label class="radio-inline">' +
-            '<input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>' +
-            '</div>' +
-            '</div>' +
-            '<div id="{orgId}_consentAgreementMessage" class="error-message"></div>' +
-            '</div>' +
-            '<br/>' +
-            '<div class="modal-footer" >' +
-            '<div id="{orgId}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
-            '<button type="button" class="btn btn-default btn-consent-close" data-org="{orgId}" data-dismiss="modal" aria-label="{close}">{close}</button>' +
-            '</div></div></div></div>';
-        s = s.replace(/\{orgId\}/g, orgId)
-            .replace(/\{close\}/g, i18next.t("Close"))
-            .replace(/\{yes\}/g, i18next.t("Yes"))
-            .replace(/\{no\}/g, i18next.t("No"))
-            .replace(/\{title\}/g, title)
-            .replace(/\{consentText\}/g, consentText);
-        if ($("#defaultConsentContainer").length === 0) {
-            $("body").append("<div id='defaultConsentContainer'></div>");
-        }
-        $("#defaultConsentContainer").append(s);
-        $("#" + orgId + "_defaultConsentModal input[name='toConsent']").each(function() {
-            $(this).on("click", function(e) {
-                e.stopPropagation();
-                var orgId = $(this).attr("data-org");
-                var userId = self.getUserId();
-                $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true);
-                $("#" + orgId + "_loader").show();
-                if ($(this).val() == "yes") {
-                    setTimeout("tnthAjax.setDefaultConsent(" + userId + "," + orgId + ");", 100);
-                } else {
-                    tnthAjax.deleteConsent(userId, {"org": orgId});
-                    setTimeout(function() {
-                        tnthAjax.removeObsoleteConsent();
-                    }, 100);
-                }
-                setTimeout(function() {
-                    tnthAjax.reloadConsentList(self.userId);
-                }, 500);
-                setTimeout(function() {
-                    $(".modal").modal("hide");
-                }, 250);
-            });
-        });
-        $(document).delegate("#" + orgId + "_defaultConsentModal button[data-dismiss]", "click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            setTimeout(function() {
-                location.reload();
-            }, 10);
-        });
-        $("#" + orgId + "_defaultConsentModal").on("hidden.bs.modal", function() {
-            if ($(this).find("input[name='toConsent']:checked").length > 0) {
-                $("#userOrgs input[name='organization']").each(function() {
-                    $(this).removeAttr("data-require-validate");
-                });
-                var userId = self.getUserId();
-                assembleContent.demo(userId, true, $("#userOrgs input[name='organization']:checked"), true);
-            }
-        }).on("shown.bs.modal", function() {
-            var checkedOrg = $("#userOrgs input[name='organization']:checked");
-            var shortName = self.getShortName(checkedOrg.val());
-            if (shortName) {
-                $(this).find(".consent-clinic-name").text(i18next.t(shortName));
-            }
-            $(this).find("input[name='toConsent']").each(function() {
-                $(this).prop("checked", false);
-            });
-            $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
-            $(this).find(".content-loading-message-indicator").fadeOut(50, function() {
-                $("#" + orgId + "_defaultConsentModal .main-content").removeClass("tnth-hide");
-            });
-            $(this).find(".loading-message-indicator").hide();
-        });
-    }
-    return $("#" + orgId + "_defaultConsentModal");
-};
 OrgTool.prototype.getSelectedOrg = function() {
     return $("#userOrgs input[name='organization']:checked");
-};
-OrgTool.prototype.getConsentModal = function(parentOrg) {
-    if (!parentOrg) {
-        parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-    }
-    if (parentOrg) {
-        var __modal = $("#" + parentOrg + "_consentModal");
-        if (__modal.length > 0) return __modal;
-        else {
-            var __defaultModal = this.getDefaultModal(this.getSelectedOrg() || $("#userOrgs input[name='organization'][value='" + parentOrg + "']"));
-            if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
-            else return false;
-        }
-    } else return false;
-};
-OrgTool.prototype.handleEvent = function() {
-    var self = this;
-    $("#userOrgs input[name='organization']").each(function() {
-        $(this).attr("data-save-container-id", "userOrgs");
-        $(this).on("click", function() {
-            var userId = self.getUserId();
-            var parentOrg = self.getElementParentOrg(this);
-            if ($(this).prop("checked")) {
-                if ($(this).attr("id") !== "noOrgs") {
-                    $("#noOrgs").prop("checked", false);
-                } else {
-                    $("#userOrgs input[name='organization']").each(function() {
-                        if ($(this).attr("id") !== "noOrgs") {
-                            $(this).prop("checked", false);
-                        } else {
-                            if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
-                        }
-                    });
-                }
-            } else {
-                var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
-                if (!isChecked) {
-                    //do not attempt to update if all orgs are unchecked for staff/staff admin
-                    var isStaff = false;
-                    $("#rolesGroup input[name='user_type']").each(function() {
-                        if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
-                            $("#userOrgs .help-block").addClass("error-message").text(i18next.t("Cannot uncheck.  A staff member must be associated with an organization"));
-                            isStaff = true;
-                        }
-                    });
-                    if (!isStaff) $("#userOrgs .help-block").removeClass("error-message").text("");
-                    else return false;
-                    if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
-                }
-            }
-            $("#userOrgs .help-block").removeClass("error-message").text("");
-
-            if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
-                if (tnthAjax.hasConsent(userId, parentOrg)) {
-                    assembleContent.demo(userId, true, $(this), true);
-                } else {
-                    var __modal = self.getConsentModal();
-                    if (__modal.length > 0) __modal.modal("show");
-                    else {
-                        tnthAjax.setDefaultConsent(userId, parentOrg);
-                        setTimeout(function() {
-                            assembleContent.demo(userId, true, $(this), true);
-                        }, 500);
-                    }
-                }
-            } else {
-                tnthAjax.handleConsent($(this));
-                setTimeout(function() {
-                    assembleContent.demo(userId, true, $(this), true);
-                }, 500);
-                tnthAjax.reloadConsentList(userId);
-            }
-            if ($("#locale").length > 0) {
-                tnthAjax.getLocale(userId);
-            }
-        });
-    });
-};
-OrgTool.prototype.getCommunicationArray = function() {
-    var arrCommunication = [],self = this;
-    $("#userOrgs input:checked").each(function() {
-        if (parseInt($(this).val()) === 0) {
-            return true; //don't count none
-        }
-        var oList = self.getOrgsList(), oi = oList[$(this).val()];
-        if (!oi) {
-            return true;
-        }
-        if (oi.language) {
-            arrCommunication.push({
-                "language": {"coding": [{"code": oi.language,"system": "urn:ietf:bcp:47"}]}
-            });
-        } else if (oi.extension && oi.extension.length > 0) {
-            (oi.extension).forEach(function(ex) {
-                if (String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding) {
-                    arrCommunication.push({"language": { "coding": ex.valueCodeableConcept.coding}});
-                }
-            });
-        }
-    });
-    if (arrCommunication.length === 0) {
-        var defaultLocale = $("#sys_default_locale").val();
-        if (defaultLocale) arrCommunication.push({
-            "language": {
-                "coding": [{
-                    "code": defaultLocale,
-                    "display": $("#locale").find("option[value='" + defaultLocale + "']").text(),
-                    "system": "urn:ietf:bcp:47"
-                }]
-            }
-        });
-
-    }
-    return arrCommunication;
 };
 OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
     var parentList = [], self = this;
@@ -987,7 +516,7 @@ var tnthAjax = {
         var params = {};
         params.subject_id = userId ? userId : 0;
         params.page_url = page_url ? page_url : window.location.href;
-        params.message = "Error generated in JS - " + (message ? message : "no detail available"); //don't think we want to translate message sent back to the server here
+        params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
         if (window.console) {
             console.log("Errors occurred.....");
             console.log(params);
@@ -1002,7 +531,7 @@ var tnthAjax = {
         }).done(function() {}).fail(function() {});
     },
     "FieldLoaderHelper": {
-        delayDuration: 600,
+        delayDuration: 300,
         showLoader: function(targetField) {
             if (targetField && targetField.length > 0) {
                 $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
@@ -1054,6 +583,17 @@ var tnthAjax = {
             }
         }
     },
+    "getCurrentUser": function(callback) {
+        callback = callback||function() {};
+        if (sessionStorage.currentUser) {
+            callback(JSON.parse(sessionStorage.currentUser));
+        } else {
+            this.sendRequest("api/me", "GET", "", "", function(data) {
+                sessionStorage.setItem("currentUser", JSON.stringify(data));
+                callback(data);
+            });
+        }
+    },
     "getStillNeededCoreData": function(userId, sync, callback, entry_method) {
         callback = callback || function() {};
         if (!userId) {
@@ -1073,10 +613,7 @@ var tnthAjax = {
                         (data.still_needed).forEach(function(item) {
                             var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
                             if (matchedTermsCheckbox.length > 0) {
-                                matchedTermsCheckbox.attr({
-                                    "data-required": "true",
-                                    "data-collection-method": item.collection_method
-                                });
+                                matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
                                 var parentNode = matchedTermsCheckbox.closest("label.terms-label");
                                 if (parentNode.length > 0) {
                                     parentNode.show().removeClass("tnth-hide");
@@ -1241,40 +778,15 @@ var tnthAjax = {
             }
         }
     },
-    "setDefaultConsent": function(userId, orgId) {
-        if (!userId) return false;
-        var stockConsentUrl = $("#stock_consent_url").val(), agreementUrl = "";
-        if (stockConsentUrl) {
-            var orgElement = $("#" + orgId + "_org");
-            var orgName = orgElement.attr("data-parent-name");
-            if (!orgName) {
-                orgElement.attr("data-org-name");
-            }
-            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent(orgName));
-        }
-        if (agreementUrl) {
-            var params = this.consentParams;
-            params.org = orgId;
-            params.agreementUrl = agreementUrl;
-            this.setConsent(userId, params, "default");
-            setTimeout(function() { //need to remove all other consents associated w un-selected org(s)
-                tnthAjax.removeObsoleteConsent();
-            }, 100);
-            tnthAjax.reloadConsentList(userId);
-            $($("#consentContainer .error-message").get(0)).text("");
-        } else {
-            $($("#consentContainer .error-message").get(0)).text(i18next.t("Unable to set default consent agreement"));
-        }
-    },
     deleteConsent: function(userId, params) {
         if (userId && params) {
             var consented = this.getAllValidConsent(userId, params.org);
             if (consented) {
                 var self = this, __url = "/api/user/" + userId + "/consent";
                 consented.forEach(function(orgId) { //delete all consents for the org
+                    var found = false;
                     if (params.exclude) {
                         var arr = params.exclude.split(",");
-                        var found = false;
                         arr.forEach(function(o) {
                             if (!found) {
                                 if (o == orgId) found = true;
@@ -1282,15 +794,17 @@ var tnthAjax = {
                         });
                         if (found) return true;
                     }
-                    self.sendRequest(__url, "DELETE", userId, {sync: true,data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
-                        if (data) {
-                            if (!data.error) {
-                                $(".delete-consent-error").html("");
-                            } else {
-                                $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
+                    if (!found) {
+                        self.sendRequest(__url, "DELETE", userId, {sync: true,data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
+                            if (data) {
+                                if (!data.error) {
+                                    $(".delete-consent-error").html("");
+                                } else {
+                                    $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 });
             }
         }
@@ -1445,9 +959,7 @@ var tnthAjax = {
                         topLevelOrgs.forEach(function(i) {
                             (function(orgId) {
                                 setTimeout(function() {
-                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {
-                                        "org": orgId
-                                    });
+                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
                                 }, 350);
                             })(i);
                         });
@@ -1455,9 +967,7 @@ var tnthAjax = {
                         $("#userOrgs").find("input[name='organization']").each(function() { //delete all orgs
                             (function(orgId) {
                                 setTimeout(function() {
-                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {
-                                        "org": orgId
-                                    });
+                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
                                 }, 350);
                             })($(this).val());
                         });
@@ -1476,9 +986,7 @@ var tnthAjax = {
                     if (allUnchecked && childOrgs.length > 0) {
                         (function(orgId) {
                             setTimeout(function() {
-                                tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {
-                                    "org": orgId
-                                });
+                                tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
                             }, 350);
                         })(parentOrg);
                     }
@@ -1491,10 +999,6 @@ var tnthAjax = {
                 }
             }
         });
-    },
-    /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
-    "reloadConsentList": function(userId) {
-        if (typeof ProfileObj !== "undefined") ProfileObj.reloadConsentList(userId);
     },
     "getDemo": function(userId, noOverride, sync, callback) {
         callback = callback || function() {};
@@ -1509,13 +1013,15 @@ var tnthAjax = {
             }
         });
     },
-    "putDemo": function(userId, toSend, targetField, sync) {
+    "putDemo": function(userId, toSend, targetField, sync, callback) {
+        callback = callback || function() {};
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".put-demo-error").html("");
             } else {
                 $(".put-demo-error").html(i18next.t("Server error occurred setting demographics information."));
             }
+            callback(data);
         });
     },
     "getLocale": function(userId) {
@@ -1792,9 +1298,7 @@ var tnthAjax = {
         var obsCode = [{"code": code,"display": display,"system": system}];
         var obsArray = {};
         obsArray.resourceType = "Observation";
-        obsArray.code = {
-            "coding": obsCode
-        };
+        obsArray.code = {"coding": obsCode};
         obsArray.issued = params.issuedDate ? params.issuedDate : "";
         obsArray.status = status ? status : "";
         obsArray.valueQuantity = {"units": "boolean","value": toSend};
@@ -1894,9 +1398,7 @@ var tnthAjax = {
         });
     },
     "postTermsByUser": function(userId, toSend) {
-        this.sendRequest("/api/user/" + userId + "/tou/accepted", "POST", userId, {
-            data: JSON.stringify(toSend)
-        }, function(data) {
+        this.sendRequest("/api/user/" + userId + "/tou/accepted", "POST", userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
                     $(".post-tou-error").html("");
@@ -2112,79 +1614,6 @@ var tnthAjax = {
                 }
             } else {
                 callback({"error": i18next.t("no data returned")});
-            }
-        });
-    },
-    "initNotifications": function(callback) {
-        this.getNotification($("#notificationUserId").val(), false, function(data) {
-            if (callback) callback(data);
-        });
-    },
-    "getNotification": function(userId, params, callback) {
-        callback = callback || function() {};
-        if (userId) {
-            if (!params) params = {};
-            var notificationSessionKey = "notification_" + userId;
-            if (sessionStorage.getItem(notificationSessionKey)) {
-                callback(JSON.parse(sessionStorage.getItem(notificationSessionKey)));
-            } else {
-                this.sendRequest("/api/user/" + userId + "/notification", "GET", userId, {
-                    "sync": params.sync
-                }, function(data) {
-                    if (data) {
-                        if (!data.error) {
-                            callback(data);
-                            sessionStorage.setItem(notificationSessionKey, JSON.stringify(data));
-                        } else {
-                            callback({"error": i18next.t("Error occurred retrieving notification.")});
-                        }
-                    } else {
-                        callback({"error": i18next.t("no data returned")});
-                    }
-                });
-            }
-        } else {
-            callback({"error": i18next.t("User id is required")});
-        }
-    },
-    "deleteNotification": function(userId, notificationId, params, callback) {
-        if (!callback) {
-            callback = function(data) {
-                return data;
-            };
-        }
-        if (!userId) {
-            callback({"error": i18next.t("User Id is required")});
-            return false;
-        }
-        if (parseInt(notificationId) < 0 || !notificationId) {
-            callback({"error": i18next.t("Notification id is required.")});
-        }
-        if (!params) params = {};
-        var self = this;
-        this.getNotification(userId, false, function(data) {
-            if (data.notifications) {
-                /*
-                 * check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
-                 */
-                var arrNotification = $.grep(data.notifications, function(notification) {
-                    return notification.id == notificationId;
-                });
-                if (arrNotification.length > 0) { //delete notification only if it exists
-                    self.sendRequest("/api/user/" + userId + "/notification/" + notificationId, "DELETE", userId, {
-                        "sync": params.sync
-                    }, function(data) {
-                        if (data) {
-                            if (!data.error) {
-                                callback(data);
-                            } else {
-                                callback({"error": i18next.t("Error occurred deleting notification.")});
-                            }
-                        } else {
-                            callback({"error": i18next.t("no data returned")});
-                        }
-                    });
-                }
             }
         });
     },
@@ -2743,105 +2172,28 @@ var tnthDates = {
 
 };
 
-/***
- * Bootstrap datatables functions - Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
- ****/
-var tnthTables = {
-    /***
-     * Quick way to sort when text is wrapper in an <a href> or other tag
-     * @param a,b - the two items to compare
-     * @returns 1,-1 or 0 for sorting
-     */
-    "stripLinksSorter": function(a, b) {
-        a = $(a).text();
-        b = $(b).text();
-        var aa = parseFloat(a);
-        var bb = parseFloat(b);
-        return bb - aa;
-    },
-    /***
-     * Quick way to sort when text is wrapped in an <a href> or other tag - NOTE for text that is NOT number
-     * @param a,b - the two items to compare
-     * @returns 1,-1 or 0 for sorting
-     */
-    "stripLinksTextSorter": function(a, b) {
-        var aa = $(a).text();
-        var bb = $(b).text();
-        if (aa < bb) return -1;
-        if (aa > bb) return 1;
-        return 0;
-    },
-    /***
-     * sorting date string,
-     * @param a,b - the two items to compare - note, this assumes that the parameters are in valid date format e.g. 3 August 2017
-     * @returns 1,-1 or 0 for sorting
-     */
-    "dateSorter": function(a, b) {
-        if (!(a)) a = 0;
-        if (!(b)) b = 0;
-        /*
-         * make sure the string passed in does not have line break element if so it is a possible mult-line text, split it up and use the first item in the resulting array
-         */
-        var regex = /<br\s*[\/]?>/gi;
-        a = a.replace(regex, "\n");
-        b = b.replace(regex, "\n");
-        var ar = a.split("\n");
-        if (ar.length > 0) a = ar[0];
-        var br = b.split("\n");
-        if (br.length > 0) b = br[0];
-        /* note getTime returns the numeric value corresponding to the time for the specified date according to universal time
-         * therefore, can be used for sorting
-         */
-        var a_d = (new Date(a)).getTime();
-        var b_d = (new Date(b)).getTime();
-
-        if (isNaN(a_d)) a_d = 0;
-        if (isNaN(b_d)) b_d = 0;
-
-        return b_d - a_d;
-    },
-    /***
-     * sorting alpha numeric string
-     */
-    "alphanumericSorter": function(a, b) {
-        /*
-         * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
-         */
-        return alphanum(a, b);
-    }
-};
-
 var Global = {
     "registerModules": function() { //TODO use webpack or requireJS to import modules?
         if (!window.portalModules) {
             window.portalModules = {};
         }
+        window.portalModules.SYSTEM_IDENTIFIER_ENUM = SYSTEM_IDENTIFIER_ENUM;
         window.portalModules.tnthAjax = tnthAjax;
         window.portalModules.tnthDates = tnthDates;
-        window.portalModules.assembleContent = assembleContent;
         window.portalModules.orgTool = OrgTool;
         window.portalModules.i18next = i18next;
     },
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         var isIE = getIEVersion();
         callback = callback || function() {};
-        if (isIE) {
-            newHttpRequest(PORTAL_NAV_PAGE, function(data) { //support IE9 or earlier
-                embed_page(data);
-                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
-                    Global.notifications(data);
-                });
-                callback();
-            }, true);
-        } else {
-            funcWrapper(PORTAL_NAV_PAGE, function(data) {
-                embed_page(data);
-                tnthAjax.initNotifications(function(data) { //ajax to get notifications information
-                    Global.notifications(data);
-                });
-                callback();
+        var useFunc = isIE ? newHttpRequest: funcWrapper;
+        useFunc(PORTAL_NAV_PAGE, function(data) {
+            embed_page(data);
+            Global.getNotification(function(data) { //ajax to get notifications information
+                Global.notifications(data);
             });
-        }
+            callback();
+        });
     },
     "loginAs": function() {
         var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
@@ -2915,8 +2267,60 @@ var Global = {
             }
         }, 500);
     },
+    "getNotification": function(callback) {
+        callback = callback || function() {};
+        var userId = $("#notificationUserId").val();
+        if (userId) {
+            var notificationSessionKey = "notification_" + userId;
+            if (sessionStorage.getItem(notificationSessionKey)) {
+                callback(JSON.parse(sessionStorage.getItem(notificationSessionKey)));
+            } else {
+                $.ajax({
+                    type:"GET",
+                    url: "/api/user/"+userId+"/notification"
+                }).done(function(data) {
+                    if (data) {
+                        callback(data);
+                        sessionStorage.setItem(notificationSessionKey, JSON.stringify(data));
+                    } else {
+                        callback({"error": i18next.t("no data returned")});
+                    }
+                }).fail(function(){
+                    callback({"error": i18next.t("Error occurred retrieving notification.")});
+                });
+            }
+        } else {
+            callback({"error": i18next.t("User id is required")});
+        }
+    },
+    "deleteNotification": function(userId, notificationId) {
+        if (!userId) {
+            return false;
+        }
+        if (parseInt(notificationId) < 0 || !notificationId) {
+            return false;
+        }
+        this.getNotification(function(data) {
+            console.log("callback data? ", data)
+            if (data.notifications && data.notifications.length > 0) {
+                var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
+                    return notification.id == notificationId;
+                });
+                var userId = $("#notificationUserId").val();
+                console.log("user? ", userId, " notification? ", notificationId, " array? ", arrNotification.length)
+                if (arrNotification.length > 0 && userId) { //delete notification only if it exists
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/api/user/" + userId + "/notification/" + notificationId
+                    }).done(function(data) {
+                       sessionStorage.removeItem("notification_"+userId);
+                    });
+                }
+            }
+        });
+    },
     "notifications": function(data) {
-        if (data && data.notifications) {
+        if (data && data.notifications && data.notifications.length > 0) {
             var notificationText = "";
             (data.notifications).forEach(function(notice) {
                 notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
@@ -2952,21 +2356,14 @@ var Global = {
                 $("#notificationBanner [data-id] a").each(function() {
                     $(this).on("click", function() {
                         var parentElement = $(this).closest(".notification");
-                        /*
-                         *  adding the attribute data-visited will hide the notification entry
-                         */
-                        parentElement.attr("data-visited", "true");
-                        //delete relevant notification
-                        tnthAjax.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id"));
+                        parentElement.attr("data-visited", "true"); //adding the attribute data-visited will hide the notification entry
+                        Global.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id")); //delete relevant notification
                     });
                 });
                 $("#notificationBanner [data-id]").each(function() {
                     var actionRequired = $(this).find("[data-action-required]").length > 0;
                     if (!actionRequired) {
-                        /*
-                         * adding the class of active will allow close button to display
-                         */
-                        $("#notificationBanner .close").addClass("active");
+                        $("#notificationBanner .close").addClass("active"); //adding the class of active will allow close button to display
                     }
                     $(this).on("click", function(e) {
                         e.stopPropagation();
@@ -2978,7 +2375,7 @@ var Global = {
                     $("#notificationBanner [data-id]").each(function() {
                         var actionRequired = $(this).find("[data-action-required]").length > 0;
                         if (!actionRequired) {
-                            tnthAjax.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                            Global.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
                             $(this).attr("data-visited", "true");
                         }
                     });
@@ -3004,10 +2401,6 @@ __i18next.init({
         if ($("#alertModal").length > 0) {
             $("#alertModal").modal("show");
         }
-        tnthAjax.beforeSend();
-        Global.footer();
-        Global.loginAs();
-
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
             loader(true);
@@ -3015,6 +2408,9 @@ __i18next.init({
         } else {
             loader();
         }
+        tnthAjax.beforeSend();
+        Global.footer();
+        Global.loginAs();
         // To validate a form, add class to <form> and validate by ID.
         $("form.to-validate").validator({
             custom: {
@@ -3032,7 +2428,6 @@ __i18next.init({
                     } else if (isNaN(y)) {
                         errorMsg += (errorMsg ? "<br/>" : "") + i18next.t("Please enter a valid year.");
                     }
-
                     if (errorMsg) {
                         $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");
@@ -3041,7 +2436,6 @@ __i18next.init({
                     if (goodDate) {
                         $("#errorbirthday").html("").hide();
                     }
-
                     return goodDate;
                 },
                 customemail: function($el) {
@@ -3060,8 +2454,7 @@ __i18next.init({
                         }
                     }
                     var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    // Add user_id to api call (used on patient_profile page so that staff can edit)
-                    var addUserId = "";
+                    var addUserId = ""; // Add user_id to api call (used on patient_profile page so that staff can edit)
                     if ($el.attr("data-user-id")) {
                         addUserId = "&user_id=" + $el.attr("data-user-id");
                     }
@@ -3074,7 +2467,6 @@ __i18next.init({
                                 } else {
                                     $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                                 }
-
                             }
                         });
                     }

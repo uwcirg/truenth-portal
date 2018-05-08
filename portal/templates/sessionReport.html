@@ -51,8 +51,8 @@
 			        		<TBODY>
 			        			{% raw %}
 				        			<TR v-for="item in data">
-				        				<TD>{{item.q}}</TD>
-				        				<TD>{{item.a}}</TD>
+				        				<TD v-html="item.q"></TD>
+				        				<TD v-html="item.a"></TD>
 				        			</TR>
 				        		{% endraw %}
 			        		</TBODY>

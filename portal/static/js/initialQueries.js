@@ -1,9 +1,7 @@
 (function() {
-
     function hasValue(val) {
         return String(val) !== "null" && String(val) !== "" && String(val) !== "undefined";
     }
-
     function disableHeaderFooterLinks() {
         var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
         links.addClass("disabled");
@@ -13,7 +11,6 @@
             return false;
         });
     }
-
     function __convertToNumericField(field) {
         if (field) {
             if ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch) {
@@ -23,11 +20,7 @@
             }
         }
     }
-    /*
-     * helper class to keep track of missing fields based on required/needed core data
-     */
-
-    var FieldsChecker = function(
+    var FieldsChecker = function( //helper class to keep track of missing fields based on required/needed core data
         userId,
         roleRequired,
         dependencies) {
@@ -75,13 +68,8 @@
     };
 
     FieldsChecker.prototype.initSectionData = function(data) {
-        var self = this;
-        var sections = self.getSections();
-        /*
-         * note: only populate data for still needed section(s)
-         *
-         */
-        var initCount = 0;
+        var self = this, sections = self.getSections();
+        var initCount = 0; //note: only populate data for still needed section(s)
         for (var section in sections) {
             if (self.inConfig(sections[section].config, data)) {
                 setTimeout(function() {
@@ -125,16 +113,9 @@
     };
 
     FieldsChecker.prototype.setSections = function() {
-        var preselectClinic = this.preselectClinic;
-        var self = this;
-        var i18next = this.__getDependency("i18next");
-        var orgTool = this.getOrgTool();
+        var preselectClinic = this.preselectClinic, self = this, i18next = this.__getDependency("i18next");
         var tnthAjax = this.__getDependency("tnthAjax");
-        /*
-         * main sections blueprint object, this will help keeping track of missing fields for each section
-         *
-         */
-        this.defaultSections = {
+        this.defaultSections = { //main sections blueprint object, this will help keeping track of missing fields for each section
             "topTerms": {
                 display: i18next.t("terms"),
                 config: "website_terms_of_use,subject_website_consent,privacy_policy",
@@ -173,24 +154,16 @@
                         $("#aboutForm").removeClass("tnth-hide");
                         self.continueToNext();
                     }
-                    setTimeout(function() {
-                        disableHeaderFooterLinks();
-                    }, 1000);
+                    setTimeout(function() {disableHeaderFooterLinks();}, 1000);
                 }
             },
             "demographicsContainer": {
                 display: i18next.t("your information"),
                 config: "name,dob,role",
                 subsections: {
-                    "nameGroup": {
-                        fields: ["#firstname", "#lastname"]
-                    },
-                    "rolesGroup": {
-                        fields: ["input[name='user_type']"]
-                    },
-                    "bdGroup": {
-                        fields: ["#month", "#date", "#year"]
-                    }
+                    "nameGroup": {fields: ["#firstname", "#lastname"]},
+                    "rolesGroup": {fields: ["input[name='user_type']"]},
+                    "bdGroup": {fields: ["#month", "#date", "#year"]}
                 },
                 initData: function() {
                     tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
@@ -223,15 +196,11 @@
                 required: hasValue(preselectClinic) ? true : false,
                 subsections: {
                     "clinics": {
-                        //fields: [$("#userOrgs input[name='organization']")]
                         fields: ["#userOrgs input[name='organization']"]
                     }
                 },
                 initData: function() {
-                    /*
-                     * for patient, clinic is drawn in orgs state selector template
-                     */
-                    if (!hasValue($("#iqPatientEditable").val())) {
+                    if (!hasValue($("#iqPatientEditable").val())) { //for patient, clinic is drawn in orgs state selector template
                         tnthAjax.getOrgs($("#iq_userId").val(), true, function() {
                             var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
                             if (userOrgs.length === 0) {
@@ -249,13 +218,12 @@
                             });
                             $("#clinics").attr("loaded", true);
                         });
-
                     }
                 },
                 handleIncomplete: function() {
                     if (hasValue(preselectClinic)) {
-                        orgTool.handlePreSelectedClinic();
-                        var __modal = orgTool.getConsentModal();
+                        self.handlePreSelectedClinic();
+                        var __modal = self.getConsentModal();
                         if (__modal) {
                             __modal.modal("show");
                         }
@@ -268,31 +236,39 @@
         };
     };
 
+    FieldsChecker.prototype.postDemoData = function() {
+        var demoArray = {}, tnthAjax = this.__getDependency("tnthAjax");
+        demoArray.resourceType = "Patient";
+        var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
+        demoArray.name = {"given": $.trim(fname), "family": $.trim(lname)};
+        var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+        if (y && m && d) {
+            bdFieldVal = y + "-" + m + "-" + d;
+        }
+        if (bdFieldVal) {
+            demoArray.birthDate = bdFieldVal;
+        }
+        tnthAjax.putDemo(this.userId, demoArray);
+    };
+
     FieldsChecker.prototype.initEvent = function(field) {
         if (field) {
             var subSectionId = field.subsectionId,
                 self = this;
             var fields = field.elements;
+            var events = {
+                "termsCheckbox": function(o) { self.termsCheckboxEvent(o); },
+                "nameGroup": function(o) { self.nameGroupEvent(o); },
+                "rolesGroup": function(o) { self.rolesGroupEvent(o); },
+                "bdGroup": function(o) { self.bdGroupEvent(o); },
+                "patientQ": function(o) { self.patientQEvent(o); },
+                "clinics": function(o) { self.clinicsEvent(o); }
+            };
             $(fields).each(function() {
-                switch (subSectionId) {
-                case "termsCheckbox":
-                    self.termsCheckboxEvent([$(this)]);
-                    break;
-                case "nameGroup":
-                    self.nameGroupEvent([$(this)]);
-                    break;
-                case "bdGroup":
-                    self.bdGroupEvent([$(this)]);
-                    break;
-                case "rolesGroup":
-                    self.rolesGroupEvent([$(this)]);
-                    break;
-                case "patientQ":
-                    self.patientQEvent([$(this)]);
-                    break;
-                case "clinics":
-                    self.clinicsEvent([$(this)]);
-                    break;
+                if (events[subSectionId]) {
+                    events[subSectionId]([$(this)]);
+                } else {
+                    return true;
                 }
             });
         }
@@ -333,8 +309,7 @@
     };
 
     FieldsChecker.prototype.getDefaultConfig = function() {
-        var self = this;
-        var tnthAjax = this.__getDependency("tnthAjax");
+        var self = this, tnthAjax = this.__getDependency("tnthAjax");
         if (!this.CONFIG_DEFAULT_CORE_DATA) {
             tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {
                 sync: true
@@ -361,10 +336,7 @@
                 this.CONFIG_REQUIRED_CORE_DATA = data;
             }
         }
-        /*
-         * get default required core data
-         */
-        if (!this.CONFIG_REQUIRED_CORE_DATA) {
+        if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
             var self = this;
             tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {
                 sync: true
@@ -380,7 +352,6 @@
             callback();
         }
     };
-
 
     FieldsChecker.prototype.getTotalSections = function() {
         /*** note counting all the default main sections to show progress for each**/
@@ -514,16 +485,10 @@
                                 }
                                 break;
                             case "select":
-                                if (field.val() === "") {
-                                    isComplete = false;
-                                }
+                                isComplete = field.val() !== "";
                                 break;
                             case "text":
-                                if (field.val() === "") {
-                                    isComplete = false;
-                                } else if (!(field.get(0).validity.valid)) {
-                                    isComplete = false;
-                                }
+                                isComplete = (field.val() !== "") && (field.get(0).validity.valid);
                                 break;
                             case "terms":
                                 var isAgreed = true;
@@ -532,9 +497,7 @@
                                         isAgreed = false;
                                     }
                                 });
-                                if (!isAgreed) {
-                                    isComplete = false;
-                                }
+                                isComplete = isAgreed;
                                 break;
                             }
                             if (hasValue(field.attr("data-require-validate"))) {
@@ -552,29 +515,6 @@
         this.setIncompleteFields();
         var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length === 0;
         return completed;
-    };
-
-    FieldsChecker.prototype.showAll = function() {
-        var mainSections = this.mainSections;
-        if (mainSections) {
-            for (var sec in mainSections) {
-                if (mainSections.hasOwnProperty(sec)) {
-                    var mf = $("#" + sec);
-                    if (mf.attr("skipped") === "true") {
-                        continue;
-                    }
-                    mf.fadeIn();
-                    for (var sectionId in mainSections[sec].subsections) {
-                        mainSections[sec].subsections[sectionId].fields.forEach(function(field) {
-                            field = $(field);
-                            if (field.attr("skipped") !== "true") {
-                                field.fadeIn();
-                            }
-                        });
-                    }
-                }
-            }
-        }
     };
 
     FieldsChecker.prototype.continueToFinish = function() {
@@ -641,11 +581,10 @@
     };
 
     FieldsChecker.prototype.sectionsLoaded = function(all) {
-        var self = this,
-            isLoaded = true;
+        var self = this, isLoaded = true, subsectionId;
         if (!all && hasValue(self.currentSection)) {
             if (isLoaded) {
-                for (var subsectionId in self.mainSections[self.currentSection].subsections) {
+                for (subsectionId in self.mainSections[self.currentSection].subsections) {
                     if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
                         isLoaded = false;
                     }
@@ -655,7 +594,7 @@
             //check all if current section not available
             for (var section in self.mainSections) {
                 if (isLoaded) {
-                    for (var subsectionId in self.mainSections[section].subsections) {
+                    for (subsectionId in self.mainSections[section].subsections) {
                         if (!$("#" + subsectionId).attr("loaded")) {
                             isLoaded = false;
                         }
@@ -683,26 +622,13 @@
         incompleteFields.forEach(function(field) {
             self.initEvent(field);
         });
-        /************
-          //debugging code
-          //incompleteFields.forEach(function(field, index) {
-          //    console.log(field.section.attr("id") + " " + field.elements.length);
-          //    console.log(field.elements)
-          //});
-        ************/
     };
 
     FieldsChecker.prototype.onIncompleteFieldsDidInit = function() {
-
         var self = this;
-
-        /****** prep work after initializing incomplete fields *****/
-        /*****  set visuals e.g. top terms ************************/
-
+        /****** prep work after initializing incomplete fields -set visuals e.g. top terms ************************/
         self.constructProgressBar();
         var i18next = self.__getDependency("i18next");
-        var assembleContent = self.__getDependency("assembleContent");
-
         $("#queriesForm").validator().on("submit", function(e) {
             if (e.isDefaultPrevented()) {
                 $("#iqErrorMessage").text(i18next.t("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid."));
@@ -711,11 +637,10 @@
                 $("#next").hide();
                 $(".loading-message-indicator").show();
                 setTimeout(function() {
-                    assembleContent.demo($("#iq_userId").val(), null, null, true);
+                    self.postDemoData();
                 }, 250);
             }
         });
-
         /*** event for the next button ***/
         $("#next").on("click", function() {
             $(this).hide();
@@ -724,14 +649,12 @@
                 window.location.reload();
             }, 300);
         });
-
         /*** event for the arrow in the header**/
         $("div.heading").on("click", function() {
             $("html, body").animate({
                 scrollTop: $(this).next("div.content-body").children().first().offset().top
             }, 1000);
         });
-
         $(window).bind("scroll mousedown mousewheel keyup", function(e) {
             if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel") {
                 if ($("html, body").is(":animated")) {
@@ -739,7 +662,6 @@
                 }
             }
         });
-
         //if term of use form not present - need to show the form
         if ($("#topTerms").length === 0) {
             $("#aboutForm").fadeIn();
@@ -759,131 +681,28 @@
                 }
             }
         }
-
         setTimeout(function() {
             $("#iqFooterWrapper").show();
         }, 500);
     };
 
-    FieldsChecker.prototype.handleWebsiteConsentScript = function() {
-        var getUrlParameter = function(name) {
-            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-            var results = regex.exec(location.search);
-            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-        };
-        var patientId = getUrlParameter("subject_id");
-        var entryMethod = getUrlParameter("entry_method");
-        var urlRedirect = getUrlParameter("redirect_url");
-        var topOrgName = $("#wcsTopOrganization").attr("data-name");
-        var topOrgId = $("#wcsTopOrganization").attr("data-id");
-        var tVar = setInterval(function() {
-            if ($("#tnthNavWrapper").length > 0) {
-                $("#tnthNavWrapper, #homeFooter, .watermark").each(function() {
-                    $(this).addClass("hidden-print");
-                });
-                clearInterval(tVar);
-            }
-        }, 1000);
-        var tnthAjax = this.__getDependency("tnthAjax");
-        var self = this;
-
-        $(document).ready(function() {
-
-            //get still needed
-            tnthAjax.getStillNeededCoreData(patientId, true, null, entryMethod);
-
-            //populate existing checkbox(es)
-            tnthAjax.getTerms(patientId, false, true, function(data) {
-                self.updateTerms(data);
-                if ($("[data-agree='false']").length === 0) {
-                    $(".continue-msg-wrapper").show();
-                }
-            });
-
-            $(".intro-text").text($(".intro-text").text().replace("[organization]", topOrgName));
-
-            if ($(".terms-tick-box-text[data-org='" + topOrgName + "']").length > 0) {
-                $(".terms-tick-box-text[data-org]").each(function() {
-                    if (String($(this).attr("data-org")).toLowerCase() === String(topOrgName).toLowerCase()) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+    FieldsChecker.prototype.handlePostEvent = function(sectionId) {
+        if (sectionId) {
+            if (this.allFieldsCompleted()) {
+                this.continueToFinish();
             } else {
-                $($(".terms-tick-box-text[data-org]").get(0)).show();
-            }
-
-            $(".terms-tick-box").each(function() {
-                $(this).on("click", function() {
-                    var container = $(this).closest(".terms-text-container");
-                    var termsItems = container.find("[data-type='terms']");
-                    var tickBox = $(this);
-                    termsItems.each(function() {
-                        if (String($(this).attr("data-agree")) === "false") {
-                            var type = $(this).attr("data-tou-type");
-                            if (type) {
-                                var theTerms = {};
-                                theTerms["agreement_url"] = $(this).attr("data-url");
-                                theTerms["type"] = type;
-                                if (topOrgId) {
-                                    theTerms["organization_id"] = topOrgId;
-                                }
-                                // Post terms agreement via API
-                                tnthAjax.postTermsByUser(patientId, theTerms);
-                            }
-                            // Update UI
-                            tickBox.removeClass("fa-square-o").addClass("fa-check-square-o");
-                            $(this).attr("data-agree", "true");
-                        }
-                    });
-                    if ($("[data-agree='false']").length === 0) {
-                        $(".continue-msg-wrapper").fadeIn();
-                    }
-                });
-            });
-
-            $(".button-container").each(function() {
-                $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-            });
-            $("#continue").on("click", function() {
-                $(this).hide();
-                $(".loading-message-indicator").show();
-                setTimeout(function() {
-                    window.location = urlRedirect;
-                }, 100);
-            });
-            $(".consent-form-checkbox").each(function() {
-                $(this).on("click", function() {
-                    $(this).toggleClass("fa-square-o fa-check-square-o");
-                });
-            });
-            $("#consentPrintButton").on("click", function() {
-                var elem = document.getElementById("websiteDeclarationForm");
-                $(elem).removeClass("hidden-print");
-                var domClone = elem.cloneNode(true);
-                var $printSection = document.getElementById("printSection");
-                if (!$printSection) {
-                    $printSection = document.createElement("div");
-                    $printSection.id = "printSection";
-                    document.body.appendChild($printSection);
+                if (this.sectionCompleted(sectionId)) {
+                    this.continueToNext(sectionId);
+                } else {
+                    this.stopContinue(sectionId);
                 }
-                $printSection.innerHTML = "";
-                $printSection.appendChild(domClone);
-                $(elem).addClass("hidden-print");
-                window.print();
-            });
-            $("#websiteDeclarationFormModal").on("hide.bs.modal", function() {
-                $(this).removeClass("fade");
-            });
-        });
+            }
+        }
     };
 
     FieldsChecker.prototype.updateTerms = function(data) {
         function typeInTous(type, status) {
-            var found = false;
-            var isActive = (status == "active") ? true : false;
+            var found = false, isActive = (status == "active") ? true : false;
             (data.tous).forEach(function(item) {
                 if (!found &&
                     ($.trim(item.type) === $.trim(type)) &&
@@ -901,10 +720,7 @@
                     var type = $(this).attr("data-tou-type");
                     if (typeInTous(type, "active")) {
                         item_found++;
-                        /*
-                         * set the data-agree attribute for the corresponding consent item
-                         */
-                        $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
+                        $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true"); //set the data-agree attribute for the corresponding consent item
 
                     }
                     if (typeInTous(type, "inactive")) {
@@ -913,10 +729,7 @@
                     }
                 });
                 if (item_found > 0) {
-                    /*
-                     * make sure that all items are agreed upon before checking the box
-                     */
-                    if (self.find("[data-agree='false']").length === 0) {
+                    if (self.find("[data-agree='false']").length === 0) { // make sure that all items are agreed upon before checking the box
                         self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
                         var vs = self.find(".display-view");
                         if (vs.length > 0) {
@@ -935,21 +748,14 @@
 
     FieldsChecker.prototype.termsCheckboxEvent = function(fields) {
         var __self = this;
-        var userId = __self.userId;
-        var tnthAjax = this.__getDependency("tnthAjax");
-        var orgTool = this.getOrgTool();
-
+        var userId = __self.userId, tnthAjax = this.__getDependency("tnthAjax"), orgTool = this.getOrgTool();
         var termsEvent = function() {
             if ($(this).attr("data-agree") === "false") {
                 var types = $(this).attr("data-tou-type");
                 if (hasValue(types)) {
-                    var arrTypes = types.split(",");
-                    var dataUrl = $(this).attr("data-url");
+                    var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
                     arrTypes.forEach(function(type) {
-                        /*
-                         * if already agreed, don't post again
-                         */
-                        if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) {
+                        if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
                             return true;
                         }
                         var theTerms = {};
@@ -972,47 +778,35 @@
                                         }
                                     });
                                 }
-                            }).fail(function() {
-
-                            });
+                            }).fail(function() {});
                         }
-
                         if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                             var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
                             if (hasValue(topOrg)) {
                                 theTerms["organization_id"] = topOrg;
                             }
                         }
-                        // Post terms agreement via API
-                        tnthAjax.postTerms(theTerms);
+                        tnthAjax.postTerms(theTerms); // Post terms agreement via API
                     });
                 }
-
                 // Update UI
                 if (this.nodeName.toLowerCase() === "label") {
                     $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
                 } else {
                     $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
                 }
-
                 //adding css rule here so the checkbox won't be hidden on click
                 $(this).attr("current", "true");
                 $(this).attr("data-agree", "true");
 
-                //delete relevant notifications
-                var coreTypes = [];
-                var parentCoreType = $(this).attr("data-core-data-type");
+                var coreTypes = [], parentCoreType = $(this).attr("data-core-data-type");
                 if (hasValue(parentCoreType)) {
                     coreTypes.push(parentCoreType);
                 }
                 $(this).closest("label").find("[data-core-data-type]").each(function() {
                     coreTypes.push($(this).attr("data-core-data-type"));
                 });
-                /*
-                 * need to delete notification for each corresponding coredata terms type
-                 * once user has agreed
-                 */
-                if (coreTypes.length > 0) {
+                if (coreTypes.length > 0) { //need to delete notification for each corresponding coredata terms type once user has agreed
                     coreTypes.forEach(function(type) {
                         var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
                         if (notificationEntry.length > 0) {
@@ -1031,11 +825,7 @@
                 __self.continueToNext("topTerms");
             }
         };
-
-        /*
-         * account for the fact that some terms items are hidden as child elements to a label
-         */
-        $("#topTerms label.terms-label").each(function() {
+        $("#topTerms label.terms-label").each(function() { //account for the fact that some terms items are hidden as child elements to a label
             $(this).on("click", function() {
                 if ($(this).attr("data-required")) {
                     termsEvent.apply(this);
@@ -1046,14 +836,11 @@
                 }
             });
         });
-
-
         fields.forEach(function(item) {
             $(item).each(function() {
                 $(this).on(__self.getFieldEventType(item), termsEvent);
             });
         });
-
         $("#topTerms .required-link").each(function() {
             $(this).on("click", function(e) {
                 e.stopPropagation();
@@ -1062,48 +849,30 @@
     };
 
     FieldsChecker.prototype.nameGroupEvent = function(fields) {
-        var self = this, assembleContent = self.__getDependency("assembleContent");
+        var self = this;
         fields.forEach(function(item) {
             $(item).on(self.getFieldEventType(item), function() {
-                if (self.allFieldsCompleted()) {
-                    self.continueToFinish();
-                } else {
-                    if (self.sectionCompleted("demographicsContainer")) {
-                        self.continueToNext("demographicsContainer");
-                    } else {
-                        self.stopContinue("demographicsContainer");
-                    }
-                }
+                self.handlePostEvent("demographicsContainer");
             });
             $(item).on("blur", function() {
                 if ($(this).val() !== "") {
-                    assembleContent.demo($("#iq_userId").val());
+                    self.postDemoData();
                 }
             });
         });
     };
 
     FieldsChecker.prototype.bdGroupEvent = function(fields) {
-        var self = this,
-            tnthDates = this.__getDependency("tnthDates"),
-            assembleContent = this.__getDependency("assembleContent");
+        var self = this, tnthDates = this.__getDependency("tnthDates");
         fields.forEach(function(item) {
             $(item).on(self.getFieldEventType(item), function() {
-                var d = $("#date");
-                var m = $("#month");
-                var y = $("#year");
+                var d = $("#date"), m = $("#month"), y = $("#year");
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
                 if (isValid) {
                     $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
                     $("#errorbirthday").text("").hide();
-                    assembleContent.demo($("#iq_userId").val());
-                    if (self.allFieldsCompleted()) {
-                        self.continueToFinish();
-                    } else {
-                        if (self.sectionCompleted("demographicsContainer")) {
-                            self.continueToNext("demographicsContainer");
-                        }
-                    }
+                    self.postDemoData();
+                    self.handlePostEvent("demographicsContainer");
                 } else {
                     self.stopContinue("demographicsContainer");
                 }
@@ -1115,16 +884,9 @@
         var self = this, tnthAjax = this.__getDependency("tnthAjax");
         fields.forEach(function(item) {
             $(item).on("click", function() {
-                var roles = [];
-                var theVal = $(this).val();
-                roles.push({
-                    name: theVal
-                });
-                var toSend = {
-                    "roles": roles
-                };
-                tnthAjax.putRoles(self.userId, toSend);
-
+                var roles = [], theVal = $(this).val();
+                roles.push({name: theVal});
+                tnthAjax.putRoles(self.userId,{"roles": roles});
                 if (theVal === "patient") {
                     $("#clinicalContainer").attr("skipped", "false");
                     $("#orgsContainer").attr("skipped", "false");
@@ -1133,8 +895,7 @@
                     $("#year").attr("required", "required").attr("skipped", "false");
                     $(".bd-optional").hide();
                 } else {
-                    // If partner, skip all questions
-                    if (theVal === "partner") {
+                    if (theVal === "partner") { // If partner, skip all questions
                         $("#clinicalContainer").attr("skipped", "true");
                         $("#orgsContainer").attr("skipped", "true");
                         $("#date").removeAttr("required").attr("skipped", "true");
@@ -1143,29 +904,17 @@
                         $(".bd-optional").show();
                     }
                 }
-
-                if (self.allFieldsCompleted()) {
-                    self.continueToFinish();
-                } else {
-                    if (self.sectionCompleted("demographicsContainer")) {
-                        self.continueToNext("demographicsContainer");
-                    } else {
-                        self.stopContinue("demographicsContainer");
-                    }
-                }
+                self.handlePostEvent("demographicsContainer");
             });
         });
     };
 
     FieldsChecker.prototype.patientQEvent = function(fields) {
-        var self = this,
-            userId = self.userId,
-            tnthAjax = this.__getDependency("tnthAjax");
+        var self = this, userId = self.userId, tnthAjax = this.__getDependency("tnthAjax");
         fields.forEach(function(item) {
             $(item).on("click", function() {
                 var thisItem = $(this);
                 var toCall = thisItem.attr("name") || thisItem.attr("data-name");
-                // Get value from div - either true or false
                 var toSend = (toCall === "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
                 //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
                 if (toCall !== "tx" && toCall !== "biopsy") {
@@ -1184,9 +933,7 @@
                         if (!$("#biopsyDate").val()) {
                             return true;
                         } else {
-                            tnthAjax.postClinical(userId, toCall, toSend, "", false, {
-                                "issuedDate": $("#biopsyDate").val()
-                            });
+                            tnthAjax.postClinical(userId, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                         }
                         if (self.sectionCompleted("clinicalContainer")) {
                             return false;
@@ -1198,9 +945,7 @@
                     if (nextItem.length > 0) {
                         var checkedRadio = nextItem.find("input[type='radio']:checked");
                         if (!(checkedRadio.length > 0)) {
-                            $("html, body").animate({
-                                scrollTop: nextItem.offset().top
-                            }, 1000);
+                            $("html, body").animate({scrollTop: nextItem.offset().top}, 1000);
                         }
                         nextItem.find("input[type='radio']").each(function() {
                             $(this).attr("skipped", "false");
@@ -1211,9 +956,7 @@
                                 $(this).attr("skipped", "false");
                             });
                         });
-
                     }
-
                 } else {
                     if (toCall === "biopsy") {
                         tnthAjax.postClinical(self.userId, toCall, "false", $(this).attr("data-status"), $(this));
@@ -1251,31 +994,62 @@
                     }
                     thisItem.parents(".pat-q").nextAll().fadeOut();
                 }
-                if (self.allFieldsCompleted()) {
-                    self.continueToFinish();
-                } else {
-                    if (self.sectionCompleted("clinicalContainer")) {
-                        self.continueToNext("clinicalContainer");
-                    } else {
-                        self.stopContinue("clinicalContainer");
-                    }
-                }
+                self.handlePostEvent("clinicalContainer");
 
             });
         });
     };
+    FieldsChecker.prototype.getConsentModal = function(parentOrg) {
+        var orgTool = this.getOrgTool();
+        parentOrg = parentOrg || orgTool.getElementParentOrg(orgTool.getSelectedOrg());
+        if (parentOrg) {
+            var __modal = $("#" + parentOrg + "_consentModal");
+            if (__modal.length > 0) {
+                return __modal;
+            } else {
+                var __defaultModal = $("#" + parentOrg + "_defaultConsentModal");
+                if (__defaultModal.length > 0) {
+                    return __defaultModal;
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+    };
+    FieldsChecker.prototype.handlePreSelectedClinic = function() {
+        var preselectClinic = $("#preselectClinic").val(), orgTool = this.getOrgTool();
+        if (preselectClinic) {
+            var ob = $("#userOrgs input[value='" + preselectClinic + "']");
+            if (ob.length > 0) {
+                ob.prop("checked", true);
+                var parentOrg = orgTool.getElementParentOrg(orgTool.getSelectedOrg());
+                var __modal = this.getConsentModal(parentOrg);
+                if (__modal) {
+                    ob.attr("data-require-validate", "true");
+                }
+                var stateContainer = ob.closest(".state-container");
+                if (stateContainer.length > 0) {
+                    var st = stateContainer.attr("state");
+                    if (st) {
+                        $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
+                        stateContainer.show();
+                    }
+                }
+            }
+        }
+    };
+
     FieldsChecker.prototype.clinicsEvent = function(fields) {
         var self = this;
         fields.forEach(function(item) {
             $(item).on("click", function() {
                 if ($(this).prop("checked")) {
-                    var parentOrg = $(this).attr("data-parent-id");
-                    var m = $("#" + parentOrg + "_consentModal");
-                    var dm = $("#" + parentOrg + "_defaultConsentModal");
-                    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
-                        //do nothing
-                    } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) {
-                        //do nothing
+                    var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
+                    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") { //do nothing
+                        return true;
+                    } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
+                        return true;
                     } else {
                         self.continueToFinish();
                     }

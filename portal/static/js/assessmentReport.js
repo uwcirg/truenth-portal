@@ -18,8 +18,7 @@
                 var self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId,
-                    async: false
+                    url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId
                 }).done(function(data) {
 
                     if (!("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch)) {

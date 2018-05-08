@@ -140,6 +140,7 @@
                     $("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({
                         opacity: 1
                     });
+                    $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
                     $("#pastTreatmentsContainer").hide();
                     return false;
                 }
@@ -218,6 +219,7 @@
                 $("#eventListLoad").fadeOut();
             }).fail(function() {
                 $("#procDateErrorContainer").html(i18next.t("error ocurred retrieving user procedures"));
+                $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
                 $("#eventListLoad").fadeOut();
             });
         }
