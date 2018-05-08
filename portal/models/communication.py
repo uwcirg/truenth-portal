@@ -70,7 +70,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_assessment_link():
         label = _(u'Complete Questionnaire')
         return (
-            '<a href="{ae_link}">{label}</a>'.format(
+            u'<a href="{ae_link}">{label}</a>'.format(
                 ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
@@ -94,7 +94,7 @@ def load_template_args(user, questionnaire_bank_id=None):
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
         label = _(u'TrueNTH P3P')
-        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
+        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     def _lookup_debug_slot():
         """Special slot added when configuration DEBUG_EMAIL is set"""
@@ -133,7 +133,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_password_reset_link():
         label = _(u'Password Reset')
         return (
-            '<a href="{url}">{label}</a>'.format(
+            u'<a href="{url}">{label}</a>'.format(
                 url=url_for('user.forgot_password', _external=True),
                 label=label))
 
@@ -165,7 +165,7 @@ def load_template_args(user, questionnaire_bank_id=None):
 
     def _lookup_st_link():
         label = _(u"Symptom Tracker")
-        return '<a href="{0.link_url}">{label}</a>'.format(
+        return u'<a href="{0.link_url}">{label}</a>'.format(
             INTERVENTION.SELF_MANAGEMENT, label=label)
 
     def _lookup_verify_account_button():
@@ -182,7 +182,7 @@ def load_template_args(user, questionnaire_bank_id=None):
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
         label = _(u'Verify Account')
-        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
+        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     # Load all functions from the local space with the `_lookup_` prefix
     # into the args instance
