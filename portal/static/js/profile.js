@@ -151,6 +151,8 @@
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
                 errorMessage: ""
             },
+            disableFields: [],
+            topLevelOrgs: [],
             fillViews: {},
             modules: {},
             bootstrapTableConfig: {
@@ -204,6 +206,43 @@
                     return {"done": true};
                 });
             },
+            setTopLevelOrgs: function(data) {
+                if (data && data.careProvider) {
+                    var orgTool = this.getOrgTool();
+                    var userOrgs = data.careProvider.map(function(item) {
+                       return item.reference.split("/").pop();
+                    });
+                    var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(userOrgs);
+                    this.topLevelOrgs = topLevelOrgs.map(function(orgId) {
+                        return orgTool.getOrgName(orgId);
+                    });
+                }
+            },
+            checkDisableFields: function() {
+                if (this.settings.MEDIDATA_RAVE_FIELDS) {
+                    if (this.topLevelOrgs.length === 0) {
+                        if (this.currentUserId) {
+                            var self = this;
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/demographics/"+this.currentUserId
+                            }).done(function(data) {
+                                if (data) {
+                                    self.setTopLevelOrgs(data);
+                                }
+                                if (self.topLevelOrgs.indexOf("IRONMAN") !== -1) {
+                                    self.disableFields = self.settings.MEDIDATA_RAVE_FIELDS;
+                                }
+                            });
+                        }
+                    } else {
+                        if (this.topLevelOrgs.indexOf("IRONMAN") !== -1) {
+                            this.disableFields = this.settings.MEDIDATA_RAVE_FIELDS;
+                        }
+                    }
+                }
+                return this.disableFields;
+            },
             setDemoData: function(callback) {
                 var self = this;
                 callback = callback || function() {};
@@ -214,6 +253,7 @@
                 this.modules.tnthAjax.getDemo(this.subjectId, "", "", function(data) {
                     if (data) {
                         self.demo.data = data;
+                        self.setTopLevelOrgs(data);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
                                 if (item.system === "email") {
@@ -381,6 +421,7 @@
                 }
             },
             onSectionsDidLoad: function() {
+                this.checkDisableFields();
                 if (this.mode === "profile") { //Note, this attach loader indicator to element with the class data-loader-container, in order for this to work, the element needs to have an id attribute
                     var self = this;
                     setTimeout(function() {

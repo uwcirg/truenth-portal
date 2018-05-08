@@ -109,6 +109,15 @@ OrgTool.prototype.getTopLevelOrgs = function() {
 OrgTool.prototype.getOrgsList = function() {
     return this.orgsList;
 };
+OrgTool.prototype.getOrgName = function(orgId) {
+    var orgsList = this.getOrgsList();
+    if (orgId && orgsList[orgId]) {
+        return orgsList[orgId].name;
+    }
+    else {
+        return "";
+    }
+};
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) {
         return false;
@@ -361,12 +370,16 @@ OrgTool.prototype.getSelectedOrg = function() {
 OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
     var parentList = [], self = this;
     if (uo) {
+        if (uo.parentList) {
+            return uo.parentList;
+        }
         uo.forEach(function(o) {
             var p = self.getTopLevelParentOrg(o);
             if (p && !self.inArray(p, parentList)) {
                 parentList.push(p);
             }
         });
+        uo.parentList = parentList;
         return parentList;
     } else return false;
 };

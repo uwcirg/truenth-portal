@@ -920,7 +920,7 @@
 {% macro profileDeceased(person, current_user) -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="deceased" data-profile-section-id="deceased">
+            <div class="profile-item-container" v-bind:class="{editable: disableFields.indexOf('deceased') == -1}" data-sections="deceased" data-profile-section-id="deceased">
                 <h4 id="deathLoc" class="profile-item-title index-item">{{_("Deceased Status")}}</h4>
                 <input type="hidden" id="deathDate" value=""/>
                 <div class="view-container">
@@ -931,6 +931,7 @@
                             <p>{{demo.data.displayDeceasedDate}}</p>
                         {% endraw %}
                     </div>
+                    <div v-show="!demo.data.deceasedBoolean && !demo.data.deceasedDateTime" class="text-muted">{{_("no data provided")}}</div>
                 </div>
                 <div class="edit-container">
                     <div class="checkbox" id="boolDeathGroup">
@@ -984,7 +985,7 @@
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="studyid">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" />
+        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="disableFields.indexOf('studyid') !== -1"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
     </div>
