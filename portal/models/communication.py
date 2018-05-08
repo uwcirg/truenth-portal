@@ -1,7 +1,7 @@
 """Communication model"""
 from collections import MutableMapping
 from datetime import datetime
-from flask import current_app, has_request_context,url_for
+from flask import current_app, has_request_context, url_for
 from flask_babel import gettext as _, force_locale
 import regex
 from smtplib import SMTPRecipientsRefused
@@ -238,11 +238,8 @@ class Communication(db.Model):
         """Collate message details into EmailMessage"""
 
         def localize_message():
-            args = load_template_args(
-                user=user,
-                questionnaire_bank_id=
-                self.communication_request.questionnaire_bank_id)
-
+            qb_id = self.communication_request.questionnaire_bank_id
+            args = load_template_args(user=user, questionnaire_bank_id=qb_id)
             mailresource = MailResource(
                 url=self.communication_request.content_url,
                 locale_code=user.locale_code,
