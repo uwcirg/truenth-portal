@@ -1,8 +1,8 @@
 """Communication model"""
 from collections import MutableMapping
 from datetime import datetime
-from flask import current_app, url_for
-from flask_babel import gettext as _
+from flask import current_app, has_request_context,url_for
+from flask_babel import gettext as _, force_locale
 import regex
 from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
@@ -235,35 +235,43 @@ class Communication(db.Model):
             ' of {0.communication_request.name}'.format(self))
 
     def generate_message(self):
-        "Collate message details into EmailMessage"
+        """Collate message details into EmailMessage"""
+
+        def localize_message():
+            args = load_template_args(
+                user=user,
+                questionnaire_bank_id=
+                self.communication_request.questionnaire_bank_id)
+
+            mailresource = MailResource(
+                url=self.communication_request.content_url,
+                locale_code=user.locale_code,
+                variables=args)
+
+            missing = set(mailresource.variable_list) - set(args)
+            if missing:
+                raise ValueError(
+                    "{} contains unknown varables: {}".format(
+                        mailresource.url,
+                        ','.join(missing)))
+
+            msg = EmailMessage(
+                subject=mailresource.subject,
+                body=mailresource.body,
+                recipients=user.email,
+                sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                user_id=user.id)
+
+            return msg
+
+        # Special handling of locales outside of a request context,
+        # such as when a celery task initiates this function call
 
         user = User.query.get(self.user_id)
-
-        args = load_template_args(
-            user=user,
-            questionnaire_bank_id=self.communication_request.
-            questionnaire_bank_id)
-
-        mailresource = MailResource(
-            url=self.communication_request.content_url,
-            locale_code=user.locale_code,
-            variables=args)
-
-        missing = set(mailresource.variable_list) - set(args)
-        if missing:
-            raise ValueError(
-                "{} contains unknown varables: {}".format(
-                    mailresource.url,
-                    ','.join(missing)))
-
-        msg = EmailMessage(
-            subject=mailresource.subject,
-            body=mailresource.body,
-            recipients=user.email,
-            sender=current_app.config['MAIL_DEFAULT_SENDER'],
-            user_id=user.id)
-
-        return msg
+        if has_request_context():
+            return localize_message()
+        with force_locale(user.locale_code):
+            return localize_message()
 
     def generate_and_send(self):
         "Collate message details and send"
