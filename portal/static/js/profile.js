@@ -396,7 +396,7 @@
                 }
                 return this.orgTool;
             },
-            isEditable: function() {
+            isConsentEditable: function() {
                 var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
                 var isPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
@@ -2433,6 +2433,7 @@
             },
             getConsentRow: function(item) {
                 var self = this, consentStatus = self.getConsentStatus(item), sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
+                var isDisabled = this.disableFields.indexOf("consent_status") !== -1;
                 var LROrgId = item ? item.organization_id : "";
                 if (LROrgId) {
                     var topOrgID = (self.getOrgTool()).getTopLevelParentOrg(LROrgId);
@@ -2444,7 +2445,7 @@
                 var contentArray = [{
                     content: self.getConsentOrgDisplayName(item)
                 }, {
-                    content: sDisplay + (self.isEditable() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#profileConsentListModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : ""),
+                    content: sDisplay + (!isDisabled && self.isConsentEditable() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#profileConsentListModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : ""),
                     "_class": "indent"
                 }, {
                     content: (function(item) {
@@ -2457,7 +2458,7 @@
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isEditable() && self.isTestPatient() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
+                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestPatient() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2833,16 +2834,16 @@
                             clearInterval(self.consentListReadyIntervalId);
                         }
                     }, 50);
-                    if (self.isEditable() && self.consent.hasConsentHistory) {
+                    if (self.isConsentEditable() && self.consent.hasConsentHistory) {
                         $("#viewConsentHistoryButton").on("click", function(e) {
                             e.preventDefault();
                             self.getConsentHistory();
                         });
                     }
-                    if (self.isEditable()) {
+                    if (self.isConsentEditable()) {
                         self.initConsentItemEvent();
                     }
-                    if (self.isEditable() && self.isTestPatient()) {
+                    if (self.isConsentEditable() && self.isTestPatient()) {
                         self.initConsentDateEvents();
                     }
                 } else {
