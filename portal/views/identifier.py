@@ -35,7 +35,7 @@ def identifiers(user_id):
         schema:
           id: nested_identifiers
           properties:
-            identifiers:
+            identifier:
               type: array
               items:
                 type: object
@@ -66,7 +66,7 @@ def identifiers(user_id):
     user = get_user_or_abort(user_id)
 
     # Return current identifiers
-    return jsonify(identifiers=[i.as_fhir() for i in user.identifiers])
+    return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
 
 
 @identifier_api.route('/api/user/<int:user_id>/identifier', methods=('POST',))
@@ -116,15 +116,15 @@ def add_identifier(user_id):
     """
     current_user().check_role(permission='edit', other_id=user_id)
     user = get_user_or_abort(user_id)
-    if not request.json or 'identifiers' not in request.json:
+    if not request.json or 'identifier' not in request.json:
         abort(400, "Requires identifier list")
 
     # Prevent edits to internal identifiers
     restricted_systems = (TRUENTH_ID, TRUENTH_USERNAME)
     allowed = [
-        i for i in request.json.get('identifiers')
+        i for i in request.json.get('identifier')
         if i.get('system') not in restricted_systems]
-    if len(allowed) != len(request.json.get('identifiers')):
+    if len(allowed) != len(request.json.get('identifier')):
         abort(409, "Edits to restricted system not allowed")
 
     for item in allowed:
@@ -137,4 +137,4 @@ def add_identifier(user_id):
     db.session.commit()
 
     # Return current identifiers after change
-    return jsonify(identifiers=[i.as_fhir() for i in user.identifiers])
+    return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
