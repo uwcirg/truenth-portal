@@ -53,7 +53,9 @@ var tnthTables = {
             a = ar[0];
         }
         var br = b.split("\n");
-        if (br.length > 0) b = br[0];
+        if (br.length > 0) {
+            b = br[0];
+        }
         /* note getTime returns the numeric value corresponding to the time for the specified date according to universal time
          * therefore, can be used for sorting
          */

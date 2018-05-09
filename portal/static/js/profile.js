@@ -1441,7 +1441,9 @@
                             }
                             return 0;
                         }
-                    } else return 0;
+                    } else {
+                        return 0;
+                    }
                 });
 
                 parentOrgs.forEach(function(item) {
@@ -1513,7 +1515,7 @@
                     $(".state-container, .clinic-prompt").hide();
                     setTimeout(function() { //case of pre-selected clinic, need to check if any clinic has prechecked
                         var o = $("#userOrgs input[name='organization']:checked");
-                        if (o.length > 0 && o.val() != 0) {
+                        if (o.length > 0 && parseInt(o.val()) !== 0) {
                             o.closest(".state-container").show();
                             $(".clinic-prompt").show();
                         }
@@ -1584,8 +1586,9 @@
                                 }
                                 $(".noOrg-container").show();
                             } else {
-                                if (ckOrg.length > 0) ckOrg.prop("checked", true);
-                                else {
+                                if (ckOrg.length > 0) {
+                                    ckOrg.prop("checked", true);
+                                } else {
                                     var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
                                     if (topLevelOrg.length > 0) topLevelOrg.attr("data-checked", "true");
                                 }
@@ -2135,7 +2138,7 @@
                         var todayObj = tnthDates.getTodayDateObj();
                         var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
 
-                        if (d.val() != "" && m.val() != "" && y.val() != "") {
+                        if (d.val() !== "" && m.val() !== "" && y.val() !== "") {
                             if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
                                 var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
                                 var consentDate = $("#manualEntryConsentDate").val();

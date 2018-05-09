@@ -471,7 +471,7 @@ var AccountCreationObj = function (roles, dependencies) {
         };
     };
     this.getCommunicationArray = function() {
-        var arrCommunication = [];
+        var arrCommunication = [], SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
         $("#userOrgs input:checked").each(function() {
             if (parseInt($(this).val()) === 0) {
                 return true; //don't count none

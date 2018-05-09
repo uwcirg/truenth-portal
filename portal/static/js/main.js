@@ -130,7 +130,7 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
         if (!self.inArray($(this).val(), leafOrgs)) {
             $(this).hide();
             if (self.orgsList[$(this).val()]) {
-                var l = $(this).closest("label");;
+                var l = $(this).closest("label");
                 if (self.orgsList[$(this).val()].children.length === 0) {
                     l.hide();
                 } else {
@@ -168,7 +168,9 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
                 var ip = $(this).find("input[name='organization']");
                 if (ip.length > 0) {
                     ip.each(function() {
-                        if ($(this).is(":visible") || $(this).css("display") != "none") allChildrenHidden = false;
+                        if ($(this).is(":visible") || $(this).css("display") !== "none") {
+                            allChildrenHidden = false;
+                        }
                     });
                 }
             }
@@ -205,17 +207,27 @@ OrgTool.prototype.populateOrgsList = function(items) {
                     orgsList[parentId] = new OrgObj(o.id, o.name);
                 }
                 orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
-                else orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+                if (orgsList[item.id]) {
+                    orgsList[item.id].parentOrgId = parentId;
+                }
+                else {
+                    orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+                }
             } else {
-                if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
+                if (!orgsList[item.id]) {
+                    orgsList[item.id] = new OrgObj(item.id, item.name);
+                }
                 if (item.id != 0) {
                     orgsList[item.id].isTopLevel = true;
                     self.TOP_LEVEL_ORGS.push(item.id);
                 }
             }
-            if (item.extension) orgsList[item.id].extension = item.extension;
-            if (item.language) orgsList[item.id].language = item.language;
+            if (item.extension) {
+                orgsList[item.id].extension = item.extension;
+            }
+            if (item.language) {
+                orgsList[item.id].language = item.language;
+            }
             if (item.identifier) {
                 orgsList[item.id].identifier = item.identifier;
                 (item.identifier).forEach(function(identifier) {
@@ -229,7 +241,9 @@ OrgTool.prototype.populateOrgsList = function(items) {
         items.forEach(function(item) {
             if (item.partOf) {
                 parentId = item.partOf.reference.split("/").pop();
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+                if (orgsList[item.id]) {
+                    orgsList[item.id].parentOrgId = parentId;
+                }
             }
         });
         if (items.length > 0) {
@@ -267,7 +281,6 @@ OrgTool.prototype.populateUI = function() {
         }
         return s;
     }
-
     var keys = Object.keys(orgsList), parentOrgsArray = [];
     keys = keys.sort();
     keys.forEach(function(org) { //draw parent orgs first
@@ -275,17 +288,18 @@ OrgTool.prototype.populateUI = function() {
             parentOrgsArray.push(org);
         }
     });
-
     parentOrgsArray = parentOrgsArray.sort(function(a, b) { //sort parent orgs by name
         var orgA = orgsList[a],
             orgB = orgsList[b];
-        if (orgA.name < orgB.name) return -1;
-        if (orgA.name > orgB.name) return 1;
+        if (orgA.name < orgB.name) {
+            return -1;
+        }
+        if (orgA.name > orgB.name) {
+            return 1;
+        }
         return 0;
     });
-
     var parentFragment = document.createDocumentFragment(), parentDiv;
-
     parentOrgsArray.forEach(function(org) {
         parentDiv = document.createElement("div");
         parentDiv.setAttribute("id", org+"_container");
@@ -315,8 +329,12 @@ OrgTool.prototype.populateUI = function() {
         if (orgsList[org].children.length > 0) { // Fill in each child clinic
             var childClinic = "";
             var items = orgsList[org].children.sort(function(a, b) { // sort child clinic in alphabetical order
-                if (a.name < b.name) return -1;
-                if (a.name > b.name) return 1;
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
                 return 0;
             });
             items.forEach(function(item) {
@@ -387,7 +405,9 @@ OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
     } else return false;
 };
 OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
-    if (!currentOrg) return false;
+    if (!currentOrg) {
+        return false;
+    }
     var ml = this.getOrgsList(), self = this;
     if (ml && ml[currentOrg]) {
         if (ml[currentOrg].isTopLevel) {
