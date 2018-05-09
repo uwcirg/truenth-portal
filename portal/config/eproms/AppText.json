@@ -1,11 +1,6 @@
 {
   "entry": [
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true",
-      "name": "About Movember URL",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true",
       "name": "About TrueNTH URL",
       "resourceType": "AppText"
