@@ -251,7 +251,6 @@ OrgTool.prototype.getShortName = function(orgId) {
 OrgTool.prototype.populateUI = function() {
     if (sessionStorage.orgsHTML) {
         $("#fillOrgs").html(sessionStorage.orgsHTML);
-        console.log("get to sess")
         return true;
     }
     var self = this, container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
@@ -291,13 +290,13 @@ OrgTool.prototype.populateUI = function() {
         parentDiv = document.createElement("div");
         parentDiv.setAttribute("id", org+"_container");
         if (orgsList[org].children.length > 0) {
-            if ($("#userOrgs legend[orgId='" + org + "']").length == 0) {;
+            if ($("#userOrgs legend[orgId='" + org + "']").length === 0) {
                 parentDiv.classList.add("parent-org-container");
                 parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>" +
                     "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' data-org-name='{{orgName}}' data-short-name='{{shortName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
             }
         } else {
-            if ($("#userOrgs label[id='org-label-" + org + "']").length == 0) {
+            if ($("#userOrgs label[id='org-label-" + org + "']").length === 0) {
                 parentDiv.classList.add("parent-org-container", "parent-singleton");
                 parentContent = "<label id='org-label-{{orgId}}' class='org-label'>" +
                     "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' " +

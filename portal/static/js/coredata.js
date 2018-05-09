@@ -54,7 +54,7 @@ $(document).ready(function(){
             $(this).attr("disabled", false);
             $(".loading-indicator").hide();
             $(".error-continue").text(e.message);
-        };
+        }
     });
     tnthAjax.getPortalFooter(subjectId, false, "core_data_footer");
 });

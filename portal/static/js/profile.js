@@ -177,7 +177,7 @@
                 },
                 rowStyle: function(row, index) {
                     return {
-                        css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
+                        css: {"background-color": (index % 2 !== 0 ? "#F9F9F9" : "#FFF")}
                     };
                 }
             }
@@ -195,8 +195,9 @@
                 return i18next.t("not provided");
             },
             setBootstrapTableConfig: function(config) {
-                if (!config) return this.bootstrapTableConfig;
-                else {
+                if (!config) {
+                    return this.bootstrapTableConfig;
+                } else {
                     return $.extend({}, this.bootstrapTableConfig, config);
                 }
             },
@@ -348,9 +349,10 @@
                                         }
                                         self.demo.data.race.push(race);
                                     });
-                                    if (self.demo.data.race) self.demo.data.raceCodes = self.demo.data.race.map(function(item) {
-                                        return item.code;
-                                    });
+                                    if (self.demo.data.race) {
+                                        self.demo.data.raceCodes = self.demo.data.race.map(function(item) {
+                                            return item.code; });
+                                    }
                                 }
                                 if (!self.demo.data.timezone && item.url === self.modules.SYSTEM_IDENTIFIER_ENUM.timezone) {
                                     self.demo.data.timezone = item.timezone ? item.timezone : "";
@@ -704,7 +706,9 @@
                                         }, 50);
                                     });
                                 }
-                            } else editButton.attr("disabled", false);
+                            } else {
+                                editButton.attr("disabled", false);
+                            }
                         }, 250);
                     }
                 }
@@ -994,7 +998,7 @@
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     var messageContainer = $("#profile" + emailType + "EmailMessage");
-                    if (this.value != "" && $("#email").val() != "" && $("#erroremail").text() == "") {
+                    if (this.value != "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
                         message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
@@ -1339,8 +1343,8 @@
                         container = $("#" + selectedState.val() + "_container");
                     var defaultPrompt = i18next.t("What is your main clinic for prostate cancer care");
                     $("#userOrgsInfo").hide();
-                    if (selectedState.val() != "") {
-                        if (selectedState.val() == "none") {
+                    if (selectedState.val() !== "") {
+                        if (selectedState.val() === "none") {
                             $(".state-container, .noOrg-container").hide();
                             $(".clinic-prompt").text("").hide();
                             $("#noOrgs").prop("checked", true).trigger("click");
@@ -1363,16 +1367,16 @@
                     }
                 });
 
-                var orgsList = this.orgsList;
-                var states = {},
-                    contentHTML = "";
+                var orgsList = this.orgsList, states = {}, contentHTML = "";
                 var getParentState = function(o, states) {
-                    if (!o) return "";
+                    if (!o) {
+                        return "";
+                    }
                     var s = "", found = false;
                     for (var state in states) {
                         if (!found) {
                             (states[state]).forEach(function(i) {
-                                if (i == o) {
+                                if (i === o) {
                                     s = state;
                                     found = true;
                                 }
@@ -1417,14 +1421,24 @@
                     var oo_2 = orgsList[b.id];
                     if (oo_1 && oo_2) {
                         if (oo_1.children.length > 0 && oo_2.children.length > 0) {
-                            if (a.name < b.name) return -1;
-                            if (a.name > b.name) return 1;
+                            if (a.name < b.name) {
+                                return -1;
+                            }
+                            if (a.name > b.name) {
+                                return 1;
+                            }
                             return 0;
-                        } else if (oo_1.children.length > 0 && oo_2.children.length == 0) return -1;
-                        else if (oo_2.children.length > 0 && oo_1.children.length == 0) return 1;
-                        else {
-                            if (a.name < b.name) return -1;
-                            if (a.name > b.name) return 1;
+                        } else if (oo_1.children.length > 0 && oo_2.children.length === 0) {
+                            return -1;
+                        } else if (oo_2.children.length > 0 && oo_1.children.length === 0) {
+                            return 1;
+                        } else {
+                            if (a.name < b.name) {
+                                return -1;
+                            }
+                            if (a.name > b.name) {
+                                return 1;
+                            }
                             return 0;
                         }
                     } else return 0;
@@ -1459,8 +1473,12 @@
                 });
 
                 childOrgs = childOrgs.sort(function(a, b) { //// sort child clinics in alphabetical order
-                    if (a.name < b.name) return 1;
-                    if (a.name > b.name) return -1;
+                    if (a.name < b.name) {
+                        return 1;
+                    }
+                    if (a.name > b.name) {
+                        return -1;
+                    }
                     return 0;
                 });
 
@@ -2099,7 +2117,7 @@
                 $("input[name='entryMethod']").on("click", function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = $(this).val();
-                    if ($(this).val() == "interview_assisted") {
+                    if ($(this).val() === "interview_assisted") {
                         self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //if method is interview assisted, reset completion date to GMT date/time for today
                         self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
                     }

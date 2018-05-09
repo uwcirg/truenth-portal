@@ -1,98 +1,6 @@
 (function() {
     //TODO this JS code file needs a bit of clean-up
     var i18next = window.portalModules.i18next, tnthAjax = window.portalModules.tnthAjax, tnthDates = window.portalModules.tnthDates, SYSTEM_IDENTIFIER_ENUM = window.portalModules.SYSTEM_IDENTIFIER_ENUM;
-    $.fn.extend({
-        // Special type of select question - passes two values - the answer from - the select plus an associated date from a separate input
-        eventInput: function(settings) {
-            if (!settings) {
-                settings = {};
-            }
-            var tnthAjax = settings["tnthAjax"]; //this will error out if not defined
-
-            $(this).on("click", function(e) {
-                e.stopImmediatePropagation();
-                $(this).attr("disabled", true); // First disable button to prevent double-clicks
-                var isAccountCreation = $(this).attr("data-account-create");
-                var subjectId = $("#profileProcSubjectId").val(), selectVal = $(this).attr("data-name"), selectDate = $(this).attr("data-date"), selectSystem = $(this).attr("data-system");
-                if (selectVal !== undefined && selectDate !== undefined) {
-                    var selectFriendly = $("#tnthproc option:selected").text();
-                    var procArray = {};
-                    procArray["resourceType"] = "Procedure";
-                    procArray["performedDateTime"] = selectDate;
-                    procArray["system"] = selectSystem;
-
-                    if (isAccountCreation) {
-                        if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length === 0) {
-                            procArray["display"] = selectFriendly;
-                            procArray["code"] = selectVal;
-                            var content = "";
-                            content += "<tr ";
-                            for (var item in procArray) {
-                                content += " data-" + item + "='" + procArray[item] + "'";
-                            }
-                            content += ">";
-                            content += "<td>&#9679;</td><td>" + selectFriendly + "</td><td>" + selectDate + "</td><td><a class='btn btn-default btn-xs data-delete'>" + i18next.t("REMOVE") + "</a></td>";
-                            content += "</tr>";
-                            $("#pastTreatmentsContainer").append(content);
-                            setTimeout(function() {
-                                $("#pastTreatmentsContainer").show();
-                            }, 100);
-                        }
-
-                    } else {
-                        //remove any procedure on prostate or none treatment
-                        var otherProcElements = $("#userProcedures input[name='otherProcedures']");
-                        if (otherProcElements.length > 0) {
-                            otherProcElements.each(function() {
-                                var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
-                                if (code === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE) {
-                                    tnthAjax.deleteProc(procId);
-                                }
-                                if (code === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE) {
-                                    tnthAjax.deleteProc(procId);
-                                }
-                            });
-                        }
-
-                        var procID = [{
-                            "code": selectVal,
-                            "display": selectFriendly,
-                            system: selectSystem
-                        }];
-                        procArray["subject"] = {"reference": "Patient/" + subjectId};
-                        procArray["code"] = { "coding": procID};
-                        tnthAjax.postProc(subjectId, procArray);
-
-                        // Update the procedure list - we animate opacity to retain the
-                        // width and height so lower content doesn't go up and down
-                        $("#eventListLoad").show();
-
-                        // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
-                        // more obvious when the updated list loads
-                        setTimeout(function() {
-                            procApp.getUserProcedures(true);
-                        }, 1500);
-                        $("#pastTreatmentsContainer").hide();
-                    }
-
-                    $("select[id^='tnthproc']").val("");
-                    $("input[id^='tnthproc-value']").val("");
-                    $("input[id^='tnthproc-date']").val("");
-                    $("#procDay").val("");
-                    $("#procMonth").val("");
-                    $("#procYear").val("");
-                    // Clear submit button
-                    $("button[id^='tnthproc-submit']").addClass("disabled").attr({
-                        "data-name": "",
-                        "data-date": "",
-                        "data-date-read": "",
-                        "data-system": ""
-                    });
-                }
-                return false;
-            });
-        }
-    }); // $.fn.extend({
     var procDateReg = /(0[1-9]|1\d|2\d|3[01])/;
     var procYearReg = /(19|20)\d{2}/;
     var dateFields = ["procDay", "procMonth", "procYear"];
@@ -107,23 +15,30 @@
                 this.getUserProcedures();
             }
         },
+        updateTreatmentOptions: function(entries) {
+            if (entries) {
+                $("#tnthproc").append("<option value=''>" + i18next.t("Select") + "</option>");
+                entries.forEach(function(item) {
+                    $("#tnthproc").append("<option value='{value}' data-system='{system}'>{text}</option>"
+                        .replace("{value}", item.code)
+                        .replace("{text}", i18next.t(item.text))
+                        .replace("{system}", item.system));
+                });
+            }
+        },
         getOptions: function() {
+            var self = this;
             $.ajax({
                 type: "GET",
                 url: "/patients/treatment-options",
                 cache: true
             }).done(function(data) {
+                if (sessionStorage.treatmentOptions) {
+                    self.updateTreatmentOptions(JSON.parse(sessionStorage.treatmentOptions));
+                }
                 if (data.treatment_options) {
-                    if (data.treatment_options) {
-                        var entries = data.treatment_options;
-                        $("#tnthproc").append("<option value=''>" + i18next.t("Select") + "</option>");
-                        entries.forEach(function(item) {
-                            $("#tnthproc").append("<option value='{value}' data-system='{system}'>{text}</option>"
-                                .replace("{value}", item.code)
-                                .replace("{text}", i18next.t(item.text))
-                                .replace("{system}", item.system));
-                        });
-                    }
+                    sessionStorage.setItem("treatmentOptions", JSON.stringify(data.treatment_options));
+                    self.updateTreatmentOptions(data.treatment_options);
                 }
             }).fail(function() {});
         },
@@ -223,9 +138,100 @@
             });
         }
     };
+    $.fn.extend({
+        // Special type of select question - passes two values - the answer from - the select plus an associated date from a separate input
+        eventInput: function(settings) {
+            if (!settings) {
+                settings = {};
+            }
+            var tnthAjax = settings["tnthAjax"]; //this will error out if not defined
+
+            $(this).on("click", function(e) {
+                e.stopImmediatePropagation();
+                $(this).attr("disabled", true); // First disable button to prevent double-clicks
+                var isAccountCreation = $(this).attr("data-account-create");
+                var subjectId = $("#profileProcSubjectId").val(), selectVal = $(this).attr("data-name"), selectDate = $(this).attr("data-date"), selectSystem = $(this).attr("data-system");
+                if (selectVal !== undefined && selectDate !== undefined) {
+                    var selectFriendly = $("#tnthproc option:selected").text();
+                    var procArray = {};
+                    procArray["resourceType"] = "Procedure";
+                    procArray["performedDateTime"] = selectDate;
+                    procArray["system"] = selectSystem;
+
+                    if (isAccountCreation) {
+                        if ($("#pastTreatmentsContainer tr[data-code='" + selectVal + "'][data-performedDateTime='" + selectDate + "']").length === 0) {
+                            procArray["display"] = selectFriendly;
+                            procArray["code"] = selectVal;
+                            var content = "";
+                            content += "<tr ";
+                            for (var item in procArray) {
+                                content += " data-" + item + "='" + procArray[item] + "'";
+                            }
+                            content += ">";
+                            content += "<td>&#9679;</td><td>" + selectFriendly + "</td><td>" + selectDate + "</td><td><a class='btn btn-default btn-xs data-delete'>" + i18next.t("REMOVE") + "</a></td>";
+                            content += "</tr>";
+                            $("#pastTreatmentsContainer").append(content);
+                            setTimeout(function() {
+                                $("#pastTreatmentsContainer").show();
+                            }, 100);
+                        }
+
+                    } else {
+                        //remove any procedure on prostate or none treatment
+                        var otherProcElements = $("#userProcedures input[name='otherProcedures']");
+                        if (otherProcElements.length > 0) {
+                            otherProcElements.each(function() {
+                                var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
+                                if (code === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE) {
+                                    tnthAjax.deleteProc(procId);
+                                }
+                                if (code === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE) {
+                                    tnthAjax.deleteProc(procId);
+                                }
+                            });
+                        }
+
+                        var procID = [{
+                            "code": selectVal,
+                            "display": selectFriendly,
+                            system: selectSystem
+                        }];
+                        procArray["subject"] = {"reference": "Patient/" + subjectId};
+                        procArray["code"] = { "coding": procID};
+                        tnthAjax.postProc(subjectId, procArray);
+
+                        // Update the procedure list - we animate opacity to retain the
+                        // width and height so lower content doesn't go up and down
+                        $("#eventListLoad").show();
+
+                        // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+                        // more obvious when the updated list loads
+                        setTimeout(function() {
+                            procApp.getUserProcedures(true);
+                        }, 1500);
+                        $("#pastTreatmentsContainer").hide();
+                    }
+
+                    $("select[id^='tnthproc']").val("");
+                    $("input[id^='tnthproc-value']").val("");
+                    $("input[id^='tnthproc-date']").val("");
+                    $("#procDay").val("");
+                    $("#procMonth").val("");
+                    $("#procYear").val("");
+                    // Clear submit button
+                    $("button[id^='tnthproc-submit']").addClass("disabled").attr({
+                        "data-name": "",
+                        "data-date": "",
+                        "data-date-read": "",
+                        "data-system": ""
+                    });
+                }
+                return false;
+            });
+        }
+    }); // $.fn.extend({
     $(document).ready(function() {
         procApp.init();
-
         function __convertToNumericField(field) {
             if (field) {
                 if ("ontouchstart" in window || (typeof window.DocumentTouch !== "undefined" && document instanceof window.DocumentTouch)) {
@@ -235,50 +241,44 @@
                 }
             }
         }
-
         function isLeapYear(year) {
             return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
         }
-
         function checkDate() {
-            var d = $("#procDay").val(), m = $("#procMonth").val(), y = $("#procYear").val();
+            var df = $("#procDay"), mf =  $("#procMonth"), yf = $("#procYear");
+            var d = df.val(), m = mf.val(), y = yf.val();
             if (!isNaN(parseInt(d))) {
                 if (parseInt(d) > 0 && parseInt(d) < 10) d = "0" + d;
             }
             var dTest = procDateReg.test(d), mTest = (String(m) !== ""), yTest = procYearReg.test(y);
             var errorText = i18next.t("The procedure date must be valid and in required format.");
-            var dgField = $("#procDateGroup"), deField = $("#procDateErrorContainer"), errorColor = "#a94442", validColor = "#777";
+            var dgField = $("#procDateGroup"), deField = $("#procDateErrorContainer"), errorClass="error-message";
 
             if (dTest && mTest && yTest) {
-                var date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-                var today = new Date();
-                if (date.getFullYear() == parseInt(y) && ((date.getMonth() + 1) == parseInt(m)) && date.getDate() == parseInt(d)) {
-                    if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
-                        deField.text(i18next.t("The procedure date must be in the past.")).css("color", errorColor);
-                        return false;
-                    }
-                } else {
-                    deField.text(errorText).css("color", errorColor);
+                var isValid = tnthDates.validateDateInputFields(mf, df, yf, "procDateErrorContainer");
+                if (!isValid) {
+                    deField.addClass(errorClass);
                     return false;
+                } else {
+                    deField.removeClass(errorClass);
                 }
-
                 if (parseInt(m) === 2) { //month of February
                     if (isLeapYear(parseInt(y))) {
                         if (parseInt(d) > 29) {
-                            deField.text(errorText).css("color", errorColor);
+                            deField.text(errorText).addClass(errorClass);
                             return false;
                         }
                     } else {
                         if (parseInt(d) > 28) {
                             dgField.addClass("has-error");
-                            deField.text(errorText).css("color", errorColor);
+                            deField.text(errorText).addClass(errorClass);
                             return false;
                         }
                     }
-                    deField.text("").css("color", validColor);
+                    deField.text("").removeClass(errorClass);
                     return true;
                 } else {
-                    deField.text("").css("color", validColor);
+                    deField.text("").removeClass(errorClass);
                     return true;
                 }
 

@@ -34,7 +34,7 @@
                             var entry;
 
                             entries.forEach(function(item) {
-                                if (!entry && (item.authored == sessionAuthoredDate)) {
+                                if (!entry && (String(item.authored) === String(sessionAuthoredDate))) {
                                     entry = item;
                                 }
                             });

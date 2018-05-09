@@ -702,7 +702,7 @@
 
     FieldsChecker.prototype.updateTerms = function(data) {
         function typeInTous(type, status) {
-            var found = false, isActive = (status == "active") ? true : false;
+            var found = false, isActive = String(status) === "active";
             (data.tous).forEach(function(item) {
                 if (!found &&
                     ($.trim(item.type) === $.trim(type)) &&
@@ -1046,7 +1046,7 @@
             $(item).on("click", function() {
                 if ($(this).prop("checked")) {
                     var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
-                    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") { //do nothing
+                    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) { //do nothing
                         return true;
                     } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
                         return true;
