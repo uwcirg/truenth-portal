@@ -11,7 +11,11 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
     "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
     "language": "http://hl7.org/fhir/valueset/languages",
-    "shortname": "http://us.truenth.org/identity-codes/shortname"
+    "shortname": "http://us.truenth.org/identity-codes/shortname",
+    SNOMED_SYS_URL: "http://snomed.info/sct",
+    CLINICAL_SYS_URL: "http://us.truenth.org/clinical-codes",
+    CANCER_TREATMENT_CODE: "118877007",
+    NONE_TREATMENT_CODE: "999"
 };
 
 var OrgObj = function(orgId, orgName, parentOrg) {
@@ -54,7 +58,6 @@ OrgTool.prototype.init = function(callback) {
         });
     }
 };
-
 OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     if (userId) {
         this.setUserId(userId);
@@ -67,15 +70,12 @@ OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     });
     $("#clinics").attr("loaded", true);
 };
-
 OrgTool.prototype.setUserId = function(userId) {
     $("#fillOrgs").attr("userId", userId);
 };
-
 OrgTool.prototype.getUserId = function() {
     return $("#fillOrgs").attr("userId");
 };
-
 OrgTool.prototype.inArray = function(n, array) {
     if (n && array && Array.isArray(array)) {
         var found = false;
@@ -126,16 +126,14 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
         return false;
     }
     var self = this;
-    $("input[name='organization']").each(function() {
+    $("#fillOrgs input[name='organization']").each(function() {
         if (!self.inArray($(this).val(), leafOrgs)) {
             $(this).hide();
             if (self.orgsList[$(this).val()]) {
-                var l;
+                var l = $(this).closest("label");;
                 if (self.orgsList[$(this).val()].children.length === 0) {
-                    l = $(this).closest("label");
                     l.hide();
                 } else {
-                    l = $(this).closest("label");
                     l.addClass("data-display-only");
                 }
             }
@@ -143,10 +141,9 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
     });
 
     var topList = self.getTopLevelOrgs();
-
     topList.forEach(function(orgId) {
         var allChildrenHidden = true;
-        $(".org-container[data-parent-id='" + orgId + "']").each(function() {
+        $("#fillOrgs .org-container[data-parent-id='" + orgId + "']").each(function() {
             var subOrgs = $(this).find(".org-container");
             if (subOrgs.length > 0) {
                 var allSubOrgsHidden = true;
@@ -252,6 +249,11 @@ OrgTool.prototype.getShortName = function(orgId) {
     return shortName;
 };
 OrgTool.prototype.populateUI = function() {
+    if (sessionStorage.orgsHTML) {
+        $("#fillOrgs").html(sessionStorage.orgsHTML);
+        console.log("get to sess")
+        return true;
+    }
     var self = this, container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
         var s = "",
@@ -283,31 +285,33 @@ OrgTool.prototype.populateUI = function() {
         return 0;
     });
 
+    var parentFragment = document.createDocumentFragment(), parentDiv;
+
     parentOrgsArray.forEach(function(org) {
+        parentDiv = document.createElement("div");
+        parentDiv.setAttribute("id", org+"_container");
         if (orgsList[org].children.length > 0) {
-            if ($("#userOrgs legend[orgId='" + org + "']").length == 0) {
-                parentContent = "<div id='{{orgId}}_container' class='parent-org-container'><legend orgId='{{orgId}}'>{{orgName}}</legend>" +
+            if ($("#userOrgs legend[orgId='" + org + "']").length == 0) {;
+                parentDiv.classList.add("parent-org-container");
+                parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>" +
                     "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' data-org-name='{{orgName}}' data-short-name='{{shortName}}' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' /></div>";
-                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                    .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
-                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                container.append(parentContent);
             }
         } else {
             if ($("#userOrgs label[id='org-label-" + org + "']").length == 0) {
-                parentContent = "<div id='{{orgId}}_container' class='parent-org-container parent-singleton'><label id='org-label-{{orgId}}' class='org-label'>" +
+                parentDiv.classList.add("parent-org-container", "parent-singleton");
+                parentContent = "<label id='org-label-{{orgId}}' class='org-label'>" +
                     "<input class='clinic' type='checkbox' name='organization' parent_org='true' id='{{orgId}}_org' state='{{state}}' value='{{orgId}}' " +
                     "data-parent-id='{{orgId}}'  data-org-name='{{orgName}}' data-short-name='{{shortName}}' data-parent-name='{{orgName}}'/><span>{{orgName}}</span></label></div>";
-                parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                    .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
-                    .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                    .replace(/\{\{state\}\}/g, getState(orgsList[org]));
-                container.append(parentContent);
             }
         }
+        parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
+                        .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
+                        .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+                        .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+        parentDiv.innerHTML = parentContent;
+        parentFragment.appendChild(parentDiv);
     });
-
+    container.get(0).appendChild(parentFragment);
     keys.forEach(function(org) { //draw child orgs
         if (orgsList[org].children.length > 0) { // Fill in each child clinic
             var childClinic = "";
@@ -317,8 +321,7 @@ OrgTool.prototype.populateUI = function() {
                 return 0;
             });
             items.forEach(function(item) {
-                var _parentOrgId = item.parentOrgId;
-                var _parentOrg = orgsList[_parentOrgId];
+                var _parentOrgId = item.parentOrgId, _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
                 var topLevelOrgId = self.getTopLevelParentOrg(item.id);
@@ -360,6 +363,7 @@ OrgTool.prototype.populateUI = function() {
             });
         }
     });
+    sessionStorage.setItem("orgsHTML", container.html());
     if (!container.text()) {
         container.html(i18next.t("No organizations available"));
     }
@@ -453,10 +457,6 @@ OrgTool.prototype.morphPatientOrgs = function() {
 };
 
 var tnthAjax = {
-    SNOMED_SYS_URL: "http://snomed.info/sct",
-    CLINICAL_SYS_URL: "http://us.truenth.org/clinical-codes",
-    CANCER_TREATMENT_CODE: "118877007",
-    NONE_TREATMENT_CODE: "999",
     "beforeSend": function() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
@@ -469,9 +469,7 @@ var tnthAjax = {
     "getOrgTool": function(init) {
         if (!this.orgTool) {
             this.orgTool = new OrgTool();
-            if (init) {
-                this.orgTool.init();
-            }
+            if (init) { this.orgTool.init();}
         }
         return this.orgTool;
     },
@@ -547,7 +545,8 @@ var tnthAjax = {
         delayDuration: 300,
         showLoader: function(targetField) {
             if (targetField && targetField.length > 0) {
-                $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
+                console.log("save loader id ", targetField.attr("data-save-container-id"))
+                $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
             }
         },
         showUpdate: function(targetField) {
@@ -555,7 +554,7 @@ var tnthAjax = {
             if (targetField && targetField.length > 0) {
                 setTimeout(function() {
                     (function(targetField) {
-                        var containerId = targetField.attr("data-save-container-id");
+                        var containerId = targetField.attr("data-save-container-id") || targetField.attr("id");
                         var errorField = $("#" + containerId + "_error");
                         var successField = $("#" + containerId + "_success");
                         var loadingField = $("#" + containerId + "_load");
@@ -563,9 +562,8 @@ var tnthAjax = {
                         successField.text(i18next.t("success"));
                         loadingField.animate({"opacity": 0}, __timeout, function() {
                             successField.animate({"opacity": 1}, __timeout, function() {
-                                setTimeout(function() {
-                                    successField.animate({"opacity": 0}, __timeout * 2);
-                                }, __timeout * 2);
+                                setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);},
+                                __timeout * 2);
                             });
                         });
                     })(targetField);
@@ -632,10 +630,8 @@ var tnthAjax = {
                                     parentNode.show().removeClass("tnth-hide");
                                     if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
                                         parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                        $("#termsCheckbox").addClass("tnth-hide");
+                                        $("#termsCheckbox, #termsCheckbox_default, #topTerms .terms-of-use-intro").addClass("tnth-hide");
                                         $("#termsText").addClass("agreed");
-                                        $("#termsCheckbox_default").removeClass("tnth-hide");
-                                        $("#topTerms .terms-of-use-intro").addClass("tnth-hide");
                                         $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
                                         acceptOnNextCheckboxes.push(parentNode);
                                     }
@@ -875,12 +871,9 @@ var tnthAjax = {
     hasConsent: function(userId, orgId, filterStatus) {  /****** NOTE - this will return the latest updated consent entry *******/
         if (!userId) return false;
         if (!orgId) return false;
-        if (String(filterStatus) === "default") {
-            return false;
-        }
+        if (String(filterStatus) === "default") { return false; }
         var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
-        var __url = "/api/user/" + userId + "/consent";
-        var self = this;
+        var __url = "/api/user/" + userId + "/consent", self = this;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1051,7 +1044,7 @@ var tnthAjax = {
         });
     },
     "hasTreatment": function(data) {
-        var found = false, self = this;
+        var found = false;
         if (data && data.entry && data.entry.length > 0) {
             data.entry = data.entry.sort(function(a, b) { // sort from newest to oldest based on lsat updated date
                 return new Date(b.resource.meta.lastUpdated) - new Date(a.resource.meta.lastUpdated);
@@ -1061,7 +1054,7 @@ var tnthAjax = {
                     var resourceItemCode = item.resource.code.coding[0].code;
                     var system = item.resource.code.coding[0].system;
                     var procId = item.resource.id;
-                    if ((resourceItemCode == self.CANCER_TREATMENT_CODE && (system == self.SNOMED_SYS_URL)) || (resourceItemCode == self.NONE_TREATMENT_CODE && (system == self.CLINICAL_SYS_URL))) {
+                    if ((resourceItemCode == SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && (system == SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL)) || (resourceItemCode == SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE && (system == SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL))) {
                         found = {"code": resourceItemCode,"id": procId};
                     }
                 }
@@ -1085,11 +1078,11 @@ var tnthAjax = {
     "postTreatment": function(userId, started, treatmentDate, targetField) {
         if (!userId) return false;
         tnthAjax.deleteTreatment(userId, targetField);
-        var code = this.NONE_TREATMENT_CODE, display = "None", system = this.CLINICAL_SYS_URL;
+        var code = SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE, display = "None", system = SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL;
         if (started) {
-            code = this.CANCER_TREATMENT_CODE;
+            code = SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE;
             display = "Procedure on prostate";
-            system = this.SNOMED_SYS_URL;
+            system = SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL;
         }
         if (!treatmentDate) {
             var date = new Date();
@@ -1101,23 +1094,20 @@ var tnthAjax = {
         procArray.subject = {"reference": "Patient/" + userId};
         procArray.code = {"coding": procID};
         procArray.performedDateTime = treatmentDate ? treatmentDate : "";
-
         tnthAjax.postProc(userId, procArray, targetField);
     },
     deleteTreatment: function(userId, targetField) {
-        var self = this;
         this.sendRequest("/api/patient/" + userId + "/procedure", "GET", userId, {sync: true}, function(data) {
             if (data) {
                 if (!data.error) {
                     var treatmentData = tnthAjax.hasTreatment(data);
                     if (treatmentData) {
-                        if (treatmentData.code == self.CANCER_TREATMENT_CODE) {
+                        if (treatmentData.code == SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE) {
                             tnthAjax.deleteProc(treatmentData.id, targetField, true);
                         } else {
                             tnthAjax.deleteProc(treatmentData.id, targetField, true);
                         }
                     }
-
                 } else {
                     return false;
                 }
@@ -1305,7 +1295,7 @@ var tnthAjax = {
             display = "PCa localized diagnosis";
         }
         if (!code) return false;
-        var system = this.CLINICAL_SYS_URL;
+        var system = SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL;
         var method = "POST";
         var url = "/api/patient/" + userId + "/clinical";
         var obsCode = [{"code": code,"display": display,"system": system}];
@@ -1763,9 +1753,7 @@ var tnthAjax = {
                         sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
                     }
                 } else {
-                    callback({
-                        "error": i18next.t("no data returned")
-                    });
+                    callback({"error": i18next.t("no data returned")});
                 }
             });
         }
@@ -1810,9 +1798,8 @@ var tnthDates = {
 
                 if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
                     var today = new Date();
-                    // Check to see if this is a real date
                     var date = new Date(y, m - 1, d);
-                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) { // Check to see if this is a real date
                         errorField.html(i18next.t("Invalid date. Please try again.")).show();
                         return false;
                     } else if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
@@ -1822,16 +1809,12 @@ var tnthDates = {
                         errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
                         return false;
                     }
-
                     errorField.html("").hide();
-
                     return true;
-
                 } else return false;
             } else {
                 return false;
             }
-
         } else {
             return false;
         }
@@ -1885,21 +1868,17 @@ var tnthDates = {
         if (dateToCalc) {
             var c = dateToCalc.split(/[^0-9]/);
             d = new Date(c[0], c[1] - 1, c[2]).getTime();
-        } else {
-            // If no baseDate, then use today to find the number of days between dateToCalc and today
+        } else { // If no baseDate, then use today to find the number of days between dateToCalc and today
             d = new Date().getTime();
         }
-        // Round down to floor so we don't add an extra day if session is 12+ hours into the day
-        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24));
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24)); // Round down to floor so we don't add an extra day if session is 12+ hours into the day
     },
     "isValidDefaultDateFormat": function(date, errorField) {
         if (!date) return false;
         if (date.length < 10) return false;
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) return false;
-        var day = dArray[0],
-            month = dArray[1],
-            year = dArray[2];
+        var day = dArray[0], month = dArray[1], year = dArray[2];
         if (day.length < 1) return false;
         if (month.length < 3) return false;
         if (year.length < 4) return false;
@@ -2026,7 +2005,6 @@ var tnthDates = {
                 nd = this.displayDateString(month, day, year);
                 break;
             }
-
             return nd;
         } else return "";
     },
@@ -2122,13 +2100,9 @@ var tnthDates = {
          * the method return offset in minutes, so need to convert it to miliseconds - adding the resulting offset will be the UTC date/time
          */
         var utcDate = new Date(dObj.getTime() + (dObj.getTimezoneOffset()) * 60 * 1000);
-        //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
-        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");
+        return tnthDates.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");  //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
     },
-    /*
-     * return object containing today's date/time information
-     */
-    getTodayDateObj: function() {
+    getTodayDateObj: function() { //return object containing today's date/time information
         var today = new Date();
         var td = today.getDate(), tm = today.getMonth() + 1, ty = today.getFullYear();
         var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
@@ -2151,24 +2125,15 @@ var tnthDates = {
             gmtDate: gmtToday
         };
     },
-    /*
-     * parameters: day, month and year values in numeric, boolean value for restrictToPresent, true if the date needs to be before today, false is the default
-     */
-    dateValidator: function(day, month, year, restrictToPresent) {
+    dateValidator: function(day, month, year, restrictToPresent) { //parameters: day, month and year values in numeric, boolean value for restrictToPresent, true if the date needs to be before today, false is the default
         var errorMessage = "";
         if (day && month && year) {
-            // Check to see if this is a real date
-            var iy = parseInt(year),
-                im = parseInt(month),
-                iid = parseInt(day);
-            var date = new Date(iy, im - 1, iid);
-
-            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+            var iy = parseInt(year), im = parseInt(month), iid = parseInt(day), date = new Date(iy, im - 1, iid);
+            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) { // Check to see if this is a real date
                 if (iy < 1900) {
                     errorMessage = i18next.t("Year must be after 1900");
                 }
-                // Only allow if date is before today
-                if (restrictToPresent) {
+                if (restrictToPresent) { // Only allow if date is before today
                     var today = new Date();
                     if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
                         errorMessage = i18next.t("The date must not be in the future.");
@@ -2202,6 +2167,13 @@ var Global = {
         var useFunc = isIE ? newHttpRequest: funcWrapper;
         useFunc(PORTAL_NAV_PAGE, function(data) {
             embed_page(data);
+            setTimeout(function() {
+                $("#tnthNavWrapper .logout").on("click", function(e) {
+                    console.log("HERE?")
+                    e.stopImmediatePropagation();
+                    sessionStorage.clear();
+                });
+            }, 150);
             Global.getNotification(function(data) { //ajax to get notifications information
                 Global.notifications(data);
             });
@@ -2243,8 +2215,7 @@ var Global = {
         }, 100);
 
         setTimeout(function() {
-            var userLocale = $("#copyrightLocaleCode").val();
-            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
+            var userLocale = $("#copyrightLocaleCode").val(), footerElements = $("#homeFooter .copyright");
             var getContent = function(cc) {
                 var content = "";
                 switch (String(cc.toUpperCase())) {
@@ -2268,13 +2239,13 @@ var Global = {
 
             };
             if (userLocale) {
-                $(footerElements).html(getContent(userLocale));
+                footerElements.html(getContent(userLocale));
             } else {
                 $.getJSON("//freegeoip.net/json/?callback=?", function(data) {
                     if (data && data.country_code) { //country code Australia AU New Zealand NZ USA US
-                        $(footerElements).html(getContent(data.country_code));
+                        footerElements.html(getContent(data.country_code));
                     } else {
-                        $(footerElements).html(getContent());
+                        footerElements.html(getContent());
                     }
                 });
             }
@@ -2307,26 +2278,21 @@ var Global = {
         }
     },
     "deleteNotification": function(userId, notificationId) {
-        if (!userId) {
-            return false;
-        }
-        if (parseInt(notificationId) < 0 || !notificationId) {
+        if (!userId || parseInt(notificationId) < 0 || !notificationId) {
             return false;
         }
         this.getNotification(function(data) {
-            console.log("callback data? ", data)
             if (data.notifications && data.notifications.length > 0) {
                 var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
                     return notification.id == notificationId;
                 });
                 var userId = $("#notificationUserId").val();
-                console.log("user? ", userId, " notification? ", notificationId, " array? ", arrNotification.length)
                 if (arrNotification.length > 0 && userId) { //delete notification only if it exists
                     $.ajax({
                         type: "DELETE",
                         url: "/api/user/" + userId + "/notification/" + notificationId
-                    }).done(function(data) {
-                       sessionStorage.removeItem("notification_"+userId);
+                    }).done(function() {
+                        sessionStorage.removeItem("notification_"+userId);
                     });
                 }
             }
@@ -2424,8 +2390,7 @@ __i18next.init({
         tnthAjax.beforeSend();
         Global.footer();
         Global.loginAs();
-        // To validate a form, add class to <form> and validate by ID.
-        $("form.to-validate").validator({
+        $("form.to-validate").validator({ // To validate a form, add class to <form> and validate by ID.
             custom: {
                 birthday: function() {
                     var m = parseInt($("#month").val()), d = parseInt($("#date").val()), y = parseInt($("#year").val());

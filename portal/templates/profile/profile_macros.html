@@ -3,12 +3,32 @@
 {% macro profileImage(person) -%}
     {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
 {%- endmacro %}
-
+{% macro profileSection(editable=True, id="", data_sections="", class="") -%}
+    <div id="{%-if id -%}{{id}}{%- endif -%}" class="profile-item-container {%if editable%}editable{%endif%} {{class}}" data-sections="{{data_sections}}">
+        {% if editable %}{{profileEditButton()}}{% endif %}
+        {{caller()}}
+    </div>
+{%- endmacro %}
+{% macro profileEditButton() -%}
+    <input type="button" class="btn profile-item-edit-btn" value="{{_('Edit')}}" aria-label="{{_('Edit Button')}}"></input>
+{%- endmacro %}
+{% macro titleSection(id="", class="") -%}
+    <h4 id="{%-if id -%}{{id}}{%- endif -%}" class="profile-item-title index-item {{class}}">{{caller()}}</h4>
+{%- endmacro %}
+{% macro viewSection(class="", id="") -%}
+    <div id="{%-if id -%}{{id}}{%- endif -%}" class="view-container {{class}}">{{caller()}}</div>
+{%- endmacro %}
+{% macro editSection(class="", id="") -%}
+    <div id="{%-if id -%}{{id}}{%- endif -%}" class="edit-container {{class}}">{{caller()}}</div>
+{%- endmacro %}
+{% macro saveLoaderDiv(container_id="") -%}
+    <div class="load-container save-loader-wrapper"><i id="{{container_id}}_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" aria-hidden="true"></i><i id="{{container_id}}_success" class="fa fa-check success-icon save-info" aria-hidden="true">{{_("Updated")}}</i><i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Update. System error.")}}</i></div>
+{%- endmacro %}
 {% macro profileDemo(person, current_user) -%}
     <div class="row" data-profile-section-id="demo">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="demo">
-                <h4 id="patientInformationLoc" class="profile-item-title index-item">
+            {% call profileSection(data_sections ='demo') %}
+                {% call titleSection(id="patientInformationLoc") %}
                     {% if person.id == current_user.id -%}
                         {{_("My Information")}}
                     {% else %}
@@ -18,8 +38,8 @@
                             {{_("User Information") }}
                         {%- endif%}
                     {% endif %}
-                </h4>
-                <div class="view-container">
+                {% endcall %}
+                {% call viewSection() %}
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.fullName" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.displayBirthDate" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
@@ -29,8 +49,8 @@
                         <tr><td class="text-muted">{{_("Cell")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.cellPhone" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.homePhone" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                    </table>
-                </div>
-                <div class="edit-container">
+                {% endcall %}
+                {% call editSection() %}
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {{profileEmail(person)}}
@@ -38,18 +58,18 @@
                     {% if person.has_role(ROLE.PATIENT) and not current_user.has_role(ROLE.PATIENT) %} {{profileSiteID(current_user)}} {% endif %}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
-                </div>
+                {% endcall %}
                 <div class="get-demo-error error-message"></div>
                 <div class="put-demo-error error-message"></div>
-            </div>
+            {% endcall %}
         </div>
     </div>
 {%- endmacro %}
 {% macro profileDemoDetail(person, current_user) -%}
     <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail">
         <div class="col-md-12 col-xs-12">
-          <div class="profile-item-container patient-detail-container editable" data-sections="detail">
-                <h4 id="patientDetailLoc" class="profile-item-title index-item">
+            {% call profileSection(data_sections="detail", class="patient-detail-container") -%}
+                {% call titleSection(id="patientDetailLoc") -%}
                     {% if person.id == current_user.id -%}
                         {{_("My Detail")}}
                     {%- else %}
@@ -59,48 +79,49 @@
                             {{_("User Detail")}}
                         {%endif%}
                     {%- endif %}
-                </h4>
-                <div class="view-container">
+                {%- endcall %}
+                {% call viewSection() -%}
                     <table>
                         <tr class="gender-view" v-if="(getShowInMacro()).indexOf('gender') !== -1"><td class="text-muted">{{_("Gender")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.gender" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                         <tr data-section-id="ethnicity" class="ethnicity-view optional" v-if="(getShowInMacro()).indexOf('ethnicity') !== -1"><td class="text-muted">{{_("Ethnicity")}}</td><td>{% raw %}<section-view-extension v-bind:data="demo.data.ethnicity" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                         <tr data-section-id="race" class="race-view optional" v-if="(getShowInMacro()).indexOf('race') !== -1"><td class="text-muted">{{_("Race")}}</td><td>{% raw %}<section-view-extension v-bind:data="demo.data.race" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                      </table>
-                </div>
-                <div class="flex edit-container">
+                {%- endcall %}
+                {% call editSection(class="flex") -%}
                     {{profileGender(person)|show_macro('gender')}}
                     {{profileEthnicity(person)|show_macro('ethnicity')}}
                     {{profileRace(person)|show_macro('race')}}
-                </div>
+                {%- endcall %}
                 <div class="no-data-container"></div>
                 <div class="get-demo-error error-message"></div>
                 <div class="put-demo-error error-message"></div>
-            </div>
+            {%- endcall %}
         </div>
     </div>
 {%- endmacro %}
 {% macro profileLocaleTimeZone(person) %}
-    <div  class="profile-item-container editable" data-sections="locale,timezone">
-        <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("Locale / Time Zone")}}</h4>
-        <div id="profileLocaleTimezoneContainer" class="view-container">
+    {% call profileSection(data_sections="locale, timezone") %}
+        {% call titleSection(id="timeZoneLocaleLoc") -%}{{_("Locale / Time Zone")}}{%- endcall %}
+        {% call viewSection(id="profileLocaleTimezoneContainer") -%}
             <table>
                 <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.languageDisplay" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                 <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.timezone" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
             </table>
-            <div class="get-demo-error get-locale-error error-message"></div>
-            <div class="put-demo-error error-message"></div>
-        </div>
-        <div class="edit-container flex">
+        {%- endcall %}
+        {% call editSection(class="flex") -%}
             {{profileLocale(person)|show_macro('language')}}
             {{profileTimeZone(person)}}
-        </div>
-    </div>
+        {%- endcall %}
+        <div class="get-demo-error get-locale-error error-message"></div>
+        <div class="put-demo-error error-message"></div>
+    {% endcall %}
 {% endmacro %}
 {% macro profileBirthDate(person) -%}
     <div class="form-group profile-section" id="bdGroup" data-profile-section-id="birthday">
         <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" required />
+            {{saveLoaderDiv("bdDateContainer")}}
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" v-model.lazy="demo.data.birthMonth" required>
@@ -118,9 +139,11 @@
                     <option value="11">{{ _("November") }}</option>
                     <option value="12">{{ _("December") }}</option>
                 </select>
+                {{saveLoaderDiv("bdMonthContainer")}}
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
                 <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear"  required />
+                {{saveLoaderDiv("bdYearContainer")}}
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -130,13 +153,14 @@
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
-    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true" data-profile-section-id="locale">
+    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
-        <select class="form-control" name="locale" id="locale" v-model="demo.data.languageCode">
+        <select class="form-control" name="locale" id="locale" v-model="demo.data.languageCode" v-on:change="updateLocaleData">
             {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
                 <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
             {%- endfor -%}
         </select>
+        {{saveLoaderDiv("localeGroup")}}
         <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
         <div class="get-demo-error get-locale-error error-message"></div>
         <div class="put-demo-error error-message"></div>
@@ -152,6 +176,7 @@
                 <div class="help-block with-errors"></div>
                 <div id="errorfirstname" class="error-message"></div>
             </div>
+            {{saveLoaderDiv("firstNameContainer")}}
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
@@ -159,92 +184,88 @@
                 <div class="help-block with-errors"></div>
                 <div id="errorlastname" class="error-message"></div>
             </div>
+            {{saveLoaderDiv("lastNameContainer")}}
         </div>
     </div>
 {%- endmacro %}
 
 {% macro profileGender(person) -%}
-    <div class="form-group profile-section flex-item" id="genderGroup" data-profile-section-id="gender">
+    <div class="form-group profile-section flex-item" id="genderGroup" data-loader-container="true">
         <label id="genderLabel">{{ _("Gender") }}</label>
-        <div id="profile-gender-list" class="profile-radio-list" data-loader-container="true">
+        <div id="profile-gender-list" class="profile-radio-list">
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexM" value="male" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "male"}}/>
+                <input type="radio" name="sex" id="sexM" value="male" data-save-container-id="genderGroup" v-on:click="updateGenderData" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexF" value="female" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "female"}}/>
+                <input type="radio" name="sex" id="sexF" value="female" data-save-container-id="genderGroup" v-on:click="updateGenderData" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "female"}}/>
                 {{ _("Female") }}
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexO" value="other" data-trigger-event="click" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "other"}}/>
+                <input type="radio" name="sex" id="sexO" value="other" data-save-container-id="genderGroup" v-on:click="updateGenderData" v-model="demo.data.gender" required {{ "checked" if person and person.gender == "other"}}/>
                 {{ _("Other") }}
             </label>
         </div>
+        {{saveLoaderDiv("genderGroup")}}
     </div>
 {%- endmacro %}
-
-{% macro profileIndigenous(person) -%}
-    {%- if person and person.org_coding_display_options.indigenous -%}
-        <div id="userIndigenousStatusContainer" data-section-id="indigenous" class="flex-item" data-profile-section-id="indigenous"></div>
-    {%- endif -%}
-{%- endmacro %}
-
 {% macro profileRace(person) -%}
     {%- if person and person.org_coding_display_options.race -%}
-        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace" data-loader-container="true" data-profile-section-id="race">
+        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace" data-loader-container="true">
             <label>{{ _("Race") }}</label>
             <div class="profile-radio-list">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="1002-5" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("American Indian or Alaska Native") }}
+                        <input type="checkbox" name="race" value="1002-5" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("American Indian or Alaska Native") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2028-9" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Asian") }}
+                        <input type="checkbox" name="race" value="2028-9" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("Asian") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2054-5" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Black or African American") }}
+                        <input type="checkbox" name="race" value="2054-5" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("Black or African American") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2076-8" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Native Hawaiian or Other Pacific Islander") }}
+                        <input type="checkbox" name="race" value="2076-8" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("Native Hawaiian or Other Pacific Islander") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2106-3" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("White") }}
+                        <input type="checkbox" name="race" value="2106-3" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("White") }}
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" value="2131-1" data-trigger-event="click" v-model="demo.data.raceCodes">{{ _("Other") }}
+                        <input type="checkbox" name="race" value="2131-1" data-trigger-event="click" v-model="demo.data.raceCodes" v-on:click="updateExtensionData">{{ _("Other") }}
                     </label>
                 </div>
             </div>
+            {{saveLoaderDiv("userRace")}}
         </div>
     {%- endif -%}
 {%- endmacro %}
-
 {% macro profileEthnicity(person) -%}
     {%- if person and person.org_coding_display_options.ethnicity -%}
-        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" data-loader-container="true" id="userEthnicity" data-profile-section-id="ethnicity">
+        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" data-loader-container="true" id="userEthnicity">
             <label>{{ _("Ethnicity") }}</label>
             <div class="profile-radio-list">
                 <div class="radio">
                     <label>
-                        <input type="radio" name="ethnicity" value="2135-2" data-trigger-event="click" v-model="demo.data.ethnicityCodes">{{ _("Hispanic or Latino") }}
+                        <input type="radio" name="ethnicity" value="2135-2" data-trigger-event="click" v-model="demo.data.ethnicityCodes" v-on:click="updateExtensionData">{{ _("Hispanic or Latino") }}
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="ethnicity" value="2186-5" data-trigger-event="click" v-model="demo.data.ethnicityCodes">{{ _("Not Hispanic or Latino") }}
+                        <input type="radio" name="ethnicity" value="2186-5" data-trigger-event="click" v-model="demo.data.ethnicityCodes" v-on:click="updateExtensionData">{{ _("Not Hispanic or Latino") }}
                     </label>
                 </div>
             </div>
+            {{saveLoaderDiv("userEthnicity")}}
         </div>
     {%- endif -%}
 {%- endmacro %}
@@ -253,6 +274,7 @@
         <label for="email">{{_("Email Address")}}</label>
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT)%}data-optional="true"{% else %}required{% endif %} />
         <div class="help-block with-errors" id="erroremail"></div>
+        {{saveLoaderDiv("emailGroup")}}
     </div>
 {%- endmacro %}
 {% macro profileEmailForm(person, prefix='registration', status_title=_('Registration Status:'), status_label=_('not registered'), class='') -%}
@@ -415,8 +437,9 @@
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="phone">
         <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone" v-model.lazy="demo.data.cellPhone"/>
+        <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone" v-on:change="updateTelecomData" v-model.lazy="demo.data.cellPhone"/>
         <div class="help-block with-errors"></div>
+        {{saveLoaderDiv("phoneGroup")}}
     </div>
     <div id="errorphone" class="error-message"></div>
 {%- endmacro %}
@@ -424,9 +447,10 @@
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="altphone">
         <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
-        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone" v-model.lazy="demo.data.homePhone"/>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone" v-on:change="updateTelecomData" v-model.lazy="demo.data.homePhone"/>
         <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
+        {{saveLoaderDiv("altPhoneGroup")}}
     </div>
 {%- endmacro %}
 
@@ -438,16 +462,16 @@
 {%-endmacro %}
 
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
-    <div id="userOrgs_view" class="view-container">
+    {% call viewSection(id="userOrgs_view") -%}
         <div v-if="demo.data.careProvider && demo.data.careProvider.length > 0">
             {% raw %}
                 <p v-for="item in demo.data.careProvider">{{item.display}}</p>
             {% endraw %}
         </div>
         <div class="text-muted" v-else>{{_("No affiliated clinic")}}</p></div>
-    </div>
-    <div class="edit-container" data-profile-section-id="orgsstateselector">
-        <div id="clinics" data-loader-container="true">
+    {%- endcall %}
+    {% call editSection() -%}
+        <div id="clinics" data-loader-container="true" data-profile-section-id="orgsstateselector" data-save-container-id="clinics">
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
                <p class="prompt text-muted">
@@ -457,11 +481,12 @@
                     {{_("In what state are you currently receiving prostate cancer care?")}}
                 {% endif %}
                </p>
-               <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
+               <div class="state-selector-container selector-show">
+                    <select id="stateSelector" class="form-control"></select>
+                </div>
                <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
                    <p class="clinic-prompt prompt selector-show">{{_("What is your main clinic for prostate cancer care?")}}</p>
-                   <div class="main-state-container selector-show">
-                   </div>
+                   <div class="main-state-container selector-show"></div>
                </div>
                 <div class="noOrg-container" style="display: none">
                     <label>
@@ -475,23 +500,24 @@
                {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
             </div>
         </div>
-    </div>
+        {{saveLoaderDiv("clinics")}}
+    {%- endcall %}
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
 {%- endmacro %}
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
-    <div id="userOrgs_view" class="view-container">
+    {% call viewSection(id="userOrgs_view") -%}
         <div v-if="demo.data.careProvider && demo.data.careProvider.length > 0">
             {% raw %}
                 <p v-for="item in demo.data.careProvider" >{{item.display}}</p>
             {% endraw %}
         </div>
         <p class="text-muted" v-else>{{_("No affiliated clinic")}}</p>
-    </div>
-    <div class="edit-container" data-profile-section-id="orgs">
-        <div id="clinics">
+    {%- endcall %}
+    {% call editSection() %}
+        <div id="clinics" data-profile-section-id="orgs" data-save-container-id="clinics">
             <div class="form-group profile-section standard" id="userOrgs">
                 {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
                 <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
@@ -510,7 +536,8 @@
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-    </div>
+    {% endcall %}
+    {{saveLoaderDiv("clinics")}}
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
@@ -797,14 +824,14 @@
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0">
+        <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
             <div class='checkbox' v-for="item in roles.data">
                 {% raw %}
-                    <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id='rolesGroup' v-model="userRoles">{{item.display}}</label>
+                    <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-model="userRoles" v-on:click="updateRolesData">{{item.display}}</label>
                 {% endraw %}
             </div>
         </div>
-        <div id="rolesLoadingContainer" data-save-container-id="rolesLoadingContainer" data-loader-container="true"></div>
+        {{saveLoaderDiv("rolesGroup")}}
         <div class="get-roles-error error-message"></div>
         <div class="put-roles-error error-message"></div>
         <div class="delete-roles-error error-message"></div>
@@ -814,7 +841,7 @@
 {% macro profileSessionList(person, current_user) -%}
     <div id="userSessionsListContainer" data-profile-section-id="assessmentlist">
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
-        <div class="text-muted" v-if="assessment.assessmentListItems.length == 0">{{_("No questionnaire data found.")}}</div>
+        <div id="assessmentListMessage" class="text-muted" v-show="assessment.assessmentListItems.length == 0"></div>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text" v-if="assessment.assessmentListItems.length > 0">
             <caption>{{_("Session History")}} <span class="text-muted smaller-text">({{_("click each row to review report")}})</span></caption>
             <THEAD><th>{{_("Questionnaire Name")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></THEAD>
@@ -834,20 +861,26 @@
 {% macro profileClinicalQuestions(person, current_user) -%}
     <div class="row">
         <div class="col-md-12">
-            <div class="profile-item-container {% if person and current_user and person.id == current_user.id %}editable{% endif %}" data-sections="clinical" data-profile-section-id="clinicalquestions">
-                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{% if person.id == current_user.id %}{{_("My Prostate Cancer Profile")}}{% else %}{{ _("Clinical Questions") }}{% endif %}</h4>
+            <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
+            <div class="profile-item-container {% if person and current_user and person.id == current_user.id %}editable{% endif %}" data-sections="clinical">
+                {{profileEditButton()}}
+                {% call titleSection(id="clinicalQuestionsLoc") %}
+                    {% if person.id == current_user.id %}{{_("My Prostate Cancer Profile")}}{% else %}{{ _("Clinical Questions") }}{% endif %}
+                {%- endcall %}
                 {% if person.id != current_user.id %}<p class="text-muted">{{ _("Questions asked of the patient at registration") }}</p>{% endif %}
-                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
-                <div class="view-container">
+                {% call viewSection() -%}
                      <table>
                         <tr><td class="text-muted">{{_("Have you had a prostate cancer biopsy?")}}</td><td><div id="biopsy_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Have you been diagnosed with prostate cancer?")}}</td><td><div id="pca_diag_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Is the prostate cancer only within the prostate?")}}</td><td><div id="pca_localized_view"></div></td></tr>
                    </table>
-                </div>
-                <div id="patientQContainer" class="edit-container">
-                    {{patientQGroup(person)}}
-                </div>
+                {%- endcall %}
+                {% call editSection() -%}
+                    <div id="patientQContainer" data-sections="clinical" data-profile-section-id="clinicalquestions" data-save-container-id="patientQContainer">
+                        {{patientQGroup(person)}}
+                    </div>
+                    {{saveLoaderDiv("patientQContainer")}}
+                {%- endcall %}
                 <div class="get-clinical-error error-message"></div>
                 <div class="put-clinical-error error-message"></div>
                 <div class="post-clinical-error error-message"></div>
@@ -874,11 +907,11 @@
 {%- endmacro %}
 
 {% macro profileTimeZone(person) %}
-    <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item" data-profile-section-id="timezone">
+    <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item">
         <label>Time Zone</label>
-        <select class="form-control" id="profileTimeZone" data-save-container-id="profileTimeZoneGroup" v-model="demo.data.timezone">
-            <option value="UTC">-- Select --</option>
-             <option value="America/Chicago">{{_("America/Chicago")}}</option>
+        <select class="form-control" id="profileTimeZone" data-save-container-id="profileTimeZoneGroup" v-model="demo.data.timezone" v-on:change="updateExtensionData">
+            <option value="UTC">{{_("Select")}}</option>
+            <option value="America/Chicago">{{_("America/Chicago")}}</option>
             <option value="America/Denver">{{_("America/Denver")}}</option>
             <option value="America/Los_Angeles">{{_("America/Los Angeles")}}</option>
             <option value="America/Indianapolis">{{_("America/Indianapolis")}}</option>
@@ -910,20 +943,18 @@
             <option value="Europe/Stockholm">{{_("Europe/Stockholm")}}</option>
             <option value="Europe/Sofia">{{_("Europe/Sofia")}}</option>
             <option value="Europe/Zurich">{{_("Europe/Zurich")}}</option>
-
         </select>
     </div>
-    <div class="timezone-warning"></div>
-    <div class="timezone-error"></div>
+    {{saveLoaderDiv("profileTimeZoneGroup")}}
 {%-endmacro %}
 
 {% macro profileDeceased(person, current_user) -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container" v-bind:class="{editable: disableFields.indexOf('deceased') == -1}" data-sections="deceased" data-profile-section-id="deceased">
-                <h4 id="deathLoc" class="profile-item-title index-item">{{_("Deceased Status")}}</h4>
+            {% call profileSection(id="profileDeceasedSection", data_sections="deceased") -%}
+                {% call titleSection(id="deathLoc") -%}{{_("Deceased Status")}}{%- endcall%}
                 <input type="hidden" id="deathDate" value=""/>
-                <div class="view-container">
+                {% call viewSection() -%}
                     <div id="boolDeath_view" v-show="demo.data.deceasedBoolean">{{_("Patient is deceased")}}</div>
                     <div id="deathDate_view" v-show="demo.data.deceasedDateTime">
                         <p>{{_("Patient is deceased")}}</p>
@@ -932,25 +963,26 @@
                         {% endraw %}
                     </div>
                     <div v-show="!demo.data.deceasedBoolean && !demo.data.deceasedDateTime" class="text-muted">{{_("no data provided")}}</div>
-                </div>
-                <div class="edit-container">
-                    <div class="checkbox" id="boolDeathGroup">
-                        <label><input type="checkbox" name="boolDeath" id="boolDeath" value="1" data-save-container-id="boolDeathGroup"/>{{_("Has the patient passed away?")}}</label>
+                {%- endcall %}
+                {% call editSection() -%}
+                    <div class="checkbox" id="boolDeathGroup" data-save-container-id="boolDeathGroup">
+                        <label><input type="checkbox" name="boolDeath" id="boolDeath" value="1" />{{_("Has the patient passed away?")}}</label>
                     </div>
+                    {{saveLoaderDiv("boolDeathGroup")}}
                     <hr/>
                     <div class="form-group">
                         <label class="text-muted">{{_("Deceased Date")}}</label>
                     </div>
-                    <div class="row deceased-date-container">
+                    <div id="deceasedDateContainer" class="row deceased-date-container" data-profile-section-id="deceased" data-save-container-id="deceasedDateContainer">
                         <div class="col-md-3 col-xs-6">
                             <div id="deathDayContainer" class="form-group profile-section">
-                                <input class="form-control" id="deathDay" name="deathDay" data-save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                                <input class="form-control" id="deathDay" name="deathDay"  placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
                                  <div class="help-block with-errors"></div>
                             </div>
                         </div>
                         <div class="col-md-3 col-xs-10">
                             <div id="deathMonthContainer" class="form-group profile-section">
-                                <select class="form-control" name="deathMonth" id="deathMonth" data-save-container-id="deathMonthContainer" required>
+                                <select class="form-control" name="deathMonth" id="deathMonth" required>
                                     <option value="">{{ _("Month") }}...</option>
                                     <option value="01">{{ _("January") }}</option>
                                     <option value="02">{{ _("February") }}</option>
@@ -970,31 +1002,34 @@
                         </div>
                         <div class="col-md-3 col-xs-6">
                             <div id="deathYearContainer" class="form-group profile-section">
-                                <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-save-container-id="deathYearContainer" required />
+                                <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4"  required />
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {%- endcall %}
+                {{saveLoaderDiv("deceasedDateContainer")}}
                 <div id="errorDeathDate" class="get-demo-error error-message"></div>
                 <div class="put-demo-error error-message"></div>
-            </div>
+            {%- endcall %}
         </div>
     </div>
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
-    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="studyid">
+    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="disableFields.indexOf('studyid') !== -1"/>
+        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="disableFields.indexOf('studyid') !== -1" v-on:change="updateIdentifierData"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
+        {{saveLoaderDiv("profileStudyIDContainer")}}
     </div>
 {%- endmacro %}
 {% macro profileSiteID(current_user) -%}
-    <div id="profileSiteIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="siteid">
+    <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
         <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
-        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId" v-model.lazy="demo.data.siteId"/>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId" v-model.lazy="demo.data.siteId" v-on:change="updateIdentifierData"/>
         <div class="help-block with-errors"></div>
+        {{saveLoaderDiv("profileSiteIDContainer")}}
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
 {%- endmacro %}
@@ -1127,9 +1162,12 @@
             <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %} data-profile-section-id="procedure">
                 <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
                 <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
-                <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span></h4>
-                <div class="view-container"><div id="procedure_view"></div></div>
-                <div class="edit-container">
+                {{profileEditButton()}}
+                {% call titleSection(id="clinicalDataLoc") -%}
+                    {% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span>
+                {%- endcall %}
+                {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
+                {% call editSection() -%}
                     <p class="text-muted">
                         {%-if current_user and current_user.has_role(ROLE.STAFF)-%}
                             {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
@@ -1204,7 +1242,7 @@
                             <div id="procErrorMessage" class="error-message"></div>
                         </div>
                     </div>
-                </div>
+                {%- endcall%}
             </div>
         </div>
     </div>

@@ -108,6 +108,18 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
+.save-loader-wrapper {
+  .load-icon {
+    margin-left:4px; 
+    margin-top:5px;
+  }
+  .success-icon {
+    color: green;
+  }
+  .error-icon {
+    color: red;
+  }
+}
 .form-control,
 input,
 select,
@@ -448,6 +460,9 @@ select:not([multiple]) {
   transition: visibility 0.6s, opacity 0.7s ease-in;
 }
 #createProfileForm {
+  .profile-item-edit-btn {
+    display: none;
+  }
   #profileSiteId {
     width: 350px;
     max-width: 100%;
@@ -1576,8 +1591,11 @@ div.pull-right {
 .core-data-procedure {
   .profile-item-container {
     background: none;
-    border: none;
+    border: 0 !important;
     padding: 0;
+  }
+  .profile-item-edit-btn {
+    display: none;
   }
   #profileProcedureContainer {
     border-top: 1px solid #e8e7e7;

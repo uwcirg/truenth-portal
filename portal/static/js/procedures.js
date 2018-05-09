@@ -1,7 +1,6 @@
 (function() {
     //TODO this JS code file needs a bit of clean-up
-    var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
-    var i18next = window.portalModules.i18next, tnthAjax = window.portalModules.tnthAjax, tnthDates = window.portalModules.tnthDates;
+    var i18next = window.portalModules.i18next, tnthAjax = window.portalModules.tnthAjax, tnthDates = window.portalModules.tnthDates, SYSTEM_IDENTIFIER_ENUM = window.portalModules.SYSTEM_IDENTIFIER_ENUM;
     $.fn.extend({
         // Special type of select question - passes two values - the answer from - the select plus an associated date from a separate input
         eventInput: function(settings) {
@@ -46,10 +45,10 @@
                         if (otherProcElements.length > 0) {
                             otherProcElements.each(function() {
                                 var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
-                                if (code === CANCER_TREATMENT_CODE) {
+                                if (code === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE) {
                                     tnthAjax.deleteProc(procId);
                                 }
-                                if (code === NONE_TREATMENT_CODE) {
+                                if (code === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE) {
                                     tnthAjax.deleteProc(procId);
                                 }
                             });
@@ -153,7 +152,7 @@
                 $.each(data.entry, function(i, val) {
                     var code = val.resource.code.coding[0].code;
                     var procID = val.resource.id;
-                    if (code !== CANCER_TREATMENT_CODE && code !== NONE_TREATMENT_CODE) {
+                    if (code !== SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && code !== SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE) {
                         var displayText = val.resource.code.coding[0].display;
                         var performedDateTime = val.resource.performedDateTime;
                         var deleteInvocation = "";
