@@ -71,11 +71,6 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f2ea71f5-d47a-1a5c-130b-830b9bd785cf&editorUrl=true",
-      "name": "Privacy URL",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true",
       "name": "TrueNTH Global Registry organization consent URL",
       "resourceType": "AppText"
