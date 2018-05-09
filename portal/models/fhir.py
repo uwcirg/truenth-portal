@@ -197,9 +197,11 @@ class Observation(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "Observation {0.codeable_concept} {0.value_quantity} "\
-                "at {0.issued} by {0.performers} with status {0.status} ".\
-                format(self)
+        at = ' at {0.issued}'.format(self) if self.issued else ''
+        status = ' with status {0.status}'.format(self) if self.status else ''
+        return (
+            "Observation {0.codeable_concept} {0.value_quantity}{at}"
+            "{status}".format(self, at=at, status=status))
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""

@@ -278,6 +278,12 @@ def access_via_token(token, next_step=None):
             "/access with next_step, storing in session['next']: {}".format(
                 session['next']))
 
+    # as this is the entry point for many pre-registered or not-yet-logged-in
+    # users, capture their locale_code in the session for template rendering
+    # prior to logging in.  (Post log-in, the current_user().locale_code is
+    # always available
+    session['locale_code'] = user.locale_code
+
     if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
         # write only users with special role skip the challenge protocol
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
