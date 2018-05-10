@@ -35,6 +35,23 @@ def dummy_context():
     yield None
 
 
+def locale_closure(locale_code, fn):
+    """Capture preferred locale at load for use later during render
+
+    As the variable load may be invoked by another user (say staff)
+    or when run by celery outside a request context, force the locale
+    of the subject.  Must capture in a closure to preserve, as the acting
+    user may change before the template has been rendered.
+
+    """
+    locale_code = locale_code
+
+    def function_with_forced_locale():
+        with force_locale(locale_code) if locale_code else dummy_context():
+            return fn()
+    return function_with_forced_locale
+
+
 def load_template_args(user, questionnaire_bank_id=None):
     """Capture known variable lookup functions and values
 
@@ -190,17 +207,16 @@ def load_template_args(user, questionnaire_bank_id=None):
         label = _(u'Verify Account')
         return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
-    # As this may be invoked by another user (say staff) or when run by
-    # celery outside a request context, force the locale of the subject
-    with force_locale(user.locale_code) if user else dummy_context():
-        # Load all functions from the local space with the `_lookup_` prefix
-        # into the args instance
-        args = DynamicDictLookup()
-        for fname, function in locals().items():
-            if fname.startswith('_lookup_'):
-                # chop the prefix and assign to the function
-                args[fname[len('_lookup_'):]] = function
-        return args
+    # Load all functions from the local space with the `_lookup_` prefix
+    # into the args instance
+    args = DynamicDictLookup()
+    lc = user.locale_code if user else None
+    for fname, function in locals().items():
+        if fname.startswith('_lookup_'):
+            # chop the prefix and assign to the function
+            args[fname[len('_lookup_'):]] = locale_closure(
+                locale_code=lc, fn=function)
+    return args
 
 
 class Communication(db.Model):
