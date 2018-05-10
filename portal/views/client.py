@@ -336,8 +336,9 @@ def client_edit(client_id):
             db.session.delete(existing)
         service_user = user.add_service_account()
         auditable_event(
-            "service account created by", user_id=user.id,
-            subject_id=client.user_id, context='authentication')
+            u"service account created by {}".format(user.display_name),
+            user_id=user.id, subject_id=client.user_id,
+            context='authentication')
         create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
             client.client_id), user_id=user.id, subject_id=client.user_id,
