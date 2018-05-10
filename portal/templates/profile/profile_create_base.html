@@ -4,7 +4,7 @@
 {%- from "initial_queries_macros.html" import consent_fields -%}
 {% block main %}
     <br/>
-    <form id="createProfileForm" data-account="patient" class="form tnth-form to-validate" data-toggle="validator">
+    <form id="createProfileForm" class="form tnth-form to-validate" data-toggle="validator">
         <input type="hidden" id="current_user_email" value="{{user.email}}" />
         <input type="hidden" id="currentStaffUserId" value="{{user.id}}" />
         <div class="row">

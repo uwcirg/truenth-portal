@@ -218,7 +218,11 @@
                     });
                 }
             },
-            checkDisableFields: function() {
+            isDisableField: function(fieldId) {
+                fieldId = fieldId || "";
+                return this.disableFields.indexOf(fieldId) !== -1;
+            },
+            setDisableFields: function() {
                 if (this.settings.MEDIDATA_RAVE_FIELDS) {
                     if (this.topLevelOrgs.length === 0) {
                         if (this.currentUserId) {
@@ -377,9 +381,10 @@
                     this.currentUserId = $("#iq_userId").val();
                     this.mode = "initialQueries";
                 }
-                if ($("#createProfileForm").length > 0) {
+                var acoContainer = $("#accountCreationContentContainer");
+                if (acoContainer.length > 0) {
                     this.currentUserId = $("#currentStaffUserId").val();
-                    this.mode = "createAccount";
+                    this.mode = acoContainer.attr("data-account") === "patient" ? "createPatientAccount": "createUserAccount";
                 }
             },
             getOrgTool: function(callback) {
@@ -410,6 +415,12 @@
             isAdmin: function() {
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
+            isStaff: function() {
+                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
+            },
+            isProxy: function() {
+                return (this.currenUserId !== "") && (this.subjectId !== "") && (this.currentUserId !== this.subjectId);
+            },
             isConsentWithTopLevelOrg: function() {
                 return this.settings.CONSENT_WITH_TOP_LEVEL_ORG;
             },
@@ -422,7 +433,7 @@
                 }
             },
             onSectionsDidLoad: function() {
-                this.checkDisableFields();
+                this.setDisableFields();
                 if (this.mode === "profile") { //Note, this attach loader indicator to element with the class data-loader-container, in order for this to work, the element needs to have an id attribute
                     var self = this;
                     setTimeout(function() {
@@ -1203,7 +1214,7 @@
                         $("#boolDeath").prop("checked", false);
                     }
                 }
-                if (this.disableFields.indexOf("deceased") !== -1) {
+                if (this.isDisableField("deceased")) {
                     $("#profileDeceasedSection").removeClass("editable");
                 } else {
                     this.__convertToNumericField($("#deathDay, #deathYear"));
@@ -2331,7 +2342,7 @@
             },
             getConsentRow: function(item) {
                 var self = this, consentStatus = self.getConsentStatus(item), sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var isDisabled = this.disableFields.indexOf("consent_status") !== -1;
+                var isDisabled = this.isDisableField("consent_status");
                 var LROrgId = item ? item.organization_id : "";
                 if (LROrgId) {
                     var topOrgID = (self.getOrgTool()).getTopLevelParentOrg(LROrgId);

@@ -120,11 +120,11 @@
     <div class="form-group profile-section" id="bdGroup" data-profile-section-id="birthday">
         <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" required />
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" v-bind:disabled="isDisableField('dob')" required />
             {{saveLoaderDiv("bdDateContainer")}}
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
-                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" v-model.lazy="demo.data.birthMonth" required>
+                <select class="form-control bd-element" aria-label="{{_('Birth Month')}}" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" v-model.lazy="demo.data.birthMonth" v-bind:disabled="isDisableField('dob')" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -142,7 +142,7 @@
                 {{saveLoaderDiv("bdMonthContainer")}}
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear"  required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear" v-bind:disabled="isDisableField('dob')" required />
                 {{saveLoaderDiv("bdYearContainer")}}
             </div>
         </div>
@@ -1018,7 +1018,7 @@
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="disableFields.indexOf('studyid') !== -1" v-on:change="updateIdentifierData"/>
+        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('studyid')" v-on:change="updateIdentifierData"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
         {{saveLoaderDiv("profileStudyIDContainer")}}
