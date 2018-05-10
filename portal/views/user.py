@@ -12,6 +12,7 @@ from flask import (
     url_for
 )
 from flask_user import roles_required
+from flask_babel import force_locale
 from sqlalchemy import and_
 from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
@@ -1923,7 +1924,8 @@ def invite(user_id):
     org = user.first_top_organization()
     org_name = org.name if org else None
     name_key = UserInviteEmail_ATMA.name_key(org=org_name)
-    args = load_template_args(user=user)
+    with force_locale(user.locale_code):
+        args = load_template_args(user=user)
     mail = MailResource(
         app_text(name_key), locale_code=user.locale_code, variables=args)
     email = EmailMessage(
