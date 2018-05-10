@@ -1,7 +1,8 @@
 """Communication model"""
 from collections import MutableMapping
+from contextlib import contextmanager
 from datetime import datetime
-from flask import current_app, has_request_context, url_for
+from flask import current_app, url_for
 from flask_babel import gettext as _, force_locale
 import regex
 from smtplib import SMTPRecipientsRefused
@@ -27,6 +28,11 @@ event_status_types = ENUM(
     'preparation', 'in-progress', 'suspended', 'aborted', 'completed',
     'entered-in-error', 'unknown', name='event_statuses',
     create_type=False)
+
+
+@contextmanager
+def dummy_context():
+    yield None
 
 
 def load_template_args(user, questionnaire_bank_id=None):
@@ -184,14 +190,17 @@ def load_template_args(user, questionnaire_bank_id=None):
         label = _(u'Verify Account')
         return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
-    # Load all functions from the local space with the `_lookup_` prefix
-    # into the args instance
-    args = DynamicDictLookup()
-    for fname, function in locals().items():
-        if fname.startswith('_lookup_'):
-            # chop the prefix and assign to the function
-            args[fname[len('_lookup_'):]] = function
-    return args
+    # As this may be invoked by another user (say staff) or when run by
+    # celery outside a request context, force the locale of the subject
+    with force_locale(user.locale_code) if user else dummy_context():
+        # Load all functions from the local space with the `_lookup_` prefix
+        # into the args instance
+        args = DynamicDictLookup()
+        for fname, function in locals().items():
+            if fname.startswith('_lookup_'):
+                # chop the prefix and assign to the function
+                args[fname[len('_lookup_'):]] = function
+        return args
 
 
 class Communication(db.Model):
@@ -236,39 +245,31 @@ class Communication(db.Model):
 
     def generate_message(self):
         """Collate message details into EmailMessage"""
-
-        def localize_message():
-            qb_id = self.communication_request.questionnaire_bank_id
-            args = load_template_args(user=user, questionnaire_bank_id=qb_id)
-            mailresource = MailResource(
-                url=self.communication_request.content_url,
-                locale_code=user.locale_code,
-                variables=args)
-
-            missing = set(mailresource.variable_list) - set(args)
-            if missing:
-                raise ValueError(
-                    "{} contains unknown varables: {}".format(
-                        mailresource.url,
-                        ','.join(missing)))
-
-            msg = EmailMessage(
-                subject=mailresource.subject,
-                body=mailresource.body,
-                recipients=user.email,
-                sender=current_app.config['MAIL_DEFAULT_SENDER'],
-                user_id=user.id)
-
-            return msg
-
-        # Special handling of locales outside of a request context,
-        # such as when a celery task initiates this function call
-
         user = User.query.get(self.user_id)
-        if has_request_context():
-            return localize_message()
-        with force_locale(user.locale_code):
-            return localize_message()
+
+        qb_id = self.communication_request.questionnaire_bank_id
+        args = load_template_args(user=user, questionnaire_bank_id=qb_id)
+        mailresource = MailResource(
+            url=self.communication_request.content_url,
+            locale_code=user.locale_code,
+            variables=args)
+
+        missing = set(mailresource.variable_list) - set(args)
+        if missing:
+            raise ValueError(
+                "{} contains unknown varables: {}".format(
+                    mailresource.url,
+                    ','.join(missing)))
+
+        msg = EmailMessage(
+            subject=mailresource.subject,
+            body=mailresource.body,
+            recipients=user.email,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            user_id=user.id)
+
+        return msg
+
 
     def generate_and_send(self):
         "Collate message details and send"
