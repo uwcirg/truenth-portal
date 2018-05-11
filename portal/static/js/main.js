@@ -1896,7 +1896,10 @@ var fillContent = {
                         });
                     };
 
-                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (hasValue(a) ? i18next.t(a) : "--") + "</td></tr>";
+                    if (!hasValue(q)) q = "--";
+                    if (!hasValue(a)) a = "--";
+
+                    reportHTML += "<tr><td>" + q + "</td><td>" + a + "</td></tr>";
                 });
                 $("#userSessionReportDetailTable").append(reportHTML);
             };

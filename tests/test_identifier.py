@@ -15,7 +15,7 @@ class TestIdentifier(TestCase):
         self.login()
         rv = self.client.get('/api/user/{}/identifier'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['identifiers']), expected)
+        self.assertEquals(len(rv.json['identifier']), expected)
 
     def testPOST(self):
         """Add an existing and fresh identifier - confirm it sticks"""
@@ -26,12 +26,12 @@ class TestIdentifier(TestCase):
             db.session.commit()
         existing = db.session.merge(existing)
         fresh = Identifier(system='http://another.com', value='unique')
-        data = {'identifiers': [i.as_fhir() for i in (existing, fresh)]}
+        data = {'identifier': [i.as_fhir() for i in (existing, fresh)]}
         self.login()
         rv = self.client.post(
             '/api/user/{}/identifier'.format(TEST_USER_ID),
             content_type='application/json', data=json.dumps(data))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['identifiers']), expected)
+        self.assertEquals(len(rv.json['identifier']), expected)
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.identifiers), expected)
