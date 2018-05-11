@@ -1454,7 +1454,7 @@
         }
       ],
       "language": "en_GB",
-      "name": "Kantonsspital Chur",
+      "name": "Kantonsspitals Chur",
       "partOf": {
         "reference": "api/organization/25000"
       },
@@ -1476,7 +1476,7 @@
         }
       ],
       "language": "en_GB",
-      "name": "Kantonsspital St. Gallen",
+      "name": "Kantonsspitals St. Gallen",
       "partOf": {
         "reference": "api/organization/25000"
       },

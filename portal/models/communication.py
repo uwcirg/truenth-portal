@@ -1,8 +1,9 @@
 """Communication model"""
 from collections import MutableMapping
+from contextlib import contextmanager
 from datetime import datetime
 from flask import current_app, url_for
-from flask_babel import gettext as _
+from flask_babel import gettext as _, force_locale
 import regex
 from smtplib import SMTPRecipientsRefused
 from sqlalchemy import UniqueConstraint
@@ -27,6 +28,28 @@ event_status_types = ENUM(
     'preparation', 'in-progress', 'suspended', 'aborted', 'completed',
     'entered-in-error', 'unknown', name='event_statuses',
     create_type=False)
+
+
+@contextmanager
+def dummy_context():
+    yield None
+
+
+def locale_closure(locale_code, fn):
+    """Capture preferred locale at load for use later during render
+
+    As the variable load may be invoked by another user (say staff)
+    or when run by celery outside a request context, force the locale
+    of the subject.  Must capture in a closure to preserve, as the acting
+    user may change before the template has been rendered.
+
+    """
+    locale_code = locale_code
+
+    def function_with_forced_locale():
+        with force_locale(locale_code) if locale_code else dummy_context():
+            return fn()
+    return function_with_forced_locale
 
 
 def load_template_args(user, questionnaire_bank_id=None):
@@ -70,7 +93,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_assessment_link():
         label = _(u'Complete Questionnaire')
         return (
-            '<a href="{ae_link}">{label}</a>'.format(
+            u'<a href="{ae_link}">{label}</a>'.format(
                 ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
@@ -94,7 +117,7 @@ def load_template_args(user, questionnaire_bank_id=None):
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
         label = _(u'TrueNTH P3P')
-        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
+        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     def _lookup_debug_slot():
         """Special slot added when configuration DEBUG_EMAIL is set"""
@@ -133,7 +156,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_password_reset_link():
         label = _(u'Password Reset')
         return (
-            '<a href="{url}">{label}</a>'.format(
+            u'<a href="{url}">{label}</a>'.format(
                 url=url_for('user.forgot_password', _external=True),
                 label=label))
 
@@ -165,7 +188,7 @@ def load_template_args(user, questionnaire_bank_id=None):
 
     def _lookup_st_link():
         label = _(u"Symptom Tracker")
-        return '<a href="{0.link_url}">{label}</a>'.format(
+        return u'<a href="{0.link_url}">{label}</a>'.format(
             INTERVENTION.SELF_MANAGEMENT, label=label)
 
     def _lookup_verify_account_button():
@@ -182,15 +205,17 @@ def load_template_args(user, questionnaire_bank_id=None):
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
         label = _(u'Verify Account')
-        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
+        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     # Load all functions from the local space with the `_lookup_` prefix
     # into the args instance
     args = DynamicDictLookup()
+    lc = user.locale_code if user else None
     for fname, function in locals().items():
         if fname.startswith('_lookup_'):
             # chop the prefix and assign to the function
-            args[fname[len('_lookup_'):]] = function
+            args[fname[len('_lookup_'):]] = locale_closure(
+                locale_code=lc, fn=function)
     return args
 
 
@@ -235,15 +260,11 @@ class Communication(db.Model):
             ' of {0.communication_request.name}'.format(self))
 
     def generate_message(self):
-        "Collate message details into EmailMessage"
-
+        """Collate message details into EmailMessage"""
         user = User.query.get(self.user_id)
 
-        args = load_template_args(
-            user=user,
-            questionnaire_bank_id=self.communication_request.
-            questionnaire_bank_id)
-
+        qb_id = self.communication_request.questionnaire_bank_id
+        args = load_template_args(user=user, questionnaire_bank_id=qb_id)
         mailresource = MailResource(
             url=self.communication_request.content_url,
             locale_code=user.locale_code,
@@ -264,6 +285,7 @@ class Communication(db.Model):
             user_id=user.id)
 
         return msg
+
 
     def generate_and_send(self):
         "Collate message details and send"
