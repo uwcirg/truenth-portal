@@ -88,7 +88,9 @@ gulp.task("jshint", function() {
     if (arg.file) {
       files = [arg.file];
     }
-    else files = jsMainFiles;
+    else {
+        files = jsMainFiles;
+    }
     return gulp.src(files)
         .pipe(jshint())
         .pipe(jshint.reporter("jshint-stylish"));
@@ -196,3 +198,4 @@ gulp.task("watchGil", function() {
 gulp.task("watchTopnav", function() {
     gulp.watch(lessPath + "/topnav.less", ["topnavLess"]);
 });
+

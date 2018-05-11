@@ -1,4 +1,4 @@
-var subjectId = $("#coreDataUserId").val(), currentUserId, tnthAjax = window.portalModules.tnthAjax, SYSTEM_IDENTIFIER_ENUM = window.portalModules.SYSTEM_IDENTIFIER_ENUM;
+var subjectId = $("#coreDataUserId").val(), tnthAjax = window.portalModules.tnthAjax, SYSTEM_IDENTIFIER_ENUM = window.portalModules.SYSTEM_IDENTIFIER_ENUM;
 $(document).ready(function(){
     if ($("#userRace").length > 0 || $("#userEthnicity").length > 0) {
         tnthAjax.getDemo(subjectId);
@@ -6,39 +6,33 @@ $(document).ready(function(){
             var demoArray = {};
             demoArray.resourceType = "Patient";
             demoArray.extension = [];
-            if ($("#userEthnicity").length > 0) {
-                var ethnicityFields = $("#userEthnicity input:checked");
-                if (ethnicityFields.length > 0) {
-                    var ethnicityIDs = ethnicityFields.map(function() {
-                        return {
-                            code: $(this).val(),
-                            system: "http://hl7.org/fhir/v3/Ethnicity"
-                        };
-                    }).get();
-                    demoArray.extension.push({
-                        "url": SYSTEM_IDENTIFIER_ENUM.ethnicity,
-                        "valueCodeableConcept": {"coding": ethnicityIDs}
-                    });
-                }
+            var ethnicityFields = $("#userEthnicity input:checked");
+            if (ethnicityFields.length > 0) {
+                var ethnicityIDs = ethnicityFields.map(function() {
+                    return {
+                        code: $(this).val(),
+                        system: "http://hl7.org/fhir/v3/Ethnicity"
+                    };
+                }).get();
+                demoArray.extension.push({
+                    "url": SYSTEM_IDENTIFIER_ENUM.ethnicity,
+                    "valueCodeableConcept": {"coding": ethnicityIDs}
+                });
             }
-            if ($("#userRace").length > 0) {
-                var raceFields = $("#userRace input:checkbox:checked");
-                if (raceFields.length > 0) {
-                    var raceIDs = raceFields.map(function() {
-                        return {
-                            code: $(this).val(),
-                            system: "http://hl7.org/fhir/v3/Race"
-                        };
-                    }).get();
-                    demoArray.extension.push({
-                        "url": SYSTEM_IDENTIFIER_ENUM.race,
-                        "valueCodeableConcept": {"coding": raceIDs}
-                    });
-                }
+            var raceFields = $("#userRace input:checkbox:checked");
+            if (raceFields.length > 0) {
+                var raceIDs = raceFields.map(function() {
+                    return {
+                        code: $(this).val(),
+                        system: "http://hl7.org/fhir/v3/Race"
+                    };
+                }).get();
+                demoArray.extension.push({
+                    "url": SYSTEM_IDENTIFIER_ENUM.race,
+                    "valueCodeableConcept": {"coding": raceIDs}
+                });
             }
-            if (demoArray.extension.length > 0) {
-                tnthAjax.putDemo(subjectId, demoArray);
-            }
+            tnthAjax.putDemo(subjectId, demoArray);
         });
     }
     // Class for both "done" and "skip" buttons

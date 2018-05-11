@@ -1,6 +1,6 @@
 (function() {
     var i18next = window.portalModules.i18next, tnthDates = window.portalModules.tnthDates;
-    var AssessmentReportObj = new Vue({
+    var AssessmentReportObj = new Vue({ /*global Vue $*/
         el: "#userSessionReportMainContainer",
         data: {
             userId: $("#_report_user_id").val(),
@@ -20,15 +20,11 @@
                     type: "GET",
                     url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId
                 }).done(function(data) {
-
-                    if (!("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch)) {
-                        $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
-                    }
-                    var sessionUserId = $("#_report_user_id").val();
                     var sessionAuthoredDate = $("#_report_authored_date").val();
                     self.errorMessage = "";
-
-                    if (!data.error) {
+                    if (data.error) {
+                        self.errorMessage = i18next.t("Server Error occurred retrieving report data");
+                    } else {
                         if (data.entry && data.entry.length > 0) {
                             var entries = data.entry;
                             var entry;
@@ -39,33 +35,17 @@
                                 }
                             });
 
-                            if (!entry) {
-                                entry = entries[0];
-                            }
-
+                            entry = entry || entries[0];
                             self.caption.title = i18next.t(entries[0].questionnaire.display);
                             self.caption.lastUpdated = tnthDates.formatDateString(sessionAuthoredDate, "iso");
                             self.caption.timezone = i18next.t("GMT, Y-M-D");
 
                             (entry.group.question).forEach(function(entry) {
-
-                                var q = (entry.text ? i18next.t(entry.text) : ""),
-                                    a = "";
-
-                                if (q) {
-                                    q = q.replace(/^[\d\w]{1,3}\./, ""); //replace question # in the beginning of the question
-                                }
-
+                                var q = (entry.text ? entry.text.replace(/^[\d\w]{1,3}\./, "") : ""), a = "";
                                 if (entry.answer) {
                                     (entry.answer).forEach(function(item) {
                                         if (self.hasValue(item.valueString)) {
-                                            var value = "";
-                                            if (!isNaN(parseInt(item.valueString))) {
-                                                value = item.valueString;
-                                            } else {
-                                                value = i18next.t(item.valueString);
-                                            }
-                                            a += (a ? "<br/>" : "") + value;
+                                            a += (a ? "<br/>" : "") + item.valueString;
                                         }
                                     });
                                 }
@@ -89,18 +69,12 @@
                                 if (!self.hasValue(a)) {
                                     a = "--";
                                 }
-                                self.data.push({
-                                    q: q,
-                                    a: a
-                                });
-
+                                self.data.push({ q: q, a: a});
                             });
                         }
-                    } else {
-                        self.errorMessage = i18next.t("Server Error occurred retrieving report data");
                     }
 
-                }).fail(function(xhr) {
+                }).fail(function() {
                     self.errorMessage = i18next.t("Unable to load report data");
                 });
             }
@@ -108,5 +82,8 @@
     });
     $(function() {
         AssessmentReportObj.getData();
+        if (!("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch)) {
+            $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
+        }
     });
 })();

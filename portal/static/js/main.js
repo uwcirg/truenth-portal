@@ -80,12 +80,14 @@ OrgTool.prototype.inArray = function(n, array) {
     if (n && array && Array.isArray(array)) {
         var found = false;
         for (var index = 0; !found && index < array.length; index++) {
-            if (array[index] == n) {
+            if (String(array[index]) === String(n)) {
                 found = true;
             }
         }
         return found;
-    } else return false;
+    } else {
+        return false;
+    }
 };
 OrgTool.prototype.getElementParentOrg = function(o) {
     var parentOrg;
@@ -150,7 +152,7 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
                 subOrgs.each(function() {
                     var isVisible = false;
                     $(this).find("input[name='organization']").each(function() {
-                        if ($(this).is(":visible") || $(this).css("display") !== "none") {
+                        if ($(this).is(":visible") || String($(this).css("display")) !== "none") {
                             isVisible = true;
                             allChildrenHidden = false;
                         }
@@ -168,7 +170,7 @@ OrgTool.prototype.filterOrgs = function(leafOrgs) {
                 var ip = $(this).find("input[name='organization']");
                 if (ip.length > 0) {
                     ip.each(function() {
-                        if ($(this).is(":visible") || $(this).css("display") !== "none") {
+                        if ($(this).is(":visible") || String($(this).css("display")) !== "none") {
                             allChildrenHidden = false;
                         }
                     });
@@ -217,7 +219,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
                 if (!orgsList[item.id]) {
                     orgsList[item.id] = new OrgObj(item.id, item.name);
                 }
-                if (item.id != 0) {
+                if (parseInt(item.id) !== 0) {
                     orgsList[item.id].isTopLevel = true;
                     self.TOP_LEVEL_ORGS.push(item.id);
                 }
@@ -318,9 +320,9 @@ OrgTool.prototype.populateUI = function() {
             }
         }
         parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-                        .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
-                        .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-                        .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+            .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
+            .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
+            .replace(/\{\{state\}\}/g, getState(orgsList[org]));
         parentDiv.innerHTML = parentContent;
         parentFragment.appendChild(parentDiv);
     });
@@ -402,7 +404,9 @@ OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
         });
         uo.parentList = parentList;
         return parentList;
-    } else return false;
+    } else {
+        return false;
+    }
 };
 OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
     if (!currentOrg) {
@@ -413,16 +417,22 @@ OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
         if (ml[currentOrg].isTopLevel) {
             return currentOrg;
         } else {
-            if (ml[currentOrg].parentOrgId) return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
-            else return currentOrg;
+            if (ml[currentOrg].parentOrgId) {
+                return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
+            }
+            else {
+                return currentOrg;
+            }
         }
-    } else return false;
+    } else {
+        return false;
+    }
 };
 OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
     if (!orgs || (orgs.length === 0)) {
         return orgList;
     } else {
-        if (!orgList) orgList = [];
+        orgList = orgList || [];
         var mainOrgsList = this.getOrgsList(), childOrgs = [];
         orgs.forEach(function(org) {
             var o = mainOrgsList[org.id];
@@ -493,10 +503,12 @@ var tnthAjax = {
         return this.orgTool;
     },
     "sendRequest": function(url, method, userId, params, callback) {
-        if (!url) return false;
-        if (!params) params = {};
-        if (!params.attempts) params.attempts = 0;
-        if (!params.max_attempts) params.max_attempts = 3;
+        if (!url) {
+            return false;
+        }
+        params = params || {};
+        params.attempts = params.attempts || 0;
+        params.max_attempts = params.max_attempts || 3;
         var self = this;
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
@@ -529,7 +541,7 @@ var tnthAjax = {
                 })(self, url, method, userId, params, callback);
             } else {
                 params.attempts = 0;
-                if (callback) callback({"error": true});
+                callback({"error": true});
                 fieldHelper.showError(targetField);
                 self.sendError(xhr, url, userId);
             }
@@ -537,7 +549,7 @@ var tnthAjax = {
     },
     "sendError": function(xhr, url, userId) {
         if (xhr) {
-            var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) == 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
+            var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
             tnthAjax.reportError(userId ? userId : "Not available", url, errorMessage, true);
         }
     },
@@ -549,7 +561,7 @@ var tnthAjax = {
         params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
         if (window.console) {
             console.log("Errors occurred.....");
-            console.log(params);
+            console.log(params); /*global console*/
         }
         $.ajax({
             type: "GET",
@@ -564,7 +576,6 @@ var tnthAjax = {
         delayDuration: 300,
         showLoader: function(targetField) {
             if (targetField && targetField.length > 0) {
-                console.log("save loader id ", targetField.attr("data-save-container-id"))
                 $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
             }
         },
@@ -581,8 +592,7 @@ var tnthAjax = {
                         successField.text(i18next.t("success"));
                         loadingField.animate({"opacity": 0}, __timeout, function() {
                             successField.animate({"opacity": 1}, __timeout, function() {
-                                setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);},
-                                __timeout * 2);
+                                setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);}, __timeout * 2);
                             });
                         });
                     })(targetField);
@@ -649,8 +659,9 @@ var tnthAjax = {
                                     parentNode.show().removeClass("tnth-hide");
                                     if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
                                         parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                        $("#termsCheckbox, #termsCheckbox_default, #topTerms .terms-of-use-intro").addClass("tnth-hide");
+                                        $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
                                         $("#termsText").addClass("agreed");
+                                        $("#termsCheckbox_default").removeClass("tnth-hide");
                                         $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
                                         acceptOnNextCheckboxes.push(parentNode);
                                     }
@@ -728,7 +739,9 @@ var tnthAjax = {
         this.sendRequest("/api/portal-footer-html/", "GET", userId, {sync: sync,cache: true,"dataType": "html"}, function(data) {
             if (data) {
                 if (!data.error) {
-                    if (containerId) $("#" + containerId).html(data);
+                    if (containerId) {
+                        $("#" + containerId).html(data);
+                    }
                     callback(data);
                 } else {
                     callback("<div class='error-message'>" + i18next.t("Unable to retrieve portal footer html") + "</div>");
@@ -776,6 +789,7 @@ var tnthAjax = {
         });
     },
     "setConsent": function(userId, params, status, sync, callback) {
+        callback = callback || function() {};
         if (userId && params) {
             var consented = this.hasConsent(userId, params.org, status);
             var __url = "/api/user/" + userId + "/consent";
@@ -795,15 +809,17 @@ var tnthAjax = {
                     if (data) {
                         if (!data.error) {
                             $(".set-consent-error").html("");
-                            if (callback) callback(data);
+                            callback(data);
                         } else {
                             var errorMessage = i18next.t("Server error occurred setting consent status.");
-                            if (callback) callback({"error": errorMessage});
+                            callback({"error": errorMessage});
                             $(".set-consent-error").html(errorMessage);
                         }
                     }
                 });
             }
+        } else {
+            callback(i18next.t("User id and parameters are required"));
         }
     },
     deleteConsent: function(userId, params) {
@@ -817,10 +833,12 @@ var tnthAjax = {
                         var arr = params.exclude.split(",");
                         arr.forEach(function(o) {
                             if (!found) {
-                                if (o == orgId) found = true;
+                                found = (String(o) === String(orgId));
                             }
                         });
-                        if (found) return true;
+                        if (found) {
+                            return true;
+                        }
                     }
                     if (!found) {
                         self.sendRequest(__url, "DELETE", userId, {sync: true,data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
@@ -852,17 +870,14 @@ var tnthAjax = {
             "POST",
             userId, {sync: (params.sync ? true : false),data: JSON.stringify({organization_id: orgId})},
             function(data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
+                if (!data.error) { callback(data); } else {
                     callback({"error": i18next.t("Error occurred setting consent status.")});
                 }
             }
         );
     },
     getAllValidConsent: function(userId, orgId) {
-        if (!userId) return false;
-        if (!orgId) return false;
+        if (!userId || !orgId) { return false; }
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
             if (data) {
@@ -873,67 +888,51 @@ var tnthAjax = {
                             d.forEach(function(item) {
                                 var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                                 if (!item.deleted && !(expired > 0)) {
-                                    if (orgId == "all") consentedOrgIds.push(item.organization_id);
-                                    else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
+                                    if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
+                                    else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
                                 }
                             });
                         }
                     }
-                } else {
-                    return false;
-                }
+                } else { return false; }
             }
             return consentedOrgIds;
         });
         return consentedOrgIds;
     },
     hasConsent: function(userId, orgId, filterStatus) {  /****** NOTE - this will return the latest updated consent entry *******/
-        if (!userId) return false;
-        if (!orgId) return false;
-        if (String(filterStatus) === "default") { return false; }
+        if (!userId || !orgId || String(filterStatus) === "default") { return false; }
         var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
         var __url = "/api/user/" + userId + "/consent", self = this;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    if (data.consent_agreements) {
-                        var d = data.consent_agreements;
-                        if (d.length > 0) {
-                            d = d.sort(function(a, b) {
-                                return new Date(b.signed) - new Date(a.signed); //latest comes first
-                            });
-                            item = d[0];
-                            expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                            if (item.deleted) found = true;
-                            if (expired > 0) found = true;
-                            if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
-                            if (!found) {
-                                if (orgId == item.organization_id) {
-                                    switch (filterStatus) {
-                                    case "suspended":
-                                        if (suspended) found = true;
-                                        break;
-                                    case "purged":
-                                        found = true;
-                                        break;
-                                    case "consented":
-                                        if (!suspended) {
-                                            if (item.staff_editable && item.send_reminders && item.include_in_reports) found = true;
-                                        }
-                                        break;
-                                    default:
-                                        found = true; //default is to return both suspended and consented entries
-                                    }
-                                    if (found) consentedOrgIds.push(orgId);
-
-                                }
-                            }
+            if (data && !data.error && data.consent_agreements && data.consent_agreements.length > 0) {
+                var d = data.consent_agreements;
+                d = d.sort(function(a, b) {
+                    return new Date(b.signed) - new Date(a.signed); //latest comes first
+                });
+                item = d[0];
+                expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
+                found = (item.deleted || expired > 0 || (item.staff_editable && item.include_in_reports && !item.send_reminders));
+                if (!found && (String(orgId) === String(item.organization_id))) {
+                    switch (filterStatus) {
+                    case "suspended":
+                        if (suspended) { found = true;}
+                        break;
+                    case "purged":
+                        found = true;
+                        break;
+                    case "consented":
+                        if (!suspended && item.staff_editable && item.send_reminders && item.include_in_reports) {
+                            found = true;
                         }
+                        break;
+                    default:
+                        found = true; //default is to return both suspended and consented entries
                     }
-
-                } else {
-                    return false;
+                    if (found) { consentedOrgIds.push(orgId);}
                 }
+            } else {
+                return false;
             }
         });
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
@@ -944,7 +943,9 @@ var tnthAjax = {
             if ($(this).is(":checked")) {
                 var po = OT.getElementParentOrg(this);
                 co.push($(this).val());
-                if (po) co.push(po);
+                if (po) {
+                    co.push(po);
+                }
             }
         });
         tnthAjax.deleteConsent(userId, {org: "all", exclude: co.join(",")}); //exclude currently selected orgs
@@ -963,7 +964,7 @@ var tnthAjax = {
                 if ($(this).attr("id") !== "noOrgs") {
                     if (parentOrg) {
                         var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                        if (agreementUrl && agreementUrl != "") {
+                        if (agreementUrl && String(agreementUrl) !== "") {
                             var params = self.consentParams;
                             params.org = cto ? parentOrg : orgId;
                             params.agreementUrl = agreementUrl;
@@ -983,30 +984,30 @@ var tnthAjax = {
                         var topLevelOrgs = OT.getTopLevelOrgs();
                         topLevelOrgs.forEach(function(i) {
                             (function(orgId) {
-                                setTimeout(function() {
-                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
-                                }, 350);
+                                setTimeout(function() { tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});}, 350);
                             })(i);
                         });
                     } else {
                         $("#userOrgs").find("input[name='organization']").each(function() { //delete all orgs
                             (function(orgId) {
-                                setTimeout(function() {
-                                    tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
-                                }, 350);
+                                setTimeout(function() { tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});}, 350);
                             })($(this).val());
                         });
                     }
                 }
             } else {
-                //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
-                if (cto) {
+                if (cto) { //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
                     var childOrgs = [];
-                    if ($("#fillOrgs").attr("patient_view")) childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
-                    else childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
+                    if ($("#fillOrgs").attr("patient_view")) {
+                        childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
+                    } else {
+                        childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
+                    }
                     var allUnchecked = true;
                     childOrgs.each(function() {
-                        if ($(this).prop("checked")) allUnchecked = false;
+                        if ($(this).prop("checked")) {
+                            allUnchecked = false;
+                        }
                     });
                     if (allUnchecked && childOrgs.length > 0) {
                         (function(orgId) {
@@ -1070,10 +1071,10 @@ var tnthAjax = {
             });
             (data.entry).forEach(function(item) {
                 if (!found) {
-                    var resourceItemCode = item.resource.code.coding[0].code;
-                    var system = item.resource.code.coding[0].system;
+                    var resourceItemCode = String(item.resource.code.coding[0].code);
+                    var system = String(item.resource.code.coding[0].system);
                     var procId = item.resource.id;
-                    if ((resourceItemCode == SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && (system == SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL)) || (resourceItemCode == SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE && (system == SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL))) {
+                    if ((resourceItemCode === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL)) || (resourceItemCode === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL))) {
                         found = {"code": resourceItemCode,"id": procId};
                     }
                 }
@@ -1095,7 +1096,9 @@ var tnthAjax = {
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
-        if (!userId) return false;
+        if (!userId) {
+            return false;
+        }
         tnthAjax.deleteTreatment(userId, targetField);
         var code = SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE, display = "None", system = SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL;
         if (started) {
@@ -1121,7 +1124,7 @@ var tnthAjax = {
                 if (!data.error) {
                     var treatmentData = tnthAjax.hasTreatment(data);
                     if (treatmentData) {
-                        if (treatmentData.code == SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE) {
+                        if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
                             tnthAjax.deleteProc(treatmentData.id, targetField, true);
                         } else {
                             tnthAjax.deleteProc(treatmentData.id, targetField, true);
@@ -1130,7 +1133,9 @@ var tnthAjax = {
                 } else {
                     return false;
                 }
-            } else return false;
+            } else {
+                return false;
+            }
         });
     },
     "getProc": function(userId, newEntry, callback) {
@@ -1278,7 +1283,9 @@ var tnthAjax = {
         });
     },
     "getObservationId": function(userId, code) {
-        if (!userId) return false;
+        if (!userId) {
+            return false;
+        }
         var obId = "",_code = "";
         this.sendRequest("/api/patient/" + userId + "/clinical", "GET", userId, {sync: true}, function(data) {
             if (data) {
@@ -1287,7 +1294,9 @@ var tnthAjax = {
                         (data.entry).forEach(function(item) {
                             if (!obId) {
                                 _code = item.content.code.coding[0].code;
-                                if (_code == code) obId = item.content.id;
+                                if (String(_code) === String(code)) {
+                                    obId = item.content.id;
+                                } 
                             }
                         });
                     }
@@ -1297,8 +1306,10 @@ var tnthAjax = {
         return obId;
     },
     "postClinical": function(userId, toCall, toSend, status, targetField, params) {
-        if (!userId) return false;
-        if (!params) params = {};
+        if (!userId) {
+            return false;
+        }
+        params = params || {};
         var code = "", display = "";
         switch (toCall) {
         case "biopsy":
@@ -1313,7 +1324,9 @@ var tnthAjax = {
             code = "141";
             display = "PCa localized diagnosis";
         }
-        if (!code) return false;
+        if (!code) {
+            return false;
+        }
         var system = SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL;
         var method = "POST";
         var url = "/api/patient/" + userId + "/clinical";
@@ -1324,7 +1337,9 @@ var tnthAjax = {
         obsArray.issued = params.issuedDate ? params.issuedDate : "";
         obsArray.status = status ? status : "";
         obsArray.valueQuantity = {"units": "boolean","value": toSend};
-        if (params.performer) obsArray.performer = params.performer;
+        if (params.performer) {
+            obsArray.performer = params.performer;
+        }
         var obsId = tnthAjax.getObservationId(userId, code);
         if (obsId) {
             method = "PUT";
@@ -1340,7 +1355,7 @@ var tnthAjax = {
             }
         });
     },
-    "getTermsUrl": function(sync, callback) {
+    "getTermsUrl": function(sync, callback) { /*global i18next */
         callback = callback || function() {};
         this.sendRequest("/api/tou", "GET", null, {sync: sync}, function(data) {
             if (data) {
@@ -1375,14 +1390,16 @@ var tnthAjax = {
                             (data.entry).forEach(function(item) {
                                 if (item.organization) {
                                     var orgID = (item.organization.reference).split("/")[2];
-                                    if (!qList[orgID]) qList[orgID] = []; //don't assign orgID to object if it was already present
+                                    if (!qList[orgID]) {
+                                        qList[orgID] = []; //don't assign orgID to object if it was already present
+                                    }
                                     if (item.questionnaires) {
                                         (item.questionnaires).forEach(function(q) {
                                             /*
                                              * add instrument name to instruments array for the org - will not add if it is already in the array
                                              * NOTE: inArray returns -1 if the item is NOT in the array
                                              */
-                                            if ($.inArray(q.questionnaire.display, qList[orgID]) == -1) {
+                                            if ($.inArray(q.questionnaire.display, qList[orgID]) === -1) {
                                                 qList[orgID].push(q.questionnaire.display);
                                             }
                                         });
@@ -1402,7 +1419,7 @@ var tnthAjax = {
     },
     "getTerms": function(userId, type, sync, callback, params) {
         callback = callback || function() {};
-        if (!params) params = {};
+        params = params || {};
         var url = "/api/user/{userId}/tou{type}{all}".replace("{userId}", userId)
             .replace("{type}", type ? ("/" + type) : "")
             .replace("{all}", (params.hasOwnProperty("all") ? "?all=true" : ""));
@@ -1609,7 +1626,7 @@ var tnthAjax = {
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        if (!params) params = {};
+        params = params || {};
         this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1626,7 +1643,7 @@ var tnthAjax = {
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        if (!params) params = {};
+        params = params || {};
         this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "GET", userId, {"sync": params.sync}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1681,7 +1698,7 @@ var tnthAjax = {
             callback({"error": i18next.t("configuration key is required.")});
             return false;
         }
-        if (!params) params = {};
+        params = params || {};
         this.sendRequest("/api/settings/" + key, "GET", userId, {
             "sync": params.sync
         }, function(data) {
@@ -1716,19 +1733,16 @@ var tnthAjax = {
 
     },
     "treatmentOptions": function(userId, params, callback) {
+        callback = callback||function() {};
         this.sendRequest("/patients/treatment-options", "GET", userId, (params || {}), function(data) {
             if (data) {
                 if (!data.error) {
-                    if (callback) callback(data);
+                    callback(data);
                 } else {
-                    if (callback) callback({
-                        "error": i18next.t("Error occurred retrieving treatment options.")
-                    });
+                    callback({"error": i18next.t("Error occurred retrieving treatment options.")});
                 }
             } else {
-                if (callback) callback({
-                    "error": i18next.t("no data returned")
-                });
+                callback({"error": i18next.t("no data returned")});
             }
         });
     },
@@ -1805,9 +1819,7 @@ var tnthDates = {
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
     "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
-        var m = $(monthField).val();
-        var d = $(dayField).val();
-        var y = $(yearField).val();
+        var m = $(monthField).val(), d = $(dayField).val(), y = $(yearField).val();
         if (m && d && y) {
             if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
                 m = parseInt(m);
@@ -1818,7 +1830,7 @@ var tnthDates = {
                 if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
                     var today = new Date();
                     var date = new Date(y, m - 1, d);
-                    if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) { // Check to see if this is a real date
+                    if (!(date.getFullYear() === y && (date.getMonth() + 1) === m && date.getDate() === d)) { // Check to see if this is a real date
                         errorField.html(i18next.t("Invalid date. Please try again.")).show();
                         return false;
                     } else if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
@@ -1830,7 +1842,9 @@ var tnthDates = {
                     }
                     errorField.html("").hide();
                     return true;
-                } else return false;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
@@ -1849,7 +1863,7 @@ var tnthDates = {
         return splitDate[1] + "/" + splitDate[0] + "/" + splitDate[2];
     },
     "convertMonthNumeric": function(month) { //Convert month string to numeric
-        if (!month) return "";
+        if (!month) { return ""; }
         else {
             var month_map = {"jan": 1,"feb": 2,"mar": 3,"apr": 4,"may": 5,"jun": 6,"jul": 7,"aug": 8,"sep": 9,"oct": 10,"nov": 11,"dec": 12};
             var m = month_map[month.toLowerCase()];
@@ -1857,8 +1871,9 @@ var tnthDates = {
         }
     },
     "convertMonthString": function(month) { //Convert month string to text
-        if (!month) return "";
-        else {
+        if (!month) {
+            return "";
+        } else {
             var numeric_month_map = {1: "Jan",2: "Feb",3: "Mar",4: "Apr",5: "May",6: "Jun",7: "Jul",8: "Aug",9: "Sep",10: "Oct",11: "Nov",12: "Dec"};
             var m = numeric_month_map[parseInt(month)];
             return m ? m : "";
@@ -1869,9 +1884,13 @@ var tnthDates = {
     },
     "displayDateString": function(m, d, y) {
         var s = "";
-        if (d) s = d;
-        if (m) s += (s ? " " : "") + this.convertMonthString(m);
-        if (y) s += (s ? " " : "") + y;
+        s += (d ? d : "");
+        if (m) {
+            s += (s ? " " : "") + this.convertMonthString(m);
+        }
+        if (y) {
+            s += (s ? " " : "") + y;
+        }
         return s;
     },
     /***
@@ -1893,34 +1912,31 @@ var tnthDates = {
         return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24)); // Round down to floor so we don't add an extra day if session is 12+ hours into the day
     },
     "isValidDefaultDateFormat": function(date, errorField) {
-        if (!date) return false;
-        if (date.length < 10) return false;
+        if (!date || date.length < 10) { return false; }
         var dArray = $.trim(date).split(" ");
-        if (dArray.length < 3) return false;
+        if (dArray.length < 3) { return false; }
         var day = dArray[0], month = dArray[1], year = dArray[2];
-        if (day.length < 1) return false;
-        if (month.length < 3) return false;
-        if (year.length < 4) return false;
-        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
-        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
-        if (!/(19|20)\d{2}/.test(year)) return false;
+        if (day.length < 1 || month.length < 3 || year.length < 4) { return false; }
+        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) { return false; }
+        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) { return false; }
+        if (!/(19|20)\d{2}/.test(year)) { return false; }
         var dt = new Date(date);
-        if (!this.isDateObj(dt)) return false;
-        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
+        if (!this.isDateObj(dt)) { return false; } 
+        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) { 
             return false;
         } else {
             var today = new Date(),
                 errorMsg = "";
-            if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
+            if (dt.getFullYear() < 1900) { errorMsg = "Year must be after 1900"; }
             // Only allow if date is before today
             if (dt.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
                 errorMsg = "The date must not be in the future.";
             }
             if (errorMsg) {
-                if (errorField) $(errorField).text(errorMsg);
+                $(errorField).text(errorMsg);
                 return false;
             } else {
-                if (errorField) $(errorField).text("");
+                $(errorField).text("");
                 return true;
             }
         }
@@ -1930,33 +1946,32 @@ var tnthDates = {
     },
     "isValidDate": function(y, m, d) {
         var date = this.getDateObj(y, m, d), convertedDate = this.getConvertedDate(date), givenDate = this.getGivenDate(y, m, d);
-        return (givenDate == convertedDate);
+        return String(givenDate) === String(convertedDate);
     },
     /*
      * method does not check for valid numbers, will return NaN if conversion failed
      */
     "getDateObj": function(y, m, d, h, mi, s) {
-        if (!h) h = 0;
-        if (!mi) mi = 0;
-        if (!s) s = 0;
+        h = h || 0;
+        mi = mi || 0;
+        s = s || 0;
         return new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
     },
     "getConvertedDate": function(dateObj) {
-        if (dateObj && this.isDateObj(dateObj)) return "" + dateObj.getFullYear() + (dateObj.getMonth() + 1) + dateObj.getDate();
-        else return "";
+        if (dateObj && this.isDateObj(dateObj)) { return "" + dateObj.getFullYear() + (dateObj.getMonth() + 1) + dateObj.getDate(); }
+        else { return ""; }
     },
     "getGivenDate": function(y, m, d) {
         return "" + y + m + d;
     },
-    /*
-     * NB For dateString in ISO-8601 format date as returned from server e.g. '2011-06-29T16:52:48'*/
-    "formatDateString": function(dateString, format) {
+    "formatDateString": function(dateString, format) { //NB For dateString in ISO-8601 format date as returned from server e.g. '2011-06-29T16:52:48'
         if (dateString) {
             var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
             var d = new Date(dateString);
             var day, month, year, hours, minutes, seconds, nd;
-            //note instantiating ios formatted date using Date object resulted in error in IE
-            if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) return "";
+            if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
+                return "";
+            }
             if (iosDateTest.test(dateString)) {
                 //IOS date, no need to convert again to date object, just parse it as is
                 //issue when passing it into Date object, the output date is inconsistent across from browsers
@@ -2025,7 +2040,9 @@ var tnthDates = {
                 break;
             }
             return nd;
-        } else return "";
+        } else {
+            return "";
+        }
     },
     "convertToLocalTime": function(dateString) {
         var convertedDate = "";
@@ -2041,9 +2058,8 @@ var tnthDates = {
         return convertedDate;
     },
     "getUserTimeZone": function(userId) {
-        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
-        var userTimeZone = "";
-        if (selectVal == "") {
+        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "", userTimeZone = "";
+        if (String(selectVal) === "") {
             if (userId) {
                 tnthAjax.sendRequest("/api/demographics/" + userId, "GET", userId, {
                     sync: true
@@ -2148,7 +2164,7 @@ var tnthDates = {
         var errorMessage = "";
         if (day && month && year) {
             var iy = parseInt(year), im = parseInt(month), iid = parseInt(day), date = new Date(iy, im - 1, iid);
-            if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) { // Check to see if this is a real date
+            if (date.getFullYear() === iy && (date.getMonth() + 1) === im && date.getDate() === iid) { // Check to see if this is a real date
                 if (iy < 1900) {
                     errorMessage = i18next.t("Year must be after 1900");
                 }
@@ -2168,7 +2184,8 @@ var tnthDates = {
     }
 
 };
-
+/*global tnthAjax OrgTool tnthDates SYSTEM_IDENTIFIER_ENUM getIEVersion newHttpRequest funcWrapper embed_page $ */
+/*global i18next */
 var Global = {
     "registerModules": function() { //TODO use webpack or requireJS to import modules?
         if (!window.portalModules) {
@@ -2188,7 +2205,6 @@ var Global = {
             embed_page(data);
             setTimeout(function() {
                 $("#tnthNavWrapper .logout").on("click", function(e) {
-                    console.log("HERE?")
                     e.stopImmediatePropagation();
                     sessionStorage.clear();
                 });
@@ -2202,8 +2218,8 @@ var Global = {
     "loginAs": function() {
         var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
         if (LOGIN_AS_PATIENT) {
-            sessionStorage.clear();
-            tnthDates.getUserLocale(true); //need to clear current user locale in session storage when logging in as patient
+            sessionStorage.clear(); 
+            tnthDates.getUserLocale(true); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
             if (typeof history !== "undefined" && history.pushState) {
                 history.pushState(null, null, location.href);
             }
@@ -2303,7 +2319,7 @@ var Global = {
         this.getNotification(function(data) {
             if (data.notifications && data.notifications.length > 0) {
                 var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
-                    return notification.id == notificationId;
+                    return parseInt(notification.id) === parseInt(notificationId);
                 });
                 var userId = $("#notificationUserId").val();
                 if (arrNotification.length > 0 && userId) { //delete notification only if it exists
@@ -2390,8 +2406,7 @@ var Global = {
 
 var userSetLang = tnthDates.getUserLocale();
 Global.registerModules();
-var i18next = window.portalModules.i18next;
-__i18next.init({
+__i18next.init({ /*global __i18next*/
     "lng": userSetLang
 }, function() {
     $(document).ready(function() {
@@ -2401,10 +2416,10 @@ __i18next.init({
         }
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
-            loader(true);
+            loader(true); /*global loader*/
             Global.initPortalWrapper(PORTAL_NAV_PAGE);
         } else {
-            loader();
+            loader(); /*global loader*/
         }
         tnthAjax.beforeSend();
         Global.footer();
@@ -2475,8 +2490,11 @@ __i18next.init({
                         return /[<>]/.test(text);
                     };
                     var invalid = containHtmlTags($el.val());
-                    if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
-                    else $("#error" + $el.attr("id")).html("");
+                    if (invalid) {
+                        $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                    } else {
+                        $("#error" + $el.attr("id")).html("");
+                    }
                     return !invalid;
                 }
             },

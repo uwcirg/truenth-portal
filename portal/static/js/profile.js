@@ -3,7 +3,7 @@
  */
 (function() {
     var i18next = window.portalModules.i18next;
-    var ProfileObj = window.ProfileObj = new Vue({
+    var ProfileObj = window.ProfileObj = new Vue({ /*global Vue */ 
         el: "#mainDiv",
         components: {
             "section-view": {
@@ -21,7 +21,7 @@
         },
         created: function() {
             var self = this;
-            DELAY_LOADING = true;
+            DELAY_LOADING = true; /*global DELAY_LOADING */ 
             this.registerDependencies();
             this.setUserSettings();
             this.onBeforeSectionsLoad();
@@ -437,86 +437,94 @@
                 if (this.mode === "profile") { //Note, this attach loader indicator to element with the class data-loader-container, in order for this to work, the element needs to have an id attribute
                     var self = this;
                     setTimeout(function() {
-                        $("#profileMainContent [data-loader-container]").each(function() {
-                            var attachId = $(this).attr("id");
-                            if (!attachId) {
+                        self.initFieldsEvent();
+                        self.initLoginAsButtons();
+                        self.fillViews = self.setView();
+                        self.initEditButtons();
+                    }, 50);
+                }
+            },
+            initLoginAsButtons: function() {
+                var self = this;
+                $("#loginAsButton, #btnLoginAs").on("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.handleLoginAs(e);
+                });
+            },
+            initEditButtons: function() {
+                var self = this;
+                $("#profileForm .profile-item-edit-btn").each(function() {
+                    $(this).val(i18next.t("EDIT"));
+                    $(this).on("click", function(e) {
+                        e.preventDefault();
+                        var container = $(this).closest(".profile-item-container");
+                        container.toggleClass("edit");
+                        $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
+                        if (!container.hasClass("edit")) {
+                            var formGroup = container.find(".form-group").not(".data-update-on-validated");
+                            formGroup.removeClass("has-error");
+                            formGroup.find(".help-block.with-errors").html("");
+                            self.setDemoData();
+                            self.fillSectionView(container.attr("data-sections"));
+                            self.handleOptionalCoreData();
+                        }
+                    });
+                });
+            },
+            initFieldsEvent: function() {
+                $("#profileMainContent [data-loader-container]").each(function() {
+                    var attachId = $(this).attr("id");
+                    if (!attachId) {
+                        return false;
+                    }
+                    var targetFields = $(this).find("input, select");
+                    if (targetFields.length > 0) {
+                        targetFields.each(function() {
+                            if ($(this).attr("type") === "hidden") {
                                 return false;
                             }
-                            var targetFields = $(this).find("input, select");
-                            if (targetFields.length > 0) {
-                                targetFields.each(function() {
-                                    if ($(this).attr("type") === "hidden") {
-                                        return false;
-                                    }
-                                    $(this).attr("data-save-container-id", attachId);
-                                    var triggerEvent = "";
-                                    if ($(this).attr("data-update-on-validated")) {
-                                        triggerEvent = "blur";
-                                    } else {
-                                        triggerEvent = $(this).attr("data-trigger-event");
-                                    }
-                                    if (!triggerEvent) {
-                                        triggerEvent = $(this).attr("data-update-on-validated")?"blur":"change";
-                                    }
-                                    $(this).on(triggerEvent, function(e) {
-                                        e.stopPropagation();
-                                        var valid = this.validity ? this.validity.valid : true;
-                                        if (!$(this).attr("data-update-on-validated") && valid) {
-                                            var o = $(this);
-                                            var parentContainer = $(this).closest(".profile-item-container");
-                                            var editButton = parentContainer.find(".profile-item-edit-btn");
-                                            editButton.attr("disabled", true);
-                                            setTimeout(function() {
-                                                var hasError = false;
-                                                if (o.attr("data-error-field")) {
-                                                    var customErrorField = $("#" + o.attr("data-error-field"));
-                                                    if (customErrorField.length > 0) {
-                                                        hasError = (customErrorField.text() !== "");
-                                                    }
-                                                }
-                                                if (!hasError) {
-                                                    o.trigger("updateDemoData");
-                                                }
-                                            }, 250);
-                                        }
-                                    });
-                                });
+                            $(this).attr("data-save-container-id", attachId);
+                            var triggerEvent = "";
+                            if ($(this).attr("data-update-on-validated")) {
+                                triggerEvent = "blur";
+                            } else {
+                                triggerEvent = $(this).attr("data-trigger-event");
                             }
-                        });
-
-                        $("#loginAsButton, #btnLoginAs").on("click", function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            self.handleLoginAs(e);
-                        });
-
-                        self.fillViews = self.setView();
-
-                        $("#profileForm .profile-item-edit-btn").each(function() {
-                            $(this).val(i18next.t("EDIT"));
-                            $(this).on("click", function(e) {
-                                e.preventDefault();
-                                var container = $(this).closest(".profile-item-container");
-                                container.toggleClass("edit");
-                                $(this).val(container.hasClass("edit") ? i18next.t("DONE") : i18next.t("EDIT"));
-                                if (!container.hasClass("edit")) {
-                                    var formGroup = container.find(".form-group").not(".data-update-on-validated");
-                                    formGroup.removeClass("has-error");
-                                    formGroup.find(".help-block.with-errors").html("");
-                                    self.setDemoData();
-                                    self.fillSectionView(container.attr("data-sections"));
-                                    self.handleOptionalCoreData();
+                            if (!triggerEvent) {
+                                triggerEvent = $(this).attr("data-update-on-validated")?"blur":"change";
+                            }
+                            $(this).on(triggerEvent, function(e) {
+                                e.stopPropagation();
+                                var valid = this.validity ? this.validity.valid : true;
+                                if (!$(this).attr("data-update-on-validated") && valid) {
+                                    var o = $(this);
+                                    var parentContainer = $(this).closest(".profile-item-container");
+                                    var editButton = parentContainer.find(".profile-item-edit-btn");
+                                    editButton.attr("disabled", true);
+                                    setTimeout(function() {
+                                        var hasError = false;
+                                        if (o.attr("data-error-field")) {
+                                            var customErrorField = $("#" + o.attr("data-error-field"));
+                                            if (customErrorField.length > 0) {
+                                                hasError = (customErrorField.text() !== "");
+                                            }
+                                        }
+                                        if (!hasError) {
+                                            o.trigger("updateDemoData");
+                                        }
+                                    }, 250);
                                 }
                             });
                         });
-                    }, 50);
-                }
+                    }
+                });
             },
             setVis: function() {
                 $("#mainHolder").css({"visibility": "visible", "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)","filter": "alpha(opacity=100)","-moz-opacity": 1,"-khtml-opacity": 1,"opacity": 1
                 });
                 setTimeout(function() {$("#loadingIndicator").hide();}, 150);
-                DELAY_LOADING = false;
+                DELAY_LOADING = false; /*global DELAY_LOADINT */
             },
             initSections: function(callback) {
                 var self = this, sectionsInitialized = {}, initCount = 0;
@@ -583,23 +591,17 @@
                         }
                     },
                     "clinical": function() {
-                        var content = "", tnthDates = self.modules.tnthDates;
+                        var tnthDates = self.modules.tnthDates;
                         if (!$("#biopsyDateContainer").hasClass("has-error")) {
                             var f = $("#patBiopsy input[name='biopsy']:checked");
                             var a = f.val(), biopsyDate = $("#biopsyDate").val();
+                            var content = f.closest("label").text();
                             if (String(a) === "true" && biopsyDate) {
-                                var displayDate = "";
+                                var displayDate = i18next.t("not provided");
                                 if ($.trim($("#biopsy_month option:selected").val() + $("#biopsy_year").val() + $("#biopsy_day").val())) {
                                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
                                 }
-                                if (!displayDate) {
-                                    displayDate = i18next.t("not provided");
-                                }
                                 content = f.closest("label").text() + "&nbsp;&nbsp;" + displayDate;
-                            } else {
-                                content = f.closest("label").text();
-                            }
-                            if (String(a) === "true") {
                                 $("#biopsyDateContainer").show();
                             }
                             this.setContent($("#biopsy_view"), content);
@@ -690,38 +692,32 @@
             },
             postDemoData: function(field, data) {
                 var self = this;
-                if (field) {
-                    var valid = field.get(0).validity ? field.get(0).validity.valid : true;
-                    if (valid) {
-                        var o = field;
-                        var parentContainer = field.closest(".profile-item-container");
-                        var editButton = parentContainer.find(".profile-item-edit-btn");
-                        setTimeout(function() {
-                            var hasError = false;
-                            if (o.attr("data-error-field")) {
-                                var customErrorField = $("#" + o.attr("data-error-field"));
-                                if (customErrorField.length > 0) {
-                                    hasError = (customErrorField.text() !== "");
-                                }
+                field = field || $(field);
+                data = data || {};
+                var valid = field.get(0).validity ? field.get(0).validity.valid : true;
+                if (valid) {
+                    var o = field;
+                    var parentContainer = field.closest(".profile-item-container");
+                    var editButton = parentContainer.find(".profile-item-edit-btn");
+                    setTimeout(function() {
+                        var hasError = false;
+                        if (o.attr("data-error-field")) {
+                            var customErrorField = $("#" + o.attr("data-error-field"));
+                            if (customErrorField.length > 0) {
+                                hasError = (customErrorField.text() !== "");
                             }
-                            if (!hasError) {
-                                editButton.attr("disabled", true);
-                                if (data) {
-                                    if (!data.resourceType) {
-                                        data.resourceType = "Patient";
-                                    }
-                                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                                        self.setDemoData();
-                                        setTimeout(function() {
-                                            editButton.attr("disabled", false);
-                                        }, 50);
-                                    });
-                                }
-                            } else {
-                                editButton.attr("disabled", false);
-                            }
-                        }, 250);
-                    }
+                        }
+                        if (!hasError) {
+                            data.resourceType = data.resourceType || "Patient";
+                            self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                                self.setDemoData();
+                                setTimeout(function() {
+                                    editButton.attr("disabled", false);
+                                }, 50);
+                            });
+                        }
+                        editButton.attr("disabled", hasError);
+                    }, 250);
                 }
             },
             getTelecomData: function() {
@@ -1009,7 +1005,7 @@
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     var messageContainer = $("#profile" + emailType + "EmailMessage");
-                    if (this.value != "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
+                    if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
                         message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
@@ -1387,7 +1383,7 @@
                     for (var state in states) {
                         if (!found) {
                             (states[state]).forEach(function(i) {
-                                if (i === o) {
+                                if (String(i) === String(o)) {
                                     s = state;
                                     found = true;
                                 }
@@ -1402,7 +1398,7 @@
                     var __state = "";
                     if (item.identifier) {
                         (item.identifier).forEach(function(region) {
-                            if (region.system === self.modules.SYSTEM_IDENTIFIER_ENUM.practice_region && region.value) {
+                            if (String(region.system) === String(self.modules.SYSTEM_IDENTIFIER_ENUM.practice_region) && region.value) {
                                 __state = (region.value).split(":")[1];
                                 if (!states[__state]) {
                                     states[__state] = [item.id];
@@ -1562,7 +1558,7 @@
                 orgTool.onLoaded(subjectId, true);
                 this.setOrgsVis(
                     function() {
-                        if ((typeof leafOrgs !== "undefined") && leafOrgs) {
+                        if ((typeof leafOrgs !== "undefined") && leafOrgs) { /*global leafOrgs*/  
                             orgTool.filterOrgs(leafOrgs);
                         }
                         if ($("#requireMorph").val()) {
@@ -1584,7 +1580,9 @@
                         var orgID = val.reference.split("/").pop();
                         if (parseInt(orgID) === 0) {
                             $("#userOrgs #noOrgs").prop("checked", true);
-                            if ($("#stateSelector").length > 0) $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
+                            if ($("#stateSelector").length > 0) {
+                                $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
+                            }
                         } else {
                             var ckOrg = $("#userOrgs input.clinic[value=" + orgID + "]");
                             if ($(".state-container").length > 0) {
@@ -1601,7 +1599,9 @@
                                     ckOrg.prop("checked", true);
                                 } else {
                                     var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
-                                    if (topLevelOrg.length > 0) topLevelOrg.attr("data-checked", "true");
+                                    if (topLevelOrg.length > 0) {
+                                        topLevelOrg.attr("data-checked", "true");
+                                    }
                                 }
                             }
                         }
@@ -1662,25 +1662,18 @@
                 var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val(), userId=this.subjectId;
                 var self = this;
                 if (preselectClinic) {
-                    var parentOrg = $("#userOrgs input[name='organization'][value='" + preselectClinic + "']").attr("data-parent-id");
-                    if (!parentOrg) {
-                        parentOrg = preselectClinic;
-                    }
+                    var parentOrg = $("#userOrgs input[name='organization'][value='" + preselectClinic + "']").attr("data-parent-id") || preselectClinic;
                     if (self.modules.tnthAjax.hasConsent(userId, parentOrg)) {
                         demoArray.careProvider = [{reference: "api/organization/" + preselectClinic}];
                     }
                 } else {
                     if ($("#userOrgs input[name='organization']").length > 0) {
                         var orgIDs;
-                        orgIDs = $("#userOrgs input[name='organization']").map(function() {
-                            if ($(this).prop("checked")) {
-                                return {reference: "api/organization/" + $(this).val()};
-                            }
+                        orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
+                            return {reference: "api/organization/" + $(this).val()};
                         }).get();
-                        if (orgIDs) {
-                            if (orgIDs.length > 0) {
-                                demoArray.careProvider = orgIDs;
-                            }
+                        if (orgIDs && orgIDs.length > 0) {
+                            demoArray.careProvider = orgIDs;
                         }
                     }
                     /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
@@ -1689,18 +1682,14 @@
                         topLevelOrgs.each(function() {
                             var tOrg = $(this).attr("orgid");
                             if (tOrg) {
-                                if (!demoArray.careProvider) {
-                                    demoArray.careProvider = [];
-                                }
+                                demoArray.careProvider = demoArray.careProvider || [];
                                 demoArray.careProvider.push({reference: "api/organization/" + tOrg});
                             }
                         });
                     }
                 }
-                if (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0)) { //don't update org to none if there are top level org affiliation above
-                    if ($("#aboutForm").length === 0) {
-                        demoArray.careProvider = [{reference: "api/organization/" + 0}];
-                    }
+                if ($("#aboutForm").length === 0 && (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0))) { //don't update org to none if there are top level org affiliation above
+                    demoArray.careProvider = [{reference: "api/organization/" + 0}];
                 }
                 self.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync);
             },
@@ -1725,13 +1714,10 @@
                 }
             },
             "getDefaultAgreementUrl": function(orgId) {
-                var stockConsentUrl = $("#stock_consent_url").val(), agreementUrl = "";
-                if (stockConsentUrl) {
-                    var orgElement = $("#" + orgId + "_org");
-                    if (orgElement.length > 0) {
-                        var orgName = orgElement.attr("data-parent-name") || orgElement.attr("data-org-name");
-                        agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent(orgName));
-                    }
+                var stockConsentUrl = $("#stock_consent_url").val(), agreementUrl = "", orgElement = $("#" + orgId + "_org");
+                if (stockConsentUrl && orgElement.length > 0) {
+                    var orgName = orgElement.attr("data-parent-name") || orgElement.attr("data-org-name");
+                    agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent(orgName));
                 }
                 return agreementUrl;
             },
@@ -1850,32 +1836,36 @@
                 var self = this;
                 for (var i = 0; i < data.length; i++) {
                     var val = data[i];
-                    var clinicalItem = val.content.code.coding[0].display;
+                    var clinicalItem = String(val.content.code.coding[0].display);
                     var clinicalValue = val.content.valueQuantity.value;
                     var clinicalUnit = val.content.valueQuantity.units;
                     var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
                     var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
                     //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
                     var status = val.content.status;
-                    if (clinicalItem == "PCa diagnosis") {
+                    if (clinicalItem === "PCa diagnosis") {
                         clinicalItem = "pca_diag";
-                    } else if (clinicalItem == "PCa localized diagnosis") {
+                    } else if (clinicalItem === "PCa localized diagnosis") {
                         clinicalItem = "pca_localized";
                     }
                     var ci = $('div[data-topic="' + clinicalItem + '"]');
-                    if (ci.length > 0) ci.fadeIn().next().fadeIn();
+                    if (ci.length > 0) {
+                        ci.fadeIn().next().fadeIn();
+                    }
                     var $radios = $('input:radio[name="' + clinicalItem + '"]');
                     if ($radios.length > 0) {
                         if (!$radios.is(":checked")) {
-                            if (status == "unknown") $radios.filter('[data-status="unknown"]').prop("checked", true);
-                            else $radios.filter("[value=" + clinicalValue + "]").not("[data-status='unknown']").prop("checked", true);
+                            if (String(status) === "unknown") {
+                                $radios.filter('[data-status="unknown"]').prop("checked", true);
+                            } else {
+                                $radios.filter("[value=" + clinicalValue + "]").not("[data-status='unknown']").prop("checked", true);
+                            }
                             if (truesyValue) {
                                 $radios.filter("[value=true]").prop("checked", true);
-                            }
-                            else if (falsyValue) {
+                            } else if (falsyValue) {
                                 $radios.filter("[value=false]").prop("checked", true);
                             }
-                            if (clinicalItem == "biopsy") {
+                            if (clinicalItem === "biopsy") {
                                 if (String(clinicalValue) === "true" || truesyValue) {
                                     if (val.content.issued) {
                                         var dString = self.modules.tnthDates.formatDateString(val.content.issued, "iso-short");
@@ -1893,7 +1883,7 @@
                                     $("#biopsyDate").attr("skipped", "true");
                                 }
                             }
-                            if (clinicalItem == "pca_diag") {
+                            if (clinicalItem === "pca_diag") {
                                 if ($("#pca_diag_no").is(":checked")) {
                                     $("#tx_yes").attr("skipped", "true");
                                     $("#tx_no").attr("skipped", "true");
@@ -1921,7 +1911,9 @@
                 self.modules.tnthAjax.getTreatment(self.subjectId, function(data) {
                     self.updateTreatment(data);
                     self.modules.tnthAjax.getClinical(self.subjectId, function(data) {
-                        if (data.entry) self.updateClinicalSection(data.entry);
+                        if (data.entry) {
+                            self.updateClinicalSection(data.entry);
+                        }
                         $("#patientQ").attr("loaded", "true");
                         if (self.mode === "profile") {
                             if (self.currentUserId !== self.subjectId) {
@@ -2020,10 +2012,10 @@
                     profileSelf.__convertToNumericField($("#biopsy_day, #biopsy_year"));
                     $("input[name='biopsy']").each(function() {
                         $(this).on("click", function() {
-                            if ($(this).val() == "true") {
+                            if (String($(this).val()) === "true") {
                                 $("#biopsyDateContainer").show();
-                                if ($(this).attr("id") == "biopsy_yes") {
-                                    if (!$("#biopsy_day").val()) $("#biopsy_day").focus();
+                                if (String($(this).attr("id")) === "biopsy_yes" && String($("#biopsy_day").val()) === "") {
+                                    $("#biopsy_day").focus();
                                 }
                             } else {
                                 $("#biopsyDate").val("");
@@ -2052,7 +2044,7 @@
                     });
                     $("input[name='tx']").each(function() {
                         $(this).on("click", function() {
-                            profileSelf.modules.tnthAjax.postTreatment($("#iq_userId").val(), ($(this).val() == "true"), "", $(this));
+                            profileSelf.modules.tnthAjax.postTreatment($("#iq_userId").val(), (String($(this).val()) === "true"), "", $(this));
                         });
                     });
                 }, 550);
@@ -2118,7 +2110,7 @@
                         }
                         if (dataArray.length > 0) {
                             var items = $.grep(dataArray, function(item) { //filtered out non-deleted items from all consents
-                                return !item.deleted && item.status == "consented";
+                                return !item.deleted && String(item.status) === "consented";
                             });
                             if (items.length > 0) { //consent date in GMT
                                 self.manualEntry.consentDate = items[0].signed;
@@ -2193,9 +2185,9 @@
                 });
                 $(document).delegate("#meSubmit", "click", function() {
 
-                    var method = self.manualEntry.method, completionDate = $("#qCompletionDate").val();
+                    var method = String(self.manualEntry.method), completionDate = $("#qCompletionDate").val();
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
-                    if (method != "") {
+                    if (method !== "") {
                         if (method === "paper") {
                             self.manualEntryModalVis(true);
                             var errorMsg = "";
@@ -2223,7 +2215,7 @@
 
                 self.modules.tnthAjax.assessmentStatus(subjectId, function(data) {
                     if (!data.error) {
-                        if (((data.assessment_status).toUpperCase() == "COMPLETED") &&
+                        if (((data.assessment_status).toUpperCase() === "COMPLETED") &&
                             (parseInt(data.outstanding_indefinite_work) === 0)) {
                             $("#assessmentLink").attr("disabled", true);
                             $("#enterManualInfoContainer").text(i18next.t("All available questionnaires have been completed."));
@@ -2334,7 +2326,7 @@
             getConsentHeaderRow: function(header) {
                 var content = "", h = header || this.consent.consentHeaderArray;
                 h.forEach(function(title) {
-                    if (title != "n/a") {
+                    if (String(title) !== "n/a") {
                         content += "<TH class='consentlist-header'>" + title + "</TH>";
                     }
                 });
@@ -2346,7 +2338,7 @@
                 var LROrgId = item ? item.organization_id : "";
                 if (LROrgId) {
                     var topOrgID = (self.getOrgTool()).getTopLevelParentOrg(LROrgId);
-                    if (topOrgID && (topOrgID != LROrgId)) {
+                    if (topOrgID && (String(topOrgID) !== String(LROrgId))) {
                         LROrgId = topOrgID;
                     }
                 }
@@ -2354,20 +2346,21 @@
                 var contentArray = [{
                     content: self.getConsentOrgDisplayName(item)
                 }, {
-                    content: sDisplay + (!isDisabled && self.isConsentEditable() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#profileConsentListModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : ""),
+                    content: sDisplay + (!isDisabled && self.isConsentEditable() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#profileConsentListModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : ""),
                     "_class": "indent"
                 }, {
                     content: (function(item) {
                         var s = "";
-                        if (self.isDefaultConsent(item)) s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
-                        else {
+                        if (self.isDefaultConsent(item)) {
+                            s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                        } else {
                             s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                                ((editorUrlEl.length > 0 && editorUrlEl.val()) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ? "data-show='true'" : "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "");
+                                ((editorUrlEl.length > 0 && editorUrlEl.val()) ? ("<div class='button--LR' " + (String(editorUrlEl.attr("data-show")) === "true" ? "data-show='true'" : "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "");
                         }
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestPatient() && consentStatus == "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
+                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestPatient() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2455,7 +2448,9 @@
                     case "consented":
                         if (this.isDefaultConsent(item)) {
                             sDisplay = oDisplayText.default;
-                        } else sDisplay = oDisplayText.consented;
+                        } else {
+                            sDisplay = oDisplayText.consented;
+                        }
                         cflag = "consented";
                         break;
                     case "suspended":
@@ -2491,7 +2486,7 @@
                             (data.tous).forEach(function(item) {
                                 var fType = $.trim(item.type).toLowerCase();
                                 var org = orgsList[item.organization_id];
-                                if (fType == "subject website consent" || fType == "website terms of use") {
+                                if (["subject website consent", "website terms of use"].indexOf(String(fType)) !== -1) {
                                     item.name = (org && org.name ? i18next.t(org.name) : "--");
                                     item.truenth_name = i18next.t("TrueNTH USA"),
                                     item.accepted = self.modules.tnthDates.formatDateString(item.accepted); //format to accepted format D m y
@@ -2517,7 +2512,9 @@
                     var userId = relatedTarget.attr("data-userId"), status = relatedTarget.attr("data-status");
                     $(this).find("input[class='radio_consent_input']").each(function() {
                         $(this).attr({ "data-agreementUrl": agreementUrl, "data-userId": userId, "data-orgId": orgId});
-                        if ($(this).val() == status) $(this).prop("checked", true);
+                        if (String($(this).val()) === String(status)) {
+                            $(this).prop("checked", true);
+                        }
                     });
                     if (__self.isAdmin()) {
                         $(this).find(".admin-radio").show();
@@ -2530,12 +2527,12 @@
                             o.org = $(this).attr("data-orgId");
                             o.agreementUrl = $(this).attr("data-agreementUrl");
                         }
-                        if ($(this).val() == "purged") {
+                        if (String($(this).val()) === "purged") {
                             __self.modules.tnthAjax.deleteConsent($(this).attr("data-userId"), {
                                 org: $(this).attr("data-orgId")
                             });
-                            __self.reloadConsentList(self.attr("data-userId"));
-                        } else if ($(this).val() == "suspended") {
+                            __self.reloadConsentList($(this).attr("data-userId"));
+                        } else if (String($(this).val()) === "suspended") {
                             var modalElement = $("#profileConsentListModal"), self = $(this);
                             __self.modules.tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"), null, function(data) {
                                 modalElement.removeClass("fade").modal("hide");

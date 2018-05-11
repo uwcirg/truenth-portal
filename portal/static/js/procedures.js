@@ -1,5 +1,6 @@
 (function() {
     //TODO this JS code file needs a bit of clean-up
+    /*global $ */
     var i18next = window.portalModules.i18next, tnthAjax = window.portalModules.tnthAjax, tnthDates = window.portalModules.tnthDates, SYSTEM_IDENTIFIER_ENUM = window.portalModules.SYSTEM_IDENTIFIER_ENUM;
     var procDateReg = /(0[1-9]|1\d|2\d|3[01])/;
     var procYearReg = /(19|20)\d{2}/;
@@ -77,7 +78,7 @@
                         if (String(creator) === String(currentUserId)) {
                             creator = i18next.t("you");
                             deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
-                        } else if (creator == subjectId) {
+                        } else if (String(creator) === String(subjectId)) {
                             creator = i18next.t("this patient");
                         } else {
                             creator = i18next.t("staff member") + ", <span class='creator'>" + (creatorDisplay ? creatorDisplay : creator) + "</span>, ";
@@ -233,22 +234,29 @@
     $(document).ready(function() {
         procApp.init();
         function __convertToNumericField(field) {
-            if (field) {
-                if ("ontouchstart" in window || (typeof window.DocumentTouch !== "undefined" && document instanceof window.DocumentTouch)) {
-                    field.each(function() {
-                        $(this).prop("type", "tel");
-                    });
-                }
+            field = field || $(field);
+            if ("ontouchstart" in window || (typeof window.DocumentTouch !== "undefined" && document instanceof window.DocumentTouch)) {
+                field.each(function() {
+                    $(this).prop("type", "tel");
+                });
+            }
+        }
+        function checkSubmit(btnId) { //// Add/remove disabled from submit button
+            if (String($(btnId).attr("data-name")) !== "" && String($(btnId).attr("data-date-read")) !== "") {
+                // We trigger the click here. The button is actually hidden so user doesn't interact with it
+                $(btnId).removeClass("disabled").removeAttr("disabled");
+            } else {
+                $(btnId).addClass("disabled").attr("disabled", true);
             }
         }
         function isLeapYear(year) {
-            return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+            return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
         }
         function checkDate() {
             var df = $("#procDay"), mf =  $("#procMonth"), yf = $("#procYear");
             var d = df.val(), m = mf.val(), y = yf.val();
             if (!isNaN(parseInt(d))) {
-                if (parseInt(d) > 0 && parseInt(d) < 10) d = "0" + d;
+                if (parseInt(d) > 0 && parseInt(d) < 10) { d = "0" + d; }
             }
             var dTest = procDateReg.test(d), mTest = (String(m) !== ""), yTest = procYearReg.test(y);
             var errorText = i18next.t("The procedure date must be valid and in required format.");
@@ -304,14 +312,6 @@
             checkSubmit("button[id^='tnthproc-submit']");
 
         }
-        function checkSubmit(btnId) { //// Add/remove disabled from submit button
-            if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
-                // We trigger the click here. The button is actually hidden so user doesn't interact with it
-                $(btnId).removeClass("disabled").removeAttr("disabled");
-            } else {
-                $(btnId).addClass("disabled").attr("disabled", true);
-            }
-        }
         // Options for datepicker - prevent future dates, no default
         $(".event-element .input-group.date").each(function() {
             $(this).datepicker({
@@ -346,7 +346,7 @@
         });
 
         dateFields.forEach(function(fn) {
-            var triggerEvent = $("#" + fn).attr("type") == "text" ? "keyup" : "change";
+            var triggerEvent = String($("#" + fn).attr("type")) === "text" ? "keyup" : "change";
             if (("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch)) {
                 triggerEvent = "change";
             }
@@ -362,7 +362,7 @@
                 $("button[id^='tnthproc-submit']").attr("data-date-read", passedDate);
                 dateFormatted = tnthDates.swap_mm_dd(passedDate);
                 $("button[id^='tnthproc-submit']").attr("data-date", dateFormatted);
-                checkSubmit("button[id^='tnthproc-submit']");
+                checkSubmit("button[id^='tnthproc-submit']"); 
             }
 
         });

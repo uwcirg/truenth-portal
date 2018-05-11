@@ -1,4 +1,4 @@
-(function() {
+(function() { /*global $*/
     function hasValue(val) {
         return String(val) !== "null" && String(val) !== "" && String(val) !== "undefined";
     }
@@ -12,12 +12,11 @@
         });
     }
     function __convertToNumericField(field) {
-        if (field) {
-            if ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch) {
-                field.each(function() {
-                    $(this).prop("type", "tel");
-                });
-            }
+        field = field || $(field);
+        if ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch) {
+            field.each(function() {
+                $(this).prop("type", "tel");
+            });
         }
     }
     var FieldsChecker = function( //helper class to keep track of missing fields based on required/needed core data
@@ -454,8 +453,7 @@
     };
 
     FieldsChecker.prototype.sectionCompleted = function(sectionId) {
-        var isComplete = true,
-            isChecked = false;
+        var isComplete = true, isChecked = false;
         if (this.mainSections && this.mainSections[sectionId]) {
             //count skipped section as complete
             if ($("#" + sectionId).attr("skipped") === "true") {
@@ -463,7 +461,7 @@
             }
             for (var id in (this.mainSections[sectionId]).subsections) {
                 var fields = (this.mainSections[sectionId]).subsections[id].fields;
-                if (fields) {
+                if (isComplete && fields) {
                     fields.forEach(function(field) {
                         field = $(field);
                         if (field.length > 0 && (field.attr("skipped") !== "true")) {
@@ -583,21 +581,17 @@
     FieldsChecker.prototype.sectionsLoaded = function(all) {
         var self = this, isLoaded = true, subsectionId;
         if (!all && hasValue(self.currentSection)) {
-            if (isLoaded) {
-                for (subsectionId in self.mainSections[self.currentSection].subsections) {
-                    if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                        isLoaded = false;
-                    }
+            for (subsectionId in self.mainSections[self.currentSection].subsections) {
+                if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
+                    isLoaded = false;
                 }
             }
         } else {
             //check all if current section not available
             for (var section in self.mainSections) {
-                if (isLoaded) {
-                    for (subsectionId in self.mainSections[section].subsections) {
-                        if (!$("#" + subsectionId).attr("loaded")) {
-                            isLoaded = false;
-                        }
+                for (subsectionId in self.mainSections[section].subsections) {
+                    if (!isLoaded && !$("#" + subsectionId).attr("loaded")) {
+                        isLoaded = false;
                     }
                 }
             }
@@ -655,11 +649,9 @@
                 scrollTop: $(this).next("div.content-body").children().first().offset().top
             }, 1000);
         });
-        $(window).bind("scroll mousedown mousewheel keyup", function(e) {
-            if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel") {
-                if ($("html, body").is(":animated")) {
-                    $("html, body").stop(true, true);
-                }
+        $(window).bind("scroll mousedown mousewheel keyup", function() {
+            if ($("html, body").is(":animated")) {
+                $("html, body").stop(true, true);
             }
         });
         //if term of use form not present - need to show the form
@@ -1029,12 +1021,10 @@
                     ob.attr("data-require-validate", "true");
                 }
                 var stateContainer = ob.closest(".state-container");
-                if (stateContainer.length > 0) {
-                    var st = stateContainer.attr("state");
-                    if (st) {
-                        $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
-                        stateContainer.show();
-                    }
+                var st = stateContainer.attr("state");
+                if (stateContainer.length > 0 && st) {
+                    $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
+                    stateContainer.show();
                 }
             }
         }

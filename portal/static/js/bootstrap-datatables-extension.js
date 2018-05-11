@@ -36,12 +36,8 @@ var tnthTables = {
      * @returns 1,-1 or 0 for sorting
      */
     "dateSorter": function(a, b) {
-        if (!(a)) {
-            a = 0;
-        }
-        if (!(b)) {
-            b = 0;
-        }
+        a = a || 0;
+        b = b || 0;
         /*
          * make sure the string passed in does not have line break element if so it is a possible mult-line text, split it up and use the first item in the resulting array
          */
@@ -78,6 +74,6 @@ var tnthTables = {
         /*
          * see https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js
          */
-        return alphanum(a, b);
+        return alphanum(a, b); /*global alphanum */
     }
 };
