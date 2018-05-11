@@ -1,6 +1,5 @@
 """Communication model"""
 from collections import MutableMapping
-from contextlib import contextmanager
 from datetime import datetime
 from flask import current_app, url_for
 from flask_babel import gettext as _, force_locale
@@ -30,11 +29,6 @@ event_status_types = ENUM(
     create_type=False)
 
 
-@contextmanager
-def dummy_context():
-    yield None
-
-
 def locale_closure(locale_code, fn):
     """Capture preferred locale at load for use later during render
 
@@ -47,8 +41,11 @@ def locale_closure(locale_code, fn):
     locale_code = locale_code
 
     def function_with_forced_locale():
-        with force_locale(locale_code) if locale_code else dummy_context():
+        if not locale_code:
             return fn()
+        with force_locale(locale_code):
+            return fn()
+
     return function_with_forced_locale
 
 
