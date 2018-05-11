@@ -11,6 +11,7 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "indigenous": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
     "timezone": "http://hl7.org/fhir/StructureDefinition/user-timezone",
     "language": "http://hl7.org/fhir/valueset/languages",
+    "language_system": "urn:ietf:bcp:47",
     "shortname": "http://us.truenth.org/identity-codes/shortname",
     SNOMED_SYS_URL: "http://snomed.info/sct",
     CLINICAL_SYS_URL: "http://us.truenth.org/clinical-codes",

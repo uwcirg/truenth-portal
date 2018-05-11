@@ -105,7 +105,7 @@ var AccountCreationObj = function (roles, dependencies) {
     };
     this.__setDemo = function(returnedData) {
         var responseData = returnedData && returnedData.data? returnedData.data : null;
-        var self = this;
+        var self = this, SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
         if (responseData) {
 
             self.userId = responseData["user_id"];
@@ -151,7 +151,7 @@ var AccountCreationObj = function (roles, dependencies) {
             var studyId = $("#profileStudyId").val();
             if (hasValue(studyId)) {
                 var studyIdObj = {
-                    system: "http://us.truenth.org/identity-codes/external-study-id",
+                    system: SYSTEM_IDENTIFIER_ENUM.external_study_id,
                     use: "secondary",
                     value: studyId
                 };
@@ -164,7 +164,7 @@ var AccountCreationObj = function (roles, dependencies) {
             var siteId = $("#profileSiteId").val();
             if (hasValue(siteId)) {
                 var siteIdObj = {
-                    system: "http://us.truenth.org/identity-codes/external-site-id",
+                    system: SYSTEM_IDENTIFIER_ENUM.external_site_id,
                     use: "secondary",
                     value: siteId
                 };
@@ -479,7 +479,7 @@ var AccountCreationObj = function (roles, dependencies) {
             } else {
                 if (oi.language) {
                     arrCommunication.push({
-                        "language": {"coding": [{"code": oi.language,"system": "urn:ietf:bcp:47"}]}
+                        "language": {"coding": [{"code": oi.language,"system": SYSTEM_IDENTIFIER_ENUM.language_system}]}
                     });
                 } else {
                     if (oi.extension && oi.extension.length > 0) {

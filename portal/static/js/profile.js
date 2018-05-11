@@ -691,6 +691,9 @@
                 location.replace("/login-as/" + this.subjectId);
             },
             postDemoData: function(field, data) {
+                if (!this.subjectId) {
+                    return false;
+                }
                 var self = this;
                 field = field || $(field);
                 data = data || {};
