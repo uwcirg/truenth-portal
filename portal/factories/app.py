@@ -33,6 +33,7 @@ from ..views.extend_flask_user import reset_password_view_function
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
+from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
 from ..views.organization import org_api
@@ -43,6 +44,7 @@ from ..views.procedure import procedure_api
 from ..views.portal import portal
 from ..views.questionnaire import questionnaire_api
 from ..views.reporting import reporting_api
+from ..views.role import role_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.staff import staff
 from ..views.tou import tou_api
@@ -62,6 +64,7 @@ DEFAULT_BLUEPRINTS = (
     fhir_api,
     filters_blueprint,
     group_api,
+    identifier_api,
     intervention_api,
     notification_api,
     org_api,
@@ -72,6 +75,7 @@ DEFAULT_BLUEPRINTS = (
     portal,
     questionnaire_api,
     reporting_api,
+    role_api,
     scheduled_job_api,
     staff,
     truenth_api,

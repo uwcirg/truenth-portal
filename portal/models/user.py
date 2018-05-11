@@ -523,44 +523,49 @@ class User(db.Model, UserMixin):
         else:
             self._email = prefix
 
+    def implicit_identifiers(self):
+        """Generate and return the implicit identifiers
+
+        The primary key, email and auth providers are all visible in formats
+        such as demographics, but should never be stored as user_identifiers,
+        less problems of duplicate, out of sync data arise.
+
+        This method generates those on the fly for display purposes.
+
+        :returns: list of implicit identifiers
+
+        """
+        def primary():
+            return [Identifier(
+                use='official', system=TRUENTH_ID, value=self.id)]
+
+        def secondary():
+            if self.username:
+                return [Identifier(
+                    use='secondary', system=TRUENTH_USERNAME, value=self._email)]
+            return []
+
+        def providers():
+            return [
+                Identifier.from_fhir(provider.as_fhir())
+                for provider in self.auth_providers]
+
+        return primary() + secondary() + providers()
+
     @property
     def identifiers(self):
         """Return list of identifiers
 
         Several identifiers are "implicit", such as the primary key
         from the user table, and any auth_providers associated with
-        this user.  Add those if not already found for this user
-        on request, and return with existing identifiers linked
-        with this account.
+        this user.  These will be prepended to the existing identifiers
+        but should never be stored, as they're generated from other
+        fields.
+
+        :returns: list of implicit and existing identifiers
 
         """
-        primary = Identifier(use='official', system=TRUENTH_ID, value=self.id)
-        if primary not in self._identifiers.all():
-            self._identifiers.append(primary)
-
-        if self.username:
-            # As email addresses do legitimately change when registering and
-            # deleting users, may need to update the existing Identifier
-            username_identifier = [
-                i for i in self._identifiers if i.system == TRUENTH_USERNAME]
-            if len(username_identifier) > 1:
-                raise ValueError(
-                    "Users should only have a single identifier with system {}."
-                    "Problem user: {}".format(TRUENTH_USERNAME, self))
-            if username_identifier:
-                if username_identifier[0].value != self._email:
-                    username_identifier[0].value = self._email
-            else:
-                secondary = Identifier(
-                    use='secondary', system=TRUENTH_USERNAME, value=self._email)
-                self._identifiers.append(secondary)
-
-        for provider in self.auth_providers:
-            p_id = Identifier.from_fhir(provider.as_fhir())
-            if p_id not in self._identifiers.all():
-                self._identifiers.append(p_id)
-
-        return self._identifiers
+        return self.implicit_identifiers() + [i for i in self._identifiers]
 
     @property
     def external_study_id(self):
@@ -1023,6 +1028,41 @@ class User(db.Model, UserMixin):
                 allow_org_change(org, user=self, acting_user=acting_user)
             self.organizations.remove(org)
 
+    def add_roles(self, role_list, acting_user):
+        """Add one or more roles to user's existing roles
+
+        :param role_list: list of role objects defining what roles to add
+        :param acting_user: user performing action, for permissions, etc.
+
+        :raises: 409 if any named roles are already assigned to the user
+
+        """
+        if not set(self.roles).isdisjoint(set(role_list)):
+            abort(409, "Can't add role already applied to user")
+        # reuse update_roles() by including the current set now that input
+        # has been validated
+        self.update_roles(
+            role_list=role_list+self.roles, acting_user=acting_user)
+
+    def delete_roles(self, role_list, acting_user):
+        """Delete one or more roles from user's existing roles
+
+        :param role_list: list of role objects defining what roles to remove
+        :param acting_user: user performing action, for permissions, etc.
+
+        :raises: 409 if any named roles are not currently assigned to the user
+
+        """
+        if (len(set(self.roles).intersection(set(role_list))) !=
+                len(role_list)):
+            abort(409, "Request to delete role not currently applied to user")
+
+        # reuse update_roles() by including the current set now that input
+        # has been validated
+        self.update_roles(
+            role_list=[role for role in self.roles if role not in role_list],
+            acting_user=acting_user)
+
     def update_roles(self, role_list, acting_user):
         """Update user's roles
 
@@ -1059,6 +1099,41 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='role')
             db.session.add(audit)
 
+    def update_deceased(self, fhir):
+        if 'deceasedDateTime' in fhir:
+            dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
+                                     error_subject='deceasedDataTime')
+            if self.deceased_id:
+                # only update if the datetime is different
+                if dt == self.deceased.timestamp:
+                    return  # short circuit out of here
+            # Given a time, store and mark as "time of death"
+            audit = Audit(
+                user_id=current_user().id, timestamp=dt,
+                subject_id=self.id, context='user',
+                comment="time of death for user {}".format(self.id))
+            self.deceased = audit
+        elif 'deceasedBoolean' in fhir:
+            if fhir['deceasedBoolean'] is False:
+                if self.deceased_id:
+                    # Remove deceased record from the user, but maintain
+                    # the old audit row.
+                    self.deceased_id = None
+                    audit = Audit(
+                        user_id=current_user().id,
+                        subject_id=self.id, context='user',
+                        comment=("Remove existing deceased from "
+                                 "user {}".format(self.id)))
+                    db.session.add(audit)
+            else:
+                # still marked with an audit, but without the special
+                # comment syntax and using default (current) time.
+                audit = Audit(
+                    user_id=current_user().id, subject_id=self.id,
+                    comment=("Marking user {} as "
+                             "deceased".format(self.id)), context='user')
+                self.deceased = audit
+
     def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
@@ -1070,43 +1145,9 @@ class User(db.Model, UserMixin):
         :param acting_user: user requesting the change
 
         """
-        def update_deceased(fhir):
-            if 'deceasedDateTime' in fhir:
-                dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
-                                         error_subject='deceasedDataTime')
-                if self.deceased_id:
-                    # only update if the datetime is different
-                    if dt == self.deceased.timestamp:
-                        return  # short circuit out of here
-                # Given a time, store and mark as "time of death"
-                audit = Audit(
-                    user_id=current_user().id, timestamp=dt,
-                    subject_id=self.id, context='user',
-                    comment="time of death for user {}".format(self.id))
-                self.deceased = audit
-            elif 'deceasedBoolean' in fhir:
-                if fhir['deceasedBoolean'] is False:
-                    if self.deceased_id:
-                        # Remove deceased record from the user, but maintain
-                        # the old audit row.
-                        self.deceased_id = None
-                        audit = Audit(
-                            user_id=current_user().id,
-                            subject_id=self.id, context='user',
-                            comment=("Remove existing deceased from "
-                                     "user {}".format(self.id)))
-                        db.session.add(audit)
-                else:
-                    # still marked with an audit, but without the special
-                    # comment syntax and using default (current) time.
-                    audit = Audit(
-                        user_id=current_user().id, subject_id=self.id,
-                        comment=("Marking user {} as "
-                                 "deceased".format(self.id)), context='user')
-                    self.deceased = audit
 
         def update_identifiers(fhir):
-            """Given FHIR defines identifiers, but we never remove implicit
+            """Given FHIR defines identifiers, but we never store implicit
 
             Implicit identifiers include user.id, user.email (username)
             and any auth_providers.  Others may be manipulated via
@@ -1117,9 +1158,15 @@ class User(db.Model, UserMixin):
             if 'identifier' not in fhir:
                 return
 
-            # ignore internal system identifiers
-            pre_existing = [ident for ident in self._identifiers
-                            if ident.system not in internal_identifier_systems]
+            # ignore internal/implicit system identifiers
+            pre_existing = [
+                ident for ident in self._identifiers
+                if ident.system not in internal_identifier_systems]
+
+            if len(pre_existing) != self._identifiers.count():
+                raise ValueError(
+                    "implicit identifiers snuck in for {}".format(self))
+
             seen = []
             for identifier in fhir['identifier']:
                 try:
@@ -1132,10 +1179,7 @@ class User(db.Model, UserMixin):
                 except TypeError as e:
                     abort(400, "invalid format for identifier {}".format(e))
                 if new_id.system in internal_identifier_systems:
-                    # Let user know this isn't how to change email if attempted
-                    if (new_id.system == TRUENTH_USERNAME and
-                            self._email != new_id.value):
-                        abort(400, "use telecom to update email address")
+                    # Do NOT store or manipulate implicit identifiers
                     continue
                 new_id = new_id.add_if_not_found()
                 if new_id in pre_existing:
@@ -1174,7 +1218,7 @@ class User(db.Model, UserMixin):
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
-        update_deceased(fhir)
+        self.update_deceased(fhir)
         update_identifiers(fhir)
         update_care_providers(fhir)
         if 'gender' in fhir:
@@ -1441,11 +1485,15 @@ class User(db.Model, UserMixin):
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self),
                              context='account')
-        # also need to alter the TRUENTH_USERNAME identifier in case anyone
-        # in the future needs to reuse this address
-        ids = [id for id in self._identifiers if id.system == TRUENTH_USERNAME]
+        # confirm implicit IDs didn't sneak in, as they'll prevent reuse
+        # of values such as the email
+        ids = [
+            id for id in self._identifiers
+            if id.system in internal_identifier_systems]
         if ids:
-            ids[0].value = self._email
+            raise ValueError(
+                "Implicit identifiers don't belong - remove {} "
+                "from {}".format(ids, self))
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

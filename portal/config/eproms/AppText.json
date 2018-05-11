@@ -171,7 +171,7 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=8e562c71-e77e-8eb3-7716-152da4a59a32",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34",
       "name": "patient reminder email",
       "resourceType": "AppText"
     },

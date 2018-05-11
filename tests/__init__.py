@@ -308,6 +308,16 @@ class TestCase(Base):
             db.session.commit()
         OrgTree.invalidate_cache()
 
+    def prep_org_w_identifier(self):
+        o = Organization(name='test org')
+        i = Identifier(system=US_NPI, value='123-45')
+        o.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(o)
+            db.session.commit()
+        o = db.session.merge(o)
+        return o
+
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW
 

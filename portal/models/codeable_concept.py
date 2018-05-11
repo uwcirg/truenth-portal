@@ -26,8 +26,8 @@ class CodeableConcept(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        summary = "CodeableConcept {} [".format(
-            self.text if self.text else '')
+        text = "{} ".format(self.text) if self.text else ''
+        summary = "CodeableConcept {}[".format(text)
         summary += ','.join([str(coding) for coding in self.codings])
         return summary + ']'
 

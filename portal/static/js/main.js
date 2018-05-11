@@ -425,8 +425,8 @@ var ConsentUIHelper = function(consentItems, userId) {
             /*
              * note terms of use text is hidden/unhidden using respective project's stylesheet
              */
-            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t("Agreed to " + capitalize(item.display_type)) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
-            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{project name} Terms of Use").replace("{project name}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
+            touContent += "<td><span class='text-success small-text eproms-tou-table-text'><a href='" + item.agreement_url + "' target='_blank'>" + (i18next.t("Agreed to {documentType}").replace("{documentType}", capitalize(item.display_type))) + "</a></span><span class='text-success small-text truenth-tou-table-text'>" + i18next.t("Agreed to terms") + "</span></td>";
+            touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + i18next.t(item.display_type) + "</a></span><span class='truenth-tou-table-text'>" + (i18next.t("{projectName} Terms of Use").replace("{projectName}", "TrueNTH USA")) + "</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span></td>";
             touContent += "<td>" + item.accepted + "</td></tr>";
         });
         return touContent;
@@ -436,6 +436,7 @@ var ConsentUIHelper = function(consentItems, userId) {
         //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
         //and also website terms of use
         // WILL NEED TO CLARIFY
+        self.touObj = [];
         tnthAjax.getTerms(this.userId, "", true, function(data) {
             if (data && data.tous) {
                 (data.tous).forEach(function(item) {
@@ -871,7 +872,10 @@ var fillViews = {
                 var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
                 $("#deathDate_view").text(i18next.t(displayString));
             };
-        } else $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+        } else {
+            $("#boolDeath_view").html("<p class='text-muted'>" + __NOT_PROVIDED_TEXT + "</p>");
+            $("#deathDate_view").text("");
+        }
     },
     "locale": function() {
         if ($("#locale").length > 0) {
@@ -983,7 +987,9 @@ var fillContent = {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
-            //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
+            var clinicalUnit = val.content.valueQuantity.units;
+            var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
+            var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
             var status = val.content.status;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
@@ -997,8 +1003,14 @@ var fillContent = {
                 if(!$radios.is(':checked')) {
                     if (status == "unknown") $radios.filter('[data-status="unknown"]').prop('checked', true);
                     else $radios.filter('[value='+clinicalValue+']').not("[data-status='unknown']").prop('checked', true);
+                    if (truesyValue) {
+                        $radios.filter('[value=true]').prop("checked", true);
+                    }
+                    else if (falsyValue) {
+                        $radios.filter('[value=false]').prop("checked", true);
+                    }
                     if (clinicalItem == "biopsy") {
-                        if (clinicalValue == "true") {
+                        if (String(clinicalValue) === "true" || truesyValue) {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
                                 var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
@@ -1405,8 +1417,8 @@ var fillContent = {
                     var type = $(this).attr("data-tou-type");
                     if (typeInTous(type, "active")) {
                         item_found++;
-                        /* 
-                         * set the data-agree attribute for the corresponding consent item 
+                        /*
+                         * set the data-agree attribute for the corresponding consent item
                          */
                         $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true");
 
@@ -1691,7 +1703,7 @@ var fillContent = {
                     undefinedText: '--',
                     formatShowingRows: function (pageFrom, pageTo, totalRows) {
                         var rowInfo;
-                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} records").
                         replace("{pageFrom}", pageFrom).
                         replace("{pageTo}", pageTo).
                         replace("{totalRows}", totalRows);
@@ -1884,7 +1896,10 @@ var fillContent = {
                         });
                     };
 
-                    reportHTML += "<tr><td>" + (hasValue(q)? i18next.t(q) : "--") + "</td><td>" + (hasValue(a) ? i18next.t(a) : "--") + "</td></tr>";
+                    if (!hasValue(q)) q = "--";
+                    if (!hasValue(a)) a = "--";
+
+                    reportHTML += "<tr><td>" + q + "</td><td>" + a + "</td></tr>";
                 });
                 $("#userSessionReportDetailTable").append(reportHTML);
             };
@@ -2010,6 +2025,18 @@ var fillContent = {
                           return {
                             css: {"background-color": (index % 2 != 0 ? "#F9F9F9" : "#FFF")}
                           };
+                    },
+                    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+                        var rowInfo;
+                        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} records").
+                        replace("{pageFrom}", pageFrom).
+                        replace("{pageTo}", pageTo).
+                        replace("{totalRows}", totalRows);
+                        $(".pagination-detail .pagination-info").html(rowInfo);
+                        return rowInfo;
+                    },
+                    formatRecordsPerPage: function(pageNumber) {
+                        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
                     },
                     undefinedText: "--",
                     columns: [
@@ -2478,9 +2505,16 @@ var Profile = function(subjectId, currentUserId) {
         }, 1000);
     }
     this.initSections = function(callback) {
-        var self = this;
+        var self = this, existingSections = {}, initCount = 0;
         $("[data-profile-section-id]").each(function() {
-            self.initSection($(this).attr("data-profile-section-id"));
+            var sectionId = $(this).attr("data-profile-section-id");
+            if (!existingSections[sectionId]) {
+                setTimeout(function() {
+                    self.initSection(sectionId);
+                }, initCount);
+                initCount += 50;
+                existingSections[sectionId] = true;
+            }
         });
         if (callback) {
             setTimeout(function() {
@@ -2885,7 +2919,7 @@ var Profile = function(subjectId, currentUserId) {
         };
         $("#btnPasswordResetEmail").on("click", function(event) {
             event.preventDefault();
-            /* 
+            /*
              * stop bubbling of events
              */
             event.stopImmediatePropagation();
@@ -2918,7 +2952,7 @@ var Profile = function(subjectId, currentUserId) {
         var self = this;
         var saveLoaderDiv = self.getSaveLoaderDiv;
         saveLoaderDiv("profileForm", "boolDeathGroup");
-        $("#boolDeath").on("change", function() {
+        $("#boolDeath").on("click", function() {
             if (!($(this).is(":checked"))) {
                 $("#deathYear").val("");
                 $("#deathDay").val("");
@@ -3750,20 +3784,27 @@ var OrgTool = function() {
 };
 OrgTool.prototype.init = function (callback) {
     var self = this, callback = callback||function() {};
-    $.ajax ({
-        type: "GET",
-        url: "/api/organization",
-        async: false
-    }).done(function(data) {
-        if (data && data.entry) {
-            self.populateOrgsList(data.entry);
-            callback(data.entry);
-        };
-    }).fail(function(xhr) {
-        callback({"error": xhr.responseText});
-        tnthAjax.sendError(xhr, "/api/organization");
-    });
-}
+    if (sessionStorage.orgsData) {
+        var orgsData = JSON.parse(sessionStorage.orgsData);
+        self.populateOrgsList(orgsData);
+        callback(orgsData);
+    } else {
+        $.ajax ({
+            type: "GET",
+            url: "/api/organization",
+            async: false
+        }).done(function(data) {
+            if (data && data.entry) {
+                self.populateOrgsList(data.entry);
+                sessionStorage.setItem("orgsData", JSON.stringify(data.entry));
+                callback(data.entry);
+            };
+        }).fail(function(xhr) {
+            callback({"error": xhr.responseText});
+            tnthAjax.sendError(xhr, "/api/organization");
+        });
+    }
+};
 OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
     if (userId) {
         this.setUserId(userId);
@@ -4449,8 +4490,8 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        //don't think we want to translate message sent back to the server here
-        params.message = "Error generated in JS - " + (hasValue(message) ? message : "no detail available");
+        //don't think we want to translate message sent back to the server here, for some reason quotation marks weren't encoded, causing problem
+        params.message = "Error generated in JS - " + (hasValue(message) ? message.replace(/['"]/g, "") : "no detail available");
 
         if (window.console) {
             console.log("Errors occurred.....");
@@ -6528,7 +6569,7 @@ var tnthDates = {
                     });
                 }
             }).fail(function(xhr) {
-                
+
             });
         }
         if (!locale) {

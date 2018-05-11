@@ -12,12 +12,17 @@ def reset_password_view_function(token):
     is_valid, has_expired, user_id = current_app.user_manager.verify_token(
         token,
         current_app.user_manager.reset_password_expiration)
+    user = get_user_or_abort(user_id)
+
+    # as this is an entry point for not-yet-logged-in users, capture their
+    # locale_code in the session for template rendering prior to logging in.
+    # (Post log-in, the current_user().locale_code is always available
+    session['locale_code'] = user.locale_code
 
     if current_app.config.get("NO_CHALLENGE_WO_DATA"):
         # Some early users were not forced to set DOB and name fields.
         # As they will fail the challenge without data to compare, provide
         # a back door.
-        user = get_user_or_abort(user_id)
         if not all((user.birthdate, user.first_name, user.last_name)):
             if user.has_role(ROLE.ACCESS_ON_VERIFY):
                 message = (

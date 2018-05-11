@@ -153,7 +153,7 @@ class TestClinical(TestCase):
                 "display":"PCa diagnosis",
                 "system":"http://us.truenth.org/clinical-codes"}]},
                 "status":"unknown",
-                "valueQuantity":{"units":"boolean","value":"false"}}
+                "valueQuantity":{"units": "boolean", "value": None}}
         rv = self.client.post('/api/patient/{}/clinical'.format(
             TEST_USER_ID), content_type='application/json',
             data=json.dumps(data))

@@ -10,7 +10,8 @@ from portal.system_uri import (
     IETF_LANGUAGE_TAG,
     PRACTICE_REGION,
     SHORTCUT_ALIAS,
-    SHORTNAME_ID)
+    SHORTNAME_ID,
+    US_NPI)
 from portal.models.coding import Coding
 from portal.models.identifier import Identifier
 from portal.models.locale import LocaleConstants
@@ -21,9 +22,10 @@ from portal.models.organization import (
     OrganizationResearchProtocol,
     OrgTree,
     ResearchProtocolExtension)
+from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 
 
 class TestOrganization(TestCase):
@@ -588,3 +590,30 @@ class TestOrganization(TestCase):
 
         patients_list = OrgTree().visible_patients(self.test_user)
         self.assertEquals(len(patients_list), 0)
+
+    def test_user_org_get(self):
+        self.bless_with_basics()
+        self.test_user = db.session.merge(self.test_user)
+        expected = [
+            Reference.organization(o.id).as_fhir()
+            for o in self.test_user.organizations]
+        self.login()
+        rv = self.client.get('/api/user/{}/organization'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(rv.json['organizations'], expected)
+
+    def test_user_org_post(self):
+        self.shallow_org_tree()
+        self.prep_org_w_identifier()
+        data = {'organizations': [
+            {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
+            {'reference': 'api/organization/1001'}
+        ]}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/organization'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['organizations']), 2)
