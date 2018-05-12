@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+DH_VIRTUALENV_ARGS = --preinstall='pip>=8,<10.0' --preinstall='setuptools>=12'
 
 
 distclean:
