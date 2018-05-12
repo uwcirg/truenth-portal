@@ -4,6 +4,7 @@
   "description": "fills the front-end needs including incorporating i18next for frontend translation needs",
   "main": "main.js",
   "scripts": {
+    "build": "gulp --gulpfile development_gulpfile.js main", //call 'npm run-script build' will build minify script file, if need to 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Amy",
@@ -35,9 +36,6 @@
     "request": "^2.81.0",
     "run-sequence": "^2.2.0",
     "vinyl-source-stream": "^1.1.0"
-  },
-  "dependencies": {
-    "fs": "0.0.1-security",
-    "path": "^0.12.7"
   }
 }
+
