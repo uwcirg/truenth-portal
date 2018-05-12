@@ -748,19 +748,21 @@
                         identifiers.push(identifier);
                     });
                 } else {
-                    $.ajax({ //get current identifier(s)
-                        type: "GET",
-                        url: "/api/demographics/" + self.subjectId,
-                        async: false
-                    }).done(function(data) {
-                        if (data && data.identifier) {
-                            (data.identifier).forEach(function(identifier) {
-                                identifiers.push(identifier);
-                            });
-                        }
-                    }).fail(function(xhr) {
-                        self.modules.tnthAjax.reportError(self.subjectId, "api/demographics" + self.subjectId, xhr.responseText);
-                    });
+                    if (self.subjectId) {
+                        $.ajax({ //get current identifier(s)
+                            type: "GET",
+                            url: "/api/demographics/" + self.subjectId,
+                            async: false
+                        }).done(function(data) {
+                            if (data && data.identifier) {
+                                (data.identifier).forEach(function(identifier) {
+                                    identifiers.push(identifier);
+                                });
+                            }
+                        }).fail(function(xhr) {
+                            self.modules.tnthAjax.reportError(self.subjectId, "api/demographics" + self.subjectId, xhr.responseText);
+                        });
+                    }
                 }
                 identifiers = $.grep(identifiers, function(identifier) { //this will save study Id or site Id only if each has a value otherwise if each is empty, it will be purged from the identifiers that had older value of each
                     return identifier.system !== self.modules.SYSTEM_IDENTIFIER_ENUM.external_study_id &&
