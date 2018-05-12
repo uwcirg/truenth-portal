@@ -36,10 +36,11 @@
             }).done(function(data) {
                 if (sessionStorage.treatmentOptions) {
                     self.updateTreatmentOptions(JSON.parse(sessionStorage.treatmentOptions));
-                }
-                if (data.treatment_options) {
-                    sessionStorage.setItem("treatmentOptions", JSON.stringify(data.treatment_options));
-                    self.updateTreatmentOptions(data.treatment_options);
+                } else {
+                    if (data.treatment_options) {
+                        sessionStorage.setItem("treatmentOptions", JSON.stringify(data.treatment_options));
+                        self.updateTreatmentOptions(data.treatment_options);
+                    }
                 }
             }).fail(function() {});
         },
@@ -49,7 +50,8 @@
             }
             $.ajax({
                 type: "GET",
-                url: "/api/patient/" + this.subjectId + "/procedure"
+                url: "/api/patient/" + this.subjectId + "/procedure",
+                cache: false
             }).done(function(data) {
                 if (data.entry.length === 0) {
                     $("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({
@@ -209,7 +211,7 @@
                         // more obvious when the updated list loads
                         setTimeout(function() {
                             procApp.getUserProcedures(true);
-                        }, 1500);
+                        }, 1800);
                         $("#pastTreatmentsContainer").hide();
                     }
 

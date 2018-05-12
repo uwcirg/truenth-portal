@@ -60,12 +60,8 @@ OrgTool.prototype.init = function(callback) {
     }
 };
 OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
-    if (userId) {
-        this.setUserId(userId);
-    }
-    if (doPopulateUI) {
-        this.populateUI();
-    }
+    if (userId) { this.setUserId(userId); }
+    if (doPopulateUI) { this.populateUI(); }
     $("#userOrgs input[name='organization']").each(function() {
         $(this).prop("checked", false);
     });
@@ -117,17 +113,11 @@ OrgTool.prototype.getOrgName = function(orgId) {
     if (orgId && orgsList[orgId]) {
         return orgsList[orgId].name;
     }
-    else {
-        return "";
-    }
+    else { return ""; }
 };
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
-    if (!leafOrgs) {
-        return false;
-    }
-    if (leafOrgs.length === 0) {
-        return false;
-    }
+    if (!leafOrgs) { return false; }
+    if (leafOrgs.length === 0) { return false; }
     var self = this;
     $("#fillOrgs input[name='organization']").each(function() {
         if (!self.inArray($(this).val(), leafOrgs)) {
@@ -199,9 +189,7 @@ OrgTool.prototype.findOrg = function(entry, orgId) {
 OrgTool.prototype.populateOrgsList = function(items) {
     var entry = items, self = this, parentId, orgsList = {};
     if (Object.keys(this.orgsList).length === 0) {
-        if (!items) {
-            return false;
-        }
+        if (!items) { return false; }
         items.forEach(function(item) {
             if (item.partOf) {
                 parentId = item.partOf.reference.split("/").pop();
@@ -249,9 +237,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
                 }
             }
         });
-        if (items.length > 0) {
-            this.initialized = true;
-        }
+        if (items.length > 0) { this.initialized = true; }
         this.orgsList = orgsList;
     }
     return orgsList;
@@ -272,8 +258,7 @@ OrgTool.prototype.populateUI = function() {
     }
     var self = this, container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
     function getState(item) {
-        var s = "",
-            found = false;
+        var s = "", found = false;
         if (item.identifier) {
             (item.identifier).forEach(function(i) {
                 if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM.practice_region && i.value)) {
@@ -292,14 +277,9 @@ OrgTool.prototype.populateUI = function() {
         }
     });
     parentOrgsArray = parentOrgsArray.sort(function(a, b) { //sort parent orgs by name
-        var orgA = orgsList[a],
-            orgB = orgsList[b];
-        if (orgA.name < orgB.name) {
-            return -1;
-        }
-        if (orgA.name > orgB.name) {
-            return 1;
-        }
+        var orgA = orgsList[a], orgB = orgsList[b];
+        if (orgA.name < orgB.name) { return -1; }
+        if (orgA.name > orgB.name) { return 1; }
         return 0;
     });
     var parentFragment = document.createDocumentFragment(), parentDiv;
@@ -332,12 +312,8 @@ OrgTool.prototype.populateUI = function() {
         if (orgsList[org].children.length > 0) { // Fill in each child clinic
             var childClinic = "";
             var items = orgsList[org].children.sort(function(a, b) { // sort child clinic in alphabetical order
-                if (a.name < b.name) {
-                    return -1;
-                }
-                if (a.name > b.name) {
-                    return 1;
-                }
+                if (a.name < b.name) { return -1; }
+                if (a.name > b.name) { return 1; }
                 return 0;
             });
             items.forEach(function(item) {
@@ -394,9 +370,7 @@ OrgTool.prototype.getSelectedOrg = function() {
 OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
     var parentList = [], self = this;
     if (uo) {
-        if (uo.parentList) {
-            return uo.parentList;
-        }
+        if (uo.parentList) { return uo.parentList; }
         uo.forEach(function(o) {
             var p = self.getTopLevelParentOrg(o);
             if (p && !self.inArray(p, parentList)) {
@@ -405,14 +379,10 @@ OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
         });
         uo.parentList = parentList;
         return parentList;
-    } else {
-        return false;
-    }
+    } else { return false; }
 };
 OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
-    if (!currentOrg) {
-        return false;
-    }
+    if (!currentOrg) { return false; }
     var ml = this.getOrgsList(), self = this;
     if (ml && ml[currentOrg]) {
         if (ml[currentOrg].isTopLevel) {
@@ -953,10 +923,13 @@ var tnthAjax = {
     },
     handleConsent: function(obj) {
         var self = this, OT = this.getOrgTool(), userId = $("#fillOrgs").attr("userId") || $("#userOrgs").attr("userId");
-        var configVar = $("#profile_CONSENT_WITH_TOP_LEVEL_ORG").val();
-        if (!configVar) {
-            tnthAjax.getConfigurationByKey("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, false, true);
-        }
+        var configVar = "";
+        tnthAjax.getConfigurationByKey("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, function(data) {
+            if (!data.error) {
+                configVar = data.CONSENT_WITH_TOP_LEVEL_ORG;
+            }
+        }, true);
+        if (!configVar) { configVar = $("#profile_CONSENT_WITH_TOP_LEVEL_ORG").val(); }
         $(obj).each(function() {
             var parentOrg = OT.getElementParentOrg(this);
             var orgId = $(this).val();
@@ -975,9 +948,7 @@ var tnthAjax = {
                                 });
                             }, 350);
                         } else {
-                            if (cto) {
-                                tnthAjax.setDefaultConsent(userId, parentOrg);
-                            }
+                            tnthAjax.setDefaultConsent(userId, parentOrg);
                         }
                     }
                 } else {
@@ -1097,9 +1068,7 @@ var tnthAjax = {
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
-        if (!userId) {
-            return false;
-        }
+        if (!userId) { return false;}
         tnthAjax.deleteTreatment(userId, targetField);
         var code = SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE, display = "None", system = SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL;
         if (started) {
@@ -1131,12 +1100,8 @@ var tnthAjax = {
                             tnthAjax.deleteProc(treatmentData.id, targetField, true);
                         }
                     }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+                } else { return false; }
+            } else { return false; }
         });
     },
     "getProc": function(userId, newEntry, callback) {
@@ -1165,8 +1130,7 @@ var tnthAjax = {
     "deleteProc": function(procedureId, targetField, sync) {
         this.sendRequest("/api/procedure/" + procedureId, "DELETE", null, {sync: sync,targetField: targetField}, function(data) {
             if (data) {
-                if (!data.error) {
-                    $(".del-procs-error").html("");
+                if (!data.error) { $(".del-procs-error").html("");
                 } else {
                     $(".del-procs-error").html(i18next.t("Server error occurred removing procedure/treatment information."));
                 }
@@ -1284,9 +1248,7 @@ var tnthAjax = {
         });
     },
     "getObservationId": function(userId, code) {
-        if (!userId) {
-            return false;
-        }
+        if (!userId) { return false; }
         var obId = "",_code = "";
         this.sendRequest("/api/patient/" + userId + "/clinical", "GET", userId, {sync: true}, function(data) {
             if (data) {
@@ -1307,9 +1269,7 @@ var tnthAjax = {
         return obId;
     },
     "postClinical": function(userId, toCall, toSend, status, targetField, params) {
-        if (!userId) {
-            return false;
-        }
+        if (!userId) { return false; }
         params = params || {};
         var code = "", display = "";
         switch (toCall) {
@@ -1461,9 +1421,7 @@ var tnthAjax = {
     },
     "accessUrl": function(userId, sync, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-        }
+        if (!userId) { callback({"error": i18next.t("User id is required.")}); return false; }
         this.sendRequest("/api/user/" + userId + "/access_url", "GET", userId, {sync: sync}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1478,9 +1436,7 @@ var tnthAjax = {
     },
     "invite": function(userId, data, callback) {
         callback = callback || function() {};
-        if (!data) {
-            callback({"error": i18next.t("Invite data are required.")});
-        }
+        if (!data) { callback({"error": i18next.t("Invite data are required.")}); return false; }
         this.sendRequest("/invite", "POST", userId, {
             "contentType": "application/x-www-form-urlencoded; charset=UTF-8",
             "data": data,
@@ -1495,9 +1451,7 @@ var tnthAjax = {
     },
     "passwordReset": function(userId, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-        }
+        if (!userId) { callback({"error": i18next.t("User id is required.")}); return false; }
         this.sendRequest("/api/user/" + userId + "/password_reset", "POST", userId, {"contentType": "application/x-www-form-urlencoded; charset=UTF-8"}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1512,9 +1466,7 @@ var tnthAjax = {
     },
     "assessmentStatus": function(userId, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-        }
+        if (!userId) { callback({"error": i18next.t("User id is required.")}); return false; }
         this.sendRequest("/api/patient/" + userId + "/assessment-status", "GET", userId, null, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1529,12 +1481,8 @@ var tnthAjax = {
     },
     "updateAssessment": function(userId, data, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-        }
-        if (!data) {
-            callback({"error": i18next.t("Questionnaire response data is required.")});
-        }
+        if (!userId) { callback({"error": i18next.t("User id is required.")}); return false; }
+        if (!data) { callback({"error": i18next.t("Questionnaire response data is required.")}); return false;}
         this.sendRequest("/api/patient/" + userId + "/assessment", "PUT", userId, {data: JSON.stringify(data)}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1758,23 +1706,17 @@ var tnthAjax = {
         callback = callback || function() {};
         var self = this;
         if (!userId) {
-            callback({
-                "error": i18next.t("User id is required.")
-            });
+            callback({"error": i18next.t("User id is required.")});
             return false;
         }
         if (!configVar) {
-            callback({
-                "error": i18next.t("configuration variable name is required.")
-            });
+            callback({"error": i18next.t("configuration variable name is required.")});
             return false;
         }
         var sessionConfigKey = "config_" + configVar + "_" + userId;
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
-            if (setConfigInUI) {
-                self.setConfigurationUI(configVar, data[configVar] + "");
-            }
+            if (setConfigInUI) { self.setConfigurationUI(configVar, data[configVar] + "");}
             callback(data);
         } else {
             this.sendRequest("/api/settings/" + configVar, "GET", userId, (params || {}), function(data) {
@@ -2406,22 +2348,17 @@ var Global = {
 };
 
 var userSetLang = tnthDates.getUserLocale();
+/*global __i18next*/
 Global.registerModules();
-__i18next.init({ /*global __i18next*/
-    "lng": userSetLang
+__i18next.init({"lng": userSetLang
 }, function() {
     $(document).ready(function() {
-
-        if ($("#alertModal").length > 0) {
-            $("#alertModal").modal("show");
-        }
+        if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
             loader(true); /*global loader*/
             Global.initPortalWrapper(PORTAL_NAV_PAGE);
-        } else {
-            loader(); /*global loader*/
-        }
+        } else { loader();  }
         tnthAjax.beforeSend();
         Global.footer();
         Global.loginAs();
@@ -2462,9 +2399,7 @@ __i18next.init({ /*global __i18next*/
                         if ($el.attr("data-optional")) { //if email address is optional, update it as is
                             update($el);
                             return true;
-                        } else {
-                            return false;
-                        }
+                        } else { return false; }
                     }
                     var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                     var addUserId = ""; // Add user_id to api call (used on patient_profile page so that staff can edit)
@@ -2491,11 +2426,8 @@ __i18next.init({ /*global __i18next*/
                         return /[<>]/.test(text);
                     };
                     var invalid = containHtmlTags($el.val());
-                    if (invalid) {
-                        $("#error" + $el.attr("id")).html("Invalid characters in text.");
-                    } else {
-                        $("#error" + $el.attr("id")).html("");
-                    }
+                    if (invalid) { $("#error" + $el.attr("id")).html("Invalid characters in text."); } 
+                    else {$("#error" + $el.attr("id")).html("");}
                     return !invalid;
                 }
             },

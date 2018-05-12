@@ -409,7 +409,7 @@
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
                 return this.isAdmin() || (isStaff && isEditableByStaff) || (isPatient && isEditableByPatient);
             },
-            isTestPatient: function() {
+            isTestEnvironment: function() {
                 return String(this.settings.SYSTEM_TYPE).toLowerCase() !== "production";
             },
             isAdmin: function() {
@@ -465,7 +465,6 @@
                             var formGroup = container.find(".form-group").not(".data-update-on-validated");
                             formGroup.removeClass("has-error");
                             formGroup.find(".help-block.with-errors").html("");
-                            self.setDemoData();
                             self.fillSectionView(container.attr("data-sections"));
                             self.handleOptionalCoreData();
                         }
@@ -716,7 +715,7 @@
                                 self.setDemoData();
                                 setTimeout(function() {
                                     editButton.attr("disabled", false);
-                                }, 50);
+                                }, 150);
                             });
                         }
                         editButton.attr("disabled", hasError);
@@ -838,12 +837,16 @@
                 var self = this;
                 $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
                 $(".btn-send-email").blur();
-                $("#email").on("blur", function() {
+                $("#email").on("keyup", function() {
+                    $("#erroremail").html("");
+                });
+                $("#email").on("change", function() {
                     var o = $(this);
                     setTimeout(function() {
                         var hasError = $("#emailGroup").hasClass("has-error");
                         if (!hasError) {
                             self.demo.data.email = o.val();
+                            $("#erroremail").html("");
                             $("#email_view").html("<p>" + o.val() + "</p>");
                         }
                     }, 350);
@@ -1173,9 +1176,7 @@
                                 $("#passwordResetMessage").text(i18next.t("Unable to send email."));
                             }
                         });
-                    } else {
-                        $("#passwordResetMessage").text(i18next.t("No email address found for user"));
-                    }
+                    } else { $("#passwordResetMessage").text(i18next.t("No email address found for user")); }
                 });
             },
             updateDeceasedSection: function(targetField) {
@@ -2363,7 +2364,7 @@
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestPatient() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
+                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestEnvironment() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2750,7 +2751,7 @@
                     if (self.isConsentEditable()) {
                         self.initConsentItemEvent();
                     }
-                    if (self.isConsentEditable() && self.isTestPatient()) {
+                    if (self.isConsentEditable() && self.isTestEnvironment()) {
                         self.initConsentDateEvents();
                     }
                 } else {

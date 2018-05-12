@@ -12,10 +12,12 @@ const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const uglify = require("gulp-uglifyes");
 const sourcemaps = require("gulp-sourcemaps");
-const rootPath = "./static";
+const rootPath = "static";
 const jsPath = rootPath + "/js";
 const jsDest = rootPath + "/js/dist";
 const lessPath = rootPath + "/less";
+const cssPath = rootPath + "/css";
+const mapPath = rootPath + "/maps";
 const gutil = require("gulp-util");
 const jshint = require("gulp-jshint");
 const less = require("gulp-less");
@@ -84,12 +86,9 @@ gulp.task("main", function() {
  * alternatively can use eslint, see command line tool:  https://eslint.org/docs/user-guide/getting-started
  */
 gulp.task("jshint", function() {
-    var files = [];
+    var files = jsMainFiles;
     if (arg.file) {
       files = [arg.file];
-    }
-    else {
-        files = jsMainFiles;
     }
     return gulp.src(files)
         .pipe(jshint())
@@ -109,7 +108,7 @@ function replaceStd(fileName) {
       fileName = "*";
     }
     return replace({
-        files: "static/maps/" + fileName,
+        files: mapPath + "/" + fileName,
         from: "../../$stdin",
         to: "",
     }).then(changes => {
@@ -127,8 +126,8 @@ gulp.task("epromsLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../../../static/maps"))
-        .pipe(gulp.dest(EPROMS + "/static/css"));
+        .pipe(sourcemaps.write("../../../" + mapPath))
+        .pipe(gulp.dest(EPROMS + "/" + cssPath));
 });
 /*
  * transforming portal less to css
@@ -136,13 +135,13 @@ gulp.task("epromsLess", function() {
 gulp.task("portalLess", function() {
     gulp.src(lessPath + "/" + PORTAL + ".less")
         .pipe(sourcemaps.init({
-            sources: ["static/less/" + PORTAL + ".less"]
+            sources: [lessPath + "/" + PORTAL + ".less"]
         }))
         .pipe(less({
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../maps"))
-        .pipe(gulp.dest("static/css"));
+        .pipe(gulp.dest(cssPath));
     setTimeout(function() {
         replaceStd(PORTAL + ".css.map");
     }, 500);
@@ -156,8 +155,8 @@ gulp.task("gilLess", () => {
         .pipe(sourcemaps.init())
         .pipe(postCSS())
         .pipe(rename(GIL + ".css"))
-        .pipe(sourcemaps.write("../../../static/maps"))
-        .pipe(gulp.dest("gil/static/css"));
+        .pipe(sourcemaps.write("../../../"+mapPath))
+        .pipe(gulp.dest("gil/" + cssPath));
 
     setTimeout(function() {
         replaceStd(GIL + ".css.map");
@@ -176,7 +175,7 @@ gulp.task("topnavLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../maps"))
-        .pipe(gulp.dest("static/css"));
+        .pipe(gulp.dest(cssPath));
     setTimeout(function() {
         replaceStd(TOPNAV + ".css.map");
     }, 500);
@@ -198,4 +197,3 @@ gulp.task("watchGil", function() {
 gulp.task("watchTopnav", function() {
     gulp.watch(lessPath + "/topnav.less", ["topnavLess"]);
 });
-
