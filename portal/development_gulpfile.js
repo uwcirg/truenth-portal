@@ -58,7 +58,7 @@ const arg = (argList => {
 
 })(process.argv);
 
-/* 
+/*
  * NOT currently implemented
  * concat and minify main source files to be consumed in production ??
  */
@@ -75,7 +75,7 @@ gulp.task("main", function() {
         .on("error", function(err) {
             gutil.log(gutil.colors.red("[Error]"), err.toString());
         })
-        .pipe(sourcemaps.write("../../maps"))
+        .pipe(sourcemaps.write("../../maps")) //path relative to the source file, can't use rootPath here
         .pipe(gulp.dest(jsDest));
 });
 
@@ -140,7 +140,7 @@ gulp.task("portalLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps"))
+        .pipe(sourcemaps.write("../maps")) //path relative to the source file, can't use rootPath here
         .pipe(gulp.dest(cssPath));
     setTimeout(function() {
         replaceStd(PORTAL + ".css.map");
@@ -155,7 +155,7 @@ gulp.task("gilLess", () => {
         .pipe(sourcemaps.init())
         .pipe(postCSS())
         .pipe(rename(GIL + ".css"))
-        .pipe(sourcemaps.write("../../../"+mapPath))
+        .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
         .pipe(gulp.dest("gil/" + cssPath));
 
     setTimeout(function() {
@@ -164,7 +164,7 @@ gulp.task("gilLess", () => {
     return true;
 });
 
-/* 
+/*
  *transforming portal wrapper/top nav less to css
  */
 

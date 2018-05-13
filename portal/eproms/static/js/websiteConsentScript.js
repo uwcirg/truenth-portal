@@ -92,7 +92,7 @@
                             if (topOrgId) {
                                 theTerms["organization_id"] = topOrgId;
                             }
-                            
+
                             tnthAjax.postTermsByUser(patientId, theTerms);
                         }
                         tickBox.removeClass("fa-square-o").addClass("fa-check-square-o"); // Update UI
@@ -105,7 +105,7 @@
             });
         });
         $(".button-container").each(function() {
-            $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+            $(this).prepend("<div class='loading-message-indicator'><i class='fa fa-spinner fa-spin fa-2x'></i></div>");
         });
         $("#continue").on("click", function() {
             $(this).hide();

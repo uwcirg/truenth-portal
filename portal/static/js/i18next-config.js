@@ -59,7 +59,7 @@ var __i18next = window.__i18next = (function() {
                         var data;
                         try {
                             data = JSON.parse(sessionData);
-                            if (data && data[key]) {
+                            if (data && data.hasOwnProperty(key)) {
                                 return data[key];
                             }
                         } catch (e) {

@@ -3,7 +3,7 @@
  */
 (function() {
     var i18next = window.portalModules.i18next;
-    var ProfileObj = window.ProfileObj = new Vue({ /*global Vue */ 
+    var ProfileObj = window.ProfileObj = new Vue({ /*global Vue $ */
         el: "#mainDiv",
         components: {
             "section-view": {
@@ -21,7 +21,7 @@
         },
         created: function() {
             var self = this;
-            DELAY_LOADING = true; /*global DELAY_LOADING */ 
+            DELAY_LOADING = true; /*global DELAY_LOADING */
             this.registerDependencies();
             this.setUserSettings();
             this.onBeforeSectionsLoad();
@@ -45,7 +45,7 @@
                 if (data) {
                     self.settings = data;
                     if (data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { //for use by UI later, e.g. handle consent submission
-                        self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data[CONSENT_WITH_TOP_LEVEL_ORG] + "");
+                        self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + "");
                     }
                 }
                 self.onInitChecksDone();
@@ -523,7 +523,7 @@
                 $("#mainHolder").css({"visibility": "visible", "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)","filter": "alpha(opacity=100)","-moz-opacity": 1,"-khtml-opacity": 1,"opacity": 1
                 });
                 setTimeout(function() {$("#loadingIndicator").hide();}, 150);
-                DELAY_LOADING = false; /*global DELAY_LOADINT */
+                DELAY_LOADING = false; /*global DELAY_LOADING */
             },
             initSections: function(callback) {
                 var self = this, sectionsInitialized = {}, initCount = 0;
@@ -886,7 +886,7 @@
             },
             updateIdentifierData: function(event) {
                 this.postDemoData($(event.target), this.getIdentifierData());
-            }, 
+            },
             getAccessUrl: function() {
                 var url = "";
                 this.modules.tnthAjax.accessUrl(this.subjectId, true, function(data) {
@@ -1564,7 +1564,7 @@
                 orgTool.onLoaded(subjectId, true);
                 this.setOrgsVis(
                     function() {
-                        if ((typeof leafOrgs !== "undefined") && leafOrgs) { /*global leafOrgs*/  
+                        if ((typeof leafOrgs !== "undefined") && leafOrgs) { /*global leafOrgs*/
                             orgTool.filterOrgs(leafOrgs);
                         }
                         if ($("#requireMorph").val()) {
@@ -1673,28 +1673,22 @@
                         demoArray.careProvider = [{reference: "api/organization/" + preselectClinic}];
                     }
                 } else {
-                    if ($("#userOrgs input[name='organization']").length > 0) {
-                        var orgIDs;
-                        orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
-                            return {reference: "api/organization/" + $(this).val()};
-                        }).get();
-                        if (orgIDs && orgIDs.length > 0) {
-                            demoArray.careProvider = orgIDs;
-                        }
+                    var orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
+                        return {reference: "api/organization/" + $(this).val()};
+                    }).get();
+                    if (orgIDs && orgIDs.length > 0) {
+                        demoArray.careProvider = orgIDs;
                     }
                     /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
-                    var topLevelOrgs = $("#fillOrgs legend[data-checked]");
-                    if (topLevelOrgs.length > 0) {
-                        topLevelOrgs.each(function() {
-                            var tOrg = $(this).attr("orgid");
-                            if (tOrg) {
-                                demoArray.careProvider = demoArray.careProvider || [];
-                                demoArray.careProvider.push({reference: "api/organization/" + tOrg});
-                            }
-                        });
-                    }
+                    $("#fillOrgs legend[data-checked]").each(function() {
+                        var tOrg = $(this).attr("orgid");
+                        if (tOrg) {
+                            demoArray.careProvider = demoArray.careProvider || [];
+                            demoArray.careProvider.push({reference: "api/organization/" + tOrg});
+                        }
+                    });
                 }
-                if ($("#aboutForm").length === 0 && (!demoArray.careProvider || (demoArray.careProvider && demoArray.careProvider.length === 0))) { //don't update org to none if there are top level org affiliation above
+                if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
                     demoArray.careProvider = [{reference: "api/organization/" + 0}];
                 }
                 self.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync);
@@ -2064,11 +2058,11 @@
                 }
             },
             continueToAssessment: function(method, completionDate, assessment_url) {
+                var self = this;
                 if (assessment_url) {
                     var still_needed = false;
-                    var self = this;
                     var subjectId = this.subjectId;
-                    self.modules.tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
+                    this.modules.tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
                         if (data && !data.error && data.length > 0) {
                             still_needed = true;
                         }
@@ -2083,11 +2077,11 @@
                     }
                     var winLocation = !still_needed ? assessment_url : "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
                         "&redirect_url=" + encodeURIComponent(assessment_url);
-                    self.manualEntryModalVis(true);
+                    this.manualEntryModalVis(true);
                     setTimeout(function() { self.manualEntryModalVis();}, 2000);
                     setTimeout(function() { window.location = winLocation;}, 100);
                 } else {
-                    self.manualEntry.errorMessage = i18next.t("The user does not have a valid assessment link.");
+                    this.manualEntry.errorMessage = i18next.t("The user does not have a valid assessment link.");
                 }
             },
             initCustomPatientDetailSection: function() {
@@ -2494,7 +2488,7 @@
                                 var org = orgsList[item.organization_id];
                                 if (["subject website consent", "website terms of use"].indexOf(String(fType)) !== -1) {
                                     item.name = (org && org.name ? i18next.t(org.name) : "--");
-                                    item.truenth_name = i18next.t("TrueNTH USA"),
+                                    item.truenth_name = i18next.t("TrueNTH USA");
                                     item.accepted = self.modules.tnthDates.formatDateString(item.accepted); //format to accepted format D m y
                                     item.display_type = capitalize($.trim((item.type).toLowerCase().replace("subject", ""))); //for displaying consent type, note: this will remove text 'subject' from being displayed
                                     item.eproms_agreement_text = i18next.t("Agreed to {documentType}").replace("{documentType}", capitalize(item.display_type));
@@ -2712,7 +2706,8 @@
                         return new Date(b.signed) - new Date(a.signed);
                     });
                 }
-                this.consent.consentItems = dataArray, this.consent.consentDisplayRows = [];
+                this.consent.consentItems = dataArray;
+                this.consent.consentDisplayRows = [];
                 if (this.consent.consentItems.length > 0) {
                     var existingOrgs = {};
                     this.consent.consentItems.forEach(function(item, index) {

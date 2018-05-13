@@ -37,3 +37,4 @@ portal/package-lock.json
 # auto-generated JS eslint config when linting JS files (via command eslint) at development
 portal/static/js/.eslintrc.js
 portal/eproms/static/js/.eslintrc.js
+

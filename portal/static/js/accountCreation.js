@@ -478,17 +478,20 @@ var AccountCreationObj = function (roles, dependencies) {
                 return true; //don't count none
             } else {
                 if (oi.language) {
-                    arrCommunication.push({
-                        "language": {"coding": [{"code": oi.language,"system": SYSTEM_IDENTIFIER_ENUM.language_system}]}
-                    });
+                   arrCommunication.push({
+                       "language": {"coding": [{"code": oi.language,"system": SYSTEM_IDENTIFIER_ENUM.language_system}]}
+                   });
                 } else {
-                    if (oi.extension && oi.extension.length > 0) {
-                        (oi.extension).forEach(function(ex) {
-                            if (String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding) {
-                                arrCommunication.push({"language": { "coding": ex.valueCodeableConcept.coding}});
-                            }
-                        });
-                    }
+                    oi.extension = oi.extension || [];
+                    var arrExtension = $.grep(oi.extension, function(ex) {
+                        return String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding;
+                    });
+                    arrExtension = arrExtension.map(function(ex) {
+                        return ex.valueCodeableConcept.coding;
+                    });
+                    arrExtension.forEach(function(coding) {
+                        arrCommunication.push({"language": { "coding": coding}});
+                    });
                 }
             }
         });

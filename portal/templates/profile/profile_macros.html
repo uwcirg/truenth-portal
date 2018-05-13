@@ -703,7 +703,6 @@
                         </div>
                         <div class="modal-body">
                             <h4>{{_("Modify the consent status for this user to")}}</h4>
-                            <br/>
                             <div class="radio">
                                 <label>
                                     <input class="radio_consent_input" name="radio_consent" type="radio" value="consented" data-orgId="" data-agreementUrl="" data-userId="">{{_("Consented / Enrolled")}}</input>
@@ -726,7 +725,6 @@
                             </div>
                             <div id="#profileConsentListModalErrorMessage" class="text-danger"></div>
                         </div>
-                        <br/><br/>
                         <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
                         </div>
                 </div>
@@ -742,7 +740,6 @@
                     <div class="modal-body">
                         <h4><span>{{_("Current consent date: ")}}&nbsp;</span>
                             <span class="text-success data-current-consent-date"></span></h4>
-                        <br/>
                         <p>{{_("Modify the consent date")}} <span class="text-muted">{{_("GMT 24-hour format")}}</span>  <span>{{_("for this agreement to:")}}</p>
                         <div id="consentDateLoader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                         <div id="consentDateContainer" class="form-group consent-date-container">
@@ -761,7 +758,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="consentDateModalError" class="set-consent-error error-message"></div><br/><br/>
+                        <div id="consentDateModalError" class="set-consent-error error-message"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default btn-submit">{{_("Submit")}}</button>

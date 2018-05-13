@@ -12,11 +12,9 @@
         });
     }
     function __convertToNumericField(field) {
-        field = field || $(field);
         if ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch) {
-            field.each(function() {
-                $(this).prop("type", "tel");
-            });
+            field = field || $(field);
+            field.prop("type", "tel");
         }
     }
     var FieldsChecker = function( //helper class to keep track of missing fields based on required/needed core data
@@ -240,12 +238,9 @@
         demoArray.resourceType = "Patient";
         var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
         demoArray.name = {"given": $.trim(fname), "family": $.trim(lname)};
-        var bdFieldVal = "", y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+        var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
         if (y && m && d) {
-            bdFieldVal = y + "-" + m + "-" + d;
-        }
-        if (bdFieldVal) {
-            demoArray.birthDate = bdFieldVal;
+            demoArray.birthDate = y + "-" + m + "-" + d;
         }
         tnthAjax.putDemo(this.userId, demoArray);
     };
@@ -385,9 +380,11 @@
             var availableSections = 0;
             if (self.defaultSections) {
                 for (var section in self.defaultSections) {
-                    var active = self.sectionCompleted(section);
-                    $("#progressbar").append("<li sectionId='" + section + "'  " + (active ? " class='active'" : "") + ">" + self.defaultSections[section].display + "</li>");
-                    availableSections++;
+                    if (self.defaultSections.hasOwnProperty(section)) {
+                        var active = self.sectionCompleted(section);
+                        $("#progressbar").append("<li sectionId='" + section + "'  " + (active ? " class='active'" : "") + ">" + self.defaultSections[section].display + "</li>");
+                        availableSections++;
+                    }
                 }
             }
             if (availableSections > 0) {
@@ -589,9 +586,11 @@
         } else {
             //check all if current section not available
             for (var section in self.mainSections) {
-                for (subsectionId in self.mainSections[section].subsections) {
-                    if (!isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                        isLoaded = false;
+                if (self.mainSections.hasOwnProperty(section)) {
+                    for (subsectionId in self.mainSections[section].subsections) {
+                        if (!isLoaded && !$("#" + subsectionId).attr("loaded")) {
+                            isLoaded = false;
+                        }
                     }
                 }
             }
