@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
+# Makefile used by dpkg-buildpackage
 
+# dh-virtualenv options
+# https://dh-virtualenv.readthedocs.io/en/1.0/usage.html
 DH_VIRTUALENV_ARGS = --preinstall='pip>=8,<10.0' --preinstall='setuptools>=12'
 
 distclean:
