@@ -1170,15 +1170,13 @@
                     event.preventDefault();
                     event.stopImmediatePropagation(); //stop bubbling of events
                     var email = $("#email").val();
-                    if (email) {
-                        self.modules.tnthAjax.passwordReset(self.subjectId, function(data) {
-                            if (!data.error) {
-                                $("#passwordResetMessage").text(i18next.t("Password reset email sent to {email}").replace("{email}", email));
-                            } else {
-                                $("#passwordResetMessage").text(i18next.t("Unable to send email."));
-                            }
-                        });
-                    } else { $("#passwordResetMessage").text(i18next.t("No email address found for user")); }
+                    self.modules.tnthAjax.passwordReset(self.subjectId, function(data) {
+                        if (!data.error) {
+                            $("#passwordResetMessage").text(i18next.t("Password reset email sent to {email}").replace("{email}", email));
+                        } else {
+                            $("#passwordResetMessage").text(i18next.t("Unable to send email."));
+                        }
+                    });
                 });
             },
             updateDeceasedSection: function(targetField) {
@@ -1647,7 +1645,7 @@
                                 }
                             }
                         } else {
-                            self.modules.tnthAjax.handleConsent($(this));
+                            self.handleConsent($(this));
                             setTimeout(function() {
                                 self.updateOrgs($("#clinics"),true);
                             }, 500);
@@ -1695,9 +1693,7 @@
             },
             getConsentModal: function(parentOrg) {
                 var orgTool = this.getOrgTool();
-                if (!parentOrg) {
-                    parentOrg = orgTool.getElementParentOrg(orgTool.getSelectedOrg());
-                }
+                parentOrg = parentOrg || orgTool.getElementParentOrg(orgTool.getSelectedOrg());
                 if (parentOrg) {
                     var __modal = $("#" + parentOrg + "_consentModal");
                     if (__modal.length > 0) {
@@ -1738,13 +1734,59 @@
                     $($("#consentContainer .error-message").get(0)).text(i18next.t("Unable to set default consent agreement"));
                 }
             },
+            "handleConsent": function(obj) {
+                var self = this, OT = this.getOrgTool(), userId = this.subjectId, cto = this.isConsentWithTopLevelOrg(), tnthAjax = self.modules.tnthAjax;
+                $(obj).each(function() {
+                    var parentOrg = OT.getElementParentOrg(this), orgId = $(this).val();
+                    if ($(this).prop("checked")) {
+                        if ($(this).attr("id") !== "noOrgs") {
+                            var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                            if (agreementUrl && String(agreementUrl) !== "") {
+                                var params = self.CONSENT_ENUM.consented;
+                                params.org = cto ? parentOrg : orgId;
+                                params.agreementUrl = agreementUrl;
+                                setTimeout(function() {
+                                    tnthAjax.setConsent(userId, params, "all", true, function() {
+                                        tnthAjax.removeObsoleteConsent();
+                                    });
+                                }, 350);
+                            } else {
+                                self.setDefaultConsent(userId, parentOrg);
+                            }
+                        } else {
+                            var arrayDelOrgs = $("#userOrgs input[name='organization']").toArray().map(function(item) {return $(item).val();});
+                            if (cto) {
+                                arrayDelOrgs = OT.getTopLevelOrgs();
+                            }
+                            arrayDelOrgs.forEach(function(i) {
+                                (function(orgId) {
+                                    setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
+                                })(i);
+                            });
+                        }
+                    } else {
+                        if (cto) {
+                            var childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
+                            if ($("#fillOrgs").attr("patient_view")) {
+                                childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
+                            }
+                            var allUnchecked = !childOrgs.is(":checked");
+                            if (allUnchecked) {
+                                setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": parentOrg});}, 350);
+                            }
+                        } else {
+                            setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
+                        }
+                    }
+                });
+            },
             getDefaultModal: function(o) {
                 if (!o) { return false;}
                 var orgTool = this.getOrgTool();
                 var orgId = orgTool.getElementParentOrg(o), orgModalId = orgId + "_defaultConsentModal", orgElement = $("#"+orgModalId);
                 if (orgElement.length > 0) { return orgElement; }
-                var orgsList = orgTool.getOrgsList(),
-                    orgName = (orgsList[orgId] && orgsList[orgId].shortname) ? orgsList[orgId].shortname : ($(o).attr("data-parent-name") || $(o).closest("label").text());
+                var orgsList = orgTool.getOrgsList(), orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: null,
+                    orgName = (orgItem && orgItem.shortname) ? orgItem.shortname : ($(o).attr("data-parent-name") || $(o).closest("label").text());
                 var title = i18next.t("Consent to share information");
                 var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
                 var orgModalElement = $("#defaultConsentModal").clone(true);
@@ -1788,9 +1830,7 @@
                             }
                         } else {
                             __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
-                            setTimeout(function() {
-                                __self.modules.tnthAjax.removeObsoleteConsent();
-                            }, 100);
+                            setTimeout(function() {__self.modules.tnthAjax.removeObsoleteConsent();}, 100);
                         }
                         setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                         setTimeout(function() { modalElements.modal("hide");}, 250);

@@ -43,7 +43,7 @@
                                 });
                                 arrValueStrings = arrValueStrings.map(function(item) {
                                     return item.valueString;
-                                })
+                                });
                                 a = arrValueStrings.join("<br/>");
                                 /*
                                  * using valueCoding.code for answer and linkId for question if BOTH question and answer are empty strings

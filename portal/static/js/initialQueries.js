@@ -122,7 +122,7 @@
                     }
                 },
                 initData: function() {
-                    tnthAjax.getTerms($("#iq_userId").val(), false, false, function(data) {
+                    tnthAjax.getTerms(self.userId, false, false, function(data) {
                         self.updateTerms(data);
                         $("#termsCheckbox").attr("loaded", "true");
                     }, {
@@ -163,7 +163,7 @@
                     "bdGroup": {fields: ["#month", "#date", "#year"]}
                 },
                 initData: function() {
-                    tnthAjax.getDemo($("#iq_userId").val(), false, false, function() {
+                    tnthAjax.getDemo(self.userId, false, false, function() {
                         $("#nameGroup").attr("loaded", "true");
                         $("#rolesGroup").attr("loaded", "true");
                         $("#bdGroup").attr("loaded", "true");
@@ -180,8 +180,8 @@
                     }
                 },
                 initData: function() {
-                    tnthAjax.getTreatment($("#iq_userId").val(), function() {
-                        tnthAjax.getClinical($("#iq_userId").val(), function() {
+                    tnthAjax.getTreatment(self.userId, function() {
+                        tnthAjax.getClinical(self.userId, function() {
                             $("#patientQ").attr("loaded", "true");
                         });
                     });
@@ -198,7 +198,7 @@
                 },
                 initData: function() {
                     if (!hasValue($("#iqPatientEditable").val())) { //for patient, clinic is drawn in orgs state selector template
-                        tnthAjax.getOrgs($("#iq_userId").val(), true, function() {
+                        tnthAjax.getOrgs(self.userId, true, function() {
                             var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
                             if (userOrgs.length === 0) {
                                 userOrgs = $("#userOrgs input[name='organization']");
@@ -305,7 +305,7 @@
     FieldsChecker.prototype.getDefaultConfig = function() {
         var self = this, tnthAjax = this.__getDependency("tnthAjax");
         if (!this.CONFIG_DEFAULT_CORE_DATA) {
-            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {
+            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", self.userId, {
                 sync: true
             }, function(data) {
                 if (!data.error) {
@@ -332,7 +332,7 @@
         }
         if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
             var self = this;
-            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", $("#iq_userId").val(), {
+            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", this.userId, {
                 sync: true
             }, function(data) {
                 if (!data.error) {

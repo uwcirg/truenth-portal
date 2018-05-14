@@ -124,7 +124,9 @@ var AccountCreationObj = function (roles, dependencies) {
             };
 
             var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
-            _demoArray["birthDate"] = y + "-" + m + "-" + d;
+            if (y && m && d) {
+                _demoArray["birthDate"] = y + "-" + m + "-" + d;
+            }
 
             _demoArray["telecom"] = [];
 

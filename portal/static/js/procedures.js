@@ -91,7 +91,6 @@
                             month: "short",
                             year: "numeric"
                         }));
-
                         contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" +
                             (tnthDates.formatDateString(performedDateTime)) + "&nbsp;--&nbsp;" + displayText +
                             "&nbsp;<em>" + creationText +

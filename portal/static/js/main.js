@@ -110,7 +110,7 @@ OrgTool.prototype.getOrgsList = function() {
 };
 OrgTool.prototype.getOrgName = function(orgId) {
     var orgsList = this.getOrgsList();
-    if (orgId && orgsList[orgId]) {
+    if (orgId && orgsList.hasOwnProperty(orgId)) {
         return orgsList[orgId].name;
     }
     else { return ""; }
@@ -243,10 +243,11 @@ OrgTool.prototype.populateOrgsList = function(items) {
     return orgsList;
 };
 OrgTool.prototype.getShortName = function(orgId) {
-    var shortName = "", orgsList = this.getOrgsList();
     if (orgId) {
-        if (orgsList[orgId] && orgsList[orgId].shortname) {
-            shortName = orgsList[orgId].shortname;
+        var shortName = "", orgsList = this.getOrgsList();
+        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: null;
+        if (orgItem && orgItem.shortname) {
+            shortName = orgItem.shortname;
         }
     }
     return shortName;
@@ -286,7 +287,8 @@ OrgTool.prototype.populateUI = function() {
     parentOrgsArray.forEach(function(org) {
         parentDiv = document.createElement("div");
         parentDiv.setAttribute("id", org+"_container");
-        if (orgsList[org].children.length > 0) {
+        var parentOrgItem = orgsList[org];
+        if (parentOrgItem.children.length > 0) {
             if ($("#userOrgs legend[orgId='" + org + "']").length === 0) {
                 parentDiv.classList.add("parent-org-container");
                 parentContent = "<legend orgId='{{orgId}}'>{{orgName}}</legend>" +
@@ -301,9 +303,9 @@ OrgTool.prototype.populateUI = function() {
             }
         }
         parentContent = parentContent.replace(/\{\{orgId\}\}/g, org)
-            .replace(/\{\{shortName\}\}/g, (orgsList[org].shortname || orgsList[org].name))
-            .replace(/\{\{orgName\}\}/g, i18next.t(orgsList[org].name))
-            .replace(/\{\{state\}\}/g, getState(orgsList[org]));
+            .replace(/\{\{shortName\}\}/g, (parentOrgItem.shortname || parentOrgItem.name))
+            .replace(/\{\{orgName\}\}/g, i18next.t(parentOrgItem.name))
+            .replace(/\{\{state\}\}/g, getState(parentOrgItem));
         parentDiv.innerHTML = parentContent;
         parentFragment.appendChild(parentDiv);
     });
@@ -383,13 +385,13 @@ OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
 };
 OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
     if (!currentOrg) { return false; }
-    var ml = this.getOrgsList(), self = this;
-    if (ml && ml[currentOrg]) {
-        if (ml[currentOrg].isTopLevel) {
+    var ml = this.getOrgsList(), currentOrgItem = ml[currentOrg], self = this;
+    if (ml && currentOrgItem) {
+        if (currentOrgItem.isTopLevel) {
             return currentOrg;
         } else {
-            if (ml[currentOrg].parentOrgId) {
-                return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
+            if (currentOrgItem.parentOrgId) {
+                return self.getTopLevelParentOrg(currentOrgItem.parentOrgId);
             }
             else {
                 return currentOrg;
@@ -737,7 +739,6 @@ var tnthAjax = {
             }
         });
     },
-    "consentParams": {"staff_editable": true,"include_in_reports": true,"send_reminders": true},
     "getConsent": function(userId, sync, callback) {
         callback = callback || function() {};
         if (!userId) {
@@ -852,18 +853,16 @@ var tnthAjax = {
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
             if (data) {
-                if (!data.error) {
-                    if (data.consent_agreements) {
-                        var d = data.consent_agreements;
-                        if (d.length > 0) {
-                            d.forEach(function(item) {
-                                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                                if (!item.deleted && !(expired > 0)) {
-                                    if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
-                                    else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
-                                }
-                            });
-                        }
+                if (!data.error && data.consent_agreements) {
+                    var d = data.consent_agreements;
+                    if (d.length > 0) {
+                        d.forEach(function(item) {
+                            var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
+                            if (!item.deleted && !(expired > 0)) {
+                                if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
+                                else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
+                            }
+                        });
                     }
                 } else { return false; }
             }
@@ -887,15 +886,13 @@ var tnthAjax = {
                 if (!found && (String(orgId) === String(item.organization_id))) {
                     switch (filterStatus) {
                     case "suspended":
-                        if (suspended) { found = true;}
+                        found = suspended;
                         break;
                     case "purged":
                         found = true;
                         break;
                     case "consented":
-                        if (!suspended && item.staff_editable && item.send_reminders && item.include_in_reports) {
-                            found = true;
-                        }
+                        found = !suspended && item.staff_editable && item.send_reminders && item.include_in_reports;
                         break;
                     default:
                         found = true; //default is to return both suspended and consented entries
@@ -921,83 +918,7 @@ var tnthAjax = {
         });
         tnthAjax.deleteConsent(userId, {org: "all", exclude: co.join(",")}); //exclude currently selected orgs
     },
-    handleConsent: function(obj) {
-        var self = this, OT = this.getOrgTool(), userId = $("#fillOrgs").attr("userId") || $("#userOrgs").attr("userId");
-        var configVar = "";
-        tnthAjax.getConfigurationByKey("CONSENT_WITH_TOP_LEVEL_ORG", userId, {sync: true}, function(data) {
-            if (!data.error) {
-                configVar = data.CONSENT_WITH_TOP_LEVEL_ORG;
-            }
-        }, true);
-        if (!configVar) { configVar = $("#profile_CONSENT_WITH_TOP_LEVEL_ORG").val(); }
-        $(obj).each(function() {
-            var parentOrg = OT.getElementParentOrg(this);
-            var orgId = $(this).val();
-            var cto = String(configVar).toLowerCase() === "true";
-            if ($(this).prop("checked")) {
-                if ($(this).attr("id") !== "noOrgs") {
-                    if (parentOrg) {
-                        var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                        if (agreementUrl && String(agreementUrl) !== "") {
-                            var params = self.consentParams;
-                            params.org = cto ? parentOrg : orgId;
-                            params.agreementUrl = agreementUrl;
-                            setTimeout(function() {
-                                tnthAjax.setConsent($("#fillOrgs").attr("userId"), params, "all", true, function() {
-                                    tnthAjax.removeObsoleteConsent();
-                                });
-                            }, 350);
-                        } else {
-                            tnthAjax.setDefaultConsent(userId, parentOrg);
-                        }
-                    }
-                } else {
-                    if (cto) {
-                        var topLevelOrgs = OT.getTopLevelOrgs();
-                        topLevelOrgs.forEach(function(i) {
-                            (function(orgId) {
-                                setTimeout(function() { tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});}, 350);
-                            })(i);
-                        });
-                    } else {
-                        $("#userOrgs").find("input[name='organization']").each(function() { //delete all orgs
-                            (function(orgId) {
-                                setTimeout(function() { tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});}, 350);
-                            })($(this).val());
-                        });
-                    }
-                }
-            } else {
-                if (cto) { //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
-                    var childOrgs = [];
-                    if ($("#fillOrgs").attr("patient_view")) {
-                        childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
-                    } else {
-                        childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
-                    }
-                    var allUnchecked = true;
-                    childOrgs.each(function() {
-                        if ($(this).prop("checked")) {
-                            allUnchecked = false;
-                        }
-                    });
-                    if (allUnchecked && childOrgs.length > 0) {
-                        (function(orgId) {
-                            setTimeout(function() {
-                                tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
-                            }, 350);
-                        })(parentOrg);
-                    }
-                } else {
-                    (function(orgId) {
-                        setTimeout(function() {
-                            tnthAjax.deleteConsent($("#fillOrgs").attr("userId"), {"org": orgId});
-                        }, 350);
-                    })(orgId);
-                }
-            }
-        });
-    },
+    
     "getDemo": function(userId, noOverride, sync, callback) {
         callback = callback || function() {};
         this.sendRequest("/api/demographics/" + userId, "GET", userId, {sync: sync}, function(data) {
@@ -2051,15 +1972,13 @@ var tnthDates = {
                     tnthAjax.sendRequest("/api/demographics/" + userId, "GET", userId, {
                         sync: true
                     }, function(data) {
-                        if (!data.error) {
-                            if (data && data.communication) {
-                                data.communication.forEach(function(item) {
-                                    if (item.language) {
-                                        locale = item.language.coding[0].code;
-                                        sessionStorage.setItem(sessionKey, locale);
-                                    }
-                                });
-                            }
+                        if (!data.error && data.communication) {
+                            data.communication.forEach(function(item) {
+                                if (item.language) {
+                                    locale = item.language.coding[0].code;
+                                    sessionStorage.setItem(sessionKey, locale);
+                                }
+                            });
                         } else {
                             locale = "en_us";
                         }
@@ -2163,11 +2082,12 @@ var Global = {
         if (LOGIN_AS_PATIENT) {
             sessionStorage.clear(); 
             tnthDates.getUserLocale(true); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
-            if (typeof history !== "undefined" && history.pushState) {
+            var historyDefined = typeof history !== "undefined" && history.pushState;
+            if (historyDefined) {
                 history.pushState(null, null, location.href);
             }
             window.addEventListener("popstate", function() {
-                if (typeof history !== "undefined" && history.pushState) {
+                if (historyDefined) {
                     history.pushState(null, null, location.href);
                 } else {
                     window.history.forward(1);
