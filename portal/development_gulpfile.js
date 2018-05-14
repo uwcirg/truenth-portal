@@ -61,6 +61,7 @@ const arg = (argList => {
 /*
  * NOT currently implemented
  * concat and minify main source files to be consumed in production ??
+ * call 'npm run-script build' will build minify script file, if need to 
  */
 gulp.task("main", function() {
     return gulp.src(jsMainFiles)
