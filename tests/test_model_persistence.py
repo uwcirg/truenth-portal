@@ -109,11 +109,12 @@ class TestModelPersistence(TestCase):
     def test_delete_unnamed(self):
         keeper = AppText(name='keep me', custom_text='worthy')
         mp = ModelPersistence(
-            AppText, lookup_field='name', sequence_name='apptext_id_seq')
+            AppText, lookup_field='name', sequence_name='apptext_id_seq',
+            target_dir=self.tmpdir)
         with SessionScope(db):
             db.session.add(keeper)
             db.session.commit()
-        mp.export(target_dir=self.tmpdir)
+        mp.export()
 
         # Add another app text, expecting it'll be removed
         bogus = AppText(name='temp', custom_text='not worthy')
@@ -122,11 +123,11 @@ class TestModelPersistence(TestCase):
             db.session.commit()
 
         # Import w/ keep_unmentioned and expect both
-        mp.import_(keep_unmentioned=True, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=True)
         self.assertEquals(AppText.query.count(), 2)
 
         # Now import, and expect only keeper to remain
-        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=False)
         self.assertEquals(AppText.query.count(), 1)
         self.assertEquals(AppText.query.first().name, 'keep me')
 
@@ -139,9 +140,9 @@ class TestModelPersistence(TestCase):
         org = db.session.merge(org)
         mp = ModelPersistence(
             Organization, lookup_field='id',
-            sequence_name='organizations_id_seq'
-        )
-        mp.export(self.tmpdir)
+            sequence_name='organizations_id_seq',
+            target_dir=self.tmpdir)
+        mp.export()
 
         # Strip the empty extensions, as expected in the real persistence file
         with open(
@@ -174,7 +175,7 @@ class TestModelPersistence(TestCase):
         org = db.session.merge(org)
         self.assertTrue(len(org.as_fhir()['extension']) > 1)
 
-        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
         self.assertEquals(org.locales.count(), 0)
         self.assertEquals(org.timezone, 'Asia/Tokyo')
@@ -194,9 +195,9 @@ class TestModelPersistence(TestCase):
             db.session.commit()
         mp = ModelPersistence(
             Organization, lookup_field='id',
-            sequence_name='organizations_id_seq'
-        )
-        mp.export(self.tmpdir)
+            sequence_name='organizations_id_seq',
+            target_dir=self.tmpdir)
+        mp.export()
 
         # Reduce identifiers to one - make sure the other identifier goes away
         with open(
@@ -214,7 +215,7 @@ class TestModelPersistence(TestCase):
                 os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
             pfile.write(json.dumps(data))
 
-        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
         self.assertEquals(org.identifiers.count(), 1)
 
@@ -238,9 +239,9 @@ class TestModelPersistence(TestCase):
 
         mp = ModelPersistence(
             ScheduledJob, lookup_field='name',
-            sequence_name='scheduled_jobs_id_seq'
-        )
-        mp.export(self.tmpdir)
+            sequence_name='scheduled_jobs_id_seq',
+            target_dir=self.tmpdir)
+        mp.export()
 
         # Reduce identifiers to one - make sure the other identifier goes away
         with open(
@@ -254,7 +255,7 @@ class TestModelPersistence(TestCase):
                 os.path.join(self.tmpdir, 'ScheduledJob.json'), 'w') as pfile:
             pfile.write(json.dumps(data))
 
-        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=False)
         self.assertEquals(ScheduledJob.query.count(), 1)
 
     def test_rp_alteration(self):
@@ -272,9 +273,9 @@ class TestModelPersistence(TestCase):
             db.session.commit()
         mp = ModelPersistence(
             Organization, lookup_field='id',
-            sequence_name='organizations_id_seq'
-        )
-        mp.export(self.tmpdir)
+            sequence_name='organizations_id_seq',
+            target_dir=self.tmpdir)
+        mp.export()
 
         # Add second rp, mark old as retired
         with open(
@@ -302,7 +303,7 @@ class TestModelPersistence(TestCase):
                 os.path.join(self.tmpdir, 'Organization.json'), 'w') as pfile:
             pfile.write(json.dumps(data))
 
-        mp.import_(keep_unmentioned=False, target_dir=self.tmpdir)
+        mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
         self.assertEquals(len(org.research_protocols), 2)
 
