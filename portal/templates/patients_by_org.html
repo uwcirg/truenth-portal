@@ -137,32 +137,18 @@
   /*
   * initializing bootstrapTable
   */
-  $("#adminTable").bootstrapTable({
-    formatShowingRows: function (pageFrom, pageTo, totalRows) {
-      var rowInfo;
-      setTimeout(function() {
-        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-        replace("{pageFrom}", pageFrom).
-        replace("{pageTo}", pageTo).
-        replace("{totalRows}", totalRows);
-        $(".pagination-detail .pagination-info").html(rowInfo);
-      }, 50);
-      return rowInfo;
-    },
-    formatRecordsPerPage: function(pageNumber) {
-      return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
-    },
+  $("#adminTable").bootstrapTable(AT.getTableConfigOptions({
     sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
     sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
     filterBy: sortObj,
     exportOptions: {
         fileName: __getExportFileName('{{_("PatientList_")}}')
     }
-  });
+  }));
   __i18next.init({
       "lng": tnthDates.getUserLocale()
   }, function() {
-    setTimeout(function() {
+    setTimeout(function() { //TODO move this to js file
       $(document).ready(function() {
         /*
         *  scroll to the top of page on each page change
@@ -174,7 +160,7 @@
         }).on("column-search.bs.table", function(e, name, text) {
             setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
         }).on("column-switch.bs.table", function(e, field, checked) {
-            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
+            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10); 
         });
 
         AT.init(function() {
@@ -185,18 +171,12 @@
            /*
             * add placeholder text for filter controls
             */
-          (function() {
-             function addFilterPlaceHolders() {
-               $("#adminTable .filterControl input").attr("placeholder", "{{_('Enter Text')}}");
-               $("#adminTable .filterControl select option[value='']").text("Select");
-             }
-             $("#adminTable").on("reset-view.bs.table", function() {
-                addFilterPlaceHolders();
-             });
-             addFilterPlaceHolders();
-          })();
+          $("#adminTable").on("reset-view.bs.table", function() {
+            AT.addFilterPlaceHolders();
+          });
+          AT.addFilterPlaceHolders();
           AT.rowLinkEvent();
-          AT.setColumnSelections();
+          AT.setColumnSelections();  
           AT.initOrgsList(false, "patients");
           setTimeout(function() { AT.fadeLoader(); }, 550);
         });

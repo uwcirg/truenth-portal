@@ -53,6 +53,40 @@
     this.patientsIdList = [];
     this.tableIdentifier = identifier || "patientList";
     this.dependencies = dependencies || {};
+    this.tableConfig = {
+      formatShowingRows: function (pageFrom, pageTo, totalRows) {
+        var rowInfo;
+        setTimeout(function() { /*global i18next */
+          rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
+          replace("{pageFrom}", pageFrom).
+          replace("{pageTo}", pageTo).
+          replace("{totalRows}", totalRows);
+          $(".pagination-detail .pagination-info").html(rowInfo);
+        }, 50);
+        return rowInfo;
+      },
+      formatRecordsPerPage: function(pageNumber) {
+        return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
+      },
+      formatToggle: function() {
+        return i18next.t("Toggle");
+      },
+      formatColumns: function() {
+        return i18next.t("Columns");
+      },
+      formatAllRows: function() {
+        return i18next.t("All rows");
+      },
+      formatSearch: function() {
+        return i18next.t("Search");
+      },
+      formatNoMatches: function() {
+        return i18next.t("No matching records found");
+      },
+      formatExport: function() {
+        return i18next.t("Export data");
+      }
+    };
     OrgTool.call(this);
   };
 
@@ -102,6 +136,17 @@
         $("#adminTable th.status-field .loading-message-indicator").fadeIn();
         break;
     };
+  };
+  AdminTool.prototype.addFilterPlaceHolders = function() {
+    $("#adminTable .filterControl input").attr("placeholder", i18next.t("Enter Text"));
+    $("#adminTable .filterControl select option[value='']").text(i18next.t("Select"));
+  };
+  AdminTool.prototype.getTableConfigOptions = function(options) {
+    if (!options) {
+      return this.tableConfig;
+    } else {
+      return $.extend({}, this.tableConfig, options);
+    }
   };
   AdminTool.prototype.getPatientsIdList = function() {
     var self = this;

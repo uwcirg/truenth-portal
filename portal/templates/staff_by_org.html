@@ -76,51 +76,23 @@ var AT = new window.portal.AdminTool(
           "i18next": i18next,
           "tnthDates": tnthDates
         });
-$("#adminTable").bootstrapTable({
-    formatShowingRows: function (pageFrom, pageTo, totalRows) {
-      var rowInfo;
-      setTimeout(function() {
-        rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-        replace("{pageFrom}", pageFrom).
-        replace("{pageTo}", pageTo).
-        replace("{totalRows}", totalRows);
-        $(".pagination-detail .pagination-info").html(rowInfo);
-      }, 50);
-      return rowInfo;
-    },
-    formatRecordsPerPage: function(pageNumber) {
-      return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
-    },
+$("#adminTable").bootstrapTable(AT.getTableConfigOptions({
     exportOptions: {
         fileName: __getExportFileName('{{_("StaffList_")}}')
     }
-});
+}));
  __i18next.init({
   "lng": tnthDates.getUserLocale()
 }, function() {
-  setTimeout(function() {
+  setTimeout(function() { //TODO move this to JS file
     /*
      * add placeholder text for filter controls
      */
-    (function() {
-      function addFilterPlaceHolders() {
-        $("#adminTable .filterControl input").attr("placeholder", "Enter Text");
-        $("#adminTable .filterControl select option[value='']").text("Select");
-      }
-      $("#adminTable").on("reset-view.bs.table", function() {
-        addFilterPlaceHolders();
-      });
-      addFilterPlaceHolders();
-    })();
+    $("#adminTable").on("reset-view.bs.table", function() {AT.addFilterPlaceHolders();});
+    AT.addFilterPlaceHolders();
     $(document).ready(function() {
       setTimeout(function() { AT.fadeLoader(); }, 100);
     });
   }, 150);
 });
-/** Example of how we could have a select to limit to a particular role. Needs more work
-because only looks at entire field
-$("#adminTableToolbar").on("click",function(){
-    $('#adminTable').bootstrapTable('filterBy', {roles: "patient"});
-});
-**/
 {% endblock %}
