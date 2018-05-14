@@ -11,16 +11,54 @@ from ..date_tools import FHIR_datetime
 from ..models.identifier import Identifier
 from ..trace import trace
 
+
 class ModelPersistence(object):
     """Adapter class to handle persistence of model tables"""
     VERSION = '0.2'
 
     def __init__(
-            self, model_class, lookup_field='id', sequence_name=None):
+            self, model_class, lookup_field='id', sequence_name=None,
+            target_dir=None):
         """Initialize adapter for given model class"""
         self.model = model_class
         self.lookup_field = lookup_field
         self.sequence_name = sequence_name
+        self.target_dir = target_dir
+
+    def persistence_filename(self):
+        """Returns the configured persistence file
+
+        Using the first value found, looks for an environment variable named
+        `PERSISTENCE_DIR`, which should define a path relative to the `portal/config`
+        directory such as `eproms`.  If no such environment variable is found, use
+        the presence of the `GIL` config setting - if set use `gil`,
+        else `eproms`.
+
+        :returns: full path to persistence file
+
+        """
+        scope = self.model.__name__ if self.model else 'site_persistence_file'
+
+        # product level config file - use presence of env var or config setting
+        persistence_dir = os.environ.get('PERSISTENCE_DIR')
+        gil = current_app.config.get("GIL")
+
+        # prefer env var
+        if not persistence_dir:
+            persistence_dir = 'gil' if gil else 'eproms'
+
+        filename = os.path.join(
+            os.path.dirname(__file__), persistence_dir, '{scope}.json'.format(
+                scope=scope))
+        if self.target_dir:
+            # Blindly attempt to use target dir if named
+            filename = os.path.join(
+                self.target_dir, '{scope}.json'.format(scope=scope))
+        elif not os.path.exists(filename):
+            raise ValueError(
+                'File not found: {}  Check value of environment variable `PERSISTENCE_DIR` '
+                'Should be a relative path from portal root.'.format(filename))
+        return filename
 
     @staticmethod
     def _log(msg):
@@ -37,10 +75,8 @@ class ModelPersistence(object):
         data['type'] = 'document'
         return data
 
-    def __read__(self, target_dir):
-        scope = self.model.__name__ if self.model else None
-        self.filename = persistence_filename(
-            scope=scope, target_dir=target_dir)
+    def __read__(self):
+        self.filename = self.persistence_filename()
         with open(self.filename, 'r') as f:
             try:
                 data = json.load(f)
@@ -51,10 +87,8 @@ class ModelPersistence(object):
         self.__verify_header__(data)
         return data
 
-    def __write__(self, data, target_dir):
-        scope = self.model.__name__ if self.model else None
-        self.filename = persistence_filename(
-            scope=scope, target_dir=target_dir)
+    def __write__(self, data):
+        self.filename = self.persistence_filename()
         if data:
             with open(self.filename, 'w') as f:
                 f.write(json.dumps(data, indent=2, sort_keys=True, separators=(',', ': ')))
@@ -68,14 +102,14 @@ class ModelPersistence(object):
             raise ValueError("unexpected SitePersistence version {}".format(
                 data.get('id')))
 
-    def export(self, target_dir):
+    def export(self):
         d = self.__header__({})
         d['entry'] = self.serialize()
-        self.__write__(data=d, target_dir=target_dir)
+        self.__write__(data=d)
 
-    def import_(self, keep_unmentioned, target_dir):
+    def import_(self, keep_unmentioned):
         objs_seen = []
-        data = self.__read__(target_dir=target_dir)
+        data = self.__read__()
         for o in data['entry']:
             if not o.get('resourceType') == self.model.__name__:
                 raise ValueError(
@@ -210,55 +244,39 @@ class ModelPersistence(object):
                     self.sequence_name, max_known))
 
 
+class ExclusionPersistence(ModelPersistence):
+    """Specialized persistence for exclusive handling
+
+    Manages exclusive details needed when replacing settings from one
+    database to another.  For example, prior to pulling a fresh copy
+    of production, one retains the configuration of the staging interventions
+    such that they'll continue to function as previously configured for
+    testing.  Otherwise, interventions would need to use production
+    values or re-enter staging configuration values to test every time.
+
+    """
+    pass
+
+
+def export_exclusion(cls, lookup_field, retain_fields, target_dir):
+    model_persistence = ExclusionPersistence(
+        cls, lookup_field=lookup_field, retain_fields=retain_fields,
+        target_dir=target_dir)
+    return model_persistence.export()
+
+
 def export_model(cls, lookup_field, target_dir):
-    model_persistence = ModelPersistence(cls, lookup_field=lookup_field)
-    return model_persistence.export(target_dir=target_dir)
+    model_persistence = ModelPersistence(
+        cls, lookup_field=lookup_field, target_dir=target_dir)
+    return model_persistence.export()
 
 
 def import_model(
         cls, sequence_name, lookup_field, keep_unmentioned=True,
         target_dir=None):
     model_persistence = ModelPersistence(
-        cls, lookup_field=lookup_field, sequence_name=sequence_name)
-    model_persistence.import_(
-        keep_unmentioned=keep_unmentioned, target_dir=target_dir)
+        cls, lookup_field=lookup_field, sequence_name=sequence_name,
+        target_dir=target_dir)
+    model_persistence.import_(keep_unmentioned=keep_unmentioned)
 
 
-def persistence_filename(scope=None, target_dir=None):
-    """Returns the configured persistence file
-
-    :param scope: set to limit by type, i.e. `Organization`
-    :param target_dir: set to use non default directory for output
-
-    Using the first value found, looks for an environment variable named
-    `PERSISTENCE_DIR`, which should define a path relative to the `portal/config`
-    directory such as `eproms`.  If no such environment variable is found, use
-    the presence of the `GIL` config setting - if set use `gil`,
-    else `eproms`.
-
-    :returns: full path to persistence file
-
-    """
-    if scope is None:
-        scope = 'site_persistence_file'
-
-    # product level config file - use presence of env var or config setting
-    persistence_dir = os.environ.get('PERSISTENCE_DIR')
-    gil = current_app.config.get("GIL")
-
-    # prefer env var
-    if not persistence_dir:
-        persistence_dir = 'gil' if gil else 'eproms'
-
-    filename = os.path.join(
-        os.path.dirname(__file__), persistence_dir, '{scope}.json'.format(
-            scope=scope))
-    if target_dir:
-        # Blindly attempt to use target dir if named
-        filename = os.path.join(
-            target_dir, '{scope}.json'.format(scope=scope))
-    elif not os.path.exists(filename):
-        raise ValueError(
-            'File not found: {}  Check value of environment variable `PERSISTENCE_DIR` '
-            'Should be a relative path from portal root.'.format(filename))
-    return filename

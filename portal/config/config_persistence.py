@@ -7,11 +7,12 @@ from .model_persistence import ModelPersistence
 
 class ConfigPersistence(ModelPersistence):
 
-    def __init__(self):
-        super(ConfigPersistence, self).__init__(None)
+    def __init__(self, target_dir):
+        super(ConfigPersistence, self).__init__(
+            model_class=None, target_dir=target_dir)
 
-    def import_(self, keep_unmentioned=None, target_dir=None):
-        data = self.__read__(target_dir=target_dir)
+    def import_(self, keep_unmentioned=None):
+        data = self.__read__()
         self.__verify_header__(data)
 
         cfg_file = os.path.join(current_app.instance_path, SITE_CFG)
@@ -37,12 +38,10 @@ class ConfigPersistence(ModelPersistence):
 
 
 def export_config(target_dir):
-    config_persistence = ConfigPersistence()
-    return config_persistence.export(target_dir=target_dir)
+    config_persistence = ConfigPersistence(target_dir=target_dir)
+    return config_persistence.export()
 
 
-def import_config(target_dir=None):
-    config_persistence = ConfigPersistence()
-    config_persistence.import_(target_dir=target_dir)
-
-
+def import_config(target_dir):
+    config_persistence = ConfigPersistence(target_dir=target_dir)
+    config_persistence.import_()
