@@ -771,6 +771,8 @@ def config_settings(config_key):
         'REQUIRED_CORE_DATA',
         'PRE_REGISTERED_ROLES',
         'SYSTEM',
+        'SHOW_PROFILE_MACROS',
+        'MEDIDATA_RAVE_FIELDS'
     )
     if config_key:
         key = config_key.upper()

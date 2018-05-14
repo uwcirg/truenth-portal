@@ -1,4 +1,5 @@
-{% extends "layout.html" %}
+{% extends "admin_base.html" %}
+{%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
   <div id="patientList">
     <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
@@ -122,14 +123,7 @@
   </div>
 {% endif %}
 {% endblock %}
-{% block table_export_filter_script %}
-{{super()}}
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-{% endblock %}
-{%- from "flask_user/_macros.html" import footer -%}
-{% block footer %}
-{{footer(user=user)}}
-{% endblock %}
+{% block footer %}{{footer(user=user)}}{% endblock %}
 {% block document_ready %}
 
   var AT, sortObj;

@@ -132,7 +132,7 @@ def patient_profile_create():
         locale_code=user.locale_code)
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "patient_profile_create.html", user=user,
+        "profile/patient_profile_create.html", user=user,
         consent_agreements=consent_agreements,
         leaf_organizations=leaf_organizations)
 

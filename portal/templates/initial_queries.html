@@ -90,6 +90,8 @@
 </div>
 {% endblock %}
 {% block additional_scripts %}
+<!-- TODO, don't need profile JS if initial queries is own Vue instance -->
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 <script src="{{ url_for('static', filename='js/initialQueries.js') }}"></script>
 {% endblock %}
 {% block document_ready %}
@@ -98,7 +100,6 @@ var fc = new window.FieldsChecker("{{user.id}}",
                             {i18next: i18next,
                              tnthAjax: tnthAjax,
                              orgTool: new OrgTool(),
-                             assembleContent: assembleContent,
                              tnthDates: tnthDates
                             });
 
@@ -130,7 +131,7 @@ $(document).ready(function(){
             showMain();
             hideLoader(true);
         };
-      }, 10);
+      }, 100);
   });
 });
 {% endblock %}

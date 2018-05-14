@@ -4,135 +4,89 @@
 {% from "profile/profile_macros.html" import profileProcedures %}
 
 <h3 class="tnth-headline">{{ _("More About You") }}</h3>
-
 <p>{{ _("The TrueNTH system asks these questions in order to give you information that best fits") }} <strong>you</strong>. {{ _("You may
     skip any question you prefer not to answer.") }}</p>
 <hr/>
-
 {% if ('race' in require) or ('ethnicity' in require) %}
-<form id="profileForm" class="form tnth-form" role="form" method="POST">
-    {% if 'ethnicity' in require %}
-    <div class="form-group" id="userEthnicity">
-        <label>{{ _("Ethnicity") }} <span class="text-muted smaller-text"></span></label>
-        <div style="margin-top: -10px">
+    <form id="profileForm" class="form tnth-form" role="form" method="POST">
+        {% if 'ethnicity' in require %}
+            <div class="form-group" id="userEthnicity">
+                <label>{{ _("Ethnicity") }} <span class="text-muted smaller-text"></span></label>
+                <div style="margin-top: -10px">
 
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2135-2"> {{ _("Hispanic or Latino") }}
-                </label>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="ethnicity" value="2135-2"> {{ _("Hispanic or Latino") }}
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="ethnicity" value="2186-5"> {{ _("Not Hispanic or Latino") }}
+                        </label>
+                    </div>
+                </div>
             </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2186-5"> {{ _("Not Hispanic or Latino") }}
-                </label>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+        {% endif %}
+        {% if 'race' in require %}
+            <div class="form-group" id="userRace">
+                <label>{{ _("Race") }} <span class="text-muted smaller-text"></span></label>
+                <div style="margin-top: -10px">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="1002-5"> {{ _("American Indian or Alaska Native") }}
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="2028-9"> {{ _("Asian") }}
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="2054-5"> {{ _("Black or African American") }}
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="2076-8"> {{ _("Native Hawaiian or Other Pacific Islander") }}
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="2106-3"> {{ _("White") }}
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="race" value="2131-1"> {{ _("Other") }}
+                        </label>
+                    </div>
 
-    {% if 'race' in require %}
-    <div class="form-group" id="userRace">
-        <label>{{ _("Race") }} <span class="text-muted smaller-text"></span></label>
-        <div style="margin-top: -10px">
-
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="1002-5"> {{ _("American Indian or Alaska Native") }}
-                </label>
+                </div>
             </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2028-9"> {{ _("Asian") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2054-5"> {{ _("Black or African American") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2076-8"> {{ _("Native Hawaiian or Other Pacific Islander") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2106-3"> {{ _("White") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2131-1"> {{ _("Other") }}
-                </label>
-            </div>
-
-        </div>
-    </div>
-    {% endif %}
-    <br/>
-    <button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">Save</button> &nbsp;&nbsp;
-    <div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
-</form>
+        {% endif %}
+        <br/>
+        <button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">Save</button> &nbsp;&nbsp;
+        <div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
+    </form>
 {% endif %}
-
-<div class="core-data-procedure">
 {% if 'procedure' in require %}
-{{profileProcedures(user, user)}}
-</div>
-<!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
-<br/>
-<div class="btn btn-tnth-primary continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
-<div class="error-continue error-message"></div>
-<br/><br/><br/><br/>
-
+    <div class="core-data-procedure">
+        {{profileProcedures(user, user)}}
+    </div>
+    <br/>
+    <div class="btn btn-tnth-primary continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
+    <div class="error-continue error-message"></div>
+    <br/><br/><br/><br/>
 {% endif %}
+<input type="hidden" id="coreDataUserId" value="{{user.id if user}}" />
+<input type="hidden" id="procReturnAddress" value="{{ return_address | safe }}" />
+<input type="hidden" id="procAPIUrl" value="{{url_for('coredata_api.acquire')}}" />
 {% endblock %}
 {% block footer %}
-<footer id="core_data_footer"></footer>
+    <footer id="core_data_footer"></footer>
 {% endblock %}
-
 {% block additional_scripts %}
-<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
-{% endblock %}
-
-{% block document_ready %}
-    var subjectId = {{ user.id }};
-    var currentUserId = subjectId;
-
-$(document).ready(function(){
-
-    {% if ('race' in require) or ('ethnicity' in require) %}
-    tnthAjax.getDemo({{ user.id }});
-    {% endif %}
-    {% if 'procedure' in require %}
-    tnthAjax.getProc({{ user.id }}, false);
-    var profileObj = new Profile("{{user.id}}", "{{user.id}}");
-    profileObj.initSection("procedure");
-    {% endif %}
-
-    {% if ('race' in require) or ('ethnicity' in require) %}
-    // If there's any change to an input, assembleContent
-    $("#profileForm").on("change", "input", function() {
-        assembleContent.coreData({{ user.id }});
-    });
-    {% endif %}
-
-    // Class for both "done" and "skip" buttons
-    $(".continue-btn").on("click", function(event){
-        event.preventDefault();
-        $(this).attr("disabled", true);
-        $(".loading-indicator").show();
-        try {
-            window.location.replace("{{ return_address | safe }}");
-        } catch(e) {
-            //report error if invalid return address is used here
-            tnthAjax.reportError({{user.id}}, "{{url_for('coredata_api.acquire')}}", e.message, true);
-            $(this).attr("disabled", false);
-            $(".loading-indicator").hide();
-            $(".error-continue").text(e.message);
-        };
-    });
-    tnthAjax.getPortalFooter({{user.id}}, false, "core_data_footer");
-});
-
+    <script src="{{ url_for('static', filename='js/coredata.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
 {% endblock %}

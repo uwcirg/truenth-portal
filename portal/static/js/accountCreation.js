@@ -40,7 +40,6 @@ var AccountCreationObj = function (roles, dependencies) {
 
     var i18next = this.__getDependency("i18next");
     var tnthAjax = this.__getDependency("tnthAjax");
-    var SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
     var OT = this.__getDependency("OrgTool");
     var leafOrgs = this.__getDependency("leafOrgs");
     var orgList = this.__getDependency("orgList");
@@ -106,7 +105,7 @@ var AccountCreationObj = function (roles, dependencies) {
     };
     this.__setDemo = function(returnedData) {
         var responseData = returnedData && returnedData.data? returnedData.data : null;
-        var self = this;
+        var self = this, SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
         if (responseData) {
 
             self.userId = responseData["user_id"];
@@ -125,7 +124,9 @@ var AccountCreationObj = function (roles, dependencies) {
             };
 
             var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
-            _demoArray["birthDate"] = y + "-" + m + "-" + d;
+            if (y && m && d) {
+                _demoArray["birthDate"] = y + "-" + m + "-" + d;
+            }
 
             _demoArray["telecom"] = [];
 
@@ -144,16 +145,15 @@ var AccountCreationObj = function (roles, dependencies) {
 
             _demoArray["careProvider"] = orgIDs;
 
-            var arrCommunication = OT.getCommunicationArray();
+            var arrCommunication = self.getCommunicationArray();
             if (arrCommunication.length > 0) {
                 _demoArray["communication"] = arrCommunication;
             };
 
-            /*** SYSTEM uri is defined by SYSTEM_IDENTIFIER_ENUM, see main.js for details **/
             var studyId = $("#profileStudyId").val();
             if (hasValue(studyId)) {
                 var studyIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
+                    system: SYSTEM_IDENTIFIER_ENUM.external_study_id,
                     use: "secondary",
                     value: studyId
                 };
@@ -166,7 +166,7 @@ var AccountCreationObj = function (roles, dependencies) {
             var siteId = $("#profileSiteId").val();
             if (hasValue(siteId)) {
                 var siteIdObj = {
-                    system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                    system: SYSTEM_IDENTIFIER_ENUM.external_site_id,
                     use: "secondary",
                     value: siteId
                 };
@@ -175,7 +175,7 @@ var AccountCreationObj = function (roles, dependencies) {
                 };
                 _demoArray["identifier"].push(siteIdObj);
             };
-            
+
             self.__request({"apiUrl":"/api/demographics/"+this.userId, "requestType": "PUT", "requestData": JSON.stringify(_demoArray), "sync": true, "callback":
                 function(data){
                     if (data.error) {
@@ -472,6 +472,33 @@ var AccountCreationObj = function (roles, dependencies) {
             $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
         };
     };
+    this.getCommunicationArray = function() {
+        var arrCommunication = [], SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
+        $("#userOrgs input:checked").each(function() {
+            var oList = OT.getOrgsList(), oi = oList[$(this).val()];
+            if (parseInt($(this).val()) === 0 || !oi) {
+                return true; //don't count none
+            } else {
+                if (oi.language) {
+                   arrCommunication.push({
+                       "language": {"coding": [{"code": oi.language,"system": SYSTEM_IDENTIFIER_ENUM.language_system}]}
+                   });
+                } else {
+                    oi.extension = oi.extension || [];
+                    var arrExtension = $.grep(oi.extension, function(ex) {
+                        return String(ex.url) === String(SYSTEM_IDENTIFIER_ENUM.language) && ex.valueCodeableConcept.coding;
+                    });
+                    arrExtension = arrExtension.map(function(ex) {
+                        return ex.valueCodeableConcept.coding;
+                    });
+                    arrExtension.forEach(function(coding) {
+                        arrCommunication.push({"language": { "coding": coding}});
+                    });
+                }
+            }
+        });
+        return arrCommunication;
+    };
     this.getConsents = function() {
         var orgs = {}, consents = [], self = this;
         $("#createProfileForm input[name='organization']").each(function() {
@@ -573,7 +600,7 @@ $(document).ready(function(){
                 var today = new Date();
                 var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
                 var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-             
+
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
                 if (isValid) {
                 /*

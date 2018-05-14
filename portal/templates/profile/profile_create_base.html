@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{%- from "flask_user/_macros.html" import back_btn, footer -%}
+{%- from "profile/profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
+{%- from "initial_queries_macros.html" import consent_fields -%}
+{% block main %}
+    <br/>
+    <form id="createProfileForm" class="form tnth-form to-validate" data-toggle="validator">
+        <input type="hidden" id="current_user_email" value="{{user.email}}" />
+        <input type="hidden" id="currentStaffUserId" value="{{user.id}}" />
+        <div class="row">
+            <div class="col-md-11">
+                <div class="row">
+                    <div class="col-md-push-2 col-md-9 col-xs-12">
+                            <h4 class="tnth-headline left-indent-top">
+                                {% block title %}{{_("New Patient")}}{% endblock %}
+                            </h4>
+                            <hr/>
+                            <br/>
+                        <div class="profile-item-container create-account-container">
+                            {% block content %}{% endblock %}
+                            <div class="save-button-container">
+                                {{profileSaveBtn()}}
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="back-button-container">
+                            {% block back_button %}
+                                {{ back_btn('patients','patients list')}}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
+        <input type="text" id="error_response_text" value="" class="tnth-hide" />
+        {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
+        {%- endif -%}
+    </form>
+    <a id="redirectLink" href="" name="redirectLink" class="tnth-hide">&nbsp;</a>
+{% endblock %}
+{% block footer %}
+    {{footer(user=user)}}
+{% endblock %}
+{% block additional_scripts %}
+    <!--TODO don't need profile.js if this is its own Vue instance -->
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+    <script src="{{ url_for('static', filename='js/accountCreation.js') }}"></script>
+{% endblock additional_scripts %}

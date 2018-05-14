@@ -9,23 +9,17 @@
       <br/>
       <div class="right-panel">
         <div class="flex">
-          <div id="profileHeader" class="profile-header">
-            <h4 class="tnth-headline">
-              {% block profile_title %}
-              {{_("TrueNTH Profile")}}
-              {% endblock %}
-            </h4>
-          </div>
+          <div id="profileHeader" class="profile-header"><h4 class="tnth-headline">{% block profile_title %}{{_("TrueNTH Profile")}}{% endblock %}</h4></div>
         </div>
-        {% block profile_content %}
-        {% endblock %}
+        <div id="profileMainContent">{% block profile_content %}{% endblock %}</div>
         <br/><br/>
       </div>
     </div>
   </div>
 </form>
 {% endblock %}
-{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
+{% block footer %}<div id="homeFooter" class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{{linksHTML(user=current_user)}}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
 {% block additional_scripts %}
-<script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+  <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
 {% endblock %}

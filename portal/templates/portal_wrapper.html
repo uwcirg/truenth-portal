@@ -88,7 +88,7 @@
                             {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)) %}
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                             {% endif %}
-                            <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
+                            <li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>
                         </ul>
                         {% endif %}
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
@@ -137,7 +137,7 @@
                     {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)) %}
                         <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                     {% endif %}
-                    {% if user %}<li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
+                    {% if user %}<li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>
             </div>
             {% endif %}
@@ -161,7 +161,7 @@
 <script type="text/javascript">
     (function() {
         var d=document, g=d.createElement("script"), s=d.getElementsByTagName("head")[0];
-        g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/sessionMonitor.js") }}'; 
+        g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/sessionMonitor.js") }}';
         //inserting script in HEAD element
         s.appendChild(g);
         function loadSessionMonitor() {

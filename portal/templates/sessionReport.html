@@ -2,47 +2,73 @@
 {% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
 <br/>
-<div id="userSessionReportDetailHeader" class="report-custom-header gradient">
-	<span class="left">
-	<h4>{{ _("Assessment Report Detail") }}</h4>
-	<h4 class="text-muted">{{ _("Patient") }} #{{user.id}} - {{user.first_name}}  {{user.last_name}}</h4>
-	</span>
-	<span class="right">
-		{% if current_user.id == user.id %}
-		<a href="{{url_for('portal.profile')}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-		{% else %}
-			{% if current_user.has_role(ROLE.STAFF) %}
-				<a href="{{url_for('patients.patient_profile', patient_id=user.id) }}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Patient Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+<div id="userSessionReportMainContainer">
+	<div id="userSessionReportDetailHeader" class="report-custom-header gradient">
+		<span class="left">
+		<h4>{{ _("Assessment Report Detail") }}</h4>
+		<h4 class="text-muted">{{ _("Patient") }} #{{user.id}} - {{user.first_name}}  {{user.last_name}}</h4>
+		</span>
+		<span class="right">
+			{% if current_user.id == user.id %}
+			<a href="{{url_for('portal.profile')}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
 			{% else %}
-				<a href="{{url_for('portal.profile', user_id=user.id)}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to User Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+				{% if current_user.has_role(ROLE.STAFF) %}
+					<a href="{{url_for('patients.patient_profile', patient_id=user.id) }}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Patient Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+				{% else %}
+					<a href="{{url_for('portal.profile', user_id=user.id)}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to User Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+				{% endif %}
 			{% endif %}
-		{% endif %}
-		&nbsp;&nbsp;<a href="{{PORTAL}}/home" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Truenth Home') }}" class="btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
-	</span>
+			&nbsp;&nbsp;<a href="/" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Truenth Home') }}" class="btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+		</span>
 
-</div>
-<div class="report-error-message">{{ _("Unable to load report") }}</div>
-<div class="container">
-	<div class="row" style="position: relative;">
-	    <div class="col-md-12">
-	    	<div id="userSessionReportDetail" cellpadding="2">
-		        <input type="hidden" id="_report_user_id" value="{{user.id if user}}" />
-		        <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
-		        <input type="hidden" id="_report_instrument_id" value="{{instrument_id}}" />
-		        <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable"></table><br/>
+	</div>
+	<div class="error-message" v-show="errorMessage !== ''">
+		<br/>
+		{% raw %}{{errorMessage}}{% endraw %}
+		<br/>
+	</div>
+	<div class="container">
+		<div class="row">
+		    <div class="col-md-12">
+		    	<div id="userSessionReportDetail" cellpadding="2">
+			        <input type="hidden" id="_report_user_id" value="{{user.id if user}}" />
+			        <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
+			        <input type="hidden" id="_report_instrument_id" value="{{instrument_id}}" />
+			        	<table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" v-if="data.length > 0">
+			        		{% raw %}
+				        		<caption>
+				        			<hr/>
+				        			<span class="profile-item-title">{{caption.title}}</span>
+				        			<br/>
+				        			<span class="text-muted smaller-text">{{caption.lastUpdated}}</span>
+				        			<span class='gmt'>{{caption.timezone}}</span>
+				        			<hr/>
+				        		</caption>
+			        		{% endraw %}
+			        		<THEAD>
+			        			<TH>{{_("Question")}}</TH><TH>{{_("Response")}}</TH>
+			        		</THEAD>
+			        		<TBODY>
+			        			{% raw %}
+				        			<TR v-for="item in data">
+				        				<TD v-html="item.q"></TD>
+				        				<TD v-html="item.a"></TD>
+				        			</TR>
+				        		{% endraw %}
+			        		</TBODY>
+				        </table>
+			        <br/>
+			    </div>
 		    </div>
-	    </div>
+		</div>
 	</div>
 </div>
 {% endblock %}
 {% block footer %}
 {{footer(user=current_user)}}
 {% endblock %}
-{% block document_ready %}
-$(function() {
-	tnthAjax.assessmentReport($("#_report_user_id").val(), $("#_report_instrument_id").val(), function(data) {
-       fillContent.assessmentReport(data);
-    });
-});
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/assessmentReport.js') }}"></script>
 {% endblock %}
+
 
