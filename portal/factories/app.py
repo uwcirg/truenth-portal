@@ -276,8 +276,8 @@ def configure_logging(app):  # pragma: no cover
     task_logger.addHandler(info_file_handler)
 
     # Configure Error Emails for high level log messages, only in prod mode
-    ADMINS = app.config['ERROR_SENDTO_EMAIL']
     if not app.debug:
+        ADMINS = app.config['ERROR_SENDTO_EMAIL']
         creds = None
         if app.config.get('MAIL_PASSWORD'):
             creds = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
