@@ -8,7 +8,7 @@
                 throw new Error("Dependency with key value: " + key + " not found.");
             }
         };
-        this.userId = 0;
+        this.userId = null;
         this.roleRequired = false;
         this.userRoles = [];
         this.CONFIG_DEFAULT_CORE_DATA = null;
@@ -1021,7 +1021,7 @@
          * get incomplete fields thereafter
          * note: need to delay gathering incomplete fields to allow fields to be render
          */
-        if ($("#aboutForm").lenght > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
+        if ($("#aboutForm").lenghth > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
             var fc = new window.FieldsChecker({
                 i18next: i18next,
                 tnthAjax: tnthAjax,
