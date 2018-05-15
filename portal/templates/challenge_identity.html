@@ -50,7 +50,7 @@
                     <div class="col-md-5 col-xs-10">
                         <div class="form-group">
                             <label class="label">{{ _("Day") }}</label>
-                            <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" required pattern="\d[\d]?">
+                            <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" required pattern="\d[\d]?" data-error="{{_('Day is required')}}">
                             <div class="help-block with-errors"></div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                     <div class="col-md-5 col-xs-10">
                         <div class="form-group">
                             <label class="label">{{ _("Month") }}</label>
-                            <select class="form-control bd-element" name="birthdayMonth" id="month"  required>
+                            <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Month is required')}}" required>
                                 <option value="">{{ _("Month") }}...</option>
                                 <option value="01">{{ _("January") }}</option>
                                 <option value="02">{{ _("February") }}</option>
@@ -82,7 +82,7 @@
                     <div class="col-md-5 col-xs-10">
                         <div class="form-group">
                             <label class="label">{{ _("Year") }}</label>
-                            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "\d{4}" required>
+                            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "\d{4}" data-error="{{_('Year is required')}}" required>
                             <div class="help-block with-errors"></div>
                         </div>
                     </div>
