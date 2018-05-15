@@ -276,13 +276,26 @@ def configure_logging(app):  # pragma: no cover
     task_logger.addHandler(info_file_handler)
 
     # Configure Error Emails for high level log messages, only in prod mode
-    ADMINS = app.config['ERROR_SENDTO_EMAIL']
     if not app.debug:
+        ADMINS = app.config['ERROR_SENDTO_EMAIL']
+
+        creds = None
+        if app.config.get('MAIL_PASSWORD'):
+            creds = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+
+        host = app.config['MAIL_SERVER']
+        if app.config.get('MAIL_PORT'):
+            host = (app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
+
         mail_handler = handlers.SMTPHandler(
-            '127.0.0.1',
-            app.config['MAIL_DEFAULT_SENDER'],
-            ADMINS,
-            '{} Log Message'.format(app.config['SERVER_NAME']))
+            mailhost=host,
+            fromaddr=app.config['MAIL_DEFAULT_SENDER'],
+            toaddrs=ADMINS,
+            subject='{} Log Message'.format(app.config['SERVER_NAME']),
+
+            credentials=creds,
+            secure=(app.config.get('MAIL_USE_SSL') and ()),
+        )
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
         task_logger.addHandler(mail_handler)
