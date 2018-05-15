@@ -294,6 +294,7 @@ def configure_logging(app):  # pragma: no cover
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
     metadata = pkginfo.Installed('portal')
+    metadata.version = sys.modules['portal'].__version__
 
     # Get git hash from version if present
     # https://github.com/pypa/setuptools_scm#default-versioning-scheme
