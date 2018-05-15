@@ -3,7 +3,7 @@
 
 # dh-virtualenv options
 # https://dh-virtualenv.readthedocs.io/en/1.0/usage.html
-DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12' --extra-pip-arg='--verbose'
 
 distclean:
 	rm -Rf build debian/portal/ env
