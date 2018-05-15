@@ -1058,27 +1058,6 @@ var tnthAjax = {
             }
         });
     },
-    "hasRole": function(userId, roleName, callback) {
-        callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User ID is required.")});
-            return false;
-        }
-        if (!roleName) {
-            callback({"error": i18next.t("Role must be provided")});
-            return false;
-        }
-        tnthAjax.getRoles(userId, false, function(data) {
-            if (data.roles) {
-                var matchedRole = $.grep(data.roles, function(role) {
-                    return String(role.name).toLowerCase() === String(roleName).toLowerCase();
-                });
-                callback({"matched": matchedRole.length > 0});
-            } else {
-                callback({"error": i18next.t("no roles found for user")});
-            }
-        }, {"sync": true});
-    },
     "getRoleList": function(callback) {
         this.sendRequest("/api/roles", "GET", null, null, function(data) {
             callback = callback || function() {};
@@ -1095,7 +1074,7 @@ var tnthAjax = {
             }
         });
     },
-    "getRoles": function(userId, isProfile, callback, params) {
+    "getRoles": function(userId, callback, params) {
         callback = callback || function() {};
         var sessionStorageKey = "userRole_" + userId;
         if (sessionStorage.getItem(sessionStorageKey)) {

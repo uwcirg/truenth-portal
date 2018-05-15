@@ -32,7 +32,7 @@
             });
             if (this.currentUserId) { //get user roles - note using the current user Id - so we can determine: if user is an admin, if he/she can edit the consent, etc.
                 this.initChecks.push({done: false});
-                this.modules.tnthAjax.getRoles(this.currentUserId, false, function(data) {
+                this.modules.tnthAjax.getRoles(this.currentUserId, function(data) {
                     if (data && data.roles) {
                         data.roles.forEach(function(role) {self.currentUserRoles.push(role.name.toLowerCase());});
                     }
@@ -2258,7 +2258,7 @@
                             });
                         });
                     }
-                    self.modules.tnthAjax.getRoles(self.subjectId, true, function(data) {
+                    self.modules.tnthAjax.getRoles(self.subjectId, function(data) {
                         if (data.roles) {
                             self.userRoles = data.roles.map(function(role) {
                                 return role.name;
