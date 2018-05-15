@@ -9,8 +9,8 @@
         {{caller()}}
     </div>
 {%- endmacro %}
-{% macro profileEditButton() -%}
-    <input type="button" class="btn profile-item-edit-btn" value="{{_('Edit')}}" aria-label="{{_('Edit Button')}}"></input>
+{% macro profileEditButton(class="") -%}
+    <input type="button" class="btn profile-item-edit-btn {{class}}" value="{{_('Edit')}}" aria-label="{{_('Edit Button')}}"></input>
 {%- endmacro %}
 {% macro titleSection(id="", class="") -%}
     <h4 id="{%-if id -%}{{id}}{%- endif -%}" class="profile-item-title index-item {{class}}">{{caller()}}</h4>
@@ -859,8 +859,8 @@
     <div class="row">
         <div class="col-md-12">
             <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
-            <div class="profile-item-container {% if person and current_user and person.id == current_user.id %}editable{% endif %}" data-sections="clinical">
-                {{profileEditButton()}}
+            <div id="clinicalQuestionsContainer" class="profile-item-container" data-sections="clinical">
+                {{profileEditButton('tnth-hide')}}
                 {% call titleSection(id="clinicalQuestionsLoc") %}
                     {% if person.id == current_user.id %}{{_("My Prostate Cancer Profile")}}{% else %}{{ _("Clinical Questions") }}{% endif %}
                 {%- endcall %}
