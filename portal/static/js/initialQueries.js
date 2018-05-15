@@ -1021,7 +1021,7 @@
          * get incomplete fields thereafter
          * note: need to delay gathering incomplete fields to allow fields to be render
          */
-        if ($("#aboutForm").lenghth > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
+        if ($("#aboutForm").length > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
             var fc = new window.FieldsChecker({
                 i18next: i18next,
                 tnthAjax: tnthAjax,
