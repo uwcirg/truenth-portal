@@ -294,7 +294,7 @@ def configure_logging(app):  # pragma: no cover
             subject='{} Log Message'.format(app.config['SERVER_NAME']),
 
             credentials=creds,
-            secure=app.config.get('MAIL_USE_SSL'),
+            secure=(app.config.get('MAIL_USE_SSL') and ()),
         )
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
