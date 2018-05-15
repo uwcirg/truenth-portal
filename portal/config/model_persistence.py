@@ -117,12 +117,17 @@ class ModelPersistence(object):
                         self.model.__name__, o.get('resourceType')))
             result = self.update(o)
             db.session.commit()
-            objs_seen.append(result.id)
+            if hasattr(result, 'id'):
+                objs_seen.append(result.id)
+                index_field = 'id'
+            else:
+                objs_seen.append(getattr(result, self.lookup_field))
+                index_field = self.lookup_field
 
         # Delete any not named
         if not keep_unmentioned:
             query = self.model.query.filter(
-                ~getattr(self.model, 'id').in_(
+                ~getattr(self.model, index_field).in_(
                     objs_seen)) if objs_seen else []
             for obj in query:
                 current_app.logger.info(
@@ -235,6 +240,9 @@ class ModelPersistence(object):
         to avoid unique constraint violations in the future.
 
         """
+        if not self.sequence_name:
+            return
+
         max_known = db.engine.execute(
             "SELECT MAX(id) FROM {table}".format(
                 table=self.model.__tablename__)).fetchone()[0]
@@ -255,28 +263,19 @@ class ExclusionPersistence(ModelPersistence):
     values or re-enter staging configuration values to test every time.
 
     """
-    pass
+    def __init__(
+            self, model_class, lookup_field='id', attributes=None,
+            target_dir=None):
+        super(ExclusionPersistence, self).__init__(
+            model_class=model_class,
+            lookup_field=lookup_field,
+            sequence_name=None,
+            target_dir=target_dir)
+        self.attributes = attributes if attributes else []
 
-
-def export_exclusion(cls, lookup_field, retain_fields, target_dir):
-    model_persistence = ExclusionPersistence(
-        cls, lookup_field=lookup_field, retain_fields=retain_fields,
-        target_dir=target_dir)
-    return model_persistence.export()
-
-
-def export_model(cls, lookup_field, target_dir):
-    model_persistence = ModelPersistence(
-        cls, lookup_field=lookup_field, target_dir=target_dir)
-    return model_persistence.export()
-
-
-def import_model(
-        cls, sequence_name, lookup_field, keep_unmentioned=True,
-        target_dir=None):
-    model_persistence = ModelPersistence(
-        cls, lookup_field=lookup_field, sequence_name=sequence_name,
-        target_dir=target_dir)
-    model_persistence.import_(keep_unmentioned=keep_unmentioned)
-
-
+    def update(self, new_data):
+        """Strip unwanted attributes before deligating to parent impl"""
+        keepers = set(self.attributes)
+        keepers.add(self.lookup_field)
+        desired = {k: v for k, v in new_data.items() if k in keepers}
+        return super(ExclusionPersistence, self).update(desired)
