@@ -901,34 +901,15 @@
     };
 
     FieldsChecker.prototype.patientQEvent = function(fields) {
-        var self = this, userId = self.userId, tnthAjax = this.__getDependency("tnthAjax");
+        var self = this;
         fields.forEach(function(item) {
             $(item).on("click", function() {
                 var thisItem = $(this);
                 var toCall = thisItem.attr("name") || thisItem.attr("data-name");
                 var toSend = (toCall === "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
-                //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
-                if (toCall !== "tx" && toCall !== "biopsy") {
-                    tnthAjax.postClinical(userId, toCall, toSend, $(this).attr("data-status"), false);
-                }
                 if (toSend === "true" || toCall === "pca_localized") {
-                    if (toCall === "biopsy") {
-                        $("#biopsyDate").attr("skipped", "false");
-                        if (toSend === "true") {
-                            ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
-                                $("input[name='" + fieldName + "']").each(function() {
-                                    $(this).attr("skipped", "false");
-                                });
-                            });
-                        }
-                        if (!$("#biopsyDate").val()) {
-                            return true;
-                        } else {
-                            tnthAjax.postClinical(userId, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
-                        }
-                        if (self.sectionCompleted("clinicalContainer")) {
-                            return false;
-                        }
+                    if (toCall === "biopsy" && !$("#biopsyDate").val()) {
+                        return true;
                     }
                     thisItem.parents(".pat-q").next().fadeIn();
                     var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
@@ -949,40 +930,6 @@
                         });
                     }
                 } else {
-                    if (toCall === "biopsy") {
-                        tnthAjax.postClinical(self.userId, toCall, "false", $(this).attr("data-status"), $(this));
-                        $("#biopsyDate").attr("skipped", "true");
-
-                        ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
-                            $("input[name='" + fieldName + "']").each(function() {
-                                $(this).prop("checked", false);
-                                $(this).attr("skipped", "true");
-                            });
-                        });
-                        if ($("input[name='pca_diag']").length > 0) {
-                            tnthAjax.putClinical(userId, "pca_diag", "false");
-                        }
-                        if ($("input[name='pca_localized']").length > 0) {
-                            tnthAjax.putClinical(userId, "pca_localized", "false", $(this));
-                        }
-
-                        if ($("input[name='tx']").length > 0) {
-                            tnthAjax.deleteTreatment(userId);
-                        }
-                    } else if (toCall === "pca_diag") {
-                        ["pca_localized", "tx"].forEach(function(fieldName) {
-                            $("input[name='" + fieldName + "']").each(function() {
-                                $(this).prop("checked", false);
-                                $(this).attr("skipped", "true");
-                            });
-                        });
-                        if ($("input[name='pca_localized']").length > 0) {
-                            tnthAjax.putClinical(userId, "pca_localized", "false", $(this));
-                        }
-                        if ($("input[name='tx']").length > 0) {
-                            tnthAjax.deleteTreatment(userId);
-                        }
-                    }
                     thisItem.parents(".pat-q").nextAll().fadeOut();
                 }
                 self.handlePostEvent("clinicalContainer");

@@ -172,6 +172,15 @@
                     $(".pagination-detail .pagination-info").html(rowInfo);
                     return rowInfo;
                 },
+                formatAllRows: function() {
+                    return i18next.t("All rows");
+                },
+                formatSearch: function() {
+                    return i18next.t("Search");
+                },
+                formatNoMatches: function() {
+                    return i18next.t("No matching records found");
+                },
                 formatRecordsPerPage: function(pageNumber) {
                     return i18next.t("{pageNumber} records per page").replace("{pageNumber}", pageNumber);
                 },
@@ -671,9 +680,6 @@
                     break;
                 case "auditlog":
                     this.initAuditLogSection();
-                    break;
-                case "biopsy":
-                    this.initBiopsySection();
                     break;
                 }
             },
@@ -1873,15 +1879,18 @@
                 });
             },
             updateClinicalSection: function(data) {
+                if (!data) { return false; }
                 var self = this;
-                for (var i = 0; i < data.length; i++) {
-                    var val = data[i];
+                var sortedArray = data.sort(function(a, b) {
+                    return b.content.id - a.content.id;
+                });
+                for (var i = 0; i < sortedArray.length; i++) {
+                    var val = sortedArray[i];
                     var clinicalItem = String(val.content.code.coding[0].display);
                     var clinicalValue = val.content.valueQuantity.value;
                     var clinicalUnit = val.content.valueQuantity.units;
                     var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
                     var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
-                    //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
                     var status = val.content.status;
                     if (clinicalItem === "PCa diagnosis") {
                         clinicalItem = "pca_diag";
@@ -1939,11 +1948,34 @@
             updateTreatment: function(data) {
                 var treatmentCode = this.modules.tnthAjax.hasTreatment(data);
                 if (treatmentCode) {
-                    if (String(treatmentCode) === String(this.modules.SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)) {
-                        $("#tx_yes").prop("checked", true);
-                    } else {
-                        $("#tx_no").prop("checked", true);
+                    var hasCancerTreatment = String(treatmentCode) === String(this.modules.SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE);
+                    $("#tx_yes").prop("checked", hasCancerTreatment);
+                    $("#tx_no").prop("checked", !hasCancerTreatment);
+                }
+            },
+            onBeforeInitClinicalQuestionsSection: function() {
+                if (this.mode === "profile") {
+                    if (!this.isProxy()) {
+                        $("#clinicalQuestionsContainer .profile-item-edit-btn").removeClass("tnth-hide");
                     }
+                    $("#patientQ").show();
+                    $("#patTx").remove(); //don't show treatment
+                    $("#patientQ hr").hide();
+                    $(".pat-q input:radio").off("click").on("click", function() {
+                        var thisItem = $(this), toCall = thisItem.attr("name"), toSend = thisItem.val(); // Get value from div - either true or false
+                        if (String(toSend) === "true" || String(toCall) === "pca_localized") {
+                            thisItem.parents(".pat-q").nextAll().fadeIn();
+                        } else {
+                            thisItem.parents(".pat-q").nextAll().fadeOut();
+                        }
+                    });
+                    var diag = $("#pca_diag_yes");
+                    if (diag.is(":checked")) {
+                        diag.parents(".pat-q").nextAll().fadeIn();
+                    } else {
+                        diag.parents(".pat-q").nextAll().fadeOut();
+                    }
+                    this.fillSectionView("clinical");
                 }
             },
             initClinicalQuestionsSection: function() {
@@ -1951,144 +1983,90 @@
                 self.modules.tnthAjax.getTreatment(self.subjectId, function(data) {
                     self.updateTreatment(data);
                     self.modules.tnthAjax.getClinical(self.subjectId, function(data) {
-                        if (data.entry) {
-                            self.updateClinicalSection(data.entry);
-                        }
+                        self.updateClinicalSection(data.entry);
                         $("#patientQ").attr("loaded", "true");
-                        if (self.mode === "profile") {
-                            if (self.currentUserId !== self.subjectId) {
-                                $("#patientQ input[type='radio']").each(function() {
-                                    $(this).attr("disabled", "disabled");
-                                });
-                                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-                                    $(this).attr("disabled", true);
-                                });
-                            }
-                            $("#patientQ").show();
-                            $("#patTx").remove(); //don't show treatment
-                            $("#patientQ hr").hide();
-
-                            if (self.subjectId) {
-                                $(".pat-q input:radio").off("click").on("click", function() {
-                                    var thisItem = $(this);
-                                    var toCall = thisItem.attr("name");
-                                    var toSend = thisItem.val(); // Get value from div - either true or false
-                                    var targetContainer = $("#patientQContainer");
-                                    if (String(toCall) !== "biopsy") {
-                                        self.modules.tnthAjax.postClinical(self.subjectId, toCall, toSend, $(this).attr("data-status"), targetContainer);
-                                    }
-                                    if (String(toSend) === "true" || String(toCall) === "pca_localized") {
-                                        if (String(toCall) === "biopsy") {
-                                            if ($("#biopsyDate").val() === "") {
-                                                return true;
-                                            } else {
-                                                self.modules.tnthAjax.postClinical(self.subjectId, toCall, toSend, "", targetContainer, {
-                                                    "issuedDate": $("#biopsyDate").val()
-                                                });
-                                            }
-                                        }
-                                        thisItem.parents(".pat-q").nextAll().fadeIn();
-                                    } else {
-                                        if (String(toCall) === "biopsy") {
-                                            self.modules.tnthAjax.postClinical(self.subjectId, toCall, "false", $(this).attr("data-status"), targetContainer);
-                                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
-                                                $("input[name='" + fieldName + "']").each(function() {
-                                                    $(this).prop("checked", false);
-                                                });
-                                            });
-                                            if ($("input[name='pca_diag']").length > 0) {
-                                                self.modules.tnthAjax.putClinical(self.subjectId, "pca_diag", "false", targetContainer);
-                                            }
-                                            if ($("input[name='pca_localized']").length > 0) {
-                                                self.modules.tnthAjax.putClinical(self.subjectId, "pca_localized", "false", targetContainer);
-                                            }
-                                        } else if (String(toCall) === "pca_diag") {
-                                            ["pca_localized"].forEach(function(fieldName) {
-                                                $("input[name='" + fieldName + "']").each(function() {
-                                                    $(this).prop("checked", false);
-                                                });
-                                            });
-                                            if ($("input[name='pca_localized']").length > 0) {
-                                                self.modules.tnthAjax.putClinical(self.subjectId, "pca_localized", "false", targetContainer);
-                                            }
-                                        }
-                                        thisItem.parents(".pat-q").nextAll().fadeOut();
-                                    }
-                                });
-                                var diag = $("#pca_diag_yes");
-                                if (diag.is(":checked")) {
-                                    diag.parents(".pat-q").nextAll().fadeIn();
-                                } else {
-                                    diag.parents(".pat-q").nextAll().fadeOut();
-                                }
-                                if (self.currentUserId !== self.subjectId) {
-                                    if (!$("#patientQ input[type='radio']").is(":checked")) {
-                                        $("#patientQContainer").append("<span class='text-muted'>" + i18next.t("no answers provided") + "</span>");
-                                    }
-                                }
-                                [{
-                                    "fields": $("#patientQ input[name='biopsy']"),
-                                    "containerId": "patBiopsy"
-                                }, {
-                                    "fields": $("#patientQ input[name='pca_diag']"),
-                                    "containerId": "patDiag"
-                                }, {
-                                    "fields": $("#patientQ input[name='pca_localized']"),
-                                    "containerId": "patMeta"
-                                }].forEach(function(item) {
-                                    item.fields.each(function() {
-                                        $(this).attr("data-save-container-id", item.containerId);
+                        self.onBeforeInitClinicalQuestionsSection();
+                        if (self.subjectId) {
+                            $("#patientQ [name='biopsy']").on("click", function() {
+                                var toSend = String($(this).val()), biopsyDate = $("#biopsyDate").val(), thisItem = $(this), userId = self.subjectId;
+                                var toCall = thisItem.attr("name") || thisItem.attr("data-name"), targetField = $("#patientQContainer");
+                                var arrQ = ["pca_diag", "pca_localized", "tx"];
+                                if (toSend === "true") {
+                                    $("#biopsyDateContainer").show();
+                                    $("#biopsyDate").attr("skipped", "false");
+                                    arrQ.forEach(function(fieldName) {
+                                        $("#patientQ input[name='" + fieldName + "']").attr("skipped", "false");
                                     });
-                                });
-                                self.fillSectionView("clinical");
-                            }
+                                    if (biopsyDate) {
+                                        setTimeout(function() {
+                                            self.modules.tnthAjax.postClinical(userId, toCall, toSend, "", targetField, {"issuedDate": biopsyDate});
+                                        }, 50);
+                                    } else {
+                                        $("#biopsy_day").focus();
+                                    }
+                                } else {
+                                    $("#biopsyDate").attr("skipped", "true");
+                                    $("#biopsyDate, #biopsy_day, #biopsy_month, #biopsy_year").val("");
+                                    $("#biopsyDateError").text("");
+                                    $("#biopsyDateContainer").hide();
+                                    arrQ.forEach(function(fieldName) {
+                                        var field = $("#patientQ input[name='" + fieldName + "']");
+                                        field.prop("checked", false);
+                                        field.attr("skipped", "true");
+                                    });
+                                    setTimeout(function() {
+                                        self.modules.tnthAjax.postClinical(userId, toCall, "false", thisItem.attr("data-status"), targetField);
+                                        self.modules.tnthAjax.postClinical(userId, "pca_diag", "false");
+                                        self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                        self.modules.tnthAjax.deleteTreatment(userId);
+                                    }, 50);
+
+                                }
+                            });
+                            self.__convertToNumericField($("#biopsy_day, #biopsy_year"));
+                            $("#biopsy_day, #biopsy_month, #biopsy_year").on("change", function() {
+                                var d = $("#biopsy_day"), m = $("#biopsy_month"), y = $("#biopsy_year");
+                                var isValid = self.modules.tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                                if (isValid) {
+                                    $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                                    $("#biopsyDateError").text("").hide();
+                                    $("#biopsy_yes").trigger("click");
+                                } else {
+                                    $("#biopsyDate").val("");
+                                }
+                            });
+
+                            $("#patientQ input[name='tx']").on("click", function() {
+                                self.modules.tnthAjax.postTreatment(self.subjectId, (String($(this).val()) === "true"), "", $("#patientQContainer"));
+                            });
+
+                            $("#patientQ input[name='pca_localized']").on("click", function() {
+                                var o = $(this);
+                                setTimeout(function() {
+                                    self.modules.tnthAjax.postClinical(self.subjectId, o.attr("name"), o.val(), o.attr("data-status"), $("#patientQContainer"));
+                                }, 50);
+                            });
+
+                            $("#patientQ input[name='pca_diag']").on("click", function() {
+                                var toSend = String($(this).val()), userId = self.subjectId, o = $(this);
+                                setTimeout(function() {
+                                    self.modules.tnthAjax.postClinical(userId, o.attr("name"), toSend, o.attr("data-status"), $("#patientQContainer"));
+                                }, 50);
+                                if (toSend !== "true") {
+                                    ["pca_localized", "tx"].forEach(function(fieldName) {
+                                        var field = $("#patientQ input[name='" + fieldName + "']");
+                                        field.prop("checked", false);
+                                        field.attr("skipped", "true");
+                                    });
+                                    setTimeout(function() {
+                                        self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                        self.modules.tnthAjax.deleteTreatment(userId);
+                                    }, 50);
+                                }
+                            });
                         }
                     });
                 });
-            },
-            initBiopsySection: function() { //used by both profile and initial queries
-                var profileSelf = this;
-                setTimeout(function() {
-                    profileSelf.__convertToNumericField($("#biopsy_day, #biopsy_year"));
-                    $("input[name='biopsy']").each(function() {
-                        $(this).on("click", function() {
-                            if (String($(this).val()) === "true") {
-                                $("#biopsyDateContainer").show();
-                                if (String($(this).attr("id")) === "biopsy_yes" && String($("#biopsy_day").val()) === "") {
-                                    $("#biopsy_day").focus();
-                                }
-                            } else {
-                                $("#biopsyDate").val("");
-                                $("#biopsy_day").val("");
-                                $("#biopsy_month").val("");
-                                $("#biopsy_year").val("");
-                                $("#biopsyDateError").text("");
-                                $("#biopsyDateContainer").hide();
-                            }
-                        });
-                    });
-                    $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
-                        $(this).on("change", function() {
-                            var d = $("#biopsy_day");
-                            var m = $("#biopsy_month");
-                            var y = $("#biopsy_year");
-                            var isValid = profileSelf.modules.tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
-                            if (isValid) {
-                                $("#biopsyDate").val(y.val() + "-" + m.val() + "-" + d.val());
-                                $("#biopsyDateError").text("").hide();
-                                $("#biopsy_yes").trigger("click");
-                            } else {
-                                $("#biopsyDate").val("");
-                            }
-                        });
-                    });
-                    $("input[name='tx']").each(function() {
-                        $(this).on("click", function() {
-                            profileSelf.modules.tnthAjax.postTreatment($("#iq_userId").val(), (String($(this).val()) === "true"), "", $(this));
-                        });
-                    });
-                }, 550);
-
             },
             manualEntryModalVis: function(hide) {
                 if (hide) {
@@ -2796,7 +2774,6 @@
                     $("#consentListTable").animate({opacity: 1});
                 }
                 this.consent.consentLoading = false;
-
             },
             __convertToNumericField: function(field) {
                 if (field) {
@@ -2819,4 +2796,3 @@
         }
     });
 })();
-
