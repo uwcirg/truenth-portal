@@ -5,6 +5,7 @@ from flask import current_app
 from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
+from ..models.client import Client
 from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
 from ..models.intervention import Intervention
@@ -15,7 +16,7 @@ from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
 from ..models.scheduled_job import ScheduledJob
-from .model_persistence import export_model, import_model
+from .model_persistence import ModelPersistence
 
 
 # NB - order MATTERS, as any type depending on another must find
@@ -42,15 +43,33 @@ models = (
     ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
 
 
+StagingExclusions = namedtuple(
+    'StagingExclusions', ['cls', 'lookup_field', 'attributes'])
+staging_exclusions = (
+    StagingExclusions(Client, 'client_id', [
+        'client_id', 'client_secret', '_redirect_uris', 'callback_url']),
+    StagingExclusions(Intervention, 'name', ['link_url'])
+)
+
+
 class SitePersistence(object):
     """Manage import and export of dynamic site data"""
 
     VERSION = '0.1'
 
-    def export(self, dir):
+    def __init__(self, target_dir):
+        """Initialize SitePersistence instance
+
+        :param target_dir: assign filesystem path to use non-default
+
+        """
+        self.dir = target_dir
+
+    def export(self, staging_exclusion=False):
         """Generate JSON files defining dynamic site objects
 
-        :param dir: used to name non-default target directory for export files
+        :param staging_exclusion: set only if persisting exclusions to retain
+          on staging when pulling over production data
 
         Export dynamic data, such as Organizations and Access Strategies for
         import into other sites.  This does NOT export values expected
@@ -60,13 +79,27 @@ class SitePersistence(object):
         To import the data, use the seed command as defined in manage.py
         """
 
-        # The following model classes write to independent files
-        for model in models:
-            export_model(cls=model.cls, lookup_field=model.lookup_field,
-                         target_dir=dir)
+        def default_export():
+            # The following model classes write to independent files
+            for model in models:
+                model_persistence = ModelPersistence(
+                    model.cls, lookup_field=model.lookup_field,
+                    target_dir=self.dir)
+                model_persistence.export()
 
-        # Add site.cfg
-        export_config(target_dir=dir)
+            # Add site.cfg
+            export_config(target_dir=self.dir)
+
+        def exclusive_export():
+            for model in staging_exclusions:
+                export_exclusion(
+                    cls=model.cls, lookup_field=model.lookup_field,
+                    attributes=model.attributes, target_dir=self.dir)
+
+        if staging_exclusion:
+            exclusive_export()
+        else:
+            default_export()
 
     def import_(self, keep_unmentioned):
         """If persistence file is found, import the data
@@ -79,14 +112,15 @@ class SitePersistence(object):
 
         """
         for model in models:
-            import_model(
-                cls=model.cls,
+            model_persistence = ModelPersistence(
+                model.cls, lookup_field=model.lookup_field,
                 sequence_name=model.sequence_name,
-                lookup_field=model.lookup_field,
-                keep_unmentioned=keep_unmentioned)
+                target_dir=self.dir)
+            model_persistence.import_(keep_unmentioned=True)
+
 
         # Config isn't a model - separate function
-        import_config()
+        import_config(target_dir=self.dir)
 
         db.session.commit()
         current_app.logger.info("SitePersistence import complete")
