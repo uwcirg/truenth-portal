@@ -81,6 +81,17 @@ class Client(db.Model):
         """Set application origins, single string of space delimited URLs"""
         self._redirect_uris = values
 
+    def as_json(self):
+        """serialize the client"""
+        d = {'resourceType': 'Client'}
+        for attr in (
+                'client_id', 'client_secret', '_redirect_uris',
+                'callback_url'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+
+        return d
+
     @property
     def default_redirect_uri(self):
         return self.redirect_uris[0]
@@ -90,6 +101,22 @@ class Client(db.Model):
         if self._default_scopes:
             return self._default_scopes.split()
         return []
+
+    @classmethod
+    def from_json(cls, data):
+        client = cls()
+        return client.update_from_json(data)
+
+    def update_from_json(self, data):
+        if 'client_id' not in data:
+            raise ValueError("required 'client_id' field not found")
+
+        for attr in (
+                'client_id', 'client_secret', '_redirect_uris',
+                'callback_url'):
+            setattr(self, attr, data.get(attr))
+
+        return self
 
     def notify(self, data):
         """POST data to client's callback_url if defined
