@@ -279,10 +279,11 @@ def configure_logging(app):  # pragma: no cover
     ADMINS = app.config['ERROR_SENDTO_EMAIL']
     if not app.debug:
         mail_handler = handlers.SMTPHandler(
-            '127.0.0.1',
-            app.config['MAIL_DEFAULT_SENDER'],
-            ADMINS,
-            '{} Log Message'.format(app.config['SERVER_NAME']))
+            mailhost='127.0.0.1',
+            fromaddr=app.config['MAIL_DEFAULT_SENDER'],
+            toaddrs=ADMINS,
+            subject='{} Log Message'.format(app.config['SERVER_NAME']),
+        )
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
         task_logger.addHandler(mail_handler)
