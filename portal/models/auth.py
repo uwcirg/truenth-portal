@@ -5,6 +5,7 @@ from smtplib import SMTPRecipientsRefused
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from .message import EmailMessage
 from .role import Role, ROLE
@@ -107,6 +108,36 @@ class Token(db.Model):
     refresh_token = db.Column(db.String(255), unique=True)
     expires = db.Column(db.DateTime)
     _scopes = db.Column(db.Text)
+
+    def as_json(self):
+        """serialize the token - used to preserve service tokens"""
+        d = {'resourceType': 'Token'}
+        for attr in (
+                'client_id', 'user_id', 'token_type', 'access_token',
+                'refresh_token', '_scopes'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+        if self.expires:
+            d['expires'] = FHIR_datetime.as_fhir(self.expires)
+        return d
+
+    @classmethod
+    def from_json(cls, data):
+        token = cls()
+        return token.update_from_json(data)
+
+    def update_from_json(self, data):
+        if 'client_id' not in data or 'user_id' not in data:
+            raise ValueError(
+                "required 'client_id' and 'user_id' fields not found")
+
+        for attr in (
+                'client_id', 'user_id', 'token_type', 'access_token',
+                'refresh_token', '_scopes'):
+            setattr(self, attr, data.get(attr))
+        if 'expires' in data:
+            self.expires = FHIR_datetime.parse(data['expires'])
+        return self
 
     @property
     def scopes(self):
