@@ -1,4 +1,4 @@
-{% trans first_name=user.first_name, last_name=user.last_name %}<p>Hello {{ first_name }} {{ last_name }},</p>{% endtrans %}
+<p>{% trans first_name=user.first_name, last_name=user.last_name %}Hello {{ first_name }} {{ last_name }},{% endtrans %}</p>
 
 {% block message %}
 {% endblock %}
