@@ -86,7 +86,7 @@ class Client(db.Model):
         d = {'resourceType': 'Client'}
         for attr in (
                 'client_id', 'client_secret', '_redirect_uris',
-                'callback_url'):
+                'callback_url', 'user_id'):
             if getattr(self, attr, None) is not None:
                 d[attr] = getattr(self, attr)
 
@@ -113,7 +113,7 @@ class Client(db.Model):
 
         for attr in (
                 'client_id', 'client_secret', '_redirect_uris',
-                'callback_url'):
+                'callback_url', 'user_id'):
             setattr(self, attr, data.get(attr))
 
         return self
