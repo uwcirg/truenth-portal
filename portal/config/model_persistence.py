@@ -12,6 +12,14 @@ from ..models.identifier import Identifier
 from ..trace import trace
 
 
+def require(obj, attr, serial_form):
+    """Validation function to assure required attribute is defined"""
+    if attr not in serial_form:
+        raise ValueError(
+            "missing lookup_field in serial form of {}".format(
+                obj))
+
+
 class ModelPersistence(object):
     """Adapter class to handle persistence of model tables"""
     VERSION = '0.2'
@@ -149,17 +157,12 @@ class ModelPersistence(object):
         return self.model.query
 
     def require_lookup_field(self, obj, serial_form):
-        def require(attr, serial_form):
-            if not attr in serial_form:
-                raise ValueError(
-                    "missing lookup_field in serial form of {}".format(
-                        obj))
-
+        """Validate and return serial form of object"""
         if isinstance(self.lookup_field, tuple):
             for attr in self.lookup_field:
-                require(attr, serial_form)
+                require(obj, attr, serial_form)
         else:
-            require(self.lookup_field, serial_form)
+            require(obj, self.lookup_field, serial_form)
         return serial_form
 
     def serialize(self):
@@ -310,13 +313,19 @@ class ExclusionPersistence(ModelPersistence):
 
     def require_lookup_field(self, obj, serial_form):
         """Include lookup_field when lacking"""
+        results = dict(serial_form)
+
+        if isinstance(self.lookup_field, tuple):
+            for attr in self.lookup_field:
+                require(obj, attr, serial_form)
+            return serial_form
 
         # As the serialization method is often used for FHIR representation
         # and the object may not typically be handled by persistence, for
         # example with Users, force the lookup field into the serialization
         # form if missing.
-        results = dict(serial_form)
-        if not self.lookup_field in serial_form:
+
+        if self.lookup_field not in serial_form:
             results[self.lookup_field] = getattr(obj, self.lookup_field)
         return results
 
