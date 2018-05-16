@@ -1,7 +1,8 @@
-<p>Hello {{ user.first_name }} {{ user.last_name }},</p>
+{% trans first_name=user.first_name, last_name=user.last_name %}<p>Hello {{ first_name }} {{ last_name }},</p>{% endtrans %}
 
 {% block message %}
 {% endblock %}
-
+{% trans %}
 <p>Thank you,</p>
 <p>The TrueNTH Team</p>
+{% endtrans %}
