@@ -15,8 +15,10 @@ from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
+from ..models.role import Role, ROLE
 from ..models.scheduled_job import ScheduledJob
-from .model_persistence import ModelPersistence
+from ..models.user import User, UserRoles
+from .model_persistence import ExclusionPersistence, ModelPersistence
 
 
 # NB - order MATTERS, as any type depending on another must find
@@ -43,12 +45,25 @@ models = (
     ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
 
 
+# StagingExclusions capture details exclusive of a full db overwrite
+# that are to be restored *after* db migraion.  For example, when
+# bringing the production db to staging, retain the staging
+# config for interventions and service users
+
+def client_users_filter():
+    """Return query restricted to service users and those with client FKs"""
+    return (
+        User.query.join(Client).union(User.query.join(UserRoles).join(
+            Role).filter(Role.name == ROLE.SERVICE)))
+
+
 StagingExclusions = namedtuple(
-    'StagingExclusions', ['cls', 'lookup_field', 'attributes'])
+    'StagingExclusions', ['cls', 'lookup_field', 'attributes', 'filter_query'])
 staging_exclusions = (
     StagingExclusions(Client, 'client_id', [
-        'client_id', 'client_secret', '_redirect_uris', 'callback_url']),
-    StagingExclusions(Intervention, 'name', ['link_url'])
+        'client_id', 'client_secret', '_redirect_uris', 'callback_url'], None),
+    StagingExclusions(Intervention, 'name', ['link_url'], None),
+    StagingExclusions(User, 'id', ['telecom'], client_users_filter)
 )
 
 
@@ -92,9 +107,11 @@ class SitePersistence(object):
 
         def exclusive_export():
             for model in staging_exclusions:
-                export_exclusion(
-                    cls=model.cls, lookup_field=model.lookup_field,
-                    attributes=model.attributes, target_dir=self.dir)
+                ep = ExclusionPersistence(
+                    model_class=model.cls, lookup_field=model.lookup_field,
+                    attributes=model.attributes,
+                    filter_query=model.filter_query, target_dir=self.dir)
+                ep.export()
 
         if staging_exclusion:
             exclusive_export()
