@@ -16,9 +16,10 @@ from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
+from ..models.relationship import Relationship, RELATIONSHIP
 from ..models.role import Role, ROLE
 from ..models.scheduled_job import ScheduledJob
-from ..models.user import User, UserRoles
+from ..models.user import User, UserRelationship, UserRoles
 from .model_persistence import ExclusionPersistence, ModelPersistence
 
 
@@ -58,6 +59,12 @@ def client_users_filter():
             Role).filter(Role.name == ROLE.SERVICE)))
 
 
+def relationship_filter():
+    """Return query restricted to sponsor relationships (service users) """
+    return UserRelationship.query.join(Relationship).filter(
+        Relationship.name == RELATIONSHIP.SPONSOR)
+
+
 def service_token_filter():
     """Return query restricted to tokens owned by service users"""
     return Token.query.join(User).join(UserRoles).join(Role).filter(
@@ -71,6 +78,9 @@ staging_exclusions = (
     StagingExclusions(Client, 'client_id', None, None),
     StagingExclusions(Intervention, 'name', ['link_url'], None),
     StagingExclusions(User, 'id', ['telecom'], client_users_filter),
+    StagingExclusions(
+        UserRelationship, ('user_id', 'other_user_id'), None,
+        relationship_filter),
     StagingExclusions(Token, 'id', None, service_token_filter)
 )
 
