@@ -5,6 +5,7 @@ from flask import current_app
 from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
+from ..models.auth import Token
 from ..models.client import Client
 from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
@@ -57,13 +58,20 @@ def client_users_filter():
             Role).filter(Role.name == ROLE.SERVICE)))
 
 
+def service_token_filter():
+    """Return query restricted to tokens owned by service users"""
+    return Token.query.join(User).join(UserRoles).join(Role).filter(
+        Role.name == ROLE.SERVICE)
+
+
 StagingExclusions = namedtuple(
-    'StagingExclusions', ['cls', 'lookup_field', 'attributes', 'filter_query'])
+    'StagingExclusions',
+    ['cls', 'lookup_field', 'limit_to_attributes', 'filter_query'])
 staging_exclusions = (
-    StagingExclusions(Client, 'client_id', [
-        'client_id', 'client_secret', '_redirect_uris', 'callback_url'], None),
+    StagingExclusions(Client, 'client_id', None, None),
     StagingExclusions(Intervention, 'name', ['link_url'], None),
-    StagingExclusions(User, 'id', ['telecom'], client_users_filter)
+    StagingExclusions(User, 'id', ['telecom'], client_users_filter),
+    StagingExclusions(Token, 'id', None, service_token_filter)
 )
 
 
@@ -109,7 +117,7 @@ class SitePersistence(object):
             for model in staging_exclusions:
                 ep = ExclusionPersistence(
                     model_class=model.cls, lookup_field=model.lookup_field,
-                    attributes=model.attributes,
+                    limit_to_attributes=model.attributes,
                     filter_query=model.filter_query, target_dir=self.dir)
                 ep.export()
 

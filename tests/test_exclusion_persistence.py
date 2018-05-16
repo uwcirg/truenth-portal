@@ -5,14 +5,14 @@ from shutil import rmtree
 from tests import TestCase, TEST_USER_ID
 from tempfile import mkdtemp
 
-from portal.models.auth import create_service_token
+from portal.models.auth import create_service_token, Token
 from portal.config.site_persistence import (
     staging_exclusions, client_users_filter)
 from portal.config.model_persistence import ExclusionPersistence
 from portal.database import db
 from portal.models.client import Client
 from portal.models.intervention import Intervention, INTERVENTION
-from portal.models.user import User
+from portal.models.user import User, UserRelationship
 
 
 class TestExclusionPersistence(TestCase):
@@ -43,7 +43,8 @@ class TestExclusionPersistence(TestCase):
         for model in client_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             ex.export()
 
@@ -57,7 +58,8 @@ class TestExclusionPersistence(TestCase):
         for model in client_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             ex.import_(keep_unmentioned=True)
 
@@ -79,7 +81,8 @@ class TestExclusionPersistence(TestCase):
         for model in inter_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             ex.export()
 
@@ -93,7 +96,8 @@ class TestExclusionPersistence(TestCase):
         for model in inter_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             ex.import_(keep_unmentioned=True)
 
@@ -127,7 +131,8 @@ class TestExclusionPersistence(TestCase):
         for model in staging_exclusions:
             ep = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             ep.export()
 
@@ -137,15 +142,31 @@ class TestExclusionPersistence(TestCase):
             serial_form = json.loads(f.read())
         self.assertEquals(expected, len(serial_form['entry']))
 
-        # Modify some internal db values and confirm reapplication of
+        # Modify/delete some internal db values and confirm reapplication of
         # persistence restores desired values
         owner = db.session.merge(owner)
         owner.email = str(owner_id)
 
+        # just expecting the one service token.  purge it and the
+        # owner (the service user)
+        self.assertEquals(Token.query.count(), 1)
+        service_user_id = Token.query.one().user_id
+        b4 = User.query.count()
+        self.assertEquals(UserRelationship.query.count(), 1)
+        with SessionScope(db):
+            Token.query.delete()
+            UserRelationship.query.delete()
+            User.query.filter_by(id=service_user_id).delete()
+            db.session.commit()
+        self.assertEquals(Token.query.count(), 0)
+        self.assertEquals(UserRelationship.query.count(), 0)
+        self.assertEquals(b4 - 1, User.query.count())
+
         for model in staging_exclusions:
             ep = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, filter_query=model.filter_query,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
                 target_dir=self.tmpdir)
             if model.cls.__name__ == 'User':
                 pass
@@ -153,3 +174,5 @@ class TestExclusionPersistence(TestCase):
 
         result = User.query.get(owner_id)
         self.assertEquals(result.email, 'sm-owner@gmail.com')
+        self.assertEquals(Token.query.count(), 1)
+        self.assertEquals(UserRelationship.query.count(), 1)

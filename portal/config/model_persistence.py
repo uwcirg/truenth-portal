@@ -291,14 +291,14 @@ class ExclusionPersistence(ModelPersistence):
 
     """
     def __init__(
-            self, model_class, attributes, filter_query,
+            self, model_class, limit_to_attributes, filter_query,
             target_dir=None, lookup_field='id',):
         super(ExclusionPersistence, self).__init__(
             model_class=model_class,
             lookup_field=lookup_field,
             sequence_name=None,
             target_dir=target_dir)
-        self.attributes = attributes if attributes else []
+        self.limit_to_attributes = limit_to_attributes
         self.filter_query = filter_query
 
     @property
@@ -322,7 +322,11 @@ class ExclusionPersistence(ModelPersistence):
 
     def update(self, new_data):
         """Strip unwanted attributes before deligating to parent impl"""
-        keepers = set(self.attributes)
+
+        if self.limit_to_attributes is None:
+            return super(ExclusionPersistence, self).update(new_data)
+
+        keepers = set(self.limit_to_attributes)
         keepers.add(self.lookup_field)
         desired = {k: v for k, v in new_data.items() if k in keepers}
         return super(ExclusionPersistence, self).update(desired)
