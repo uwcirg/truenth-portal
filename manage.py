@@ -123,7 +123,8 @@ def seed(keep_unmentioned=False):
     db.session.commit()
 
     # import site export file if found
-    SitePersistence().import_(keep_unmentioned=keep_unmentioned)
+    SitePersistence(target_dir=None).import_(
+        keep_unmentioned=keep_unmentioned)
 
 
 @click.option('--dir', '-d', default=None, help="Export directory")
@@ -146,7 +147,8 @@ def export_site(dir, staging_exclusions):
     other static data.
 
     """
-    SitePersistence().export(dir, staging_exclusions)
+    SitePersistence(target_dir=dir).export(
+        staging_exclusions=staging_exclusions)
 
 
 @click.option('--email', '-e', help="email address for new user")
