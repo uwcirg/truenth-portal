@@ -1691,3 +1691,24 @@ class UserRelationship(db.Model):
         """Print friendly format for logging, etc."""
         return "{0.relationship} between {0.user_id} and "\
             "{0.other_user_id}".format(self)
+
+    def as_json(self):
+        """serialize the relationship - used to preserve service users"""
+        d = {'resourceType': 'UserRelationship'}
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+        return d
+
+    @classmethod
+    def from_json(cls, data):
+        user_rel = cls()
+        return user_rel.update_from_json(data)
+
+    def update_from_json(self, data):
+        if 'user_id' not in data or 'other_user_id' not in data:
+            raise ValueError(
+                "required 'user_id' and 'other_user_id' fields not found")
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            setattr(self, attr, data.get(attr))
+        return self
