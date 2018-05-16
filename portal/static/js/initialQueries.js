@@ -1,27 +1,5 @@
-(function() { /*global $*/
-    function hasValue(val) {
-        return String(val) !== "null" && String(val) !== "" && String(val) !== "undefined";
-    }
-    function disableHeaderFooterLinks() {
-        var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
-        links.addClass("disabled");
-        links.prop("onclick", null).off("click");
-        links.on("click", function(e) {
-            e.preventDefault();
-            return false;
-        });
-    }
-    function __convertToNumericField(field) {
-        if ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch) {
-            field = field || $(field);
-            field.prop("type", "tel");
-        }
-    }
-    var FieldsChecker = function( //helper class to keep track of missing fields based on required/needed core data
-        userId,
-        roleRequired,
-        dependencies) {
-
+(function() { /*global $ hasValue disableHeaderFooterLinks __convertToNumericField*/
+    var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
         this.__getDependency = function(key) {
             if (key && this.dependencies.hasOwnProperty(key)) {
                 return this.dependencies[key];
@@ -30,10 +8,11 @@
                 throw new Error("Dependency with key value: " + key + " not found.");
             }
         };
-        this.userId = userId;
+        this.userId = null;
+        this.roleRequired = false;
+        this.userRoles = [];
         this.CONFIG_DEFAULT_CORE_DATA = null;
         this.CONFIG_REQUIRED_CORE_DATA = null;
-        this.roleRequired = roleRequired;
         this.preselectClinic = "";
         this.mainSections = {};
         this.defaultSections = {};
@@ -46,13 +25,28 @@
 
     FieldsChecker.prototype.init = function(callback) {
         var self = this;
-        this.initConfig(function(data) {
-            self.preselectClinic = $("#preselectClinic").val();
-            self.initSections();
-            self.initSectionData(data);
-            if (callback) {
-                callback(data);
+        this.setUserId(function() {
+            if (!self.userId) {
+                alert("User id is required");
+                return false;
             }
+            self.initConfig(function(data) {
+                self.preselectClinic = $("#preselectClinic").val();
+                self.initSections();
+                self.initSectionData(data);
+                if (callback) {
+                    callback(data);
+                }
+            });
+        });
+    };
+
+    FieldsChecker.prototype.setUserId = function(callback) {
+        var self = this, tnthAjax = this.__getDependency("tnthAjax");
+        callback = callback || function() {};
+        tnthAjax.getCurrentUser(function(data) {
+            self.userId = data.id;
+            callback();
         });
     };
 
@@ -268,9 +262,22 @@
         }
     };
 
+    FieldsChecker.prototype.setUserRoles = function() {
+        var self = this, tnthAjax = self.__getDependency("tnthAjax");
+        tnthAjax.getRoles(this.userId, function(data) {
+            if (data.roles) {
+                self.userRoles = data.roles.map(function(item) {
+                    return item.name;
+                });
+            }
+            self.roleRequired = self.userRoles.indexOf("patient") !== -1 || self.userRoles.indexOf("staff") !== -1 || self.userRoles.indexOf("staff_admin") !== -1;
+        }, {sync: true});
+    };
+
     FieldsChecker.prototype.initConfig = function(callback) {
         var self = this, tnthAjax = self.__getDependency("tnthAjax");
         tnthAjax.getStillNeededCoreData(self.userId, true, function(data) {
+            self.setUserRoles();
             self.setConfig(self.roleRequired ? data : null, callback);
         });
     };
@@ -640,7 +647,7 @@
             $(".loading-message-indicator").show();
             setTimeout(function() {
                 window.location.reload();
-            }, 300);
+            }, 500);
         });
         /*** event for the arrow in the header**/
         $("div.heading").on("click", function() {
@@ -1005,4 +1012,44 @@
         });
     };
     window.FieldsChecker = FieldsChecker;
+
+    $(document).ready(function() {
+        /*
+         * the flow here :
+         * get still needed core data
+         * populate all required fields
+         * get incomplete fields thereafter
+         * note: need to delay gathering incomplete fields to allow fields to be render
+         */
+        if ($("#aboutForm").length > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
+            var fc = new window.FieldsChecker({
+                i18next: i18next,
+                tnthAjax: tnthAjax,
+                orgTool: new OrgTool(),
+                tnthDates: tnthDates
+            });
+            fc.init(function() {
+                fc.startTime = new Date();
+                DELAY_LOADING = true; /*global DELAY_LOADING */
+                fc.intervalId = setInterval(function() {
+                    fc.endTime = new Date();
+                    var elapsedTime = fc.endTime - fc.startTime;
+                    elapsedTime /= 1000;
+                    if (fc.sectionsLoaded() || elapsedTime >= 3) {
+                        setTimeout(function() {
+                            fc.initIncompleteFields();
+                            fc.onIncompleteFieldsDidInit();
+                        }, 300);
+                        fc.startTime = 0;
+                        fc.endTime = 0;
+                        clearInterval(fc.intervalId);
+                        DELAY_LOADING = false;
+                        showMain(); /* global showMain */
+                        hideLoader(true); /* global hideLoader */
+                    }
+                }, 100);
+            });
+        }
+    });
 })();
+
