@@ -1,13 +1,18 @@
 from flask_webtest import SessionScope
+import json
+from os.path import join as path_join
 from shutil import rmtree
 from tests import TestCase, TEST_USER_ID
 from tempfile import mkdtemp
 
-from portal.config.site_persistence import staging_exclusions
+from portal.models.auth import create_service_token
+from portal.config.site_persistence import (
+    staging_exclusions, client_users_filter)
 from portal.config.model_persistence import ExclusionPersistence
 from portal.database import db
 from portal.models.client import Client
-from portal.models.intervention import Intervention
+from portal.models.intervention import Intervention, INTERVENTION
+from portal.models.user import User
 
 
 class TestExclusionPersistence(TestCase):
@@ -38,7 +43,8 @@ class TestExclusionPersistence(TestCase):
         for model in client_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, target_dir=self.tmpdir)
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
             ex.export()
 
         # Modify the client in the db - then restore to confirm change
@@ -51,7 +57,8 @@ class TestExclusionPersistence(TestCase):
         for model in client_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, target_dir=self.tmpdir)
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
             ex.import_(keep_unmentioned=True)
 
         tc1 = Client.query.filter(Client.client_id == '123_abc').one()
@@ -72,7 +79,8 @@ class TestExclusionPersistence(TestCase):
         for model in inter_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, target_dir=self.tmpdir)
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
             ex.export()
 
         # Modify the intervention as if prod - then restore to confirm change
@@ -85,10 +93,63 @@ class TestExclusionPersistence(TestCase):
         for model in inter_ex:
             ex = ExclusionPersistence(
                 model_class=model.cls, lookup_field=model.lookup_field,
-                attributes=model.attributes, target_dir=self.tmpdir)
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
             ex.import_(keep_unmentioned=True)
 
         result = Intervention.query.filter(Intervention.name == 'alvin').one()
 
         self.assertEquals(result.link_url, 'http://retain.this')
         self.assertEquals(result.description, 'prod description')
+
+    def test_connected_user(self):
+        """User and service tokens connected with intervention should survive"""
+        owner = self.add_user('sm-owner@gmail.com')
+        self.promote_user(user=owner, role_name='application_developer')
+        owner = db.session.merge(owner)
+        owner_id = owner.id
+        service = self.add_service_user(sponsor=owner)
+
+        sm_client = Client(
+            client_id='abc_123', client_secret='shh', user_id=owner_id,
+            _redirect_uris='http://testsite.org',
+            callback_url='http://callback.one')
+        with SessionScope(db):
+            db.session.add(sm_client)
+
+        service, sm_client = map(db.session.merge, (service, sm_client))
+        create_service_token(client=sm_client, user=service)
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.client = sm_client
+
+        # Setup complete - SM has an owner, a service user and a service token
+        # generate the full export
+        for model in staging_exclusions:
+            ep = ExclusionPersistence(
+                model_class=model.cls, lookup_field=model.lookup_field,
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
+            ep.export()
+
+        # Confirm filter worked
+        expected = client_users_filter().count()
+        with open(path_join(self.tmpdir, 'User.json')) as f:
+            serial_form = json.loads(f.read())
+        self.assertEquals(expected, len(serial_form['entry']))
+
+        # Modify some internal db values and confirm reapplication of
+        # persistence restores desired values
+        owner = db.session.merge(owner)
+        owner.email = str(owner_id)
+
+        for model in staging_exclusions:
+            ep = ExclusionPersistence(
+                model_class=model.cls, lookup_field=model.lookup_field,
+                attributes=model.attributes, filter_query=model.filter_query,
+                target_dir=self.tmpdir)
+            if model.cls.__name__ == 'User':
+                pass
+            ep.import_(keep_unmentioned=True)
+
+        result = User.query.get(owner_id)
+        self.assertEquals(result.email, 'sm-owner@gmail.com')
