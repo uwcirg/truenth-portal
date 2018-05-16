@@ -112,9 +112,13 @@ class ModelPersistence(object):
         data = self.__read__()
         for o in data['entry']:
             if not o.get('resourceType') == self.model.__name__:
-                raise ValueError(
-                    "Import {} error, Found unexpected '{}' resource".format(
-                        self.model.__name__, o.get('resourceType')))
+                # Hard code exception for resourceType: Patient being a User
+                if o.get('resourceType') == 'Patient' and self.model.__name__ == 'User':
+                    pass
+                else:
+                    raise ValueError(
+                        "Import {} error, Found unexpected '{}' resource".format(
+                            self.model.__name__, o.get('resourceType')))
             result = self.update(o)
             db.session.commit()
             if hasattr(result, 'id'):
@@ -139,6 +143,25 @@ class ModelPersistence(object):
         self.update_sequence()
         trace("Import of {} complete".format(self.model.__name__))
 
+    @property
+    def query(self):
+        """Return ready query to obtain objects for persistence"""
+        return self.model.query
+
+    def require_lookup_field(self, obj, serial_form):
+        def require(attr, serial_form):
+            if not attr in serial_form:
+                raise ValueError(
+                    "missing lookup_field in serial form of {}".format(
+                        obj))
+
+        if isinstance(self.lookup_field, tuple):
+            for attr in self.lookup_field:
+                require(attr, serial_form)
+        else:
+            require(self.lookup_field, serial_form)
+        return serial_form
+
     def serialize(self):
         if hasattr(self.model, 'as_fhir'):
             serialize = 'as_fhir'
@@ -151,14 +174,18 @@ class ModelPersistence(object):
             order_col = tuple(
                 self.model.__table__.c[field].asc() for field in
                 self.lookup_field)
-            for item in self.model.query.order_by(*order_col).all():
-                results.append(getattr(item, serialize)())
+            for item in self.query.order_by(*order_col).all():
+                serial_form = self.require_lookup_field(
+                    item, getattr(item, serialize)())
+                results.append(serial_form)
         else:
             order_col = (
                 self.model.__table__.c[self.lookup_field].asc()
                 if self.lookup_field != "identifier" else "id")
-            for item in self.model.query.order_by(order_col).all():
-                results.append(getattr(item, serialize)())
+            for item in self.query.order_by(order_col).all():
+                serial_form = self.require_lookup_field(
+                    item, getattr(item, serialize)())
+                results.append(serial_form)
 
         return results
 
@@ -264,14 +291,34 @@ class ExclusionPersistence(ModelPersistence):
 
     """
     def __init__(
-            self, model_class, lookup_field='id', attributes=None,
-            target_dir=None):
+            self, model_class, attributes, filter_query,
+            target_dir=None, lookup_field='id',):
         super(ExclusionPersistence, self).__init__(
             model_class=model_class,
             lookup_field=lookup_field,
             sequence_name=None,
             target_dir=target_dir)
         self.attributes = attributes if attributes else []
+        self.filter_query = filter_query
+
+    @property
+    def query(self):
+        """return ready query to obtain correct set of objects te persist"""
+        if not self.filter_query:
+            return super(ExclusionPersistence, self).query
+        return self.filter_query()
+
+    def require_lookup_field(self, obj, serial_form):
+        """Include lookup_field when lacking"""
+
+        # As the serialization method is often used for FHIR representation
+        # and the object may not typically be handled by persistence, for
+        # example with Users, force the lookup field into the serialization
+        # form if missing.
+        results = dict(serial_form)
+        if not self.lookup_field in serial_form:
+            results[self.lookup_field] = getattr(obj, self.lookup_field)
+        return results
 
     def update(self, new_data):
         """Strip unwanted attributes before deligating to parent impl"""
