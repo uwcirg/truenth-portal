@@ -427,9 +427,9 @@ def challenge_identity(
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
-            error = "Unable to match identity"
+            error = _("Unable to match identity")
         if form.retry_count.data > 3:
-            abort(404, "User Not Found")
+            abort(404, _("User Not Found"))
 
         return render_template(
             'challenge_identity.html', form=form, errorMessage=error)
