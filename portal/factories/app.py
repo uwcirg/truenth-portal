@@ -19,6 +19,7 @@ from ..database import db
 from ..dogpile_cache import dogpile_cache
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
+from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
@@ -229,14 +230,38 @@ def configure_logging(app):  # pragma: no cover
         sql_log.setLevel(logging.INFO)
         sql_log.addHandler(sql_file_handler)
 
-    if app.testing or not app.config.get('LOG_FOLDER', None):
+    level = getattr(logging, app.config['LOG_LEVEL'].upper())
+    from ..tasks import logger as task_logger
+    task_logger.setLevel(level)
+    app.logger.setLevel(level)
+
+    # Configure Error Emails for high level log messages, only in prod mode
+    if not any((
+        app.debug,
+        app.testing,
+        not app.config.get('ERROR_SENDTO_EMAIL'),
+    )):
+        mail_handler = SSLSMTPHandler(
+            mailhost=app.config['MAIL_SERVER'],
+            mailport=app.config['MAIL_PORT'],
+            fromaddr=app.config['MAIL_DEFAULT_SENDER'],
+            toaddrs=app.config['ERROR_SENDTO_EMAIL'],
+            subject='{} Log Message'.format(app.config['SERVER_NAME']),
+            username=app.config['MAIL_USERNAME'],
+            password=app.config['MAIL_PASSWORD'],
+        )
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+        task_logger.addHandler(mail_handler)
+
+    if app.testing or not app.config.get('LOG_FOLDER'):
         # Write logs to stdout by default and when testing
         return
 
+    # Configure Error Emails for high level log messages, only in prod mode
     if not os.path.exists(app.config['LOG_FOLDER']):
         os.mkdir(app.config['LOG_FOLDER'])
 
-    level = getattr(logging, app.config['LOG_LEVEL'].upper())
 
     info_log = os.path.join(app.config['LOG_FOLDER'], 'info.log')
     # For WSGI servers, the log file is only writable by www-data
@@ -261,8 +286,8 @@ def configure_logging(app):  # pragma: no cover
         '[in %(pathname)s:%(lineno)d]')
     )
 
-    app.logger.setLevel(level)
     app.logger.addHandler(info_file_handler)
+    task_logger.addHandler(info_file_handler)
 
     # OAuth library logging tends to be helpful for connection
     # debugging
@@ -270,22 +295,6 @@ def configure_logging(app):  # pragma: no cover
         log = logging.getLogger(logger)
         log.setLevel(level)
         log.addHandler(info_file_handler)
-
-    from ..tasks import logger as task_logger
-    task_logger.setLevel(level)
-    task_logger.addHandler(info_file_handler)
-
-    # Configure Error Emails for high level log messages, only in prod mode
-    ADMINS = app.config['ERROR_SENDTO_EMAIL']
-    if not app.debug:
-        mail_handler = handlers.SMTPHandler(
-            '127.0.0.1',
-            app.config['MAIL_DEFAULT_SENDER'],
-            ADMINS,
-            '{} Log Message'.format(app.config['SERVER_NAME']))
-        mail_handler.setLevel(logging.ERROR)
-        app.logger.addHandler(mail_handler)
-        task_logger.addHandler(mail_handler)
 
     #app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)
