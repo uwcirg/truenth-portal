@@ -6,7 +6,7 @@ class SSLSMTPHandler(SMTPHandler):
     """Override SMTPHandler to support SSL"""
     def __init__(self, username=None, password=None, mailport=None, use_ssl=None, **kwargs):
         """Override default to allow direct assignment of select attributes"""
-        super(type(self), self).__init__(**kwargs)
+        super(SSLSMTPHandler, self).__init__(**kwargs)
 
         for var, value in locals().items():
             if var in ('username', 'password', 'mailport', 'use_ssl') and value is not None:
