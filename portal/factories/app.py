@@ -19,6 +19,7 @@ from ..database import db
 from ..dogpile_cache import dogpile_cache
 from ..extensions import authomatic, recaptcha
 from ..extensions import babel, mail, oauth, session, user_manager
+from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.role import ROLE
@@ -286,8 +287,7 @@ def configure_logging(app):  # pragma: no cover
         host = app.config['MAIL_SERVER']
         if app.config.get('MAIL_PORT'):
             host = (app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
-
-        mail_handler = handlers.SMTPHandler(
+        mail_handler = SSLSMTPHandler(
             mailhost=host,
             fromaddr=app.config['MAIL_DEFAULT_SENDER'],
             toaddrs=ADMINS,
