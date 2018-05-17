@@ -4,6 +4,13 @@ from logging.handlers import SMTPHandler
 
 class SSLSMTPHandler(SMTPHandler):
     """Override SMTPHandler to support SSL"""
+    def __init__(self, username=None, password=None, mailport=None, use_ssl=None, **kwargs):
+        """Override default to allow direct assignment of select attributes"""
+        super(type(self), self).__init__(**kwargs)
+
+        for var, value in locals().items():
+            if var in ('username', 'password', 'mailport', 'use_ssl') and value is not None:
+                setattr(self, var, value)
 
     def emit(self, record):
         """
@@ -32,7 +39,7 @@ class SSLSMTPHandler(SMTPHandler):
                 date=formatdate(),
                 body=self.format(record),
             )
-            if self.username and self.secure is not None:
+            if self.username:
                 smtp.login(self.username, self.password)
             smtp.sendmail(self.fromaddr, self.toaddrs, message)
             smtp.quit()

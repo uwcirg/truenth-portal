@@ -280,21 +280,14 @@ def configure_logging(app):  # pragma: no cover
     if not app.debug:
         ADMINS = app.config['ERROR_SENDTO_EMAIL']
 
-        creds = None
-        if app.config.get('MAIL_PASSWORD'):
-            creds = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
-
-        host = app.config['MAIL_SERVER']
-        if app.config.get('MAIL_PORT'):
-            host = (app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
         mail_handler = SSLSMTPHandler(
-            mailhost=host,
+            mailhost=app.config['MAIL_SERVER'],
+            mailport=app.config['MAIL_PORT'],
             fromaddr=app.config['MAIL_DEFAULT_SENDER'],
             toaddrs=ADMINS,
             subject='{} Log Message'.format(app.config['SERVER_NAME']),
-
-            credentials=creds,
-            secure=(app.config.get('MAIL_USE_SSL') and ()),
+            username=app.config['MAIL_USERNAME'],
+            password=app.config['MAIL_PASSWORD'],
         )
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
