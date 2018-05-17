@@ -5,7 +5,7 @@ from flask import current_app
 from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
-from ..models.auth import Token
+from ..models.auth import AuthProviderPersistable, Token
 from ..models.client import Client
 from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
@@ -48,9 +48,16 @@ models = (
 
 
 # StagingExclusions capture details exclusive of a full db overwrite
-# that are to be restored *after* db migraion.  For example, when
+# that are to be restored *after* db migration.  For example, when
 # bringing the production db to staging, retain the staging
-# config for interventions and service users
+# config for interventions, application_developers and service users
+
+def auth_providers_filter():
+    """Return query restricted to application developer users"""
+    return (
+        AuthProviderPersistable.query.join(User).join(UserRoles).join(
+            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
+
 
 def client_users_filter():
     """Return query restricted to service users and those with client FKs"""
@@ -77,10 +84,14 @@ StagingExclusions = namedtuple(
 staging_exclusions = (
     StagingExclusions(Client, 'client_id', None, None),
     StagingExclusions(Intervention, 'name', ['link_url'], None),
-    StagingExclusions(User, 'id', ['telecom'], client_users_filter),
+    StagingExclusions(
+        User, 'id', ['telecom', 'password'], client_users_filter),
     StagingExclusions(
         UserRelationship, ('user_id', 'other_user_id'), None,
         relationship_filter),
+    StagingExclusions(
+        AuthProviderPersistable, ('user_id', 'provider_id'), None,
+        auth_providers_filter),
     StagingExclusions(Token, 'id', None, service_token_filter)
 )
 

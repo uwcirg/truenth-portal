@@ -5,7 +5,7 @@ from shutil import rmtree
 from tests import TestCase, TEST_USER_ID
 from tempfile import mkdtemp
 
-from portal.models.auth import create_service_token, Token
+from portal.models.auth import AuthProvider, create_service_token, Token
 from portal.config.site_persistence import (
     staging_exclusions, client_users_filter)
 from portal.config.model_persistence import ExclusionPersistence
@@ -114,12 +114,21 @@ class TestExclusionPersistence(TestCase):
         owner_id = owner.id
         service = self.add_service_user(sponsor=owner)
 
+        # give the owner a fake auth_provider row
+        ap = AuthProvider(user_id=owner_id, provider_id=1)
+        with SessionScope(db):
+            db.session.add(ap)
+            db.session.commit()
+
         sm_client = Client(
             client_id='abc_123', client_secret='shh', user_id=owner_id,
             _redirect_uris='http://testsite.org',
             callback_url='http://callback.one')
         with SessionScope(db):
             db.session.add(sm_client)
+
+        # give the owner a fake auth_provider row
+        ap = AuthProvider(user=owner, provider_id=1)
 
         service, sm_client = map(db.session.merge, (service, sm_client))
         create_service_token(client=sm_client, user=service)
@@ -148,16 +157,19 @@ class TestExclusionPersistence(TestCase):
         owner.email = str(owner_id)
 
         # just expecting the one service token.  purge it and the
-        # owner (the service user)
+        # owner (the service user) and the owner's auth_provider
         self.assertEquals(Token.query.count(), 1)
         service_user_id = Token.query.one().user_id
         b4 = User.query.count()
         self.assertEquals(UserRelationship.query.count(), 1)
+        self.assertEquals(AuthProvider.query.count(), 1)
         with SessionScope(db):
+            AuthProvider.query.delete()
             Token.query.delete()
             UserRelationship.query.delete()
             User.query.filter_by(id=service_user_id).delete()
             db.session.commit()
+        self.assertEquals(AuthProvider.query.count(), 0)
         self.assertEquals(Token.query.count(), 0)
         self.assertEquals(UserRelationship.query.count(), 0)
         self.assertEquals(b4 - 1, User.query.count())
@@ -174,5 +186,6 @@ class TestExclusionPersistence(TestCase):
 
         result = User.query.get(owner_id)
         self.assertEquals(result.email, 'sm-owner@gmail.com')
+        self.assertEquals(AuthProvider.query.count(), 1)
         self.assertEquals(Token.query.count(), 1)
         self.assertEquals(UserRelationship.query.count(), 1)
