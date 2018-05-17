@@ -127,16 +127,17 @@ def seed(keep_unmentioned=False):
         keep_unmentioned=keep_unmentioned)
 
 
-@click.option('--dir', '-d', default=None, help="Export directory")
+@click.option('--directory', '-d', default=None, help="Export directory")
 @click.option(
-    '--staging_exclusions', '-x', default=False, is_flag=True,
+    '--staging_exclusion', '-x', default=False, is_flag=True,
     help="Staging Exclusions Export")
 @app.cli.command()
-def export_site(dir, staging_exclusions):
+def export_site(directory, staging_exclusion):
     """Generate JSON file containing dynamic site config
 
-    :param dir: used to name a non-default target directory for export files
-    :param staging_exclusions: set only if persisting exclusions to retain
+    :param directory: used to name a non-default target directory for export
+      files
+    :param staging_exclusion: set only if persisting exclusions to retain
       on staging when pulling over production data.
 
     Portions of site configuration live in the database, such as
@@ -147,8 +148,8 @@ def export_site(dir, staging_exclusions):
     other static data.
 
     """
-    SitePersistence(target_dir=dir).export(
-        staging_exclusions=staging_exclusions)
+    SitePersistence(target_dir=directory).export(
+        staging_exclusion=staging_exclusion)
 
 
 @click.option('--email', '-e', help="email address for new user")
