@@ -168,7 +168,7 @@ def post_patient_deceased(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    if not request.json and set(request.json.keys()).isdisjoint(
+    if not request.json or set(request.json.keys()).isdisjoint(
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
 
@@ -179,4 +179,65 @@ def post_patient_deceased(patient_id):
             patient_id))
 
     patient.update_deceased(request.json)
+    return jsonify(patient.as_fhir(include_empties=False))
+
+
+@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
+@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
+@oauth.require_oauth()
+def post_patient_dob(patient_id):
+    """POST date of birth for a patient
+
+    This convenience API wraps the ability to set a patient's birthDate - generally
+    the /api/demographics API should be preferred.
+
+    ---
+    operationId: dob
+    tags:
+      - Patient
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: dob_details
+          properties:
+            birthDate:
+              type: string
+              description: valid FHIR date string defining date of birth
+    responses:
+      200:
+        description:
+          Returns updated [FHIR patient
+          resource](http://www.hl7.org/fhir/patient.html) in JSON.
+      400:
+        description:
+          if given parameters don't validate
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to edit requested patient
+      409:
+        description:
+          if attempting to POST new birthDate data for a patient whom already
+          has a defined birthDate value.
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user_or_abort(patient_id)
+    if not request.json or 'birthDate' not in request.json:
+        abort(400, "Requires `birthDate` in JSON")
+
+    if patient.birthdate:
+        abort(409, "birthDate value already set for patient {}".format(
+            patient_id))
+
+    patient.update_birthdate(request.json)
     return jsonify(patient.as_fhir(include_empties=False))
