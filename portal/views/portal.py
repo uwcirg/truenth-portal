@@ -404,20 +404,8 @@ def challenge_identity(
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
                              birthdate=birthdate)
-    if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
-        # identity confirmed
-        session['challenge_verified_user_id'] = user.id
-        if form.merging_accounts.data == 'True':
-            user.mask_email()
-            db.session.commit()
-            session['invited_verified_user_id'] = user.id
-        if form.access_on_verify.data == 'True':
-            # Log user in as they have now verified
-            login_user(
-                user=user, auth_method='url_authenticated_and_verified')
-        return redirect(form.next_url.data)
 
-    else:
+    if score < current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         auditable_event(
             "Failed identity challenge tests with values:"
             "(first_name={}, last_name={}, birthdate={})".format(
@@ -427,12 +415,23 @@ def challenge_identity(
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
-            error = "Unable to match identity"
+            error = _("Unable to match identity")
         if form.retry_count.data > 3:
-            abort(404, "User Not Found")
+            abort(404, _("User Not Found"))
 
         return render_template(
             'challenge_identity.html', form=form, errorMessage=error)
+
+    # identity confirmed
+    session['challenge_verified_user_id'] = user.id
+    if form.merging_accounts.data == 'True':
+        user.mask_email()
+        db.session.commit()
+        session['invited_verified_user_id'] = user.id
+    if form.access_on_verify.data == 'True':
+        # Log user in as they have now verified
+        login_user(user=user, auth_method='url_authenticated_and_verified')
+    return redirect(form.next_url.data)
 
 
 @portal.route('/initial-queries', methods=['GET', 'POST'])
