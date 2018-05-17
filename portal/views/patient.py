@@ -168,7 +168,7 @@ def post_patient_deceased(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    if not request.json and set(request.json.keys()).isdisjoint(
+    if not request.json or set(request.json.keys()).isdisjoint(
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
 
@@ -231,7 +231,7 @@ def post_patient_dob(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    if not request.json and 'birthDate' not in request.json:
+    if not request.json or 'birthDate' not in request.json:
         abort(400, "Requires `birthDate` in JSON")
 
     if patient.birthdate:
