@@ -517,7 +517,7 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template(
-        'admin.html', users=users, wide_container="true",
+        'admin/admin.html', users=users, wide_container="true",
         org_list=list(org_list), user=user)
 
 
@@ -952,7 +952,7 @@ def communications_dashboard():
     for comm in comms:
         comm.user_email = User.query.get(comm.user_id).email
         comm.sent_at = comm.message.sent_at if comm.message else None
-    return render_template('communications.html', communications=comms)
+    return render_template('admin/communications.html', communications=comms)
 
 
 @portal.route('/communicate/preview/<int:comm_id>')

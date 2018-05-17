@@ -1,4 +1,4 @@
-{% extends "admin_base.html" %}
+{% extends "admin/admin_base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
   <div id="patientList">
@@ -12,18 +12,9 @@
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <hr/>
-  <div class="admin-table table-responsive medium-text">
+    <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
-         <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-            <button id="orglist-dropdown" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
-            </button>
-            <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
-              <div class="form-group smaller-text" id="userOrgs">
-                <div id="fillOrgs"></div>
-              </div>
-            </div>
-          </div>
+        {{orgsSelector()}}
         <span id="tableCount"></span>
       </div>
       <table id="adminTable"
@@ -79,7 +70,7 @@
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
-                          {% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<a class="btn btn-tnth-primary btn-report btn-report-{{loop.index}}" onclick="AT.getReportModal({{patient.id}})">{% if doc.intervention.description == 'Symptom Tracker' %}{{_('ST')}}{% else %}{{ _('DS')}}{% endif %}</a>{% endif %}{% endfor %}
+                          {% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<a class="btn btn-tnth-primary btn-report btn-report-{{loop.index}}" data-patient-id="{{patient.id}}" v-on:click.stop="showReportModal">{% if doc.intervention.description == 'Symptom Tracker' %}{{_('ST')}}{% else %}{{ _('DS')}}{% endif %}</a>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
@@ -99,97 +90,45 @@
                {% endfor %}
           </tbody>
       </table>
+      {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
+        <div class="modal fade" id="patientReportModal" tabindex="-1" role="dialog" aria-labelledby="patientReportModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title">{{ _("Patient Report") }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="patientReportLoader" v-show="patientReports.loading">
+                          <div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        </div>
+                        <div id="patientReportContent" v-show="patientReports.data.length > 0">
+                          <table class="table-bordered table-condensed table-responsive tnth-table">
+                            <THEAD>
+                              <TH>{{_("Type")}}</TH><TH>{{_("Report Name")}}</TH><TH>{{_("Generated (GMT)")}}</TH><TH>{{_("Downloaded")}}</TH>
+                            </THEAD>
+                            <TBODY>
+                                {% raw %}
+                                  <TR v-for="item in patientReports.data"><TD>{{item.contributor}}</TD><TD>{{item.fileName}}</TD><TD>{{item.date}}</TD><TD v-html="item.download" class="text-center"></TD></TR>
+                                {% endraw %}
+                            </TBODY>
+                          </table>
+                          <br/>
+                          <a class="btn btn-tnth-primary btn-sm btn-all">{{_("View All")}}</a>
+                        </div>
+                        {% raw %}
+                          <div id="patientReportMessage" class="error-message">{{patientReports.message}}</div>
+                        {% endraw %}
+                    </div>
+                    <div class="modal-footer" >
+                        <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      {% endif %}
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
 </div>
-{% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-  <div class="modal fade" id="patientReportModal" tabindex="-1" role="dialog" aria-labelledby="patientReportModal">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">{{ _("Patient Report") }}</h4>
-              </div>
-              <div class="modal-body">
-                  <div id="patientReportLoader" class="tnth-hide"></div>
-                  <div id="patientReportContent"></div>
-                  <div id="patientReportMessage" class="error-message"></div>
-              </div>
-              <div class="modal-footer" >
-                  <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
-              </div>
-          </div>
-      </div>
-  </div>
-{% endif %}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}
-{% block document_ready %}
-
-  var AT, sortObj;
-
-  AT = new window.portal.AdminTool({{user.id}}, "patientList", {
-        "tnthAjax": tnthAjax,
-        "i18next": i18next,
-        "tnthDates": tnthDates
-  });
-  sortObj = AT.getTablePreference({{user.id}});
-  /*
-  * initializing bootstrapTable
-  */
-  $("#adminTable").bootstrapTable(AT.getTableConfigOptions({
-    sortName: sortObj && sortObj.sort_field ? sortObj.sort_field :"id",
-    sortOrder: sortObj && sortObj.sort_order ?sortObj.sort_order:"desc",
-    filterBy: sortObj,
-    exportOptions: {
-        fileName: __getExportFileName('{{_("PatientList_")}}')
-    }
-  }));
-  __i18next.init({
-      "lng": tnthDates.getUserLocale()
-  }, function() {
-    setTimeout(function() { //TODO move this to js file
-      $(document).ready(function() {
-        /*
-        *  scroll to the top of page on each page change
-        */
-        $("#adminTable").on("page-change.bs.table", function() {
-            if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
-        }).on("sort.bs.table", function(e, name, order) {
-            setTimeout(function() { AT.setTablePreference({{user.id}}, AT.tableIdentifier, name, order); }, 10);
-        }).on("column-search.bs.table", function(e, name, text) {
-            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10);
-        }).on("column-switch.bs.table", function(e, field, checked) {
-            setTimeout(function() { AT.setTablePreference({{user.id}}); }, 10); 
-        });
-
-        AT.init(function() {
-          /*
-           *  hide checkbox for hidden id field from side menu
-           */
-          $("input[data-field='id']:checkbox").hide();
-           /*
-            * add placeholder text for filter controls
-            */
-          $("#adminTable").on("reset-view.bs.table", function() {
-            AT.addFilterPlaceHolders();
-          });
-          AT.addFilterPlaceHolders();
-          AT.rowLinkEvent();
-          AT.setColumnSelections();  
-          AT.initOrgsList(false, "patients");
-          setTimeout(function() { AT.fadeLoader(); }, 550);
-        });
-
-        {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-          $("#patientReportLoader").html( __getLoaderHTML());
-          $("#patientReportModal").modal({"show": false});
-        {% endif %}
-
-      });
-
-    }, 50);
-
-  });
-{% endblock %}
-

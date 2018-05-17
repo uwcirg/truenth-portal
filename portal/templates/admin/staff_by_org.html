@@ -1,4 +1,4 @@
-{% extends "admin_base.html" %}
+{% extends "admin/admin_base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
 <div id="staffList">
@@ -11,10 +11,10 @@
       <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
     </div>
     <br/>
-    <div class="admin-table table-responsive medium-text">
+    <div id="adminTableContainer" class="staff-view admin-table table-responsive medium-text" data-export-prefix="{{_('StaffList_')}}">
         <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
         <table id="adminTable"
-               class="table table-striped table-hover table-condensed"
+               class="staff-view table table-striped table-hover table-condensed"
                data-toggle="table"
                data-sort-name="id"
                data-sort-order="desc"
@@ -29,7 +29,8 @@
                data-filter-control="true"
                data-show-export="true"
                data-export-data-type="all"
-               data-id-field="id">
+               data-id-field="id"
+               >
             <thead>
             <tr>
                 <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
@@ -56,7 +57,7 @@
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
-                  <td class="text-center deleted-button-cell">{%if not user.deleted %}<button onclick="AT.deleteUser(event, '{{user.id}}')" type="button" class="btn btn-default"><em>Deactivate</em></button>{%else%}{{ _("Inactive") }}{%endif%}</td>
+                  <td class="text-center deleted-button-cell">{%if not user.deleted %}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Deactivate</em></button>{%else%}{{ _("Inactive") }}{%endif%}</td>
               </tr>
             {% endfor %}
             </tbody>
@@ -66,33 +67,4 @@
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
-{% endblock %}
-{% block document_ready %}
-var AT = new window.portal.AdminTool(
-        {{user.id}},
-        "adminList",
-        {
-          "tnthAjax": tnthAjax,
-          "i18next": i18next,
-          "tnthDates": tnthDates
-        });
-$("#adminTable").bootstrapTable(AT.getTableConfigOptions({
-    exportOptions: {
-        fileName: __getExportFileName('{{_("StaffList_")}}')
-    }
-}));
- __i18next.init({
-  "lng": tnthDates.getUserLocale()
-}, function() {
-  setTimeout(function() { //TODO move this to JS file
-    /*
-     * add placeholder text for filter controls
-     */
-    $("#adminTable").on("reset-view.bs.table", function() {AT.addFilterPlaceHolders();});
-    AT.addFilterPlaceHolders();
-    $(document).ready(function() {
-      setTimeout(function() { AT.fadeLoader(); }, 100);
-    });
-  }, 150);
-});
 {% endblock %}

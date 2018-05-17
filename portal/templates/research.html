@@ -3,53 +3,54 @@
 <h4 class="tnth-headline">Research Data</h4>
 <br/>
 <hr/>
-{% if config.STAFF_BULK_DATA_ACCESS %}
-<a href="" id="_downloadLink" target="_blank"></a>
-<div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          {{ _("Export questionnaire data") }}
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-              <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
-              <div id="patientsInstrumentListWrapper">
-                <div id="patientsInstrumentList" class="profile-radio-list">
-                  {% for instrument_code in config["INSTRUMENTS"] | sort() %}
-                  <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
-                  </div>
-                  {% endfor %}
-                </div>
-                <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
-              </div>
-              </div>
-            <div class="form-group">
-              <label class="text-muted">{{ _("Data type:")}}</label>
-              <div id="patientsDownloadTypeList" class="profile-radio-list">
-                <label class="radio-inline">
-                    <input type="radio" name="downloadType" id="csv" value="csv" checked/>
-                    {{ _("CSV") }}
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="downloadType" id="_json" value="json"/>
-                    {{ _("JSON") }}
-                </label>
-              </div>
+<div id="adminTableContainer">
+  {% if config.STAFF_BULK_DATA_ACCESS %}
+    <a href="" id="_downloadLink" target="_blank"></a>
+    <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              {{ _("Export questionnaire data") }}
             </div>
-            <div id="_downloadMessage"></div>
-            <br/>
+            <div class="modal-body">
+                <div class="form-group">
+                  <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
+                  <div id="patientsInstrumentListWrapper">
+                    <div id="patientsInstrumentList" class="profile-radio-list">
+                      {% for instrument_code in config["INSTRUMENTS"] | sort() %}
+                      <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}" v-on:click="setInstruments">{{ instrument_code | replace("_", " ") | upper }}</label>
+                      </div>
+                      {% endfor %}
+                    </div>
+                    <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
+                  </div>
+                  </div>
+                <div class="form-group">
+                  <label class="text-muted">{{ _("Data type:")}}</label>
+                  <div id="patientsDownloadTypeList" class="profile-radio-list">
+                    <label class="radio-inline">
+                        <input type="radio" name="downloadType" id="csv" value="csv" v-on:click="setDataType" checked/>
+                        {{ _("CSV") }}
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="downloadType" id="_json" v-on:click="setDataType" value="json"/>
+                        {{ _("JSON") }}
+                    </label>
+                  </div>
+                </div>
+                <br/>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" id="patientsDownloadButton" v-bind:disabled="!hasInstrumentsSelection()">{{ _("Export") }}</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" id="patientsDownloadButton">{{ _("Export") }}</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-        </div>
-      </div>
     </div>
+    <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
+  {% endif %}
 </div>
-<div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
-{% endif %}
 {% endblock %}
 {% block additional_scripts %}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
@@ -58,17 +59,5 @@
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
-{% block document_ready %}
-var AT = new window.portal.AdminTool({{user.id if user}}, "researchList", {
-  "tnthAjax": tnthAjax,
-  "i18next": i18next,
-  "tnthDates": tnthDates
-});
-$(document).ready(function() {
-    AT.fadeLoader();
-    AT.initOrgsList();
-    AT.handleDownloadModal();
-});
 
-{% endblock %}
 

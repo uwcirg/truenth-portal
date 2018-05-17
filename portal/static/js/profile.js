@@ -2,8 +2,7 @@
  * helper Object for initializing profile sections  TODO streamline this more
  */
 (function() {
-    var i18next = window.portalModules.i18next;
-    var ProfileObj = window.ProfileObj = new Vue({ /*global Vue $ */
+    var ProfileObj = window.ProfileObj = new Vue({ /*global Vue i18next $ */
         el: "#mainDiv",
         components: {
             "section-view": {
