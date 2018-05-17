@@ -17,12 +17,19 @@ class SSLSMTPHandler(SMTPHandler):
             smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self._timeout)
 
             msg = self.format(record)
-            msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
+            msg = '\r\n'.join((
+                'From: %s',
+                'To: %s',
+                'Subject: %s',
+                'Date: %s',
+                '',
+                '%s',
+            )) % (
                 self.fromaddr,
                 ",".join(self.toaddrs),
                 self.getSubject(record),
                 formatdate(),
-                msg
+                msg,
             )
             if self.username and self.secure is not None:
                 smtp.login(self.username, self.password)
