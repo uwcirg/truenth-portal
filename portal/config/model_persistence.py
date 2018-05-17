@@ -16,8 +16,8 @@ def require(obj, attr, serial_form):
     """Validation function to assure required attribute is defined"""
     if attr not in serial_form:
         raise ValueError(
-            "missing lookup_field in serial form of {}".format(
-                obj))
+            "missing lookup_field {} in serial form of {}".format(
+                attr, obj))
 
 
 class ModelPersistence(object):
