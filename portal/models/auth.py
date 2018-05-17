@@ -37,6 +37,36 @@ class AuthProvider(db.Model):
             'value': self.provider_id}
 
 
+class AuthProviderPersistable(AuthProvider):
+    """For persistence to function, need instance serialization
+
+    The base class for AuthProvider implements a non persistence-compliant
+    version of ``as_fhir()`` as needed to show FHIR compliant identifiers
+    in demographics.
+
+    This subclass (adapter) exists solely to provide serialization methods
+    that work with persistence.
+
+    """
+    def as_fhir(self):
+        """serialize the AuthProvider"""
+        d = {'resourceType': 'AuthProviderPersistable'}
+        for attr in ('provider', 'provider_id', 'user_id'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+        return d
+
+    @classmethod
+    def from_fhir(cls, data):
+        auth_provider = cls()
+        return auth_provider.update_from_fhir(data)
+
+    def update_from_fhir(self, data):
+        for attr in ('provider', 'provider_id', 'user_id'):
+            setattr(self, attr, data.get(attr))
+        return self
+
+
 class Grant(db.Model):
     __tablename__ = 'grants'  # Override default 'grant'
     id = db.Column(db.Integer, primary_key=True)
