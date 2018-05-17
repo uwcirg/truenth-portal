@@ -3,6 +3,8 @@ from logging.handlers import SMTPHandler
 
 
 class SSLSMTPHandler(SMTPHandler):
+    """Override SMTPHandler to support SSL"""
+
     def emit(self, record):
         """
         Emit a record.
