@@ -89,6 +89,18 @@ class TestPatient(TestCase):
             follow_redirects=True)
         self.assert400(rv)
 
+    def test_birthDate(self):
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.login()
+        data = {'birthDate': '1976-07-04'}
+        rv = self.client.post(
+            '/api/patient/{}/birthDate'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+        self.assertTrue(user.birthdate)
+
     def test_deceased(self):
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
