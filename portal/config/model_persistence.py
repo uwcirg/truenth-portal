@@ -306,7 +306,7 @@ class ExclusionPersistence(ModelPersistence):
 
     @property
     def query(self):
-        """return ready query to obtain correct set of objects te persist"""
+        """return ready query to obtain correct set of objects to persist"""
         if not self.filter_query:
             return super(ExclusionPersistence, self).query
         return self.filter_query()
@@ -330,7 +330,7 @@ class ExclusionPersistence(ModelPersistence):
         return results
 
     def update(self, new_data):
-        """Strip unwanted attributes before deligating to parent impl"""
+        """Strip unwanted attributes before delegating to parent impl"""
 
         if self.limit_to_attributes is None:
             return super(ExclusionPersistence, self).update(new_data)
