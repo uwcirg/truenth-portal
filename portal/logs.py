@@ -16,24 +16,23 @@ class SSLSMTPHandler(SMTPHandler):
                 port = smtplib.SMTP_PORT
             smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self._timeout)
 
-            msg = self.format(record)
-            msg = '\r\n'.join((
-                'From: %s',
-                'To: %s',
-                'Subject: %s',
-                'Date: %s',
+            message = '\r\n'.join((
+                'From: {from_addr}',
+                'To: {to_addr}',
+                'Subject: {subject}',
+                'Date: {date}',
                 '',
-                '%s',
-            )) % (
-                self.fromaddr,
-                ",".join(self.toaddrs),
-                self.getSubject(record),
-                formatdate(),
-                msg,
+                '{body}',
+            )).format(
+                from_addr=self.fromaddr,
+                to_addr=','.join(self.toaddrs),
+                subject=self.getSubject(record),
+                date=formatdate(),
+                body=self.format(record),
             )
             if self.username and self.secure is not None:
                 smtp.login(self.username, self.password)
-            smtp.sendmail(self.fromaddr, self.toaddrs, msg)
+            smtp.sendmail(self.fromaddr, self.toaddrs, message)
             smtp.quit()
         except (KeyboardInterrupt, SystemExit):
             raise
