@@ -181,6 +181,7 @@ def post_patient_deceased(patient_id):
     patient.update_deceased(request.json)
     return jsonify(patient.as_fhir(include_empties=False))
 
+
 @patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
 @patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
 @oauth.require_oauth()
