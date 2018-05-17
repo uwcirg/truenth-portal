@@ -96,7 +96,7 @@ tox==3.0.0
 traitlets==4.3.2
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4
-virtualenv==15.2.0
+virtualenv==16.0.0
 waitress==1.1.0
 wcwidth==0.1.7
 WebOb==1.8.1
