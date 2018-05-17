@@ -57,7 +57,7 @@
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
-                  <td class="text-center deleted-button-cell">{%if not user.deleted %}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Deactivate</em></button>{%else%}{{ _("Inactive") }}{%endif%}</td>
+                  <td class="text-center deleted-button-cell">{%if not user.deleted %}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>{{_("Deactivate")}}</em></button>{%else%}{{ _("Inactive") }}{%endif%}</td>
               </tr>
             {% endfor %}
             </tbody>

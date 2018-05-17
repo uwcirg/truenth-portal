@@ -368,32 +368,33 @@
             getInstrumentList: function() {
                 var self = this, tnthAjax = this.getDependency("tnthAjax");
                 tnthAjax.getInstrumentsList(true, function(data) {
-                    if(data && !data.error) {
-                        var instrumentList = data;
-                        var parentOrgList = self.orgTool.getUserTopLevelParentOrgs(self.getUserOrgs());
-                        if(instrumentList && parentOrgList && parentOrgList.length > 0) {
-                            var instrumentItems = [];
-                            parentOrgList.forEach(function(o) {
-                                if(instrumentList.hasOwnProperty(o)) {
-                                    instrumentList[o].forEach(function(n) {
-                                        instrumentItems.push(n);
-                                    });
+                    if(!data || data.error) {
+                        return false;
+                    }
+                    var instrumentList = data;
+                    var parentOrgList = self.orgTool.getUserTopLevelParentOrgs(self.getUserOrgs());
+                    if(instrumentList && parentOrgList && parentOrgList.length > 0) {
+                        var instrumentItems = [];
+                        parentOrgList.forEach(function(o) {
+                            if(instrumentList.hasOwnProperty(o)) {
+                                instrumentList[o].forEach(function(n) {
+                                    instrumentItems.push(n);
+                                });
+                            }
+                        });
+                        self.instruments.data = instrumentItems;
+                        if(instrumentItems.length > 0) {
+                            $(".instrument-container").hide();
+                            var found = false;
+                            instrumentItems.forEach(function(item) {
+                                var instrumentContainer = $("#" + item + "_container");
+                                found = instrumentContainer.length > 0;
+                                if(found) {
+                                    instrumentContainer.show();
                                 }
                             });
-                            self.instruments.data = instrumentItems;
-                            if(instrumentItems.length > 0) {
-                                $(".instrument-container").hide();
-                                var found = false;
-                                instrumentItems.forEach(function(item) {
-                                    var instrumentContainer = $("#" + item + "_container");
-                                    found = instrumentContainer.length > 0;
-                                    if(found) {
-                                        instrumentContainer.show();
-                                    }
-                                });
-                                if(!found) {
-                                    $(".instrument-container").show();
-                                }
+                            if(!found) {
+                                $(".instrument-container").show();
                             }
                         }
                     }
@@ -451,10 +452,12 @@
                 tnthAjax.getTablePreference(uid, tableIdentifier, {
                     "sync": true
                 }, function(data) {
-                    if(data && !data.error) {
-                        prefData = data || self.getDefaultTablePreference();
-                        self.currentTablePreference = prefData;
+                    if (!data || data.error) {
+                        return false;
                     }
+                    prefData = data || self.getDefaultTablePreference();
+                    self.currentTablePreference = prefData;
+
                     if(setFilter) { //set filter values
                         self.setTableFilters(uid);
                     }
@@ -467,28 +470,29 @@
             setColumnSelections: function() {
                 if(!this.sortFilterEnabled) { return false; }
                 var prefData = this.getTablePreference(this.userId, this.tableIdentifier);
-                if(prefData && prefData.filters && prefData.filters.column_selections) {
-                    var visibleColumns = $("#adminTable").bootstrapTable("getVisibleColumns");
-                    visibleColumns.forEach(function(c) { //hide visible columns
-                        $("#adminTable").bootstrapTable("hideColumn", c.field);
-                    });
-                    prefData.filters.column_selections.forEach(function(column) { //show column(s) based on preference
-                        $(".fixed-table-toolbar input[type='checkbox'][data-field='" + column + "']").prop("checked", true);
-                        $("#adminTable").bootstrapTable("showColumn", column);
-                    });
+                var hasColumnSelections = prefData && prefData.filters && prefData.filters.column_selections;
+                if (!hasColumnSelections) {
+                    return false;
                 }
+                var visibleColumns = $("#adminTable").bootstrapTable("getVisibleColumns");
+                visibleColumns.forEach(function(c) { //hide visible columns
+                    $("#adminTable").bootstrapTable("hideColumn", c.field);
+                });
+                prefData.filters.column_selections.forEach(function(column) { //show column(s) based on preference
+                    $(".fixed-table-toolbar input[type='checkbox'][data-field='" + column + "']").prop("checked", true);
+                    $("#adminTable").bootstrapTable("showColumn", column);
+                });
             },
             setTableFilters: function(userId) {
-                var prefData = null, tnthAjax = this.getDependency("tnthAjax");
-                if(this.currentTablePreference) {
-                    prefData = this.currentTablePreference;
-                } else {
+                var prefData = this.currentTablePreference, tnthAjax = this.getDependency("tnthAjax");
+                if (!prefData) {
                     tnthAjax.getTablePreference(userId || this.userId, this.tableIdentifier, {
                         "sync": true
                     }, function(data) {
-                        if(data && !data.error) {
-                            prefData = data;
+                        if (!data || data.error) {
+                            return false;
                         }
+                        prefData = data;
                     });
                 }
                 if(prefData && prefData.filters) { //set filter values
@@ -505,57 +509,58 @@
             setTablePreference: function(userId, tableName, sortField, sortOrder, filters) {
                 var tnthAjax = this.getDependency("tnthAjax");
                 tableName = tableName || this.tableIdentifier;
+                if (!tableName) {
+                    return false;
+                }
                 userId = userId || this.userId;
-                if(tableName) {
-                    var data = this.getDefaultTablePreference();
-                    if(hasValue(sortField) && hasValue(sortOrder)) {
-                        data["sort_field"] = sortField;
-                        data["sort_order"] = sortOrder;
-                    } else {
-                        //get selected sorted field information on UI
-                        var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
-                        if(sortedField.length > 0) {
-                            data["sort_field"] = sortedField.attr("data-field");
-                            var sortedOrder = "desc";
-                            sortedField.find(".sortable").each(function() {
-                                if($(this).hasClass("desc")) {
-                                    sortedOrder = "desc";
-                                } else if($(this).hasClass("asc")) {
-                                    sortedOrder = "asc";
-                                }
-                            });
-                            data["sort_order"] = sortedOrder;
-                        }
-                    }
-                    var __filters = filters || {};
-
-                    //get fields
-                    if(Object.keys(__filters).length === 0) {
-                        $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
-                            if(hasValue($(this).val())) {
-                                var field = $(this).closest("th").attr("data-field");
-                                __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text() : $(this).val();
+                var data = this.getDefaultTablePreference();
+                if(hasValue(sortField) && hasValue(sortOrder)) {
+                    data["sort_field"] = sortField;
+                    data["sort_order"] = sortOrder;
+                } else {
+                    //get selected sorted field information on UI
+                    var sortedField = $("#adminTable th[data-field]").has(".sortable.desc, .sortable.asc");
+                    if(sortedField.length > 0) {
+                        data["sort_field"] = sortedField.attr("data-field");
+                        var sortedOrder = "desc";
+                        sortedField.find(".sortable").each(function() {
+                            if($(this).hasClass("desc")) {
+                                sortedOrder = "desc";
+                            } else if($(this).hasClass("asc")) {
+                                sortedOrder = "asc";
                             }
                         });
+                        data["sort_order"] = sortedOrder;
                     }
-                    //get selected orgs from the filter list by site control
-                    var selectedOrgs = "";
-                    $("#userOrgs input[name='organization']").each(function() {
-                        if($(this).is(":checked") && ($(this).css("display") !== "none")) {
-                            selectedOrgs += (hasValue(selectedOrgs) ? "," : "") + $(this).val();
+                }
+                var __filters = filters || {};
+
+                //get fields
+                if(Object.keys(__filters).length === 0) {
+                    $("#adminTable .filterControl select, #adminTable .filterControl input").each(function() {
+                        if(hasValue($(this).val())) {
+                            var field = $(this).closest("th").attr("data-field");
+                            __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text() : $(this).val();
                         }
                     });
-                    __filters["orgs_filter_control"] = selectedOrgs;
-                    //get column selections
-                    __filters["column_selections"] = [];
-                    $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
-                        __filters["column_selections"].push($(this).attr("data-field"));
-                    });
-                    data["filters"] = __filters;
-                    if(Object.keys(data).length > 0) {
-                        tnthAjax.setTablePreference(userId, this.tableIdentifier, {"data": JSON.stringify(data)});
-                        this.currentTablePreference = data;
+                }
+                //get selected orgs from the filter list by site control
+                var selectedOrgs = "";
+                $("#userOrgs input[name='organization']").each(function() {
+                    if($(this).is(":checked") && ($(this).css("display") !== "none")) {
+                        selectedOrgs += (hasValue(selectedOrgs) ? "," : "") + $(this).val();
                     }
+                });
+                __filters["orgs_filter_control"] = selectedOrgs;
+                //get column selections
+                __filters["column_selections"] = [];
+                $(".fixed-table-toolbar input[type='checkbox'][data-field]:checked").each(function() {
+                    __filters["column_selections"].push($(this).attr("data-field"));
+                });
+                data["filters"] = __filters;
+                if(Object.keys(data).length > 0) {
+                    tnthAjax.setTablePreference(userId, this.tableIdentifier, {"data": JSON.stringify(data)});
+                    this.currentTablePreference = data;
                 }
             },
             getReportModal: function(patientId) {
@@ -564,38 +569,38 @@
                 var self = this, tnthDates = self.getDependency("tnthDates"), tnthAjax = self.getDependency("tnthAjax");
                 tnthAjax.patientReport(patientId, function(data) {
                     self.patientReports.data = [];
-                    if(data && !data.error) {
-                        if(data["user_documents"] && data["user_documents"].length > 0) {
-                            var existingItems = {}, count = 0;
-                            var documents = data["user_documents"].sort(function(a, b) { //sort to get the latest first
-                                return new Date(b.uploaded_at) - new Date(a.uploaded_at);
-                            });
-                            documents.forEach(function(item) {
-                                var c = item["contributor"];
-                                if(!existingItems[c] && hasValue(c)) { //only draw the most recent, same report won't be displayed
-                                    self.patientReports.data.push({
-                                        contributor: item.contributor,
-                                        fileName: item.filename,
-                                        date: tnthDates.formatDateString(item.uploaded_at, "iso"),
-                                        download: "<a title='" + i18next.t("Download") + "' href='" + "/api/user/" + item["user_id"] + "/user_documents/" + item["id"] + "'><i class='fa fa-download'></i></a>"
-                                    });
-                                    existingItems[c] = true;
-                                    count++;
-                                }
-                            });
-                            if(count > 1) {
-                                $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
-                            } else {
-                                $("#patientReportModal .modal-title").text(i18next.t("Patient Report"));
-                            }
-                            self.patientReports.message = "";
-                            $("#patientReportContent .btn-all").attr("href", "patient_profile/" + patientId + "#profilePatientReportTable");
-
-                        } else {
-                            self.patientReports.message = i18next.t("No report data found.");
-                        }
-                    } else {
+                    if (!data || data.error) {
                         self.patientReports.message = i18next.t("Error occurred retrieving patient report");
+                        return false;
+                    }
+                    if(data["user_documents"] && data["user_documents"].length > 0) {
+                        var existingItems = {}, count = 0;
+                        var documents = data["user_documents"].sort(function(a, b) { //sort to get the latest first
+                            return new Date(b.uploaded_at) - new Date(a.uploaded_at);
+                        });
+                        documents.forEach(function(item) {
+                            var c = item["contributor"];
+                            if(!existingItems[c] && hasValue(c)) { //only draw the most recent, same report won't be displayed
+                                self.patientReports.data.push({
+                                    contributor: item.contributor,
+                                    fileName: item.filename,
+                                    date: tnthDates.formatDateString(item.uploaded_at, "iso"),
+                                    download: "<a title='" + i18next.t("Download") + "' href='" + "/api/user/" + item["user_id"] + "/user_documents/" + item["id"] + "'><i class='fa fa-download'></i></a>"
+                                });
+                                existingItems[c] = true;
+                                count++;
+                            }
+                        });
+                        if(count > 1) {
+                            $("#patientReportModal .modal-title").text(i18next.t("Patient Reports"));
+                        } else {
+                            $("#patientReportModal .modal-title").text(i18next.t("Patient Report"));
+                        }
+                        self.patientReports.message = "";
+                        $("#patientReportContent .btn-all").attr("href", "patient_profile/" + patientId + "#profilePatientReportTable");
+
+                    } else {
+                        self.patientReports.message = i18next.t("No report data found.");
                     }
                     setTimeout(function() {
                         self.patientReports.loading = false;
