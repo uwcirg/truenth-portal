@@ -147,7 +147,7 @@ class SitePersistence(object):
         else:
             default_export()
 
-    def import_(self, keep_unmentioned):
+    def import_(self, keep_unmentioned, staging_exclusion=False):
         """If persistence file is found, import the data
 
         :param keep_unmentioned: if True, unmentioned data, such as
@@ -155,18 +155,33 @@ class SitePersistence(object):
             but not in the persistence file, will be left in place.
             if False, any unmentioned data will be purged as part of
             the import process.
+        :param staging_exclusion: set only if persisting exclusions to retain
+          on staging when pulling over production data
 
         """
-        for model in models:
-            model_persistence = ModelPersistence(
-                model.cls, lookup_field=model.lookup_field,
-                sequence_name=model.sequence_name,
-                target_dir=self.dir)
-            model_persistence.import_(keep_unmentioned=True)
+        def default_import():
+            for model in models:
+                model_persistence = ModelPersistence(
+                    model.cls, lookup_field=model.lookup_field,
+                    sequence_name=model.sequence_name,
+                    target_dir=self.dir)
+                model_persistence.import_(keep_unmentioned=keep_unmentioned)
 
+            # Config isn't a model - separate function
+            import_config(target_dir=self.dir)
 
-        # Config isn't a model - separate function
-        import_config(target_dir=self.dir)
+        def exclusive_import():
+            for model in staging_exclusions:
+                ep = ExclusionPersistence(
+                    model_class=model.cls, lookup_field=model.lookup_field,
+                    limit_to_attributes=model.limit_to_attributes,
+                    filter_query=model.filter_query, target_dir=self.dir)
+                ep.import_(keep_unmentioned=keep_unmentioned)
+
+        if staging_exclusion:
+            exclusive_import()
+        else:
+            default_import()
 
         db.session.commit()
         current_app.logger.info("SitePersistence import complete")

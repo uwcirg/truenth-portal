@@ -152,6 +152,19 @@ def export_site(directory, staging_exclusion):
         staging_exclusion=staging_exclusion)
 
 
+@click.option('--directory', '-d', default=None, help="Import directory")
+@app.cli.command()
+def import_site_exclusions(directory):
+    """Import serialized exclusions (saved on stage prior to prod db overwrite)
+
+    :param directory: used to name a non-default target directory for import
+      files
+
+    """
+    SitePersistence(target_dir=directory).import_(
+        staging_exclusion=True, keep_unmentioned=True)
+
+
 @click.option('--email', '-e', help="email address for new user")
 @click.option('--role', '-r', help="Comma separated role(s) for new user")
 @click.option('--password', '-p', help="password for new user")
