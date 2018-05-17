@@ -1099,6 +1099,15 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='role')
             db.session.add(audit)
 
+    def update_birthdate(self, fhir):
+        try:
+            bd = fhir['birthDate']
+            self.birthdate = datetime.strptime(
+                bd.strip(), '%Y-%m-%d') if bd else None
+        except (AttributeError, ValueError):
+            abort(400, "birthDate '{}' doesn't match expected format "
+                       "'%Y-%m-%d'".format(fhir['birthDate']))
+
     def update_deceased(self, fhir):
         if 'deceasedDateTime' in fhir:
             dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
@@ -1211,13 +1220,7 @@ class User(db.Model, UserMixin):
                 v_or_first(name.get('family'), 'family name')
             ) or self.last_name
         if 'birthDate' in fhir:
-            try:
-                bd = fhir['birthDate']
-                self.birthdate = datetime.strptime(
-                    bd.strip(), '%Y-%m-%d') if bd else None
-            except (AttributeError, ValueError):
-                abort(400, "birthDate '{}' doesn't match expected format "
-                      "'%Y-%m-%d'".format(fhir['birthDate']))
+            self.update_birthdate(fhir)
         self.update_deceased(fhir)
         update_identifiers(fhir)
         update_care_providers(fhir)
