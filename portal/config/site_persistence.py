@@ -138,7 +138,7 @@ class SitePersistence(object):
             for model in staging_exclusions:
                 ep = ExclusionPersistence(
                     model_class=model.cls, lookup_field=model.lookup_field,
-                    limit_to_attributes=model.attributes,
+                    limit_to_attributes=model.limit_to_attributes,
                     filter_query=model.filter_query, target_dir=self.dir)
                 ep.export()
 
