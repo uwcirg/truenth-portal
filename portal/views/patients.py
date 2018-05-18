@@ -118,7 +118,7 @@ def patients_root():
         patients = patient_list
 
     return render_template(
-        'patients_by_org.html', patients_list=patients,
+        'admin/patients_by_org.html', patients_list=patients,
         user=user, org_list=org_list,
         wide_container="true")
 

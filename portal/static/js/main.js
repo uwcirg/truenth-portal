@@ -596,12 +596,12 @@ var tnthAjax = {
             }
         }
     },
-    "getCurrentUser": function(callback) {
+    "getCurrentUser": function(callback, params) {
         callback = callback||function() {};
         if (sessionStorage.currentUser) {
             callback(JSON.parse(sessionStorage.currentUser));
         } else {
-            this.sendRequest("api/me", "GET", "", "", function(data) {
+            this.sendRequest("/api/me", "GET", "", params, function(data) {
                 sessionStorage.setItem("currentUser", JSON.stringify(data));
                 callback(data);
             });

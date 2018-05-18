@@ -157,5 +157,5 @@ def staff_index():
         staff_list = [s for s in staff_list if not s.has_role(ROLE.TEST)]
 
     return render_template(
-        'staff_by_org.html', staff_list=staff_list,
+        'admin/staff_by_org.html', staff_list=staff_list,
         user=user, wide_container="true")
