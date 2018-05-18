@@ -5,7 +5,6 @@
 <hr/>
 <div id="adminTableContainer">
   {% if config.STAFF_BULK_DATA_ACCESS %}
-    <a href="" id="_downloadLink" target="_blank"></a>
     <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -42,7 +41,7 @@
                 <br/>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" id="patientsDownloadButton" v-bind:disabled="!hasInstrumentsSelection()">{{ _("Export") }}</button>
+              <a v-bind:href="'/api/patient/assessment?' + instruments.selected + '&format=' + instruments.dataType" class="btn btn-default" id="patientsDownloadButton" v-bind:disabled="!hasInstrumentsSelection()">{{ _("Export") }}</a>
               <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
             </div>
           </div>

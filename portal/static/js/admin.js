@@ -427,11 +427,6 @@
                     self.instruments.dataType = "csv";
                     $("#patientsInstrumentList").addClass("ready");
                 });
-
-                $(document).delegate("#patientsDownloadButton", "click", function() { //attach on click event to submit button in the download modal
-                    $("#_downloadLink").attr("href", "/api/patient/assessment?" + self.instruments.selected + "&format=" + self.instruments.dataType);
-                    $("#_downloadLink")[0].click();
-                });
             },
             clearOrgsSelection: function() {
                 $("#userOrgs input[name='organization']").prop("checked", false);
