@@ -147,7 +147,7 @@ class BaseConfig(object):
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
-    DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+    DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
     SQLALCHEMY_ECHO = False
 
 
