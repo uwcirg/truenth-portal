@@ -15,6 +15,7 @@ from zipfile import ZipFile
 from ..extensions import babel
 from .app_text import AppText
 from .intervention import Intervention
+from .organization import Organization
 from .user import current_user
 
 
@@ -23,6 +24,7 @@ def get_db_strings():
     i18n_fields = {
         AppText: ('custom_text',),
         Intervention: ('description', 'card_html'),
+        Organization: ('name',),
     }
 
     for model, fields in i18n_fields.items():
