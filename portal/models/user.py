@@ -472,6 +472,38 @@ class User(db.Model, UserMixin):
             self._email = email
         assert(self._email and len(self._email))
 
+    def email_ready(self):
+        """Returns True IFF user has valid email and other necessary criteria
+
+        As user's frequently forget their passwords or start in a state without
+        a valid email address, the system should NOT email invites or reminders
+        unless adequate data is on file for the user to perform a reset password
+        loop.
+
+        NB exceptions exist for systems with the NO_CHALLENGE_WO_DATA
+        configuration set, as those systems allow for change of password without
+        the verification step, if the user doesn't have a required field set.
+
+        """
+        try:
+            validate_email(self.email)
+        except BadRequest:
+            valid_email = False
+        else:
+            valid_email = True
+
+        if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
+            return False
+
+        if current_app.config.get('NO_CHALLENGE_WO_DATA', False):
+            # Grandfather in systems that didn't capture all challenge fields
+            return valid_email
+
+        else:
+            # Otherwise, require all challenge fields are defined, so an emailed
+            # user could finish a process such as reset password, if needed.
+            return all((self.birthdate, self.first_name, self.last_name))
+
     @property
     def phone(self):
         if self._phone:
