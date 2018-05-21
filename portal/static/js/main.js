@@ -1947,7 +1947,7 @@ var tnthDates = {
                 if (userId) {
                     $.ajax({
                         type: "GET",
-                        url: "/api/demographics/" + userId,
+                        url: "/api/demographics/" + userId, //dont use tnthAjax method - don't want to report error here if failed
                         async: false
                     }).done(function(data) {
                         if (!data && !data.communication) {
