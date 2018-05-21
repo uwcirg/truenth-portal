@@ -15,24 +15,30 @@ from zipfile import ZipFile
 from .app_text import AppText
 from ..extensions import babel
 from .intervention import Intervention
+from .organization import Organization
 from .user import current_user
 
 
 def get_db_strings():
-    elements = defaultdict(set)
-    for entry in AppText.query:
-        if entry.custom_text:
-            ct = re.sub('"', r'\\"', entry.custom_text)
-            elements['"{}"'.format(ct)].add("apptext: " + entry.name)
-    for entry in Intervention.query:
-        if entry.description:
-            desc = re.sub('"', r'\\"', entry.description)
-            elements['"{}"'.format(desc)].add("interventions: " + entry.name)
-        if entry.card_html:
-            ch = re.sub('"', r'\\"', entry.card_html)
-            elements['"{}"'.format(ch)].add("interventions: " + entry.name)
-    return elements
+    msgid_map = defaultdict(set)
+    i18n_fields = {
+        AppText: ('custom_text',),
+        Intervention: ('description', 'card_html'),
+        Organization: ('name',),
+    }
 
+    for model, fields in i18n_fields.items():
+        for entry in model.query:
+            for field_name in fields:
+                msgid = getattr(entry, field_name)
+                if not msgid:
+                    continue
+                msgid = '"{}"'.format(re.sub('"', r'\\"', msgid))
+                msgid_map[msgid].add("{model_name}: {field_ref}".format(
+                    model_name=model.__name__,
+                    field_ref=entry.name,
+                ))
+    return msgid_map
 
 def upsert_to_template_file():
     db_translatables = get_db_strings()
