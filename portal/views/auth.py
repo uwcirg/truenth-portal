@@ -530,6 +530,7 @@ def token_status():
             - expires_in
             - refresh_token
             - scope
+            - scopes
           properties:
             access_token:
               type: string
@@ -553,6 +554,9 @@ def token_status():
             scope:
               type: string
               description: The authorized scope.
+            scopes:
+              type: string
+              description: Deprecated version of `scope` containing identical data.
 
     """
     authorization = request.headers.get('Authorization')
@@ -566,7 +570,8 @@ def token_status():
     return jsonify(
         access_token=access_token,
         refresh_token=token.refresh_token, token_type=token_type,
-        expires_in=expires_in.seconds, scope=token._scopes)
+        expires_in=expires_in.seconds,
+        scope=token._scopes, scopes=token._scopes)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
