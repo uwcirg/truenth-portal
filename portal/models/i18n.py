@@ -12,8 +12,8 @@ from polib import pofile
 from subprocess import check_call
 from zipfile import ZipFile
 
-from ..extensions import babel
 from .app_text import AppText
+from ..extensions import babel
 from .intervention import Intervention
 from .organization import Organization
 from .user import current_user
