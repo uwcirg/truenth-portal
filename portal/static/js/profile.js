@@ -20,7 +20,6 @@
         },
         created: function() {
             var self = this;
-            DELAY_LOADING = true; /*global DELAY_LOADING */
             this.registerDependencies();
             this.setUserSettings();
             this.onBeforeSectionsLoad();
@@ -36,10 +35,10 @@
                         data.roles.forEach(function(role) {self.currentUserRoles.push(role.name.toLowerCase());});
                     }
                     self.onInitChecksDone();
-                });
+                }, {useWorker: true});
             }
             this.initChecks.push({ done: false});
-            this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, false, function(data) { //get config settings
+            this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, {useWorker: true}, function(data) { //get config settings
                 var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
                 if (data) {
                     self.settings = data;
@@ -53,7 +52,6 @@
         mounted: function() {
             var self = this;
             this.getOrgTool();
-            setTimeout(function() {self.setVis();}, 350);
             this.initIntervalId = setInterval(function() { //wait for ajax calls to finish
                 self.initEndTime = new Date();
                 var elapsedTime = self.initEndTime - self.initStartTime;
@@ -262,7 +260,7 @@
                     callback();
                     return false;
                 }
-                this.modules.tnthAjax.getDemo(this.subjectId, "", "", function(data) {
+                this.modules.tnthAjax.getDemo(this.subjectId, {useWorker: true}, function(data) {
                     if (data) {
                         self.demo.data = data;
                         self.setTopLevelOrgs(data);
@@ -527,12 +525,6 @@
                     }
                 });
             },
-            setVis: function() {
-                $("#mainHolder").css({"visibility": "visible", "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)","filter": "alpha(opacity=100)","-moz-opacity": 1,"-khtml-opacity": 1,"opacity": 1
-                });
-                setTimeout(function() {$("#loadingIndicator").hide();}, 150);
-                DELAY_LOADING = false; /*global DELAY_LOADING */
-            },
             initSections: function(callback) {
                 var self = this, sectionsInitialized = {}, initCount = 0;
                 $("#mainDiv [data-profile-section-id]").each(function() {
@@ -553,7 +545,7 @@
                 if (targetSection.length > 0) {
                     var loadingElement = targetSection.find(".profile-item-loader");
                     loadingElement.show();
-                    this.modules.tnthAjax.getOptionalCoreData(self.subjectId, false, function(data) {
+                    this.modules.tnthAjax.getOptionalCoreData(self.subjectId, {useWorker: true}, function(data) {
                         if (data.optional) {
                             var sections = $("#profileForm .optional");
                             sections.each(function() {
@@ -923,7 +915,7 @@
             },
             "assessmentStatus": function(userId) {
                 var self = this;
-                this.modules.tnthAjax.patientReport(userId, function(data) {
+                this.modules.tnthAjax.patientReport(userId, {useWorker: true}, function(data) {
                     if (!data.error) {
                         var pcpReports;
                         if (data.user_documents) {
@@ -941,7 +933,7 @@
                 });
             },
             getEmailContent: function(userId, messageId) {
-                this.modules.tnthAjax.emailLog(userId, function(data) {
+                this.modules.tnthAjax.emailLog(userId, false, function(data) {
                     if (data.messages) {
                         (data.messages).forEach(function(item) {
                             if (parseInt(item.id) === parseInt(messageId)) {
@@ -1078,7 +1070,7 @@
                                         infoMessageContainer.html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
                                         emailTypeElem.val("");
                                         btnSelf.addClass("disabled");
-                                        self.modules.tnthAjax.emailLog(self.subjectId, function(data) { //reload email audit log
+                                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
                                             setTimeout(function() {
                                                 self.getEmailLog(self.subjectId, data);
                                             }, 100);
@@ -1165,7 +1157,7 @@
                 });
                 $("#emailBodyModal").modal({"show": false});
                 var subjectId = this.subjectId, self = this;
-                this.modules.tnthAjax.emailLog(subjectId, function(data) {
+                this.modules.tnthAjax.emailLog(subjectId, {useWorker: true}, function(data) {
                     setTimeout(function() { self.getEmailLog(subjectId, data); }, 100);
                 });
             },
@@ -1256,7 +1248,7 @@
             },
             initPatientReportSection: function() {
                 var self = this;
-                this.modules.tnthAjax.patientReport(self.subjectId, function(data) {
+                this.modules.tnthAjax.patientReport(self.subjectId, {useWorker: true}, function(data) {
                     if (!data.error) {
                         if (data.user_documents && data.user_documents.length > 0) {
                             var fData = [];
@@ -1274,35 +1266,11 @@
                                 sortName: "uploaded_at",
                                 sortOrder: "desc",
                                 toolbar: "#prTableToolBar",
-                                columns: [{
-                                    field: "contributor",
-                                    title: i18next.t("Type"),
-                                    searchable: true,
-                                    sortable: true
-                                }, {
-                                    field: "filename",
-                                    title: i18next.t("Report Name"),
-                                    searchable: true,
-                                    sortable: true
-                                }, {
-                                    field: "uploaded_at",
-                                    title: i18next.t("Generated (GMT)"),
-                                    sortable: true,
-                                    searchable: true,
-                                    width: "20%"
-                                }, {
-                                    field: "document_type",
-                                    title: i18next.t("Document Type"),
-                                    sortable: true,
-                                    visible: false
-                                }, {
-                                    field: "actions",
-                                    title: i18next.t("Download"),
-                                    sortable: false,
-                                    searchable: false,
-                                    visible: true,
-                                    class: "text-center"
-                                }]
+                                columns: [{field: "contributor", title: i18next.t("Type"), searchable: true, sortable: true},
+                                    {field: "filename", title: i18next.t("Report Name"), searchable: true, sortable: true},
+                                    {field: "uploaded_at", title: i18next.t("Generated (GMT)"), sortable: true, searchable: true, width: "20%"},
+                                    {field: "document_type", title: i18next.t("Document Type"), sortable: true, visible: false},
+                                    {field: "actions", title: i18next.t("Download"), sortable: false, searchable: false, visible: true, class: "text-center"}]
                             }));
                         } else {
                             $("#patientReportErrorMessage").text(i18next.t("No reports available.")).removeClass("error-message");
@@ -1317,7 +1285,7 @@
             initAssessmentListSection: function() {
                 var self = this;
                 $("#assessmentListMessage").text(i18next.t("No questionnaire data found."));
-                self.modules.tnthAjax.assessmentList(self.subjectId, function(data) {
+                self.modules.tnthAjax.assessmentList(self.subjectId, {useWorker: true}, function(data) {
                     if (!data.error) {
                         var sessionUserId = $("#_session_user_id").val();
                         var entries = data.entry ? data.entry : null;
@@ -1555,7 +1523,7 @@
                     });
                 }
                 if ($("#mainDiv.profile").length > 0) {
-                    self.modules.tnthAjax.getConsent(subjectId, true, function(data) {
+                    self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
                         self.getConsentList(data);
                     });
                 }
@@ -1574,7 +1542,7 @@
                             orgTool.morphPatientOrgs();
                         }
                         self.handleOrgsEvent();
-                        self.modules.tnthAjax.getConsent(subjectId, true, function(data) {
+                        self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
                             self.getConsentList(data);
                         });
                         $("#clinics").attr("loaded", true);
@@ -1731,13 +1699,24 @@
                     params.agreementUrl = agreementUrl;
                     self.modules.tnthAjax.setConsent(userId, params, "default");
                     setTimeout(function() { //need to remove all other consents associated w un-selected org(s)
-                        self.modules.tnthAjax.removeObsoleteConsent();
+                        self.removeObsoleteConsent();
                     }, 100);
                     self.reloadConsentList(userId);
                     $($("#consentContainer .error-message").get(0)).text("");
                 } else {
                     $($("#consentContainer .error-message").get(0)).text(i18next.t("Unable to set default consent agreement"));
                 }
+            },
+            removeObsoleteConsent: function() {
+                var userId = this.subjectId, co = [], OT = this.getOrgTool();
+                $("#userOrgs input[name='organization']").each(function() {
+                    if ($(this).is(":checked")) {
+                        co.push($(this).val());
+                        var po = OT.getElementParentOrg(this);
+                        if (po) { co.push(po);}
+                    }
+                });
+                this.modules.tnthAjax.deleteConsent(userId, {org: "all", exclude: co.join(",")}); //exclude currently selected orgs
             },
             "handleConsent": function(obj) {
                 var self = this, OT = this.getOrgTool(), userId = this.subjectId, cto = this.isConsentWithTopLevelOrg(), tnthAjax = self.modules.tnthAjax;
@@ -1746,13 +1725,13 @@
                     if ($(this).prop("checked")) {
                         if ($(this).attr("id") !== "noOrgs") {
                             var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                            if (agreementUrl && String(agreementUrl) !== "") {
+                            if (String(agreementUrl) !== "") {
                                 var params = self.CONSENT_ENUM.consented;
                                 params.org = cto ? parentOrg : orgId;
                                 params.agreementUrl = agreementUrl;
                                 setTimeout(function() {
                                     tnthAjax.setConsent(userId, params, "all", true, function() {
-                                        tnthAjax.removeObsoleteConsent();
+                                        self.removeObsoleteConsent();
                                     });
                                 }, 350);
                             } else {
@@ -1830,12 +1809,12 @@
                                     params.org = orgId;
                                     params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
                                     setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
-                                    setTimeout(function() {__self.modules.tnthAjax.removeObsoleteConsent();}, 250);
+                                    setTimeout(function() {__self.removeObsoleteConsent();}, 250);
                                 })(orgId);
                             }
                         } else {
                             __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
-                            setTimeout(function() {__self.modules.tnthAjax.removeObsoleteConsent();}, 100);
+                            setTimeout(function() {__self.removeObsoleteConsent();}, 100);
                         }
                         setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                         setTimeout(function() { modalElements.modal("hide");}, 250);
@@ -1979,9 +1958,9 @@
             initClinicalQuestionsSection: function() {
                 if (!this.subjectId) { return false; }
                 var self = this;
-                self.modules.tnthAjax.getTreatment(self.subjectId, function(data) {
+                self.modules.tnthAjax.getTreatment(self.subjectId, {useWorker:true}, function(data) {
                     self.updateTreatment(data);
-                    self.modules.tnthAjax.getClinical(self.subjectId, function(data) {
+                    self.modules.tnthAjax.getClinical(self.subjectId, {useWorker:true}, function(data) {
                         self.updateClinicalSection(data.entry);
                         $("#patientQ").attr("loaded", "true");
                         self.onBeforeInitClinicalQuestionsSection();
@@ -2116,7 +2095,7 @@
                     self.manualEntry.method = "";
                     self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //get GMT date/time for today
                     self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
-                    self.modules.tnthAjax.getConsent(subjectId, true, function(data) { //get consent date
+                    self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (data && data.consent_agreements && data.consent_agreements.length > 0) {
                             dataArray = data.consent_agreements.sort(function(a, b) {
@@ -2246,7 +2225,7 @@
             },
             initRolesListSection: function() {
                 var self = this;
-                this.modules.tnthAjax.getRoleList(function(data) {
+                this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (data.roles) {
                         data.roles.forEach(function(role) {
                             self.roles.data.push({
@@ -2268,7 +2247,7 @@
             },
             initAuditLogSection: function() {
                 var self = this;
-                this.modules.tnthAjax.auditLog(this.subjectId, function(data) {
+                this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
                     if (!data.error) {
                         var ww = $(window).width();
                         if (data.audits && data.audits.length > 0) {
@@ -2702,7 +2681,7 @@
                 $("#consentListTable").animate({opacity: 0}, function() {
                     self.consent.consentLoading = true;
                     setTimeout(function() { // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
-                        self.modules.tnthAjax.getConsent(userId || self.subjectId, true, function(data) {
+                        self.modules.tnthAjax.getConsent(userId || self.subjectId, {sync: true}, function(data) {
                             self.getConsentList(data);
                         });
                     }, 1500);

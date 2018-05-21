@@ -562,7 +562,7 @@
                 $("#patientReportModal").modal("show");
                 this.patientReports.loading = true;
                 var self = this, tnthDates = self.getDependency("tnthDates"), tnthAjax = self.getDependency("tnthAjax");
-                tnthAjax.patientReport(patientId, function(data) {
+                tnthAjax.patientReport(patientId, false, function(data) {
                     self.patientReports.data = [];
                     if (!data || data.error) {
                         self.patientReports.message = i18next.t("Error occurred retrieving patient report");
