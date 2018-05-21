@@ -1204,3 +1204,16 @@ class TestUser(TestCase):
         resp = self.client.post('/api/user/{}/invite'.format(TEST_USER_ID))
         self.assert400(resp)
         self.assertTrue('requires a valid email' in resp.data)
+
+    def test_email_not_ready(self):
+        # with valid email and `NO_CHALLENGE_WO_DATA` set, should pass
+        self.assertTrue(self.app.config.get("NO_CHALLENGE_WO_DATA"))
+        self.assertTrue(self.test_user.email_ready())
+
+        # alter config and expect failure w/o all DOB, first & last name
+        self.app.config['NO_CHALLENGE_WO_DATA'] = False
+        self.assertFalse(self.test_user.email_ready())
+
+        # set birthday and expect a pass
+        self.test_user.birthdate = '1976-04-01'
+        self.assertTrue(self.test_user.email_ready())
