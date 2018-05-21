@@ -231,14 +231,19 @@ def configure_logging(app):  # pragma: no cover
         sql_log.addHandler(sql_file_handler)
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
+    app.logger.setLevel(level)
+
+    # Todo: set app.testing correctly on app passed to celery
+    # ie create_celery(create_app())
+    if app.testing or not app.config.get('LOG_FOLDER'):
+        return
+
     from ..tasks import logger as task_logger
     task_logger.setLevel(level)
-    app.logger.setLevel(level)
 
     # Configure Error Emails for high level log messages, only in prod mode
     if not any((
         app.debug,
-        app.testing,
         not app.config.get('ERROR_SENDTO_EMAIL'),
     )):
         mail_handler = SSLSMTPHandler(
@@ -254,8 +259,8 @@ def configure_logging(app):  # pragma: no cover
         app.logger.addHandler(mail_handler)
         task_logger.addHandler(mail_handler)
 
-    if app.testing or not app.config.get('LOG_FOLDER'):
-        # Write logs to stdout by default and when testing
+    if not app.config.get('LOG_FOLDER'):
+        # Write logs to stdout if no LOG_FOLDER specified (eg container)
         return
 
     # Configure Error Emails for high level log messages, only in prod mode
