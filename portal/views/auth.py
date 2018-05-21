@@ -529,6 +529,7 @@ def token_status():
             - token_type
             - expires_in
             - refresh_token
+            - scope
             - scopes
           properties:
             access_token:
@@ -550,9 +551,12 @@ def token_status():
               description:
                 Use to refresh an access token, in place of the
                 authorizion token.
+            scope:
+              type: string
+              description: The authorized scope.
             scopes:
               type: string
-              description: The authorized scopes.
+              description: Deprecated version of `scope` containing identical data.
 
     """
     authorization = request.headers.get('Authorization')
@@ -566,7 +570,8 @@ def token_status():
     return jsonify(
         access_token=access_token,
         refresh_token=token.refresh_token, token_type=token_type,
-        expires_in=expires_in.seconds, scopes=token._scopes)
+        expires_in=expires_in.seconds,
+        scope=token._scopes, scopes=token._scopes)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
@@ -654,7 +659,7 @@ def access_token():
             - token_type
             - expires_in
             - refresh_token
-            - scopes
+            - scope
           properties:
             access_token:
               type: string
@@ -675,9 +680,9 @@ def access_token():
               description:
                 Use to refresh an access token, in place of the
                 authorizion token.
-            scopes:
+            scope:
               type: string
-              description: The authorized scopes.
+              description: The authorized scope.
 
     """
     for field in request.form:
@@ -727,11 +732,11 @@ def authorize(*args, **kwargs):
           (https://tools.ietf.org/html/rfc6749#section-4.1.1)
         required: true
         type: string
-      - name: scopes
+      - name: scope
         in: query
         description:
           Extent of authorization requested.  At this time, only 'email'
-          is supported.
+          is supported.  See https://tools.ietf.org/html/rfc6749#section-3.3
         required: true
         type: string
       - name: display_html
@@ -774,7 +779,7 @@ def authorize(*args, **kwargs):
 
     user = current_user()
     if not user:
-        # Entry point when intervetion is requesting OAuth token, but
+        # Entry point when intervention is requesting OAuth token, but
         # the user has yet to authenticate via FB or otherwise.  Need
         # to retain the request, and replay after TrueNTH login
         # has completed.
