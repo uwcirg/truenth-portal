@@ -7,22 +7,20 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             return;
         }
         // all is well
-        if (xhr.readyState === 4) {
-            if (xhr.status !== 200) {
-                if (requestAttempts < 3) {
-                    setTimeout(function() {
-                        sendRequest(url, params, callback);
-                    }, 2000);
-                } else {
-                    requestAttempts = 0;
-                    callback(xhr);
-                    return;
-                }
-            } else {
-                callback(xhr);
-                requestAttempts = 0;
-            }
+        if (xhr.status === 200) {
+            callback(xhr);
+            requestAttempts = 0;
+            return;
         }
+        if (requestAttempts < 3) {
+            setTimeout(function() {
+                sendRequest(url, params, callback);
+            }, 2000);
+            return;
+        }
+        requestAttempts = 0;
+        callback(xhr);
+        return;
     };
     if (typeof XMLHttpRequest !== "undefined") {
         xhr = new XMLHttpRequest();
@@ -33,20 +31,21 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             "MSXML2.XmlHttp.2.0",
             "Microsoft.XmlHttp"
         ];
-        for (var i = 0, len = versions.length; i < len; i++) {
+        for (var i = 0; !xhr && i < versions.length; i++) {
             try {
                 xhr = new ActiveXObject(versions[i]); /*global ActiveXObject */
                 break;
-            } catch (e) {}
+            } catch (e) {
+                xhr = null;
+            }
         } // end for
     }
     xhr.onreadystatechange = ensureReadiness;
     xhr.open("GET", url, true);
-    if (params) {
-        for (var param in params) {
-            if (params.hasOwnProperty(param)) {
-                xhr.setRequestHeader(param, params[param]);
-            }
+    params = params || {};
+    for (var param in params) {
+        if (params.hasOwnProperty(param)) {
+            xhr.setRequestHeader(param, params[param]);
         }
     }
     xhr.send("");

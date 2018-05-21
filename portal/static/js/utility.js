@@ -230,7 +230,7 @@ function disableHeaderFooterLinks() {
 
 function pad(n) {
     n = parseInt(n);
-    return (n < 10) ? "0" + n : n;
+    return (!isNaN(n) && n < 10) ? "0" + n : n;
 }
 function escapeHtml(text) {
     "use strict";

@@ -772,36 +772,33 @@ var tnthAjax = {
     },
     "setConsent": function(userId, params, status, sync, callback) {
         callback = callback || function() {};
-        if (userId && params) {
-            var consented = this.hasConsent(userId, params.org, status);
-            var __url = "/api/user/" + userId + "/consent";
-            if (!consented || params.testPatient) {
-                var data = {};
-                data.user_id = userId;
-                data.organization_id = params.org;
-                data.agreement_url = params.agreementUrl;
-                data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
-                data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
-                data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
-                if (params.acceptance_date) {
-                    data.acceptance_date = params.acceptance_date;
-                }
-
-                this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
-                    if (data) {
-                        if (!data.error) {
-                            $(".set-consent-error").html("");
-                            callback(data);
-                        } else {
-                            var errorMessage = i18next.t("Server error occurred setting consent status.");
-                            callback({"error": errorMessage});
-                            $(".set-consent-error").html(errorMessage);
-                        }
-                    }
-                });
+        if (!userId && !params) {
+            callback({"error": i18next.t("User id and parameters are required")});
+            return false;
+        }
+        var consented = this.hasConsent(userId, params.org, status);
+        var __url = "/api/user/" + userId + "/consent";
+        if (!consented || params.testPatient) {
+            var data = {};
+            data.user_id = userId;
+            data.organization_id = params.org;
+            data.agreement_url = params.agreementUrl;
+            data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
+            data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
+            data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
+            if (params.acceptance_date) {
+                data.acceptance_date = params.acceptance_date;
             }
-        } else {
-            callback(i18next.t("User id and parameters are required"));
+            this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
+                if (!data.error) {
+                    $(".set-consent-error").html("");
+                    callback(data);
+                } else {
+                    var errorMessage = i18next.t("Server error occurred setting consent status.");
+                    callback({"error": errorMessage});
+                    $(".set-consent-error").html(errorMessage);
+                }
+            });
         }
     },
     deleteConsent: function(userId, params) {
@@ -1941,27 +1938,27 @@ var tnthDates = {
                 async: false
             }).done(function(data) {
                 var userId = "";
-                if (data) {
-                    userId = data.id;
+                if (data) { userId = data.id; }
+                if (!userId) {
+                    locale = "en_us";
+                    return false;
                 }
-                if (userId) {
-                    $.ajax({
-                        type: "GET",
-                        url: "/api/demographics/" + userId, //dont use tnthAjax method - don't want to report error here if failed
-                        async: false
-                    }).done(function(data) {
-                        if (!data && !data.communication) {
-                            locale = "en_us";
-                            return false;
+                $.ajax({
+                    type: "GET",
+                    url: "/api/demographics/" + userId, //dont use tnthAjax method - don't want to report error here if failed
+                    async: false
+                }).done(function(data) {
+                    if (!data || !data.communication) {
+                        locale = "en_us";
+                        return false;
+                    }
+                    data.communication.forEach(function(item) {
+                        if (item.language) {
+                            locale = item.language.coding[0].code;
+                            sessionStorage.setItem(sessionKey, locale);
                         }
-                        data.communication.forEach(function(item) {
-                            if (item.language) {
-                                locale = item.language.coding[0].code;
-                                sessionStorage.setItem(sessionKey, locale);
-                            }
-                        });
                     });
-                }
+                });
             }).fail(function() {});
         }
         if (!locale) {

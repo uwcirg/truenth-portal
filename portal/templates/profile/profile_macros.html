@@ -952,9 +952,8 @@
                 {% call titleSection(id="deathLoc") -%}{{_("Deceased Status")}}{%- endcall%}
                 <input type="hidden" id="deathDate" value=""/>
                 {% call viewSection() -%}
-                    <div id="boolDeath_view" v-show="demo.data.deceasedBoolean">{{_("Patient is deceased")}}</div>
+                    <div id="boolDeath_view" v-show="demo.data.deceasedBoolean || demo.data.deceasedDateTime">{{_("Patient is deceased")}}</div>
                     <div id="deathDate_view" v-show="demo.data.deceasedDateTime">
-                        <p>{{_("Patient is deceased")}}</p>
                         {% raw %}
                             <p>{{demo.data.displayDeceasedDate}}</p>
                         {% endraw %}
