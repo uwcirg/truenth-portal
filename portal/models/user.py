@@ -3,6 +3,7 @@ from cgi import escape
 from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
+from flask_babel import gettext as _
 from flask_user import UserMixin, _call_or_get
 from sqlalchemy import text
 from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
@@ -473,7 +474,7 @@ class User(db.Model, UserMixin):
         assert(self._email and len(self._email))
 
     def email_ready(self):
-        """Returns True IFF user has valid email and other necessary criteria
+        """Returns (True, None) IFF user has valid email and necessary criteria
 
         As user's frequently forget their passwords or start in a state without
         a valid email address, the system should NOT email invites or reminders
@@ -484,6 +485,10 @@ class User(db.Model, UserMixin):
         configuration set, as those systems allow for change of password without
         the verification step, if the user doesn't have a required field set.
 
+        :returns: (Success, Failure message), such as (True, None) if the user
+            account is "email_ready" or (False, _"invalid email") if the reason
+            for failure is a lack of valid email address.
+
         """
         try:
             validate_email(self.email)
@@ -493,16 +498,26 @@ class User(db.Model, UserMixin):
             valid_email = True
 
         if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
-            return False
+            return False, _("invalid email address")
 
         if current_app.config.get('NO_CHALLENGE_WO_DATA', False):
             # Grandfather in systems that didn't capture all challenge fields
-            return valid_email
+            if valid_email:
+                return True, None
+            return False, _("invalid email address")
 
         else:
             # Otherwise, require all challenge fields are defined, so an emailed
             # user could finish a process such as reset password, if needed.
-            return all((self.birthdate, self.first_name, self.last_name))
+            if all((self.birthdate, self.first_name, self.last_name)):
+                return True, None
+            else:
+                msg = _("missing required data: ")
+                missing = []
+                for attr in 'birthdate', 'first_name', 'last_name':
+                    if not getattr(self, attr):
+                        missing.append(_(attr))
+                return False, "{} {}".format(msg, ','.join(missing))
 
     @property
     def phone(self):

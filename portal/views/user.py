@@ -1116,6 +1116,11 @@ def register_now():
     user = current_user()
     if user.is_registered():
         abort(400, "User already registered")
+
+    ready, reason = user.email_ready()
+    if not ready:
+        abort(400, reason)
+
     # Need to logout current user, or the opportunity to register
     # isn't available.  This also clears the session, so do this
     # step first
