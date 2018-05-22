@@ -157,7 +157,7 @@
                     "bdGroup": {fields: ["#month", "#date", "#year"]}
                 },
                 initData: function() {
-                    tnthAjax.getDemo(self.userId, false, false, function() {
+                    tnthAjax.getDemo(self.userId, false, function() {
                         $("#nameGroup").attr("loaded", "true");
                         $("#rolesGroup").attr("loaded", "true");
                         $("#bdGroup").attr("loaded", "true");
@@ -174,8 +174,8 @@
                     }
                 },
                 initData: function() {
-                    tnthAjax.getTreatment(self.userId, function() {
-                        tnthAjax.getClinical(self.userId, function() {
+                    tnthAjax.getTreatment(self.userId, {useWorker:true}, function() {
+                        tnthAjax.getClinical(self.userId, {useWorker:true}, function() {
                             $("#patientQ").attr("loaded", "true");
                         });
                     });

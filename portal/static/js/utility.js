@@ -88,7 +88,7 @@ var request_attempts = 0;
  * note: this function supports older version of IE (version <= 9)
  * jquery ajax calls errored in older IE version
  */
-function newHttpRequest(url, callBack, noCache) {
+function newHttpRequest(url, params, callBack, noCache) {
     request_attempts++;
     var xmlhttp;
     if (window.XDomainRequest) {
@@ -122,30 +122,63 @@ function newHttpRequest(url, callBack, noCache) {
         url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     }
     xmlhttp.open("GET", url, true);
+    if (params) {
+        for (var param in params) {
+            if (params.hasOwnProperty(param)) {
+                xmlhttp.setRequestHeader(param, params[param]);
+            }
+        }
+    }
     xmlhttp.send();
 }
-function funcWrapper(PORTAL_NAV_PAGE, callback) {
-    if (PORTAL_NAV_PAGE) {
-        request_attempts++;
-        $.ajax({
-            url: PORTAL_NAV_PAGE,
-            type: "GET",
-            contentType: "text/plain",
-            timeout: 5000,
-            cache: (getIEVersion() ? false : true)
-        }, "html").done(function(data) {
-            embed_page(data);
-        }).fail(function(jqXHR, textStatus) {
-            if (request_attempts < 3) {
-                setTimeout(function() { funcWrapper(PORTAL_NAV_PAGE, callback);}, 3000);
-            } else {
-                loader();
-            }
-        }).always(function() {
+function ajaxRequest(url, params, callback) {
+    callback = callback || function() {};
+    if (!url) {
+        callback({error: i18next.t("Url is required.")});
+        return false;
+    }
+    var defaults = {
+        url: url,
+        type: "GET",
+        contentType: "text/plain",
+        timeout: 5000,
+        cache: false
+    };
+    params = params || defaults;
+    params = $.extend({}, defaults, params);
+    request_attempts++;
+    $.ajax(params).done(function(data) {
+        callback(data);
+    }).fail(function(jqXHR, textStatus) {
+        if (request_attempts < 3) {
+            setTimeout(function() { ajaxRequest(url, callback);}, 3000);
+        } else {
+            callback({error: i18next.t("Error occurred processing request")}); /*global i18next */
             loader();
-            request_attempts = 0;
-            if (callback) { callback();}
-        });
+        }
+    }).always(function() {
+        loader();
+        request_attempts = 0;
+    });
+}
+function initWorker(url, params, callback) {
+    var worker = new Worker('/static/js/ajaxWorker.js');
+    worker.postMessage({url: url, params: params});
+    worker.addEventListener("message", function(e) {
+        callback(e.data);
+        worker.terminate();
+    }, false);
+    worker.addEventListener("error", function(e) {
+        console.log("Worker runtime error: Line ", e.lineno, " in ", e.filename, ": ", e.message);
+    }, false);
+}
+function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */
+    if (window.Worker) {
+        initWorker(url, params, callback);
+    } else {
+        var isIE = getIEVersion();
+        var useFunc = isIE ? newHttpRequest: ajaxRequest;
+        useFunc(url, params, function(data) { callback(data);});
     }
 }
 function LRKeyEvent() {
@@ -197,7 +230,7 @@ function disableHeaderFooterLinks() {
 
 function pad(n) {
     n = parseInt(n);
-    return (n < 10) ? "0" + n : n;
+    return (!isNaN(n) && n < 10) ? "0" + n : n;
 }
 function escapeHtml(text) {
     "use strict";
