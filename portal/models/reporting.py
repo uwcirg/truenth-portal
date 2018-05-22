@@ -138,7 +138,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if not (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
+        if not (user.has_role(ROLE.STAFF) and user.email_ready()[0]
                 and (top_org in ot.find_top_level_org(user.organizations))):
             continue
 

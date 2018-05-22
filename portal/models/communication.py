@@ -296,9 +296,11 @@ class Communication(db.Model):
                 reset_trace=current_task is None)
 
         user = User.query.get(self.user_id)
-        if not user.email or u'@' not in user.email:
+        ready, reason = user.email_ready()
+        if not ready:
             raise ValueError(
-                "can't send communication to user w/o valid email address")
+                "can't send communication to {user}; {reason}".format(
+                    user, reason))
 
         trace("load variables for {user} & UUID {uuid} on {request}".format(
             user=user,

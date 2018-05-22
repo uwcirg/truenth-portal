@@ -187,8 +187,9 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             dogpile_cache.invalidate(overall_assessment_status, user.id)
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
-            if not user.email or '@' not in user.email:
-                # can't send to users w/o legit email
+            ready, reason = user.email_ready()
+            if not ready:
+                # don't queue/send message if user isn't ready to receive them
                 continue
             qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
             if qbd.questionnaire_bank:
@@ -230,6 +231,11 @@ def send_user_messages(user, force_update=False):
     for transmission.
 
     """
+    ready, reason = user.email_ready()
+    if not ready:
+        raise ValueError("Cannot send messages to {user}; {reason}".format(
+            user, reason))
+
     if force_update:
         invalidate_assessment_status_cache(user_id=user.id)
         qbd = QuestionnaireBank.most_current_qb(
