@@ -14,7 +14,7 @@
         <div class="col-md-12 col-xs-12">
             {% call profile_macro.profileSection(data_sections="org") -%}
                 {% call profile_macro.titleSection() -%}{{ _("Clinic") }}{%- endcall %}
-                {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
+                {{profile_macro.profileOrg(user,consent_agreements, current_user)}}
             {%- endcall %}
         </div>
     </div>

@@ -28,10 +28,17 @@
             }
         },
         getOptions: function() {
-            var self = this;
+            var self = this, url =  "/patients/treatment-options";
+            if (window.Worker) { 
+                initWorker(url, {cache: true}, function(result) { /*global initWorker */
+                    var data = JSON.parse(result);
+                    self.updateTreatmentOptions(data.treatment_options);
+                });
+                return true;
+            }
             $.ajax({
                 type: "GET",
-                url: "/patients/treatment-options",
+                url: url,
                 cache: true
             }).done(function(data) {
                 if (sessionStorage.treatmentOptions) {
@@ -59,6 +66,7 @@
                     });
                     $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
                     $("#pastTreatmentsContainer").hide();
+                    $("#eventListLoad").fadeOut();
                     return false;
                 }
                 data.entry.sort(function(a, b) { // sort from newest to oldest

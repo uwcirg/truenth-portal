@@ -649,7 +649,6 @@
                     e.stopPropagation();
                 }
                 try { //sessionStorage does not work in private mode
-                    sessionStorage.clear(); //need to clear session variables when do login as
                     sessionStorage.setItem("loginAsPatient", "true");
                 } catch (ex) { //alert user if this is not set properly
                     alert(i18next.t("Unable to properly set session storage variable for login-as. ") + ex.message);
@@ -675,9 +674,12 @@
                         data.resourceType = data.resourceType || "Patient";
                         self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
                             self.setDemoData();
+                            var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                            formGroup.removeClass("has-error");
+                            formGroup.find(".help-block.with-errors").html("");
                             setTimeout(function() {
                                 editButton.attr("disabled", false);
-                            }, 300);
+                            }, 150);
                         });
                     }
                     editButton.attr("disabled", hasError);
@@ -787,11 +789,12 @@
                             $("#errorbirthday").html("");
                         } else {
                             $("#birthday").val("");
-                            return false;
                         }
                     });
                     field.on("updateDemoData", function() {
-                        self.postDemoData($(this), {birthDate: y.val() + "-" + m.val() + "-" + d.val()});
+                        if (y.val() && m.val() && d.val()) {
+                            self.postDemoData($(this), {birthDate: y.val() + "-" + m.val() + "-" + d.val()});
+                        }
                     });
                 });
                 this.__convertToNumericField($("#date, #year"));

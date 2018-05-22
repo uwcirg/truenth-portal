@@ -59,7 +59,6 @@
 
     FieldsChecker.prototype.initSectionData = function(data) {
         var self = this, sections = self.getSections();
-        var initCount = 0; //note: only populate data for still needed section(s)
         for (var section in sections) {
             if (self.inConfig(sections[section].config, data)) {
                 self.initData(section);
@@ -451,49 +450,47 @@
             }
             for (var id in (this.mainSections[sectionId]).subsections) {
                 var fields = (this.mainSections[sectionId]).subsections[id].fields;
-                if (isComplete && fields) {
-                    fields.forEach(function(field) {
-                        field = $(field);
-                        if (field.length > 0 && (field.attr("skipped") !== "true")) {
-                            var type = field.attr("data-type") || field.attr("type");
-                            switch (String(type).toLowerCase()) {
-                            case "checkbox":
-                            case "radio":
-                                isChecked = false;
-                                field.each(function() {
-                                    if ($(this).is(":checked")) {
-                                        isChecked = true;
-                                    }
-                                    if (hasValue($(this).attr("data-require-validate"))) {
-                                        isComplete = false;
-                                    }
-                                });
-                                if (!(isChecked)) {
-                                    isComplete = false;
-                                }
-                                break;
-                            case "select":
-                                isComplete = field.val() !== "";
-                                break;
-                            case "text":
-                                isComplete = (field.val() !== "") && (field.get(0).validity.valid);
-                                break;
-                            case "terms":
-                                var isAgreed = true;
-                                field.each(function() {
-                                    if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
-                                        isAgreed = false;
-                                    }
-                                });
-                                isComplete = isAgreed;
-                                break;
+                if (!isComplete || !fields) {return isComplete; }
+                fields.forEach(function(field) {
+                    field = $(field);
+                    if (field.length === 0 || field.attr("skipped") === "true") { return true; }
+                    var type = field.attr("data-type") || field.attr("type");
+                    switch (String(type).toLowerCase()) {
+                    case "checkbox":
+                    case "radio":
+                        isChecked = false;
+                        field.each(function() {
+                            if ($(this).is(":checked")) {
+                                isChecked = true;
                             }
-                            if (hasValue(field.attr("data-require-validate"))) {
+                            if (hasValue($(this).attr("data-require-validate"))) {
                                 isComplete = false;
                             }
+                        });
+                        if (!(isChecked)) {
+                            isComplete = false;
                         }
-                    });
-                }
+                        break;
+                    case "select":
+                        isComplete = field.val() !== "";
+                        break;
+                    case "text":
+                        isComplete = (field.val() !== "") && (field.get(0).validity.valid);
+                        break;
+                    case "terms":
+                        var isAgreed = true;
+                        field.each(function() {
+                            if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
+                                isAgreed = false;
+                            }
+                        });
+                        isComplete = isAgreed;
+                        break;
+                    }
+                    if (hasValue(field.attr("data-require-validate"))) {
+                        isComplete = false;
+                    }
+                });
             }
         }
         return isComplete;
@@ -572,11 +569,12 @@
         var self = this, isLoaded = true, subsectionId;
         //check all
         for (var section in self.mainSections) {
-            if (self.mainSections.hasOwnProperty(section)) {
-                for (subsectionId in self.mainSections[section].subsections) {
-                    if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                        isLoaded = false;
-                    }
+            if (!self.mainSections.hasOwnProperty(section)) {
+                return false;
+            }
+            for (subsectionId in self.mainSections[section].subsections) {
+                if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
+                    isLoaded = false;
                 }
             }
         }

@@ -507,7 +507,7 @@
     <div class="put-demo-error error-message"></div>
 {%- endmacro %}
 <!--this has an ajax call to fill in the content-->
-{% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
+{% macro profileOrg(person, consent_agreements, current_user) -%}
     {% call viewSection(id="userOrgs_view") -%}
         <div v-if="demo.data.careProvider && demo.data.careProvider.length > 0">
             {% raw %}
@@ -527,7 +527,7 @@
                 {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                     <!-- nothing to do -->
                 {%- else -%}
-                    <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
+                    <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
                 {%- endif -%}
                 </div>
                 <div id="defaultConsentContainer" data-profile-section-id="consent"></div>
