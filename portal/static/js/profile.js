@@ -649,6 +649,7 @@
                     e.stopPropagation();
                 }
                 try { //sessionStorage does not work in private mode
+                    sessionStorage.clear(); //need to clear session variables when do login as
                     sessionStorage.setItem("loginAsPatient", "true");
                 } catch (ex) { //alert user if this is not set properly
                     alert(i18next.t("Unable to properly set session storage variable for login-as. ") + ex.message);
@@ -676,7 +677,7 @@
                             self.setDemoData();
                             setTimeout(function() {
                                 editButton.attr("disabled", false);
-                            }, 150);
+                            }, 300);
                         });
                     }
                     editButton.attr("disabled", hasError);

@@ -18,7 +18,6 @@
         this.defaultSections = {};
         this.incompleteFields = [];
         this.dependencies = dependencies || {};
-        this.currentSection = "";
         this.orgTool = null;
 
     };
@@ -63,10 +62,7 @@
         var initCount = 0; //note: only populate data for still needed section(s)
         for (var section in sections) {
             if (self.inConfig(sections[section].config, data)) {
-                setTimeout(function() {
-                    self.initData(section);
-                }, 20 * initCount);
-                initCount++;
+                self.initData(section);
             }
         }
     };
@@ -75,7 +71,6 @@
         if (this.mainSections[section] && this.mainSections[section].initData) {
             this.mainSections[section].initData();
         }
-        this.currentSection = section;
     };
 
     FieldsChecker.prototype.getSections = function() {
@@ -157,7 +152,7 @@
                     "bdGroup": {fields: ["#month", "#date", "#year"]}
                 },
                 initData: function() {
-                    tnthAjax.getDemo(self.userId, false, function() {
+                    tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
                         $("#nameGroup").attr("loaded", "true");
                         $("#rolesGroup").attr("loaded", "true");
                         $("#bdGroup").attr("loaded", "true");
@@ -289,23 +284,14 @@
             if (!dataArray) {
                 dataArray = this.CONFIG_REQUIRED_CORE_DATA;
             }
-            if (dataArray) {
-                if (dataArray.length === 0) {
-                    return false;
-                }
-                var found = false;
-                var ma = configMatch.split(",");
-                ma.forEach(function(item) {
-                    dataArray.forEach(function(v) {
-                        if (!found && v === item) {
-                            found = true;
-                        }
-                    });
-                });
-                return found;
-            } else {
-                return true;
-            }
+            if (!dataArray || dataArray.length === 0) { return false; }
+            var found = false;
+            var ma = configMatch.split(",");
+            ma.forEach(function(item) {
+                if (found) { return true; }
+                found = dataArray.indexOf(item) !== -1;
+            });
+            return found;
         }
     };
 
@@ -582,22 +568,14 @@
         }
     };
 
-    FieldsChecker.prototype.sectionsLoaded = function(all) {
+    FieldsChecker.prototype.sectionsLoaded = function() {
         var self = this, isLoaded = true, subsectionId;
-        if (!all && hasValue(self.currentSection)) {
-            for (subsectionId in self.mainSections[self.currentSection].subsections) {
-                if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                    isLoaded = false;
-                }
-            }
-        } else {
-            //check all if current section not available
-            for (var section in self.mainSections) {
-                if (self.mainSections.hasOwnProperty(section)) {
-                    for (subsectionId in self.mainSections[section].subsections) {
-                        if (!isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                            isLoaded = false;
-                        }
+        //check all
+        for (var section in self.mainSections) {
+            if (self.mainSections.hasOwnProperty(section)) {
+                for (subsectionId in self.mainSections[section].subsections) {
+                    if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
+                        isLoaded = false;
                     }
                 }
             }
