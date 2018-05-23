@@ -1,5 +1,8 @@
 """workarounds to flask_user problems"""
 from urlparse import urlsplit, urlunsplit
+from flask import current_app, flash, redirect, request, url_for
+from flask_babel import gettext as _
+from flask_user.views import _endpoint_url
 
 
 def patch_make_safe_url(url):
@@ -16,3 +19,39 @@ def patch_make_safe_url(url):
     safe_url = urlunsplit(
         (None, None, parts.path, parts.query, parts.fragment))
     return safe_url
+
+
+def patch_forgot_password():
+    """Need to customize flash message shown in forgot_password
+
+    No hooks available to customize the message, so this function is
+    intended to be a drop in replacement with only the text of the
+    message altered, as per TN-1030
+
+    """
+    """Prompt for email and send reset password email."""
+    user_manager = current_app.user_manager
+
+    # Initialize form
+    form = user_manager.forgot_password_form(request.form)
+
+    # Process valid POST
+    if request.method == 'POST' and form.validate():
+        email = form.email.data
+        user, user_email = user_manager.find_user_by_email(email)
+
+        if user:
+            user_manager.send_reset_password_email(email)
+
+        # Prepare one-time system message
+        flash(_("If the email address '%(email)s' is in the system, a "
+                "reset password email will now have been sent to it. "
+                "Please open that email and follow the instructions to "
+                "reset your password.", email=email), 'success')
+
+        # Redirect to the login page
+        return redirect(_endpoint_url(user_manager.after_forgot_password_endpoint))
+
+    # Process GET or invalid POST
+    return user_manager.render_function(
+        user_manager.forgot_password_template, form=form)
