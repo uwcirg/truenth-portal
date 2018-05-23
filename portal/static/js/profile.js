@@ -78,6 +78,7 @@
             initIntervalId: 0,
             currentUserRoles: [],
             userRoles: [],
+            userEmailReady: true,
             mode: "profile",
             demo: { //skeleton
                 data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
@@ -224,6 +225,15 @@
                     });
                 }
             },
+            isUserEmailReady: function() {
+                return this.userEmailReady;
+            },
+            setUserEmailReady: function(params) {
+                var self = this;
+                this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
+                    self.userEmailReady = data.ready;
+                });
+            },
             isDisableField: function(fieldId) {
                 fieldId = fieldId || "";
                 return this.disableFields.indexOf(fieldId) !== -1;
@@ -261,6 +271,7 @@
                 this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) {
                     if (data) {
                         self.demo.data = data;
+                        self.setUserEmailReady();
                         self.setTopLevelOrgs(data);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
@@ -478,15 +489,12 @@
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
-                                var editButton = parentContainer.find(".profile-item-edit-btn");
-                                editButton.attr("disabled", true);
                                 setTimeout(function() {
-                                    var hasError = false;
-                                    if (o.attr("data-error-field")) {
-                                        var customErrorField = $("#" + o.attr("data-error-field"));
-                                        if (customErrorField.length > 0) {
-                                            hasError = (customErrorField.text() !== "");
-                                        }
+                                    var customErrorField = $("#" + o.attr("data-error-field"))
+                                    var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
+                                    if (!hasError) { //need to check default help block for error as well
+                                        var errorBlock = parentContainer.find(".help-block");
+                                        hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
                                     if (!hasError) {
                                         o.trigger("updateDemoData");
@@ -671,6 +679,7 @@
                     var customErrorField = $("#" + o.attr("data-error-field"));
                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                     if (!hasError) {
+                        editButton.attr("disabled", true);
                         data.resourceType = data.resourceType || "Patient";
                         self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
                             self.setDemoData();
@@ -813,7 +822,7 @@
                         if (!hasError) {
                             self.demo.data.email = o.val();
                             $("#erroremail").html("");
-                            $("#email_view").html("<p>" + o.val() + "</p>");
+                            $("#email_view").html("<p>" + (o.val()||i18next.t("not provided")) + "</p>"); /*global i18next */
                         }
                     }, 350);
                 });

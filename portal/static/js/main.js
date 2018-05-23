@@ -1604,6 +1604,16 @@ var tnthAjax = {
             });
 
         }
+    },
+    "getEmailReady": function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({error: i18next.t("User id is required.")});
+            return false;
+        }
+        this.sendRequest("/api/user/" + userId + "/email_ready", "GET", userId, params, function(data) {
+            callback(data);
+        });
     }
 };
 

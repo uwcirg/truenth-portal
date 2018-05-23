@@ -301,7 +301,7 @@
                 </select>
             </div>
         </div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled:!demo.data.email}" v-bind:disabled="!demo.data.email">{{ _("Send email") }}</button>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info"></div>
         <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger"></div>
     </div>
@@ -338,7 +338,7 @@
                 <h4 class="text-warning registration-label">{{_("not yet registered")}}</h4>
             {%- endif -%}
         </div>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !demo.data.email}" v-bind:disabled="!demo.data.email">{{ _("Send email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
         <input type="hidden" id="staffRegistrationEmailUrl" value="{{url_for('staff.staff_registration_email', user_id=person.id)}}" />
@@ -456,7 +456,7 @@
 
 {% macro resetPassword(person) %}
     <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
-        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn" v-bind:class="{disabled: !demo.data.email}" v-bind:disabled="!demo.data.email">{{_("Send email")}}</button>
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{_("Send email")}}</button>
         <div id="passwordResetMessage" class="text-info"></div>
     </div>
 {%-endmacro %}
