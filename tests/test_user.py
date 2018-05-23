@@ -1223,3 +1223,26 @@ class TestUser(TestCase):
         self.test_user.first_name = 'Ready'
         self.test_user.last_name = 'Set'
         self.assertTrue(self.test_user.email_ready()[0])
+
+    def test_email_ready_api(self):
+        # with valid invite email, `NO_CHALLENGE_WO_DATA` unset
+        # and all challenge fields, should pass
+        self.app.config["NO_CHALLENGE_WO_DATA"] = False
+        self.test_user.email = '__invite__armistice@email.org'
+        self.test_user.birthdate = '1912-12-03'
+        with SessionScope(db):
+            db.session.commit()
+        self.login()
+        rv = self.client.get("/api/user/{}/email_ready".format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertTrue(rv.json['ready'])
+
+        # remove last_name from user, expect failure and details
+        self.test_user = db.session.merge(self.test_user)
+        self.test_user.last_name = None
+        with SessionScope(db):
+            db.session.commit()
+        rv = self.client.get("/api/user/{}/email_ready".format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertFalse(rv.json['ready'])
+        self.assertTrue('last_name' in rv.json['reason'])

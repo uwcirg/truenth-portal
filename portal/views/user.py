@@ -1274,6 +1274,60 @@ def set_relationships(user_id):
     return relationships(user.id)
 
 
+@user_api.route('/user/<int:user_id>/email_ready')
+@oauth.require_oauth()
+def email_ready(user_id):
+    """See if given user is 'email ready'
+
+    A user is considered email ready, if the account has adequate data
+    to 1.) send email (a valid email address) and 2.) attributes
+    required to finish a reset password process if initiated.
+
+    Returns JSON detailing if ready, and reason not if applicable.
+    ---
+    tags:
+      - User
+    operationId: email_ready
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns JSON describing {ready=True} or
+           {ready=False; reason=description}
+        schema:
+          id: ready_result
+          required:
+            - ready
+          properties:
+            ready:
+              type: boolean
+              description: result of email ready check
+            reason:
+              type: string
+              description:
+                detailed description defined only if the user is NOT ready
+                to receive email
+      401:
+        description: if missing valid OAuth token
+
+    """
+    user = get_user_or_abort(user_id)
+    current_user().check_role('view', other_id=user_id)
+    ready, reason = user.email_ready()
+    if ready:
+        return jsonify(ready=ready)
+    else:
+        return jsonify(ready=ready, reason=reason)
+
+
 @user_api.route('/unique_email')
 def unique_email():
     """Confirm a given email is unique
