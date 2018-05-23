@@ -300,7 +300,7 @@ class Communication(db.Model):
         if not ready:
             raise ValueError(
                 "can't send communication to {user}; {reason}".format(
-                    user, reason))
+                    user=user, reason=reason))
 
         trace("load variables for {user} & UUID {uuid} on {request}".format(
             user=user,
