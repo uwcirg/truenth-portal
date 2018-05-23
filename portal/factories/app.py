@@ -172,10 +172,12 @@ def configure_extensions(app):
     ## manage the flask-user business logic
 
     from flask_user.views import login, register
-    from ..views.patch_flask_user import patch_make_safe_url
+    from ..views.patch_flask_user import (
+        patch_make_safe_url, patch_forgot_password)
 
     user_manager.init_app(
         app,
+        forgot_password_view_function=patch_forgot_password,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
         register_view_function=capture_next_view_function(register),
