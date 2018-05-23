@@ -74,17 +74,12 @@ OrgTool.prototype.getUserId = function() {
     return $("#fillOrgs").attr("userId");
 };
 OrgTool.prototype.inArray = function(n, array) {
-    if (n && array && Array.isArray(array)) {
-        var found = false;
-        for (var index = 0; !found && index < array.length; index++) {
-            if (String(array[index]) === String(n)) {
-                found = true;
-            }
-        }
-        return found;
-    } else {
-        return false;
+    if (!n || !array || !Array.isArray(array)) { return false; }
+    var found = false;
+    for (var index = 0; !found && index < array.length; index++) {
+        found = String(array[index]) === String(n);
     }
+    return found;
 };
 OrgTool.prototype.getElementParentOrg = function(o) {
     var parentOrg;
@@ -243,12 +238,12 @@ OrgTool.prototype.populateOrgsList = function(items) {
     return orgsList;
 };
 OrgTool.prototype.getShortName = function(orgId) {
-    if (orgId) {
-        var shortName = "", orgsList = this.getOrgsList();
-        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: null;
-        if (orgItem && orgItem.shortname) {
-            shortName = orgItem.shortname;
-        }
+    var shortName = "";
+    if (!orgId) { return shortName; }
+    var orgsList = this.getOrgsList();
+    var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: null;
+    if (orgItem && orgItem.shortname) {
+        shortName = orgItem.shortname;
     }
     return shortName;
 };
@@ -386,20 +381,14 @@ OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
 OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
     if (!currentOrg) { return false; }
     var ml = this.getOrgsList(), currentOrgItem = ml[currentOrg], self = this;
-    if (ml && currentOrgItem) {
-        if (currentOrgItem.isTopLevel) {
-            return currentOrg;
-        } else {
-            if (currentOrgItem.parentOrgId) {
-                return self.getTopLevelParentOrg(currentOrgItem.parentOrgId);
-            }
-            else {
-                return currentOrg;
-            }
-        }
-    } else {
-        return false;
+    if (!ml || !currentOrgItem) { return false; }
+    if (currentOrgItem.isTopLevel) {
+        return currentOrg;
     }
+    if (currentOrgItem.parentOrgId) {
+        return self.getTopLevelParentOrg(currentOrgItem.parentOrgId);
+    }
+    return currentOrg;
 };
 OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
     if (!orgs || (orgs.length === 0)) {
@@ -433,15 +422,14 @@ OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
             });
         }
     }
-    if (userOrgs) {
-        userOrgs.forEach(function(orgId) {
-            here_below_orgs.push(orgId);
-            var co = mainOrgsList[orgId], cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
-            if (cOrgs && cOrgs.length > 0) {
-                here_below_orgs = here_below_orgs.concat(cOrgs);
-            }
-        });
-    }
+    userOrgs = userOrgs || [];
+    userOrgs.forEach(function(orgId) {
+        here_below_orgs.push(orgId);
+        var co = mainOrgsList[orgId], cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+        if (cOrgs && cOrgs.length > 0) {
+            here_below_orgs = here_below_orgs.concat(cOrgs);
+        }
+    });
     return here_below_orgs;
 };
 OrgTool.prototype.morphPatientOrgs = function() {
@@ -456,6 +444,7 @@ OrgTool.prototype.morphPatientOrgs = function() {
             $(this).prop("checked", true);
         }
     });
+    $("#userOrgs .noOrg-container").hide();
 };
 
 var tnthAjax = {
@@ -470,7 +459,7 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: "false", sync: false, timeout: 5000, data: null, useWorker: false};
+        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: "false", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         var self = this;
@@ -480,13 +469,17 @@ var tnthAjax = {
         fieldHelper.showLoader(targetField);
         if (params.useWorker && window.Worker) {
             initWorker(url, params, function(result) { /*global initWorker*/
+                var data;
                 try {
-                    var data = JSON.parse(result);
+                    data = JSON.parse(result);
                 } catch(e) {
                     callback({error: "Error occurred parsing data for " + url});
                     return false;
                 }
-                if (data.error) {
+                if (!data) {
+                    callback({"error": true});
+                    fieldHelper.showError(targetField);
+                } else if (data.error) {
                     callback({"error": true});
                     self.sendError(data, url, userId);
                     fieldHelper.showError(targetField);
@@ -494,7 +487,7 @@ var tnthAjax = {
                     callback(data);
                     fieldHelper.showUpdate(targetField);
                 }
-            })
+            });
             return true;
         }
         $.ajax({
@@ -503,7 +496,7 @@ var tnthAjax = {
             contentType: params.contentType,
             dataType: params.dataType,
             cache: params.cache,
-            async: params.sync ? false: true,
+            async: params.sync ? false: params.async,
             data: params.data,
             timeout: params.timeout //set default timeout to 5 seconds
         }).done(function(data) {
@@ -531,10 +524,9 @@ var tnthAjax = {
         });
     },
     "sendError": function(xhr, url, userId) {
-        if (xhr) {
-            var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
-            tnthAjax.reportError(userId ? userId : "Not available", url, errorMessage, true);
-        }
+        if (!xhr) { return false; }
+        var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
+        tnthAjax.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
     "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following: subject_id: User on which action is being attempted message: Details of the error event page_url: The page requested resulting in the error
@@ -558,52 +550,49 @@ var tnthAjax = {
     "FieldLoaderHelper": {
         delayDuration: 300,
         showLoader: function(targetField) {
-            if (targetField && targetField.length > 0) {
-                $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
-            }
+            if (!targetField || targetField.length === 0) { return false; }
+            $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
         },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
-            if (targetField && targetField.length > 0) {
-                setTimeout(function() {
-                    (function(targetField) {
-                        var containerId = targetField.attr("data-save-container-id") || targetField.attr("id");
-                        var errorField = $("#" + containerId + "_error");
-                        var successField = $("#" + containerId + "_success");
-                        var loadingField = $("#" + containerId + "_load");
-                        errorField.text("").css("opacity", 0);
-                        successField.text(i18next.t("success"));
-                        loadingField.animate({"opacity": 0}, __timeout, function() {
-                            successField.animate({"opacity": 1}, __timeout, function() {
-                                setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);}, __timeout * 2);
-                            });
+            if (!targetField || targetField.length === 0) { return false; }
+            setTimeout(function() {
+                (function(targetField) {
+                    var containerId = targetField.attr("data-save-container-id") || targetField.attr("id");
+                    var errorField = $("#" + containerId + "_error");
+                    var successField = $("#" + containerId + "_success");
+                    var loadingField = $("#" + containerId + "_load");
+                    errorField.text("").css("opacity", 0);
+                    successField.text(i18next.t("success"));
+                    loadingField.animate({"opacity": 0}, __timeout, function() {
+                        successField.animate({"opacity": 1}, __timeout, function() {
+                            setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);}, __timeout * 2);
                         });
-                    })(targetField);
-                }, __timeout);
-            }
+                    });
+                })(targetField);
+            }, __timeout);
         },
         showError: function(targetField) {
             targetField = targetField || $(targetField);
             var __timeout = this.delayDuration;
-            if (targetField && targetField.length > 0) {
-                setTimeout(function() {
-                    (function(targetField) {
-                        var containerId = targetField.attr("data-save-container-id");
-                        var errorField = $("#" + containerId + "_error");
-                        var successField = $("#" + containerId + "_success");
-                        var loadingField = $("#" + containerId + "_load");
-                        errorField.text(i18next.t("Unable to update. System/Server Error."));
-                        successField.text("").css("opacity", 0);
-                        loadingField.animate({"opacity": 0}, __timeout, function() {
-                            errorField.animate({"opacity": 1}, __timeout, function() {
-                                setTimeout(function() {
-                                    errorField.animate({"opacity": 0}, __timeout * 2);
-                                }, __timeout * 2);
-                            });
+            if (!targetField || targetField.length === 0) { return false; }
+            setTimeout(function() {
+                (function(targetField) {
+                    var containerId = targetField.attr("data-save-container-id");
+                    var errorField = $("#" + containerId + "_error");
+                    var successField = $("#" + containerId + "_success");
+                    var loadingField = $("#" + containerId + "_load");
+                    errorField.text(i18next.t("Unable to update. System/Server Error."));
+                    successField.text("").css("opacity", 0);
+                    loadingField.animate({"opacity": 0}, __timeout, function() {
+                        errorField.animate({"opacity": 1}, __timeout, function() {
+                            setTimeout(function() {
+                                errorField.animate({"opacity": 0}, __timeout * 2);
+                            }, __timeout * 2);
                         });
-                    })(targetField);
-                }, __timeout);
-            }
+                    });
+                })(targetField);
+            }, __timeout);
         }
     },
     "getCurrentUser": function(callback, params) {
@@ -625,51 +614,50 @@ var tnthAjax = {
         }
         var __url = "/api/coredata/user/" + userId + "/still_needed" + (entry_method ? "?entry_method=" + (entry_method).replace(/\_/g, " ") : "");
         this.sendRequest(__url, "GET", userId, {sync: sync,cache: true}, function(data) {
-            if (data) {
-                if (!data.error) { /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
-                    var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT";
-                    var fields = (data.still_needed).map(function(item) {
-                        return item.field;
-                    });
-                    if ($("#topTerms").length > 0) {
-                        var acceptOnNextCheckboxes = [];
-                        (data.still_needed).forEach(function(item) {
-                            var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
-                            if (matchedTermsCheckbox.length > 0) {
-                                matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
-                                var parentNode = matchedTermsCheckbox.closest("label.terms-label");
-                                if (parentNode.length > 0) {
-                                    parentNode.show().removeClass("tnth-hide");
-                                    if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
-                                        parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                        $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
-                                        $("#termsText").addClass("agreed");
-                                        $("#termsCheckbox_default").removeClass("tnth-hide");
-                                        $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
-                                        acceptOnNextCheckboxes.push(parentNode);
-                                    }
-                                }
+            if (!data) { 
+                callback({"error": i18next.t("no data returned")});
+                return false;
+            }
+            if (data.error) {
+                callback({"error": i18next.t("unable to get needed core data")});
+                return false;
+            }
+            var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
+            var fields = (data.still_needed).map(function(item) {
+                return item.field;
+            });
+            if ($("#topTerms").length > 0) {
+                var acceptOnNextCheckboxes = [];
+                (data.still_needed).forEach(function(item) {
+                    var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
+                    if (matchedTermsCheckbox.length > 0) {
+                        matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
+                        var parentNode = matchedTermsCheckbox.closest("label.terms-label");
+                        if (parentNode.length > 0) {
+                            parentNode.show().removeClass("tnth-hide");
+                            if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
+                                parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                                $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
+                                $("#termsText").addClass("agreed");
+                                $("#termsCheckbox_default").removeClass("tnth-hide");
+                                $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
+                                acceptOnNextCheckboxes.push(parentNode);
                             }
-                        });
-                        if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
-                            $("#next").on("click", function() {
-                                acceptOnNextCheckboxes.forEach(function(ckBox) {
-                                    ckBox.trigger("click");
-                                });
-                            });
                         }
                     }
-                    if (fields.indexOf("localized") === -1) {
-                        $("#patMeta").remove();
-                    }
-                    callback(fields);
-                } else {
-                    callback({"error": i18next.t("unable to get needed core data")});
+                });
+                if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
+                    $("#next").on("click", function() {
+                        acceptOnNextCheckboxes.forEach(function(ckBox) {
+                            ckBox.trigger("click");
+                        });
+                    });
                 }
-            } else {
-                callback({"error": i18next.t("no data returned")});
-
             }
+            if (fields.indexOf("localized") === -1) {
+                $("#patMeta").remove();
+            }
+            callback(fields);
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
@@ -859,20 +847,16 @@ var tnthAjax = {
         if (!userId || !orgId) { return false; }
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
-            if (data) {
-                if (!data.error && data.consent_agreements) {
-                    var d = data.consent_agreements;
-                    if (d.length > 0) {
-                        d.forEach(function(item) {
-                            var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                            if (!item.deleted && !(expired > 0)) {
-                                if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
-                                else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
-                            }
-                        });
-                    }
-                } else { return false; }
+            if (!data || data.error || !data.consent_agreements || data.consent_agreements.length === 0) {
+                return consentedOrgIds;
             }
+            (data.consent_agreements).forEach(function(item) {
+                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
+                if (!item.deleted && !(expired > 0)) {
+                    if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
+                    else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
+                }
+            });
             return consentedOrgIds;
         });
         return consentedOrgIds;
@@ -951,22 +935,22 @@ var tnthAjax = {
         });
     },
     "hasTreatment": function(data) {
-        var found = false;
-        if (data && data.entry && data.entry.length > 0) {
-            data.entry = data.entry.sort(function(a, b) { // sort from newest to oldest based on lsat updated date
-                return new Date(b.resource.meta.lastUpdated) - new Date(a.resource.meta.lastUpdated);
-            });
-            (data.entry).forEach(function(item) {
-                if (!found) {
-                    var resourceItemCode = String(item.resource.code.coding[0].code);
-                    var system = String(item.resource.code.coding[0].system);
-                    var procId = item.resource.id;
-                    if ((resourceItemCode === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL)) || (resourceItemCode === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL))) {
-                        found = {"code": resourceItemCode,"id": procId};
-                    }
-                }
-            });
+        if (!data || !data.entry || data.entry.length === 0) {
+            return false;
         }
+        var sortedArray = data.entry.sort(function(a, b) { // sort from newest to oldest based on lsat updated date
+            return new Date(b.resource.meta.lastUpdated) - new Date(a.resource.meta.lastUpdated);
+        });
+        var found = false;
+        sortedArray.forEach(function(item) {
+            if (found) { return true; }
+            var resourceItemCode = String(item.resource.code.coding[0].code);
+            var system = String(item.resource.code.coding[0].system);
+            var procId = item.resource.id;
+            if ((resourceItemCode === SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.SNOMED_SYS_URL)) || (resourceItemCode === SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE && (system === SYSTEM_IDENTIFIER_ENUM.CLINICAL_SYS_URL))) {
+                found = {"code": resourceItemCode,"id": procId};
+            }
+        });
         return found;
     },
     "getTreatment": function(userId, params, callback) {
@@ -1005,18 +989,14 @@ var tnthAjax = {
     },
     deleteTreatment: function(userId, targetField) {
         this.sendRequest("/api/patient/" + userId + "/procedure", "GET", userId, {sync: true}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    var treatmentData = tnthAjax.hasTreatment(data);
-                    if (treatmentData) {
-                        if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
-                            tnthAjax.deleteProc(treatmentData.id, targetField, true);
-                        } else {
-                            tnthAjax.deleteProc(treatmentData.id, targetField, true);
-                        }
-                    }
-                } else { return false; }
-            } else { return false; }
+            if (!data || data.error) { return false; }
+            var treatmentData = tnthAjax.hasTreatment(data);
+            if (!treatmentData) { return false; }
+            if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
+                tnthAjax.deleteProc(treatmentData.id, targetField, true);
+                return true;
+            } 
+            tnthAjax.deleteProc(treatmentData.id, targetField, true);
         });
     },
     "getProc": function(userId, newEntry, callback) {
@@ -1028,43 +1008,38 @@ var tnthAjax = {
     "postProc": function(userId, toSend, targetField, callback) {
         callback = callback || function() {};
         this.sendRequest("/api/procedure", "POST", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".get-procs-error").html("");
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
-                    $("#userProcuedures .get-procs-error").html(errorMessage);
-                    callback({error: errorMessage});
-                }
-            } else {
+            if (!data) {
                 callback({"error": i18next.t("no data returned")});
+                return false;
             }
+            if (data.error) {
+                var errorMessage = i18next.t("Server error occurred saving procedure/treatment information.");
+                $("#userProcuedures .get-procs-error").html(errorMessage);
+                callback({error: errorMessage});
+                return false;
+            }
+            $(".get-procs-error").html("");
+            callback(data);
         });
     },
     "deleteProc": function(procedureId, targetField, sync) {
         this.sendRequest("/api/procedure/" + procedureId, "DELETE", null, {sync: sync,targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) { $(".del-procs-error").html("");
-                } else {
-                    $(".del-procs-error").html(i18next.t("Server error occurred removing procedure/treatment information."));
-                }
+            if (!data.error) { 
+                $(".del-procs-error").html("");
+            } else {
+                $(".del-procs-error").html(i18next.t("Server error occurred removing procedure/treatment information."));
             }
         });
     },
     "getRoleList": function(params, callback) {
         this.sendRequest("/api/roles", "GET", null, params, function(data) {
             callback = callback || function() {};
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred retrieving roles information.");
-                    $(".get-roles-error").html(errorMessage);
-                    callback({"error": errorMessage});
-                }
+            if (!data.error) {
+                callback(data);
             } else {
-                callback({"error": "No roles list found"});
+                var errorMessage = i18next.t("Server error occurred retrieving roles information.");
+                $(".get-roles-error").html(errorMessage);
+                callback({"error": errorMessage});
             }
         });
     },
@@ -1573,28 +1548,10 @@ var tnthAjax = {
                 callback({"error": i18next.t("no data returned")});
             }
         });
-
-    },
-    "treatmentOptions": function(userId, params, callback) {
-        callback = callback||function() {};
-        this.sendRequest("/patients/treatment-options", "GET", userId, (params || {}), function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred retrieving treatment options.")});
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
-            }
-        });
     },
     "setConfigurationUI": function(configKey, value) {
-        if (configKey) {
-            if ($("#profile_" + configKey).length === 0) {
-                $("body").append("<input type='hidden' id='profile_" + configKey + "' value='" + (value ? value : "") + "'/>");
-            }
-        }
+        if (!configKey || $("#profile_" + configKey).length > 0) { return false; }
+        $("body").append("<input type='hidden' id='profile_" + configKey + "' value='" + (value ? value : "") + "'/>");
     },
     "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
         callback = callback || function() {};
@@ -1895,30 +1852,27 @@ var tnthDates = {
         return convertedDate;
     },
     "getUserTimeZone": function(userId) {
-        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "", userTimeZone = "";
-        if (String(selectVal) === "") {
-            if (userId) {
-                tnthAjax.sendRequest("/api/demographics/" + userId, "GET", userId, {
-                    sync: true
-                }, function(data) {
-                    if (!data.error) {
-                        if (data) {
-                            data.extension.forEach(
-                                function(item) {
-                                    if (item.url === SYSTEM_IDENTIFIER_ENUM.timezone) {
-                                        userTimeZone = item.timezone;
-                                    }
-                                });
-                        }
-                    } else {
-                        userTimeZone = "UTC";
-                    }
-                });
-            }
-        } else {
+        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "", userTimeZone = "UTC";
+        if (String(selectVal) !== "") {
             userTimeZone = selectVal;
+        } else {
+            if (!userId) {
+                return userTimeZone;
+            }
+            tnthAjax.sendRequest("/api/demographics/" + userId, "GET", userId, {
+                sync: true
+            }, function(data) {
+                if (!data.error && data.extension) {
+                    data.extension.forEach(
+                        function(item) {
+                            if (item.url === SYSTEM_IDENTIFIER_ENUM.timezone) {
+                                userTimeZone = item.timezone;
+                            }
+                        });
+                }
+            });
         }
-        return (userTimeZone || "UTC");
+        return userTimeZone;
     },
     "localeSessionKey": "currentUserLocale",
     "clearSessionLocale": function() {
@@ -2054,7 +2008,6 @@ var Global = {
     "loginAs": function() {
         var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
         if (LOGIN_AS_PATIENT) {
-            sessionStorage.clear();
             tnthDates.getUserLocale(true); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
             var historyDefined = typeof history !== "undefined" && history.pushState;
             if (historyDefined) {
@@ -2126,27 +2079,27 @@ var Global = {
     "getNotification": function(callback) {
         callback = callback || function() {};
         var userId = $("#notificationUserId").val();
-        if (userId) {
-            var notificationSessionKey = "notification_" + userId;
-            if (sessionStorage.getItem(notificationSessionKey)) {
-                callback(JSON.parse(sessionStorage.getItem(notificationSessionKey)));
-            } else {
-                $.ajax({
-                    type:"GET",
-                    url: "/api/user/"+userId+"/notification"
-                }).done(function(data) {
-                    if (data) {
-                        callback(data);
-                        sessionStorage.setItem(notificationSessionKey, JSON.stringify(data));
-                    } else {
-                        callback({"error": i18next.t("no data returned")});
-                    }
-                }).fail(function(){
-                    callback({"error": i18next.t("Error occurred retrieving notification.")});
-                });
-            }
-        } else {
+        if (!userId) { 
             callback({"error": i18next.t("User id is required")});
+            return false;
+        }
+        var notificationSessionKey = "notification_" + userId;
+        if (sessionStorage.getItem(notificationSessionKey)) {
+            callback(JSON.parse(sessionStorage.getItem(notificationSessionKey)));
+        } else {
+            $.ajax({
+                type:"GET",
+                url: "/api/user/"+userId+"/notification"
+            }).done(function(data) {
+                if (data) {
+                    callback(data);
+                    sessionStorage.setItem(notificationSessionKey, JSON.stringify(data));
+                } else {
+                    callback({"error": i18next.t("no data returned")});
+                }
+            }).fail(function(){
+                callback({"error": i18next.t("Error occurred retrieving notification.")});
+            });
         }
     },
     "deleteNotification": function(userId, notificationId) {
@@ -2290,10 +2243,11 @@ __i18next.init({"lng": userSetLang
                         }
                     };
                     if (emailVal === "") {
-                        if ($el.attr("data-optional")) { //if email address is optional, update it as is
-                            update($el);
-                            return true;
-                        } else { return false; }
+                        if (!$el.attr("data-optional")) {
+                            return false;
+                        }
+                        update($el); //if email address is optional, update it as is
+                        return true;
                     }
                     var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                     var addUserId = ""; // Add user_id to api call (used on patient_profile page so that staff can edit)

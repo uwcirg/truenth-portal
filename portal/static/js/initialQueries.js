@@ -18,7 +18,6 @@
         this.defaultSections = {};
         this.incompleteFields = [];
         this.dependencies = dependencies || {};
-        this.currentSection = "";
         this.orgTool = null;
 
     };
@@ -60,13 +59,9 @@
 
     FieldsChecker.prototype.initSectionData = function(data) {
         var self = this, sections = self.getSections();
-        var initCount = 0; //note: only populate data for still needed section(s)
         for (var section in sections) {
             if (self.inConfig(sections[section].config, data)) {
-                setTimeout(function() {
-                    self.initData(section);
-                }, 20 * initCount);
-                initCount++;
+                self.initData(section);
             }
         }
     };
@@ -75,7 +70,6 @@
         if (this.mainSections[section] && this.mainSections[section].initData) {
             this.mainSections[section].initData();
         }
-        this.currentSection = section;
     };
 
     FieldsChecker.prototype.getSections = function() {
@@ -157,7 +151,7 @@
                     "bdGroup": {fields: ["#month", "#date", "#year"]}
                 },
                 initData: function() {
-                    tnthAjax.getDemo(self.userId, false, function() {
+                    tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
                         $("#nameGroup").attr("loaded", "true");
                         $("#rolesGroup").attr("loaded", "true");
                         $("#bdGroup").attr("loaded", "true");
@@ -289,23 +283,14 @@
             if (!dataArray) {
                 dataArray = this.CONFIG_REQUIRED_CORE_DATA;
             }
-            if (dataArray) {
-                if (dataArray.length === 0) {
-                    return false;
-                }
-                var found = false;
-                var ma = configMatch.split(",");
-                ma.forEach(function(item) {
-                    dataArray.forEach(function(v) {
-                        if (!found && v === item) {
-                            found = true;
-                        }
-                    });
-                });
-                return found;
-            } else {
-                return true;
-            }
+            if (!dataArray || dataArray.length === 0) { return false; }
+            var found = false;
+            var ma = configMatch.split(",");
+            ma.forEach(function(item) {
+                found = dataArray.indexOf(item) !== -1;
+                if (found) { return true; }
+            });
+            return found;
         }
     };
 
@@ -465,49 +450,47 @@
             }
             for (var id in (this.mainSections[sectionId]).subsections) {
                 var fields = (this.mainSections[sectionId]).subsections[id].fields;
-                if (isComplete && fields) {
-                    fields.forEach(function(field) {
-                        field = $(field);
-                        if (field.length > 0 && (field.attr("skipped") !== "true")) {
-                            var type = field.attr("data-type") || field.attr("type");
-                            switch (String(type).toLowerCase()) {
-                            case "checkbox":
-                            case "radio":
-                                isChecked = false;
-                                field.each(function() {
-                                    if ($(this).is(":checked")) {
-                                        isChecked = true;
-                                    }
-                                    if (hasValue($(this).attr("data-require-validate"))) {
-                                        isComplete = false;
-                                    }
-                                });
-                                if (!(isChecked)) {
-                                    isComplete = false;
-                                }
-                                break;
-                            case "select":
-                                isComplete = field.val() !== "";
-                                break;
-                            case "text":
-                                isComplete = (field.val() !== "") && (field.get(0).validity.valid);
-                                break;
-                            case "terms":
-                                var isAgreed = true;
-                                field.each(function() {
-                                    if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
-                                        isAgreed = false;
-                                    }
-                                });
-                                isComplete = isAgreed;
-                                break;
+                if (!isComplete || !fields) {return isComplete; }
+                fields.forEach(function(field) {
+                    field = $(field);
+                    if (field.length === 0 || field.attr("skipped") === "true") { return true; }
+                    var type = field.attr("data-type") || field.attr("type");
+                    switch (String(type).toLowerCase()) {
+                    case "checkbox":
+                    case "radio":
+                        isChecked = false;
+                        field.each(function() {
+                            if ($(this).is(":checked")) {
+                                isChecked = true;
                             }
-                            if (hasValue(field.attr("data-require-validate"))) {
+                            if (hasValue($(this).attr("data-require-validate"))) {
                                 isComplete = false;
                             }
+                        });
+                        if (!(isChecked)) {
+                            isComplete = false;
                         }
-                    });
-                }
+                        break;
+                    case "select":
+                        isComplete = field.val() !== "";
+                        break;
+                    case "text":
+                        isComplete = (field.val() !== "") && (field.get(0).validity.valid);
+                        break;
+                    case "terms":
+                        var isAgreed = true;
+                        field.each(function() {
+                            if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
+                                isAgreed = false;
+                            }
+                        });
+                        isComplete = isAgreed;
+                        break;
+                    }
+                    if (hasValue(field.attr("data-require-validate"))) {
+                        isComplete = false;
+                    }
+                });
             }
         }
         return isComplete;
@@ -582,23 +565,16 @@
         }
     };
 
-    FieldsChecker.prototype.sectionsLoaded = function(all) {
+    FieldsChecker.prototype.sectionsLoaded = function() {
         var self = this, isLoaded = true, subsectionId;
-        if (!all && hasValue(self.currentSection)) {
-            for (subsectionId in self.mainSections[self.currentSection].subsections) {
+        //check all
+        for (var section in self.mainSections) {
+            if (!self.mainSections.hasOwnProperty(section)) {
+                return false;
+            }
+            for (subsectionId in self.mainSections[section].subsections) {
                 if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
                     isLoaded = false;
-                }
-            }
-        } else {
-            //check all if current section not available
-            for (var section in self.mainSections) {
-                if (self.mainSections.hasOwnProperty(section)) {
-                    for (subsectionId in self.mainSections[section].subsections) {
-                        if (!isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                            isLoaded = false;
-                        }
-                    }
                 }
             }
         }
