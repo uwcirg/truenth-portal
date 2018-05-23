@@ -1275,6 +1275,7 @@ def set_relationships(user_id):
 
 
 @user_api.route('/user/<int:user_id>/email_ready')
+@oauth.require_oauth()
 def email_ready(user_id):
     """See if given user is 'email ready'
 
