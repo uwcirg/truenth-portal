@@ -92,7 +92,7 @@ staging_exclusions = (
     StagingExclusions(
         AuthProviderPersistable, ('user_id', 'provider_id'), None,
         auth_providers_filter),
-    StagingExclusions(Token, 'id', None, service_token_filter)
+    StagingExclusions(Token, 'access_token', None, service_token_filter)
 )
 
 
