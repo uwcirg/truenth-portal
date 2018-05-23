@@ -79,6 +79,7 @@
             currentUserRoles: [],
             userRoles: [],
             userEmailReady: true,
+            userEmailReadyMessage: "",
             mode: "profile",
             demo: { //skeleton
                 data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
@@ -231,7 +232,11 @@
             setUserEmailReady: function(params) {
                 var self = this;
                 this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
+                    if (data.error) {
+                        return false;
+                    }
                     self.userEmailReady = data.ready;
+                    self.userEmailReadyMessage = data.reason || "";
                 });
             },
             isDisableField: function(fieldId) {
