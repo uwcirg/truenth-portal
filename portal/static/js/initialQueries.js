@@ -287,8 +287,8 @@
             var found = false;
             var ma = configMatch.split(",");
             ma.forEach(function(item) {
-                if (found) { return true; }
                 found = dataArray.indexOf(item) !== -1;
+                if (found) { return true; }
             });
             return found;
         }
