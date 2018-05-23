@@ -386,10 +386,12 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # Symptom Tracker QB with incompleted should generate communication
         mock_communication_request('symptom_tracker', '{"days": 30}')
 
+        self.app.config['NO_CHALLENGE_WO_DATA'] = False
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
         self.add_required_clinical_data(backdate=timedelta(days=31))
         self.test_user = db.session.merge(self.test_user)
+        self.test_user.birthdate = '1969-07-16'
 
         # Confirm test user qualifies for ST QB
         self.assertTrue(QuestionnaireBank.qbs_for_user(
