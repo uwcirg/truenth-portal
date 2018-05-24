@@ -21,7 +21,7 @@ var __i18next = window.__i18next = (function() {
                 window.localStorage.removeItem("i18nextLng");
             }
         }
-        var source = options.loadPath ? options.loadPath : "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
+        var source = options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
         var defaultOptions = {
             fallbackLng: "en-US",
             lng: "en-US",
@@ -73,13 +73,13 @@ var __i18next = window.__i18next = (function() {
                     if (options.queryStringParams) {
                         url = addQueryString(url, options.queryStringParams); /* global addQueryString */
                     }
+                    var x;
+                    if (XMLHttpRequest) {
+                        x = new XMLHttpRequest();
+                    } else {
+                        x = new ActiveXObject("MSXML2.XMLHTTP.3.0"); /*global ActiveXObject */
+                    }
                     try {
-                        var x;
-                        if (XMLHttpRequest) {
-                            x = new XMLHttpRequest();
-                        } else {
-                            x = new ActiveXObject("MSXML2.XMLHTTP.3.0"); /*global ActiveXObject */
-                        }
                         //use sync
                         x.open(data ? "POST" : "GET", url, 0);
                         if (!options.crossDomain) {
