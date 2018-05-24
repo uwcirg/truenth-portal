@@ -10,10 +10,10 @@ from tests import (
 import json
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.auth import AuthProvider
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
-from portal.models.organization import OrganizationIdentifier
 from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
@@ -427,4 +427,25 @@ class TestDemographics(TestCase):
             else:
                 self.fail(
                     'unexpected telecom system: {}'.format(item['system']))
+
+    def test_deceased_undead(self):
+        "Confirm we can remove time of death via deceasedBoolean: False"
+        self.promote_user(role_name=ROLE.PATIENT)
+        d_audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, context='user',
+            comment="time of death for user {}".format(TEST_USER_ID))
+        with SessionScope(db):
+            db.session.add(d_audit)
+            db.session.commit()
+        self.test_user, d_audit = map(db.session.merge, (self.test_user, d_audit))
+        self.test_user.deceased = d_audit
+        self.login()
+        data = {"resourceType": "Patient",
+                'deceasedBoolean': False}
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assertTrue(rv.status_code, 200)
+        patient = User.query.get(TEST_USER_ID)
+        self.assertFalse(patient.deceased)
 
