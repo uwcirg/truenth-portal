@@ -59,10 +59,11 @@ var __i18next = window.__i18next = (function() {
                     /*
                      * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
                      */
+                    callback = callback || function() {};
                     if (options.language === "en-US") {
+                        callback();
                         return false;
                     }
-                    callback = callback || function() {};
                     var sessionItemKey = "i18nextData_" + options.language;
                     if (data && (typeof data === "undefined" ? "undefined" : _typeof(data)) === "object") { /*global _typeof */
                         if (!cache) { data["_t"] = new Date();}
@@ -120,9 +121,14 @@ var __i18next = window.__i18next = (function() {
         }
         options.debug = options.debug ? options.debug : (getQueryString.debugi18next ? true : false);
         var configOptions = $.extend({}, defaultOptions, options); /*global $ */
-        i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
-            if (callback) {callback(t);}
-        });
+        var sessionItemKey = "i18nextData_" + options.language;
+        if (sessionStorage.getItem(sessionItemKey)) {
+            callback();
+        } else {
+            i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
+                if (callback) {callback(t);}
+            });
+        }
     }
     return {
         init: function(options, callback) {
