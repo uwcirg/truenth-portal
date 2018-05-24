@@ -35,7 +35,7 @@ class TestSitePersistence(TestCase):
             self.fail("unset environment var PERSISTENCE_DIR for test")
         # Tests currently expect 'gil' version of persistence
         self.app.config['GIL'] = True
-        SitePersistence().import_(keep_unmentioned=False)
+        SitePersistence(target_dir=None).import_(keep_unmentioned=False)
 
     def tearDown(self):
         if hasattr(self, 'tmpfile') and self.tmpfile:
@@ -61,7 +61,7 @@ class TestSitePersistence(TestCase):
 
         # with deep (test) org tree in place, perform a delete by
         # repeating import w/o keep_unmentioned set
-        SitePersistence().import_(keep_unmentioned=False)
+        SitePersistence(target_dir=None).import_(keep_unmentioned=False)
 
     def testP3Pstrategy(self):
         # Prior to meeting conditions in strategy, user shouldn't have access
@@ -189,7 +189,7 @@ class TestEpromsSitePersistence(TestCase):
             self.fail("unset environment var PERSISTENCE_DIR for test")
         # Tests currently expect 'gil' version of persistence
         self.app.config['GIL'] = False
-        SitePersistence().import_(keep_unmentioned=False)
+        SitePersistence(target_dir=None).import_(keep_unmentioned=False)
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""

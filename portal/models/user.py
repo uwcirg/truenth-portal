@@ -1190,7 +1190,12 @@ class User(db.Model, UserMixin):
                              "deceased".format(self.id)), context='user')
                 self.deceased = audit
 
-    def update_from_fhir(self, fhir, acting_user):
+    @classmethod
+    def from_fhir(cls, data):
+        user = cls()
+        return user.update_from_fhir(data)
+
+    def update_from_fhir(self, fhir, acting_user=None):
         """Update the user's demographics from the given FHIR
 
         If a field is defined, it is the final definition for the respective
@@ -1198,9 +1203,11 @@ class User(db.Model, UserMixin):
         that are not included.
 
         :param fhir: JSON defining portions of the user demographics to change
-        :param acting_user: user requesting the change
+        :param acting_user: user requesting the change, used in audit logs
 
         """
+        if not acting_user:
+            acting_user = self
 
         def update_identifiers(fhir):
             """Given FHIR defines identifiers, but we never store implicit
@@ -1276,7 +1283,7 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if ((telecom.email != self.email) and
+                if self.email and ((telecom.email != self.email) and
                         (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
@@ -1293,6 +1300,16 @@ class User(db.Model, UserMixin):
             for e in fhir['extension']:
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
+        if 'id' in fhir:
+            # Only expected during exclusion persistence, otherwise not part
+            # of serial form
+            if self.id and self.id != fhir['id']:
+                raise ValueError(
+                    "unexpected, non-matching 'id' found in FHIR for {}".format(self))
+            self.id = fhir['id']
+
+        return self
+
 
     @classmethod
     def column_names(cls):
@@ -1724,3 +1741,24 @@ class UserRelationship(db.Model):
         """Print friendly format for logging, etc."""
         return "{0.relationship} between {0.user_id} and "\
             "{0.other_user_id}".format(self)
+
+    def as_json(self):
+        """serialize the relationship - used to preserve service users"""
+        d = {'resourceType': 'UserRelationship'}
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+        return d
+
+    @classmethod
+    def from_json(cls, data):
+        user_rel = cls()
+        return user_rel.update_from_json(data)
+
+    def update_from_json(self, data):
+        if 'user_id' not in data or 'other_user_id' not in data:
+            raise ValueError(
+                "required 'user_id' and 'other_user_id' fields not found")
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            setattr(self, attr, data.get(attr))
+        return self

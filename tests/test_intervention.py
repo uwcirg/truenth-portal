@@ -1140,8 +1140,8 @@ class TestEpromsStrategies(TestCase):
                 continue
             mp = ModelPersistence(
                 model_class=model.cls, sequence_name=model.sequence_name,
-                lookup_field=model.lookup_field)
-            mp.import_(keep_unmentioned=False, target_dir=eproms_config_dir)
+                lookup_field=model.lookup_field, target_dir=eproms_config_dir)
+            mp.import_(keep_unmentioned=False)
 
     def test_self_mgmt(self):
         """Patient w/ Southampton org should get access to self_mgmt"""
