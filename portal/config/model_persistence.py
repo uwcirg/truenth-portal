@@ -99,6 +99,20 @@ class ModelPersistence(object):
         self.__verify_header__(data)
         return data
 
+    def __iter__(self):
+        """Iterate over objects in persistence file"""
+        data = self.__read__()
+        for o in data['entry']:
+            if not o.get('resourceType') == self.model.__name__:
+                # Hard code exception for resourceType: Patient being a User
+                if o.get('resourceType') == 'Patient' and self.model.__name__ == 'User':
+                    pass
+                else:
+                    raise ValueError(
+                        "Import {} error, Found unexpected '{}' resource".format(
+                            self.model.__name__, o.get('resourceType')))
+            yield o
+
     def __write__(self, data):
         self.filename = self.persistence_filename()
         if data:
@@ -121,16 +135,7 @@ class ModelPersistence(object):
 
     def import_(self, keep_unmentioned):
         objs_seen = []
-        data = self.__read__()
-        for o in data['entry']:
-            if not o.get('resourceType') == self.model.__name__:
-                # Hard code exception for resourceType: Patient being a User
-                if o.get('resourceType') == 'Patient' and self.model.__name__ == 'User':
-                    pass
-                else:
-                    raise ValueError(
-                        "Import {} error, Found unexpected '{}' resource".format(
-                            self.model.__name__, o.get('resourceType')))
+        for o in self:
             result = self.update(o)
             db.session.commit()
             if hasattr(result, 'id'):
