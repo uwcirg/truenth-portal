@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 
 from flask_webtest import SessionScope
 
-from portal.config.model_persistence import ExclusionPersistence
+from portal.config.exclusion_persistence import ExclusionPersistence
 from portal.config.site_persistence import (
     client_users_filter,
     staging_exclusions,
