@@ -1,4 +1,4 @@
-(function() { 
+(function() {
     var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global hasValue pad __getLoaderHTML $ tnthDates _isTouchDevice*/
         this.attempts = 0;
         this.maxAttempts = 3;
@@ -64,14 +64,11 @@
                 if (self.attempts < self.maxAttempts) {
                     setTimeout ( function() { self.__request( self.params ); } , $.ajaxSetup().retryAfter );
                 } else {
+                    self.attempts = 0;
                     var displayError = i18next.t("Server error occurred updating data.");
                     $("#error_response_text").html(displayError);
-                    errorMessage = "Error processing request: " + params.apiUrl;
-                    errorMessage += ";  response status code: " + (parseInt(xhr.status) === 0 ? "request timed out/network error": xhr.status);
-                    errorMessage +=";  response text: " + (hasValue(xhr.responseText) ? xhr.responseText : "no response text returned from server");
-                    tnthAjax.reportError(self.userId, "/patients/patient-profile-create", errorMessage, true);
-                    self.attempts = 0;
                     (params.callback).call(self, {"error": displayError});
+                    tnthAjax.sendError(xhr, params.apiUrl, self.userId);
                 }
             });
             return errorMessage;
@@ -94,10 +91,8 @@
         this.__setDemo = function(returnedData) {
             var responseData = returnedData && returnedData.data? returnedData.data : null;
             var self = this, SYSTEM_IDENTIFIER_ENUM = this.__getDependency("SYSTEM_IDENTIFIER_ENUM");
-            if (!responseData) {
-                return false;
-            }
-            if (returnedData.error) { //Display Error Here
+
+            if (!responseData || returnedData.error) { //Display Error Here
                 this.__handleError(returnedData.error);
                 this.__handleButton();
                 return false;
@@ -219,7 +214,7 @@
             self.treatmentIntervalVar = setInterval(function() {
                 if (self.counter === self.treatmentCount) {
                     if (hasValue(errorMessage)) {
-                        self.__handleError(errorMessage + i18next.t(" Account created.  Redirecting to profile..."));
+                        self.__handleError(errorMessage + " " + i18next.t("Account created. Redirecting to profile..."));
                         self.__handleButton();
                         /*
                          * redirect to profile since account has been created
@@ -453,7 +448,7 @@
                 }
                 orgs[consentOrgId] = true;
                 var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val() || $("#stock_consent_url").val();
-                agreement = agreement.replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
+                agreement = (agreement||"").replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
                 if (hasValue(agreement)) {
                     var ct = $("#consentDate").val();
                     var consentItem = {};
@@ -470,6 +465,49 @@
             });
             return consents;
         };
+        this.handleEditConsentDate = function() {
+            if ($("#consentDateEditContainer").length === 0) {
+                return;
+            }
+            //default consent date to today's date
+            var today = new Date();
+            var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear()); /*global pad*/
+            var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+            $("#consentDay").val(td);
+            $("#consentMonth").val(tm);
+            $("#consentYear").val(ty);
+            //saving the consent date in GMT - default to today's date
+            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+            if (_isTouchDevice()) {
+                $("#consentDay, #consentYear").each(function() {
+                    $(this).attr("type", "tel");
+                });
+            }
+            $("#consentDay, #consentMonth, #consentYear").on("change", function() {
+                var d = $("#consentDay");
+                var m = $("#consentMonth");
+                var y = $("#consentYear");
+                //get today's date/time
+                var today = new Date();
+                var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
+                var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
+                var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
+                if (isValid) {
+                    /*
+                     * check if date entered is today, if so use today's date/time
+                     */
+                    if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
+                        $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
+                    } else {
+                        //saving the time at 12
+                        $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
+                    }
+                    $("#errorConsentDate").text("").hide();
+                } else {
+                    $("#consentDate").val("");
+                }
+            });
+        }
     };
 
     //events associated with elements on the account creation page
@@ -480,9 +518,10 @@
             roles = [{"name": "staff"}, {"name": "write_only"}];
         }
         /* global i18next, tnthAjax, OrgTool, orgList, leafOrgs, SYSTEM_IDENTIFIER_ENUM */
-        var aco = new AccountCreationObj(roles, {"i18next": i18next, "tnthAjax": tnthAjax, "OrgTool": new OrgTool(), "orgList": orgList, "leafOrgs": leafOrgs, SYSTEM_IDENTIFIER_ENUM: SYSTEM_IDENTIFIER_ENUM}); 
+        var aco = new AccountCreationObj(roles, {"i18next": i18next, "tnthAjax": tnthAjax, "OrgTool": new OrgTool(), "orgList": orgList, "leafOrgs": leafOrgs, SYSTEM_IDENTIFIER_ENUM: SYSTEM_IDENTIFIER_ENUM});
         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
         aco.getOrgs(aco.populateOrgsByRole);
+        aco.handleEditConsentDate();
         $("#createProfileForm .optional-diplay-text").removeClass("tnth-hide");
         $("#createProfileForm .back-button-container").prepend(__getLoaderHTML());
         $("#createProfileForm .save-button-container").prepend(__getLoaderHTML());
@@ -502,8 +541,8 @@
                 $("#erroremail").css("visibility", "hidden");
                 $("#email").val("").attr("disabled", true).removeAttr("required").removeAttr("data-customemail");
                 setTimeout(function() {
-                    $("#erroremail").text(""); 
-                    $("#email").closest("form-group").removeClass("has-error"); 
+                    $("#erroremail").text("");
+                    $("#email").closest("form-group").removeClass("has-error");
                     $("#email").css("border-color", "#ccc");
                 }, 600);
             }
@@ -513,49 +552,6 @@
             }
         });
 
-        if ($("#consentDateEditContainer").length > 0) {
-            //default consent date to today's date
-            var today = new Date();
-            var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
-            var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-            $("#consentDay").val(td);
-            $("#consentMonth").val(tm);
-            $("#consentYear").val(ty);
-            //saving the consent date in GMT
-            //default to today's date
-            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
-            if (_isTouchDevice()) {
-                $("#consentDay, #consentYear").each(function() {
-                    $(this).attr("type", "tel");
-                });
-            }
-            $("#consentDay, #consentMonth, #consentYear").each(function() {
-                $(this).on("change", function() {
-                    var d = $("#consentDay");
-                    var m = $("#consentMonth");
-                    var y = $("#consentYear");
-                    //get today's date/time
-                    var today = new Date();
-                    var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
-                    var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-                    var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
-                    if (isValid) {
-                        /*
-                         * check if date entered is today, if so use today's date/time
-                         */
-                        if (td+tm+ty === (pad(d.val())+pad(m.val())+pad(y.val()))) {
-                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
-                        } else {
-                            //saving the time at 12
-                            $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(y.val(),m.val(),d.val(),12,0,0)));
-                        }
-                        $("#errorConsentDate").text("").hide();
-                    } else {
-                        $("#consentDate").val("");
-                    }
-                });
-            });
-        }
         $("#createProfileForm").on("submit", function (e) {
             if (e.isDefaultPrevented()) {
                 aco.__checkFields(); // handle the invalid form...
