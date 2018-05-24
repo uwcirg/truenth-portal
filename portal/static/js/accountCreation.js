@@ -507,7 +507,7 @@
                     $("#consentDate").val("");
                 }
             });
-        }
+        };
     };
 
     //events associated with elements on the account creation page
