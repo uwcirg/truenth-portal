@@ -10,6 +10,7 @@ from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..database import db
 from .demographics import demographics
 from ..extensions import oauth
 from ..models.identifier import Identifier, UserIdentifier
@@ -179,6 +180,7 @@ def post_patient_deceased(patient_id):
             patient_id))
 
     patient.update_deceased(request.json)
+    db.session.commit()
     return jsonify(patient.as_fhir(include_empties=False))
 
 
