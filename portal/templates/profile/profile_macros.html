@@ -24,6 +24,9 @@
 {% macro saveLoaderDiv(container_id="") -%}
     <div class="load-container save-loader-wrapper"><i id="{{container_id}}_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" aria-hidden="true"></i><i id="{{container_id}}_success" class="fa fa-check success-icon save-info" aria-hidden="true">{{_("Updated")}}</i><i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Update. System error.")}}</i></div>
 {%- endmacro %}
+{% macro emailReadyMessage() -%}
+    <email-ready-message v-bind:message="userEmailReadyMessage"></email-ready-message>
+{%- endmacro %}
 {% macro profileDemo(person, current_user) -%}
     <div class="row" data-profile-section-id="demo">
         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -304,9 +307,7 @@
         <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info"></div>
         <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger"></div>
-        {% raw %}
-            <div class="text-danger" v-show="userEmailReadyMessage">{{userEmailReadyMessage}}</div>
-        {% endraw %}
+        {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
 {% macro profileSendEmail(person) -%}
@@ -344,9 +345,7 @@
         <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
-        {% raw %}
-            <div class="text-danger" v-show="userEmailReadyMessage">{{userEmailReadyMessage}}</div>
-        {% endraw %}
+        {{emailReadyMessage()}}
         <input type="hidden" id="staffRegistrationEmailUrl" value="{{url_for('staff.staff_registration_email', user_id=person.id)}}" />
     </div>
     {%- endif -%}
@@ -464,9 +463,7 @@
     <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
         <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{_("Send email")}}</button>
         <div id="passwordResetMessage" class="text-info"></div>
-        {% raw %}
-            <div class="error-message" v-show="userEmailReadyMessage">{{userEmailReadyMessage}}</div>
-        {% endraw %}
+        {{emailReadyMessage()}}
     </div>
 {%-endmacro %}
 
