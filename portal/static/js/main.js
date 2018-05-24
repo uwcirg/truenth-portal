@@ -722,18 +722,21 @@ var tnthAjax = {
             }
         });
     },
-    "getOrgs": function(userId, sync, callback) {
+    "getOrgs": function(userId, params, callback) {
         callback = callback || function() {};
-        this.sendRequest("/api/organization", "GET", userId, {sync: sync,cache: true}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".get-orgs-error").html("");
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
-                    $(".get-orgs-error").html(errorMessage);
-                    callback({"error": errorMessage});
-                }
+        this.sendRequest("/api/organization", "GET", userId, params, function(data) {
+            if (sessionStorage.demoOrgsData) {
+                callback(JSON.parse(sessionStorage.demoOrgsData));
+                return true;
+            }
+            if (!data.error) {
+                $(".get-orgs-error").html("");
+                sessionStorage.setItem("demoOrgsData", JSON.stringify(data));
+                callback(data);
+            } else {
+                var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
+                $(".get-orgs-error").html(errorMessage);
+                callback({"error": errorMessage});
             }
         });
     },

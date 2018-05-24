@@ -453,6 +453,7 @@
                 $("#loginAsButton, #btnLoginAs").on("click", function(e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    sessionStorage.clear();
                     self.handleLoginAs(e);
                 });
             },

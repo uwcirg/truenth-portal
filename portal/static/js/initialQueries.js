@@ -186,7 +186,7 @@
                 },
                 initData: function() {
                     if (!hasValue($("#iqPatientEditable").val())) { //for patient, clinic is drawn in orgs state selector template
-                        tnthAjax.getOrgs(self.userId, true, function() {
+                        tnthAjax.getOrgs(self.userId, {sync: true}, function() {
                             var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
                             if (userOrgs.length === 0) {
                                 userOrgs = $("#userOrgs input[name='organization']");
