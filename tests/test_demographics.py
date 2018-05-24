@@ -449,4 +449,3 @@ class TestDemographics(TestCase):
         self.assertTrue(rv.status_code, 200)
         patient = User.query.get(TEST_USER_ID)
         self.assertFalse(patient.deceased)
-
