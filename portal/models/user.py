@@ -1156,6 +1156,23 @@ class User(db.Model, UserMixin):
                        "'%Y-%m-%d'".format(fhir['birthDate']))
 
     def update_deceased(self, fhir):
+        # As the update process starts with a complete record of the
+        # current patient and then merges in given fields, it's possible
+        # to land here with conflicting data.  Process boolean first
+        # as it may be clearing a previously set datetime.
+
+        if fhir.get('deceasedBoolean', None) is False and self.deceased_id:
+            # Remove deceased record from the user, but maintain
+            # the old audit row.
+            self.deceased_id = None
+            audit = Audit(
+                user_id=current_user().id,
+                subject_id=self.id, context='user',
+                comment=("Remove existing deceased from "
+                         "user {}".format(self.id)))
+            db.session.add(audit)
+            return  # don't process deceasedDateTime as it is now stale
+
         if 'deceasedDateTime' in fhir:
             dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
                                      error_subject='deceasedDataTime')
@@ -1172,15 +1189,8 @@ class User(db.Model, UserMixin):
         elif 'deceasedBoolean' in fhir:
             if fhir['deceasedBoolean'] is False:
                 if self.deceased_id:
-                    # Remove deceased record from the user, but maintain
-                    # the old audit row.
-                    self.deceased_id = None
-                    audit = Audit(
-                        user_id=current_user().id,
-                        subject_id=self.id, context='user',
-                        comment=("Remove existing deceased from "
-                                 "user {}".format(self.id)))
-                    db.session.add(audit)
+                    raise ValueError(
+                        "logic error, deceased_id and false deceasedBoolean")
             else:
                 # still marked with an audit, but without the special
                 # comment syntax and using default (current) time.
