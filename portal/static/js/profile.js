@@ -12,6 +12,10 @@
             "section-view-extension": {
                 props: ["data", "nodatatext"],
                 template: "<div v-if='data'><p v-for='item in data'>{{item.display}}</p></div><div class='text-muted' v-else>{{nodatatext}}</div>"
+            },
+            "email-ready-message": {
+                props: ['message'],
+                template: "<div class='text-warning email-ready-message' v-show='message'><span class='glyphicon glyphicon-alert warning' aria-hidden='true'></span>{{message}}</div>"
             }
         },
         errorCaptured: function(Error, Component, info) {
