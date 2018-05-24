@@ -123,7 +123,7 @@ var __i18next = window.__i18next = (function() {
         var configOptions = $.extend({}, defaultOptions, options); /*global $ */
         var sessionItemKey = "i18nextData_" + options.language;
         if (sessionStorage.getItem(sessionItemKey)) {
-            callback();
+            if (callback) { callback(); }
         } else {
             i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
                 if (callback) {callback(t);}
