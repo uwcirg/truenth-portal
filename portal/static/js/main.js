@@ -2222,7 +2222,7 @@ __i18next.init({"lng": userSetLang
         if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
-            loader(true); /*global loader*/
+            loader(true); /*global loader showMain hideLoader*/
             try {
                 Global.initPortalWrapper(PORTAL_NAV_PAGE);
             } catch(e) {
