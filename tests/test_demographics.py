@@ -442,9 +442,10 @@ class TestDemographics(TestCase):
         self.login()
         data = {"resourceType": "Patient",
                 'deceasedBoolean': False}
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(data))
         self.assertTrue(rv.status_code, 200)
         patient = User.query.get(TEST_USER_ID)
         self.assertFalse(patient.deceased)
