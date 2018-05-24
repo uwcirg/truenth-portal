@@ -287,8 +287,8 @@
             var found = false;
             var ma = configMatch.split(",");
             ma.forEach(function(item) {
+                if (found) { return true; } /* IMPORTANT, immediately return true. without checking this item, this is in the context of the loop, the sequence matters here, loop still continues*/
                 found = dataArray.indexOf(item) !== -1;
-                if (found) { return true; }
             });
             return found;
         }
