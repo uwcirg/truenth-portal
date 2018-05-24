@@ -522,7 +522,7 @@
                     if (!sectionsInitialized[sectionId]) {
                         setTimeout(function() {
                             self.initSection(sectionId);
-                        }, initCount += 50);
+                        }, initCount += 20);
                         sectionsInitialized[sectionId] = true;
                     }
                 });
