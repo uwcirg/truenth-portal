@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 from portal.models.auth import AuthProvider, create_service_token, Token
 from portal.config.site_persistence import (
     staging_exclusions, client_users_filter)
-from portal.config.model_persistence import ExclusionPersistence
+from portal.config.exclusion_persistence import ExclusionPersistence
 from portal.database import db
 from portal.models.client import Client
 from portal.models.intervention import Intervention, INTERVENTION

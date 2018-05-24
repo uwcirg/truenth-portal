@@ -4,6 +4,7 @@ from flask import current_app
 
 from .config_persistence import export_config, import_config
 from ..database import db
+from .exclusion_persistence import ExclusionPersistence
 from ..models.app_text import AppText
 from ..models.auth import AuthProviderPersistable, Token
 from ..models.client import Client
@@ -20,7 +21,7 @@ from ..models.relationship import Relationship, RELATIONSHIP
 from ..models.role import Role, ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import User, UserRelationship, UserRoles
-from .model_persistence import ExclusionPersistence, ModelPersistence
+from .model_persistence import ModelPersistence
 
 
 # NB - order MATTERS, as any type depending on another must find
