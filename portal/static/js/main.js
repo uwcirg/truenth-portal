@@ -2004,7 +2004,13 @@ var Global = {
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
         sendRequest(PORTAL_NAV_PAGE, false, function(data) { /*global sendRequest */
-            if (data.error) { return false; }
+            if (!data || data.error) { 
+                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+                showMain();
+                hideLoader();
+                callback(); 
+                return false;
+            }
             embed_page(data);
             setTimeout(function() {
                 $("#tnthNavWrapper .logout").on("click", function(event) {
@@ -2217,7 +2223,13 @@ __i18next.init({"lng": userSetLang
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
             loader(true); /*global loader*/
-            Global.initPortalWrapper(PORTAL_NAV_PAGE);
+            try {
+                Global.initPortalWrapper(PORTAL_NAV_PAGE);
+            } catch(e) {
+                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+                showMain();
+                hideLoader();
+            }            
         } else { loader();  }
         tnthAjax.beforeSend();
         Global.footer();
