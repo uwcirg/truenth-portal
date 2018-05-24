@@ -232,22 +232,31 @@ def next_after_login():
         current_app.logger.debug("next_after_login: [no state] -> home")
         resp = redirect('/home')
 
-    # make cookie max_age outlast the browser session
-    max_age = 60 * 60 * 24 * 365 * 5
-    # set timeout cookies
-    if session.get('login_as_id'):
-        if request.cookies.get('SS_TIMEOUT'):
-            resp.set_cookie('SS_TIMEOUT_REVERT',
-                            request.cookies['SS_TIMEOUT'],
+    def update_timeout():
+        # make cookie max_age outlast the browser session
+        max_age = 60 * 60 * 24 * 365 * 5
+        # set timeout cookies
+        if session.get('login_as_id'):
+            if request.cookies.get('SS_TIMEOUT'):
+                resp.set_cookie('SS_TIMEOUT_REVERT',
+                                request.cookies['SS_TIMEOUT'],
+                                max_age=max_age)
+            resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
+        elif request.cookies.get('SS_TIMEOUT_REVERT'):
+            resp.set_cookie('SS_TIMEOUT',
+                            request.cookies['SS_TIMEOUT_REVERT'],
                             max_age=max_age)
-        resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
-    elif request.cookies.get('SS_TIMEOUT_REVERT'):
-        resp.set_cookie('SS_TIMEOUT',
-                        request.cookies['SS_TIMEOUT_REVERT'],
-                        max_age=max_age)
-        resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
-    else:
-        resp.set_cookie('SS_TIMEOUT', '', expires=0)
+            resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
+        else:
+            # TODO determine if this line should stay - it seems it
+            # would clear a value potentially set on the browser via
+            # /settings
+            resp.set_cookie('SS_TIMEOUT', '', expires=0)
+
+    ready_for_login_as_timeout = False
+    if ready_for_login_as_timeout:
+        update_timeout()
+
     return resp
 
 
