@@ -233,7 +233,11 @@ def configure_logging(app):  # pragma: no cover
         sql_log.addHandler(sql_file_handler)
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
-    from ..tasks import logger as task_logger
+
+    task_logger = logging.NullHandler()
+    if not app.testing:
+        from ..tasks import logger as task_logger
+
     task_logger.setLevel(level)
     app.logger.setLevel(level)
 
