@@ -2404,6 +2404,7 @@
                     var self = this;
                     var orgTool = this.getOrgTool();
                     var orgsList = orgTool.getOrgsList();
+                    var i18next = self.modules.i18next;
                     var capitalize = function(str) {
                         return str.replace(/\w\S*/g, function(txt) {
                             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -2419,10 +2420,10 @@
                                     item.truenth_name = i18next.t("TrueNTH USA");
                                     item.accepted = self.modules.tnthDates.formatDateString(item.accepted); //format to accepted format D m y
                                     item.display_type = capitalize($.trim((item.type).toLowerCase().replace("subject", ""))); //for displaying consent type, note: this will remove text 'subject' from being displayed
-                                    item.eproms_agreement_text = i18next.t("Agreed to {documentType}").replace("{documentType}", capitalize(item.display_type));
+                                    item.eproms_agreement_text = String(i18next.t("Agreed to {documentType}")).replace("{documentType}", capitalize(item.display_type));
                                     item.truenth_agreement_text = i18next.t("Agreed to terms");
                                     item.eproms_url_text = i18next.t(item.display_type);
-                                    item.truenth_url_text = (i18next.t("{projectName} Terms of Use").replace("{projectName}", "TrueNTH USA"));
+                                    item.truenth_url_text = (String(i18next.t("{projectName} Terms of Use")).replace("{projectName}", "TrueNTH USA"));
                                     item.view = i18next.t("View");
                                     item.type = fType;
                                     self.consent.touObj.push(item);

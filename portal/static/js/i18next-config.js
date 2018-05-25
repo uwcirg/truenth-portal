@@ -43,6 +43,7 @@ var __i18next = window.__i18next = (function() {
                 }
                 try {
                     var data = JSON.parse(sessionData);
+
                     if (data && data.hasOwnProperty(key)) {
                         return data[key];
                     }
@@ -122,11 +123,14 @@ var __i18next = window.__i18next = (function() {
         options.debug = options.debug ? options.debug : (getQueryString.debugi18next ? true : false);
         var configOptions = $.extend({}, defaultOptions, options); /*global $ */
         var sessionItemKey = "i18nextData_" + options.language;
-        if (sessionStorage.getItem(sessionItemKey)) {
-            if (callback) { callback(); }
+        callback = callback || function() {};
+        if (sessionStorage.getItem(sessionItemKey)) { //still need to initialize i18next but skip call to backend
+            i18next.init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
+                callback(t);
+            });
         } else {
             i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
-                if (callback) {callback(t);}
+                callback(t);
             });
         }
     }
