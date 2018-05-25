@@ -260,8 +260,8 @@ def configure_logging(app):  # pragma: no cover
         app.logger.addHandler(mail_handler)
         task_logger.addHandler(mail_handler)
 
-    if app.testing or not app.config.get('LOG_FOLDER'):
-        # Write logs to stdout by default and when testing
+    if not app.config.get('LOG_FOLDER'):
+        # Write logs to stdout if LOG_FOLDER not set (default)
         return
 
     # Configure Error Emails for high level log messages, only in prod mode
