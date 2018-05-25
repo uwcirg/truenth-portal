@@ -23,7 +23,7 @@ var __i18next = window.__i18next = (function() {
         }
         var source = options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
         var defaultOptions = {
-            fallbackLng: "en-US",
+            fallbackLng: "",
             lng: "en-US",
             preload: false,
             debug: false,
@@ -43,6 +43,7 @@ var __i18next = window.__i18next = (function() {
                 }
                 try {
                     var data = JSON.parse(sessionData);
+
                     if (data && data.hasOwnProperty(key)) {
                         return data[key];
                     }
@@ -60,10 +61,6 @@ var __i18next = window.__i18next = (function() {
                      * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
                      */
                     callback = callback || function() {};
-                    if (options.language === "en-US") {
-                        callback();
-                        return false;
-                    }
                     var sessionItemKey = "i18nextData_" + options.language;
                     if (data && (typeof data === "undefined" ? "undefined" : _typeof(data)) === "object") { /*global _typeof */
                         if (!cache) { data["_t"] = new Date();}
@@ -122,11 +119,15 @@ var __i18next = window.__i18next = (function() {
         options.debug = options.debug ? options.debug : (getQueryString.debugi18next ? true : false);
         var configOptions = $.extend({}, defaultOptions, options); /*global $ */
         var sessionItemKey = "i18nextData_" + options.language;
-        if (sessionStorage.getItem(sessionItemKey)) {
-            if (callback) { callback(); }
+        callback = callback || function() {};
+        if (String(options.lng).toLowerCase() === "en-us" || sessionStorage.getItem(sessionItemKey)) { 
+            //still need to initialize i18next but skip call to backend
+            i18next.init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
+                callback(t);
+            });
         } else {
             i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
-                if (callback) {callback(t);}
+                callback(t);
             });
         }
     }

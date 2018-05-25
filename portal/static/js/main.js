@@ -467,7 +467,7 @@ var tnthAjax = {
         callback = callback || function() {};
         params.attempts++;
         fieldHelper.showLoader(targetField);
-        if (params.useWorker && window.Worker) {
+        if (params.useWorker && window.Worker && !_isTouchDevice()) { /*global _isTouchDevice()*/
             initWorker(url, params, function(result) { /*global initWorker*/
                 var data;
                 try {
@@ -614,7 +614,7 @@ var tnthAjax = {
         }
         var __url = "/api/coredata/user/" + userId + "/still_needed" + (entry_method ? "?entry_method=" + (entry_method).replace(/\_/g, " ") : "");
         this.sendRequest(__url, "GET", userId, {sync: sync,cache: true}, function(data) {
-            if (!data) { 
+            if (!data) {
                 callback({"error": i18next.t("no data returned")});
                 return false;
             }
@@ -998,7 +998,7 @@ var tnthAjax = {
             if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
                 tnthAjax.deleteProc(treatmentData.id, targetField, true);
                 return true;
-            } 
+            }
             tnthAjax.deleteProc(treatmentData.id, targetField, true);
         });
     },
@@ -1027,7 +1027,7 @@ var tnthAjax = {
     },
     "deleteProc": function(procedureId, targetField, sync) {
         this.sendRequest("/api/procedure/" + procedureId, "DELETE", null, {sync: sync,targetField: targetField}, function(data) {
-            if (!data.error) { 
+            if (!data.error) {
                 $(".del-procs-error").html("");
             } else {
                 $(".del-procs-error").html(i18next.t("Server error occurred removing procedure/treatment information."));
@@ -2004,11 +2004,11 @@ var Global = {
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
         sendRequest(PORTAL_NAV_PAGE, false, function(data) { /*global sendRequest */
-            if (!data || data.error) { 
+            if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
                 showMain();
                 hideLoader();
-                callback(); 
+                callback();
                 return false;
             }
             embed_page(data);
@@ -2098,7 +2098,7 @@ var Global = {
     "getNotification": function(callback) {
         callback = callback || function() {};
         var userId = $("#notificationUserId").val();
-        if (!userId) { 
+        if (!userId) {
             callback({"error": i18next.t("User id is required")});
             return false;
         }
@@ -2229,7 +2229,7 @@ __i18next.init({"lng": userSetLang
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
                 showMain();
                 hideLoader();
-            }            
+            }
         } else { loader();  }
         tnthAjax.beforeSend();
         Global.footer();
