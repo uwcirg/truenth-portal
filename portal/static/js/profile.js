@@ -464,7 +464,6 @@
             initEditButtons: function() {
                 var self = this;
                 $("#profileForm .profile-item-edit-btn").each(function() {
-                    $(this).val(i18next.t("EDIT"));
                     $(this).on("click", function(e) {
                         e.preventDefault();
                         var container = $(this).closest(".profile-item-container");

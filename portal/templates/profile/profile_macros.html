@@ -10,7 +10,7 @@
     </div>
 {%- endmacro %}
 {% macro profileEditButton(class="") -%}
-    <input type="button" class="btn profile-item-edit-btn {{class}}" value="{{_('Edit')}}" aria-label="{{_('Edit Button')}}"></input>
+    <input type="button" class="btn profile-item-edit-btn {{class}}" value='{{_("Edit")}}' aria-label='{{_("Edit Button")}}'></input>
 {%- endmacro %}
 {% macro titleSection(id="", class="") -%}
     <h4 id="{%-if id -%}{{id}}{%- endif -%}" class="profile-item-title index-item {{class}}">{{caller()}}</h4>
