@@ -16,8 +16,8 @@ from .app_text import AppText
 from ..extensions import babel
 from .intervention import Intervention
 from .organization import Organization
+from .research_protocol import ResearchProtocol
 from .user import current_user
-
 
 def get_db_strings():
     msgid_map = defaultdict(set)
@@ -25,6 +25,7 @@ def get_db_strings():
         AppText: ('custom_text',),
         Intervention: ('description', 'card_html'),
         Organization: ('name',),
+        ResearchProtocol: ('name',),
     }
 
     for model, fields in i18n_fields.items():
