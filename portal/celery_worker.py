@@ -11,6 +11,7 @@ Launch in the same virtual environment via
 
 """
 from .database import db
+from config.config import TestConfig
 from factories.celery import create_celery
 from factories.app import create_app
 from .models.scheduled_job import ScheduledJob
@@ -20,6 +21,11 @@ import tasks
 app = create_app()
 celery = create_celery(app)
 app.app_context().push()
+
+# celery app for testing
+test_app = create_app(TestConfig)
+test_celery = create_celery(test_app)
+test_app.app_context().push()
 
 
 @celery.on_after_configure.connect
