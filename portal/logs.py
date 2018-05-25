@@ -47,3 +47,4 @@ class SSLSMTPHandler(SMTPHandler):
             raise
         except:
             self.handleError(record)
+            raise
