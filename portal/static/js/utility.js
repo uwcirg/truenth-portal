@@ -173,7 +173,7 @@ function initWorker(url, params, callback) {
     }, false);
 }
 function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */
-    if (window.Worker) {
+    if (window.Worker && !_isTouchDevice()) {
         initWorker(url, params, callback);
     } else {
         var isIE = getIEVersion();
