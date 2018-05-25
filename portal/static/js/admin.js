@@ -201,6 +201,11 @@
                             $("html, body").animate({  scrollTop: $(".fixed-table-toolbar").offset().top}, 2000);
                         }
                     });
+                    $(window).bind("scroll mousedown mousewheel keyup", function() {
+                        if ($("html, body").is(":animated")) {
+                            $("html, body").stop(true, true);
+                        }
+                    });
                 }
                 if(this.sortFilterEnabled) {
                     $("#adminTable").on("sort.bs.table", function(e, name, order) {
@@ -216,7 +221,7 @@
                 var self = this;
                 $("#adminTableContainer .btn-report").on("click", function(e) {
                     e.stopPropagation();
-                    self.getReportModal($(this).attr("data-patient-id"), $(this).attr("data-document-type"));
+                    self.getReportModal($(this).attr("data-patient-id"), {documentDataType:$(this).attr("data-document-type")});
                 });
                 $("#adminTableContainer .btn-delete-user").off("click").on("click", function(e) {
                     e.stopPropagation();
@@ -558,10 +563,11 @@
                     this.currentTablePreference = data;
                 }
             },
-            getReportModal: function(patientId, documentType, options) {
+            getReportModal: function(patientId, options) {
                 $("#patientReportModal").modal("show");
                 this.patientReports.loading = true;
                 var self = this, tnthDates = self.getDependency("tnthDates"), tnthAjax = self.getDependency("tnthAjax");
+                options = options || {};
                 tnthAjax.patientReport(patientId, options, function(data) {
                     self.patientReports.data = [];
                     if (!data || data.error) {
@@ -576,7 +582,7 @@
                         documents.forEach(function(item) {
                             var c = item["contributor"];
                             if(!existingItems[c] && hasValue(c)) { //only draw the most recent, same report won't be displayed
-                                if(documentType && String(documentType).toLowerCase() !== String(c).toLowerCase()) {
+                                if(options.documentDataType && String(options.documentDataType).toLowerCase() !== String(c).toLowerCase()) {
                                     return false;
                                 }
                                 self.patientReports.data.push({
