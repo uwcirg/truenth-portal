@@ -7,7 +7,7 @@ the flask background tasks to run.
 
 Launch in the same virtual environment via
 
-  $ celery worker -A portal.celery_worker.celery --loglevel=info
+  $ celery worker --app portal.celery_worker.celery --loglevel info
 
 """
 from .database import db
@@ -20,11 +20,6 @@ from .models.scheduled_job import ScheduledJob
 app = create_app()
 celery = create_celery(app)
 app.app_context().push()
-
-# celery app for testing
-test_app = create_app(TestConfig)
-test_celery = create_celery(test_app)
-test_app.app_context().push()
 
 
 @celery.on_after_configure.connect
