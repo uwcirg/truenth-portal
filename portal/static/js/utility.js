@@ -74,6 +74,9 @@ function loader(show) {
         }
     }
 }
+function _isTouchDevice() {
+    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch);
+}
 // populate portal banner content
 function embed_page(data) {
     $("#mainNav").html(data);
@@ -202,18 +205,6 @@ function appendLREditContainer(target, url, show) { /*global i18next */
 }
 function __getLoaderHTML(message) {
     return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message) ? "&nbsp;" + message : "") + '</div>';
-}
-function _isTouchDevice() {
-    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch);
-}
-function __convertToNumericField(field) {
-    if (field) {
-        if (_isTouchDevice()) {
-            field.each(function() {
-                $(this).prop("type", "tel");
-            });
-        }
-    }
 }
 function isString(obj) {
     return (Object.prototype.toString.call(obj) === "[object String]");

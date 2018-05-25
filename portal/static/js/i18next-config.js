@@ -23,7 +23,7 @@ var __i18next = window.__i18next = (function() {
         }
         var source = options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
         var defaultOptions = {
-            fallbackLng: "en-US",
+            fallbackLng: "",
             lng: "en-US",
             preload: false,
             debug: false,
@@ -61,10 +61,6 @@ var __i18next = window.__i18next = (function() {
                      * default code from i18nextBackend.js, but modify it to allow sync loading of resources and add session storage
                      */
                     callback = callback || function() {};
-                    if (options.language === "en-US") {
-                        callback();
-                        return false;
-                    }
                     var sessionItemKey = "i18nextData_" + options.language;
                     if (data && (typeof data === "undefined" ? "undefined" : _typeof(data)) === "object") { /*global _typeof */
                         if (!cache) { data["_t"] = new Date();}
@@ -124,7 +120,8 @@ var __i18next = window.__i18next = (function() {
         var configOptions = $.extend({}, defaultOptions, options); /*global $ */
         var sessionItemKey = "i18nextData_" + options.language;
         callback = callback || function() {};
-        if (sessionStorage.getItem(sessionItemKey)) { //still need to initialize i18next but skip call to backend
+        if (String(options.lng).toLowerCase() === "en-us" || sessionStorage.getItem(sessionItemKey)) { 
+            //still need to initialize i18next but skip call to backend
             i18next.init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
                 callback(t);
             });
