@@ -63,6 +63,9 @@ var SessionMonitorObj = function() {
                     onbeforetimeout: function() {},
                     ontimeout: function() {
                       window.location.href = l.timeoutUrl;
+                      if (typeof(sessionStorage) !== "undefined") {
+                        sessionStorage.clear();
+                      }
                     }
                   };
 
