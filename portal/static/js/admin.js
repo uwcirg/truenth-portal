@@ -216,7 +216,7 @@
                 var self = this;
                 $("#adminTableContainer .btn-report").on("click", function(e) {
                     e.stopPropagation();
-                    self.getReportModal($(this).attr("data-patient-id"));
+                    self.getReportModal($(this).attr("data-patient-id"), $(this).attr("data-document-type"));
                 });
                 $("#adminTableContainer .btn-delete-user").off("click").on("click", function(e) {
                     e.stopPropagation();
@@ -558,7 +558,7 @@
                     this.currentTablePreference = data;
                 }
             },
-            getReportModal: function(patientId, options) {
+            getReportModal: function(patientId, documentType, options) {
                 $("#patientReportModal").modal("show");
                 this.patientReports.loading = true;
                 var self = this, tnthDates = self.getDependency("tnthDates"), tnthAjax = self.getDependency("tnthAjax");
@@ -576,6 +576,9 @@
                         documents.forEach(function(item) {
                             var c = item["contributor"];
                             if(!existingItems[c] && hasValue(c)) { //only draw the most recent, same report won't be displayed
+                                if(documentType && String(documentType).toLowerCase() !== String(c).toLowerCase()) {
+                                    return false;
+                                }
                                 self.patientReports.data.push({
                                     contributor: item.contributor,
                                     fileName: item.filename,
