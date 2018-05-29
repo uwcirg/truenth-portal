@@ -5,9 +5,9 @@ from tempfile import mkdtemp
 
 from flask_webtest import SessionScope
 
-from portal.config.exclusion_persistence import ExclusionPersistence
-from portal.config.site_persistence import (
+from portal.config.exclusion_persistence import (
     client_users_filter,
+    ExclusionPersistence,
     staging_exclusions,
 )
 from portal.database import db
@@ -192,3 +192,39 @@ class TestExclusionPersistence(TestCase):
         self.assertEqual(AuthProvider.query.count(), 1)
         self.assertEqual(Token.query.count(), 1)
         self.assertEqual(UserRelationship.query.count(), 1)
+
+
+    def test_preflight_valid(self):
+        # setup pre-flight conditions expected to pass
+        ds_p3p = INTERVENTION.decision_support_p3p
+        ds_client = Client(
+            client_id='12345', client_secret='54321', user_id=TEST_USER_ID,
+            intervention=ds_p3p, _redirect_uris='http://testsite.org',
+            callback_url='http://callback.one')
+        service = self.add_service_user(sponsor=self.test_user)
+
+        with SessionScope(db):
+            db.session.add(ds_client)
+            db.session.commit()
+
+        ds_client = db.session.merge(ds_client)
+        service = db.session.merge(service)
+        create_service_token(client=ds_client, user=service)
+
+        # Export
+        for model in staging_exclusions:
+            ex = ExclusionPersistence(
+                model_class=model.cls, lookup_field=model.lookup_field,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
+                target_dir=self.tmpdir)
+            ex.export()
+
+        self.assertEqual(Token.query.count(), 1)
+
+        # Delete service account, expect it to return
+        with SessionScope(db):
+            db.session.delete(service)
+            db.session.commit()
+
+        self.assertEqual(Token.query.count(), 0)
