@@ -1,4 +1,97 @@
+from collections import namedtuple
+
 from .model_persistence import ModelPersistence, require
+from ..models.auth import AuthProviderPersistable, Token
+from ..models.client import Client
+from ..models.intervention import Intervention
+from ..models.relationship import Relationship, RELATIONSHIP
+from ..models.role import Role, ROLE
+from ..models.user import User, UserRelationship, UserRoles
+
+
+# StagingExclusions capture details exclusive of a full db overwrite
+# that are to be restored *after* db migration.  For example, when
+# bringing the production db to staging, retain the staging
+# config for interventions, application_developers and service users
+
+def auth_providers_filter():
+    """Return query restricted to application developer users"""
+    return (
+        AuthProviderPersistable.query.join(User).join(UserRoles).join(
+            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
+
+
+def client_users_filter():
+    """Return query restricted to service users and those with client FKs"""
+    return (
+        User.query.join(Client).union(User.query.join(UserRoles).join(
+            Role).filter(Role.name == ROLE.SERVICE)))
+
+
+def relationship_filter():
+    """Return query restricted to sponsor relationships (service users) """
+    return UserRelationship.query.join(Relationship).filter(
+        Relationship.name == RELATIONSHIP.SPONSOR)
+
+
+def service_token_filter():
+    """Return query restricted to tokens owned by service users"""
+    return Token.query.join(User).join(UserRoles).join(Role).filter(
+        Role.name == ROLE.SERVICE)
+
+
+StagingExclusions = namedtuple(
+    'StagingExclusions',
+    ['cls', 'lookup_field', 'limit_to_attributes', 'filter_query'])
+staging_exclusions = (
+    StagingExclusions(Client, 'client_id', None, None),
+    StagingExclusions(Intervention, 'name', ['link_url'], None),
+    StagingExclusions(
+        User, 'id', ['telecom', 'password'], client_users_filter),
+    StagingExclusions(
+        UserRelationship, ('user_id', 'other_user_id'), None,
+        relationship_filter),
+    StagingExclusions(
+        AuthProviderPersistable, ('user_id', 'provider_id'), None,
+        auth_providers_filter),
+    StagingExclusions(Token, 'access_token', None, service_token_filter)
+)
+
+
+def preflight(target_dir):
+    """Confirm database meets expectations prior to replacing data
+
+    For exclusion persistence, rather than supporting the complexity of
+    changing users, intervention owners, etc., confirm the local database
+    contains any expectations before overwriting with persistence files
+
+    :raises ValueError: if problems are discovered
+    :returns: True if all clear
+
+    """
+    def persistence_by_type(cls):
+        """Helper to pull details by type and return persistence instance"""
+        ex_by_cls = [ex for ex in staging_exclusions if ex.cls == cls]
+        if len(ex_by_cls) != 1:
+            raise ValueError(
+                "Expected exactly ONE but found {} staging_exclusions "
+                "for {}".format(len(ex_by_cls), cls.__name__))
+
+        for model in ex_by_cls:
+            ex = ExclusionPersistence(
+                model_class=model.cls, lookup_field=model.lookup_field,
+                limit_to_attributes=model.limit_to_attributes,
+                filter_query=model.filter_query,
+                target_dir=target_dir)
+            return ex
+
+    # 1.) user_id associated with an intervention/client is the same
+    intervention_persistence = persistence_by_type(Intervention)
+    intervention_clients = {}
+    for i in intervention_persistence:
+        intervention_clients[i.name] = i.client_id
+
+    return True
 
 
 class ExclusionPersistence(ModelPersistence):
