@@ -55,9 +55,7 @@ class BaseConfig(object):
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
     MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
-    ERROR_SENDTO_EMAIL = os.environ.get(
-        'ERROR_SENDTO_EMAIL',
-        'truenth-wsgi-app-errors@mailman.cirg.washington.edu')
+    ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
 
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
