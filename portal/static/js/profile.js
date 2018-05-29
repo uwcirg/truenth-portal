@@ -22,11 +22,21 @@
             console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
             return false;
         },
+        errorHandler: function (err, vm) {
+            this.dataError = true;
+            var errorElement = document.getElementById("profileErrorMessage");
+            if (errorElement) {
+                errorElement.innerHTML = "Error occurred initializing Admin Vue instance.";
+            }
+            console.warn("Profile Vue instance threw an error: ", vm, this);
+            console.error("Error thrown: ", err);
+        },
         created: function() {
             var self = this;
+            VueErrorHandling(); /*global VueErrorHandling */
             this.registerDependencies();
-            this.setUserSettings();
             this.onBeforeSectionsLoad();
+            this.setUserSettings();
             this.initStartTime = new Date();
             this.initChecks.push({done: false});
             this.setDemoData({useWorker: true}, function() {

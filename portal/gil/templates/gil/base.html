@@ -8,6 +8,7 @@
       <title>{%- block title -%}{{_("TrueNTH")}}{%- endblock -%}</title>
       <meta name="description" content="">
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
       <link rel="apple-touch-icon" href="apple-touch-icon.png">
       <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
@@ -325,6 +326,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     <script src="{{url_for('static', filename='js/gil.js') }}" defer></script>
 {% endblock %} <!-- end block footer -->

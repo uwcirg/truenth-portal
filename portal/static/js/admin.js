@@ -7,12 +7,22 @@
             console.error("Error: ", Error, " Component: ", Component, " Message: ", info); /* console global */
             return false;
         },
+        errorHandler: function (err, vm) {
+            this.dataError = true;
+            var errorElement = document.getElementById("admin-table-error-message");
+            if (errorElement) {
+                errorElement.innerHTML = "Error occurred initializing Admin Vue instance.";
+            }
+            console.warn("Admin Vue instance threw an error: ", vm, this);
+            console.error("Error thrown: ", err);
+        },
         created: function() {
             this.injectDependencies();
             this.getOrgTool();
         },
         mounted: function() {
             var self = this;
+            VueErrorHandling(); /* global VueErrorHandling */
             this.preConfig(function() {
                 if ($("#adminTable").length > 0) {
                     self.rowLinkEvent();
@@ -30,6 +40,7 @@
             });
         },
         data: {
+            dataError: false,
             configured: false,
             initIntervalId: 0,
             sortFilterEnabled: false,

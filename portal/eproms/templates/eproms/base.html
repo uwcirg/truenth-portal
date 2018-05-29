@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
         <link rel="stylesheet" href="{{ url_for('.static', filename='css/eproms.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+        <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
     </head>
 {% endblock %}
 {# sets container to full-width #}
@@ -37,6 +38,9 @@
           <div class="container{% if splashView %}-fluid{% endif %}">
             <div class="row">
                 <div class="col-xs-12 {% if not wideContainer %}col-lg-12{% endif %}">
+                    <!--[if lt IE 10]>
+                      <div class="error-message text-center" style="background: #FFF; padding: 10px;"><h2>{{_("You are using an outdated browser. Please upgrade your browser to improve your experience.")}}</h2></div>
+                    <!--<![endif]-->
                     {% block main -%}
                     {%- endblock %}
                 </div>
@@ -92,9 +96,12 @@
     {% endblock %}
     <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
+<script src="{{ url_for('static', filename='js/utility.js') }}"></script>
+<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.min.js" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.9.0/validator.min.js"></script>
@@ -105,9 +112,6 @@
     <!-- production version, optimized for size and speed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 {% endif %}
-<script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
-<script src="{{ url_for('static', filename='js/utility.js') }}"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
 <script>
 {% block document_ready -%}

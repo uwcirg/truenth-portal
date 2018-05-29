@@ -80,7 +80,9 @@ function _isTouchDevice() {
 // populate portal banner content
 function embed_page(data) {
     $("#mainNav").html(data);
-    loader();
+    setTimeout(function() {
+        loader();
+    }, 0);
 }
 function getIEVersion() {
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
@@ -263,34 +265,71 @@ function capitalize(str) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
-var __winHeight = $(window).height(), __winWidth = $(window).width();
-$.fn.isOnScreen = function() {
-    var viewport = {};
-    viewport.top = $(window).scrollTop();
-    viewport.bottom = viewport.top + __winHeight;
-    var bounds = {};
-    bounds.top = this.offset().top;
-    bounds.bottom = bounds.top + this.outerHeight();
-    return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
-};
-$.fn.sortOptions = function() {
-    var selectOptions = $(this).find("option");
-    selectOptions.sort(function(a, b) {
-        if (a.text > b.text) {
-            return 1;
-        } else if (a.text < b.text) {
-            return -1;
+function restoreVis() {
+    var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
+    if (loadingElement) { loadingElement.setAttribute("style", "display:none; visibility:hidden;"); }
+    if (mainElement) { mainElement.setAttribute("style", "visibility:visible;-ms-filter:'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';filter:alpha(opacity=100); -moz-opacity:1; -khtml-opacity:1; opacity:1"); }
+}
+function VueErrorHandling() {
+    if (typeof Vue === "undefined") { return false; } /*global Vue */
+    Vue.config.errorHandler = function (err, vm, info)  {
+        var handler, current = vm;
+        if (vm.$options.errorHandler) {
+            handler = vm.$options.errorHandler;
         } else {
-            return 0;
+            while (current.$parent) {
+                current = current.$parent;
+                if (handler = current.$options.errorHandler) {
+                    break;
+                }
+            }
         }
-    });
-    return selectOptions;
-};
+        if (handler) { handler.call(current, err, vm, info); }
+        else {
+            console.log(err);
+        }
+        restoreVis();
+    };
+}
+function checkJQuery() {
+    if (typeof jQuery === "undefined") {
+        this.restoreVis();
+        return false;
+    }
+    return true;
+}
+(function($) {
+    if (!$) { return false; }
+    var __winHeight = $(window).height(), __winWidth = $(window).width();
+    $.fn.isOnScreen = function() {
+        var viewport = {};
+        viewport.top = $(window).scrollTop();
+        viewport.bottom = viewport.top + __winHeight;
+        var bounds = {};
+        bounds.top = this.offset().top;
+        bounds.bottom = bounds.top + this.outerHeight();
+        return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
+    };
+    $.fn.sortOptions = function() {
+        var selectOptions = $(this).find("option");
+        selectOptions.sort(function(a, b) {
+            if (a.text > b.text) {
+                return 1;
+            } else if (a.text < b.text) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        return selectOptions;
+    };
+})(checkJQuery()?jQuery: null);
 // Extend an object with an extension
 function extend(obj, extension) {
     for (var key in extension) {
         obj[key] = extension[key];
     }
+    return obj;
 }
 function getUrlParameter(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

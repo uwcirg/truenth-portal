@@ -1899,6 +1899,9 @@ var tnthDates = {
             return sessionLocale;
         } else {
             this.clearSessionLocale();
+            if (!checkJQuery()) { /*global checkJQuery */
+                return false;
+            }
             $.ajax({
                 type: "GET",
                 url: "/api/me",
@@ -1999,15 +2002,16 @@ var Global = {
         window.portalModules.tnthAjax = tnthAjax;
         window.portalModules.tnthDates = tnthDates;
         window.portalModules.orgTool = OrgTool;
-        window.portalModules.i18next = i18next;
+        if (typeof i18next !== "undefined") {
+            window.portalModules.i18next = i18next;
+        }
     },
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
         sendRequest(PORTAL_NAV_PAGE, false, function(data) { /*global sendRequest */
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
-                showMain();
-                hideLoader();
+                restoreVis(); /*global restoreVis */
                 callback();
                 return false;
             }
@@ -2210,30 +2214,9 @@ var Global = {
         } else {
             $("#notificationBanner").hide();
         }
-    }
-};
-
-var userSetLang = tnthDates.getUserLocale();
-/*global __i18next*/
-Global.registerModules();
-__i18next.init({"lng": userSetLang
-}, function() {
-    $(document).ready(function() {
-        if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
-        var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
-        if (PORTAL_NAV_PAGE) {
-            loader(true); /*global loader showMain hideLoader*/
-            try {
-                Global.initPortalWrapper(PORTAL_NAV_PAGE);
-            } catch(e) {
-                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
-                showMain();
-                hideLoader();
-            }
-        } else { loader();  }
-        tnthAjax.beforeSend();
-        Global.footer();
-        Global.loginAs();
+    },
+    initValidator: function() {
+        if (typeof $.fn.validator === "undefined") { return false; }
         $("form.to-validate").validator({ // To validate a form, add class to <form> and validate by ID.
             custom: {
                 birthday: function() {
@@ -2311,5 +2294,31 @@ __i18next.init({"lng": userSetLang
             },
             disable: false
         }).off("input.bs.validator change.bs.validator"); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }
+};
+
+var userSetLang = tnthDates.getUserLocale();
+/*global __i18next*/
+Global.registerModules();
+__i18next.init({"lng": userSetLang
+}, function() {
+    if (!checkJQuery()) { alert("JQuery library necessary for this website was not loaded.  Please refresh your browser and try again."); return false; }
+    if (typeof i18next === "undefined") { i18next = {t: function(key) { return key; }}; } //fallback for i18next in older browser?
+    $(document).ready(function() {
+        var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
+        if (PORTAL_NAV_PAGE) {
+            loader(true); /*global loader restoreVis*/
+            try {
+                Global.initPortalWrapper(PORTAL_NAV_PAGE);
+            } catch(e) {
+                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+                restoreVis();
+            }
+        } else { restoreVis();  }
+        if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
+        tnthAjax.beforeSend();
+        Global.footer();
+        Global.loginAs();
+        Global.initValidator();
     });
 });

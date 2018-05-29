@@ -60,6 +60,10 @@ portal = Blueprint('portal', __name__)
 def favicon():
     return redirect(url_for('static', filename='img/favicon.ico'), code=302)
 
+@portal.route('/no-script')
+def no_script():
+    return  make_response(_(u"This application requires Javascript enabled. Please check your browser setting."))
+
 
 @portal.before_app_request
 def assert_locale_selector():
