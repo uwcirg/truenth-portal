@@ -279,7 +279,8 @@ function VueErrorHandling() {
         } else {
             while (current.$parent) {
                 current = current.$parent;
-                if (handler = current.$options.errorHandler) {
+                handler = current.$options.errorHandler;
+                if (handler) {
                     break;
                 }
             }
