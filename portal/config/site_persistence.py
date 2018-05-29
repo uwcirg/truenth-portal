@@ -4,10 +4,9 @@ from flask import current_app
 
 from .config_persistence import export_config, import_config
 from ..database import db
-from .exclusion_persistence import ExclusionPersistence
+from .exclusion_persistence import (
+    ExclusionPersistence, preflight, staging_exclusions)
 from ..models.app_text import AppText
-from ..models.auth import AuthProviderPersistable, Token
-from ..models.client import Client
 from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
 from ..models.intervention import Intervention
@@ -17,10 +16,7 @@ from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
-from ..models.relationship import Relationship, RELATIONSHIP
-from ..models.role import Role, ROLE
 from ..models.scheduled_job import ScheduledJob
-from ..models.user import User, UserRelationship, UserRoles
 from .model_persistence import ModelPersistence
 
 
@@ -46,55 +42,6 @@ models = (
     ModelDetails(AppText, 'apptext_id_seq', 'name'),
     ModelDetails(Notification, 'notifications_id_seq', 'name'),
     ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
-
-
-# StagingExclusions capture details exclusive of a full db overwrite
-# that are to be restored *after* db migration.  For example, when
-# bringing the production db to staging, retain the staging
-# config for interventions, application_developers and service users
-
-def auth_providers_filter():
-    """Return query restricted to application developer users"""
-    return (
-        AuthProviderPersistable.query.join(User).join(UserRoles).join(
-            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
-
-
-def client_users_filter():
-    """Return query restricted to service users and those with client FKs"""
-    return (
-        User.query.join(Client).union(User.query.join(UserRoles).join(
-            Role).filter(Role.name == ROLE.SERVICE)))
-
-
-def relationship_filter():
-    """Return query restricted to sponsor relationships (service users) """
-    return UserRelationship.query.join(Relationship).filter(
-        Relationship.name == RELATIONSHIP.SPONSOR)
-
-
-def service_token_filter():
-    """Return query restricted to tokens owned by service users"""
-    return Token.query.join(User).join(UserRoles).join(Role).filter(
-        Role.name == ROLE.SERVICE)
-
-
-StagingExclusions = namedtuple(
-    'StagingExclusions',
-    ['cls', 'lookup_field', 'limit_to_attributes', 'filter_query'])
-staging_exclusions = (
-    StagingExclusions(Client, 'client_id', None, None),
-    StagingExclusions(Intervention, 'name', ['link_url'], None),
-    StagingExclusions(
-        User, 'id', ['telecom', 'password'], client_users_filter),
-    StagingExclusions(
-        UserRelationship, ('user_id', 'other_user_id'), None,
-        relationship_filter),
-    StagingExclusions(
-        AuthProviderPersistable, ('user_id', 'provider_id'), None,
-        auth_providers_filter),
-    StagingExclusions(Token, 'access_token', None, service_token_filter)
-)
 
 
 class SitePersistence(object):
@@ -136,6 +83,9 @@ class SitePersistence(object):
             export_config(target_dir=self.dir)
 
         def exclusive_export():
+            # Requires a pre-flight check, to confirm we don't overwrite, etc.
+            preflight(target_dir=self.dir)
+
             for model in staging_exclusions:
                 ep = ExclusionPersistence(
                     model_class=model.cls, lookup_field=model.lookup_field,
