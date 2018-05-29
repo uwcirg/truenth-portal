@@ -23,7 +23,7 @@ var __i18next = window.__i18next = (function() {
         }
         var source = options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
         var defaultOptions = {
-            fallbackLng: "",
+            fallbackLng: "en-US",
             lng: "en-US",
             preload: false,
             debug: false,
@@ -117,10 +117,14 @@ var __i18next = window.__i18next = (function() {
             options.lng = options.lng.replace("_", "-");
         }
         options.debug = options.debug ? options.debug : (getQueryString.debugi18next ? true : false);
-        var configOptions = $.extend({}, defaultOptions, options); /*global $ */
+        var configOptions = extend(defaultOptions, options); /*global extend */
         var sessionItemKey = "i18nextData_" + options.language;
         callback = callback || function() {};
-        if (String(options.lng).toLowerCase() === "en-us" || sessionStorage.getItem(sessionItemKey)) { 
+        if (typeof i18next === "undefined") { //i18next js libraries raises runtime error in <= IE8 
+            callback();
+            return false;
+        }
+        if (String(options.lng).toLowerCase() === "en-us" || sessionStorage.getItem(sessionItemKey)) {
             //still need to initialize i18next but skip call to backend
             i18next.init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
                 callback(t);
@@ -137,3 +141,4 @@ var __i18next = window.__i18next = (function() {
         }
     };
 })();
+
