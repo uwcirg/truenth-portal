@@ -293,7 +293,7 @@ function VueErrorHandling() {
 }
 function checkJQuery() {
     if (typeof jQuery === "undefined") {
-        this.restoreVis();
+        restoreVis();
         return false;
     }
     return true;
