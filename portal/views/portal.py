@@ -64,7 +64,7 @@ def favicon():
 @portal.route('/no-script')
 def no_script():
     return make_response(_(u"This application requires Javascript enabled.\
-                            Please check your browser setting."))
+                            Please check your browser settings."))
 
 
 @portal.before_app_request
