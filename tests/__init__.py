@@ -50,6 +50,35 @@ from portal.models.communication_request import CommunicationRequest
 CommunicationRequest
 
 
+def associative_backdate(now, backdate):
+    """Correct non-associative relative-delta month math
+
+    :param now: datetime start point
+    :param backdate: relativedelta value to move back from now.
+
+    Asking for a relative delta back in time for a period of months and
+    then adding the same number of months does NOT always produce the
+    same starting value.  For example May 30 - 3 months => Feb 28/29 depending
+    on leap year determination.  Adding 3 months to Feb 28 always produces
+    May 28.
+
+    Work around this problem by returning a backdated datetime value, that is
+    by reducing now by the backdate, and also return a ``nowish`` datetime
+    value, either equal to now or adjusted to make the pair associative,
+    such that:
+
+        nowish - backdate == result + backdate == nowish
+
+    Therefore nowish will typically be equal to now, but altered in boundary
+    cases for tests needing this associative property.
+
+    :returns: backdated_datetime, nowish
+
+    """
+    result = now - backdate
+    return result, result + backdate
+
+
 class TestCase(Base):
     """Base TestClass for application."""
 
@@ -245,7 +274,8 @@ class TestCase(Base):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
-          happening said period in the past
+          happening said period in the past.  See
+          ``associative_backdate`` for issues with 'months'.
 
         :param setdate: datetime value.  Define to mock consents
           happening at exact time in the past
@@ -266,6 +296,12 @@ class TestCase(Base):
         if setdate:
             audit.timestamp = setdate
         elif backdate:
+            # Guard against associative problems with backdating by
+            # months.
+            if backdate.months:
+                raise ValueError(
+                    "moving dates by month values is non-associative; use"
+                    "`associative_backdate` and pass in `setdate` param")
             audit.timestamp = datetime.utcnow() - backdate
         tou = ToU(audit=audit, agreement_url='http://not.really.org',
                   type='website terms of use')
