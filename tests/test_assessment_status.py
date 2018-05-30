@@ -21,6 +21,7 @@ from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
+from portal.system_uri import ICHOM
 from tests import associative_backdate, TestCase, TEST_USER_ID
 
 now = datetime.utcnow()
@@ -654,6 +655,24 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, 'Partially Completed')
+
+    def test_all_expired_old_tx(self):
+        self.login()
+        # backdate outside of baseline window (which uses consent date)
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=4, hours=1))
+        self.bless_with_basics(setdate=backdate)
+        self.mark_localized()
+
+        # provide treatment date outside of all recurrences
+        tx_date = datetime(2000, 3, 12, 0, 0, 00, 000000)
+        self.add_procedure(code='7', display='Focal therapy',
+                           system=ICHOM, setdate=tx_date)
+
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
+        self.assertEquals(a_s.overall_status, 'Expired')
+
 
 
 class TestTnthAssessmentStatus(TestQuestionnaireSetup):
