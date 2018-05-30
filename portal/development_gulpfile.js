@@ -12,12 +12,15 @@ const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const uglify = require("gulp-uglifyes");
 const sourcemaps = require("gulp-sourcemaps");
-const rootPath = "static";
-const jsPath = rootPath + "/js";
-const jsDest = rootPath + "/js/dist";
-const lessPath = rootPath + "/less";
-const cssPath = rootPath + "/css";
-const mapPath = rootPath + "/maps";
+const rootPath = "./";
+const GILPath = rootPath + "/gil/";
+const EPROMSPath = rootPath + "/eproms/";
+const staticPath = "static";
+const jsPath = rootPath + staticPath + "/js";
+const jsDest = rootPath + staticPath + "/js/dist";
+const lessPath = rootPath + staticPath + "/less";
+const cssPath = rootPath + staticPath + "/css";
+const mapPath = rootPath + staticPath + "/maps";
 const gutil = require("gulp-util");
 const jshint = require("gulp-jshint");
 const less = require("gulp-less");
@@ -128,7 +131,7 @@ gulp.task("epromsLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../../" + mapPath))
-        .pipe(gulp.dest(EPROMS + "/" + cssPath));
+        .pipe(gulp.dest(EPROMSPath + cssPath));
 });
 /*
  * transforming portal less to css
@@ -157,7 +160,7 @@ gulp.task("gilLess", () => {
         .pipe(postCSS())
         .pipe(rename(GIL + ".css"))
         .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
-        .pipe(gulp.dest("gil/" + cssPath))
+        .pipe(gulp.dest(GILPath + cssPath))
         .on("end", function() {
             replaceStd(GIL + ".css.map");
         });
