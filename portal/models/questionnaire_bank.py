@@ -362,8 +362,9 @@ class QuestionnaireBank(db.Model):
         if not baseline:
             trace("no baseline questionnaire_bank, can't continue")
             return QBD(None, None, None, None)
-        trigger_date = baseline[0].trigger_date(user)
-        if not trigger_date:
+
+        if not baseline[0].trigger_date(user):
+            trace("no baseline trigger date, can't continue")
             return QBD(None, None, None, None)
 
         # Iterate over users QBs looking for current
@@ -374,6 +375,7 @@ class QuestionnaireBank(db.Model):
                 continue
             for qb in QuestionnaireBank.qbs_for_user(
                     user, classification, as_of_date=as_of_date):
+                trigger_date = qb.trigger_date(user)
                 qbd = qb.calculated_start(trigger_date, as_of_date)
                 if qbd.relative_start is None:
                     # indicates QB hasn't started yet, continue
