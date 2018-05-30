@@ -159,7 +159,7 @@ gulp.task("gilLess", () => {
         .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
         .pipe(gulp.dest("gil/" + cssPath))
         .on("end", function() {
-            replaceStd(GIL + ".css.map")
+            replaceStd(GIL + ".css.map");
         });
     return true;
 });
