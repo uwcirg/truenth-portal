@@ -58,7 +58,7 @@ oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
 page-objects==1.1.0
 passlib==1.7.1
 pathlib2==2.3.2
-pexpect==4.5.0
+pexpect==4.6.0
 pickleshare==0.7.4
 pkginfo==1.4.2
 pluggy==0.6.0
