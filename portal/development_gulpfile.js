@@ -12,12 +12,14 @@ const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const uglify = require("gulp-uglifyes");
 const sourcemaps = require("gulp-sourcemaps");
-const rootPath = "static";
-const jsPath = rootPath + "/js";
-const jsDest = rootPath + "/js/dist";
-const lessPath = rootPath + "/less";
-const cssPath = rootPath + "/css";
-const mapPath = rootPath + "/maps";
+const rootPath = "./";
+const GILPath = rootPath + "/gil/";
+const EPROMSPath = rootPath + "/eproms/";
+const jsPath = rootPath + "static/js";
+const jsDest = rootPath + "static/js/dist";
+const lessPath = rootPath + "static/less";
+const cssPath = rootPath + "static/css";
+const mapPath = rootPath + "static/maps";
 const gutil = require("gulp-util");
 const jshint = require("gulp-jshint");
 const less = require("gulp-less");
@@ -128,7 +130,7 @@ gulp.task("epromsLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../../" + mapPath))
-        .pipe(gulp.dest(EPROMS + "/" + cssPath));
+        .pipe(gulp.dest(EPROMSPath + cssPath));
 });
 /*
  * transforming portal less to css
@@ -142,10 +144,10 @@ gulp.task("portalLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../maps")) //path relative to the source file, can't use rootPath here
-        .pipe(gulp.dest(cssPath));
-    setTimeout(function() {
-        replaceStd(PORTAL + ".css.map");
-    }, 500);
+        .pipe(gulp.dest(cssPath))
+        .on("end", function() {
+            replaceStd(PORTAL + ".css.map");
+        });
     return true;
 });
 /*
@@ -157,14 +159,12 @@ gulp.task("gilLess", () => {
         .pipe(postCSS())
         .pipe(rename(GIL + ".css"))
         .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
-        .pipe(gulp.dest("gil/" + cssPath));
-
-    setTimeout(function() {
-        replaceStd(GIL + ".css.map");
-    }, 500);
+        .pipe(gulp.dest(GILPath + cssPath))
+        .on("end", function() {
+            replaceStd(GIL + ".css.map");
+        });
     return true;
 });
-
 /*
  *transforming portal wrapper/top nav less to css
  */
@@ -176,10 +176,10 @@ gulp.task("topnavLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../maps"))
-        .pipe(gulp.dest(cssPath));
-    setTimeout(function() {
-        replaceStd(TOPNAV + ".css.map");
-    }, 500);
+        .pipe(gulp.dest(cssPath))
+        .on("end", function() {
+            replaceStd(TOPNAV + ".css.map");
+        });
     return true;
 });
 /*
