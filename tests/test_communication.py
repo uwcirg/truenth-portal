@@ -1,5 +1,6 @@
 """Unit test module for communication"""
-from datetime import timedelta, datetime
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import regex
 
@@ -159,7 +160,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=13))
+        self.bless_with_basics(backdate=relativedelta(days=13))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
@@ -179,7 +180,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=14))
+        self.bless_with_basics(backdate=relativedelta(days=14))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
@@ -197,7 +198,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=14))
+        self.bless_with_basics(backdate=relativedelta(days=14))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
 
@@ -214,7 +215,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=22))
+        self.bless_with_basics(backdate=relativedelta(days=22))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
 
@@ -233,7 +234,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=22))
+        self.bless_with_basics(backdate=relativedelta(days=22))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
         self.test_user.email = NO_EMAIL_PREFIX
@@ -251,7 +252,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=timedelta(days=14))
+        self.bless_with_basics(backdate=relativedelta(days=14))
         self.promote_user(role_name=ROLE.PATIENT)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add')
@@ -349,7 +350,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=89))
+        self.add_required_clinical_data(backdate=relativedelta(days=89))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
@@ -367,7 +368,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
@@ -389,7 +390,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.app.config['NO_CHALLENGE_WO_DATA'] = False
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=31))
+        self.add_required_clinical_data(backdate=relativedelta(days=31))
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = '1969-07-16'
 
@@ -411,7 +412,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
         self.test_user.save_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.FALSE_VALUE,
@@ -434,7 +435,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        self.add_required_clinical_data(backdate=timedelta(days=91))
+        self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB

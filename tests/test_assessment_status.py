@@ -21,7 +21,7 @@ from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
-from tests import TestCase, TEST_USER_ID
+from tests import associative_backdate, TestCase, TEST_USER_ID
 
 now = datetime.utcnow()
 
@@ -457,17 +457,19 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # if the user completed something on time, and nothing else
         # is due, should see the thank you message.
 
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         # backdate so the baseline q's have expired
         mock_qr(instrument_id='epic26', status='in-progress')
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, "Partially Completed")
 
         # with all q's expired,
-        # instruments_needing_full_assessment and insturments_in_progress
+        # instruments_needing_full_assessment and instruments_in_progress
         # should be empty
         self.assertFalse(a_s.instruments_needing_full_assessment())
         self.assertFalse(a_s.instruments_in_progress())
@@ -476,14 +478,16 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # backdating consent beyond expired and the status lookup date
         # within a valid window should show available assessments.
 
-        self.bless_with_basics(backdate=relativedelta(months=3))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         # backdate so the baseline q's have expired
         mock_qr(instrument_id='epic26', status='in-progress', doc_id='doc-26',
-                timestamp=now - relativedelta(months=3))
+                timestamp=backdate)
 
         self.test_user = db.session.merge(self.test_user)
-        as_of_date = now - relativedelta(months=2, days=28)
+        as_of_date = backdate + relativedelta(days=2)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
         self.assertEquals(a_s.overall_status, "In Progress")
 
@@ -498,14 +502,16 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # backdating consent beyond expired and the status lookup date
         # within a valid window should show available assessments.
 
-        self.bless_with_basics(backdate=relativedelta(months=3))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3))
+        self.bless_with_basics(setdate=backdate)
         self.mark_metastatic()
         # backdate so the baseline q's have expired
         mock_qr(instrument_id='epic23', status='in-progress', doc_id='doc-23',
-                timestamp=now - relativedelta(months=3))
+                timestamp=backdate)
 
         self.test_user = db.session.merge(self.test_user)
-        as_of_date = now - relativedelta(months=2, days=28)
+        as_of_date = backdate + relativedelta(days=2)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
         self.assertEquals(a_s.overall_status, "In Progress")
 
@@ -517,11 +523,13 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_initial_recur_due(self):
 
         # backdate so baseline q's have expired, and we within the first
-        # recurrance window
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=1))
+        # recurrence window
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, "Due")
 
         # in the initial window w/ no questionnaires submitted
@@ -533,12 +541,14 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
     def test_initial_recur_baseline_done(self):
         # backdate to be within the first recurrence window
 
-        self.bless_with_basics(backdate=relativedelta(months=3, days=2))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, days=2))
+        self.bless_with_basics(setdate=backdate)
         self.mark_metastatic()
 
         # add baseline QNRs, as if submitted nearly 3 months ago, during
         # baseline window
-        backdated = now - relativedelta(months=2, days=25)
+        backdated = nowish - relativedelta(months=2, days=25)
         baseline = QuestionnaireBank.query.filter_by(
             name='metastatic').one()
         for instrument in metastatic_baseline_instruments:
@@ -552,7 +562,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertFalse(a_s_baseline.instruments_needing_full_assessment())
 
         # Whereas "current" status for the initial recurrence show due.
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, "Due")
 
         # in the initial window w/ no questionnaires submitted
@@ -565,10 +575,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # backdate so baseline q's have expired, and we are within the
         # second recurrence window
-        self.bless_with_basics(backdate=relativedelta(months=6, hours=1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=6, hours=1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, "Due")
 
         # w/ no questionnaires submitted
@@ -598,41 +610,49 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
         self.assertEquals(a_s.overall_status, "Due")
 
-    def test_boundry_overdue(self):
+    def test_boundary_overdue(self):
         self.login()
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=-1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=-1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, 'Overdue')
 
-    def test_boundry_expired(self):
+    def test_boundary_expired(self):
         "At expired, should be expired"
         self.login()
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, 'Expired')
 
-    def test_boundry_in_progress(self):
+    def test_boundary_in_progress(self):
         self.login()
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=-1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=-1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         for instrument in localized_instruments:
             mock_qr(instrument_id=instrument, status='in-progress')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, 'In Progress')
 
-    def test_boundry_in_progress_expired(self):
+    def test_boundary_in_progress_expired(self):
         self.login()
-        self.bless_with_basics(backdate=relativedelta(months=3, hours=1))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3, hours=1))
+        self.bless_with_basics(setdate=backdate)
         self.mark_localized()
         for instrument in localized_instruments:
             mock_qr(instrument_id=instrument, status='in-progress')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEquals(a_s.overall_status, 'Partially Completed')
 
 
