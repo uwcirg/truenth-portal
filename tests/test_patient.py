@@ -116,25 +116,6 @@ class TestPatient(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertTrue(user.deceased)
 
-    def test_deceased_again(self):
-        """POST shouldn't take deceased if already deceased"""
-        self.promote_user(role_name=ROLE.PATIENT)
-        d_audit = Audit(
-            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, context='user',
-            comment="time of death for user {}".format(TEST_USER_ID))
-        with SessionScope(db):
-            db.session.add(d_audit)
-            db.session.commit()
-        self.test_user, d_audit = map(db.session.merge, (self.test_user, d_audit))
-        self.test_user.deceased = d_audit
-        self.login()
-        data = {}
-        rv = self.client.post(
-            '/api/patient/{}/deceased'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
-        self.assertTrue(rv.status_code, 409)
-
     def test_deceased_undead(self):
         """POST should allow reversal if already deceased"""
         self.promote_user(role_name=ROLE.PATIENT)
