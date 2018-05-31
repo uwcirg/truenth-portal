@@ -181,6 +181,10 @@ def post_patient_deceased(patient_id):
 
     patient.update_deceased(request.json)
     db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
     return jsonify(patient.as_fhir(include_empties=False))
 
 
@@ -242,4 +246,9 @@ def post_patient_dob(patient_id):
             patient_id))
 
     patient.update_birthdate(request.json)
+    db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
     return jsonify(patient.as_fhir(include_empties=False))
