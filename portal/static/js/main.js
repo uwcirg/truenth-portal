@@ -1891,16 +1891,20 @@ var tnthDates = {
     "clearSessionLocale": function() {
         sessionStorage.removeItem(this.localeSessionKey);
     },
-    "getUserLocale": function(force) {
+    "getUserLocale": function() {
         var sessionKey = this.localeSessionKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
-        if (!force && sessionLocale) {
+        if (sessionLocale) {
             return sessionLocale;
         } else {
-            this.clearSessionLocale();
             if (!checkJQuery()) { /*global checkJQuery */
                 return false;
+            }
+            var userSessionLocale = $("#userSessionLocale").val();
+            if (userSessionLocale) {
+                sessionStorage.setItem(sessionKey, userSessionLocale);
+                return userSessionLocale;
             }
             $.ajax({
                 type: "GET",
@@ -2031,7 +2035,8 @@ var Global = {
     "loginAs": function() {
         var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
         if (LOGIN_AS_PATIENT) {
-            tnthDates.getUserLocale(true); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
+            tnthDates.clearSessionLocale();
+            tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
             var historyDefined = typeof history !== "undefined" && history.pushState;
             if (historyDefined) {
                 history.pushState(null, null, location.href);
