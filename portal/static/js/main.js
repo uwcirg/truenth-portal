@@ -1891,46 +1891,49 @@ var tnthDates = {
     "clearSessionLocale": function() {
         sessionStorage.removeItem(this.localeSessionKey);
     },
-    "getUserLocale": function(force) {
+    "getUserLocale": function() {
         var sessionKey = this.localeSessionKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
-        if (!force && sessionLocale) {
+        if (sessionLocale) {
             return sessionLocale;
-        } else {
-            this.clearSessionLocale();
-            if (!checkJQuery()) { /*global checkJQuery */
+        } 
+        if (!checkJQuery()) { /*global checkJQuery */
+            return false;
+        }
+        var userSessionLocale = $("#userSessionLocale").val();
+        if (userSessionLocale) {
+            sessionStorage.setItem(sessionKey, userSessionLocale);
+            return userSessionLocale;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/me",
+            async: false
+        }).done(function(data) {
+            var userId = "";
+            if (data) { userId = data.id; }
+            if (!userId) {
+                locale = "en_us";
                 return false;
             }
             $.ajax({
                 type: "GET",
-                url: "/api/me",
+                url: "/api/demographics/" + userId, //dont use tnthAjax method - don't want to report error here if failed
                 async: false
             }).done(function(data) {
-                var userId = "";
-                if (data) { userId = data.id; }
-                if (!userId) {
+                if (!data || !data.communication) {
                     locale = "en_us";
                     return false;
                 }
-                $.ajax({
-                    type: "GET",
-                    url: "/api/demographics/" + userId, //dont use tnthAjax method - don't want to report error here if failed
-                    async: false
-                }).done(function(data) {
-                    if (!data || !data.communication) {
-                        locale = "en_us";
-                        return false;
+                data.communication.forEach(function(item) {
+                    if (item.language) {
+                        locale = item.language.coding[0].code;
+                        sessionStorage.setItem(sessionKey, locale);
                     }
-                    data.communication.forEach(function(item) {
-                        if (item.language) {
-                            locale = item.language.coding[0].code;
-                            sessionStorage.setItem(sessionKey, locale);
-                        }
-                    });
                 });
-            }).fail(function() {});
-        }
+            });
+        }).fail(function() {});
         if (!locale) {
             locale = "en_us";
         }
@@ -2031,7 +2034,8 @@ var Global = {
     "loginAs": function() {
         var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
         if (LOGIN_AS_PATIENT) {
-            tnthDates.getUserLocale(true); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
+            tnthDates.clearSessionLocale();
+            tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
             var historyDefined = typeof history !== "undefined" && history.pushState;
             if (historyDefined) {
                 history.pushState(null, null, location.href);

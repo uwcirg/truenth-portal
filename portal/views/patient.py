@@ -161,10 +161,6 @@ def post_patient_deceased(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
-      409:
-        description:
-          if attempting to POST new deceased data for a patient whom already
-          has a defined deceased value.
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -173,14 +169,12 @@ def post_patient_deceased(patient_id):
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
 
-    if patient.deceased and (
-            request.json.get('deceasedBoolean') or
-            request.json.get('deceasedDateTime')):
-        abort(409, "Deceased value already set for patient {}".format(
-            patient_id))
-
     patient.update_deceased(request.json)
     db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
     return jsonify(patient.as_fhir(include_empties=False))
 
 
@@ -226,10 +220,6 @@ def post_patient_dob(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested patient
-      409:
-        description:
-          if attempting to POST new birthDate data for a patient whom already
-          has a defined birthDate value.
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -237,9 +227,10 @@ def post_patient_dob(patient_id):
     if not request.json or 'birthDate' not in request.json:
         abort(400, "Requires `birthDate` in JSON")
 
-    if patient.birthdate:
-        abort(409, "birthDate value already set for patient {}".format(
-            patient_id))
-
     patient.update_birthdate(request.json)
+    db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
     return jsonify(patient.as_fhir(include_empties=False))
