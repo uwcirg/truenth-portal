@@ -2,6 +2,7 @@
 from collections import defaultdict
 from datetime import datetime
 from flask import current_app
+from flask_babel import force_locale
 from smtplib import SMTPRecipientsRefused
 
 from .app_text import app_text, MailResource, SiteSummaryEmail_ATMA
@@ -137,16 +138,18 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if not (user.has_role(ROLE.STAFF) and user.email and (u'@' in user.email)
+        if not (user.has_role(ROLE.STAFF) and user.email_ready()[0]
                 and (top_org in ot.find_top_level_org(user.organizations))):
             continue
 
         args = load_template_args(user=user)
-        args['eproms_site_summary_table'] = generate_overdue_table_html(
-            cutoff_days=cutoffs,
-            overdue_stats=ostats,
-            user=user,
-            top_org=top_org)
+        with force_locale(user.locale_code):
+            args['eproms_site_summary_table'] = generate_overdue_table_html(
+                cutoff_days=cutoffs,
+                overdue_stats=ostats,
+                user=user,
+                top_org=top_org,
+            )
         summary_email = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
         em = EmailMessage(recipients=user.email,

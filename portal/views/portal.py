@@ -61,6 +61,12 @@ def favicon():
     return redirect(url_for('static', filename='img/favicon.ico'), code=302)
 
 
+@portal.route('/no-script')
+def no_script():
+    return make_response(_(u"This application requires Javascript enabled.\
+                            Please check your browser settings."))
+
+
 @portal.before_app_request
 def assert_locale_selector():
     # Confirm import & use of custom babel localeselector function.
@@ -404,20 +410,8 @@ def challenge_identity(
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
                              birthdate=birthdate)
-    if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
-        # identity confirmed
-        session['challenge_verified_user_id'] = user.id
-        if form.merging_accounts.data == 'True':
-            user.mask_email()
-            db.session.commit()
-            session['invited_verified_user_id'] = user.id
-        if form.access_on_verify.data == 'True':
-            # Log user in as they have now verified
-            login_user(
-                user=user, auth_method='url_authenticated_and_verified')
-        return redirect(form.next_url.data)
 
-    else:
+    if score < current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         auditable_event(
             "Failed identity challenge tests with values:"
             "(first_name={}, last_name={}, birthdate={})".format(
@@ -427,12 +421,23 @@ def challenge_identity(
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
-            error = "Unable to match identity"
+            error = _("Unable to match identity")
         if form.retry_count.data > 3:
-            abort(404, "User Not Found")
+            abort(404, _("User Not Found"))
 
         return render_template(
             'challenge_identity.html', form=form, errorMessage=error)
+
+    # identity confirmed
+    session['challenge_verified_user_id'] = user.id
+    if form.merging_accounts.data == 'True':
+        user.mask_email()
+        db.session.commit()
+        session['invited_verified_user_id'] = user.id
+    if form.access_on_verify.data == 'True':
+        # Log user in as they have now verified
+        login_user(user=user, auth_method='url_authenticated_and_verified')
+    return redirect(form.next_url.data)
 
 
 @portal.route('/initial-queries', methods=['GET', 'POST'])
@@ -518,7 +523,7 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template(
-        'admin.html', users=users, wide_container="true",
+        'admin/admin.html', users=users, wide_container="true",
         org_list=list(org_list), user=user)
 
 
@@ -771,6 +776,8 @@ def config_settings(config_key):
         'REQUIRED_CORE_DATA',
         'PRE_REGISTERED_ROLES',
         'SYSTEM',
+        'SHOW_PROFILE_MACROS',
+        'MEDIDATA_RAVE_FIELDS'
     )
     if config_key:
         key = config_key.upper()
@@ -951,7 +958,7 @@ def communications_dashboard():
     for comm in comms:
         comm.user_email = User.query.get(comm.user_id).email
         comm.sent_at = comm.message.sent_at if comm.message else None
-    return render_template('communications.html', communications=comms)
+    return render_template('admin/communications.html', communications=comms)
 
 
 @portal.route('/communicate/preview/<int:comm_id>')

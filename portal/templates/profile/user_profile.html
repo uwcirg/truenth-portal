@@ -20,19 +20,19 @@
 
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="org">
-                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
-                {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
-            </div>
+            {% call profile_macro.profileSection(data_sections="org") -%}
+                {% call profile_macro.titleSection(id="orgsLoc") -%}{{ _("Clinic") }}{%- endcall %}
+                {{profile_macro.profileOrg(person=user,consent_agreements=consent_agreements, current_user=current_user)}}
+            {%- endcall %}
         </div>
     </div>
     {%- if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER))%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="consentHistoryLoc") -%}{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}{%- endcall %}
                     {{profile_macro.profileConsent(user, current_user)}}
-                </div>
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}
@@ -44,10 +44,10 @@
     {%- if user and user.has_role(ROLE.PATIENT)%}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
-                <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{% if current_user and current_user.has_role(ROLE.PATIENT) %}{{ _("My Questionnaires") }}{% else %}{{ _("PRO Questionnaires") }}{% endif %}</h4>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="proAssessmentsLoc") -%}{% if current_user and current_user.has_role(ROLE.PATIENT) %}{{_("My Questionnaires")}}{% else %}{{_("PRO Questionnaires")}}{% endif %}{%- endcall %}
                     {{profile_macro.profileSessionList(user, current_user)}}
-                </div>
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}
@@ -67,10 +67,10 @@
     {%- if (user and current_user) and user.has_role(ROLE.PATIENT) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="patientReportsLoc") -%}{{_("Patient Reports")}}{% endcall %}
                     {{profile_macro.patientReports(user)}}
-                </div>
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}
@@ -78,30 +78,15 @@
         {{profile_macro.profileDeceased(user, current_user)}}
     {%- endif %}
     <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div  class="profile-item-container editable" data-sections="locale,timezone">
-                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("Locale / Time Zone")}}</h4>
-                <div class="view-container">
-                    <table>
-                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
-                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
-                    </table>
-                    <div class="get-demo-error get-locale-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-                <div class="edit-container flex">
-                    {{profile_macro.profileLocale(user)|show_macro('language')}}
-                    {{profile_macro.profileTimeZone(user)}}
-                </div>
-            </div>
-        </div>
+        <div class="col-md-12 col-xs-12">{{profile_macro.profileLocaleTimeZone(user)}}</div>
     </div>
     {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN) and not user.has_role(ROLE.SERVICE) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("User Roles") }}</h4>{{profile_macro.profileRole(user, current_user)}}
-                </div>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="rolesLoc") -%}{{_("User Roles")}}{% endcall %}
+                    {{profile_macro.profileRole(user, current_user)}}
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}
@@ -109,10 +94,10 @@
     {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="auditLogLoc" class="profile-item-title index-item">{{ _("Audit Log") }}</h4>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="auditLogLoc") -%}{{_("Audit Log")}}{% endcall %}
                     {{profile_macro.profileAuditLog(user, current_user)}}
-                </div>
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}

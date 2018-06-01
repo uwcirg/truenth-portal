@@ -1,11 +1,6 @@
 {
   "entry": [
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true",
-      "name": "About Movember URL",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true",
       "name": "About TrueNTH URL",
       "resourceType": "AppText"
@@ -66,18 +61,8 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=68af03b7-813c-d93e-06d1-9702686744c8&editorUrl=true",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true",
       "name": "Initial Consent Terms URL",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f2ea71f5-d47a-1a5c-130b-830b9bd785cf&editorUrl=true",
-      "name": "Privacy URL",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true",
-      "name": "Terms and Conditions URL",
       "resourceType": "AppText"
     },
     {

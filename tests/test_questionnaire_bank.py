@@ -17,7 +17,7 @@ from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent
 from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
-from tests import TestCase, TEST_USER_ID
+from tests import associative_backdate, TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr
 
 now = datetime.utcnow()
@@ -508,12 +508,14 @@ class TestQuestionnaireBank(TestCase):
 
     def test_visit_3mo(self):
         crv = self.setup_qbs()
-        self.bless_with_basics(backdate=relativedelta(months=3))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3))
+        self.bless_with_basics(setdate=backdate)
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
         qbd = QuestionnaireBank.most_current_qb(
-            self.test_user, as_of_date=now + timedelta(hours=1))
+            self.test_user, as_of_date=nowish + timedelta(hours=1))
         self.assertEquals("Month 3", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
@@ -521,12 +523,14 @@ class TestQuestionnaireBank(TestCase):
 
     def test_visit_6mo(self):
         crv = self.setup_qbs()
-        self.bless_with_basics(backdate=relativedelta(months=6))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=6))
+        self.bless_with_basics(setdate=backdate)
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
         qbd = QuestionnaireBank.most_current_qb(
-            self.test_user, as_of_date=now + timedelta(hours=1))
+            self.test_user, as_of_date=nowish + timedelta(hours=1))
         self.assertEquals("Month 6", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
@@ -534,7 +538,9 @@ class TestQuestionnaireBank(TestCase):
 
     def test_user_current_qb(self):
         crv = self.setup_qbs()
-        self.bless_with_basics(backdate=relativedelta(months=3))
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=3))
+        self.bless_with_basics(setdate=backdate)
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
 
@@ -545,14 +551,14 @@ class TestQuestionnaireBank(TestCase):
         self.assertEquals(resp.json['questionnaire_bank']['name'],
                           'CRV_recurring_3mo_period v2')
 
-        dt = (datetime.utcnow() - relativedelta(months=2)).strftime('%Y-%m-%d')
+        dt = (nowish - relativedelta(months=2)).strftime('%Y-%m-%d')
         resp2 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp2)
         self.assertEquals(resp2.json['questionnaire_bank']['name'],
                           'CRV Baseline v2')
 
-        dt = (datetime.utcnow() - relativedelta(months=4)).strftime('%Y-%m-%d')
+        dt = (nowish - relativedelta(months=4)).strftime('%Y-%m-%d')
         resp3 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp3)

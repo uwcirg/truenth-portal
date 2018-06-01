@@ -8,11 +8,8 @@
       <title>{%- block title -%}{{_("TrueNTH")}}{%- endblock -%}</title>
       <meta name="description" content="">
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
-      <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
-      <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
-      <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
       <link rel="apple-touch-icon" href="apple-touch-icon.png">
       <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
       <!--[if lte IE 6]>
@@ -96,11 +93,11 @@
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{url_for('gil.decision_support')}}">
               <svg width="32" height="32">
-                <use xlink:href="#DS-Icon-Nav"></use>
+                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#DS-Icon-Nav"></use>
               </svg>{{_("Decision Support")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{url_for('gil.symptom_tracker')}}">
               <svg width="32" height="32">
-                <use xlink:href="#ST-Icon-Nav"></use>
+                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#ST-Icon-Nav"></use>
               </svg>{{_("Symptom Tracker")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{url_for('exercise_diet.portal')}}">{{_("Exercise and Diet")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{url_for('gil.lived_experience')}}">{{_("Lived Experience")}}</a></li>
@@ -215,10 +212,10 @@
             <div>
             <a href="{{url_for('auth.login', provider_name='facebook')}}" class="button button--facebook button-large button--teal button--has-svg">
               <svg width="15" height="31">
-                <use xlink:href="#Facebook-Icon"></use>
+                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#Facebook-Icon"></use>
               </svg>{{_("Log in with Facebook")}}</a><a href="{{url_for('auth.login',provider_name='google')}}" class="button button--google button-large button--teal button--has-svg">
               <svg width="20" height="31">
-                <use xlink:href="#Google-Icon"></use>
+                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#Google-Icon"></use>
               </svg>{{_("Log in with Google")}}</a>
             </div>
           </div>
@@ -326,10 +323,10 @@
     {% endif %}
 {% endblock %}
 {% block init_scripts %}
-    <script src="https://unpkg.com/i18next-xhr-backend@1.4.2/i18nextXHRBackend.js"></script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector@2.0.0/i18nextBrowserLanguageDetector.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
     <script src="{{url_for('static', filename='js/gil.js') }}" defer></script>
 {% endblock %} <!-- end block footer -->

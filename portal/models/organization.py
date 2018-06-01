@@ -720,7 +720,10 @@ class OrgTree(object):
                 Organization.id != 0,  # none of the above doesn't apply
                 Organization.partOf_id == partOf_id)):
                 new_node = node.insert(id=org.id, partOf_id=partOf_id)
-                assert org.id not in self.lookup_table
+                if org.id in self.lookup_table:
+                    raise ValueError(
+                        "Found cycle in org graph - can't add {} to table: {}"
+                        "".format(org.id, self.lookup_table.keys()))
                 self.lookup_table[org.id] = new_node
                 if Organization.query.filter(
                     Organization.partOf_id == new_node.id).count():

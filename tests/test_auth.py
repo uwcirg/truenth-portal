@@ -46,7 +46,9 @@ class TestAuth(TestCase):
 
     def test_register_now(self):
         """Initiate process to register exiting account"""
+        self.app.config['NO_CHALLENGE_WO_DATA'] = False
         self.test_user.password = None
+        self.test_user.birthdate = '1998-01-31'
         self.promote_user(role_name=ROLE.ACCESS_ON_VERIFY)
         user = db.session.merge(self.test_user)
         email = user.email

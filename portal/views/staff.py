@@ -62,7 +62,7 @@ def staff_profile_create():
         org_list.update(ot.here_and_below_id(org.id))
 
     return render_template(
-        "staff_profile_create.html", user=user,
+        "profile/staff_profile_create.html", user=user,
         consent_agreements=consent_agreements,
         org_list=list(org_list))
 
@@ -157,5 +157,5 @@ def staff_index():
         staff_list = [s for s in staff_list if not s.has_role(ROLE.TEST)]
 
     return render_template(
-        'staff_by_org.html', staff_list=staff_list,
+        'admin/staff_by_org.html', staff_list=staff_list,
         user=user, wide_container="true")

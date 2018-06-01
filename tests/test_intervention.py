@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import json
 import os
-from tests import TestCase, TEST_USER_ID
+from tests import associative_backdate, TestCase, TEST_USER_ID
 from tests.test_assessment_status import mock_qr, mock_questionnairebanks
 from tests.test_assessment_status import metastatic_baseline_instruments
 
@@ -513,7 +513,9 @@ class TestIntervention(TestCase):
         ae = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
         # backdate so baseline is expired
-        self.bless_with_basics(backdate=relativedelta(months=3))
+        backdate, nowish = associative_backdate(
+            now=datetime.utcnow(), backdate=relativedelta(months=3))
+        self.bless_with_basics(setdate=backdate)
 
         # generate questionnaire banks and associate user with
         # localized organization
@@ -1140,8 +1142,8 @@ class TestEpromsStrategies(TestCase):
                 continue
             mp = ModelPersistence(
                 model_class=model.cls, sequence_name=model.sequence_name,
-                lookup_field=model.lookup_field)
-            mp.import_(keep_unmentioned=False, target_dir=eproms_config_dir)
+                lookup_field=model.lookup_field, target_dir=eproms_config_dir)
+            mp.import_(keep_unmentioned=False)
 
     def test_self_mgmt(self):
         """Patient w/ Southampton org should get access to self_mgmt"""

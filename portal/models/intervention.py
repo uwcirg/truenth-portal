@@ -1,4 +1,6 @@
 """Intervention Module"""
+from flask import current_app
+
 from UserDict import IterableUserDict
 from sqlalchemy import and_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -90,11 +92,15 @@ class Intervention(db.Model):
         The id is also independent - return the rest of the not null
         fields as a simple json dict.
 
+        NB for staging exclusions to function, link_url is now included.
+        Take care to remove it from persistence files where it is NOT
+        portable.
+
         """
         d = {'resourceType': 'Intervention'}
         for attr in ('name', 'description', 'card_html', 'link_label',
                      'status_text', 'public_access', 'display_rank',
-                     'subscribed_events'):
+                     'subscribed_events', 'link_url'):
             if getattr(self, attr, None) is not None:
                 d[attr] = getattr(self, attr)
 
@@ -112,15 +118,19 @@ class Intervention(db.Model):
         for attr in ('name', 'description', 'card_html', 'link_label',
                      'status_text', 'public_access', 'display_rank',
                      'subscribed_events'):
-            setattr(self, attr, data.get(attr))
+            if attr in data:
+                setattr(self, attr, data.get(attr))
 
-        # static_link_url is special - generally we don't pull links
+        # link_url is special - generally we don't pull links
         # from persisted format as each instance is configured to
-        # communicate with distinct interventions.  'static_link_url'
-        # is an exception - if present, set link_url to match - but
-        # don't include in exports
-        if 'static_link_url' in data:
-            self.link_url = data['static_link_url']
+        # communicate with distinct interventions.  As it is used
+        # for prod -> staging, warn if seen on any other system
+        if 'link_url' in data and self.link_url != data['link_url']:
+            if current_app.config.get("SYSTEMT_TYPE", '').lower() != 'staging':
+                current_app.logger.warn(
+                    "IMPORTING non-portable intervention({}) link_url: '{}'"
+                    "".format(self.name, data['link_url']))
+            self.link_url = data['link_url']
 
         return self
 

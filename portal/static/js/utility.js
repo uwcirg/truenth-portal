@@ -1,25 +1,25 @@
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 }
-function equalHeightBoxes(passClass) {
+function equalHeightBoxes(passClass) { /*global $ */
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
-    $("."+passClass).css("height","auto");
-    if (windowsize > 768 && $("."+passClass).length > 1) {
-        var elementHeights = $("."+passClass).map(function() {
+    $("." + passClass).css("height", "auto");
+    if (windowsize > 768 && $("." + passClass).length > 1) {
+        var elementHeights = $("." + passClass).map(function() {
             return $(this).height();
         }).get();
         // Math.max takes a variable number of arguments
         // `apply` is equivalent to passing each height as an argument
         var maxHeight = Math.max.apply(null, elementHeights);
         // Set each height to the max height
-        $("."+passClass).height(maxHeight);
+        $("." + passClass).height(maxHeight);
     }
 }
 // Return an XHR without XHR header so  it doesn't need to be explicitly allowed with CORS
-function xhr_function(){
+function xhr_function() {
     // Get new xhr object using default factory
-    var xhr = jQuery.ajaxSettings.xhr();
+    var xhr = jQuery.ajaxSettings.xhr(); /*global jQuery */
     // Copy the browser's native setRequestHeader method
     var setRequestHeader = xhr.setRequestHeader;
     // Replace with a wrapper
@@ -38,24 +38,25 @@ function xhr_function(){
 }
 function showMain() {
     $("#mainHolder").css({
-                          "visibility" : "visible",
-                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
-                          "filter": "alpha(opacity=100)",
-                          "-moz-opacity": 1,
-                          "-khtml-opacity": 1,
-                          "opacity": 1
-                        });
-
+        "visibility": "visible",
+        "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
+        "filter": "alpha(opacity=100)",
+        "-moz-opacity": 1,
+        "-khtml-opacity": 1,
+        "opacity": 1
+    });
 }
-function hideLoader(delay, time ) {
+function hideLoader(delay, time) {
     if (delay) {
         $("#loadingIndicator").hide();
     } else {
-        setTimeout(function() { $("#loadingIndicator").fadeOut();}, time||200);
+        setTimeout(function() {
+            $("#loadingIndicator").fadeOut();
+        }, time || 200);
     }
 }
 // Loading indicator that appears in UI on page loads and when saving
-var loader = function(show) {
+function loader(show) {
     //landing page
     if ($("#fullSizeContainer").length > 0) {
         hideLoader();
@@ -65,224 +66,296 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        if ((typeof DELAY_LOADING !== "undefined") && !DELAY_LOADING) {
-            setTimeout(function() { showMain(); }, 100);
+        if ((typeof DELAY_LOADING !== "undefined") && !DELAY_LOADING) { /*global DELAY_LOADING*/
+            setTimeout(function() {
+                showMain();
+            }, 100);
             hideLoader(true);
         }
     }
-};
-
-// populate portal banner content
-function embed_page(data){
-    $("#mainNav")
-        // Embed data returned by AJAX call into container element
-        .html(data);
-        loader();
 }
-
+function _isTouchDevice() {
+    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch);
+}
+// populate portal banner content
+function embed_page(data) {
+    $("#mainNav").html(data);
+    setTimeout(function() {
+        loader();
+    }, 0);
+}
 function getIEVersion() {
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
     return match ? parseInt(match[1]) : false;
 }
-
 var request_attempts = 0;
 /*
  * note: this function supports older version of IE (version <= 9)
  * jquery ajax calls errored in older IE version
  */
-function newHttpRequest(url,callBack, noCache)
-{
+function newHttpRequest(url, params, callBack, noCache) {
     request_attempts++;
     var xmlhttp;
-    if (window.XDomainRequest)
-    {
-        xmlhttp=new XDomainRequest();
-        xmlhttp.onload = function(){callBack(xmlhttp.responseText);};
+    if (window.XDomainRequest) {
+        xmlhttp = new XDomainRequest();
+        xmlhttp.onload = function() {
+            callBack(xmlhttp.responseText);
+        };
     } else if (window.XMLHttpRequest) {
-        xmlhttp=new XMLHttpRequest();
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); /*global ActiveXObject */
     }
-    else {
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    };
-    xmlhttp.onreadystatechange=function()
-    {
-        if (xmlhttp.readyState===4) {
-            if (xmlhttp.status===200) {
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState === 4) {
+            if (xmlhttp.status === 200) {
                 if (callBack) {
                     callBack(xmlhttp.responseText);
-                };
+                }
             } else {
                 if (request_attempts < 3) {
-                    setTimeout ( function(){ newHttpRequest(url,callBack, noCache); }, 3000 );
-                }
-                else {
+                    setTimeout(function() {
+                        newHttpRequest(url, callBack, noCache);
+                    }, 3000);
+                } else {
                     loader();
-                };
-            };
-        };
+                }
+            }
+        }
     };
     if (noCache) {
         url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-    };
-    xmlhttp.open("GET",url,true);
-    xmlhttp.send();
-};
-
-funcWrapper = function(PORTAL_NAV_PAGE, callback) {
-    if (PORTAL_NAV_PAGE) {
-        request_attempts++;
-        $.ajax({
-            url: PORTAL_NAV_PAGE,
-            type:"GET",
-            contentType:"text/plain",
-            timeout: 5000,
-            cache: (getIEVersion() ? false : true)
-        }, "html")
-        .done(function(data) {
-            embed_page(data);
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-            if (request_attempts < 3) {
-                setTimeout ( function(){ funcWrapper(PORTAL_NAV_PAGE, callback); }, 3000 );
-            } else {
-                loader();
-            };
-        })
-        .always(function() {
-            loader();
-            request_attempts = 0;
-            if (callback) {
-                callback();
+    }
+    xmlhttp.open("GET", url, true);
+    if (params) {
+        for (var param in params) {
+            if (params.hasOwnProperty(param)) {
+                xmlhttp.setRequestHeader(param, params[param]);
             }
-        });
+        }
+    }
+    xmlhttp.send();
+}
+function ajaxRequest(url, params, callback) {
+    callback = callback || function() {};
+    if (!url) {
+        callback({error: i18next.t("Url is required.")});
+        return false;
+    }
+    var defaults = {
+        url: url,
+        type: "GET",
+        contentType: "text/plain",
+        timeout: 5000,
+        cache: false
     };
-};
-
+    params = params || defaults;
+    params = $.extend({}, defaults, params);
+    request_attempts++;
+    $.ajax(params).done(function(data) {
+        callback(data);
+    }).fail(function(jqXHR, textStatus) {
+        if (request_attempts < 3) {
+            setTimeout(function() { ajaxRequest(url, callback);}, 3000);
+        } else {
+            callback({error: i18next.t("Error occurred processing request")}); /*global i18next */
+            loader();
+        }
+    }).always(function() {
+        loader();
+        request_attempts = 0;
+    });
+}
+function initWorker(url, params, callback) {
+    var worker = new Worker('/static/js/ajaxWorker.js');
+    worker.postMessage({url: url, params: params});
+    worker.addEventListener("message", function(e) {
+        callback(e.data);
+        worker.terminate();
+    }, false);
+    worker.addEventListener("error", function(e) {
+        console.log("Worker runtime error: Line ", e.lineno, " in ", e.filename, ": ", e.message);
+    }, false);
+}
+function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */
+    if (window.Worker && !_isTouchDevice()) {
+        initWorker(url, params, callback);
+    } else {
+        var isIE = getIEVersion();
+        var useFunc = isIE ? newHttpRequest: ajaxRequest;
+        useFunc(url, params, function(data) { callback(data);});
+    }
+}
 function LRKeyEvent() {
     var LR_INVOKE_KEYCODE = 187;
     if ($(".button--LR").length > 0) {
         $("html").on("keydown", function(e) {
             if (parseInt(e.keyCode) === parseInt(LR_INVOKE_KEYCODE)) {
-               $(".button--LR").toggleClass("data-show");
-            };
+                $(".button--LR").toggleClass("data-show");
+            }
         });
-    };
-};
-
-function appendLREditContainer(target, url, show) {
-    if (!hasValue(url)) {
-        return false;
-    };
-    if (!target) {
-        target = $(document);
-    };
-    target.append("<div>" +
-                "<button class='btn btn-default button--LR'><a href='" + url + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></button>" +
-                "</div>"
-                );
-    if (show) {
-        $(".button--LR").addClass("data-show");
-    };
-
-};
-
-function __getLoaderHTML(message) {
-    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message)?"&nbsp;"+message:"") + '</div>';
+    }
 }
-function _isTouchDevice(){
-    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
-};
+function appendLREditContainer(target, url, show) { /*global i18next */
+    if (!hasValue(url)) { return false; }
+    if (!target) { target = $(document); }
+    target.append("<div>" +
+        "<button class='btn btn-default button--LR'><a href='" + url + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></button>" +
+        "</div>"
+    );
+    if (show) { $(".button--LR").addClass("data-show");}
+}
+function __getLoaderHTML(message) {
+    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message) ? "&nbsp;" + message : "") + '</div>';
+}
 function __convertToNumericField(field) {
     if (field) {
         if (_isTouchDevice()) {
-            field.each(function() {$(this).prop("type", "tel");});
-        };
-    };
-};
-function isString (obj) {
-    return (Object.prototype.toString.call(obj) === '[object String]');
-};
+            field.each(function() {
+                $(this).prop("type", "tel");
+            });
+        }
+    }
+}
+function isString(obj) {
+    return (Object.prototype.toString.call(obj) === "[object String]");
+}
 function disableHeaderFooterLinks() {
     var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
     links.addClass("disabled");
-    links.prop("onclick",null).off("click");
+    links.prop("onclick", null).off("click");
     links.on("click", function(e) {
         e.preventDefault();
         return false;
     });
-};
+}
+
 function pad(n) {
-    n = parseInt(n); return (n < 10) ? '0' + n : n;
-};
+    n = parseInt(n);
+    return (!isNaN(n) && n < 10) ? "0" + n : n;
+}
 function escapeHtml(text) {
     "use strict";
     if (text === null || text !== "undefined" || String(text).length === 0) {
         return text;
     }
-    return text.replace(/[\"&'\/<>]/g, function (a) {
+    return text.replace(/[\"&'\/<>]/g, function(a) {
         return {
-            '"': "&quot;", "&": "&amp;", "'": "&#39;",
-            "/": "&#47;",  "<": "&lt;",  ">": "&gt;"
+            '"': "&quot;",
+            "&": "&amp;",
+            "'": "&#39;",
+            "/": "&#47;",
+            "<": "&lt;",
+            ">": "&gt;"
         }[a];
     });
-};
+}
 function containHtmlTags(text) {
     if (!hasValue(text)) {
         return false;
-    };
+    }
     return /[<>]/.test(text);
-};
+}
 function __getExportFileName(prefix) {
     var d = new Date();
-    return (prefix?prefix:"ExportList_")+("00" + d.getDate()).slice(-2)+("00" + (d.getMonth() + 1)).slice(-2)+d.getFullYear();
+    return (prefix ? prefix : "ExportList_") + ("00" + d.getDate()).slice(-2) + ("00" + (d.getMonth() + 1)).slice(-2) + d.getFullYear();
 }
-function capitalize(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
-var __winHeight = $(window).height(), __winWidth = $(window).width();
-$.fn.isOnScreen = function(){
-    var viewport = {};
-    viewport.top = $(window).scrollTop();
-    viewport.bottom = viewport.top + __winHeight;
-    var bounds = {};
-    bounds.top = this.offset().top;
-    bounds.bottom = bounds.top + this.outerHeight();
-    return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
-};
-$.fn.sortOptions = function() {
-    var selectOptions = $(this).find("option");
-    selectOptions.sort(function(a, b) {
-        if (a.text > b.text) {
-            return 1;
-        }
-        else if (a.text < b.text) {
-            return -1;
-        }
-        else {
-            return 0;
-        }
+function capitalize(str) {
+    return str.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
-      return selectOptions;
-};
+}
+function restoreVis() {
+    var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
+    if (loadingElement) { loadingElement.setAttribute("style", "display:none; visibility:hidden;"); }
+    if (mainElement) { mainElement.setAttribute("style", "visibility:visible;-ms-filter:'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';filter:alpha(opacity=100); -moz-opacity:1; -khtml-opacity:1; opacity:1"); }
+}
+function VueErrorHandling() {
+    if (typeof Vue === "undefined") { return false; } /*global Vue */
+    Vue.config.errorHandler = function (err, vm, info)  {
+        var handler, current = vm;
+        if (vm.$options.errorHandler) {
+            handler = vm.$options.errorHandler;
+        } else {
+            while (current.$parent) {
+                current = current.$parent;
+                handler = current.$options.errorHandler;
+                if (handler) {
+                    break;
+                }
+            }
+        }
+        if (handler) { handler.call(current, err, vm, info); }
+        else {
+            console.log(err);
+        }
+        restoreVis();
+    };
+}
+function checkJQuery() {
+    if (typeof jQuery === "undefined") {
+        restoreVis();
+        return false;
+    }
+    return true;
+}
+(function($) {
+    if (!$) { return false; }
+    var __winHeight = $(window).height(), __winWidth = $(window).width();
+    $.fn.isOnScreen = function() {
+        var viewport = {};
+        viewport.top = $(window).scrollTop();
+        viewport.bottom = viewport.top + __winHeight;
+        var bounds = {};
+        bounds.top = this.offset().top;
+        bounds.bottom = bounds.top + this.outerHeight();
+        return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
+    };
+    $.fn.sortOptions = function() {
+        var selectOptions = $(this).find("option");
+        selectOptions.sort(function(a, b) {
+            if (a.text > b.text) {
+                return 1;
+            } else if (a.text < b.text) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        return selectOptions;
+    };
+})(checkJQuery()?jQuery: null);
 // Extend an object with an extension
-function extend( obj, extension ){
-  for ( var key in extension ){
-    obj[key] = extension[key];
-  }
-};
-
+function extend(obj, extension) {
+    for (var key in extension) {
+        obj[key] = extension[key];
+    }
+    return obj;
+}
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+    var results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
  * unless dev tools are open, and IE doesn't define console.debug
  */
 (function() {
     var console = (window.console = window.console || {});
-    var noop = function () {};
+    var noop = function() {};
     var log = console.log || noop;
-    var start = function(name) { return function(param) { log("Start " + name + ": " + param); }; };
-    var end = function(name) { return function(param) { log("End " + name + ": " + param); }; };
+    var start = function(name) {
+        return function(param) {
+            log("Start " + name + ": " + param);
+        };
+    };
+    var end = function(name) {
+        return function(param) {
+            log("End " + name + ": " + param);
+        };
+    };
 
     var methods = {
         // Internet Explorer (IE 10): http://msdn.microsoft.com/en-us/library/ie/hh772169(v=vs.85).aspx#methods
@@ -304,16 +377,30 @@ function extend( obj, extension ){
         // markTimeline(String)
         // "markTimeline"
 
-        assert: noop, clear: noop, trace: noop, count: noop, timeStamp: noop, msIsIndependentlyComposed: noop,
-        debug: log, info: log, log: log, warn: log, error: log,
-        dir: log, dirxml: log, markTimeline: log,
-        group: start('group'), groupCollapsed: start('groupCollapsed'), groupEnd: end('group'),
-        profile: start('profile'), profileEnd: end('profile'),
-        time: start('time'), timeEnd: end('time')
+        assert: noop,
+        clear: noop,
+        trace: noop,
+        count: noop,
+        timeStamp: noop,
+        msIsIndependentlyComposed: noop,
+        debug: log,
+        info: log,
+        log: log,
+        warn: log,
+        error: log,
+        dir: log,
+        dirxml: log,
+        markTimeline: log,
+        group: start("group"),
+        groupCollapsed: start("groupCollapsed"),
+        groupEnd: end("group"),
+        profile: start("profile"),
+        profileEnd: end("profile"),
+        time: start("time"),
+        timeEnd: end("time")
     };
-
     for (var method in methods) {
-        if ( methods.hasOwnProperty(method) && !(method in console) ) { // define undefined methods as best-effort methods
+        if (methods.hasOwnProperty(method) && !(method in console)) { // define undefined methods as best-effort methods
             console[method] = methods[method];
         }
     }

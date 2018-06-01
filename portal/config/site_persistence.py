@@ -5,6 +5,8 @@ from flask import current_app
 from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
+from ..models.auth import AuthProviderPersistable, Token
+from ..models.client import Client
 from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
 from ..models.intervention import Intervention
@@ -14,8 +16,11 @@ from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
+from ..models.relationship import Relationship, RELATIONSHIP
+from ..models.role import Role, ROLE
 from ..models.scheduled_job import ScheduledJob
-from .model_persistence import export_model, import_model
+from ..models.user import User, UserRelationship, UserRoles
+from .model_persistence import ExclusionPersistence, ModelPersistence
 
 
 # NB - order MATTERS, as any type depending on another must find
@@ -42,15 +47,73 @@ models = (
     ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
 
 
+# StagingExclusions capture details exclusive of a full db overwrite
+# that are to be restored *after* db migration.  For example, when
+# bringing the production db to staging, retain the staging
+# config for interventions, application_developers and service users
+
+def auth_providers_filter():
+    """Return query restricted to application developer users"""
+    return (
+        AuthProviderPersistable.query.join(User).join(UserRoles).join(
+            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
+
+
+def client_users_filter():
+    """Return query restricted to service users and those with client FKs"""
+    return (
+        User.query.join(Client).union(User.query.join(UserRoles).join(
+            Role).filter(Role.name == ROLE.SERVICE)))
+
+
+def relationship_filter():
+    """Return query restricted to sponsor relationships (service users) """
+    return UserRelationship.query.join(Relationship).filter(
+        Relationship.name == RELATIONSHIP.SPONSOR)
+
+
+def service_token_filter():
+    """Return query restricted to tokens owned by service users"""
+    return Token.query.join(User).join(UserRoles).join(Role).filter(
+        Role.name == ROLE.SERVICE)
+
+
+StagingExclusions = namedtuple(
+    'StagingExclusions',
+    ['cls', 'lookup_field', 'limit_to_attributes', 'filter_query'])
+staging_exclusions = (
+    StagingExclusions(Client, 'client_id', None, None),
+    StagingExclusions(Intervention, 'name', ['link_url'], None),
+    StagingExclusions(
+        User, 'id', ['telecom', 'password'], client_users_filter),
+    StagingExclusions(
+        UserRelationship, ('user_id', 'other_user_id'), None,
+        relationship_filter),
+    StagingExclusions(
+        AuthProviderPersistable, ('user_id', 'provider_id'), None,
+        auth_providers_filter),
+    StagingExclusions(Token, 'access_token', None, service_token_filter)
+)
+
+
 class SitePersistence(object):
     """Manage import and export of dynamic site data"""
 
     VERSION = '0.1'
 
-    def export(self, dir):
+    def __init__(self, target_dir):
+        """Initialize SitePersistence instance
+
+        :param target_dir: assign filesystem path to use non-default
+
+        """
+        self.dir = target_dir
+
+    def export(self, staging_exclusion=False):
         """Generate JSON files defining dynamic site objects
 
-        :param dir: used to name non-default target directory for export files
+        :param staging_exclusion: set only if persisting exclusions to retain
+          on staging when pulling over production data
 
         Export dynamic data, such as Organizations and Access Strategies for
         import into other sites.  This does NOT export values expected
@@ -60,15 +123,31 @@ class SitePersistence(object):
         To import the data, use the seed command as defined in manage.py
         """
 
-        # The following model classes write to independent files
-        for model in models:
-            export_model(cls=model.cls, lookup_field=model.lookup_field,
-                         target_dir=dir)
+        def default_export():
+            # The following model classes write to independent files
+            for model in models:
+                model_persistence = ModelPersistence(
+                    model.cls, lookup_field=model.lookup_field,
+                    target_dir=self.dir)
+                model_persistence.export()
 
-        # Add site.cfg
-        export_config(target_dir=dir)
+            # Add site.cfg
+            export_config(target_dir=self.dir)
 
-    def import_(self, keep_unmentioned):
+        def exclusive_export():
+            for model in staging_exclusions:
+                ep = ExclusionPersistence(
+                    model_class=model.cls, lookup_field=model.lookup_field,
+                    limit_to_attributes=model.limit_to_attributes,
+                    filter_query=model.filter_query, target_dir=self.dir)
+                ep.export()
+
+        if staging_exclusion:
+            exclusive_export()
+        else:
+            default_export()
+
+    def import_(self, keep_unmentioned, staging_exclusion=False):
         """If persistence file is found, import the data
 
         :param keep_unmentioned: if True, unmentioned data, such as
@@ -76,17 +155,33 @@ class SitePersistence(object):
             but not in the persistence file, will be left in place.
             if False, any unmentioned data will be purged as part of
             the import process.
+        :param staging_exclusion: set only if persisting exclusions to retain
+          on staging when pulling over production data
 
         """
-        for model in models:
-            import_model(
-                cls=model.cls,
-                sequence_name=model.sequence_name,
-                lookup_field=model.lookup_field,
-                keep_unmentioned=keep_unmentioned)
+        def default_import():
+            for model in models:
+                model_persistence = ModelPersistence(
+                    model.cls, lookup_field=model.lookup_field,
+                    sequence_name=model.sequence_name,
+                    target_dir=self.dir)
+                model_persistence.import_(keep_unmentioned=keep_unmentioned)
 
-        # Config isn't a model - separate function
-        import_config()
+            # Config isn't a model - separate function
+            import_config(target_dir=self.dir)
+
+        def exclusive_import():
+            for model in staging_exclusions:
+                ep = ExclusionPersistence(
+                    model_class=model.cls, lookup_field=model.lookup_field,
+                    limit_to_attributes=model.limit_to_attributes,
+                    filter_query=model.filter_query, target_dir=self.dir)
+                ep.import_(keep_unmentioned=keep_unmentioned)
+
+        if staging_exclusion:
+            exclusive_import()
+        else:
+            default_import()
 
         db.session.commit()
         current_app.logger.info("SitePersistence import complete")

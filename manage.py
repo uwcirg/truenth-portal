@@ -101,12 +101,17 @@ def sync():
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 @app.cli.command(name="seed")
 def seed_command(keep_unmentioned):
+    """Seed database with required data"""
     seed(keep_unmentioned)
 
 
 def seed(keep_unmentioned=False):
-    """Seed database with required data"""
+    """Actual seed function
 
+    NB this is defined separately so it can also be called internally,
+    i.e. from sync
+
+    """
     # Request context necessary for generating data from own HTTP APIs
     with app.test_request_context():
         add_static_concepts()
@@ -118,19 +123,22 @@ def seed(keep_unmentioned=False):
     db.session.commit()
 
     # import site export file if found
-    SitePersistence().import_(keep_unmentioned=keep_unmentioned)
+    SitePersistence(target_dir=None).import_(
+        keep_unmentioned=keep_unmentioned)
 
 
-@click.option('--dir', '-d', default=None, help="Export directory")
-@app.cli.command(name="export_site")
-def export_command(dir):
-    export_site(dir)
-
-
-def export_site(dir):
+@click.option('--directory', '-d', default=None, help="Export directory")
+@click.option(
+    '--staging_exclusion', '-x', default=False, is_flag=True,
+    help="Staging Exclusions Export")
+@app.cli.command()
+def export_site(directory, staging_exclusion):
     """Generate JSON file containing dynamic site config
 
-    :param dir: used to name a non-default target directory for export files
+    :param directory: used to name a non-default target directory for export
+      files
+    :param staging_exclusion: set only if persisting exclusions to retain
+      on staging when pulling over production data.
 
     Portions of site configuration live in the database, such as
     Organizations and Access Strategies.  Generate a single export
@@ -140,7 +148,21 @@ def export_site(dir):
     other static data.
 
     """
-    SitePersistence().export(dir)
+    SitePersistence(target_dir=directory).export(
+        staging_exclusion=staging_exclusion)
+
+
+@click.option('--directory', '-d', default=None, help="Import directory")
+@app.cli.command()
+def import_site_exclusions(directory):
+    """Import serialized exclusions (saved on stage prior to prod db overwrite)
+
+    :param directory: used to name a non-default target directory for import
+      files
+
+    """
+    SitePersistence(target_dir=directory).import_(
+        staging_exclusion=True, keep_unmentioned=True)
 
 
 @click.option('--email', '-e', help="email address for new user")

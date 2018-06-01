@@ -12,49 +12,30 @@
     {{profile_macro.profileCommunications(user, current_user)}}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container editable" data-sections="org">
-                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
-                {{profile_macro.profileOrg(user,None,consent_agreements, current_user)}}
-            </div>
+            {% call profile_macro.profileSection(data_sections="org") -%}
+                {% call profile_macro.titleSection() -%}{{ _("Clinic") }}{%- endcall %}
+                {{profile_macro.profileOrg(person=user,consent_agreements=consent_agreements, current_user=current_user)}}
+            {%- endcall %}
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div  class="profile-item-container editable" data-sections="locale,timezone">
-                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("Locale / Time Zone")}}</h4>
-                <div class="view-container">
-                    <table>
-                        <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
-                        <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
-                    </table>
-                    <div class="get-demo-error get-locale-error error-message"></div>
-                    <div class="put-demo-error error-message"></div>
-                </div>
-                <div class="edit-container flex">
-                    {{profile_macro.profileLocale(user)|show_macro('language')}}
-                    {{profile_macro.profileTimeZone(user)}}
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <div class="row"><div class="col-md-12 col-xs-12">{{profile_macro.profileLocaleTimeZone(user)}}</div></div>
     {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN) and not user.has_role(ROLE.SERVICE) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("User Roles") }}</h4>{{profile_macro.profileRole(user, current_user)}}
-                </div>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="rolesLoc") -%}{{ _("User Roles") }}{% endcall %}
+                    {{profile_macro.profileRole(user, current_user)}}
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}
-
     {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="auditLogLoc" class="profile-item-title index-item">{{ _("Audit Log") }}</h4>
+                {% call profile_macro.profileSection(editable=False) -%}
+                    {% call profile_macro.titleSection(id="auditLogLoc") -%}{{ _("Audit Log") }}{% endcall %}
                     {{profile_macro.profileAuditLog(user, current_user)}}
-                </div>
+                {%- endcall %}
             </div>
         </div>
     {%- endif %}

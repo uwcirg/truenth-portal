@@ -1,6 +1,5 @@
-{% extends "layout.html" %}
+{% extends "admin/admin_base.html" %}
 {% block main %}
-
 <div class="reduce-font-sizes">
 
     <h3 class="tnth-headline">{{ _("Admin Tools") }}</h3>
@@ -19,18 +18,9 @@
 
     <p id="profileIntro">{{ _("Select any user to view details or make changes.") }}</p>
 
-    <div class="admin-table table-responsive smaller-text">
+    <div id="adminTableContainer" class="admin-view admin-table table-responsive smaller-text" data-export-prefix="{{_('AdminList_')}}">
         <div id="adminTableToolbar" class="admin-toolbar">
-            <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-                <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
-                </button>
-                <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
-                    <div class="form-group smaller-text" id="userOrgs">
-                        <div id="fillOrgs" class="smaller-text"></div>
-                    </div>
-                </div>
-            </div>
+            {{orgsSelector()}}
             <span id="tableCount"></span>
         </div>
         <table id="adminTable"
@@ -47,30 +37,29 @@
                data-show-export="true"
                data-export-data-type="all"
                data-filter-control="true"
-               data-show-columns="true">
+               data-show-columns="true"
+               >
             <thead>
             <tr>
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
-                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-filter-control="input">{{ _("Username") }}</th>
                 <th data-field="firstname" data-sortable="true" data-filter-control="input">{{ _("First Name") }}</th>
                 <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
                 <th data-field="email" data-sortable="true" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="roles" data-sortable="true" data-filter-control="input">{{ _("Roles") }}</th>
                 <th data-field="sites" data-sortable="true" data-filter-control="input">{{_("Sites")}}</th>
-                <th class="text-center"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
+                <th class="text-center" data-sortable="false" data-searchable="false"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in users %}
             <tr id="data_row_{{user.id}}">
                 <td><a href="{{ url_for('.profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a></td>
-                <td>{{ user.username if user.username}}</td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button onclick="AT.deleteUser(event, '{{user.id}}', true)" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
+                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Delete</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -78,55 +67,8 @@
     </div>
 </div>
 {% endblock %}
-{% block table_export_filter_script %}
-{{super()}}
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-{% endblock %}
 {% block footer %}
 {% from "flask_user/_macros.html" import footer %}
 {{footer(user=user)}}
 {% endblock %}
-{% block document_ready %}
 
-$("#adminTable").bootstrapTable({
-    formatShowingRows: function (pageFrom, pageTo, totalRows) {
-        var rowInfo = i18next.t("Showing {pageFrom} to {pageTo} of {totalRows} users").
-          replace("{pageFrom}", pageFrom).
-          replace("{pageTo}", pageTo).
-          replace("{totalRows}", totalRows);
-        $("#tableCount").html(rowInfo);
-        return rowInfo;
-    },
-    exportOptions: {
-        fileName: __getExportFileName("AdminList_")
-    }
-});
-
-/** Example of how we could have a select to limit to a particular role. Needs more work
-because only looks at entire field
-$("#adminTableToolbar").on("click",function(){
-    $('#adminTable').bootstrapTable('filterBy', {roles: "patient"});
-});
-**/
-var AT = new window.portal.AdminTool(
-{{user.id}},
-"adminList",
-{
-  "tnthAjax": tnthAjax,
-  "i18next": i18next,
-  "tnthDates": tnthDates
-});
-(function() {
-  var org_list = {};
-  {% if org_list %}
-    {% for org in org_list %}
-        org_list["{{org}}"] = true;
-    {% endfor %}
-  {% endif %}
-  $(document).ready(function() {
-    AT.getTablePreference({{user.id}}, AT.tableIdentifier);
-    AT.initOrgsList(org_list, 'admin');
-    setTimeout(function() { AT.fadeLoader(); }, 500);
-  });
-})();
-{% endblock %}

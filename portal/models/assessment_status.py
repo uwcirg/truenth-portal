@@ -93,6 +93,9 @@ def qb_status_dict(user, questionnaire_bank, as_of_date):
         return d
     start = questionnaire_bank.calculated_start(
         trigger_date, as_of_date=as_of_date).relative_start
+    if not start:
+        raise ValueError("no start for {} {}, can't continue".format(
+            user, questionnaire_bank))
     overdue = questionnaire_bank.calculated_overdue(
         trigger_date, as_of_date=as_of_date)
     expired = questionnaire_bank.calculated_expiry(

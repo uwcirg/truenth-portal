@@ -49,15 +49,13 @@ class BaseConfig(object):
     REQUEST_CACHE_EXPIRE = 10
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'localhost')
-    MAIL_PORT = os.environ.get('MAIL_PORT', 25)
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
     MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
-    ERROR_SENDTO_EMAIL = os.environ.get(
-        'ERROR_SENDTO_EMAIL',
-        'truenth-wsgi-app-errors@mailman.cirg.washington.edu')
+    ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
 
     CELERY_IMPORTS = ('portal.tasks', )
     DEBUG = False
@@ -147,7 +145,7 @@ class BaseConfig(object):
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
-    DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+    DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
     SQLALCHEMY_ECHO = False
 
 

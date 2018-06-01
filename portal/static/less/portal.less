@@ -108,6 +108,18 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
+.save-loader-wrapper {
+  .load-icon {
+    margin-left:4px; 
+    margin-top:5px;
+  }
+  .success-icon {
+    color: green;
+  }
+  .error-icon {
+    color: red;
+  }
+}
 .form-control,
 input,
 select,
@@ -234,6 +246,13 @@ a.btn {
   color: @labelColor;
   padding: 0;
   margin: 1em 0.2em 2em 0.2em;
+}
+.email-ready-message {
+  padding: 8px 5px;
+  span.warning {
+    display: inline-block;
+    margin-right: 8px;
+  }
 }
 .button--LR,
 .button--LR.data-show,
@@ -448,12 +467,18 @@ select:not([multiple]) {
   transition: visibility 0.6s, opacity 0.7s ease-in;
 }
 #createProfileForm {
+  .profile-item-edit-btn {
+    display: none;
+  }
   #profileSiteId {
     width: 350px;
     max-width: 100%;
   }
   #profileSiteIDContainer {
     margin-top: 1.6em;
+  }
+  #noEmailContainer {
+    display: none;
   }
 }
 #profileSiteId {
@@ -549,6 +574,9 @@ div.right-panel {
   float: left;
   width: 2%;
   margin: 0.2em 0.5em 0 0;
+  &:hover {
+    cursor: pointer;
+  }
 }
 .terms-tick-box-text {
   float: left;
@@ -857,6 +885,9 @@ div.pull-right {
     margin: 0.8em auto;
   }
   td.reports-field {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     a {
       width: 4em;
       max-width: 100%;
@@ -872,13 +903,8 @@ div.pull-right {
       white-space: nowrap;
     }
     a.btn-report {
-      padding: .4em .2em;
-      margin: 0.2em .2em 0.3em .2em;
-    }
-    a.btn-report-2 {
-      margin-left: -1.5em;
-      padding-left: 0;
-      width: 3.5em;
+      padding: 8px;
+      margin: 4px;
     }
   }
   .eproms-id-label {
@@ -958,6 +984,8 @@ div.pull-right {
       width: 250px;
       max-width: 100%;
       margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
       label {
         font-weight: normal;
         font-size: @baseMobileFontSize;
@@ -1573,8 +1601,11 @@ div.pull-right {
 .core-data-procedure {
   .profile-item-container {
     background: none;
-    border: none;
+    border: 0 !important;
     padding: 0;
+  }
+  .profile-item-edit-btn {
+    display: none;
   }
   #profileProcedureContainer {
     border-top: 1px solid #e8e7e7;
@@ -2064,10 +2095,10 @@ div.noOrg-container {
   background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
 }
-#createProfileForm[data-account='patient'] #bdGroup {
+#accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 104px;
 }
-#createProfileForm[data-account='staff'] {
+#accountCreationContentContainer[data-account='staff'] {
   #userOrgs {
    margin-top: 0;
   }

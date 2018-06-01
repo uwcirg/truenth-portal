@@ -3,6 +3,7 @@ from cgi import escape
 from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
+from flask_babel import gettext as _
 from flask_user import UserMixin, _call_or_get
 from sqlalchemy import text
 from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
@@ -471,6 +472,52 @@ class User(db.Model, UserMixin):
         else:
             self._email = email
         assert(self._email and len(self._email))
+
+    def email_ready(self):
+        """Returns (True, None) IFF user has valid email and necessary criteria
+
+        As user's frequently forget their passwords or start in a state without
+        a valid email address, the system should NOT email invites or reminders
+        unless adequate data is on file for the user to perform a reset password
+        loop.
+
+        NB exceptions exist for systems with the NO_CHALLENGE_WO_DATA
+        configuration set, as those systems allow for change of password without
+        the verification step, if the user doesn't have a required field set.
+
+        :returns: (Success, Failure message), such as (True, None) if the user
+            account is "email_ready" or (False, _"invalid email") if the reason
+            for failure is a lack of valid email address.
+
+        """
+        try:
+            validate_email(self.email)
+        except BadRequest:
+            valid_email = False
+        else:
+            valid_email = True
+
+        if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
+            return False, _("invalid email address")
+
+        if current_app.config.get('NO_CHALLENGE_WO_DATA', False):
+            # Grandfather in systems that didn't capture all challenge fields
+            if valid_email:
+                return True, None
+            return False, _("invalid email address")
+
+        else:
+            # Otherwise, require all challenge fields are defined, so an emailed
+            # user could finish a process such as reset password, if needed.
+            if all((self.birthdate, self.first_name, self.last_name)):
+                return True, None
+            else:
+                msg = _("missing required data: ")
+                missing = []
+                for attr in 'birthdate', 'first_name', 'last_name':
+                    if not getattr(self, attr):
+                        missing.append(_(attr))
+                return False, "{} {}".format(msg, ','.join(missing))
 
     @property
     def phone(self):
@@ -1099,7 +1146,33 @@ class User(db.Model, UserMixin):
                 subject_id=self.id, context='role')
             db.session.add(audit)
 
+    def update_birthdate(self, fhir):
+        try:
+            bd = fhir['birthDate']
+            self.birthdate = datetime.strptime(
+                bd.strip(), '%Y-%m-%d') if bd else None
+        except (AttributeError, ValueError):
+            abort(400, "birthDate '{}' doesn't match expected format "
+                       "'%Y-%m-%d'".format(fhir['birthDate']))
+
     def update_deceased(self, fhir):
+        # As the update process starts with a complete record of the
+        # current patient and then merges in given fields, it's possible
+        # to land here with conflicting data.  Process boolean first
+        # as it may be clearing a previously set datetime.
+
+        if fhir.get('deceasedBoolean', None) is False and self.deceased_id:
+            # Remove deceased record from the user, but maintain
+            # the old audit row.
+            self.deceased_id = None
+            audit = Audit(
+                user_id=current_user().id,
+                subject_id=self.id, context='user',
+                comment=("Remove existing deceased from "
+                         "user {}".format(self.id)))
+            db.session.add(audit)
+            return  # don't process deceasedDateTime as it is now stale
+
         if 'deceasedDateTime' in fhir:
             dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
                                      error_subject='deceasedDataTime')
@@ -1116,15 +1189,8 @@ class User(db.Model, UserMixin):
         elif 'deceasedBoolean' in fhir:
             if fhir['deceasedBoolean'] is False:
                 if self.deceased_id:
-                    # Remove deceased record from the user, but maintain
-                    # the old audit row.
-                    self.deceased_id = None
-                    audit = Audit(
-                        user_id=current_user().id,
-                        subject_id=self.id, context='user',
-                        comment=("Remove existing deceased from "
-                                 "user {}".format(self.id)))
-                    db.session.add(audit)
+                    raise ValueError(
+                        "logic error, deceased_id and false deceasedBoolean")
             else:
                 # still marked with an audit, but without the special
                 # comment syntax and using default (current) time.
@@ -1134,7 +1200,12 @@ class User(db.Model, UserMixin):
                              "deceased".format(self.id)), context='user')
                 self.deceased = audit
 
-    def update_from_fhir(self, fhir, acting_user):
+    @classmethod
+    def from_fhir(cls, data):
+        user = cls()
+        return user.update_from_fhir(data)
+
+    def update_from_fhir(self, fhir, acting_user=None):
         """Update the user's demographics from the given FHIR
 
         If a field is defined, it is the final definition for the respective
@@ -1142,9 +1213,11 @@ class User(db.Model, UserMixin):
         that are not included.
 
         :param fhir: JSON defining portions of the user demographics to change
-        :param acting_user: user requesting the change
+        :param acting_user: user requesting the change, used in audit logs
 
         """
+        if not acting_user:
+            acting_user = self
 
         def update_identifiers(fhir):
             """Given FHIR defines identifiers, but we never store implicit
@@ -1211,13 +1284,7 @@ class User(db.Model, UserMixin):
                 v_or_first(name.get('family'), 'family name')
             ) or self.last_name
         if 'birthDate' in fhir:
-            try:
-                bd = fhir['birthDate']
-                self.birthdate = datetime.strptime(
-                    bd.strip(), '%Y-%m-%d') if bd else None
-            except (AttributeError, ValueError):
-                abort(400, "birthDate '{}' doesn't match expected format "
-                      "'%Y-%m-%d'".format(fhir['birthDate']))
+            self.update_birthdate(fhir)
         self.update_deceased(fhir)
         update_identifiers(fhir)
         update_care_providers(fhir)
@@ -1226,7 +1293,7 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if ((telecom.email != self.email) and
+                if self.email and ((telecom.email != self.email) and
                         (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
@@ -1243,6 +1310,16 @@ class User(db.Model, UserMixin):
             for e in fhir['extension']:
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
+        if 'id' in fhir:
+            # Only expected during exclusion persistence, otherwise not part
+            # of serial form
+            if self.id and self.id != fhir['id']:
+                raise ValueError(
+                    "unexpected, non-matching 'id' found in FHIR for {}".format(self))
+            self.id = fhir['id']
+
+        return self
+
 
     @classmethod
     def column_names(cls):
@@ -1674,3 +1751,24 @@ class UserRelationship(db.Model):
         """Print friendly format for logging, etc."""
         return "{0.relationship} between {0.user_id} and "\
             "{0.other_user_id}".format(self)
+
+    def as_json(self):
+        """serialize the relationship - used to preserve service users"""
+        d = {'resourceType': 'UserRelationship'}
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+        return d
+
+    @classmethod
+    def from_json(cls, data):
+        user_rel = cls()
+        return user_rel.update_from_json(data)
+
+    def update_from_json(self, data):
+        if 'user_id' not in data or 'other_user_id' not in data:
+            raise ValueError(
+                "required 'user_id' and 'other_user_id' fields not found")
+        for attr in ('user_id', 'other_user_id', 'relationship_id'):
+            setattr(self, attr, data.get(attr))
+        return self

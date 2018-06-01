@@ -139,7 +139,7 @@
                 getData: function() {
                     var self = this;
                     this.loading = true;
-                    this.tnthAjax.getClinical(this.getCurrentUserId(), function(data) {
+                    this.tnthAjax.getClinical(this.getCurrentUserId(), false, function(data) {
                         if (data.error) {
                             $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         } else {

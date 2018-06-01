@@ -1,4 +1,8 @@
-Hello User,
+{% trans first_name=user.first_name, last_name=user.last_name %}Hello {{ first_name }} {{ last_name }},{% endtrans %}
 
 {% block message %}
 {% endblock %}
+{% trans %}
+Thank you,
+The TrueNTH Team
+{% endtrans %}

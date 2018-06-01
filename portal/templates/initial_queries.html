@@ -90,48 +90,8 @@
 </div>
 {% endblock %}
 {% block additional_scripts %}
+<!-- TODO, don't need profile JS if initial queries is own Vue instance -->
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 <script src="{{ url_for('static', filename='js/initialQueries.js') }}"></script>
-{% endblock %}
-{% block document_ready %}
-var fc = new window.FieldsChecker("{{user.id}}",
-                            {%-if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN)-%}true{%-else-%}false{%-endif-%},
-                            {i18next: i18next,
-                             tnthAjax: tnthAjax,
-                             orgTool: new OrgTool(),
-                             assembleContent: assembleContent,
-                             tnthDates: tnthDates
-                            });
-
-$(document).ready(function(){
-  /*
-   * the flow here :
-   * get still needed core data
-   * populate all required fields
-   * get incomplete fields thereafter
-   * note: need to delay gathering incomplete fields to allow fields to be render
-   */
-
-  fc.init(function() {
-      fc.startTime = new Date();
-      DELAY_LOADING = true;
-      fc.intervalId = setInterval(function() {
-        fc.endTime = new Date();
-        var elapsedTime = fc.endTime - fc.startTime;
-        elapsedTime /= 1000;
-        if (fc.sectionsLoaded() || elapsedTime >= 3) {
-            setTimeout(function() {
-              fc.initIncompleteFields();
-              fc.onIncompleteFieldsDidInit();
-            }, 300);
-            fc.startTime = 0;
-            fc.endTime = 0;
-            clearInterval(fc.intervalId);
-            DELAY_LOADING = false;
-            showMain();
-            hideLoader(true);
-        };
-      }, 10);
-  });
-});
 {% endblock %}
 

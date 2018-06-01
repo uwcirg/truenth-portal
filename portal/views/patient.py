@@ -10,6 +10,7 @@ from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..database import db
 from .demographics import demographics
 from ..extensions import oauth
 from ..models.identifier import Identifier, UserIdentifier
@@ -160,23 +161,76 @@ def post_patient_deceased(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
-      409:
-        description:
-          if attempting to POST new deceased data for a patient whom already
-          has a defined deceased value.
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    if not request.json and set(request.json.keys()).isdisjoint(
+    if not request.json or set(request.json.keys()).isdisjoint(
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
 
-    if patient.deceased and (
-            request.json.get('deceasedBoolean') or
-            request.json.get('deceasedDateTime')):
-        abort(409, "Deceased value already set for patient {}".format(
-            patient_id))
-
     patient.update_deceased(request.json)
+    db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
+    return jsonify(patient.as_fhir(include_empties=False))
+
+
+@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
+@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
+@oauth.require_oauth()
+def post_patient_dob(patient_id):
+    """POST date of birth for a patient
+
+    This convenience API wraps the ability to set a patient's birthDate - generally
+    the /api/demographics API should be preferred.
+
+    ---
+    operationId: dob
+    tags:
+      - Patient
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: dob_details
+          properties:
+            birthDate:
+              type: string
+              description: valid FHIR date string defining date of birth
+    responses:
+      200:
+        description:
+          Returns updated [FHIR patient
+          resource](http://www.hl7.org/fhir/patient.html) in JSON.
+      400:
+        description:
+          if given parameters don't validate
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to edit requested patient
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user_or_abort(patient_id)
+    if not request.json or 'birthDate' not in request.json:
+        abort(400, "Requires `birthDate` in JSON")
+
+    patient.update_birthdate(request.json)
+    db.session.commit()
+    auditable_event("updated demographics on user {0} from input {1}".format(
+        patient.id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient.id, context='user')
+
     return jsonify(patient.as_fhir(include_empties=False))

@@ -107,7 +107,25 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
-
+.save-loader-wrapper {
+  .load-icon {
+    margin-left:4px; 
+    margin-top:5px;
+  }
+  .success-icon {
+    color: green;
+  }
+  .error-icon {
+    color: red;
+  }
+}
+.email-ready-message {
+  padding: 8px 5px;
+  span.warning {
+    display: inline-block;
+    margin-right: 8px;
+  }
+}
 .form-control,
 input,
 select,
@@ -563,7 +581,6 @@ select:not([multiple]) {
     }
   }
   #manualEntryCompletionDateContainer {
-    display: none;
     margin-top: 1em
   }
   #study_id_view {
@@ -733,6 +750,9 @@ div.footer-wrapper.right-panel {
   float: left;
   width: 2%;
   margin: 0.3em 0.5em 0 0;
+  &:hover {
+    cursor: pointer;
+  }
 }
 .terms-tick-box-text {
   width: 93.5%;
@@ -1154,11 +1174,16 @@ div.footer-wrapper.right-panel {
 
     #orglist-footer-container {
       padding: 0.5em 1em;
-      width: 250px;
+      width: 300px;
+      display: flex;
+      justify-content: space-between;
       max-width: 100%;
       margin: 0 auto;
       label {
         font-weight: normal;
+        margin: 2px;
+        line-height: 1.1em;
+        text-align: center;
       }
       input[type="checkbox"] {
         position: relative;
@@ -1404,7 +1429,7 @@ div.footer-wrapper.right-panel {
   &.box-min-500 {
     min-height: 500px;
     max-height: 660px;
-    margin: 2em;
+    margin: auto;
     overflow: hidden;
   }
   &.box-min-400 {
@@ -1417,6 +1442,7 @@ div.footer-wrapper.right-panel {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
   padding: 18px 0 18px;
 }
 #fullSizeLogo {
@@ -1792,16 +1818,38 @@ div.footer-wrapper.right-panel {
   overflow-x: hidden;
   max-width: 100%;
  }
-.core-data-procedure .profile-item-container {
-  background: none;
-  border: none;
-  padding: 0;
+
+#profileProceduresWrapper.profile-item-container {
+    border: 1px solid #dcdcdc;
 }
-.core-data-procedure #profileProcedureContainer {
-  border-top: 1px solid #e8e7e7;
-  border-bottom: 1px solid #e8e7e7;
-  padding-top: 2em;
+
+#profileProceduresWrapper[data-top-org-name='IRONMAN'] {
+    display: none;
 }
+#profileProceduresWrapper{
+  &[data-user-view = 'true'] {
+    .profile-item-edit-btn {
+      display: none;
+    }
+  }
+}
+
+.core-data-procedure {
+  .profile-item-container {
+    background: none;
+    border: 0 !important;
+    padding: 0;
+  }
+  .profile-item-edit-btn {
+    display: none;
+  }
+  #profileProcedureContainer {
+    border-top: 1px solid #e8e7e7;
+    border-bottom: 1px solid #e8e7e7;
+    padding-top: 2em;
+  }
+}
+
 #profileProcedureContainer {
   table {
     border: 0;
@@ -1857,7 +1905,13 @@ div.footer-wrapper.right-panel {
 }
 
 #mainDiv.profile {
+  .profile-item-container.editable {
+    .profile-item-edit-btn {
+      display: block;
+    }
+  }
   .profile-item-edit-btn {
+    display: none;
     position: absolute;
     top: 2.5em;
     right: 3em;
@@ -2082,6 +2136,9 @@ input.clinic {
   right: 5px !important;
 }
 #createProfileForm  {
+  .profile-item-edit-btn {
+    display: none;
+  }
   .title {
     margin-top: 5%;
   }
@@ -2167,21 +2224,6 @@ input.clinic {
     height: auto;
   }
 }
-
-#profileProceduresWrapper.profile-item-container {
-    border: 1px solid #dcdcdc;
-}
-
-#profileProceduresWrapper[data-top-org-name='IRONMAN'] {
-    display: none;
-}
-#profileProceduresWrapper{
-  &[data-user-view = 'true'] {
-    .profile-item-edit-btn {
-      display: none;
-    }
-  }
-}
 .create-account-container {
   padding: 2em;
   width: 100%;
@@ -2190,7 +2232,7 @@ input.clinic {
   background-color: @wellColor;
   overflow: hidden;
 }
-#createProfileForm[data-account='patient'] #bdGroup {
+#accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 114px;
 }
 #emailInfoText {
@@ -2625,6 +2667,9 @@ input.clinic {
       padding: 0.1em 1.5em;
     }
   }
+  .loading-message-indicator {
+    display: block;
+  }
 }
 #emailBodyModal .body-content {
   overflow: hidden;
@@ -2735,13 +2780,26 @@ div.biopsy-option:last-of-type{
 .withdrawn-label [data-truenth] {
   display: none;
 }
-
+.truenth-tou-table-text,
+.agreement {
+  display: none;
+}
 #consentDateEditContainer {
   margin-top: 2.6em;
   margin-bottom: 2em;
   label:first-of-type {
     margin-bottom: -0.1em;
   }
+}
+#consentDateModal {
+    .form-control {
+      margin: 0.5em 0;
+    }
+    .consent-hour,
+    .consent-minute,
+    .consent-second {
+      width: 60px;
+    }
 }
 #profileConsentList,
 #profileConsentHistory {
@@ -3305,6 +3363,7 @@ div.timezone-warning.text-warning {
     #btnProfileSendEmail, .custom-btn,
     .btn-send-email {
       width: 100%;
+      white-space: pre-wrap;
     }
   }
   .form-group {
