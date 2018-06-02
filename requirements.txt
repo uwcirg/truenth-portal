@@ -63,7 +63,7 @@ pickleshare==0.7.4
 pkginfo==1.4.2
 pluggy==0.6.0
 polib==1.1.0
-prompt-toolkit==1.0.15
+prompt-toolkit==2.0.1
 psycopg2==2.7.4
 ptpython==0.41
 ptyprocess==0.5.2
