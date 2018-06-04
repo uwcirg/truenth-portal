@@ -34,6 +34,7 @@ class TestResearchProtocol(TestCase):
         rp_json = rp.as_json()
         self.assertEquals(rp_json['name'], 'test_rp')
         self.assertTrue(rp_json['created_at'])
+        self.assertTrue(rp_json['display_name'], 'Test Rp')
 
     def test_org_rp_reference(self):
         rp = ResearchProtocol(name="test_rp")
