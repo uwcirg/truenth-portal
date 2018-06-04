@@ -143,6 +143,15 @@ class TestQuestionnaireBank(TestCase):
 
         return db.session.merge(org)
 
+    def test_display_name(self):
+        self.setup_qbs()
+        qbs = QuestionnaireBank.query.all()
+        expected = {
+            u'Crv Baseline V2',
+            u'Crv Recurring 3Mo Period V2',
+            u'Crv Recurring 6Mo Period V2'}
+        self.assertEquals(expected, set([q.display_name for q in qbs]))
+
     def test_org_trigger_date(self):
         # testing org-based QBs
         org, rp, rp_id = self.setup_org_n_rp()
