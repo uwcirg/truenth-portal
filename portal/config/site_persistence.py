@@ -83,9 +83,6 @@ class SitePersistence(object):
             export_config(target_dir=self.dir)
 
         def exclusive_export():
-            # Requires a pre-flight check, to confirm we don't overwrite, etc.
-            preflight(target_dir=self.dir)
-
             for model in staging_exclusions:
                 ep = ExclusionPersistence(
                     model_class=model.cls, lookup_field=model.lookup_field,
@@ -122,6 +119,9 @@ class SitePersistence(object):
             import_config(target_dir=self.dir)
 
         def exclusive_import():
+            # Requires a pre-flight check, to confirm we don't overwrite, etc.
+            preflight(target_dir=self.dir)
+
             for model in staging_exclusions:
                 ep = ExclusionPersistence(
                     model_class=model.cls, lookup_field=model.lookup_field,
