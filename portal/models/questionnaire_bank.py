@@ -78,6 +78,14 @@ class QuestionnaireBank(db.Model):
         return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
             self)
 
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
+
     @classmethod
     def from_json(cls, data):
         instance = cls()
