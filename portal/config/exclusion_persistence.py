@@ -45,7 +45,7 @@ StagingExclusions = namedtuple(
     ['cls', 'lookup_field', 'limit_to_attributes', 'filter_query'])
 staging_exclusions = (
     StagingExclusions(Client, 'client_id', None, None),
-    StagingExclusions(Intervention, 'name', ['link_url'], None),
+    StagingExclusions(Intervention, 'name', ['link_url', 'client_id'], None),
     StagingExclusions(
         User, 'id', ['telecom', 'password'], client_users_filter),
     StagingExclusions(
@@ -86,11 +86,51 @@ def preflight(target_dir):
             return ex
 
     # 1.) user_id associated with an intervention/client is the same
+    client_persistence = persistence_by_type(Client)
+    client_users = {}
+    for c in client_persistence:
+        client_users[c['client_id']] = c['user_id']
+
     intervention_persistence = persistence_by_type(Intervention)
     intervention_clients = {}
     for i in intervention_persistence:
-        intervention_clients[i.name] = i.client_id
+        if 'client_id' in i:
+            intervention_clients[i['name']] = i['client_id']
 
+    for intervention_name, client_id in intervention_clients.items():
+        if client_id not in client_users:
+            raise ValueError(
+                'no matching client found in persistence for {}'.format(
+                    intervention_name))
+        # look up local user_id associated with same intervention and
+        # confirm match
+        expected_user_id = Intervention.query.join(Client).filter(
+            Intervention.client_id == Client.client_id).filter(
+            Intervention.name == intervention_name).with_entities(
+            Client.user_id).one()[0]
+        if expected_user_id != client_users[client_id]:
+            raise ValueError(
+                "Mismatch - persistence files have {user_id} for "
+                "{intervention_name}, whereas local db has "
+                "{expected_user_id}".format(
+                    user_id=client_users[client_id],
+                    intervention_name=intervention_name,
+                    expected_user_id=expected_user_id))
+
+    # 2.) user_ids don't collide with anyone but a match
+    user_persistence = persistence_by_type(User)
+    for u in user_persistence:
+        candidate = u['id']
+        local = User.query.get(candidate)
+        if not local:
+            continue
+        candidate_email = [
+            t['value'] for t in u['telecom'] if t['system'] == 'email'][0]
+        if candidate_email == local.email:
+            continue
+        raise ValueError(
+            "persisted user<{}> will overwrite local <{}>; can't continue".format(
+                candidate_email, local.email))
     return True
 
 
