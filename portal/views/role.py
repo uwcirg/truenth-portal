@@ -46,15 +46,17 @@ def system_roles():
                   description:
                     type: string
                     description: Plain text describing the role.
+                  display_name:
+                    type: string
+                    description:
+                      Display version of name field, title cased with whitespace
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view roles
 
     """
-    results = [{'name': r.name, 'description': r.description}
-               for r in Role.query.all()]
-    return jsonify(roles=results)
+    return jsonify(roles=[r.as_json() for r in Role.query.all()])
 
 
 @role_api.route('/api/user/<int:user_id>/roles')
@@ -93,9 +95,8 @@ def roles(user_id):
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
         user = get_user_or_abort(user_id)
-    results = [{'name': r.name, 'description': r.description}
-               for r in user.roles]
-    return jsonify(roles=results)
+
+    return jsonify(roles=[r.as_json() for r in user.roles])
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('POST',))
@@ -163,9 +164,7 @@ def add_roles(user_id):
     db.session.commit()
 
     # Return user's updated role list
-    results = [{'name': r.name, 'description': r.description}
-               for r in user.roles]
-    return jsonify(roles=results)
+    return jsonify(roles=[r.as_json() for r in user.roles])
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('DELETE',))
@@ -232,9 +231,7 @@ def delete_roles(user_id):
     db.session.commit()
 
     # Return user's updated role list
-    results = [{'name': r.name, 'description': r.description}
-               for r in user.roles]
-    return jsonify(roles=results)
+    return jsonify(roles=[r.as_json() for r in user.roles])
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('PUT',))
@@ -297,6 +294,4 @@ def set_roles(user_id):
     db.session.commit()
 
     # Return user's updated role list
-    results = [{'name': r.name, 'description': r.description}
-               for r in user.roles]
-    return jsonify(roles=results)
+    return jsonify(roles=[r.as_json() for r in user.roles])

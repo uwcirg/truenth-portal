@@ -24,6 +24,21 @@ class Role(db.Model):
     def __str__(self):
         return "Role {}".format(self.name)
 
+    def as_json(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'display_name': self.display_name}
+
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
+
+
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
     'access_on_verify':

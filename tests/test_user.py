@@ -519,6 +519,9 @@ class TestUser(TestCase):
         received = [r['name'] for r in result_roles['roles']]
         self.assertTrue(ROLE.PATIENT in received)
         self.assertTrue(ROLE.STAFF in received)
+        display_names = [r['display_name'] for r in result_roles['roles']]
+        self.assertTrue('Patient' in display_names)
+        self.assertTrue('Staff' in display_names)
 
     def test_unauth_role(self):
         self.login()
@@ -550,6 +553,10 @@ class TestUser(TestCase):
         self.assertEquals(len(doc['roles']), len(data['roles']))
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
+        title_case_name = [
+            r['display_name'] for r in doc['roles']
+            if r['name'] == 'application_developer'][0]
+        self.assertEquals('Application Developer', title_case_name)
 
     def test_roles_post(self):
         data = {"roles": [
