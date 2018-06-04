@@ -2210,14 +2210,7 @@
                 var self = this;
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
-                    data.roles.forEach(function(role) {
-                        self.roles.data.push({
-                            name: role.name,
-                            display: i18next.t((role.name.replace(/\_/g, " ").replace(/\b[a-z]/g, function(f) {
-                                return f.toUpperCase();
-                            })))
-                        });
-                    });
+                    self.roles.data = data.roles;
                 });
                 self.initUserRoles();
             },
