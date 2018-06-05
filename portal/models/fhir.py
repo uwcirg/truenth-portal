@@ -135,8 +135,8 @@ class ValueQuantity(db.Model):
             # based on classic truth value.
             try:
                 self.value = int(value) != 0
-            except (TypeError, ValueError), e:
-                if value is None or isinstance(value, basestring):
+            except (TypeError, ValueError) as e:
+                if value is None or isinstance(value, str):
                     pass
                 else:
                     raise e
@@ -619,10 +619,10 @@ def generate_qnr_csv(qnr_bundle):
                 row = []
                 for column_name in columns:
                     column = row_data.get(column_name)
-                    column = "\N" if column is None else column
+                    column = "\\N" if column is None else column
 
                     # Handle JSON column escaping/enclosing
-                    if not isinstance(column, basestring):
+                    if not isinstance(column, str):
                         column = json.dumps(column).replace('"', '""')
                     row.append('"' + column + '"')
 

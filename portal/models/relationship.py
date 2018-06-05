@@ -7,8 +7,11 @@ To extend the list of roles, add name: description pairs to the
 STATIC_RELATIONSHIPS dict within, and rerun the seed command above.
 
 """
+from future.standard_library import install_aliases
+install_aliases()
+
 from ..database import db
-from UserDict import IterableUserDict
+from collections import UserDict
 
 
 class Relationship(db.Model):
@@ -23,7 +26,7 @@ class Relationship(db.Model):
         return "Relationship {0.name}".format(self)
 
 #Source definition for relationships, as dictionary {name: description,}
-STATIC_RELATIONSHIPS = IterableUserDict({
+STATIC_RELATIONSHIPS = UserDict({
     'partner':
         'An intimate partner relationship',
     'sponsor':
@@ -37,7 +40,7 @@ def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
 
-RELATIONSHIP = enum(**{unicode(r).upper():r for r in STATIC_RELATIONSHIPS})
+RELATIONSHIP = enum(**{str(r).upper():r for r in STATIC_RELATIONSHIPS})
 
 
 def add_static_relationships():

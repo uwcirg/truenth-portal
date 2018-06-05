@@ -19,8 +19,8 @@ from traceback import format_exc
 
 from .database import db
 from .dogpile_cache import dogpile_cache
-from factories.celery import create_celery
-from factories.app import create_app
+from .factories.celery import create_celery
+from .factories.app import create_app
 from .models.assessment_status import invalidate_assessment_status_cache
 from .models.assessment_status import overall_assessment_status
 from .models.communication import Communication
@@ -286,7 +286,7 @@ def update_tous_task(**kwargs):
 @scheduled_task
 def token_watchdog(**kwargs):
     """Clean up stale tokens and alert service sponsors if nearly expired"""
-    from models.auth import token_janitor
+    from .models.auth import token_janitor
     error_emails = token_janitor()
     if error_emails:
         return '\nUnable to reach recipient(s): {}'.format(

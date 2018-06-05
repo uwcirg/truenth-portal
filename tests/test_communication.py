@@ -59,8 +59,8 @@ class TestCommunication(TestQuestionnaireSetup):
         dd = DynamicDictLookup()
         dd['a'] = f
         dd['b'] = 'bbb'
-        self.assertEquals(dd['a'], 'zzz')
-        self.assertEquals(dd['b'], 'bbb')
+        self.assertEqual(dd['a'], 'zzz')
+        self.assertEqual(dd['b'], 'bbb')
         target = 'a {a} and b {b}'.format(**dd)
         self.assertTrue(dd['a'] in target)
         self.assertTrue(dd['b'] in target)
@@ -72,10 +72,10 @@ class TestCommunication(TestQuestionnaireSetup):
 
     def test_unicode(self):
         dd = DynamicDictLookup()
-        dd['u'] = u'\u2713'
-        target = u'works {u}'
+        dd['u'] = '\u2713'
+        target = 'works {u}'
         result = target.format(**dd)
-        self.assertTrue(u'\u2713' in result)
+        self.assertTrue('\u2713' in result)
 
     def test_dd_no_extra_calls(self):
         def bad():
@@ -100,8 +100,8 @@ class TestCommunication(TestQuestionnaireSetup):
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
         dd = load_template_args(user=user, questionnaire_bank_id=None)
-        self.assertEquals(dd['parent_org'], '101')
-        self.assertEquals(dd['clinic_name'], '1001')
+        self.assertEqual(dd['parent_org'], '101')
+        self.assertEqual(dd['clinic_name'], '1001')
 
     def test_pw_button(self):
         dd = load_template_args(user=None, questionnaire_bank_id=None)
@@ -122,7 +122,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(self.test_user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEquals(dd['questionnaire_due_date'], '10 Jun 2017')
+        self.assertEqual(dd['questionnaire_due_date'], '10 Jun 2017')
 
         # with timezone where (day = UTCday + 1)
         user.timezone = "Asia/Tokyo"
@@ -132,7 +132,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEquals(dd['questionnaire_due_date'], '11 Jun 2017')
+        self.assertEqual(dd['questionnaire_due_date'], '11 Jun 2017')
 
         # with calculated_due
         qb.due = "{\"days\": 7}"
@@ -142,7 +142,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEquals(dd['questionnaire_due_date'], '18 Jun 2017')
+        self.assertEqual(dd['questionnaire_due_date'], '18 Jun 2017')
 
     def test_empty(self):
         # Base test system shouldn't generate any messages
@@ -151,7 +151,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         count_after = Communication.query.count()
-        self.assertEquals(count_b4, count_after)
+        self.assertEqual(count_b4, count_after)
 
     def test_nearready_message(self):
         # At 13 days with all work in-progress, shouldn't generate message
@@ -189,7 +189,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertEquals(expected.user_id, TEST_USER_ID)
+        self.assertEqual(expected.user_id, TEST_USER_ID)
 
     def test_noworkdone_message(self):
         # At 14 days with no work started, should generate message
@@ -204,7 +204,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertEquals(expected.user_id, TEST_USER_ID)
+        self.assertEqual(expected.user_id, TEST_USER_ID)
 
     def test_single_message(self):
         # With multiple time spaced CRs, only latest should send
@@ -221,10 +221,10 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
-        self.assertEquals(expected.count(), 3)
-        self.assertEquals(
+        self.assertEqual(expected.count(), 3)
+        self.assertEqual(
             len([e for e in expected if e.status == 'preparation']), 1)
-        self.assertEquals(
+        self.assertEqual(
             len([e for e in expected if e.status == 'suspended']), 2)
 
     def test_no_email(self):
@@ -243,7 +243,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
-        self.assertEquals(expected.count(), 0)
+        self.assertEqual(expected.count(), 0)
 
     def test_done_message(self):
         # At 14 days with all work done, should not generate message
@@ -284,8 +284,8 @@ class TestCommunication(TestQuestionnaireSetup):
         # looks good.
 
         self.assertTrue(comm.message)
-        self.assertEquals(comm.message.recipients, TEST_USERNAME)
-        self.assertEquals(comm.status, 'completed')
+        self.assertEqual(comm.message.recipients, TEST_USERNAME)
+        self.assertEqual(comm.status, 'completed')
 
     def test_preview(self):
         self.bless_with_basics()
@@ -304,7 +304,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         self.assertTrue('<style>' in preview.body)
         self.assertTrue(preview.subject)
-        self.assertEquals(preview.recipients, TEST_USERNAME)
+        self.assertEqual(preview.recipients, TEST_USERNAME)
 
     def test_practitioner(self):
         self.bless_with_basics()
@@ -316,13 +316,13 @@ class TestCommunication(TestQuestionnaireSetup):
         user.practitioner_id = dr.id
 
         dd = load_template_args(user=user)
-        self.assertEquals(dd['practitioner_name'], 'Bob Jones')
+        self.assertEqual(dd['practitioner_name'], 'Bob Jones')
 
     def test_missing_practitioner(self):
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
         dd = load_template_args(user=user)
-        self.assertEquals(dd['practitioner_name'], '')
+        self.assertEqual(dd['practitioner_name'], '')
 
     def test_decision_support(self):
         self.bless_with_basics()
@@ -401,7 +401,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
         a_s, _ = overall_assessment_status(TEST_USER_ID)
-        self.assertEquals('In Progress', a_s)
+        self.assertEqual('In Progress', a_s)
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         self.assertTrue(expected)
@@ -457,7 +457,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             communication_request_name='test-communication-request')
 
         serial = cr.as_fhir()
-        self.assertEquals(serial['resourceType'], 'CommunicationRequest')
+        self.assertEqual(serial['resourceType'], 'CommunicationRequest')
         copy = CommunicationRequest.from_fhir(serial)
-        self.assertEquals(cr.questionnaire_bank.name,
+        self.assertEqual(cr.questionnaire_bank.name,
                           copy.questionnaire_bank.name)

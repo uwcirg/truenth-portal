@@ -107,9 +107,8 @@ class Coredata(object):
         return setattr(self.instance, name, value)
 
 
-class CoredataPoint(object):
+class CoredataPoint(object, metaclass=ABCMeta):
     """Abstract base class - defining methods each datapoint needs"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def required(self, user, **kwargs):

@@ -11,7 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from werkzeug.exceptions import Unauthorized
 
-import address
+from . import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource, UnversionedResource
 from .codeable_concept import CodeableConcept

@@ -58,7 +58,7 @@ project_slug = project.replace(" ","")
 
 now = datetime.datetime.now()
 author = metadata.author
-copyright = u'{}, {}'.format(now.year, author)
+copyright = '{}, {}'.format(now.year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -250,7 +250,7 @@ latex_elements = {
 latex_documents = [(
     master_doc,
     '%s.tex' % project_slug,
-    u'%s Documentation' % project,
+    '%s Documentation' % project,
     author,
     'manual'
 )]
@@ -281,7 +281,7 @@ latex_documents = [(
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, project_slug.lower(), u'%s Documentation' % project,
+    (master_doc, project_slug.lower(), '%s Documentation' % project,
      [author], 1)
 ]
 
@@ -297,7 +297,7 @@ man_pages = [
 texinfo_documents = [(
     master_doc,
     project_slug,
-    u'%s Documentation' % project,
+    '%s Documentation' % project,
     author,
     project_slug,
     'One line description of project.',

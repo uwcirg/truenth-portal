@@ -16,9 +16,9 @@ class TestGroup(TestCase):
         data = {'name': 'random_group_name',
                 'description': 'with a windy description'}
         grp = Group.from_json(data)
-        self.assertEquals(grp.name,
+        self.assertEqual(grp.name,
                           data['name'])
-        self.assertEquals(grp.description,
+        self.assertEqual(grp.description,
                           data['description'])
 
     def test_invalid_name(self):
@@ -37,7 +37,7 @@ class TestGroup(TestCase):
         self.login()
         rv = self.client.get('/api/group/{}'.format(grp.name))
         self.assert200(rv)
-        self.assertEquals(rv.json['group']['name'], 'test')
+        self.assertEqual(rv.json['group']['name'], 'test')
 
     def test_group_list(self):
         grp1 = Group(name='test_1')
@@ -52,7 +52,7 @@ class TestGroup(TestCase):
         rv = self.client.get('/api/group/')
         self.assert200(rv)
         bundle = rv.json
-        self.assertEquals(len(bundle['groups']), 2)
+        self.assertEqual(len(bundle['groups']), 2)
 
     def test_group_post(self):
         grp = Group(name='test', description='test group')
@@ -66,8 +66,8 @@ class TestGroup(TestCase):
 
         # Pull the posted group
         grp2 = Group.query.filter_by(name='test').one()
-        self.assertEquals(grp2.name, grp.name)
-        self.assertEquals(grp2.description, grp.description)
+        self.assertEqual(grp2.name, grp.name)
+        self.assertEqual(grp2.description, grp.description)
 
     def test_group_edit(self):
         grp = Group(name='test_grp_name', description='test group')
@@ -86,14 +86,14 @@ class TestGroup(TestCase):
 
         # Pull the posted group
         grp2 = Group.query.one()
-        self.assertEquals(grp2.name, improved_grp.name)
-        self.assertEquals(grp2.description, improved_grp.description)
+        self.assertEqual(grp2.name, improved_grp.name)
+        self.assertEqual(grp2.description, improved_grp.description)
 
     def test_user_no_groups(self):
         self.login()
         rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['groups']), 0)
+        self.assertEqual(len(rv.json['groups']), 0)
 
     def test_user_groups(self):
         grp1 = Group(name='test_1')
@@ -106,7 +106,7 @@ class TestGroup(TestCase):
         self.login()
         rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['groups']), 2)
+        self.assertEqual(len(rv.json['groups']), 2)
 
     def test_put_user_groups(self):
         grp1 = Group(name='test1')

@@ -10,8 +10,11 @@ To extend the list of roles, add name: description pairs to the
 STATIC_ROLES dict within.
 
 """
+from future.standard_library import install_aliases
+install_aliases()
+
 from ..database import db
-from UserDict import IterableUserDict
+from collections import UserDict
 
 
 class Role(db.Model):
@@ -40,7 +43,7 @@ class Role(db.Model):
 
 
 #Source definition for roles, as dictionary {name: description,}
-STATIC_ROLES = IterableUserDict({
+STATIC_ROLES = UserDict({
     'access_on_verify':
         'Provides access prior to registration, on verification',
     'admin':
@@ -88,7 +91,7 @@ def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
 
-ROLE = enum(**{unicode(r).upper():r for r in STATIC_ROLES})
+ROLE = enum(**{str(r).upper():r for r in STATIC_ROLES})
 ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
 
 

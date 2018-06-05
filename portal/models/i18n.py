@@ -6,7 +6,7 @@ import sys
 import tempfile
 
 from collections import defaultdict
-from cStringIO import StringIO
+from io import StringIO
 from flask import current_app, has_request_context, session
 from polib import pofile
 from subprocess import check_call

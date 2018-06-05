@@ -101,7 +101,7 @@ class TestPatient(TestCase):
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
         self.assertTrue(user.birthdate)
-        self.assertEquals(user.birthdate.strftime("%Y-%m-%d"), "1976-07-04")
+        self.assertEqual(user.birthdate.strftime("%Y-%m-%d"), "1976-07-04")
 
     def test_deceased(self):
         self.promote_user(role_name=ROLE.PATIENT)

@@ -10,7 +10,7 @@ from wtforms import (
     validators, widgets)
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
-from urlparse import urlparse
+from urllib.parse import urlparse
 from validators import url as url_validation
 
 from ..audit import auditable_event
@@ -336,7 +336,7 @@ def client_edit(client_id):
             db.session.delete(existing)
         service_user = user.add_service_account()
         auditable_event(
-            u"service account created by {}".format(user.display_name),
+            "service account created by {}".format(user.display_name),
             user_id=user.id, subject_id=client.user_id,
             context='authentication')
         create_service_token(client=client, user=service_user)

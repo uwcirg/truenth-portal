@@ -63,7 +63,7 @@ def favicon():
 
 @portal.route('/no-script')
 def no_script():
-    return make_response(_(u"This application requires Javascript enabled.\
+    return make_response(_("This application requires Javascript enabled.\
                             Please check your browser settings."))
 
 
@@ -1043,7 +1043,7 @@ def stock_consent(org_name):
     :param org_name: the org_name to include in the agreement text
 
     """
-    body = _(u"I consent to sharing information with %(org_name)s",
+    body = _("I consent to sharing information with %(org_name)s",
              org_name=_(org_name))
     return render_template_string(
         """<!doctype html>

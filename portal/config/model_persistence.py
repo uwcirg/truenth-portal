@@ -2,7 +2,7 @@
 from flask import current_app
 import json
 import os
-from StringIO import StringIO
+from io import StringIO
 from sqlalchemy import exc
 
 from ..database import db
@@ -88,7 +88,7 @@ class ModelPersistence(object):
         with open(self.filename, 'r') as f:
             try:
                 data = json.load(f)
-            except ValueError, e:
+            except ValueError as e:
                 msg = "Ill formed JSON in {}".format(self.filename)
                 self._log(msg)
                 raise ValueError(e, msg)
@@ -195,7 +195,7 @@ class ModelPersistence(object):
     def lookup_existing(self, new_obj, new_data):
         match, field_description = None, None
         if self.lookup_field == 'id':
-            field_description = unicode(new_obj.id)
+            field_description = str(new_obj.id)
             match = (
                 self.model.query.get(new_obj.id)
                 if new_obj.id is not None else None)
@@ -203,7 +203,7 @@ class ModelPersistence(object):
             ids = new_data.get('identifier')
             if len(ids) == 1:
                 id = Identifier.from_fhir(ids[0]).add_if_not_found()
-                field_description = unicode(id)
+                field_description = str(id)
                 match = self.model.find_by_identifier(id) if id else None
             elif len(ids) > 1:
                 raise ValueError(
@@ -212,7 +212,7 @@ class ModelPersistence(object):
         elif isinstance(self.lookup_field, tuple):
             # Composite key case
             args = {k: new_data.get(k) for k in self.lookup_field}
-            field_description = unicode(args)
+            field_description = str(args)
             match = self.model.query.filter_by(**args).first()
         else:
             args = {self.lookup_field: new_data[self.lookup_field]}

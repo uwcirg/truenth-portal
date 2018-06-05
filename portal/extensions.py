@@ -8,7 +8,7 @@ Defined here to break the circular dependencies.  See `app.py` for
 additional configuration of most objects defined herein.
 
 """
-from database import db
+from .database import db
 
 # Flask-User
 from flask_user import UserManager, SQLAlchemyAdapter

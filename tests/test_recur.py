@@ -45,4 +45,4 @@ class TestRecur(TestCase):
             trigger_date=thirty_back, as_of_date=now)
         # should get back 30 back, plus 2 to start, plus 10*2
         self.assertAlmostEqual(result, thirty_back + timedelta(days=22))
-        self.assertEquals(ic, 2)
+        self.assertEqual(ic, 2)

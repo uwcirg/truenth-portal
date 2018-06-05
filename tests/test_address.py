@@ -15,15 +15,15 @@ class TestAddress(TestCase):
             "country": "USA"
         }
         addr = Address.from_fhir(data)
-        self.assertEquals(addr.line1, data['line'][0])
-        self.assertEquals(addr.city, data['city'])
-        self.assertEquals(addr.state, data['state'])
-        self.assertEquals(addr.postalCode, data['postalCode'])
+        self.assertEqual(addr.line1, data['line'][0])
+        self.assertEqual(addr.city, data['city'])
+        self.assertEqual(addr.state, data['state'])
+        self.assertEqual(addr.postalCode, data['postalCode'])
         self.assertIn('Suite 227', str(addr))
 
     def test_as_fhir(self):
         addr = Address(city='Seattle', state='WA', postalCode='98101')
         data = addr.as_fhir()
-        self.assertEquals(addr.city, data['city'])
-        self.assertEquals(addr.state, data['state'])
-        self.assertEquals(addr.postalCode, data['postalCode'])
+        self.assertEqual(addr.city, data['city'])
+        self.assertEqual(addr.state, data['state'])
+        self.assertEqual(addr.postalCode, data['postalCode'])

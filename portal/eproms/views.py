@@ -194,7 +194,7 @@ def contact():
         email = user.email if user else ''
         recipient_types = []
         for org in Organization.query.filter(Organization.email.isnot(None)):
-            if u'@' in org.email:
+            if '@' in org.email:
                 recipient_types.append((org.name, org.email))
         return render_template(
             'eproms/contact.html', sendername=sendername, email=email, user=user,
@@ -209,7 +209,7 @@ def contact():
     if not sender or ('@' not in sender):
         abort(400, "No valid sender email address provided")
     sendername = request.form.get('sendername')
-    subject = u"{server} contact request: {subject}".format(
+    subject = "{server} contact request: {subject}".format(
         server=current_app.config['SERVER_NAME'],
         subject=request.form.get('subject'))
     if len(sendername) > 255:
@@ -219,7 +219,7 @@ def contact():
     formbody = request.form.get('body')
     if not formbody:
         abort(400, "No contact request body provided")
-    body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
+    body = "From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
         sendername=sendername, sender=sender, body=formbody)
     recipient = request.form.get('type')
     recipient = recipient or current_app.config['CONTACT_SENDTO_EMAIL']
