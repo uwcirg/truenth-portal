@@ -696,7 +696,7 @@ class AccessStrategy(db.Model):
 
             # validate the given details by attempting to instantiate
             self.instantiate()
-        except Exception, e:
+        except Exception as e:
             raise ValueError("AccessStrategy instantiation error: {}".format(
                 e))
         return self
