@@ -18,5 +18,5 @@ class TestTrueNTH(TestCase):
         self.login(user_id=user.id)
         rv = self.client.get('/api/portal-wrapper-html/')
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         self.assertTrue(username in rv.data)
