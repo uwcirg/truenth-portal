@@ -64,12 +64,12 @@ def upgrade():
 
     # wipe out all the bogus `unknown` overwrites
     if del_user_observations:
-        print "delete user_obs: {}".format(tuple(del_user_observations))
+        print("delete user_obs: {}".format(tuple(del_user_observations)))
         del_stmt = text("DELETE FROM user_observations WHERE id IN :id_list")
         conn.execute(del_stmt, id_list=tuple(del_user_observations))
 
     if del_audits:
-        print "delete audits: {}".format(tuple(del_audits))
+        print("delete audits: {}".format(tuple(del_audits)))
         del_stmt = text("DELETE FROM audit WHERE id IN :id_list")
         conn.execute(del_stmt, id_list=tuple(del_audits))
 

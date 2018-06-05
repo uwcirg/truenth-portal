@@ -53,7 +53,7 @@ def main():
 
     # Environment variables do not persist unless evaluated by parent shell
     for name, value in final_envvars.items():
-        print("export {}='{}'".format(name, value))
+        print(("export {}='{}'".format(name, value)))
 
 
 if __name__ == "__main__":

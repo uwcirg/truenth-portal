@@ -289,11 +289,11 @@ def config(config_key):
 
     if config_key:
         # Remap None values to an empty string
-        print(app.config.get(config_key, '') or '')
+        print((app.config.get(config_key, '') or ''))
         return
 
-    print(json.dumps(
+    print((json.dumps(
         # Skip un-serializable values
         {k: v for k, v in app.config.items() if isinstance(v, basestring)},
         indent=2,
-    ))
+    )))
