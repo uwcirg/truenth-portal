@@ -16,7 +16,9 @@ from .app_text import AppText
 from ..extensions import babel
 from .intervention import Intervention
 from .organization import Organization
+from .questionnaire_bank import QuestionnaireBank
 from .research_protocol import ResearchProtocol
+from .role import Role
 from .user import current_user
 
 def get_db_strings():
@@ -25,7 +27,9 @@ def get_db_strings():
         AppText: ('custom_text',),
         Intervention: ('description', 'card_html'),
         Organization: ('name',),
-        ResearchProtocol: ('name',),
+        QuestionnaireBank: ('display_name',),
+        ResearchProtocol: ('display_name',),
+        Role: ('display_name',)
     }
 
     for model, fields in i18n_fields.items():
