@@ -38,7 +38,7 @@ Flask-Testing==0.7.1
 Flask-User==0.6.21 # pyup: <0.7 # pin until 1.0 is ready for prod
 Flask-WebTest==0.0.9
 Flask-WTF==0.14.2
-functools32==3.2.3.post2
+functools32==3.2.3.post2;python_version < '3'
 future==0.16.0
 fuzzywuzzy==0.16.0
 gunicorn==19.8.1
