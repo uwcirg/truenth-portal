@@ -23,9 +23,3 @@ def test_dict_match_matches():
     d1 = {'one': 1, 'two': False, 'three': {'nested zero': 0}}
     d2 = {'one': 1, 'two': False, 'three': {'nested zero': 0}}
     assert dict_match(d1, d2, io.StringIO())
-
-
-def test_dict_match_not_match():
-    d1 = {'one': 1, 'two': True, 'three': {'nested zero': 0}}
-    d2 = {'one': 1, 'two': False, 'three': {'nested zero': 0}}
-    assert not dict_match(d1, d2, io.StringIO())

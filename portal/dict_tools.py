@@ -30,7 +30,7 @@ def dict_match(newd, oldd, diff_stream):
 
     """
     added, removed, modified, same = dict_compare(newd, oldd)
-    if len(same) == len(list(newd.keys())) and len(list(newd.keys())) == len(list(oldd.keys())):
+    if len(same) == len(newd.keys()) and len(newd.keys()) == len(oldd.keys()):
         assert not added
         assert not removed
         assert not modified
@@ -43,7 +43,7 @@ def dict_match(newd, oldd, diff_stream):
             diff_stream.write(
                 "removed {}\n".format({k:oldd.get(k) for k in removed}))
         if modified:
-            for k in list(modified.keys()):
+            for k in modified.keys():
                 diff_stream.write(
                     "replace {} with {}\n".format(
                         {k:oldd.get(k)},{k:newd.get(k)}))
@@ -74,4 +74,4 @@ def strip_empties(d):
         return [v for v in (strip_empties(v) for v in d) if has_value(v)]
 
     return {k: v for k, v in (
-        (k, strip_empties(v)) for k, v in list(d.items())) if has_value(v)}
+        (k, strip_empties(v)) for k, v in d.items()) if has_value(v)}
