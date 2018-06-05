@@ -3,7 +3,7 @@ import io
 
 def test_shallow_empty():
     d = {'one': 1, 'two': 'two', 'three': [3], 'four': None}
-    expected = {k: v for k, v in list(d.items()) if v}
+    expected = {k: v for k, v in d.items() if v}
     assert expected == strip_empties(d)
 
 def test_nested_empty_dict():
