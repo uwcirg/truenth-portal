@@ -1,15 +1,14 @@
 """Unit test module for Reference class"""
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID
-
 from portal.extensions import db
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.organization import Organization
 from portal.models.practitioner import Practitioner
-from portal.models.reference import Reference
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.reference import Reference
 from portal.system_uri import US_NPI
+from tests import TEST_USER_ID, TestCase
 
 
 class TestReference(TestCase):

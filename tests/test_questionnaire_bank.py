@@ -1,23 +1,21 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime, timedelta
+
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
-from portal.models.organization import Organization
-from portal.models.organization import OrganizationResearchProtocol
-from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.organization import Organization, OrganizationResearchProtocol
+from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire, visit_name
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent
 from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
-from tests import associative_backdate, TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 
 now = datetime.utcnow()

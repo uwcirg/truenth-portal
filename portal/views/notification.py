@@ -1,11 +1,11 @@
 """Views for UserNotifications"""
-from flask import abort, jsonify, Blueprint, current_app
+from flask import Blueprint, abort, current_app, jsonify
+
 from ..database import db
 from ..extensions import oauth
 from ..models.notification import UserNotification
 from ..models.user import current_user, get_user, get_user_or_abort
 from .portal import check_int
-
 
 notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 

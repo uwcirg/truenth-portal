@@ -1,25 +1,26 @@
 """Module for i18n methods and functionality"""
 import os
 import re
-import requests
 import sys
 import tempfile
-
 from collections import defaultdict
 from cStringIO import StringIO
-from flask import current_app, has_request_context, session
-from polib import pofile
 from subprocess import check_call
 from zipfile import ZipFile
 
-from .app_text import AppText
+import requests
+from flask import current_app, has_request_context, session
+from polib import pofile
+
 from ..extensions import babel
+from .app_text import AppText
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank
 from .research_protocol import ResearchProtocol
 from .role import Role
 from .user import current_user
+
 
 def get_db_strings():
     msgid_map = defaultdict(set)

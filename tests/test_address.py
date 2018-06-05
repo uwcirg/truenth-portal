@@ -1,6 +1,6 @@
 """Unit test module for address model"""
-from tests import TestCase
 from portal.models.address import Address
+from tests import TestCase
 
 
 class TestAddress(TestCase):

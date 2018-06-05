@@ -1,16 +1,16 @@
 """Unit test module for Encounter API and model"""
-import dateutil
 import json
 import os
 import time
-from tests import TestCase, TEST_USER_ID
-from flask_webtest import SessionScope
 
+import dateutil
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import INVITE_PREFIX
+from tests import TEST_USER_ID, TestCase
 
 
 class TestEncounter(TestCase):

@@ -1,4 +1,4 @@
-from flask import abort, current_app, Blueprint, request
+from flask import Blueprint, abort, current_app, request
 from flask_wtf.csrf import CSRFProtect
 
 from .models.user import current_user

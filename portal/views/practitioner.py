@@ -1,7 +1,8 @@
 """Practitioner API view functions"""
-from flask import abort, jsonify, Blueprint, request, url_for
-from flask_user import roles_required
 import json
+
+from flask import Blueprint, abort, jsonify, request, url_for
+from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..audit import auditable_event
@@ -14,7 +15,6 @@ from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
 from .portal import check_int
-
 
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 

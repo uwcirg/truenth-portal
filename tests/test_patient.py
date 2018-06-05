@@ -1,15 +1,15 @@
 """Test module for patient specific APIs"""
-from datetime import datetime
-from flask_webtest import SessionScope
 import json
+from datetime import datetime
 
-from portal.extensions import db
+from flask_webtest import SessionScope
 from portal.date_tools import FHIR_datetime
+from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.identifier import Identifier, UserIdentifier
 from portal.models.role import ROLE
 from portal.models.user import User
-from tests import TestCase, TEST_USERNAME, TEST_USER_ID
+from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 
 
 class TestPatient(TestCase):

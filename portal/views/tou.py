@@ -1,16 +1,16 @@
 """Views for Terms Of Use"""
-from flask import abort, jsonify, Blueprint, request
 from re import sub
+
+from flask import Blueprint, abort, jsonify, request
 from sqlalchemy import and_
 from sqlalchemy.exc import DataError
 
 from ..database import db
 from ..extensions import oauth
-from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
+from ..models.app_text import InitialConsent_ATMA, VersionedResource, app_text
 from ..models.audit import Audit
-from ..models.user import current_user, get_user_or_abort
 from ..models.tou import ToU, tou_types
-
+from ..models.user import current_user, get_user_or_abort
 
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 

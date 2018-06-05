@@ -1,10 +1,10 @@
 """Intervention Module"""
-from flask import current_app
-
 from UserDict import IterableUserDict
+
+from flask import current_app
 from sqlalchemy import and_
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..database import db
 from ..dict_tools import strip_empties

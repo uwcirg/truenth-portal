@@ -1,14 +1,13 @@
 """Test module for audit functionality"""
 from dateutil import parser
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID, FIRST_NAME, LAST_NAME
-
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user_consent import UserConsent
+from tests import FIRST_NAME, LAST_NAME, TEST_USER_ID, TestCase
 
 log_login_idp = "2016-02-23 09:49:25,733: performed by {} on {}: login: login user via NEW IdP facebook".format(TEST_USER_ID,TEST_USER_ID)
 log_login_google = "2016-02-23 09:52:57,806: performed by {} on {}: login: login via google".format(TEST_USER_ID,TEST_USER_ID)

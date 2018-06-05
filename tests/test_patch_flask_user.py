@@ -1,6 +1,6 @@
 """Unit test module for patch_flask_user"""
-from tests import TestCase
 from portal.views.patch_flask_user import patch_make_safe_url
+from tests import TestCase
 
 
 class TestPathFlaskUser(TestCase):

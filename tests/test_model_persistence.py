@@ -1,25 +1,23 @@
 import json
-from datetime import datetime
-from tests import TestCase
-from flask_webtest import SessionScope
 import os
+from datetime import datetime
 from shutil import rmtree
-from sqlalchemy.orm.exc import NoResultFound
 from tempfile import mkdtemp
 
+from flask_webtest import SessionScope
 from portal.config.model_persistence import ModelPersistence
 from portal.database import db
 from portal.date_tools import FHIR_datetime
-from portal.models.locale import LocaleConstants
 from portal.models.app_text import AppText
-from portal.models.communication_request import CommunicationRequest
 from portal.models.coding import Coding
-from portal.models.organization import (
-    Organization,
-    ResearchProtocolExtension)
+from portal.models.communication_request import CommunicationRequest
+from portal.models.locale import LocaleConstants
+from portal.models.organization import Organization, ResearchProtocolExtension
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
+from sqlalchemy.orm.exc import NoResultFound
+from tests import TestCase
 
 
 class TestModelPersistence(TestCase):

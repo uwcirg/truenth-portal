@@ -1,14 +1,7 @@
 """Unit test module for Demographics API"""
-from flask_webtest import SessionScope
-from tests import (
-    TestCase,
-    IMAGE_URL,
-    LAST_NAME,
-    FIRST_NAME,
-    TEST_USERNAME,
-    TEST_USER_ID)
 import json
 
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.auth import AuthProvider
@@ -18,6 +11,7 @@ from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
 from portal.system_uri import US_NPI
+from tests import FIRST_NAME, IMAGE_URL, LAST_NAME, TEST_USER_ID, TEST_USERNAME, TestCase
 
 
 class TestDemographics(TestCase):

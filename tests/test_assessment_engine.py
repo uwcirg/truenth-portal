@@ -1,18 +1,17 @@
 """Unit test module for Assessment Engine API"""
 import json
+
 from flask_swagger import swagger
 from flask_webtest import SessionScope
-
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
+from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.user import get_user
 from portal.models.user_consent import UserConsent
-from tests import TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase
 
 
 class TestAssessmentEngine(TestCase):

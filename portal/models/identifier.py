@@ -4,7 +4,6 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 
-
 identifier_use = ENUM('usual', 'official', 'temp', 'secondary',
                       name='id_use', create_type=False)
 

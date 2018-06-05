@@ -1,12 +1,13 @@
 """User Consent module"""
 from datetime import datetime, timedelta
+
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from validators import url as url_validation
 
-from .audit import Audit
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .audit import Audit
 from .organization import Organization
 from .user import User
 

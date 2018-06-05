@@ -1,14 +1,13 @@
 """TrueNTH API view functions"""
-from flask import Blueprint, jsonify, make_response, session
-from flask import current_app, render_template, request, url_for
+from flask import Blueprint, current_app, jsonify, make_response, render_template, request, session, url_for
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
-from ..extensions import oauth
 from ..csrf import csrf
-from .crossdomain import crossdomain
+from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.user import current_user
+from .crossdomain import crossdomain
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
 

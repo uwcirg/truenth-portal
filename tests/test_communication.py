@@ -1,26 +1,24 @@
 """Unit test module for communication"""
 from datetime import datetime
+
+import regex
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-import regex
-
 from portal.database import db
-from portal.models.audit import Audit
 from portal.models.assessment_status import overall_assessment_status
-from portal.models.communication import Communication, DynamicDictLookup
-from portal.models.communication import load_template_args
+from portal.models.audit import Audit
+from portal.models.communication import Communication, DynamicDictLookup, load_template_args
 from portal.models.communication_request import CommunicationRequest
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
+from portal.models.user import NO_EMAIL_PREFIX
 from portal.system_uri import ICHOM, TRUENTH_CR_NAME
 from portal.tasks import update_patient_loop
-from portal.models.user import NO_EMAIL_PREFIX
 from tests import TEST_USER_ID, TEST_USERNAME
-from tests.test_assessment_status import TestQuestionnaireSetup, mock_qr
-from tests.test_assessment_status import symptom_tracker_instruments
+from tests.test_assessment_status import TestQuestionnaireSetup, mock_qr, symptom_tracker_instruments
 
 
 def mock_communication_request(

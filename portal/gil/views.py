@@ -1,40 +1,19 @@
-from flask import (
-    abort,
-    current_app,
-    Blueprint,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for
-)
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, session, url_for
 from jinja2 import TemplateNotFound
 
 from ..database import db
 from ..extensions import recaptcha
-from ..models.app_text import (
-    app_text,
-    AboutATMA,
-    PrivacyATMA,
-    Terms_ATMA,
-    VersionedResource
-)
+from ..models.app_text import AboutATMA, PrivacyATMA, Terms_ATMA, VersionedResource, app_text
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE
-from ..models.organization import (
-    OrgTree,
-    Organization,
-    OrganizationIdentifier
-)
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
-
 
 gil = Blueprint(
     'gil', __name__, template_folder='templates', static_folder='static',

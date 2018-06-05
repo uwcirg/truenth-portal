@@ -1,18 +1,18 @@
 """Unit test module for user document logic"""
-from tempfile import NamedTemporaryFile
-from StringIO import StringIO
+import os
 from datetime import datetime
+from StringIO import StringIO
+from tempfile import NamedTemporaryFile
+
 from flask import current_app
 from flask_webtest import SessionScope
-import os
-
-from tests import TestCase, TEST_USER_ID
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.auth import create_service_token
 from portal.models.intervention import INTERVENTION
-from portal.models.user_document import UserDocument
 from portal.models.user import get_user
+from portal.models.user_document import UserDocument
+from tests import TEST_USER_ID, TestCase
 
 
 class TestUserDocument(TestCase):

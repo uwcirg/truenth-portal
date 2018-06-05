@@ -1,7 +1,7 @@
 """Unit test module for scheduled jobs logic"""
-from flask_webtest import SessionScope
 import json
 
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob

@@ -1,24 +1,24 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
 from datetime import datetime
-from flask import current_app
-from flask_babel import force_locale
 from smtplib import SMTPRecipientsRefused
 
-from .app_text import app_text, MailResource, SiteSummaryEmail_ATMA
-from .assessment_status import AssessmentStatus
+from flask import current_app
+from flask_babel import force_locale
+
 from ..audit import auditable_event
-from .communication import load_template_args
 from ..dogpile_cache import dogpile_cache
+from ..views.reporting import generate_overdue_table_html
+from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
+from .assessment_status import AssessmentStatus
+from .communication import load_template_args
 from .fhir import CC
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
-from .procedure_codes import known_treatment_started
-from .procedure_codes import known_treatment_not_started
+from .procedure_codes import known_treatment_not_started, known_treatment_started
 from .role import ROLE
 from .user import User
-from ..views.reporting import generate_overdue_table_html
 
 
 @dogpile_cache.region('hourly')

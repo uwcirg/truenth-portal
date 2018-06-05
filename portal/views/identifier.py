@@ -1,12 +1,11 @@
 """Identifier API"""
-from flask import abort, Blueprint, jsonify, request
+from flask import Blueprint, abort, jsonify, request
 
 from ..database import db
 from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
-
 
 identifier_api = Blueprint('identifier_api', __name__)
 

@@ -4,18 +4,17 @@ from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.app_text import (
-    app_text,
     InitialConsent_ATMA,
     MailResource,
     StaffRegistrationEmail_ATMA,
     UndefinedAppText,
-    VersionedResource
+    VersionedResource,
+    app_text
 )
 from ..models.communication import load_template_args
 from ..models.organization import Organization, OrgTree, UserOrganization
-from ..models.role import Role, ROLE
-from ..models.user import current_user, get_user_or_abort, User, UserRoles
-
+from ..models.role import ROLE, Role
+from ..models.user import User, UserRoles, current_user, get_user_or_abort
 
 staff = Blueprint('staff', __name__)
 

@@ -1,4 +1,4 @@
-from tests import TestCase, LAST_NAME, FIRST_NAME
+from tests import FIRST_NAME, LAST_NAME, TestCase
 
 
 class TestTrueNTH(TestCase):

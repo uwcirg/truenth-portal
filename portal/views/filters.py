@@ -1,6 +1,5 @@
 import jinja2
-from flask import current_app, Blueprint
-
+from flask import Blueprint, current_app
 
 filters_blueprint = Blueprint('filters', __name__)
 

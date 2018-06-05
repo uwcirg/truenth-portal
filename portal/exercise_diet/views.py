@@ -1,11 +1,11 @@
-import requests
 import json
 from collections import OrderedDict
-from flask import Blueprint, current_app, render_template, redirect, url_for
+
+import requests
+from flask import Blueprint, current_app, redirect, render_template, url_for
 
 from ..models.user import current_user
-from ..views.portal import get_asset, get_any_tag_data
-
+from ..views.portal import get_any_tag_data, get_asset
 
 exercise_diet = Blueprint(
     'exercise_diet', __name__, template_folder='templates',

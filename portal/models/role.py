@@ -10,8 +10,9 @@ To extend the list of roles, add name: description pairs to the
 STATIC_ROLES dict within.
 
 """
-from ..database import db
 from UserDict import IterableUserDict
+
+from ..database import db
 
 
 class Role(db.Model):

@@ -1,28 +1,26 @@
 """Module to test assessment_status"""
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from flask_webtest import SessionScope
 from random import choice
-from sqlalchemy.orm.exc import NoResultFound
 from string import ascii_letters
 
+from dateutil.relativedelta import relativedelta
+from flask_webtest import SessionScope
 from portal.extensions import db
-from portal.models.assessment_status import invalidate_assessment_status_cache
-from portal.models.assessment_status import AssessmentStatus
+from portal.models.assessment_status import AssessmentStatus, invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC, QuestionnaireResponse, qnr_document_id
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
 from portal.system_uri import ICHOM
-from tests import associative_backdate, TestCase, TEST_USER_ID
+from sqlalchemy.orm.exc import NoResultFound
+from tests import TEST_USER_ID, TestCase, associative_backdate
 
 now = datetime.utcnow()
 

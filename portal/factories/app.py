@@ -1,24 +1,23 @@
 """Portal module"""
-from logging import handlers
 import logging
 import os
-import pkginfo
 import sys
+from logging import handlers
+
+import pkginfo
+import redis
 import requests_cache
 from flask import Flask
-import redis
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
+from ..audit import configure_audit_log
+from ..config.config import SITE_CFG, DefaultConfig
 # Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..config.site_persistence import SitePersistence
-
-from ..audit import configure_audit_log
-from ..config.config import DefaultConfig, SITE_CFG
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
-from ..extensions import authomatic, recaptcha
-from ..extensions import babel, mail, oauth, session, user_manager
+from ..extensions import authomatic, babel, mail, oauth, recaptcha, session, user_manager
 from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
@@ -27,8 +26,8 @@ from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
 from ..views.auth import auth, capture_next_view_function
 from ..views.client import client_api
-from ..views.coredata import coredata_api
 from ..views.clinical import clinical_api
+from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
 from ..views.extend_flask_user import reset_password_view_function
 from ..views.fhir import fhir_api
@@ -40,9 +39,9 @@ from ..views.notification import notification_api
 from ..views.organization import org_api
 from ..views.patient import patient_api
 from ..views.patients import patients
+from ..views.portal import portal
 from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
-from ..views.portal import portal
 from ..views.questionnaire import questionnaire_api
 from ..views.reporting import reporting_api
 from ..views.role import role_api
@@ -51,7 +50,6 @@ from ..views.staff import staff
 from ..views.tou import tou_api
 from ..views.truenth import truenth_api
 from ..views.user import user_api
-
 
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,

@@ -13,27 +13,27 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
+import json
+import sys
 from datetime import datetime
+
 from flask import current_app, url_for
 from flask_babel import gettext as _
-import json
-from sqlalchemy import and_, UniqueConstraint
+from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-import sys
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-from .codeable_concept import CodeableConcept
-from .coding import Coding
 from ..database import db
 from ..date_tools import localize_datetime
+from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from .fhir import CC
 from .identifier import Identifier
-from .intervention import Intervention, INTERVENTION, UserIntervention
-from .organization import Organization, OrgTree, OrganizationIdentifier
+from .intervention import INTERVENTION, Intervention, UserIntervention
+from .organization import Organization, OrganizationIdentifier, OrgTree
 from .procedure_codes import known_treatment_started
 from .role import Role
-from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
-
 
 # ##
 # # functions implementing the 'access_strategy' API

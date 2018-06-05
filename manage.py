@@ -3,31 +3,25 @@
 FLASK_APP=manage.py flask --help
 
 """
-import os
-import click
 import json
-import redis
+import os
 
 import alembic.config
-from sqlalchemy.orm.exc import NoResultFound
+import click
+import redis
 from flask_migrate import Migrate
-
-from portal.factories.app import create_app
-from portal.extensions import db, user_manager
 from portal.audit import auditable_event
-from portal.models.i18n import smartling_upload, smartling_download
+from portal.config.site_persistence import SitePersistence
+from portal.extensions import db, user_manager
+from portal.factories.app import create_app
 from portal.models.fhir import add_static_concepts
+from portal.models.i18n import smartling_download, smartling_upload
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
-from portal.models.role import add_static_roles, Role, ROLE
-from portal.models.user import (
-    flag_test,
-    permanently_delete_user,
-    User,
-    validate_email
-)
-from portal.config.site_persistence import SitePersistence
+from portal.models.role import ROLE, Role, add_static_roles
+from portal.models.user import User, flag_test, permanently_delete_user, validate_email
+from sqlalchemy.orm.exc import NoResultFound
 
 app = create_app()
 

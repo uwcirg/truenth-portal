@@ -8,9 +8,10 @@ auditable_event()
 Audit data is also persisted in the database *audit* table.
 
 """
+import logging
 import os
 import sys
-import logging
+
 from flask import current_app
 
 from .database import db

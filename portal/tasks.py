@@ -7,30 +7,30 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-from celery.utils.log import get_task_logger
-from datetime import datetime
-from flask import current_app
-from functools import wraps
 import json
+from datetime import datetime
+from functools import wraps
+from traceback import format_exc
+
+from celery.utils.log import get_task_logger
+from factories.app import create_app
+from factories.celery import create_celery
+from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
-from traceback import format_exc
 
 from .database import db
 from .dogpile_cache import dogpile_cache
-from factories.celery import create_celery
-from factories.app import create_app
-from .models.assessment_status import invalidate_assessment_status_cache
-from .models.assessment_status import overall_assessment_status
+from .models.assessment_status import invalidate_assessment_status_cache, overall_assessment_status
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
-from .models.reporting import get_reporting_stats, generate_and_send_summaries
-from .models.role import Role, ROLE
 from .models.questionnaire_bank import QuestionnaireBank
+from .models.reporting import generate_and_send_summaries, get_reporting_stats
+from .models.role import ROLE, Role
+from .models.scheduled_job import check_active, update_job_status
 from .models.tou import update_tous
 from .models.user import User, UserRoles
-from .models.scheduled_job import check_active, update_job_status
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug

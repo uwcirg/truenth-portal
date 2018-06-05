@@ -1,7 +1,7 @@
 """Unit test module for telecom model"""
+from portal.models.telecom import ContactPoint, Telecom
 from tests import TestCase
 
-from portal.models.telecom import ContactPoint, Telecom
 
 class TestTelecom(TestCase):
     """Telecom model tests"""

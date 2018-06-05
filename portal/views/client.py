@@ -1,27 +1,30 @@
 from datetime import datetime
-from flask import (
-    Blueprint, redirect, current_app,
-    render_template, request, abort, url_for)
+from urlparse import urlparse
+
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 from flask_user import roles_required
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField, FormField, HiddenField,
-    SelectField, SelectMultipleField, StringField,
-    validators, widgets)
+from validators import url as url_validation
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
-from urlparse import urlparse
-from validators import url as url_validation
+from wtforms import (
+    BooleanField,
+    FormField,
+    HiddenField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    validators,
+    widgets
+)
 
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.auth import create_service_token, Token
+from ..models.auth import Token, create_service_token
 from ..models.client import Client, validate_origin
-from ..models.intervention import (
-    INTERVENTION,
-    STATIC_INTERVENTIONS)
+from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import current_user
 

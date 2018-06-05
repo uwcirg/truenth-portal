@@ -1,23 +1,25 @@
 """Unit test module for Procedure API and model"""
-from datetime import datetime, timedelta
-import dateutil
-from flask import current_app
 import json
 import os
-import pytz
-from sqlalchemy.orm.exc import NoResultFound
-from tests import TestCase, TEST_USER_ID
+from datetime import datetime, timedelta
 
+import dateutil
+import pytz
+from flask import current_app
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import FHIR_datetime
 from portal.models.procedure import Procedure
-from portal.models.procedure_codes import latest_treatment_started_date
-from portal.models.procedure_codes import known_treatment_not_started
-from portal.models.procedure_codes import known_treatment_started
-from portal.models.procedure_codes import TxStartedConstants
+from portal.models.procedure_codes import (
+    TxStartedConstants,
+    known_treatment_not_started,
+    known_treatment_started,
+    latest_treatment_started_date
+)
 from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
+from sqlalchemy.orm.exc import NoResultFound
+from tests import TEST_USER_ID, TestCase
 
 
 class TestProcedure(TestCase):

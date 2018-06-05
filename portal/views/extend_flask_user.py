@@ -1,10 +1,10 @@
 """Module to extend or specialize flask user views for our needs"""
-from flask import abort, current_app, url_for, session
+from flask import abort, current_app, session, url_for
 from flask_user.views import reset_password
 
-from .portal import challenge_identity
 from ..models.role import ROLE
 from ..models.user import get_user_or_abort
+from .portal import challenge_identity
 
 
 def reset_password_view_function(token):

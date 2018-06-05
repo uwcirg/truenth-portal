@@ -1,22 +1,29 @@
 """Auth related view functions"""
 import base64
-from datetime import datetime
 import hashlib
 import hmac
 import json
+from datetime import datetime
+
 import requests
 from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError, ConfigError
 from flask import (
-    Blueprint, jsonify, redirect, current_app, make_response,
-    render_template, request, session, abort, url_for)
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for
+)
 from flask_login import logout_user
 from flask_user import roles_required
-from flask_user.signals import (
-    user_changed_password,
-    user_logged_in,
-    user_registered,
-    user_reset_password)
+from flask_user.signals import user_changed_password, user_logged_in, user_registered, user_reset_password
+
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -27,8 +34,7 @@ from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import add_authomatic_user
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import User, add_authomatic_user, current_user, get_user_or_abort
 
 auth = Blueprint('auth', __name__)
 

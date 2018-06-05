@@ -1,7 +1,7 @@
-from flask import url_for
-from flask_webtest import SessionScope
 import json
 
+from flask import url_for
+from flask_webtest import SessionScope
 from portal.database import db
 from portal.extensions import user_manager
 from tests import TestCase

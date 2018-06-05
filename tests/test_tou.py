@@ -1,15 +1,15 @@
 """Unit test module for terms of use logic"""
 import json
 from datetime import datetime
-from flask_webtest import SessionScope
-import pytz
 
-from tests import TestCase, TEST_USER_ID
+import pytz
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.organization import Organization
 from portal.models.notification import Notification, UserNotification
+from portal.models.organization import Organization
 from portal.models.tou import ToU, update_tous
+from tests import TEST_USER_ID, TestCase
 
 tou_url = 'http://fake-tou.org'
 

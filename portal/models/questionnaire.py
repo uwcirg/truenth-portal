@@ -1,14 +1,12 @@
 """Questionnaire module"""
 from flask import url_for
-from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from .identifier import Identifier
 from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
-
+from .identifier import Identifier
 
 status_types = ('draft', 'published', 'retired')
 status_types_enum = ENUM(

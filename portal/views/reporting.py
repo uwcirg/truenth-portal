@@ -1,11 +1,12 @@
 import csv
 from collections import defaultdict
 from datetime import datetime
-from flask import Blueprint, render_template, make_response, request
-from flask_babel import gettext as _
-from flask_user import roles_required
 from StringIO import StringIO
 from time import strftime
+
+from flask import Blueprint, make_response, render_template, request
+from flask_babel import gettext as _
+from flask_user import roles_required
 
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus

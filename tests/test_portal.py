@@ -1,21 +1,21 @@
 """Unit test module for portal views"""
 
-from datetime import datetime
-from flask_webtest import SessionScope
-from flask_swagger import swagger
-from swagger_spec_validator import validate_spec_url
 import tempfile
 import urllib
+from datetime import datetime
 
+from flask_swagger import swagger
+from flask_webtest import SessionScope
 from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.factories.app import create_app
 from portal.models.intervention import INTERVENTION, UserIntervention
+from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from portal.models.user import get_user, User
-from portal.models.message import EmailMessage
-from tests import TestCase, TEST_USER_ID
+from portal.models.user import User, get_user
+from swagger_spec_validator import validate_spec_url
+from tests import TEST_USER_ID, TestCase
 
 
 class TestPortal(TestCase):

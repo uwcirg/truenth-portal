@@ -1,6 +1,5 @@
 """Group view methods"""
-from flask import abort, Blueprint, jsonify
-from flask import request
+from flask import Blueprint, abort, jsonify, request
 from flask_user import roles_required
 
 from ..audit import auditable_event

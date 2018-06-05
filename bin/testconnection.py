@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-import psycopg2
-import sys
 import os
+import sys
+
+import psycopg2
+
 
 def parse_connection_uri():
     here, _ = os.path.split(__file__)

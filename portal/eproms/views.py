@@ -1,27 +1,18 @@
 import json
-from flask import (
-    abort,
-    current_app,
-    Blueprint,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for
-)
+
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, session, url_for
 from flask_user import roles_required
 
 from ..database import db
 from ..extensions import oauth, recaptcha
 from ..models.app_text import (
-    app_text,
-    get_terms,
     AboutATMA,
     PrivacyATMA,
     Terms_ATMA,
     VersionedResource,
-    WebsiteDeclarationForm_ATMA
+    WebsiteDeclarationForm_ATMA,
+    app_text,
+    get_terms
 )
 from ..models.client import validate_origin
 from ..models.coredata import Coredata
@@ -31,8 +22,7 @@ from ..models.organization import Organization
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..views.auth import next_after_login
-from ..views.portal import get_asset, get_any_tag_data, get_all_tag_data
-
+from ..views.portal import get_all_tag_data, get_any_tag_data, get_asset
 
 eproms = Blueprint(
     'eproms', __name__, template_folder='templates', static_folder='static',
