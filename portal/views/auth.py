@@ -50,8 +50,8 @@ def deauthorized():
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
         s += "="*padding_factor
-        return base64.b64decode(unicode(s).translate(
-            dict(zip(map(ord, u'-_'), u'+/'))))
+        return base64.b64decode(str(s).translate(
+            dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
     sig = base64_url_decode(encoded_sig)
@@ -126,7 +126,7 @@ def capture_next_view_function(real_function):
             validate_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
-                    session['next'], real_function.func_name))
+                    session['next'], real_function.__name__))
         if request.args.get('suspend_initial_queries'):
             session['suspend_initial_queries'] = request.args.get(
                 'suspend_initial_queries')

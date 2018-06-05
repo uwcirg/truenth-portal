@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, make_response, request
 from flask_babel import gettext as _
 from flask_user import roles_required
-from StringIO import StringIO
+from io import StringIO
 from time import strftime
 
 from ..extensions import oauth
@@ -83,7 +83,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         org_row.append(row_total)
         rows.append(org_row)
 
-    totalrow = [_(u"TOTAL")]
+    totalrow = [_("TOTAL")]
     row_total = 0
     for cd in cutoff_days:
         totalrow.append(totals[cd])

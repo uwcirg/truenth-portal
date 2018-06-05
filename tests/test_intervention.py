@@ -61,13 +61,13 @@ class TestIntervention(TestCase):
         self.assert200(rv)
 
         ui = UserIntervention.query.one()
-        self.assertEquals(ui.user_id, data['user_id'])
-        self.assertEquals(ui.access, data['access'])
-        self.assertEquals(ui.card_html, data['card_html'])
-        self.assertEquals(ui.link_label, data['link_label'])
-        self.assertEquals(ui.link_url, data['link_url'])
-        self.assertEquals(ui.status_text, data['status_text'])
-        self.assertEquals(ui.staff_html, data['staff_html'])
+        self.assertEqual(ui.user_id, data['user_id'])
+        self.assertEqual(ui.access, data['access'])
+        self.assertEqual(ui.card_html, data['card_html'])
+        self.assertEqual(ui.link_label, data['link_label'])
+        self.assertEqual(ui.link_url, data['link_url'])
+        self.assertEqual(ui.status_text, data['status_text'])
+        self.assertEqual(ui.staff_html, data['staff_html'])
 
     def test_music_hack(self):
         client = self.add_client()
@@ -85,8 +85,8 @@ class TestIntervention(TestCase):
         self.assert200(rv)
 
         ui = UserIntervention.query.one()
-        self.assertEquals(ui.user_id, data['user_id'])
-        self.assertEquals(ui.access, 'subscribed')
+        self.assertEqual(ui.user_id, data['user_id'])
+        self.assertEqual(ui.access, 'subscribed')
 
     def test_intervention_partial_put(self):
         client = self.add_client()
@@ -132,13 +132,13 @@ class TestIntervention(TestCase):
         self.assert200(rv)
 
         ui = UserIntervention.query.one()
-        self.assertEquals(ui.user_id, data['user_id'])
-        self.assertEquals(ui.access, update['access'])
-        self.assertEquals(ui.card_html, update['card_html'])
-        self.assertEquals(ui.link_label, data['link_label'])
-        self.assertEquals(ui.link_url, data['link_url'])
-        self.assertEquals(ui.status_text, data['status_text'])
-        self.assertEquals(ui.staff_html, data['staff_html'])
+        self.assertEqual(ui.user_id, data['user_id'])
+        self.assertEqual(ui.access, update['access'])
+        self.assertEqual(ui.card_html, update['card_html'])
+        self.assertEqual(ui.link_label, data['link_label'])
+        self.assertEqual(ui.link_url, data['link_url'])
+        self.assertEqual(ui.status_text, data['status_text'])
+        self.assertEqual(ui.staff_html, data['staff_html'])
 
     def test_intervention_bad_access(self):
         client = self.add_client()
@@ -550,8 +550,8 @@ class TestIntervention(TestCase):
             }
         }
         acc_strat = AccessStrategy.from_json(d)
-        self.assertEquals(d['name'], acc_strat.name)
-        self.assertEquals(d['function_details'],
+        self.assertEqual(d['name'], acc_strat.name)
+        self.assertEqual(d['function_details'],
                           json.loads(acc_strat.function_details))
 
     def test_strat_view(self):
@@ -794,7 +794,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        self.assertEquals(user.organizations.count(), 0)
+        self.assertEqual(user.organizations.count(), 0)
         self.assertTrue(ds_p3p.display_for_user(user).access)
 
     def test_eproms_p3p_conditions(self):
@@ -924,7 +924,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        self.assertEquals(user.organizations.count(), 0)
+        self.assertEqual(user.organizations.count(), 0)
         self.assertTrue(ds_p3p.display_for_user(user).access)
 
         # Finally, add the WRITE_ONLY group and it should disappear
@@ -1019,7 +1019,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
-        self.assertEquals(user.organizations.count(), 0)
+        self.assertEqual(user.organizations.count(), 0)
         self.assertTrue(sm.display_for_user(user).access)
 
         # Finally, remove the PATIENT role and it should disappear
@@ -1036,8 +1036,8 @@ class TestIntervention(TestCase):
         rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json.keys()), 1)
-        self.assertEquals(rv.json['user_id'], TEST_USER_ID)
+        self.assertEqual(len(rv.json.keys()), 1)
+        self.assertEqual(rv.json['user_id'], TEST_USER_ID)
 
     def test_get_user_intervention(self):
         intervention_id = INTERVENTION.SEXUAL_RECOVERY.id
@@ -1057,14 +1057,14 @@ class TestIntervention(TestCase):
         rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json.keys()), 7)
-        self.assertEquals(rv.json['user_id'], TEST_USER_ID)
-        self.assertEquals(rv.json['access'], 'granted')
-        self.assertEquals(rv.json['card_html'], "custom ch")
-        self.assertEquals(rv.json['link_label'], "link magic")
-        self.assertEquals(rv.json['link_url'], "http://example.com")
-        self.assertEquals(rv.json['status_text'], "status example")
-        self.assertEquals(rv.json['staff_html'], "custom ph")
+        self.assertEqual(len(rv.json.keys()), 7)
+        self.assertEqual(rv.json['user_id'], TEST_USER_ID)
+        self.assertEqual(rv.json['access'], 'granted')
+        self.assertEqual(rv.json['card_html'], "custom ch")
+        self.assertEqual(rv.json['link_label'], "link magic")
+        self.assertEqual(rv.json['link_url'], "http://example.com")
+        self.assertEqual(rv.json['status_text'], "status example")
+        self.assertEqual(rv.json['staff_html'], "custom ph")
 
     def test_communicate(self):
         email_group = Group(name='test_email')
@@ -1086,12 +1086,12 @@ class TestIntervention(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
-        self.assertEquals(rv.json['message'], 'sent')
+        self.assertEqual(rv.json['message'], 'sent')
 
         message = EmailMessage.query.one()
         set1 = set((foo.email, boo.email))
         set2 = set(message.recipients.split())
-        self.assertEquals(set1, set2)
+        self.assertEqual(set1, set2)
 
     def test_dynamic_intervention_access(self):
         # Confirm interventions dynamically added still accessible
@@ -1101,7 +1101,7 @@ class TestIntervention(TestCase):
             db.session.add(newbee)
             db.session.commit()
 
-        self.assertEquals(INTERVENTION.newbee, db.session.merge(newbee))
+        self.assertEqual(INTERVENTION.newbee, db.session.merge(newbee))
 
     def test_bogus_intervention_access(self):
         with self.assertRaises(ValueError):

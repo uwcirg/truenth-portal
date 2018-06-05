@@ -4,7 +4,7 @@ import hmac
 import json
 import time
 from flask import current_app, abort
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from .auth import Token
 from ..database import db

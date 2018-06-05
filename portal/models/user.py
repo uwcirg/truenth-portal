@@ -10,7 +10,7 @@ from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
 from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
-from StringIO import StringIO
+from io import StringIO
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
@@ -32,7 +32,7 @@ from .intervention import UserIntervention
 from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
-import reference
+from . import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import (
@@ -441,7 +441,7 @@ class User(db.Model, UserMixin):
         # Called in different contexts - only compare string
         # value if it's a base string type, as opposed to when
         # its being used in a query statement (email.ilike('foo'))
-        if isinstance(self._email, basestring):
+        if isinstance(self._email, str):
             if self._email.startswith(INVITE_PREFIX):
                 # strip the invite prefix for UI
                 return self._email[len(INVITE_PREFIX):]
@@ -775,7 +775,7 @@ class User(db.Model, UserMixin):
             if rel.relationship.name == RELATIONSHIP.SPONSOR:
                 return User.query.get(rel.other_user_id)
 
-        service_user = User(username=(u'service account sponsored by {}'.
+        service_user = User(username=('service account sponsored by {}'.
                                       format(self.username)))
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE)

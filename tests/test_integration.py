@@ -5,7 +5,7 @@ from selenium import webdriver
 from flask_testing import LiveServerTestCase
 
 from tests import TestCase
-from pages import LoginPage
+from .pages import LoginPage
 
 
 @unittest.skipUnless(

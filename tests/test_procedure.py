@@ -34,24 +34,24 @@ class TestProcedure(TestCase):
         rv = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
         data = json.loads(rv.data)
-        self.assertEquals(
+        self.assertEqual(
             '367336001',
             data['entry'][0]['resource']['code']['coding'][0]['code'])
-        self.assertEquals(
+        self.assertEqual(
             'Chemotherapy',
             data['entry'][0]['resource']['code']['coding'][0]['display'])
-        self.assertEquals(
+        self.assertEqual(
             Reference.patient(TEST_USER_ID).as_fhir()['reference'],
             data['entry'][0]['resource']['meta']['by']['reference'])
         last_updated = FHIR_datetime.parse(
             data['entry'][0]['resource']['meta']['lastUpdated'])
-        self.assertAlmostEquals(
+        self.assertAlmostEqual(
             datetime.utcnow(), last_updated, delta=timedelta(seconds=5))
         start_time = FHIR_datetime.parse(
             data['entry'][0]['resource']['performedPeriod']['start'])
-        self.assertAlmostEquals(
+        self.assertAlmostEqual(
             datetime.utcnow(), start_time, delta=timedelta(seconds=5))
-        self.assertEquals(
+        self.assertEqual(
             current_app.config.metadata.version,
             data['entry'][0]['resource']['meta']['version'])
 
@@ -61,11 +61,11 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         proc = Procedure.from_fhir(data, Audit(user_id=TEST_USER_ID))
-        self.assertEquals(
+        self.assertEqual(
             proc.code.codings[0].system,
             'http://snomed.info/sct')
-        self.assertEquals(proc.code.codings[0].code, '80146002')
-        self.assertEquals(proc.start_time, dateutil.parser.parse("2013-04-05"))
+        self.assertEqual(proc.code.codings[0].code, '80146002')
+        self.assertEqual(proc.start_time, dateutil.parser.parse("2013-04-05"))
 
     def test_procedure_bad_date(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -97,12 +97,12 @@ class TestProcedure(TestCase):
         results = json.loads(rv.data)
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
-        self.assertEquals(
+        self.assertEqual(
             proc.code.codings[0].system,
             'http://snomed.info/sct')
-        self.assertEquals(proc.user_id, 1)
-        self.assertEquals(proc.end_time, datetime(2011, 6, 27))
-        self.assertEquals(proc.encounter.user_id, TEST_USER_ID)
+        self.assertEqual(proc.user_id, 1)
+        self.assertEqual(proc.end_time, datetime(2011, 6, 27))
+        self.assertEqual(proc.encounter.user_id, TEST_USER_ID)
 
     def test_timezone_procedure_POST(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -125,12 +125,12 @@ class TestProcedure(TestCase):
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
 
-        self.assertEquals(proc.start_time.tzinfo, None)
-        self.assertEquals(proc.end_time.tzinfo, None)
+        self.assertEqual(proc.start_time.tzinfo, None)
+        self.assertEqual(proc.end_time.tzinfo, None)
         st = dateutil.parser.parse(start_time)
         st = st.astimezone(pytz.utc)
         st = st.replace(tzinfo=None)
-        self.assertEquals(proc.start_time, st)
+        self.assertEqual(proc.start_time, st)
 
     def test_procedureDELETE(self):
         self.add_procedure()
@@ -139,7 +139,7 @@ class TestProcedure(TestCase):
         rv = self.client.delete('/api/procedure/{}'.format(proc_id))
         self.assert200(rv)
         self.assertRaises(NoResultFound, Procedure.query.one)
-        self.assertEquals(self.test_user.procedures.count(), 0)
+        self.assertEqual(self.test_user.procedures.count(), 0)
 
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
@@ -156,13 +156,13 @@ class TestProcedure(TestCase):
             ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
-            ('888', u'Other (free text)', ICHOM),
+            ('888', 'Other (free text)', ICHOM),
             ('118877007', 'Procedure on prostate', SNOMED),
-            ('999999999', u'Other primary treatment', SNOMED),
-            (u'androgen deprivation therapy - surgical orchiectomy', u'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
-            (u'androgen deprivation therapy - chemical', u'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
-            ('176307007', u'Whole-gland ablation', SNOMED),
-            ('438778003', u'Focal-gland ablation', SNOMED)
+            ('999999999', 'Other primary treatment', SNOMED),
+            ('androgen deprivation therapy - surgical orchiectomy', 'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('androgen deprivation therapy - chemical', 'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('176307007', 'Whole-gland ablation', SNOMED),
+            ('438778003', 'Focal-gland ablation', SNOMED)
 
         ])
         # confirm we have the whole list:
@@ -170,7 +170,7 @@ class TestProcedure(TestCase):
         for codeableconcept in TxStartedConstants():
             [found.add((cc.code, cc.display, cc.system)) for cc in
              codeableconcept.codings]
-        self.assertEquals(started_codes, found)
+        self.assertEqual(started_codes, found)
 
         # prior to setting any procedures, should return false
         self.assertFalse(known_treatment_started(self.test_user))

@@ -5,7 +5,7 @@ from flask_webtest import SessionScope
 from flask_swagger import swagger
 from swagger_spec_validator import validate_spec_url
 import tempfile
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from portal.config.config import TestConfig
 from portal.extensions import db
@@ -92,7 +92,7 @@ class TestPortal(TestCase):
         rv = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
-        results = unicode(rv.data, 'utf-8')
+        results = str(rv.data, 'utf-8')
         self.assertIn(ui.staff_html, results)
 
     def test_public_access(self):
@@ -157,16 +157,16 @@ class TestPortal(TestCase):
                 "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
-                body=u'Welcome to testing \u2713', sent_at=sent_at,
+                body='Welcome to testing \u2713', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
 
         # confirm styling unicode functions
         body = message.style_message(message.body)
-        self.assertTrue(u'DOCTYPE' in body)
-        self.assertTrue(u'style' in body)
-        self.assertTrue(isinstance(body, unicode))
+        self.assertTrue('DOCTYPE' in body)
+        self.assertTrue('style' in body)
+        self.assertTrue(isinstance(body, str))
 
         self.login()
         rv = self.client.get('/invite/{0}'.format(message.id))
@@ -178,7 +178,7 @@ class TestPortal(TestCase):
         """Request to view non existant message should 404"""
         self.login()
         rv = self.client.get('/invite/404')
-        self.assertEquals(rv.status_code, 404)
+        self.assertEqual(rv.status_code, 404)
 
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
@@ -215,7 +215,7 @@ class TestPortal(TestCase):
             'message': 'creative test string'
         }
         rv = self.client.get('/report-error?{}'.format(
-            urllib.urlencode(params)))
+            urllib.parse.urlencode(params)))
         self.assert200(rv)
 
     def test_configuration_settings(self):
@@ -223,9 +223,9 @@ class TestPortal(TestCase):
         lr_group = self.app.config['LR_GROUP']
         rv = self.client.get('/api/settings/lr_group')
         self.assert200(rv)
-        self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
+        self.assertEqual(rv.json.get('LR_GROUP'), lr_group)
         rv2 = self.client.get('/api/settings/bad_value')
-        self.assertEquals(rv2.status_code, 400)
+        self.assertEqual(rv2.status_code, 400)
 
 
 class TestPortalEproms(TestCase):

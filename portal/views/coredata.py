@@ -1,7 +1,7 @@
 from flask import abort, current_app, jsonify, url_for
 from flask import Blueprint, render_template, request
-from urllib import urlencode
-from urlparse import parse_qsl, urlparse
+from urllib.parse import urlencode
+from urllib.parse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth

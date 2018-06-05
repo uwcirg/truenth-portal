@@ -295,6 +295,6 @@ def config(config_key):
 
     print(json.dumps(
         # Skip un-serializable values
-        {k: v for k, v in app.config.items() if isinstance(v, basestring)},
+        {k: v for k, v in app.config.items() if isinstance(v, str)},
         indent=2,
     ))

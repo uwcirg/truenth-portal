@@ -31,5 +31,5 @@ class TestNextStep(TestCase):
         with SessionScope(db):
             db.session.commit()
 
-        self.assertEquals(test_link, NextStep.decision_support(
+        self.assertEqual(test_link, NextStep.decision_support(
             self.test_user))

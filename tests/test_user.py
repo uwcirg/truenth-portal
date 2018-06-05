@@ -4,7 +4,7 @@ import pytest
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 import json
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from sqlalchemy import and_
 from datetime import datetime
 from tests import TestCase, TEST_USER_ID, TEST_USERNAME
@@ -59,7 +59,7 @@ class TestUser(TestCase):
         self.assert400(rv)
 
         email = 'john+test@example.com'
-        request = '/api/unique_email?email={}'.format(urllib.quote(email))
+        request = '/api/unique_email?email={}'.format(urllib.parse.quote(email))
         rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
@@ -84,7 +84,7 @@ class TestUser(TestCase):
 
         # admins can test for other users
         request = '/api/unique_email?email={}&user_id={}'.format(
-            urllib.quote(email), TEST_USER_ID)
+            urllib.parse.quote(email), TEST_USER_ID)
         self.promote_user(second, ROLE.ADMIN)
         rv = self.client.get(request)
         self.assert200(rv)
@@ -111,7 +111,7 @@ class TestUser(TestCase):
                                          coding_id=concepts[1].id))
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(2, self.test_user.ethnicities.count())
+        self.assertEqual(2, self.test_user.ethnicities.count())
 
         extension = {"url":
             "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"}
@@ -121,7 +121,7 @@ class TestUser(TestCase):
         # generate FHIR from user's ethnicities
         fhir_data = kls.as_fhir()
 
-        self.assertEquals(2, len(fhir_data['valueCodeableConcept']['coding']))
+        self.assertEqual(2, len(fhir_data['valueCodeableConcept']['coding']))
         codes = [c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
         self.assertIn('2135-2', codes)
         self.assertIn('2142-8', codes)
@@ -144,7 +144,7 @@ class TestUser(TestCase):
 
         ue = UserEthnicityExtension(self.test_user, extension)
         ue.apply_fhir()
-        self.assertEquals(2, self.test_user.ethnicities.count())
+        self.assertEqual(2, self.test_user.ethnicities.count())
         found = [c.code for c in self.test_user.ethnicities]
         self.assertIn('2162-6', found)
         self.assertIn('2142-8', found)
@@ -163,7 +163,7 @@ class TestUser(TestCase):
                                          coding_id=concepts[1].id))
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(2, self.test_user.indigenous.count())
+        self.assertEqual(2, self.test_user.indigenous.count())
 
         extension = {"url": TRUENTH_EXTENSTION_NHHD_291036}
         kls = user_extension_map(user=self.test_user, extension=extension)
@@ -172,7 +172,7 @@ class TestUser(TestCase):
         # generate FHIR from user's ethnicities
         fhir_data = kls.as_fhir()
 
-        self.assertEquals(2, len(fhir_data['valueCodeableConcept']['coding']))
+        self.assertEqual(2, len(fhir_data['valueCodeableConcept']['coding']))
         codes = [c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
         self.assertIn('1', codes)
         self.assertIn('4', codes)
@@ -192,7 +192,7 @@ class TestUser(TestCase):
 
         ue = UserIndigenousStatusExtension(self.test_user, extension)
         ue.apply_fhir()
-        self.assertEquals(2, self.test_user.indigenous.count())
+        self.assertEqual(2, self.test_user.indigenous.count())
         found = [c.code for c in self.test_user.indigenous]
         self.assertIn('1', found)
         self.assertIn('9', found)
@@ -208,7 +208,7 @@ class TestUser(TestCase):
         user = db.session.merge(user)
         self.assertTrue(user.deleted_id)
         self.assertTrue(user._email.startswith("__deleted_"))
-        self.assertEquals(user.email, TEST_USERNAME)
+        self.assertEqual(user.email, TEST_USERNAME)
         # confirm the 'TrueNTH-username' identity also got wiped
         ids = [id for id in user.identifiers if id.system == TRUENTH_USERNAME]
         self.assertTrue(id.value.startswith("__deleted_"))
@@ -302,7 +302,7 @@ class TestUser(TestCase):
         self.assertFalse(Audit.query.get(ca_id))
 
     def test_user_timezone(self):
-        self.assertEquals(self.test_user.timezone, 'UTC')
+        self.assertEqual(self.test_user.timezone, 'UTC')
         self.login()
         # Set to bogus, confirm exception
         data = {"resourceType": "Patient",
@@ -320,7 +320,7 @@ class TestUser(TestCase):
                           data=json.dumps(data))
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.timezone, 'US/Eastern')
+        self.assertEqual(user.timezone, 'US/Eastern')
 
     def test_ur_format(self):
         ur = UserRelationship(user_id=TEST_USER_ID, other_user_id=TEST_USER_ID,
@@ -361,17 +361,17 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
         new_user = User.query.get(user_id)
-        self.assertEquals(new_user.first_name, given)
-        self.assertEquals(new_user.last_name, family)
-        self.assertEquals(new_user.username, None)
-        self.assertEquals(len(new_user.roles), 0)
+        self.assertEqual(new_user.first_name, given)
+        self.assertEqual(new_user.last_name, family)
+        self.assertEqual(new_user.username, None)
+        self.assertEqual(len(new_user.roles), 0)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
-        self.assertEquals(len(new_user.roles), 1)
-        self.assertEquals(new_user.locale_code, language)
-        self.assertEquals(new_user.locale_name, language_name)
+        self.assertEqual(len(new_user.roles), 1)
+        self.assertEqual(new_user.locale_code, language)
+        self.assertEqual(new_user.locale_name, language_name)
 
     def test_tz_set_on_account_creation(self):
         org = Organization(id=101, name='org', timezone='US/Pacific')
@@ -397,7 +397,7 @@ class TestUser(TestCase):
 
         user_id = rv.json['user_id']
         new_user = User.query.get(user_id)
-        self.assertEquals(new_user.timezone, 'US/Pacific')
+        self.assertEqual(new_user.timezone, 'US/Pacific')
 
     def test_account_creation_by_staff(self):
         # permission challenges when done as staff
@@ -443,18 +443,18 @@ class TestUser(TestCase):
                 data=json.dumps(data))
         self.assert200(rv)
         new_user = User.query.get(user_id)
-        self.assertEquals(new_user.first_name, given)
-        self.assertEquals(new_user.last_name, family)
-        self.assertEquals(new_user.username, None)
-        self.assertEquals(len(new_user.roles), 1)
+        self.assertEqual(new_user.first_name, given)
+        self.assertEqual(new_user.last_name, family)
+        self.assertEqual(new_user.username, None)
+        self.assertEqual(len(new_user.roles), 1)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
-        self.assertEquals(len(new_user.roles), 1)
-        self.assertEquals(new_user.locale_code, language)
-        self.assertEquals(new_user.locale_name, language_name)
-        self.assertEquals(new_user.organizations.count(), 2)
+        self.assertEqual(len(new_user.roles), 1)
+        self.assertEqual(new_user.locale_code, language)
+        self.assertEqual(new_user.locale_name, language_name)
+        self.assertEqual(new_user.organizations.count(), 2)
 
     def test_failed_account_creation_by_staff(self):
         # without the right set of consents & roles, should fail
@@ -515,7 +515,7 @@ class TestUser(TestCase):
         rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
-        self.assertEquals(len(result_roles['roles']), 2)
+        self.assertEqual(len(result_roles['roles']), 2)
         received = [r['name'] for r in result_roles['roles']]
         self.assertTrue(ROLE.PATIENT in received)
         self.assertTrue(ROLE.STAFF in received)
@@ -533,7 +533,7 @@ class TestUser(TestCase):
         rv = self.client.get('/api/roles')
 
         result_roles = json.loads(rv.data)
-        self.assertEquals(len(result_roles['roles']), len(STATIC_ROLES))
+        self.assertEqual(len(result_roles['roles']), len(STATIC_ROLES))
 
     def test_roles_add(self):
         data = {"roles": [
@@ -548,15 +548,15 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), len(data['roles']))
+        self.assertEqual(len(doc['roles']), len(data['roles']))
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), len(data['roles']))
+        self.assertEqual(len(user.roles), len(data['roles']))
         title_case_name = [
             r['display_name'] for r in doc['roles']
             if r['name'] == 'application_developer'][0]
-        self.assertEquals('Application Developer', title_case_name)
+        self.assertEqual('Application Developer', title_case_name)
 
     def test_roles_post(self):
         data = {"roles": [
@@ -570,11 +570,11 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 3)
+        self.assertEqual(len(doc['roles']), 3)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), len(doc['roles']))
+        self.assertEqual(len(user.roles), len(doc['roles']))
 
     def test_roles_duplicate_add(self):
         data = {"roles": [
@@ -588,12 +588,12 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 1)
-        self.assertEquals(doc['roles'][0]['name'], data['roles'][0]['name'])
+        self.assertEqual(len(doc['roles']), 1)
+        self.assertEqual(doc['roles'][0]['name'], data['roles'][0]['name'])
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles),  1)
+        self.assertEqual(len(user.roles),  1)
 
     def test_roles_duplicate_post(self):
         """POST shouldn't allow duplicates"""
@@ -608,9 +608,9 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 409)
+        self.assertEqual(rv.status_code, 409)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), 2)
+        self.assertEqual(len(user.roles), 2)
 
     def test_roles_delete_via_put(self):
         "delete via PUT of less than all current roles"
@@ -627,11 +627,11 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 2)
+        self.assertEqual(len(doc['roles']), 2)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), 2)
+        self.assertEqual(len(user.roles), 2)
 
     def test_roles_delete(self):
         self.promote_user(role_name=ROLE.PATIENT)
@@ -644,11 +644,11 @@ class TestUser(TestCase):
             '/api/user/%s/roles' % TEST_USER_ID,
             content_type='application/json', data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 2)
+        self.assertEqual(len(doc['roles']), 2)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), 2)
+        self.assertEqual(len(user.roles), 2)
 
     def test_roles_nochange(self):
         data = {"roles": [
@@ -662,11 +662,11 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), len(data['roles']))
+        self.assertEqual(len(doc['roles']), len(data['roles']))
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), len(data['roles']))
+        self.assertEqual(len(user.roles), len(data['roles']))
 
     def test_prevent_service_role(self):
         "Don't allow promotion of accounts to service"
@@ -681,7 +681,7 @@ class TestUser(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assertEquals(rv.status_code, 400)
+        self.assertEqual(rv.status_code, 400)
 
     def test_user_check_roles(self):
         org = Organization(name='members only')
@@ -980,7 +980,7 @@ class TestUser(TestCase):
 
         ur = UserRelationship.query.filter_by(
             other_user_id=other_user.id).first()
-        self.assertEquals(ur.relationship.name, RELATIONSHIP.PARTNER)
+        self.assertEqual(ur.relationship.name, RELATIONSHIP.PARTNER)
 
     def test_put_relationships(self):
         """PUT defines the whole list for a user - deletes unnamed existing"""
@@ -989,7 +989,7 @@ class TestUser(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         # self.test_user.relationships only includes subject relations
-        self.assertEquals(len(self.test_user.relationships), 1)
+        self.assertEqual(len(self.test_user.relationships), 1)
 
         self.login()
         rv = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
@@ -997,18 +997,18 @@ class TestUser(TestCase):
         data = rv.json
 
         # includes subj and predicate relations
-        self.assertEquals(len(data['relationships']), 2)
+        self.assertEqual(len(data['relationships']), 2)
 
         # Now, just PUT the subject one of the two
         data['relationships'] = [r for r in data['relationships'] if
                                  r['user'] == self.test_user.id]
-        self.assertEquals(len(data['relationships']), 1)
+        self.assertEqual(len(data['relationships']), 1)
         rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['relationships']), 1)
-        self.assertEquals(len(self.test_user.relationships), 1)
+        self.assertEqual(len(rv.json['relationships']), 1)
+        self.assertEqual(len(self.test_user.relationships), 1)
 
     def test_delete_relationships(self):
         "delete now done by PUTting less than all relationships"
@@ -1032,7 +1032,7 @@ class TestUser(TestCase):
         # but the one PUT should remain
         ur = UserRelationship.query.filter_by(
             other_user_id=TEST_USER_ID).first()
-        self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
+        self.assertEqual(ur.relationship.name, RELATIONSHIP.SPONSOR)
 
     def test_fuzzy_match(self):
         self.test_user.birthdate = "01-31-1950"
@@ -1042,12 +1042,12 @@ class TestUser(TestCase):
         score = user.fuzzy_match(first_name=user.first_name,
                                  last_name=user.last_name,
                                  birthdate=user.birthdate)
-        self.assertEquals(score, 100)  # should be perfect match
+        self.assertEqual(score, 100)  # should be perfect match
 
         score = user.fuzzy_match(first_name=user.first_name,
                                  last_name=user.last_name,
                                  birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
-        self.assertEquals(score, 0)  # incorrect birthdate returns 0
+        self.assertEqual(score, 0)  # incorrect birthdate returns 0
 
         score = user.fuzzy_match(first_name=user.first_name,
                                  last_name='O' + user.last_name,
@@ -1079,13 +1079,13 @@ class TestUser(TestCase):
             user.merge_with(other.id)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
-            self.assertEquals(user.first_name, 'newFirst')
-            self.assertEquals(user.last_name, 'Better')
-            self.assertEquals(user.gender, 'male')
-            self.assertEquals({o.name for o in user.organizations},
+            self.assertEqual(user.first_name, 'newFirst')
+            self.assertEqual(user.last_name, 'Better')
+            self.assertEqual(user.gender, 'male')
+            self.assertEqual({o.name for o in user.organizations},
                             {o.name for o in orgs})
             self.assertTrue(user.deceased)
-            self.assertEquals(user.timezone, 'US/Central')
+            self.assertEqual(user.timezone, 'US/Central')
 
     def test_promote(self):
         with SessionScope(db):
@@ -1110,11 +1110,11 @@ class TestUser(TestCase):
             self.assertTrue(user.is_registered())
             self.assertNotEqual(user.registered, old_regtime)
             self.assertTrue(other.deleted)
-            self.assertEquals(user.first_name, 'newFirst')
-            self.assertEquals(user.last_name, 'Better')
-            self.assertEquals(user.gender, 'male')
-            self.assertEquals(user.password, 'phoney')
-            self.assertEquals({o.name for o in user.organizations},
+            self.assertEqual(user.first_name, 'newFirst')
+            self.assertEqual(user.last_name, 'Better')
+            self.assertEqual(user.gender, 'male')
+            self.assertEqual(user.password, 'phoney')
+            self.assertEqual({o.name for o in user.organizations},
                             {o.name for o in orgs})
 
     def test_password_reset(self):
@@ -1124,19 +1124,19 @@ class TestUser(TestCase):
         rv = self.client.post('/api/user/{}/password_reset'.format(TEST_USER_ID),
                 content_type='application/json')
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
 
     def test_bogus_user_contensent(self):
         # example bogus data from msk testing
         data = {
-            u'agreement_url':
-            u'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorUrl=true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-5339-e677353e694f',
-            u'user_id': u'{}'.format(TEST_USER_ID),
-            u'include_in_reports': True,
-            u'send_reminders': False,
-            u'organization_id': u'%22',
-            u'staff_editable': True,
-            u'org': u'22110'}
+            'agreement_url':
+            'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorUrl=true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-5339-e677353e694f',
+            'user_id': '{}'.format(TEST_USER_ID),
+            'include_in_reports': True,
+            'send_reminders': False,
+            'organization_id': '%22',
+            'staff_editable': True,
+            'org': '22110'}
         self.login()
         rv = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID), data=json.dumps(data),
@@ -1161,12 +1161,12 @@ class TestUser(TestCase):
             db.session.add(org)
             db.session.commit()
         org = db.session.merge(org)
-        self.assertEquals(org.partOf_id, parent_id)
+        self.assertEqual(org.partOf_id, parent_id)
         # add child org to user
         user = User.query.get(TEST_USER_ID)
         user.organizations.append(org)
         # test locale inheritance
-        self.assertEquals(user.locale_display_options['en_AU'], 'Australian English')
+        self.assertEqual(user.locale_display_options['en_AU'], 'Australian English')
 
     def test_user_messages(self):
         msg1 = EmailMessage(subject='Test #1',
@@ -1191,8 +1191,8 @@ class TestUser(TestCase):
         resp = self.client.get('/api/user/{}/messages'.format(TEST_USER_ID))
 
         self.assert200(resp)
-        self.assertEquals(len(resp.json['messages']), 2)
-        self.assertEquals(resp.json['messages'][0]['body'], 'Test message.')
+        self.assertEqual(len(resp.json['messages']), 2)
+        self.assertEqual(resp.json['messages'][0]['body'], 'Test message.')
 
     def test_invite(self):
         su = self.add_service_user()

@@ -25,13 +25,13 @@ class SSLSMTPHandler(SMTPHandler):
                 port = smtplib.SMTP_PORT
             smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self._timeout)
 
-            message = u'\r\n'.join((
-                u'From: {from_addr}',
-                u'To: {to_addr}',
-                u'Subject: {subject}',
-                u'Date: {date}',
-                u'',
-                u'{body}',
+            message = '\r\n'.join((
+                'From: {from_addr}',
+                'To: {to_addr}',
+                'Subject: {subject}',
+                'Date: {date}',
+                '',
+                '{body}',
             )).format(
                 from_addr=self.fromaddr,
                 to_addr=','.join(self.toaddrs),

@@ -32,7 +32,7 @@ class TestResearchProtocol(TestCase):
         rp = db.session.merge(rp)
 
         rp_json = rp.as_json()
-        self.assertEquals(rp_json['name'], 'test_rp')
+        self.assertEqual(rp_json['name'], 'test_rp')
         self.assertTrue(rp_json['created_at'])
         self.assertTrue(rp_json['display_name'], 'Test Rp')
 
@@ -50,8 +50,8 @@ class TestResearchProtocol(TestCase):
                     ]}
 
         org = Organization.from_fhir(org_data)
-        self.assertEquals(1, len(org.research_protocols))
-        self.assertEquals(org.research_protocols[0].id, rp.id)
+        self.assertEqual(1, len(org.research_protocols))
+        self.assertEqual(org.research_protocols[0].id, rp.id)
 
     def test_rp_inheritance(self):
         rp = ResearchProtocol(name="test_rp")
@@ -69,7 +69,7 @@ class TestResearchProtocol(TestCase):
             db.session.commit()
         parent, child, rp = map(db.session.merge, (parent, child, rp))
 
-        self.assertEquals(1, len(parent.research_protocols))
-        self.assertEquals(parent.research_protocols[0].id, rp.id)
-        self.assertEquals(0, len(child.research_protocols))
-        self.assertEquals(child.research_protocol(as_of_date=datetime.utcnow()).id, rp.id)
+        self.assertEqual(1, len(parent.research_protocols))
+        self.assertEqual(parent.research_protocols[0].id, rp.id)
+        self.assertEqual(0, len(child.research_protocols))
+        self.assertEqual(child.research_protocol(as_of_date=datetime.utcnow()).id, rp.id)

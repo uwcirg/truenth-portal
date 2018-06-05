@@ -37,7 +37,7 @@ def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
 
-RELATIONSHIP = enum(**{unicode(r).upper():r for r in STATIC_RELATIONSHIPS})
+RELATIONSHIP = enum(**{str(r).upper():r for r in STATIC_RELATIONSHIPS})
 
 
 def add_static_relationships():

@@ -30,7 +30,7 @@ class TestAuth(TestCase):
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
         rv = self.client.get('/logout')
-        self.assertEquals(302, rv.status_code)
+        self.assertEqual(302, rv.status_code)
 
     def test_local_user_add(self):
         """Add a local user via flask_user forms"""
@@ -40,9 +40,9 @@ class TestAuth(TestCase):
                 'email': 'otu@example.com',
                }
         rv = self.client.post('/user/register', data=data)
-        self.assertEquals(rv.status_code, 302)
+        self.assertEqual(rv.status_code, 302)
         new_user = User.query.filter_by(username=data['email']).first()
-        self.assertEquals(new_user.active, True)
+        self.assertEqual(new_user.active, True)
 
     def test_register_now(self):
         """Initiate process to register exiting account"""
@@ -64,10 +64,10 @@ class TestAuth(TestCase):
         self.login()
         rv = self.client.post('/client', data=dict(
             application_origins=origins))
-        self.assertEquals(302, rv.status_code)
+        self.assertEqual(302, rv.status_code)
 
         client = Client.query.filter_by(user_id=TEST_USER_ID).first()
-        self.assertEquals(client.application_origins, origins)
+        self.assertEqual(client.application_origins, origins)
 
     def test_client_bad_add(self):
         """Test adding a bad client application"""
@@ -87,10 +87,10 @@ class TestAuth(TestCase):
                 data=dict(callback_url=test_url,
                           application_origins=origins,
                           application_role=INTERVENTION.DEFAULT.name))
-        self.assertEquals(302, rv.status_code)
+        self.assertEqual(302, rv.status_code)
 
         client = Client.query.get('test_client')
-        self.assertEquals(client.callback_url, test_url)
+        self.assertEqual(client.callback_url, test_url)
 
         invalid_url = "http://invalid.org"
         rv2 = self.client.post('/client/{0}'.format(client.client_id),
@@ -103,7 +103,7 @@ class TestAuth(TestCase):
         self.assertTrue(error_text in rv2.data)
 
         client = Client.query.get('test_client')
-        self.assertNotEquals(client.callback_url, invalid_url)
+        self.assertNotEqual(client.callback_url, invalid_url)
 
     def test_unicode_name(self):
         """Test insertion of unicode name via add_authomatic_user"""
@@ -113,16 +113,16 @@ class TestAuth(TestCase):
         authomatic_user = AuthomaticMock()
         authomatic_user.name = 'Test User'
         authomatic_user.first_name = 'Test'
-        authomatic_user.last_name = u'Bugn\xed'
+        authomatic_user.last_name = 'Bugn\xed'
         authomatic_user.birth_date = None
-        authomatic_user.gender = u'male'
+        authomatic_user.gender = 'male'
         authomatic_user.email = 'test@test.org'
 
         new_user = add_authomatic_user(authomatic_user, None)
 
         user = User.query.filter_by(email='test@test.org').first()
-        self.assertEquals(user.last_name, u'Bugn\xed')
-        self.assertEquals(new_user, user)
+        self.assertEqual(user.last_name, 'Bugn\xed')
+        self.assertEqual(new_user, user)
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
@@ -131,10 +131,10 @@ class TestAuth(TestCase):
         rv = self.client.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='badprotocol.com',
                     application_origins=client.application_origins))
-        self.assertEquals(200, rv.status_code)
+        self.assertEqual(200, rv.status_code)
 
         client = Client.query.get('test_client')
-        self.assertEquals(client.callback_url, None)
+        self.assertEqual(client.callback_url, None)
 
     def test_service_account_creation(self):
         """Confirm we can create a service account and token"""
@@ -150,12 +150,12 @@ class TestAuth(TestCase):
         client = db.session.merge(client)
 
         # Did we get a service account with the correct roles and relationships
-        self.assertEquals(len(service_user.roles), 1)
-        self.assertEquals('service', service_user.roles[0].name)
+        self.assertEqual(len(service_user.roles), 1)
+        self.assertEqual('service', service_user.roles[0].name)
         sponsorship = UserRelationship.query.filter_by(
             other_user_id=service_user.id).first()
-        self.assertEquals(sponsorship.user_id, TEST_USER_ID)
-        self.assertEquals(sponsorship.relationship.name, 'sponsor')
+        self.assertEqual(sponsorship.user_id, TEST_USER_ID)
+        self.assertEqual(sponsorship.relationship.name, 'sponsor')
 
         # Can we get a usable Bearer Token
         create_service_token(client=client, user=service_user)
@@ -181,7 +181,7 @@ class TestAuth(TestCase):
         # try to promote - which should fail
         self.assertRaises(RoleError, add_role, service_user,
                           ROLE.APPLICATION_DEVELOPER)
-        self.assertEquals(len(service_user.roles), 1)
+        self.assertEqual(len(service_user.roles), 1)
 
     def test_token_status(self):
         with SessionScope(db):
@@ -203,7 +203,7 @@ class TestAuth(TestCase):
             headers={'Authorization': 'Bearer {}'.format(token.access_token)})
         self.assert200(rv)
         data = rv.json
-        self.assertAlmostEquals(30, data['expires_in'], delta=5)
+        self.assertAlmostEqual(30, data['expires_in'], delta=5)
 
     def test_token_status_wo_header(self):
         """Call for token_status w/o token should return 401"""

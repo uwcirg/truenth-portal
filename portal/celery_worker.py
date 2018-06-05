@@ -11,10 +11,10 @@ Launch in the same virtual environment via
 
 """
 from .database import db
-from factories.celery import create_celery
-from factories.app import create_app
+from .factories.celery import create_celery
+from .factories.app import create_app
 from .models.scheduled_job import ScheduledJob
-import tasks
+from . import tasks
 
 
 app = create_app()

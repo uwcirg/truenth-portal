@@ -25,7 +25,7 @@ class TestAccessUrl(TestCase):
                 user_manager.token_manager.verify_token(token, 10)
         self.assertTrue(is_valid)
         self.assertFalse(has_expired)
-        self.assertEquals(id, onetime.id)
+        self.assertEqual(id, onetime.id)
 
     def test_use_access_url(self):
         """The current flow forces access to the challenge page"""
