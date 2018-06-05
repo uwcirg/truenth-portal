@@ -619,7 +619,7 @@ def generate_qnr_csv(qnr_bundle):
                 row = []
                 for column_name in columns:
                     column = row_data.get(column_name)
-                    column = "\N" if column is None else column
+                    column = "\\N" if column is None else column
 
                     # Handle JSON column escaping/enclosing
                     if not isinstance(column, str):
