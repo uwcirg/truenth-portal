@@ -472,7 +472,7 @@
       },
       "id": 1006,
       "intervention_name": "exercise_diet",
-      "name": "Allow Exercise & Diet if not in Communitiy of Wellness or Sexual Recovery",
+      "name": "Allow Exercise & Diet if not in Community of Wellness or Sexual Recovery",
       "resourceType": "AccessStrategy"
     }
   ],
