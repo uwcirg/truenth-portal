@@ -2,14 +2,12 @@
 {% block title %}{{super()}} Home{% endblock %}
 {% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
-    <!-- fill in conditional based on config variable to show/hide this -->
-        <div class="sys-maintenance">
-            <h4 class="title">{{_("Please note")}}</h4>
-            <h4 class="message">
-                <!-- FILL IN MESSAGE HERE -->
-            </h4>
-        </div>
-    <!-- end conditional-->
+    {% if config.MAINTENANCE -%}
+      <div class="sys-maintenance">
+          <h4 class="title">{{_("Please note")}}</h4>
+          <h4 class="message">{{config.MAINTENANCE | safe}}</h4>
+      </div>
+    {%- endif %}
     <main class="main" data-section="home">
       {% if init_login_modal %}<input type="hidden" id="initLoginModal" value="true" />{% endif %}
       {{ super() }}

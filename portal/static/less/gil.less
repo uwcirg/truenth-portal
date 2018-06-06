@@ -7731,25 +7731,30 @@ a.home--modal-link {
 }
 .sys-maintenance {
     position: fixed;
-    top: 0;
+    top: 6em;
     right: 0;
     left: 0;
     height: 65px;
-    background: #fffc;
+    background: #a94442;
     z-index: 100001;
     text-align: center;
     padding: 0 8px;
-    color: #a94442;
+    color: #fffc;
     .title {
-        font-weight: bold;
+        font-weight: 700;
         text-transform: uppercase;
     }
 }
 .sys-maintenance .title,
 .sys-maintenance .message {
-    font-size: 14px;
+    font-size: 12px;
 }
-@media (min-width: 500px) {
+@media (min-width: 900px) {
+    .sys-maintenance {
+        top: 0;
+    }
+}
+@media (min-width: 992px) {
     .sys-maintenance .title,
     .sys-maintenance .message {
         font-size: 1.2em;

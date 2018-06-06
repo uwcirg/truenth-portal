@@ -23,14 +23,6 @@
 </style>
 <div id="fullSizeBox" class="box-min-500">
     <img  src="{{ url_for('.static', filename='img/spacer.jpg') }}" class="tnth-image img-responsive hidden-xs" style="visibility:hidden" alt="spacer image"/>
-    <!-- fill in conditional based on config variable to show/hide this -->
-        <div class="sys-maintenance">
-            <h4 class="title">{{_("Please note")}}</h4>
-            <h4 class="message">
-                <!-- FILL IN MESSAGE HERE -->
-            </h4>
-        </div>
-    <!-- end conditional-->
     <div id="fullSizeContainer">
         <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="{{_('TrueNTH')}}" /></a></div>
         <div id="wellContainer">
@@ -41,6 +33,12 @@
                         {{ app_text('landing sub-title') }}
                     </div>
                     <a href="/go" class="btn feature-btn feature-btn-primary">{{ _("Register") }}</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-primary">{{ _("Log in") }}</a>
+                    {% if config.MAINTENANCE -%}
+                        <div class="sys-maintenance">
+                            <h4 class="title">{{_("Please note")}}
+                            <h4 class="message">{{config.MAINTENANCE | safe}}</h4>
+                        </div>
+                    {%- endif %}
                     {% if timed_out %}
                         <div id="timeOutMessageContainer">
                             {{ _("You have been logged out due to inactivity. Please log in again to continue.") }}
