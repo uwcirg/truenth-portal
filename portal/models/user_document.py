@@ -62,10 +62,10 @@ class UserDocument(db.Model):
             raise ValueError("filetype must be one of: " + ", ".join(data['allowed_extensions']))
         file_uuid = uuid4()
         try:
-            upload_dir = os.path.join(current_app.root_path,current_app.config.get("FILE_UPLOAD_DIR"))
+            upload_dir = os.path.join(current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"))
             if not os.path.exists(upload_dir):
                 os.makedirs(upload_dir)
-            upload_file.save(os.path.join(upload_dir,str(file_uuid)))
+            upload_file.save(os.path.join(upload_dir, str(file_uuid)))
         except:
             raise OSError("could not save file")
         if 'contributor' in data:
@@ -82,11 +82,11 @@ class UserDocument(db.Model):
 
 
     def get_file_contents(self):
-        filepath = os.path.join(current_app.root_path,current_app.config.get("FILE_UPLOAD_DIR"),self.uuid)
+        filepath = os.path.join(current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"), self.uuid)
         if not os.path.exists(filepath):
             raise ValueError("could not find file")
         try:
-            with open(filepath,"r") as file_in:
+            with open(filepath, "r") as file_in:
                 file_contents = file_in.read()
         except:
             raise ValueError("could not open file")

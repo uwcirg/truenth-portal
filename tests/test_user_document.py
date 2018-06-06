@@ -73,7 +73,7 @@ class TestUserDocument(TestCase):
                             current_app.config.get("FILE_UPLOAD_DIR"),
                             str(udoc.uuid))
         with open(fpath, 'r') as udoc_file:
-            self.assertEqual(udoc_file.read(),test_contents)
+            self.assertEqual(udoc_file.read(), test_contents)
         os.remove(fpath)
 
         self.assertEqual(udoc.user_id, TEST_USER_ID)
@@ -98,6 +98,6 @@ class TestUserDocument(TestCase):
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
         rv = self.client.get('/api/user/{}/user_documents/{}'.format(
-                            TEST_USER_ID,udoc.id))
+                            TEST_USER_ID, udoc.id))
         self.assert200(rv)
-        self.assertEqual(rv.data,test_contents)
+        self.assertEqual(rv.data, test_contents)

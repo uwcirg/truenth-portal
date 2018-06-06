@@ -46,7 +46,7 @@ def dict_match(newd, oldd, diff_stream):
             for k in modified.keys():
                 diff_stream.write(
                     u"replace {} with {}\n".format(
-                        {k:oldd.get(k)},{k:newd.get(k)}))
+                        {k:oldd.get(k)}, {k:newd.get(k)}))
         return False
 
 

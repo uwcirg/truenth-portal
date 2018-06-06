@@ -97,7 +97,7 @@ class TestOrganization(TestCase):
             db.session.add(parent)
             db.session.add(org)
             db.session.commit()
-        parent, org = map(db.session.merge,(parent, org))
+        parent, org = map(db.session.merge, (parent, org))
         self.assertEqual(org.timezone, 'UTC')
 
         # test that timezone-less child org inherits from parent
@@ -105,7 +105,7 @@ class TestOrganization(TestCase):
         with SessionScope(db):
             db.session.add(parent)
             db.session.commit()
-        parent, org = map(db.session.merge,(parent, org))
+        parent, org = map(db.session.merge, (parent, org))
         self.assertEqual(org.timezone, 'Asia/Tokyo')
 
         # test that child org with timezone does NOT inherit from parent
@@ -177,8 +177,8 @@ class TestOrganization(TestCase):
         org_id_system = "http://test/system"
         org_id_value = "testval"
         self.login()
-        org = Organization(name='test',id=999)
-        ident = Identifier(id=99,system=org_id_system,value=org_id_value)
+        org = Organization(name='test', id=999)
+        ident = Identifier(id=99, system=org_id_system, value=org_id_value)
         org_ident = OrganizationIdentifier(organization_id=999,
                                             identifier_id=99)
         with SessionScope(db):

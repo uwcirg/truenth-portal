@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = metadata.summary
-project_slug = project.replace(" ","")
+project_slug = project.replace(" ", "")
 
 now = datetime.datetime.now()
 author = metadata.author

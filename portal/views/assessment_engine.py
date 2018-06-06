@@ -632,15 +632,15 @@ def assessment(patient_id, instrument_id):
         documents.append(qnr.document)
 
     bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(documents),
+        'resourceType': 'Bundle',
+        'updated': FHIR_datetime.now(),
+        'total': len(documents),
         'type': 'searchset',
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
-        'entry':documents,
+        'entry': documents,
     }
 
     return jsonify(bundle)
@@ -749,8 +749,8 @@ def get_assessments():
     )
     bundle.update({
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
     })
 
