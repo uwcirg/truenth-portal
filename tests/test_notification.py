@@ -36,8 +36,8 @@ class TestNotification(TestCase):
             '/api/user/{}/notification'.format(TEST_USER_ID))
         self.assert200(resp)
 
-        self.assertEquals(len(resp.json['notifications']), 1)
-        self.assertEquals(resp.json['notifications'][0]['name'], 'test')
+        self.assertEqual(len(resp.json['notifications']), 1)
+        self.assertEqual(resp.json['notifications'][0]['name'], 'test')
         self.assertTrue(resp.json['notifications'][0]['created_at'])
 
     def test_usernotification_delete(self):

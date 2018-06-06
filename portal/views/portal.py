@@ -289,7 +289,7 @@ def access_via_token(token, next_step=None):
     # Valid token - confirm user id looks legit
     user = get_user_or_abort(user_id)
     not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
-    has = set([role.name for role in user.roles])
+    has = {role.name for role in user.roles}
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
 

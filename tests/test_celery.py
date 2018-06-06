@@ -12,4 +12,4 @@ class TestCelery(TestCase):
         rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'. \
                              format(x=x, y=y), follow_redirects=True)
         self.assert200(rv)
-        self.assertEquals(rv.data, str(x + y))
+        self.assertEqual(rv.data, str(x + y))

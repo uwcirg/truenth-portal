@@ -215,7 +215,7 @@ def practitioner_post():
     try:
         check_for_existing_external_id(request.json)
         practitioner = Practitioner.from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.add(practitioner)
     db.session.commit()
@@ -300,7 +300,7 @@ def practitioner_put(id_or_code):
     try:
         check_for_existing_external_id(request.json, practitioner.id)
         practitioner.update_from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated practitioner from input {}".format(

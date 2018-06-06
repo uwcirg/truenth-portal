@@ -229,7 +229,7 @@ def organization_delete(organization_id):
     try:
         db.session.delete(org)
         db.session.commit()
-    except exc.IntegrityError, e:
+    except exc.IntegrityError as e:
         message = "Cannot delete organization with related entities"
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
@@ -300,7 +300,7 @@ def organization_post():
         abort(400, "Requires FHIR resourceType of 'Organization'")
     try:
         org = Organization.from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.add(org)
     db.session.commit()
@@ -377,7 +377,7 @@ def organization_put(organization_id):
         complete = org.as_fhir(include_empties=True)
         complete.update(request.json)
         org.update_from_fhir(complete)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated organization from input {}".format(

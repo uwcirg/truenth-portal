@@ -72,7 +72,7 @@ pycparser==2.18
 pycrypto==2.6.1
 pyflakes==2.0.0
 Pygments==2.2.0
-pytest==3.6.0
+pytest==3.6.1
 python-dateutil==2.7.3
 python-editor==1.0.3
 python-Levenshtein==0.12.0
@@ -82,7 +82,7 @@ redis==2.10.6
 requests==2.18.4
 requests-cache==0.4.13
 requests-oauthlib==1.0.0
-regex==2018.02.21
+regex==2018.06.06
 selenium==3.12.0
 simplegeneric==0.8.1
 six==1.11.0
@@ -99,7 +99,7 @@ vine==1.1.4
 virtualenv==16.0.0
 waitress==1.1.0
 wcwidth==0.1.7
-WebOb==1.8.1
+WebOb==1.8.2
 WebTest==2.0.29
 Werkzeug==0.14.1
 WTForms==2.2

@@ -155,7 +155,7 @@ class TestQuestionnaireBank(TestCase):
             u'Crv Baseline V2',
             u'Crv Recurring 3Mo Period V2',
             u'Crv Recurring 6Mo Period V2'}
-        self.assertEquals(expected, set([q.display_name for q in qbs]))
+        self.assertEqual(expected, {q.display_name for q in qbs})
 
     def test_org_trigger_date(self):
         # testing org-based QBs
@@ -175,7 +175,7 @@ class TestQuestionnaireBank(TestCase):
         # user with consent should return consent date
         self.consent_with_org(org.id, setdate=now)
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(qb.trigger_date(self.test_user), now)
+        self.assertEqual(qb.trigger_date(self.test_user), now)
 
         # user with consent and TX date should return TX date (if qb.recurs)
         tx_date = datetime(2017, 6, 10, 20, 00, 00, 000000)
@@ -187,7 +187,7 @@ class TestQuestionnaireBank(TestCase):
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
         qb.recurs.append(recur)
-        self.assertEquals(qb.trigger_date(self.test_user), tx_date)
+        self.assertEqual(qb.trigger_date(self.test_user), tx_date)
 
     def test_intervention_trigger_date(self):
         # testing intervention-based QBs
@@ -215,8 +215,8 @@ class TestQuestionnaireBank(TestCase):
             status='', issued=None)
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
-        self.assertEquals(obs.codeable_concept.codings[0].display, 'biopsy')
-        self.assertEquals(qb.trigger_date(self.test_user), obs.issued)
+        self.assertEqual(obs.codeable_concept.codings[0].display, 'biopsy')
+        self.assertEqual(qb.trigger_date(self.test_user), obs.issued)
 
         # user with biopsy and TX date should return TX date
         tx_date = datetime.utcnow()
@@ -224,7 +224,7 @@ class TestQuestionnaireBank(TestCase):
                            system=ICHOM, setdate=tx_date)
         self.test_user = db.session.merge(self.test_user)
         qb.__trigger_date = None  # clear out stored trigger_date
-        self.assertEquals(qb.trigger_date(self.test_user), tx_date)
+        self.assertEqual(qb.trigger_date(self.test_user), tx_date)
 
     def test_intervention_in_progress(self):
         # testing intervention-based QBs
@@ -249,13 +249,13 @@ class TestQuestionnaireBank(TestCase):
             status='', issued=None)
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
-        self.assertEquals(obs.codeable_concept.codings[0].display, 'biopsy')
-        self.assertEquals(qb.trigger_date(self.test_user), obs.issued)
+        self.assertEqual(obs.codeable_concept.codings[0].display, 'biopsy')
+        self.assertEqual(qb.trigger_date(self.test_user), obs.issued)
 
         # add mock in-process QB - confirm most_current_qb still returns one
         mock_qr('q', 'in-progress', qb=qb)
         self.test_user, qb = map(db.session.merge, (self.test_user, qb))
-        self.assertEquals(qb.most_current_qb(self.test_user, as_of_date=now).questionnaire_bank, qb)
+        self.assertEqual(qb.most_current_qb(self.test_user, as_of_date=now).questionnaire_bank, qb)
 
     def test_start(self):
         org, rp, rp_id = self.setup_org_n_rp()
@@ -271,11 +271,11 @@ class TestQuestionnaireBank(TestCase):
         start = qb.calculated_start(
             trigger_date, as_of_date=now).relative_start
         self.assertTrue(start > trigger_date)
-        self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
+        self.assertEqual(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
 
         end = qb.calculated_expiry(trigger_date, as_of_date=now)
         expected_expiry = datetime.strptime('2000-01-04', '%Y-%m-%d')
-        self.assertEquals(end, expected_expiry)
+        self.assertEqual(end, expected_expiry)
 
     def test_due(self):
         org, rp, rp_id = self.setup_org_n_rp()
@@ -292,19 +292,19 @@ class TestQuestionnaireBank(TestCase):
         start = qb.calculated_start(
             trigger_date, as_of_date=now).relative_start
         self.assertTrue(start > trigger_date)
-        self.assertEquals(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
+        self.assertEqual(start, datetime.strptime('2000-01-02', '%Y-%m-%d'))
 
         due = qb.calculated_due(trigger_date, as_of_date=now)
         expected_due = datetime.strptime('2000-01-04', '%Y-%m-%d')
-        self.assertEquals(due, expected_due)
+        self.assertEqual(due, expected_due)
 
     def test_questionnaire_serialize(self):
         q1 = self.add_questionnaire(name='q1')
         data = q1.as_fhir()
-        self.assertEquals(data['resourceType'], "Questionnaire")
+        self.assertEqual(data['resourceType'], "Questionnaire")
         expected = Identifier(
             system=TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, value='q1')
-        self.assertEquals(
+        self.assertEqual(
             Identifier.from_fhir(data['identifier'][0]), expected)
 
     def test_serialize(self):
@@ -326,8 +326,8 @@ class TestQuestionnaireBank(TestCase):
         qb = db.session.merge(qb)
 
         data = qb.as_json()
-        self.assertEquals('QuestionnaireBank', data.get('resourceType'))
-        self.assertEquals(2, len(data['questionnaires']))
+        self.assertEqual('QuestionnaireBank', data.get('resourceType'))
+        self.assertEqual(2, len(data['questionnaires']))
 
     def test_import(self):
         org, rp, rp_id = self.setup_org_n_rp()
@@ -362,8 +362,8 @@ class TestQuestionnaireBank(TestCase):
             'classification': 'baseline'
         }
         qb = QuestionnaireBank.from_json(data)
-        self.assertEquals(2, len(qb.questionnaires))
-        self.assertEquals(qb.research_protocol_id, rp_id)
+        self.assertEqual(2, len(qb.questionnaires))
+        self.assertEqual(qb.research_protocol_id, rp_id)
 
     def test_import_followup(self):
         intervention = Intervention(name='testy', description='simple')
@@ -399,7 +399,7 @@ class TestQuestionnaireBank(TestCase):
             'classification': 'followup'
         }
         qb = QuestionnaireBank.from_json(data)
-        self.assertEquals(2, len(qb.questionnaires))
+        self.assertEqual(2, len(qb.questionnaires))
 
     def test_lookup_for_user(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
@@ -431,10 +431,10 @@ class TestQuestionnaireBank(TestCase):
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
         results = list(qb.questionnaires)
-        self.assertEquals(3, len(results))
+        self.assertEqual(3, len(results))
         # confirm rank sticks
-        self.assertEquals(results[0].name, 'epic26')
-        self.assertEquals(results[2].name, 'comorb')
+        self.assertEqual(results[0].name, 'epic26')
+        self.assertEqual(results[2].name, 'comorb')
 
     def test_lookup_with_intervention(self):
         intv = Intervention(name='TEST', description='Test Intervention')
@@ -469,7 +469,7 @@ class TestQuestionnaireBank(TestCase):
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
         results = list(qb.questionnaires)
-        self.assertEquals(2, len(results))
+        self.assertEqual(2, len(results))
 
     def test_questionnaire_gets(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
@@ -481,7 +481,7 @@ class TestQuestionnaireBank(TestCase):
 
         resp = self.client.get('/api/questionnaire')
         self.assert200(resp)
-        self.assertEquals(len(resp.json['entry']), 3)
+        self.assertEqual(len(resp.json['entry']), 3)
 
         resp = self.client.get('/api/questionnaire/{}?system={}'.format(
             'epic26', TRUENTH_QUESTIONNAIRE_CODE_SYSTEM))
@@ -489,8 +489,8 @@ class TestQuestionnaireBank(TestCase):
         q_ids = [
             ident for ident in resp.json['identifier'] if
             ident['system'] == TRUENTH_QUESTIONNAIRE_CODE_SYSTEM]
-        self.assertEquals(len(q_ids), 1)
-        self.assertEquals(q_ids[0]['value'], 'epic26')
+        self.assertEqual(len(q_ids), 1)
+        self.assertEqual(q_ids[0]['value'], 'epic26')
 
         bank = QuestionnaireBank(name='CRV', research_protocol_id=rp_id,
                                  start='{"days": 7}',
@@ -508,7 +508,7 @@ class TestQuestionnaireBank(TestCase):
 
         resp = self.client.get('/api/questionnaire_bank')
         self.assert200(resp)
-        self.assertEquals(len(resp.json['entry'][0]['questionnaires']), 3)
+        self.assertEqual(len(resp.json['entry'][0]['questionnaires']), 3)
 
     def test_visit_baseline(self):
         crv = self.setup_qbs()
@@ -518,7 +518,7 @@ class TestQuestionnaireBank(TestCase):
 
         qbd = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now)
-        self.assertEquals("Baseline", visit_name(qbd))
+        self.assertEqual("Baseline", visit_name(qbd))
 
     def test_visit_3mo(self):
         crv = self.setup_qbs()
@@ -530,10 +530,10 @@ class TestQuestionnaireBank(TestCase):
 
         qbd = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=nowish + timedelta(hours=1))
-        self.assertEquals("Month 3", visit_name(qbd))
+        self.assertEqual("Month 3", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
-        self.assertEquals("Month 9", visit_name(qbd_i2))
+        self.assertEqual("Month 9", visit_name(qbd_i2))
 
     def test_visit_6mo(self):
         crv = self.setup_qbs()
@@ -545,10 +545,10 @@ class TestQuestionnaireBank(TestCase):
 
         qbd = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=nowish + timedelta(hours=1))
-        self.assertEquals("Month 6", visit_name(qbd))
+        self.assertEqual("Month 6", visit_name(qbd))
 
         qbd_i2 = qbd._replace(iteration=1)
-        self.assertEquals("Month 18", visit_name(qbd_i2))
+        self.assertEqual("Month 18", visit_name(qbd_i2))
 
     def test_user_current_qb(self):
         crv = self.setup_qbs()
@@ -562,14 +562,14 @@ class TestQuestionnaireBank(TestCase):
         resp = self.client.get('/api/user/{}/'
                                'questionnaire_bank'.format(TEST_USER_ID))
         self.assert200(resp)
-        self.assertEquals(resp.json['questionnaire_bank']['name'],
+        self.assertEqual(resp.json['questionnaire_bank']['name'],
                           'CRV_recurring_3mo_period v2')
 
         dt = (nowish - relativedelta(months=2)).strftime('%Y-%m-%d')
         resp2 = self.client.get('/api/user/{}/questionnaire_bank?as_of_date='
                                 '{}'.format(TEST_USER_ID, dt))
         self.assert200(resp2)
-        self.assertEquals(resp2.json['questionnaire_bank']['name'],
+        self.assertEqual(resp2.json['questionnaire_bank']['name'],
                           'CRV Baseline v2')
 
         dt = (nowish - relativedelta(months=4)).strftime('%Y-%m-%d')
@@ -620,7 +620,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
-        self.assertEquals(qb.research_protocol.name, 'proto')
+        self.assertEqual(qb.research_protocol.name, 'proto')
 
         # Pointing the User's org to a new QB/RP
         # marking the old RP as retired as of yesterday
@@ -659,8 +659,8 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
-        self.assertEquals(qb.name, 'Test Questionnaire Bank')
-        self.assertEquals(qb.research_protocol.name, 'proto')
+        self.assertEqual(qb.name, 'Test Questionnaire Bank')
+        self.assertEqual(qb.research_protocol.name, 'proto')
 
         # completing QNR should result in completed status
         # shouldn't pick up new protocol till next iteration
@@ -671,7 +671,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
-        self.assertEquals(qb.name, 'Test Questionnaire Bank')
+        self.assertEqual(qb.name, 'Test Questionnaire Bank')
 
     def test_qb_pre_retired(self):
         # Confirm backdating returns the correct QB
@@ -714,12 +714,12 @@ class TestQuestionnaireBank(TestCase):
             db.session.merge, (self.test_user, org, qb2, qb3))
 
         # w/o backdating, should get current QB
-        self.assertEquals(qb3, QuestionnaireBank.most_current_qb(
+        self.assertEqual(qb3, QuestionnaireBank.most_current_qb(
             user, as_of_date=now).questionnaire_bank)
 
         # backdate prior to retirement of previous, should get the previous QB
         pre_retirement = weekago - timedelta(days=1)
-        self.assertEquals(qb2, QuestionnaireBank.most_current_qb(
+        self.assertEqual(qb2, QuestionnaireBank.most_current_qb(
             user, as_of_date=pre_retirement).questionnaire_bank)
 
     def test_outdated_done_indef(self):
@@ -759,7 +759,7 @@ class TestQuestionnaireBank(TestCase):
         # for today, should get the v3 baseline
         user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=user, as_of_date=now)
-        self.assertEquals(
+        self.assertEqual(
             ['epic26', 'irondemog_v3'],
             a_s.instruments_needing_full_assessment(classification='all'))
 
@@ -768,18 +768,18 @@ class TestQuestionnaireBank(TestCase):
         mock_qr('irondemog', timestamp=weekago, qb=qb2_indef)
         user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=user, as_of_date=weekago)
-        self.assertEquals([], a_s.instruments_needing_full_assessment(
+        self.assertEqual([], a_s.instruments_needing_full_assessment(
             classification='indefinite'))
 
         # move forward in time; user should no longer need indefinite, even
         # tho RP changed
         qb2_indef = db.session.merge(qb2_indef)
-        self.assertEquals([qb2_indef], QuestionnaireBank.qbs_for_user(
+        self.assertEqual([qb2_indef], QuestionnaireBank.qbs_for_user(
             user, classification='indefinite', as_of_date=now))
         a_s = AssessmentStatus(user=user, as_of_date=now)
-        self.assertEquals([], a_s.instruments_needing_full_assessment(
+        self.assertEqual([], a_s.instruments_needing_full_assessment(
             classification='indefinite'))
-        self.assertEquals(['epic26'], a_s.instruments_needing_full_assessment(
+        self.assertEqual(['epic26'], a_s.instruments_needing_full_assessment(
             classification='all'))
 
     def test_completed_older_rp(self):
@@ -807,14 +807,14 @@ class TestQuestionnaireBank(TestCase):
         user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
         v2qb = a_s.qb_data.qb
-        self.assertEquals('CRV_recurring_3mo_period v2', a_s.qb_data.qb.name)
-        self.assertEquals(
+        self.assertEqual('CRV_recurring_3mo_period v2', a_s.qb_data.qb.name)
+        self.assertEqual(
             ['epic26_v2'], a_s.instruments_needing_full_assessment())
 
         # Now, should still be rp v3, 3mo recurrence
         a_s = AssessmentStatus(user=user, as_of_date=now)
-        self.assertEquals('CRV_recurring_3mo_period v3', a_s.qb_data.qb.name)
-        self.assertEquals(
+        self.assertEqual('CRV_recurring_3mo_period v3', a_s.qb_data.qb.name)
+        self.assertEqual(
             ['epic26_v3'], a_s.instruments_needing_full_assessment())
 
         # Complete the questionnaire from the 3mo v2 QB
@@ -823,9 +823,9 @@ class TestQuestionnaireBank(TestCase):
         # Two weeks ago, should be completed
         user = db.session.merge(user)
         a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
-        self.assertEquals('Completed', a_s.overall_status)
+        self.assertEqual('Completed', a_s.overall_status)
 
         # Current should also be completed, even tho protocol changed
         a_s = AssessmentStatus(user=user, as_of_date=now)
         qb = QuestionnaireBank.qbs_for_user(user, classification='recurring', as_of_date=now)
-        self.assertEquals('Completed', a_s.overall_status)
+        self.assertEqual('Completed', a_s.overall_status)

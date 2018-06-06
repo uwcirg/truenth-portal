@@ -42,9 +42,9 @@ class TestFHIR(TestCase):
                }
         cc_parsed = CodeableConcept.from_fhir(data['test_concept1'])
 
-        self.assertEquals(cc_parsed.codings, cc.codings)
-        self.assertEquals(2, len(cc.codings))
-        self.assertEquals(cc_parsed.text, cc.text)
+        self.assertEqual(cc_parsed.codings, cc.codings)
+        self.assertEqual(2, len(cc.codings))
+        self.assertEqual(cc_parsed.text, cc.text)
 
         # and again, but now containing a new coding
         data = {"test_concept2":
@@ -60,16 +60,16 @@ class TestFHIR(TestCase):
         cc_parsed = CodeableConcept.from_fhir(data['test_concept2'])
 
         persisted = CodeableConcept.query.get(cc_parsed.id)
-        self.assertEquals(cc_parsed.codings, persisted.codings)
-        self.assertEquals(len(persisted.codings), 3)
-        self.assertEquals(persisted.text, 'given two codings')
+        self.assertEqual(cc_parsed.codings, persisted.codings)
+        self.assertEqual(len(persisted.codings), 3)
+        self.assertEqual(persisted.text, 'given two codings')
 
     def test_display_lookup(self):
         # example used: Coding(system=SNOMED, code='707266006',
         #  display='Androgen deprivation therapy').add_if_not_found(True)
 
         display = Coding.display_lookup(system=SNOMED, code='707266006')
-        self.assertEquals('Androgen deprivation therapy', display)
+        self.assertEqual('Androgen deprivation therapy', display)
 
     def test_codeable_concept_parse(self):
         system = "urn:ietf:bcp:47"
@@ -83,12 +83,12 @@ class TestFHIR(TestCase):
                 },
                }
         cc = CodeableConcept.from_fhir(data['language'])
-        self.assertEquals(cc.text, 'Nederlands')
-        self.assertEquals(1, len(cc.codings))
+        self.assertEqual(cc.text, 'Nederlands')
+        self.assertEqual(1, len(cc.codings))
         coding = cc.codings[0]
-        self.assertEquals(coding.system, system)
-        self.assertEquals(coding.code, code)
-        self.assertEquals(coding.display, display)
+        self.assertEqual(coding.system, system)
+        self.assertEqual(coding.code, code)
+        self.assertEqual(coding.display, display)
 
     def test_vq_format(self):
         vq = ValueQuantity(units='widgets',
@@ -101,12 +101,12 @@ class TestFHIR(TestCase):
     def test_vq_true_boolean(self):
         # units of `boolean` should convert ints to true/false
         vq = ValueQuantity(units='boolean', system='unknown', value='-10')
-        self.assertEquals(True, vq.value)
+        self.assertEqual(True, vq.value)
 
     def test_vq_false_boolean(self):
         # units of `boolean` should convert ints to true/false
         vq = ValueQuantity(units='boolean', system='unknown', value='0')
-        self.assertEquals(False, vq.value)
+        self.assertEqual(False, vq.value)
 
     def test_cc_format(self):
         c1 = Coding(system='http://test.org', code='66.5',

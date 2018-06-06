@@ -89,7 +89,7 @@ class ModelPersistence(object):
         with open(self.filename, 'r') as f:
             try:
                 data = json.load(f)
-            except ValueError, e:
+            except ValueError as e:
                 msg = "Ill formed JSON in {}".format(self.filename)
                 self._log(msg)
                 raise ValueError(e, msg)

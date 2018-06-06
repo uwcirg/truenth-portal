@@ -78,8 +78,7 @@ def update_tous(
             raise ValueError("No such organization: {}".format(organization))
         require_orgs = set(OrgTree().here_and_below_id(org.id))
 
-    require_roles = set(roles) if roles else set(
-        (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))
+    require_roles = set(roles) if roles else {ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN}
     for role in require_roles:
         if not Role.query.filter(Role.name == role).first():
             raise ValueError("No such role: {}".format(role))

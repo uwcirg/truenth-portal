@@ -178,7 +178,7 @@ class TestPortal(TestCase):
         """Request to view non existant message should 404"""
         self.login()
         rv = self.client.get('/invite/404')
-        self.assertEquals(rv.status_code, 404)
+        self.assertEqual(rv.status_code, 404)
 
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
@@ -223,9 +223,9 @@ class TestPortal(TestCase):
         lr_group = self.app.config['LR_GROUP']
         rv = self.client.get('/api/settings/lr_group')
         self.assert200(rv)
-        self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
+        self.assertEqual(rv.json.get('LR_GROUP'), lr_group)
         rv2 = self.client.get('/api/settings/bad_value')
-        self.assertEquals(rv2.status_code, 400)
+        self.assertEqual(rv2.status_code, 400)
 
 
 class TestPortalEproms(TestCase):
