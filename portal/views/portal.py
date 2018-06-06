@@ -16,7 +16,7 @@ from flask import (
     render_template_string,
     request,
     session,
-    url_for
+    url_for,
 )
 from flask_babel import gettext as _
 from flask_sqlalchemy import get_debug_queries
@@ -25,7 +25,13 @@ from flask_user import roles_required
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import BooleanField, HiddenField, IntegerField, StringField, validators
+from wtforms import (
+    BooleanField,
+    HiddenField,
+    IntegerField,
+    StringField,
+    validators,
+)
 
 from ..audit import auditable_event
 from ..database import db
@@ -41,7 +47,7 @@ from ..models.app_text import (
     UserReminderEmail_ATMA,
     VersionedResource,
     app_text,
-    get_terms
+    get_terms,
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.client import validate_origin
@@ -53,7 +59,12 @@ from ..models.identifier import Identifier
 from ..models.login import login_user
 from ..models.message import EmailMessage
 from ..models.next_step import NextStep
-from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.organization import (
+    Organization,
+    OrganizationIdentifier,
+    OrgTree,
+    UserOrganization,
+)
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference

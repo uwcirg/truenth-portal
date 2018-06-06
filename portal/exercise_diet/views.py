@@ -1,5 +1,6 @@
 import json
 from collections import OrderedDict
+
 from flask import Blueprint, redirect, render_template, url_for
 
 from ..models.user import current_user

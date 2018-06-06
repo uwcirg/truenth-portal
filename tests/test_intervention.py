@@ -10,7 +10,11 @@ from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
-from portal.models.intervention import INTERVENTION, Intervention, UserIntervention
+from portal.models.intervention import (
+    INTERVENTION,
+    Intervention,
+    UserIntervention,
+)
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
@@ -19,7 +23,11 @@ from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, TestCase, associative_backdate
-from tests.test_assessment_status import metastatic_baseline_instruments, mock_qr, mock_questionnairebanks
+from tests.test_assessment_status import (
+    metastatic_baseline_instruments,
+    mock_qr,
+    mock_questionnairebanks,
+)
 
 
 class TestIntervention(TestCase):

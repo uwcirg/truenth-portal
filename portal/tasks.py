@@ -22,7 +22,10 @@ from sqlalchemy import and_
 
 from .database import db
 from .dogpile_cache import dogpile_cache
-from .models.assessment_status import invalidate_assessment_status_cache, overall_assessment_status
+from .models.assessment_status import (
+    invalidate_assessment_status_cache,
+    overall_assessment_status,
+)
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
 from .models.questionnaire_bank import QuestionnaireBank

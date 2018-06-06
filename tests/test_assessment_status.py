@@ -6,14 +6,20 @@ from string import ascii_letters
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 from portal.extensions import db
-from portal.models.assessment_status import AssessmentStatus, invalidate_assessment_status_cache
+from portal.models.assessment_status import (
+    AssessmentStatus,
+    invalidate_assessment_status_cache,
+)
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC, QuestionnaireResponse, qnr_document_id
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
-from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE

@@ -17,7 +17,13 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
 from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
-from .app_text import ConsentByOrg_ATMA, UndefinedAppText, UnversionedResource, VersionedResource, app_text
+from .app_text import (
+    ConsentByOrg_ATMA,
+    UndefinedAppText,
+    UnversionedResource,
+    VersionedResource,
+    app_text,
+)
 from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .extension import CCExtension, TimezoneExtension

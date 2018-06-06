@@ -8,7 +8,13 @@ from portal.models.auth import Token, create_service_token
 from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
-from portal.models.user import RoleError, User, UserRelationship, add_authomatic_user, add_role
+from portal.models.user import (
+    RoleError,
+    User,
+    UserRelationship,
+    add_authomatic_user,
+    add_role,
+)
 from tests import TEST_USER_ID, TestCase
 from werkzeug.exceptions import Unauthorized
 

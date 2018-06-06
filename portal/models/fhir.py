@@ -15,7 +15,7 @@ from ..system_uri import (
     TRUENTH_CLINICAL_CODE_SYSTEM,
     TRUENTH_ENCOUNTER_CODE_SYSTEM,
     TRUENTH_EXTERNAL_STUDY_SYSTEM,
-    TRUENTH_VALUESET
+    TRUENTH_VALUESET,
 )
 from ..views.fhir import valueset_nhhd_291036
 from .codeable_concept import CodeableConcept

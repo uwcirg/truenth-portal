@@ -1,7 +1,15 @@
 from datetime import datetime
 from urlparse import urlparse
 
-from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_user import roles_required
 from flask_wtf import FlaskForm
 from validators import url as url_validation
@@ -15,7 +23,7 @@ from wtforms import (
     SelectMultipleField,
     StringField,
     validators,
-    widgets
+    widgets,
 )
 
 from ..audit import auditable_event

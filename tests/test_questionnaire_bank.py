@@ -9,8 +9,15 @@ from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
-from portal.models.organization import Organization, OrganizationResearchProtocol
-from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire, visit_name
+from portal.models.organization import (
+    Organization,
+    OrganizationResearchProtocol,
+)
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+    visit_name,
+)
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent

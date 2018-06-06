@@ -14,7 +14,7 @@ from portal.models.procedure_codes import (
     TxStartedConstants,
     known_treatment_not_started,
     known_treatment_started,
-    latest_treatment_started_date
+    latest_treatment_started_date,
 )
 from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM

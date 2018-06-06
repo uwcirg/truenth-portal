@@ -1,9 +1,25 @@
-from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from jinja2 import TemplateNotFound
 
 from ..database import db
 from ..extensions import recaptcha
-from ..models.app_text import AboutATMA, PrivacyATMA, Terms_ATMA, VersionedResource, app_text
+from ..models.app_text import (
+    AboutATMA,
+    PrivacyATMA,
+    Terms_ATMA,
+    VersionedResource,
+    app_text,
+)
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention

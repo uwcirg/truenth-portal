@@ -27,14 +27,20 @@ from ..system_uri import (
     TRUENTH_EXTERNAL_STUDY_SYSTEM,
     TRUENTH_ID,
     TRUENTH_PROVIDER_SYSTEMS,
-    TRUENTH_USERNAME
+    TRUENTH_USERNAME,
 )
 from .audit import Audit
 from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
-from .fhir import Observation, UserObservation, ValueQuantity, v_or_first, v_or_n
+from .fhir import (
+    Observation,
+    UserObservation,
+    ValueQuantity,
+    v_or_first,
+    v_or_n,
+)
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .organization import Organization, OrgTree

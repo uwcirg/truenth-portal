@@ -1,5 +1,12 @@
 """Views for Scheduled Jobs"""
-from flask import Blueprint, abort, current_app, jsonify, render_template, request
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 
 from ..audit import auditable_event

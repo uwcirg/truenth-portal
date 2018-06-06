@@ -18,11 +18,16 @@ from flask import (
     render_template,
     request,
     session,
-    url_for
+    url_for,
 )
 from flask_login import logout_user
 from flask_user import roles_required
-from flask_user.signals import user_changed_password, user_logged_in, user_registered, user_reset_password
+from flask_user.signals import (
+    user_changed_password,
+    user_logged_in,
+    user_registered,
+    user_reset_password,
+)
 
 from ..audit import auditable_event
 from ..csrf import csrf
@@ -34,7 +39,12 @@ from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import User, add_authomatic_user, current_user, get_user_or_abort
+from ..models.user import (
+    User,
+    add_authomatic_user,
+    current_user,
+    get_user_or_abort,
+)
 
 auth = Blueprint('auth', __name__)
 

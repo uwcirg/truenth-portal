@@ -6,7 +6,11 @@ from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
-from portal.models.fhir import FHIR_datetime, QuestionnaireResponse, ValueQuantity
+from portal.models.fhir import (
+    FHIR_datetime,
+    QuestionnaireResponse,
+    ValueQuantity,
+)
 from portal.system_uri import SNOMED
 from tests import TEST_USER_ID, TestCase
 

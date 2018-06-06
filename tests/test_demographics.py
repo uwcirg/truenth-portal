@@ -11,7 +11,14 @@ from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
 from portal.system_uri import US_NPI
-from tests import FIRST_NAME, IMAGE_URL, LAST_NAME, TEST_USER_ID, TEST_USERNAME, TestCase
+from tests import (
+    FIRST_NAME,
+    IMAGE_URL,
+    LAST_NAME,
+    TEST_USER_ID,
+    TEST_USERNAME,
+    TestCase,
+)
 
 
 class TestDemographics(TestCase):

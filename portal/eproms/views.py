@@ -1,6 +1,16 @@
 import json
 
-from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_user import roles_required
 
 from ..database import db
@@ -12,7 +22,7 @@ from ..models.app_text import (
     VersionedResource,
     WebsiteDeclarationForm_ATMA,
     app_text,
-    get_terms
+    get_terms,
 )
 from ..models.client import validate_origin
 from ..models.coredata import Coredata

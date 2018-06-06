@@ -16,7 +16,10 @@ from .fhir import CC
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
-from .procedure_codes import known_treatment_not_started, known_treatment_started
+from .procedure_codes import (
+    known_treatment_not_started,
+    known_treatment_started,
+)
 from .role import ROLE
 from .user import User
 

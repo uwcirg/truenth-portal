@@ -1,5 +1,14 @@
 """TrueNTH API view functions"""
-from flask import Blueprint, current_app, jsonify, make_response, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event

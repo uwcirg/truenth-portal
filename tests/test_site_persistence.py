@@ -18,7 +18,10 @@ from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE

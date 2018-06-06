@@ -6,7 +6,10 @@ from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank, QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user

@@ -11,7 +11,13 @@ from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import Observation, UserEthnicity, UserIndigenous, UserObservation, ValueQuantity
+from portal.models.fhir import (
+    Observation,
+    UserEthnicity,
+    UserIndigenous,
+    UserObservation,
+    ValueQuantity,
+)
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrganizationLocale
 from portal.models.performer import Performer
@@ -26,10 +32,14 @@ from portal.models.user import (
     UserRelationship,
     get_user_or_abort,
     permanently_delete_user,
-    user_extension_map
+    user_extension_map,
 )
 from portal.models.user_consent import STAFF_EDITABLE_MASK, UserConsent
-from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036, TRUENTH_USERNAME, TRUENTH_VALUESET_NHHD_291036
+from portal.system_uri import (
+    TRUENTH_EXTENSTION_NHHD_291036,
+    TRUENTH_USERNAME,
+    TRUENTH_VALUESET_NHHD_291036,
+)
 from sqlalchemy import and_
 from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized

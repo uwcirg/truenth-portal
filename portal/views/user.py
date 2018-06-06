@@ -1,7 +1,17 @@
 """User API view functions"""
 from datetime import datetime
 
-from flask import Blueprint, abort, current_app, jsonify, make_response, redirect, request, session, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask_user import roles_required
 from sqlalchemy import and_
 from sqlalchemy.orm import make_transient
@@ -32,7 +42,7 @@ from ..models.user import (
     current_user,
     get_user_or_abort,
     permanently_delete_user,
-    validate_email
+    validate_email,
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument

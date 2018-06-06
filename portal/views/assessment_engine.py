@@ -3,7 +3,18 @@ from datetime import datetime
 
 import jsonschema
 import requests
-from flask import Blueprint, Response, abort, current_app, flash, jsonify, redirect, request, session, url_for
+from flask import (
+    Blueprint,
+    Response,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import gettext as _
 from flask_swagger import swagger
 from flask_user import roles_required
@@ -13,9 +24,18 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus, invalidate_assessment_status_cache, overall_assessment_status
+from ..models.assessment_status import (
+    AssessmentStatus,
+    invalidate_assessment_status_cache,
+    overall_assessment_status,
+)
 from ..models.client import validate_origin
-from ..models.fhir import EC, QuestionnaireResponse, aggregate_responses, generate_qnr_csv
+from ..models.fhir import (
+    EC,
+    QuestionnaireResponse,
+    aggregate_responses,
+    generate_qnr_csv,
+)
 from ..models.intervention import INTERVENTION
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank

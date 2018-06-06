@@ -15,12 +15,18 @@ from portal.models.organization import (
     OrganizationIdentifier,
     OrganizationResearchProtocol,
     OrgTree,
-    ResearchProtocolExtension
+    ResearchProtocolExtension,
 )
 from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.system_uri import IETF_LANGUAGE_TAG, PRACTICE_REGION, SHORTCUT_ALIAS, SHORTNAME_ID, US_NPI
+from portal.system_uri import (
+    IETF_LANGUAGE_TAG,
+    PRACTICE_REGION,
+    SHORTCUT_ALIAS,
+    SHORTNAME_ID,
+    US_NPI,
+)
 from tests import TEST_USER_ID, TestCase
 
 
