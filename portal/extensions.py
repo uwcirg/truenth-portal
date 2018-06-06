@@ -8,22 +8,35 @@ Defined here to break the circular dependencies.  See `app.py` for
 additional configuration of most objects defined herein.
 
 """
-from database import db
-
-# Flask-User
-from flask_user import UserManager, SQLAlchemyAdapter
-from .models.user import User
-db_adapter = SQLAlchemyAdapter(db, User)
-user_manager = UserManager(db_adapter)
-
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
+
+# Flask-Authomatic provides OAuth between the Portal and upstream
+# identity providers such as Facebook
+from authomatic import Authomatic
+from authomatic.providers import oauth2
+from database import db
 from flask import abort, request
+# Babel is used for i18n
+from flask_babel import Babel
+# Flask-Mail is used for email communication
+from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
+# ReCaptcha is used for form verification
+from flask_recaptcha import ReCaptcha
+# Flask-Session provides server side sessions
+from flask_session import Session
+# Flask-User
+from flask_user import SQLAlchemyAdapter, UserManager
 
 from .csrf import csrf
 from .models.login import login_user
-from .models.user import current_user
+from .models.user import User, current_user
+
+db_adapter = SQLAlchemyAdapter(db, User)
+user_manager = UserManager(db_adapter)
+
+
 
 
 class OAuthOrAlternateAuth(OAuth2Provider):
@@ -96,10 +109,6 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 oauth = OAuthOrAlternateAuth()
 
 
-# Flask-Authomatic provides OAuth between the Portal and upstream
-# identity providers such as Facebook
-from authomatic import Authomatic
-from authomatic.providers import oauth2
 
 class _delay_init(object):
     """We can't initialize authomatic till the app config is ready"""
@@ -138,18 +147,10 @@ class _delay_init(object):
 authomatic = _delay_init()
 
 
-# Flask-Mail is used for email communication
-from flask_mail import Mail
 mail = Mail()
 
-# Flask-Session provides server side sessions
-from flask_session import Session
 session = Session()
 
-# Babel is used for i18n
-from flask_babel import Babel
 babel = Babel()
 
-# ReCaptcha is used for form verification
-from flask_recaptcha import ReCaptcha
 recaptcha = ReCaptcha()

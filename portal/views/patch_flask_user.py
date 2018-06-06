@@ -1,5 +1,6 @@
 """workarounds to flask_user problems"""
 from urlparse import urlsplit, urlunsplit
+
 from flask import current_app, flash, redirect, request, url_for
 from flask_babel import gettext as _
 from flask_user.views import _endpoint_url

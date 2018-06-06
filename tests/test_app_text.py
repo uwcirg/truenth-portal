@@ -1,16 +1,19 @@
 """Unit test module for app_text"""
+from urllib import unquote_plus
+from urlparse import parse_qsl, urlparse
+
 from flask import render_template_string
 from flask_webtest import SessionScope
-
 from portal.extensions import db
-from portal.models.app_text import AppText, app_text, VersionedResource
-from portal.models.app_text import UnversionedResource, MailResource
+from portal.models.app_text import (
+    AppText,
+    MailResource,
+    UnversionedResource,
+    VersionedResource,
+    app_text,
+)
 from portal.models.user import User
-from tests import TestCase, TEST_USER_ID
-
-
-from urlparse import urlparse, parse_qsl
-from urllib import unquote_plus
+from tests import TEST_USER_ID, TestCase
 
 
 class Url(object):

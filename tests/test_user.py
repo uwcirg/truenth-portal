@@ -1,41 +1,48 @@
 """Unit test module for user model and views"""
-from flask_webtest import SessionScope
-import pytest
-from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 import json
 import re
 import urllib
-from sqlalchemy import and_
 from datetime import datetime
-from tests import TestCase, TEST_USER_ID, TEST_USERNAME
 
+import pytest
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import UserEthnicity, UserIndigenous
-from portal.models.fhir import ValueQuantity
-from portal.models.fhir import Observation, UserObservation
+from portal.models.fhir import (
+    Observation,
+    UserEthnicity,
+    UserIndigenous,
+    UserObservation,
+    ValueQuantity,
+)
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrganizationLocale
 from portal.models.performer import Performer
 from portal.models.reference import Reference
-from portal.models.relationship import Relationship, RELATIONSHIP
-from portal.models.role import STATIC_ROLES, ROLE
+from portal.models.relationship import RELATIONSHIP, Relationship
+from portal.models.role import ROLE, STATIC_ROLES
 from portal.models.user import (
+    TimezoneExtension,
+    User,
+    UserEthnicityExtension,
+    UserIndigenousStatusExtension,
+    UserRelationship,
     get_user_or_abort,
-    User, UserEthnicityExtension, user_extension_map,
-    UserRelationship, TimezoneExtension,
     permanently_delete_user,
-    UserIndigenousStatusExtension
+    user_extension_map,
 )
-from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
+from portal.models.user_consent import STAFF_EDITABLE_MASK, UserConsent
 from portal.system_uri import (
     TRUENTH_EXTENSTION_NHHD_291036,
     TRUENTH_USERNAME,
-    TRUENTH_VALUESET_NHHD_291036
+    TRUENTH_VALUESET_NHHD_291036,
 )
+from sqlalchemy import and_
+from tests import TEST_USER_ID, TEST_USERNAME, TestCase
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 
 def test_null_id():

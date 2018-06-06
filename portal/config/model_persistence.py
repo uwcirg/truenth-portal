@@ -1,13 +1,14 @@
 """Persistence details for Model Classes"""
-from flask import current_app
 import json
 import os
 from StringIO import StringIO
+
+from flask import current_app
 from sqlalchemy import exc
 
 from ..database import db
-from ..dict_tools import dict_match
 from ..date_tools import FHIR_datetime
+from ..dict_tools import dict_match
 from ..models.identifier import Identifier
 from ..trace import trace
 

@@ -8,13 +8,14 @@ Interventions will sometimes require their own set of data, for which the
 `/api/coredata/*` endpoints exist.
 
 """
-from abc import ABCMeta, abstractmethod
-from flask import current_app
 import sys
+from abc import ABCMeta, abstractmethod
+
+from flask import current_app
 
 from .audit import Audit
-from .intervention import UserIntervention, INTERVENTION
 from .fhir import CC
+from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
 from .role import ROLE
 from .tou import ToU

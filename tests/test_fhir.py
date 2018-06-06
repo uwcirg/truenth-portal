@@ -1,15 +1,18 @@
 """Unit test module for fhir model"""
 from datetime import datetime
-from flask_webtest import SessionScope
-import pytz
-from tests import TestCase, TEST_USER_ID
 
+import pytz
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
-from portal.models.fhir import ValueQuantity
-from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
+from portal.models.fhir import (
+    FHIR_datetime,
+    QuestionnaireResponse,
+    ValueQuantity,
+)
 from portal.system_uri import SNOMED
+from tests import TEST_USER_ID, TestCase
 
 
 class TestFHIR(TestCase):

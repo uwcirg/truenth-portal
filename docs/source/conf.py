@@ -13,8 +13,9 @@
 # serve to show the default.
 
 import datetime
-import sys
 import os
+import sys
+
 import pkginfo
 
 metadata = pkginfo.Develop(

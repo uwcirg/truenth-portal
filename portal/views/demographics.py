@@ -1,7 +1,7 @@
 """Demographics API view functions"""
-from flask import abort, Blueprint, jsonify
-from flask import current_app, request
 import json
+
+from flask import Blueprint, abort, current_app, jsonify, request
 
 from ..audit import auditable_event
 from ..database import db

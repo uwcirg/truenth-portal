@@ -1,27 +1,27 @@
 """SitePersistence Module"""
 from collections import namedtuple
+
 from flask import current_app
 
-from .config_persistence import export_config, import_config
 from ..database import db
 from ..models.app_text import AppText
 from ..models.auth import AuthProviderPersistable, Token
 from ..models.client import Client
-from ..models.communication_request import CommunicationRequest
 from ..models.coding import Coding
+from ..models.communication_request import CommunicationRequest
 from ..models.intervention import Intervention
 from ..models.intervention_strategies import AccessStrategy
 from ..models.notification import Notification
 from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.research_protocol import ResearchProtocol
-from ..models.relationship import Relationship, RELATIONSHIP
-from ..models.role import Role, ROLE
+from ..models.role import ROLE, Role
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import User, UserRelationship, UserRoles
+from .config_persistence import export_config, import_config
 from .model_persistence import ExclusionPersistence, ModelPersistence
-
 
 # NB - order MATTERS, as any type depending on another must find
 # the dependent bits in place on import, such as the known:

@@ -1,27 +1,30 @@
 """Model classes for retaining FHIR data"""
-from datetime import datetime
-from flask import current_app, abort, url_for
-from html.parser import HTMLParser
 import json
-from sqlalchemy import UniqueConstraint, or_
-from sqlalchemy.dialects.postgresql import JSONB, ENUM
-import requests
+from datetime import datetime
+from html.parser import HTMLParser
 
+import requests
+from flask import abort, current_app, url_for
+from sqlalchemy import UniqueConstraint, or_
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
+
+from ..database import db
+from ..date_tools import FHIR_datetime, as_fhir
+from ..system_uri import (
+    NHHD_291036,
+    TRUENTH_CLINICAL_CODE_SYSTEM,
+    TRUENTH_ENCOUNTER_CODE_SYSTEM,
+    TRUENTH_EXTERNAL_STUDY_SYSTEM,
+    TRUENTH_VALUESET,
+)
+from ..views.fhir import valueset_nhhd_291036
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from ..database import db
-from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .locale import LocaleConstants
 from .organization import OrgTree
 from .performer import Performer
 from .reference import Reference
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
-from ..system_uri import TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
-from ..system_uri import NHHD_291036
-from ..views.fhir import valueset_nhhd_291036
-
 
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):

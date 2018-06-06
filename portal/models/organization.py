@@ -4,29 +4,34 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
-from flask import current_app, url_for, abort
+
+import address
+from flask import abort, current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from werkzeug.exceptions import Unauthorized
 
-import address
-from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
-from .app_text import VersionedResource, UnversionedResource
-from .codeable_concept import CodeableConcept
-from .coding import Coding
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
+from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from .app_text import (
+    ConsentByOrg_ATMA,
+    UndefinedAppText,
+    UnversionedResource,
+    VersionedResource,
+    app_text,
+)
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
-from .role import Role, ROLE
-from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
-
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010

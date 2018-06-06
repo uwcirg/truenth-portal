@@ -7,15 +7,16 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
-from abc import ABCMeta, abstractmethod
-from flask import current_app
-from flask_babel import gettext
-import requests
-from requests.exceptions import MissingSchema, ConnectionError
 import timeit
+from abc import ABCMeta, abstractmethod
 from string import Formatter
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
+
+import requests
+from flask import current_app
+from flask_babel import gettext
+from requests.exceptions import ConnectionError, MissingSchema
 
 from ..database import db
 

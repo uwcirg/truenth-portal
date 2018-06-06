@@ -1,14 +1,15 @@
-from flask import abort, jsonify, Blueprint, request
 from collections import defaultdict
+
+from flask import Blueprint, abort, jsonify, request
 
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
-from ..models.audit import Audit
 from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.user import current_user, get_user_or_abort
+from ..models.audit import Audit
 from ..models.procedure import Procedure
-from ..models.procedure_codes import TxStartedConstants, TxNotStartedConstants
+from ..models.procedure_codes import TxNotStartedConstants, TxStartedConstants
+from ..models.user import current_user, get_user_or_abort
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
 

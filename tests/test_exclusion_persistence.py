@@ -1,18 +1,20 @@
-from flask_webtest import SessionScope
 import json
 from os.path import join as path_join
 from shutil import rmtree
-from tests import TestCase, TEST_USER_ID
 from tempfile import mkdtemp
 
-from portal.models.auth import AuthProvider, create_service_token, Token
-from portal.config.site_persistence import (
-    staging_exclusions, client_users_filter)
+from flask_webtest import SessionScope
 from portal.config.model_persistence import ExclusionPersistence
+from portal.config.site_persistence import (
+    client_users_filter,
+    staging_exclusions,
+)
 from portal.database import db
+from portal.models.auth import AuthProvider, Token, create_service_token
 from portal.models.client import Client
-from portal.models.intervention import Intervention, INTERVENTION
+from portal.models.intervention import INTERVENTION, Intervention
 from portal.models.user import User, UserRelationship
+from tests import TEST_USER_ID, TestCase
 
 
 class TestExclusionPersistence(TestCase):

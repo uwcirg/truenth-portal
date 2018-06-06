@@ -1,6 +1,6 @@
+from ..system_uri import IETF_LANGUAGE_TAG
 from .coding import Coding
 from .lazy import lazyprop
-from ..system_uri import IETF_LANGUAGE_TAG
 
 
 class LocaleConstants(object):

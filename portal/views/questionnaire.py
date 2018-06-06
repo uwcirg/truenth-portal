@@ -1,9 +1,8 @@
-from flask import abort, Blueprint, jsonify, request
+from flask import Blueprint, abort, jsonify, request
 
 from ..extensions import oauth
 from ..models.identifier import Identifier
-from ..models.questionnaire_bank import QuestionnaireBank
-from ..models.questionnaire_bank import Questionnaire
+from ..models.questionnaire_bank import Questionnaire, QuestionnaireBank
 from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 
 questionnaire_api = Blueprint('questionnaire_api', __name__)

@@ -1,20 +1,20 @@
 """Unit test module for Intervention API"""
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-from flask_webtest import SessionScope
 import json
 import os
-from tests import associative_backdate, TestCase, TEST_USER_ID
-from tests.test_assessment_status import mock_qr, mock_questionnairebanks
-from tests.test_assessment_status import metastatic_baseline_instruments
+from datetime import datetime, timedelta
 
+from dateutil.relativedelta import relativedelta
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
 from portal.models.intervention import (
-    Intervention, INTERVENTION, UserIntervention)
+    INTERVENTION,
+    Intervention,
+    UserIntervention,
+)
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
@@ -22,6 +22,12 @@ from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
+from tests import TEST_USER_ID, TestCase, associative_backdate
+from tests.test_assessment_status import (
+    metastatic_baseline_instruments,
+    mock_qr,
+    mock_questionnairebanks,
+)
 
 
 class TestIntervention(TestCase):

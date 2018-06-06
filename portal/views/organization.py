@@ -1,8 +1,9 @@
 """Organization related views module"""
-from flask import abort, current_app, Blueprint, jsonify, request
-from flask_user import roles_required
 import json
-from sqlalchemy import exc, and_
+
+from flask import Blueprint, abort, current_app, jsonify, request
+from flask_user import roles_required
+from sqlalchemy import and_, exc
 
 from ..audit import auditable_event
 from ..database import db
@@ -13,7 +14,6 @@ from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import PRACTICE_REGION
-
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 

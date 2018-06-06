@@ -1,6 +1,5 @@
 """Unit test module for access URLs"""
 from flask import url_for
-
 from portal.extensions import db, user_manager
 from portal.models.role import ROLE
 from tests import TestCase

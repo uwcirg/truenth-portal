@@ -1,14 +1,16 @@
 """User Document module"""
-from datetime import datetime
-from werkzeug.utils import secure_filename
-from uuid import uuid4
-from flask import current_app
 import os
+from datetime import datetime
+from uuid import uuid4
+
+from flask import current_app
+from werkzeug.utils import secure_filename
 
 from ..database import db
 from ..date_tools import FHIR_datetime
 from .intervention import Intervention
 from .user import User
+
 
 class UserDocument(db.Model):
     """ORM class for user document upload data
@@ -90,4 +92,3 @@ class UserDocument(db.Model):
             raise ValueError("could not open file")
 
         return file_contents
-

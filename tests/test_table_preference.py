@@ -1,11 +1,11 @@
 """Unit test module for table preferences logic"""
-from flask_webtest import SessionScope
 import json
 
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.table_preference import TablePreference
-from tests import TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase
 
 
 class TestTablePreference(TestCase):

@@ -6,25 +6,27 @@ integration tests.  For example, does a complicated strategy come
 to life and properly control the visibility of a intervention card?
 
 """
-from datetime import datetime
-from flask_webtest import SessionScope
 import os
-from tests import TestCase, TEST_USER_ID
+from datetime import datetime
 
-from portal.extensions import db
+from flask_webtest import SessionScope
 from portal.config.site_persistence import SitePersistence
+from portal.extensions import db
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
+from tests import TEST_USER_ID, TestCase
 
 
 class TestSitePersistence(TestCase):

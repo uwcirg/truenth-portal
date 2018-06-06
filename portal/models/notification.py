@@ -1,5 +1,6 @@
 """User Notification module"""
 from datetime import datetime
+
 from sqlalchemy import UniqueConstraint
 
 from ..database import db

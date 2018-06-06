@@ -1,7 +1,7 @@
 """Unit test module for ResearchProtocol logic"""
-from flask_webtest import SessionScope
 from datetime import datetime
 
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.organization import Organization
 from portal.models.research_protocol import ResearchProtocol

@@ -4,9 +4,9 @@ Address data lives in the 'addresses' table.  Several entities link
 to address via foreign keys.
 
 """
-from ..database import db
 from sqlalchemy.dialects.postgresql import ENUM
 
+from ..database import db
 
 address_type = ENUM('postal', 'physical', 'both', name='address_type',
                     create_type=False)
@@ -72,5 +72,3 @@ class Address(db.Model):
             if value:
                 d[attr] = value
         return d
-
-

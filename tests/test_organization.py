@@ -1,17 +1,11 @@
 """Unit test module for organization model"""
-from datetime import datetime, timedelta
-from flask_webtest import SessionScope
 import json
 import os
+from datetime import datetime, timedelta
 from urllib import quote_plus
 
+from flask_webtest import SessionScope
 from portal.extensions import db
-from portal.system_uri import (
-    IETF_LANGUAGE_TAG,
-    PRACTICE_REGION,
-    SHORTCUT_ALIAS,
-    SHORTNAME_ID,
-    US_NPI)
 from portal.models.coding import Coding
 from portal.models.identifier import Identifier
 from portal.models.locale import LocaleConstants
@@ -21,11 +15,19 @@ from portal.models.organization import (
     OrganizationIdentifier,
     OrganizationResearchProtocol,
     OrgTree,
-    ResearchProtocolExtension)
+    ResearchProtocolExtension,
+)
 from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from tests import TestCase, TEST_USER_ID
+from portal.system_uri import (
+    IETF_LANGUAGE_TAG,
+    PRACTICE_REGION,
+    SHORTCUT_ALIAS,
+    SHORTNAME_ID,
+    US_NPI,
+)
+from tests import TEST_USER_ID, TestCase
 
 
 class TestOrganization(TestCase):

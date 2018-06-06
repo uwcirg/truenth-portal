@@ -1,7 +1,7 @@
 """Unit test module for Practitioner module"""
-from flask_webtest import SessionScope
 import json
 
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.practitioner import Practitioner

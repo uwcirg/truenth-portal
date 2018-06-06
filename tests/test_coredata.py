@@ -1,12 +1,10 @@
 """Coredata tests"""
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID
-
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-
+from tests import TEST_USER_ID, TestCase
 
 TRUENTH = 'TrueNTH'
 EPROMS = 'ePROMs'

@@ -1,21 +1,20 @@
 """Unit test module for Clinical API"""
-from datetime import datetime, timedelta
-from dateutil import parser
-from flask_webtest import SessionScope
 import json
 import os
-from tests import TestCase, TEST_USER_ID
+from datetime import datetime, timedelta
 
+from dateutil import parser
+from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
-from portal.models.encounter import Encounter
-from portal.models.fhir import Observation, UserObservation
-from portal.models.fhir import ValueQuantity
 from portal.models.coding import Coding
+from portal.models.encounter import Encounter
+from portal.models.fhir import Observation, UserObservation, ValueQuantity
 from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.user import User
+from tests import TEST_USER_ID, TestCase
 
 
 class TestClinical(TestCase):

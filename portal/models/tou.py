@@ -5,7 +5,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from .notification import Notification, UserNotification
 from .organization import Organization, OrgTree
-from .role import Role, ROLE
+from .role import ROLE, Role
 from .user import User
 
 tou_types = ENUM('website terms of use', 'subject website consent',

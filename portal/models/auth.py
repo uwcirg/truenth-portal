@@ -1,18 +1,18 @@
 """Auth related model classes """
-from flask import current_app, url_for
 from datetime import datetime, timedelta
 from smtplib import SMTPRecipientsRefused
+
+from flask import current_app, url_for
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from .message import EmailMessage
-from .role import Role, ROLE
-from .relationship import Relationship, RELATIONSHIP
-from .user import User, UserRoles, UserRelationship
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
-from .user import current_user
+from .message import EmailMessage
+from .relationship import RELATIONSHIP, Relationship
+from .role import ROLE, Role
+from .user import User, UserRelationship, UserRoles, current_user
 
 providers_list = ENUM(
     *SUPPORTED_OAUTH_PROVIDERS, name='providers', create_type=False)

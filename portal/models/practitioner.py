@@ -1,9 +1,10 @@
 """Practitioner module"""
 from cgi import escape
+
 from sqlalchemy import UniqueConstraint
 
 from ..database import db
-from .fhir import v_or_n, v_or_first
+from .fhir import v_or_first, v_or_n
 from .identifier import Identifier
 from .telecom import ContactPoint, Telecom
 

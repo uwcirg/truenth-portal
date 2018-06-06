@@ -1,42 +1,57 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import json
+from datetime import datetime
+from pprint import pformat
+
 import requests
 from celery.result import AsyncResult
-from flask import current_app, Blueprint, jsonify, render_template
-from flask import abort, make_response, redirect, request, session, url_for
-from flask import render_template_string
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    render_template_string,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import gettext as _
-from flask_user import roles_required
 from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
+from flask_user import roles_required
 from flask_wtf import FlaskForm
-from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import validators, BooleanField, HiddenField, IntegerField, StringField
-from datetime import datetime
+from wtforms import (
+    BooleanField,
+    HiddenField,
+    IntegerField,
+    StringField,
+    validators,
+)
 
-from .auth import next_after_login, logout
 from ..audit import auditable_event
-from .crossdomain import crossdomain
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..factories.celery import create_celery
 from ..extensions import oauth, user_manager
+from ..factories.celery import create_celery
 from ..models.app_text import (
-    app_text,
     AppText,
-    get_terms,
     InitialConsent_ATMA,
     MailResource,
     UndefinedAppText,
     UserInviteEmail_ATMA,
     UserReminderEmail_ATMA,
-    VersionedResource
+    VersionedResource,
+    app_text,
+    get_terms,
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.client import validate_origin
-from ..models.communication import load_template_args, Communication
+from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
 from ..models.fhir import QuestionnaireResponse
 from ..models.i18n import get_locale
@@ -44,14 +59,20 @@ from ..models.identifier import Identifier
 from ..models.login import login_user
 from ..models.message import EmailMessage
 from ..models.next_step import NextStep
-from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.organization import (
+    Organization,
+    OrganizationIdentifier,
+    OrgTree,
+    UserOrganization,
+)
 from ..models.reporting import get_reporting_stats
-from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
+from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
-from ..trace import establish_trace, dump_trace, trace
-
+from ..trace import dump_trace, establish_trace, trace
+from .auth import logout, next_after_login
+from .crossdomain import crossdomain
 
 portal = Blueprint('portal', __name__)
 

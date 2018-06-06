@@ -1,14 +1,21 @@
-from flask import abort, current_app, jsonify, url_for
-from flask import Blueprint, render_template, request
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
+
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+    url_for,
+)
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.coredata import Coredata
 from ..models.user import current_user, get_user_or_abort
-
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
 
