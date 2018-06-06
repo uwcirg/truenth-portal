@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 from portal.models.user import User
 
-
 """empty message
 
 Revision ID: 68c153cf6a02

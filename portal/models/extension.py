@@ -1,8 +1,8 @@
 """Extension model"""
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import pytz
 from flask import abort
+import pytz
 
 from .coding import Coding
 

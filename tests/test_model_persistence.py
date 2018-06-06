@@ -1,10 +1,12 @@
+from datetime import datetime
 import json
 import os
-from datetime import datetime
 from shutil import rmtree
 from tempfile import mkdtemp
 
 from flask_webtest import SessionScope
+from sqlalchemy.orm.exc import NoResultFound
+
 from portal.config.model_persistence import ModelPersistence
 from portal.database import db
 from portal.date_tools import FHIR_datetime
@@ -16,7 +18,6 @@ from portal.models.organization import Organization, ResearchProtocolExtension
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
-from sqlalchemy.orm.exc import NoResultFound
 from tests import TestCase
 
 

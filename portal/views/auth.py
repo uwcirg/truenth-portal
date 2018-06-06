@@ -1,11 +1,10 @@
 """Auth related view functions"""
 import base64
+from datetime import datetime
 import hashlib
 import hmac
 import json
-from datetime import datetime
 
-import requests
 from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError, ConfigError
 from flask import (
@@ -28,6 +27,7 @@ from flask_user.signals import (
     user_registered,
     user_reset_password,
 )
+import requests
 
 from ..audit import auditable_event
 from ..csrf import csrf

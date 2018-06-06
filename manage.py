@@ -8,8 +8,10 @@ import os
 
 import alembic.config
 import click
-import redis
 from flask_migrate import Migrate
+import redis
+from sqlalchemy.orm.exc import NoResultFound
+
 from portal.audit import auditable_event
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
@@ -26,7 +28,6 @@ from portal.models.user import (
     permanently_delete_user,
     validate_email,
 )
-from sqlalchemy.orm.exc import NoResultFound
 
 app = create_app()
 

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit

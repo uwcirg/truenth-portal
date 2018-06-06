@@ -5,6 +5,7 @@ import time
 
 import dateutil
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization

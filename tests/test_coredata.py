@@ -1,5 +1,6 @@
 """Coredata tests"""
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
 from portal.models.organization import Organization

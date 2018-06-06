@@ -7,9 +7,9 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-import json
 from datetime import datetime
 from functools import wraps
+import json
 from traceback import format_exc
 
 from celery.utils.log import get_task_logger

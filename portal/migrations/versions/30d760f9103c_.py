@@ -9,7 +9,6 @@ from portal.models.organization import OrgTree
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 
-
 """empty message
 
 Revision ID: 30d760f9103c

@@ -1,5 +1,6 @@
 from alembic import op
 from sqlalchemy.orm import sessionmaker
+
 """Clean up protected roles
 
 Revision ID: bd9a3f60b2c3

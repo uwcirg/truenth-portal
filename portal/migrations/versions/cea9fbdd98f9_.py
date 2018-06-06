@@ -6,7 +6,6 @@ from portal.models.communication_request import CommunicationRequest
 from portal.models.identifier import Identifier
 from portal.system_uri import TRUENTH_CR_NAME
 
-
 """Correct IRONMAN 6 month iteration count
 
 Revision ID: cea9fbdd98f9

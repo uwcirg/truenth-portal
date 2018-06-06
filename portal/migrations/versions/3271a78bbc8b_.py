@@ -8,7 +8,6 @@ Create Date: 2018-04-24 09:37:47.003826
 from alembic import op
 from sqlalchemy.orm import sessionmaker
 
-
 # revision identifiers, used by Alembic.
 revision = '3271a78bbc8b'
 down_revision = '1b7b8092fcef'

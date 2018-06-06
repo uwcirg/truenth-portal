@@ -1,10 +1,11 @@
-import pytest
 from flask_webtest import SessionScope
+import pytest
+from werkzeug.exceptions import BadRequest
+
 from portal.database import db
 from portal.models.intervention import Intervention
 from portal.models.next_step import NextStep
 from tests import TestCase
-from werkzeug.exceptions import BadRequest
 
 
 def test_validate():

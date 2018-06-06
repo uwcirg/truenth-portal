@@ -1,12 +1,7 @@
 from alembic import op
 from sqlalchemy.sql import text
 
-from portal.system_uri import (
-    PRACTICE_REGION,
-    SHORTCUT_ALIAS,
-    SHORTNAME_ID
-)
-
+from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS, SHORTNAME_ID
 
 """Delete orphaned organization identifiers
 
