@@ -1,7 +1,7 @@
 """Unit test module for organization model"""
+from datetime import datetime, timedelta
 import json
 import os
-from datetime import datetime, timedelta
 from urllib import quote_plus
 
 from flask_webtest import SessionScope

@@ -1,9 +1,9 @@
 """Unit test module for communication"""
 from datetime import datetime
 
-import regex
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import regex
 
 from portal.database import db
 from portal.models.assessment_status import overall_assessment_status

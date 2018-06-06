@@ -1,9 +1,8 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-import json
 from datetime import datetime
+import json
 from pprint import pformat
 
-import requests
 from celery.result import AsyncResult
 from flask import (
     Blueprint,
@@ -23,6 +22,7 @@ from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_user import roles_required
 from flask_wtf import FlaskForm
+import requests
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import (

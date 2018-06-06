@@ -1,7 +1,7 @@
 """Persistence details for Model Classes"""
+from StringIO import StringIO
 import json
 import os
-from StringIO import StringIO
 
 from flask import current_app
 from sqlalchemy import exc

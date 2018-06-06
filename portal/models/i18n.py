@@ -1,16 +1,16 @@
 """Module for i18n methods and functionality"""
+from cStringIO import StringIO
+from collections import defaultdict
 import os
 import re
+from subprocess import check_call
 import sys
 import tempfile
-from collections import defaultdict
-from cStringIO import StringIO
-from subprocess import check_call
 from zipfile import ZipFile
 
-import requests
 from flask import current_app, has_request_context, session
 from polib import pofile
+import requests
 
 from ..extensions import babel
 from .app_text import AppText

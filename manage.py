@@ -8,8 +8,8 @@ import os
 
 import alembic.config
 import click
-import redis
 from flask_migrate import Migrate
+import redis
 from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event

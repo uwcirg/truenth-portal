@@ -1,7 +1,7 @@
 """Unit test module for user document logic"""
-import os
-from datetime import datetime
 from StringIO import StringIO
+from datetime import datetime
+import os
 from tempfile import NamedTemporaryFile
 
 from flask import current_app

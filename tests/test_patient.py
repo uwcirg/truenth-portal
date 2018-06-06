@@ -1,6 +1,6 @@
 """Test module for patient specific APIs"""
-import json
 from datetime import datetime
+import json
 
 from flask_webtest import SessionScope
 

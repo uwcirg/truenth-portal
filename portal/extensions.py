@@ -13,19 +13,19 @@ from functools import wraps
 
 # Flask-Authomatic provides OAuth between the Portal and upstream
 # identity providers such as Facebook
+# Babel is used for i18n
+# Flask-Mail is used for email communication
+# ReCaptcha is used for form verification
+# Flask-Session provides server side sessions
+# Flask-User
 from authomatic import Authomatic
 from authomatic.providers import oauth2
 from flask import abort, request
-# Babel is used for i18n
 from flask_babel import Babel
-# Flask-Mail is used for email communication
 from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
-# ReCaptcha is used for form verification
 from flask_recaptcha import ReCaptcha
-# Flask-Session provides server side sessions
 from flask_session import Session
-# Flask-User
 from flask_user import SQLAlchemyAdapter, UserManager
 
 from .csrf import csrf

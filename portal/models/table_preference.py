@@ -1,6 +1,6 @@
 """Table Preference module"""
-import json
 from datetime import datetime
+import json
 
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM

@@ -1,11 +1,11 @@
 """Unit test module for user model and views"""
+from datetime import datetime
 import json
 import re
 import urllib
-from datetime import datetime
 
-import pytest
 from flask_webtest import SessionScope
+import pytest
 from sqlalchemy import and_
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 

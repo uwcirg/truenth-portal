@@ -1,6 +1,6 @@
+from datetime import datetime
 import json
 import os
-from datetime import datetime
 from shutil import rmtree
 from tempfile import mkdtemp
 

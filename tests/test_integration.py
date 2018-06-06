@@ -3,9 +3,9 @@ import os
 import sys
 import unittest
 
-import xvfbwrapper
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
+import xvfbwrapper
 
 from tests import TestCase
 

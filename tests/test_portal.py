@@ -1,8 +1,8 @@
 """Unit test module for portal views"""
 
+from datetime import datetime
 import tempfile
 import urllib
-from datetime import datetime
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope

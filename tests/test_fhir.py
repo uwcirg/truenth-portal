@@ -1,8 +1,8 @@
 """Unit test module for fhir model"""
 from datetime import datetime
 
-import pytz
 from flask_webtest import SessionScope
+import pytz
 
 from portal.extensions import db
 from portal.models.codeable_concept import CodeableConcept

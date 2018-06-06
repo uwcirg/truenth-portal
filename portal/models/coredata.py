@@ -8,8 +8,8 @@ Interventions will sometimes require their own set of data, for which the
 `/api/coredata/*` endpoints exist.
 
 """
-import sys
 from abc import ABCMeta, abstractmethod
+import sys
 
 from flask import current_app
 

@@ -1,5 +1,5 @@
-import pytest
 from flask_webtest import SessionScope
+import pytest
 from werkzeug.exceptions import BadRequest
 
 from portal.database import db

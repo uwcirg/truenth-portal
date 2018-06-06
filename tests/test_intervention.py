@@ -1,7 +1,7 @@
 """Unit test module for Intervention API"""
+from datetime import datetime, timedelta
 import json
 import os
-from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope

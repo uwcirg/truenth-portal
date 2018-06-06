@@ -1,6 +1,6 @@
 """Unit test module for user consent"""
-import json
 from datetime import datetime
+import json
 
 from dateutil import parser
 from flask import current_app

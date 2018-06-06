@@ -1,11 +1,11 @@
 """Unit test module for Procedure API and model"""
+from datetime import datetime, timedelta
 import json
 import os
-from datetime import datetime, timedelta
 
 import dateutil
-import pytz
 from flask import current_app
+import pytz
 from sqlalchemy.orm.exc import NoResultFound
 
 from portal.extensions import db
