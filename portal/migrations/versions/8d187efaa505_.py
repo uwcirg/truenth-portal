@@ -1,10 +1,9 @@
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.organization import Organization
 from portal.models.research_protocol import ResearchProtocol
-
 
 """empty message
 

@@ -10,8 +10,8 @@ Create Date: 2017-04-05 11:00:47.310296
 revision = 'feb22883a500'
 down_revision = '3d317a184862'
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.sql import text
 
 

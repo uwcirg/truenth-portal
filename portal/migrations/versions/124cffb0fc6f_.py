@@ -1,6 +1,5 @@
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 """Add `url_authenticated_and_verified` to encounter.auth_method enum
 

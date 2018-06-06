@@ -10,10 +10,11 @@ Create Date: 2017-05-10 10:34:12.617168
 revision = 'b92dc277c384'
 down_revision = '5d1daa0f3a14'
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import sessionmaker
+
 from portal.models.telecom import ContactPoint
 
 Session = sessionmaker()

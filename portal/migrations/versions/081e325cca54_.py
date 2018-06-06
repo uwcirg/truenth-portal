@@ -1,6 +1,5 @@
 from alembic import op
 
-
 """User Identifiers made unique
 
 Revision ID: 081e325cca54

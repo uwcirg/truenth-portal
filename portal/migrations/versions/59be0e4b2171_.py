@@ -1,10 +1,9 @@
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
 from portal.models.user_consent import UserConsent
-
 
 """empty message
 

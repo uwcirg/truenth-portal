@@ -11,8 +11,9 @@ revision = '12113d3fcab1'
 down_revision = '85ee128c8304'
 
 from datetime import datetime
-from alembic import op
+
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.sql import text
 
 comment = "placeholder - entry predates audit"

@@ -5,8 +5,8 @@ Revises: 91351a73e6e2
 Create Date: 2018-03-21 11:44:54.544568
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.identifier import Identifier

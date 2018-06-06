@@ -1,11 +1,10 @@
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.communication_request import CommunicationRequest
 from portal.models.identifier import Identifier
 from portal.system_uri import TRUENTH_CR_NAME
-
 
 """Correct IRONMAN 6 month iteration count
 

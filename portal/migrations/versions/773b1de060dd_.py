@@ -5,15 +5,14 @@ Revises: 1b7b8092fcef
 Create Date: 2018-04-23 12:49:17.756737
 
 """
+import sqlalchemy as sa
 from alembic import op
 from sqlalchemy import text
-import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
 from portal.models.role import Role
 from portal.models.user import User, UserRoles
-
 
 Session = sessionmaker()
 

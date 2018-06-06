@@ -10,8 +10,8 @@ Create Date: 2016-03-29 16:15:58.157711
 revision = 'c04d7e1c0ae'
 down_revision = '510aaa0d1541'
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 old_genders = ('male', 'female', 'undifferentiated')
 new_genders = ('male', 'female', 'other', 'unknown')
