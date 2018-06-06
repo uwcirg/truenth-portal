@@ -1,6 +1,7 @@
 """Module for additional dictionary tools/utilities"""
 import numbers
 
+
 def dict_compare(d1, d2):
     """Deep order independent comparison of two dictionaries
 

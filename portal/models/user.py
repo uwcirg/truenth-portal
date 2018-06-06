@@ -4,7 +4,6 @@ from cgi import escape
 from datetime import datetime
 from StringIO import StringIO
 
-from . import reference
 import regex
 from dateutil import parser
 from flask import abort, current_app
@@ -18,6 +17,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from . import reference
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
 from ..dict_tools import dict_match, strip_empties

@@ -5,7 +5,6 @@ and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
 
-from . import address
 from flask import abort, current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -13,6 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from werkzeug.exceptions import Unauthorized
 
+from . import address
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
