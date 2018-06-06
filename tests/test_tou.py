@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pytz
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.notification import Notification, UserNotification

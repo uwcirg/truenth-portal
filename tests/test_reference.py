@@ -1,5 +1,6 @@
 """Unit test module for Reference class"""
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention

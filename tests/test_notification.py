@@ -1,5 +1,6 @@
 """Unit test module for Notification and UserNotification logic"""
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.notification import Notification, UserNotification
 from tests import TEST_USER_ID, TestCase

@@ -5,6 +5,8 @@ from string import ascii_letters
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+from sqlalchemy.orm.exc import NoResultFound
+
 from portal.extensions import db
 from portal.models.assessment_status import (
     AssessmentStatus,
@@ -25,7 +27,6 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
 from portal.system_uri import ICHOM
-from sqlalchemy.orm.exc import NoResultFound
 from tests import TEST_USER_ID, TestCase, associative_backdate
 
 now = datetime.utcnow()

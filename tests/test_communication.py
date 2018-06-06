@@ -4,6 +4,7 @@ from datetime import datetime
 import regex
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+
 from portal.database import db
 from portal.models.assessment_status import overall_assessment_status
 from portal.models.audit import Audit

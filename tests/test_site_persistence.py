@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 
 from flask_webtest import SessionScope
+
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db
 from portal.models.app_text import app_text

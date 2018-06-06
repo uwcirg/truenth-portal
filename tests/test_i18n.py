@@ -1,6 +1,7 @@
 """Unit test module for internationalization logic"""
 from flask import current_app
 from flask_login import login_user
+
 from portal.models.i18n import get_locale
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase

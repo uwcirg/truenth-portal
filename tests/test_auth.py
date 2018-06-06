@@ -3,6 +3,8 @@ import datetime
 
 from flask import url_for
 from flask_webtest import SessionScope
+from werkzeug.exceptions import Unauthorized
+
 from portal.extensions import db
 from portal.models.auth import Token, create_service_token
 from portal.models.client import Client, validate_origin
@@ -16,7 +18,6 @@ from portal.models.user import (
     add_role,
 )
 from tests import TEST_USER_ID, TestCase
-from werkzeug.exceptions import Unauthorized
 
 
 class AuthomaticMock(object):

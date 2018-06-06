@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pytz
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding

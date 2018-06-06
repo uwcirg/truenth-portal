@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from dateutil import parser
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept

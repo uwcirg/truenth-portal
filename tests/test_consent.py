@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization

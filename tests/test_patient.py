@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 from flask_webtest import SessionScope
+
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit

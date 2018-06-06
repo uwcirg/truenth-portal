@@ -4,6 +4,7 @@ from urlparse import parse_qsl, urlparse
 
 from flask import render_template_string
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.app_text import (
     AppText,

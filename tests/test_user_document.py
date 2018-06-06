@@ -6,6 +6,7 @@ from tempfile import NamedTemporaryFile
 
 from flask import current_app
 from flask_webtest import SessionScope
+
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.auth import create_service_token
