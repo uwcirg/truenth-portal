@@ -57,6 +57,69 @@
       "intervention_name": "self_management",
       "name": "Self Management Strategy",
       "resourceType": "AccessStrategy"
+    },
+    {
+      "name": "PSA Tracker strategy",
+      "description": "Allow TNG Patients with localized PCa and w/o positive PCa dx",
+      "resourceType": "AccessStrategy",
+      "intervention_name": "psa_tracker",
+      "id": 3001,
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "all"
+          },
+          {
+            "name": "strategy_1",
+            "value": "limit_by_clinic_w_id"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "identifier_value",
+                "value": "TNG"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa localized diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              }
+            ]
+          },
+          {
+            "name": "strategy_3",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_3_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "id": "SitePersistence v0.2",
