@@ -119,14 +119,13 @@ class AppText(db.Model):
         return d
 
 
-class AppTextModelAdapter(object):
+class AppTextModelAdapter(object, metaclass=ABCMeta):
     """Several special purpose patterns used for lookups
 
     Make access consistent and easy for model classes where appropriate
 
     Abstract base class - defining methods each model adapter needs
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def name_key(**kwargs):
