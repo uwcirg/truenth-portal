@@ -143,7 +143,7 @@ class TestProcedure(TestCase):
 
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
-        started_codes = set([
+        started_codes = {
             ('3', 'Radical prostatectomy (nerve-sparing)', ICHOM),
             ('3-nns', 'Radical prostatectomy (non-nerve-sparing)', ICHOM),
             ('4', 'External beam radiation therapy', ICHOM),
@@ -164,7 +164,7 @@ class TestProcedure(TestCase):
             ('176307007', u'Whole-gland ablation', SNOMED),
             ('438778003', u'Focal-gland ablation', SNOMED)
 
-        ])
+        }
         # confirm we have the whole list:
         found = set()
         for codeableconcept in TxStartedConstants():

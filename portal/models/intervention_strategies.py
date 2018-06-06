@@ -85,7 +85,7 @@ def limit_by_clinic_w_id(
 
     if include_children:
         ot = OrgTree()
-        required = set([o for og in orgs for o in ot.here_and_below_id(og.id)])
+        required = {o for og in orgs for o in ot.here_and_below_id(og.id)}
     else:
         required = set((o.id for o in orgs))
     if combinator not in ('any', 'all'):
@@ -136,8 +136,7 @@ def not_in_clinic_w_id(
 
     if include_children:
         ot = OrgTree()
-        dont_want = set(
-            [o for og in orgs for o in ot.here_and_below_id(og.id)])
+        dont_want = {o for og in orgs for o in ot.here_and_below_id(og.id)}
     else:
         dont_want = set((o.id for o in orgs))
 
@@ -696,7 +695,7 @@ class AccessStrategy(db.Model):
 
             # validate the given details by attempting to instantiate
             self.instantiate()
-        except Exception, e:
+        except Exception as e:
             raise ValueError("AccessStrategy instantiation error: {}".format(
                 e))
         return self

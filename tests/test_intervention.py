@@ -1089,7 +1089,7 @@ class TestIntervention(TestCase):
         self.assertEqual(rv.json['message'], 'sent')
 
         message = EmailMessage.query.one()
-        set1 = set((foo.email, boo.email))
+        set1 = {foo.email, boo.email}
         set2 = set(message.recipients.split())
         self.assertEqual(set1, set2)
 

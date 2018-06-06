@@ -150,7 +150,7 @@ class TestQuestionnaireBank(TestCase):
             u'Crv Baseline V2',
             u'Crv Recurring 3Mo Period V2',
             u'Crv Recurring 6Mo Period V2'}
-        self.assertEqual(expected, set([q.display_name for q in qbs]))
+        self.assertEqual(expected, {q.display_name for q in qbs})
 
     def test_org_trigger_date(self):
         # testing org-based QBs

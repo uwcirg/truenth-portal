@@ -67,17 +67,17 @@ def mock_qr(
     invalidate_assessment_status_cache(TEST_USER_ID)
 
 
-localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
-metastatic_baseline_instruments = set([
-    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'])
-metastatic_indefinite_instruments = set(['irondemog'])
-metastatic_3 = set([
-    'eortc', 'eproms_add', 'ironmisc'])
-metastatic_4 = set([
-    'eortc', 'eproms_add', 'ironmisc', 'factfpsi'])
-metastatic_6 = set([
-    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'])
-symptom_tracker_instruments = set(['epic26', 'eq5d', 'maxpc', 'pam'])
+localized_instruments = {'eproms_add', 'epic26', 'comorb'}
+metastatic_baseline_instruments = {
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'}
+metastatic_indefinite_instruments = {'irondemog'}
+metastatic_3 = {
+    'eortc', 'eproms_add', 'ironmisc'}
+metastatic_4 = {
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi'}
+metastatic_6 = {
+    'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'}
+symptom_tracker_instruments = {'epic26', 'eq5d', 'maxpc', 'pam'}
 
 
 def mock_questionnairebanks(eproms_or_tnth):
@@ -413,7 +413,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.assertEqual(
             localized_instruments -
             set(a_s.instruments_needing_full_assessment('all')),
-            set(['eproms_add']))
+            {'eproms_add'})
         self.assertFalse(a_s.instruments_in_progress())
 
     def test_metastatic_on_time(self):
@@ -495,7 +495,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # with only epic26 started, should see results for both
         # instruments_needing_full_assessment and insturments_in_progress
         self.assertEqual(
-            set(['eproms_add', 'comorb']),
+            {'eproms_add', 'comorb'},
             set(a_s.instruments_needing_full_assessment()))
         self.assertEqual(['doc-26'], a_s.instruments_in_progress())
 
