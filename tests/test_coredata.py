@@ -73,7 +73,7 @@ class TestCoredata(TestCase):
         # should leave only indigenous, race and ethnicity as options
         # and nothing required
         self.assertTrue(Coredata().initial_obtained(self.test_user))
-        expect = set(('race', 'ethnicity', 'indigenous'))
+        expect = {'race', 'ethnicity', 'indigenous'}
         found = set(Coredata().optional(self.test_user))
         self.assertEquals(found, expect)
 
@@ -92,7 +92,7 @@ class TestCoredata(TestCase):
 
         # needed should match required (minus 'name', 'role')
         required = Coredata().required(self.test_user)
-        self.assertEquals(set(required) - set(needed), set(('name', 'role')))
+        self.assertEquals(set(required) - set(needed), {'name', 'role'})
 
     def test_eproms_staff(self):
         """Eproms staff: privacy policy and website terms of use"""
