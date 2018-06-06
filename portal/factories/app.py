@@ -1,4 +1,6 @@
 """Portal module"""
+from __future__ import print_function
+
 import logging
 import os
 import sys
@@ -280,10 +282,11 @@ def configure_logging(app):  # pragma: no cover
         with open(info_log, 'a+'):
             pass
     except IOError:
-        print >> sys.stderr, "Can't open log file '%s', use stdout" %\
-            info_log
-        print >> sys.stderr,\
-            "Set LOG_FOLDER to a writable directory in configuration file"
+        print(
+            "Can't open log file '%s', use stdout" % info_log,
+            "Set LOG_FOLDER to a writable directory in configuration file",
+            file=sys.stderr,
+        )
         return
 
     info_file_handler = handlers.RotatingFileHandler(info_log,
