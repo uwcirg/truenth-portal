@@ -43,8 +43,6 @@ future==0.16.0
 fuzzywuzzy==0.16.0
 gunicorn==19.8.1
 imagesize==1.0.0
-ipdb==0.11
-ipython==5.7.0; python_version <= '2.7' # pyup: <6.0.0 # See uwcirg/true_nth_usa_portal#819
 ipython-genutils==0.2.0
 itsdangerous==0.24
 jedi==0.12.0
@@ -65,7 +63,6 @@ pluggy==0.6.0
 polib==1.1.0
 prompt-toolkit==2.0.2
 psycopg2==2.7.4
-ptpython==0.41
 ptyprocess==0.5.2
 py==1.5.3
 pycparser==2.18
