@@ -33,10 +33,10 @@
                         {{ app_text('landing sub-title') }}
                     </div>
                     <a href="/go" class="btn feature-btn feature-btn-primary">{{ _("Register") }}</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-primary">{{ _("Log in") }}</a>
-                    {% if config.MAINTENANCE -%}
+                    {% if config.MAINTENANCE_MESSAGE -%}
                         <div class="sys-maintenance">
                             <h4 class="title">{{_("Please note")}}
-                            <h4 class="message">{{config.MAINTENANCE | safe}}</h4>
+                            <h4 class="message">{{config.MAINTENANCE_MESSAGE | safe}}</h4>
                         </div>
                     {%- endif %}
                     {% if timed_out %}
