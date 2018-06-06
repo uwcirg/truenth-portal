@@ -66,8 +66,8 @@ class TestExclusionPersistence(TestCase):
         tc1 = Client.query.filter(Client.client_id == '123_abc').one()
         tc2 = Client.query.filter(Client.client_id == '234_bcd').one()
 
-        self.assertEquals(tc1.callback_url, 'http://callback.one')
-        self.assertEquals(tc2._redirect_uris, 'http://test_two.org')
+        self.assertEqual(tc1.callback_url, 'http://callback.one')
+        self.assertEqual(tc2._redirect_uris, 'http://test_two.org')
 
     def testIntervention(self):
         t1 = Intervention(
@@ -103,8 +103,8 @@ class TestExclusionPersistence(TestCase):
 
         result = Intervention.query.filter(Intervention.name == 'alvin').one()
 
-        self.assertEquals(result.link_url, 'http://retain.this')
-        self.assertEquals(result.description, 'prod description')
+        self.assertEqual(result.link_url, 'http://retain.this')
+        self.assertEqual(result.description, 'prod description')
 
     def test_connected_user(self):
         """User and service tokens connected with intervention should survive"""
@@ -149,7 +149,7 @@ class TestExclusionPersistence(TestCase):
         expected = client_users_filter().count()
         with open(path_join(self.tmpdir, 'User.json')) as f:
             serial_form = json.loads(f.read())
-        self.assertEquals(expected, len(serial_form['entry']))
+        self.assertEqual(expected, len(serial_form['entry']))
 
         # Modify/delete some internal db values and confirm reapplication of
         # persistence restores desired values
@@ -158,21 +158,21 @@ class TestExclusionPersistence(TestCase):
 
         # just expecting the one service token.  purge it and the
         # owner (the service user) and the owner's auth_provider
-        self.assertEquals(Token.query.count(), 1)
+        self.assertEqual(Token.query.count(), 1)
         service_user_id = Token.query.one().user_id
         b4 = User.query.count()
-        self.assertEquals(UserRelationship.query.count(), 1)
-        self.assertEquals(AuthProvider.query.count(), 1)
+        self.assertEqual(UserRelationship.query.count(), 1)
+        self.assertEqual(AuthProvider.query.count(), 1)
         with SessionScope(db):
             AuthProvider.query.delete()
             Token.query.delete()
             UserRelationship.query.delete()
             User.query.filter_by(id=service_user_id).delete()
             db.session.commit()
-        self.assertEquals(AuthProvider.query.count(), 0)
-        self.assertEquals(Token.query.count(), 0)
-        self.assertEquals(UserRelationship.query.count(), 0)
-        self.assertEquals(b4 - 1, User.query.count())
+        self.assertEqual(AuthProvider.query.count(), 0)
+        self.assertEqual(Token.query.count(), 0)
+        self.assertEqual(UserRelationship.query.count(), 0)
+        self.assertEqual(b4 - 1, User.query.count())
 
         for model in staging_exclusions:
             ep = ExclusionPersistence(
@@ -185,7 +185,7 @@ class TestExclusionPersistence(TestCase):
             ep.import_(keep_unmentioned=True)
 
         result = User.query.get(owner_id)
-        self.assertEquals(result.email, 'sm-owner@gmail.com')
-        self.assertEquals(AuthProvider.query.count(), 1)
-        self.assertEquals(Token.query.count(), 1)
-        self.assertEquals(UserRelationship.query.count(), 1)
+        self.assertEqual(result.email, 'sm-owner@gmail.com')
+        self.assertEqual(AuthProvider.query.count(), 1)
+        self.assertEqual(Token.query.count(), 1)
+        self.assertEqual(UserRelationship.query.count(), 1)

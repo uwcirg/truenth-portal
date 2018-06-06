@@ -24,7 +24,7 @@ class TestTablePreference(TestCase):
             data=json.dumps(data))
 
         self.assert200(resp)
-        self.assertEquals(resp.json['user_id'], TEST_USER_ID)
+        self.assertEqual(resp.json['user_id'], TEST_USER_ID)
 
         pref = TablePreference.query.filter_by(user_id=TEST_USER_ID,
                                                table_name='testTable').first()
@@ -32,8 +32,8 @@ class TestTablePreference(TestCase):
         first_update_id = pref.id
         first_update_at = pref.updated_at
         self.assertTrue(first_update_at)
-        self.assertEquals(pref.filters, filter_json)
-        self.assertEquals(pref.sort_order, "asc")
+        self.assertEqual(pref.filters, filter_json)
+        self.assertEqual(pref.sort_order, "asc")
 
         # test that updates work, and ONLY update the provided field(s)
         data = {"sort_order": "desc"}
@@ -43,14 +43,14 @@ class TestTablePreference(TestCase):
             data=json.dumps(data))
 
         self.assert200(resp2)
-        self.assertEquals(resp2.json['id'], first_update_id)
+        self.assertEqual(resp2.json['id'], first_update_id)
 
         pref = TablePreference.query.filter_by(user_id=TEST_USER_ID,
                                                table_name='testTable').first()
 
         self.assertNotEqual(pref.updated_at, first_update_at)
-        self.assertEquals(pref.filters, filter_json)
-        self.assertEquals(pref.sort_order, "desc")
+        self.assertEqual(pref.filters, filter_json)
+        self.assertEqual(pref.sort_order, "desc")
 
     def test_preference_get(self):
         self.login()
@@ -69,8 +69,8 @@ class TestTablePreference(TestCase):
                                'testTable'.format(TEST_USER_ID))
 
         self.assert200(resp)
-        self.assertEquals(resp.json['user_id'], TEST_USER_ID)
-        self.assertEquals(resp.json['filters'], filter_json)
+        self.assertEqual(resp.json['user_id'], TEST_USER_ID)
+        self.assertEqual(resp.json['filters'], filter_json)
 
     def test_no_preferences(self):
         self.login()
@@ -79,4 +79,4 @@ class TestTablePreference(TestCase):
                                'testTable'.format(TEST_USER_ID))
 
         self.assert200(resp)
-        self.assertEquals(resp.json, {})
+        self.assertEqual(resp.json, {})

@@ -36,14 +36,14 @@ class TestUserDocument(TestCase):
         rv = self.client.get(
             '/api/user/{}/user_documents'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['user_documents']), 2)
+        self.assertEqual(len(rv.json['user_documents']), 2)
         # tests document_type filter
         rv = self.client.get(
             '/api/user/{}/user_documents?document_type=TestFile'.format(
                 TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['user_documents']), 1)
-        self.assertEquals(
+        self.assertEqual(len(rv.json['user_documents']), 1)
+        self.assertEqual(
             rv.json['user_documents'][0]['uploaded_at'],
             FHIR_datetime.as_fhir(now))
 
@@ -76,8 +76,8 @@ class TestUserDocument(TestCase):
             self.assertEqual(udoc_file.read(),test_contents)
         os.remove(fpath)
 
-        self.assertEquals(udoc.user_id, TEST_USER_ID)
-        self.assertEquals(udoc.intervention.description,
+        self.assertEqual(udoc.user_id, TEST_USER_ID)
+        self.assertEqual(udoc.intervention.description,
                           INTERVENTION.SEXUAL_RECOVERY.description)
 
 

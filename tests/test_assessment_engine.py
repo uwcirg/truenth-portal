@@ -29,10 +29,10 @@ class TestAssessmentEngine(TestCase):
         )
         self.assert200(rv)
         response = rv.json
-        self.assertEquals(response['ok'], True)
-        self.assertEquals(response['valid'], True)
+        self.assertEqual(response['ok'], True)
+        self.assertEqual(response['valid'], True)
         self.assertTrue(self.test_user.questionnaire_responses.count(), 1)
-        self.assertEquals(
+        self.assertEqual(
             self.test_user.questionnaire_responses[0].encounter.auth_method,
             'password_authenticated')
 
@@ -101,8 +101,8 @@ class TestAssessmentEngine(TestCase):
         )
         self.assert200(rv)
         test_user = get_user(TEST_USER_ID)
-        self.assertEquals(test_user.questionnaire_responses.count(), 1)
-        self.assertEquals(
+        self.assertEqual(test_user.questionnaire_responses.count(), 1)
+        self.assertEqual(
             test_user.questionnaire_responses[0].questionnaire_bank_id,
             qb.id)
 
@@ -154,7 +154,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
         )
         self.assert200(updated_qnr_response)
-        self.assertEquals(updated_qnr_response.json['entry'][0]['group'],
+        self.assertEqual(updated_qnr_response.json['entry'][0]['group'],
                           completed_qnr['group'])
 
     def test_no_update_assessment(self):
@@ -204,7 +204,7 @@ class TestAssessmentEngine(TestCase):
         )
         response = rv.json
 
-        self.assertEquals(response['total'], len(response['entry']))
+        self.assertEqual(response['total'], len(response['entry']))
         self.assertTrue(response['entry'][0]['questionnaire']['reference'].endswith(instrument_id))
 
     def test_assessments_csv(self):
