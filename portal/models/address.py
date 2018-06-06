@@ -31,7 +31,7 @@ class Address(db.Model):
 
     @property
     def lines(self):
-        return '; '.join([el for el in self.line1, self.line2, self.line3 if
+        return '; '.join([el for el in (self.line1, self.line2, self.line3) if
                           el])
 
     def __str__(self):
