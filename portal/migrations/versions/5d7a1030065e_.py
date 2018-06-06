@@ -10,8 +10,8 @@ Create Date: 2017-06-06 12:36:41.656269
 revision = '5d7a1030065e'
 down_revision = '823de677d394'
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 Session = sa.orm.sessionmaker()

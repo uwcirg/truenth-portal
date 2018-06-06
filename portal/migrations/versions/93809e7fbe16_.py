@@ -10,8 +10,8 @@ Create Date: 2017-08-17 13:09:51.145481
 revision = '93809e7fbe16'
 down_revision = '2fdf0e8b8e08'
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 request_status_types = postgresql.ENUM(

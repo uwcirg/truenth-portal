@@ -5,8 +5,8 @@ Revises: 1b7b8092fcef
 Create Date: 2018-04-23 12:49:17.756737
 
 """
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 

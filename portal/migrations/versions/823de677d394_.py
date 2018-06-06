@@ -12,8 +12,8 @@ down_revision = '320726253d2d'
 
 from datetime import datetime
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 
 from portal.models.encounter import Encounter
 

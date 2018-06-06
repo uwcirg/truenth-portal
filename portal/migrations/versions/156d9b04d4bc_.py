@@ -10,8 +10,8 @@ Create Date: 2015-06-22 17:09:20.180760
 revision = '156d9b04d4bc'
 down_revision = '923b0f523f3'
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import ENUM
 

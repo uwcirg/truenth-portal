@@ -10,8 +10,8 @@ Create Date: 2016-04-26 17:57:43.813601
 revision = 'f9d108978c5a'
 down_revision = '24d8d4008534'
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 

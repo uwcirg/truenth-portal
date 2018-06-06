@@ -5,8 +5,8 @@ Revises: 5aeadb11e97b
 Create Date: 2018-03-21 16:25:10.457911
 
 """
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import ENUM
 
