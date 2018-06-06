@@ -156,10 +156,10 @@ def demographics_set(patient_id):
         complete = patient.as_fhir(include_empties=True)
         complete.update(request.json)
         patient.update_from_fhir(complete, acting_user=current_user())
-    except MissingReference, e:
+    except MissingReference as e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))
-    except ValueError, e:
+    except ValueError as e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))
     db.session.commit()
