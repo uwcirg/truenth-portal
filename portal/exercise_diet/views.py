@@ -1,8 +1,6 @@
 import json
 from collections import OrderedDict
-
-import requests
-from flask import Blueprint, current_app, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for
 
 from ..models.user import current_user
 from ..views.portal import get_any_tag_data, get_asset
