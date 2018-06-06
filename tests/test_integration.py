@@ -5,7 +5,7 @@ import unittest
 
 import xvfbwrapper
 from flask_testing import LiveServerTestCase
-from pages import LoginPage
+from .pages import LoginPage
 from selenium import webdriver
 from tests import TestCase
 

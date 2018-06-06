@@ -4,7 +4,7 @@ from cgi import escape
 from datetime import datetime
 from StringIO import StringIO
 
-import reference
+from . import reference
 import regex
 from dateutil import parser
 from flask import abort, current_app

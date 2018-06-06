@@ -5,7 +5,7 @@ and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
 
-import address
+from . import address
 from flask import abort, current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy

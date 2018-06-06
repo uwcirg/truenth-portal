@@ -15,7 +15,7 @@ from functools import wraps
 # identity providers such as Facebook
 from authomatic import Authomatic
 from authomatic.providers import oauth2
-from database import db
+from .database import db
 from flask import abort, request
 # Babel is used for i18n
 from flask_babel import Babel
