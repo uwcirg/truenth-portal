@@ -7,6 +7,8 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from future.utils import with_metaclass
+
 import timeit
 from abc import ABCMeta, abstractmethod
 from string import Formatter
@@ -119,7 +121,7 @@ class AppText(db.Model):
         return d
 
 
-class AppTextModelAdapter(object, metaclass=ABCMeta):
+class AppTextModelAdapter(with_metaclass(ABCMeta, object)):
     """Several special purpose patterns used for lookups
 
     Make access consistent and easy for model classes where appropriate

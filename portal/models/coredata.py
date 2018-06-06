@@ -8,6 +8,7 @@ Interventions will sometimes require their own set of data, for which the
 `/api/coredata/*` endpoints exist.
 
 """
+from future.utils import with_metaclass
 import sys
 from abc import ABCMeta, abstractmethod
 
@@ -108,7 +109,7 @@ class Coredata(object):
         return setattr(self.instance, name, value)
 
 
-class CoredataPoint(object, metaclass=ABCMeta):
+class CoredataPoint(with_metaclass(ABCMeta, object)):
     """Abstract base class - defining methods each datapoint needs"""
 
     @abstractmethod

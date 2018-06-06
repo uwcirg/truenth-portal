@@ -1,4 +1,5 @@
 """Extension model"""
+from future.utils import with_metaclass
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import pytz
@@ -7,7 +8,7 @@ from flask import abort
 from .coding import Coding
 
 
-class Extension(metaclass=ABCMeta):
+class Extension(with_metaclass(ABCMeta, object)):
     """Abstract base class for extension FHIR objects"""
 
     @abstractmethod
@@ -19,7 +20,7 @@ class Extension(metaclass=ABCMeta):
         pass
 
 
-class CCExtension(Extension, metaclass=ABCMeta):
+class CCExtension(with_metaclass(ABCMeta, Extension)):
     """Abstract base class for extension FHIR objects with CC value sets"""
 
     @abstractproperty
