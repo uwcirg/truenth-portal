@@ -13,8 +13,6 @@ from functools import wraps
 from traceback import format_exc
 
 from celery.utils.log import get_task_logger
-from factories.app import create_app
-from factories.celery import create_celery
 from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
@@ -22,6 +20,8 @@ from sqlalchemy import and_
 
 from .database import db
 from .dogpile_cache import dogpile_cache
+from .factories.app import create_app
+from .factories.celery import create_celery
 from .models.assessment_status import (
     invalidate_assessment_status_cache,
     overall_assessment_status,
@@ -289,7 +289,7 @@ def update_tous_task(**kwargs):
 @scheduled_task
 def token_watchdog(**kwargs):
     """Clean up stale tokens and alert service sponsors if nearly expired"""
-    from models.auth import token_janitor
+    from .models.auth import token_janitor
     error_emails = token_janitor()
     if error_emails:
         return '\nUnable to reach recipient(s): {}'.format(

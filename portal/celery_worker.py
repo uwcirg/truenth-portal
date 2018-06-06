@@ -10,11 +10,10 @@ Launch in the same virtual environment via
   $ celery worker -A portal.celery_worker.celery --loglevel=info
 
 """
-import tasks
-from factories.app import create_app
-from factories.celery import create_celery
-
+from . import tasks
 from .database import db
+from .factories.app import create_app
+from .factories.celery import create_celery
 from .models.scheduled_job import ScheduledJob
 
 app = create_app()
