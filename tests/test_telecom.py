@@ -40,7 +40,7 @@ class TestTelecom(TestCase):
         tc = Telecom(email='hq@HL7.org',contact_points=[cp])
         data = tc.cp_dict()
         self.assertEqual(len(data), 1)
-        self.assertEqual(data.get(('phone','work')), '123-4567')
+        self.assertEqual(data.get(('phone', 'work')), '123-4567')
 
     def test_contactpoint_from_fhir(self):
         data = {

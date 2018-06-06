@@ -11,7 +11,8 @@ class TestI18n(TestCase):
     """I18n tests"""
 
     def test_get_locale(self):
-        self.assertEqual(get_locale(),current_app.config.get("DEFAULT_LOCALE"))
+        self.assertEqual(
+            get_locale(), current_app.config.get("DEFAULT_LOCALE"))
 
         language = 'en_AU'
         language_name = "Australian English"
@@ -21,4 +22,3 @@ class TestI18n(TestCase):
 
         login_user(test_user)
         self.assertEqual(get_locale(), language)
-        

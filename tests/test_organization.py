@@ -50,7 +50,7 @@ class TestOrganization(TestCase):
         self.assertTrue(org.use_specific_codings)
         self.assertTrue(org.race_codings)
         self.assertFalse(org.ethnicity_codings)
-        self.assertEqual(org.locales.count(),1)
+        self.assertEqual(org.locales.count(), 1)
         self.assertEqual(org.default_locale, "en_AU")
         self.assertEqual(org._timezone, "US/Pacific")
 
