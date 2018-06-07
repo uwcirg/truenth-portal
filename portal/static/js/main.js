@@ -1722,7 +1722,7 @@ var tnthDates = {
         if (!date || date.length < 10) { return false; }
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) { return false; }
-        var day = dArray[0], month = dArray[1], year = dArray[2];
+        var day = parseInt(dArray[0])+"", month = dArray[1], year = dArray[2];
         if (day.length < 1 || month.length < 3 || year.length < 4) { return false; }
         if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) { return false; }
         if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) { return false; }
