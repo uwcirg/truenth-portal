@@ -297,8 +297,12 @@ class Organization(db.Model):
         self.partOf_id = (
             Reference.parse(data['partOf']).id if data.get('partOf')
             else None)
-        for attr in ('use_specific_codings', 'race_codings',
-                    'ethnicity_codings', 'indigenous_codings'):
+        for attr in (
+            'use_specific_codings',
+            'race_codings',
+            'ethnicity_codings',
+            'indigenous_codings',
+        ):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 

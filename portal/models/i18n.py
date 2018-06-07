@@ -50,7 +50,13 @@ def upsert_to_template_file():
     db_translatables = get_db_strings()
     if db_translatables:
         try:
-            with open(os.path.join(current_app.root_path, "translations/messages.pot"), "r+") as potfile:
+            with open(
+                os.path.join(
+                    current_app.root_path,
+                    "translations/messages.pot",
+                ),
+                "r+",
+            ) as potfile:
                 potlines = potfile.readlines()
                 for i, line in enumerate(potlines):
                     if line.split() and (line.split()[0] == "msgid"):

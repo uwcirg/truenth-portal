@@ -1052,9 +1052,11 @@ class TestUser(TestCase):
                                  birthdate=user.birthdate)
         self.assertEqual(score, 100)  # should be perfect match
 
-        score = user.fuzzy_match(first_name=user.first_name,
-                                 last_name=user.last_name,
-                                 birthdate=datetime.strptime("01-31-1951", '%m-%d-%Y'))
+        score = user.fuzzy_match(
+            first_name=user.first_name,
+            last_name=user.last_name,
+            birthdate=datetime.strptime("01-31-1951", '%m-%d-%Y'),
+        )
         self.assertEqual(score, 0)  # incorrect birthdate returns 0
 
         score = user.fuzzy_match(first_name=user.first_name,

@@ -397,7 +397,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         questionnaire_response.document["encounter"] = encounter_fhir
 
         questionnaire_response.document["subject"] = {
-            k:v for k, v in subject.as_fhir().items() if k in patient_fields
+            k: v for k, v in subject.as_fhir().items() if k in patient_fields
         }
 
         if subject.organizations:
