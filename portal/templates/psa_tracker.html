@@ -15,20 +15,54 @@
     </section>
     <section>
         {% raw %}
-            <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">{{noResultMessage}}</div>
-            <div id="psaTrackerResultsContainer" v-if="items.length">
-                <div class="psaTrackerLoader" v-bind:class="{ 'tnth-hide': !loading }"><i class="fa fa-spinner fa-spin fa-3x"></i></div>
-                <table id="psaTrackerResultsTable" v-bind:class="{ 'tnth-hide': loading }">
-                    <THEAD class="psa-tracker-table-header">
-                        <th v-for="item in headers">{{item}}</th>
-                    </THEAD>
-                    <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" class="result-row">
-                        <td class="result-cell"><span v-on:click="onEdit(item)">{{item.result}}</span></td>
-                        <td class="result-cell"><span v-on:click="onEdit(item)">{{item.date}}</span></td>
-                    </tr>
-                </table>
-                <div id="psaTrackerGraphContainer" v-bind:class="{ 'tnth-hide': loading }" v-if="items.length > 0">
+            <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">
+                {{noResultMessage}}
+                <span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" v-if="showRefresh" v-on:click="refresh" v-bind:title="getRefreshMessage()"></span>
+            </div>
+            <div id="psaTrackerResultsContainer" v-if="items.length > 0">
+                <div class="psaTrackerLoader" v-bind:class="{ 'tnth-hide': !loading }"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                <div class="psaTrackerDataContainer" v-bind:class="{ 'tnth-hide': loading }">
+                    <table id="psaTrackerResultsTable" >
+                        <THEAD class="psa-tracker-table-header">
+                            <th v-for="item in headers">{{item}}</th>
+                        </THEAD>
+                        <tr v-if="showFilters()">
+                            <td>
+                                <select id="psaTrackerYearFilter" class="form-control filter-control" v-on:change="filterDataByYearEvent">
+                                    <option value="" class="select-option">{{filters.filterYearPrompt}}</option>
+                                    <option v-bind:value="item" v-for="item in yearList" v-bind:selected="item == filters.selectedFilterYearValue">{{item}}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="psaTrackerResultFilter" class="form-control filter-control" v-on:change="filterDataByResultEvent">
+                                    <option value="" class="select-option">{{filters.filterResultPrompt}}</option>
+                                    <option v-bind:value="item" v-for="item in resultRange" v-bind:selected="item == filters.selectedFilterResultRange">{{item}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row">
+                            <td class="result-cell"><span v-on:click="onEdit(item)">{{item.date}}</span></td>
+                            <td class="result-cell"><span v-on:click="onEdit(item)">{{item.result}}</span></td>
+                        </tr>
+                    </table>
+                    <div id="psaTrackerDataSidebar">
+                        <button class="btn btn-tnth-primary" v-show="history.items.length" v-on:click="showHistory">{{history.label}}</button>
+                        <button class="btn btn-tnth-primary" v-on:click="refresh" v-bind:disabled="!showRefresh" v-if="showFilters()">{{filters.clearLabel}}</button>
+                    </div>
+                </div>
+                <div id="psaTrackerGraphContainer" v-bind:class="{ 'tnth-hide': loading }">
                     <div id="psaTrackerGraph"></div>
+                    <div id="psaTrackerTreatmentContainer">
+                        <div v-if="showTreatment()" v-for="item in treatment.data">
+                            <span>{{treatment.treatmentTextPrompt}}</span> <span class="text-warning display-text">{{item.display}}</span>
+                            <br/>
+                            <span>{{treatment.treatmentDatePrompt}}</span> <span class="text-warning display-text">{{item.date}}</span>
+                        </div>
+                        <div v-if="!showTreatment()">
+                            <span class="text-warning">No treatment received as of today.</span>
+                        </div>
+                        <a href="profile#profileProceduresWrapper" class="info-link">{{editLink}}</a>
+                    </div>
                 </div>
             </div>
             <div id="psaTrackerErrorMessageContainer" class="error-message"></div>
@@ -45,7 +79,8 @@
             </div>
             <div class="modal-body">
                 <div class="body-content">
-                    <table id="psaTrackerAddTable">
+                    <div class="psaTrackerModalLoader" v-bind:class="{ 'tnth-hide': !modalLoading }"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                    <table id="psaTrackerAddTable" v-bind:class="{ 'tnth-hide': modalLoading }">
                         <tr>
                             <td>{{_("PSA (ng/ml)")}}</td>
                             <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" placeholder="{{_('Enter a number')}}"/></td>
@@ -62,16 +97,49 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!newItem.result || !newItem.date">{{_("Save")}}</button>
+                <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!isValidData()">{{_("Save")}}</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
             </div>
           </div>
         </div>
     </div>
+    <div class="modal fade" id="PSAHistoryModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="modal-header-title">{{_("PSA Result History")}}</div>
+            </div>
+            <div class="modal-body">
+                <div class="body-content">
+                    {% raw %}
+                    <table id="psaTrackerHistoryTable">
+                        <THEAD class="psa-tracker-table-header">
+                            <TH v-for="item in headers">{{item}}</TH>
+                        </THEAD>
+                        <TR v-for="item in history.items">
+                            <TD>{{item.date}}</TD>
+                            <TD>{{item.result}}</TD>
+                        </TR>
+                    </table>
+                    {% endraw %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <svg width="300" height="200">
+        <defs>
+            <path id="arrow" d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #8a6d3b" transform="rotate(90)" stroke-width="4"></path>
+            <rect id="marker" width="4" height="4" stroke="#8a6d3b" stroke-width="1" fill="#8a6d3b"/>
+        </defs>
+    </svg>
 </main>
 {% endblock %}
 {% block additional_scripts %}
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.min.js"></script>
 	<script src="{{url_for('static', filename='js/psaTracker.js')}}" ></script>
 {% endblock %}
