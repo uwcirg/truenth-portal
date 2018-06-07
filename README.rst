@@ -460,6 +460,9 @@ host    all             all             127.0.0.1/32            trust
 host    all             all             ::1/128                 trust
 
 Copy the default configuration file to the named configuration file
+
+.. code:: bash
+
     $ copy $PROJECT_HOME/instance/application.cfg.default $PROJECT_HOME/instance/application.cfg
 
 In application.cfg, (below), fill in the values on line 9 for user, password, localhost, portnum, and dbname
@@ -472,4 +475,7 @@ Testing
 ~~~~~~~
 
 To test that the database is set up correctly, from a virtual environment run:
+
+.. code:: bash
+
     $ python ./bin/testconnection.py
