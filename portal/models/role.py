@@ -10,8 +10,6 @@ To extend the list of roles, add name: description pairs to the
 STATIC_ROLES dict within.
 
 """
-from UserDict import IterableUserDict
-
 from ..database import db
 
 
@@ -41,7 +39,7 @@ class Role(db.Model):
 
 
 #Source definition for roles, as dictionary {name: description,}
-STATIC_ROLES = IterableUserDict({
+STATIC_ROLES = {
     'access_on_verify':
         'Provides access prior to registration, on verification',
     'admin':
@@ -82,7 +80,7 @@ STATIC_ROLES = IterableUserDict({
     'write_only':
         'Limited access account, write only, cannot view data from '
         'previous sessions',
-})
+}
 
 
 def enum(**items):

@@ -1,6 +1,4 @@
 """Intervention Module"""
-from UserDict import IterableUserDict
-
 from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
@@ -275,7 +273,7 @@ class UserIntervention(db.Model):
         return q.count() > 0
 
 
-STATIC_INTERVENTIONS = IterableUserDict({
+STATIC_INTERVENTIONS = {
     'assessment_engine': 'Assessment Engine',
     'care_plan': 'Care Plan',
     'community_of_wellness': 'Community of Wellness',
@@ -286,7 +284,8 @@ STATIC_INTERVENTIONS = IterableUserDict({
     'self_management': 'Self Management',
     'sexual_recovery': 'Sexual Recovery',
     'social_support': 'Social Support Network',
-    'default': 'OTHER: not yet officially supported'})
+    'default': 'OTHER: not yet officially supported',
+}
 
 
 def add_static_interventions():
