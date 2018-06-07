@@ -17,12 +17,12 @@ def parse_connection_uri():
     return conn_uri.strip()[1:-1]  # strip quotes, newlines
 
 connection_uri = parse_connection_uri()
-print "Connecting to database\n ->{}".format(connection_uri)
+print("Connecting to database\n ->{}".format(connection_uri))
 
 try:
     conn = psycopg2.connect(connection_uri)
     cursor = conn.cursor()
-    print "Connected!\n"
+    print("Connected!\n")
 except:
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     sys.exit("Database connection failed!\n ->%s" % (exceptionValue))

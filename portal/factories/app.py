@@ -1,18 +1,20 @@
 """Portal module"""
+from __future__ import print_function
+
 import logging
+from logging import handlers
 import os
 import sys
-from logging import handlers
 
+from flask import Flask
 import pkginfo
 import redis
 import requests_cache
-from flask import Flask
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
+# Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..audit import configure_audit_log
 from ..config.config import SITE_CFG, DefaultConfig
-# Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
@@ -280,10 +282,11 @@ def configure_logging(app):  # pragma: no cover
         with open(info_log, 'a+'):
             pass
     except IOError:
-        print >> sys.stderr, "Can't open log file '%s', use stdout" %\
-            info_log
-        print >> sys.stderr,\
-            "Set LOG_FOLDER to a writable directory in configuration file"
+        print(
+            "Can't open log file '%s', use stdout" % info_log,
+            "Set LOG_FOLDER to a writable directory in configuration file",
+            file=sys.stderr,
+        )
         return
 
     info_file_handler = handlers.RotatingFileHandler(info_log,

@@ -1,11 +1,13 @@
 """Unit test module for Procedure API and model"""
+from datetime import datetime, timedelta
 import json
 import os
-from datetime import datetime, timedelta
 
 import dateutil
-import pytz
 from flask import current_app
+import pytz
+from sqlalchemy.orm.exc import NoResultFound
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import FHIR_datetime
@@ -18,7 +20,6 @@ from portal.models.procedure_codes import (
 )
 from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
-from sqlalchemy.orm.exc import NoResultFound
 from tests import TEST_USER_ID, TestCase
 
 

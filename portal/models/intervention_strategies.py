@@ -13,9 +13,9 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
+from datetime import datetime
 import json
 import sys
-from datetime import datetime
 
 from flask import current_app, url_for
 from flask_babel import gettext as _

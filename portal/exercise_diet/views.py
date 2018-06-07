@@ -1,5 +1,5 @@
-import json
 from collections import OrderedDict
+import json
 
 from flask import Blueprint, redirect, render_template, url_for
 

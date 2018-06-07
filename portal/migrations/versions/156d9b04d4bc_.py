@@ -15,7 +15,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import ENUM
 
-
 gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
                     create_type=False)
 

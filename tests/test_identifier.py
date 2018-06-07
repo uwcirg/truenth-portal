@@ -2,6 +2,7 @@
 import json
 
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.identifier import Identifier
 from portal.models.user import User

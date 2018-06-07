@@ -1,10 +1,10 @@
 """Model classes for retaining FHIR data"""
-import json
 from datetime import datetime
 from html.parser import HTMLParser
+import json
 
-import requests
 from flask import abort, current_app, url_for
+import requests
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 

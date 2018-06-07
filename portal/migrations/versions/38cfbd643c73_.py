@@ -18,7 +18,6 @@ from portal.models.audit import Audit
 from portal.models.role import Role
 from portal.models.user import User, UserRoles
 
-
 Session = sessionmaker()
 
 

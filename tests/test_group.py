@@ -2,11 +2,12 @@
 import json
 
 from flask_webtest import SessionScope
+from werkzeug.exceptions import BadRequest
+
 from portal.extensions import db
 from portal.models.group import Group
 from portal.models.role import ROLE
 from tests import TEST_USER_ID, TestCase
-from werkzeug.exceptions import BadRequest
 
 
 class TestGroup(TestCase):

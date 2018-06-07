@@ -10,8 +10,9 @@ Create Date: 2017-05-24 12:27:57.861464
 revision = '823de677d394'
 down_revision = '320726253d2d'
 
-from alembic import op
 from datetime import datetime
+
+from alembic import op
 import sqlalchemy as sa
 
 from portal.models.encounter import Encounter

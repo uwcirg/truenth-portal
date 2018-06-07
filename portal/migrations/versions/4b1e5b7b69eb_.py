@@ -10,10 +10,12 @@ Create Date: 2017-01-19 12:36:55.339537
 revision = '4b1e5b7b69eb'
 down_revision = '13d1c714823a'
 
+import re
+
 from alembic import op
 import sqlalchemy as sa
-import re
 from sqlalchemy.orm import sessionmaker
+
 from portal.models.audit import Audit
 from portal.models.user import User
 

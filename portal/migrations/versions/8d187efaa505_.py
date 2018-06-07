@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from portal.models.organization import Organization
 from portal.models.research_protocol import ResearchProtocol
 
-
 """empty message
 
 Revision ID: 8d187efaa505

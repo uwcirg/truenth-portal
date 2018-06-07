@@ -1,10 +1,11 @@
 """Unit test module for Intervention API"""
+from datetime import datetime, timedelta
 import json
 import os
-from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC

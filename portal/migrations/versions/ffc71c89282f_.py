@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 from portal.models.questionnaire_bank import QuestionnaireBank
 
-
 """empty message
 
 Revision ID: ffc71c89282f

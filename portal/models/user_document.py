@@ -1,6 +1,6 @@
 """User Document module"""
-import os
 from datetime import datetime
+import os
 from uuid import uuid4
 
 from flask import current_app

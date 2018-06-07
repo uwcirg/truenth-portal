@@ -1,7 +1,7 @@
-import csv
-from collections import defaultdict
-from datetime import datetime
 from StringIO import StringIO
+from collections import defaultdict
+import csv
+from datetime import datetime
 from time import strftime
 
 from flask import Blueprint, make_response, render_template, request

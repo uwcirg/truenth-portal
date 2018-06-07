@@ -1,10 +1,11 @@
 """Unit test module for user consent"""
-import json
 from datetime import datetime
+import json
 
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization

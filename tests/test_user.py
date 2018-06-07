@@ -1,11 +1,14 @@
 """Unit test module for user model and views"""
+from datetime import datetime
 import json
 import re
 import urllib
-from datetime import datetime
 
-import pytest
 from flask_webtest import SessionScope
+import pytest
+from sqlalchemy import and_
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
@@ -40,9 +43,7 @@ from portal.system_uri import (
     TRUENTH_USERNAME,
     TRUENTH_VALUESET_NHHD_291036,
 )
-from sqlalchemy import and_
 from tests import TEST_USER_ID, TEST_USERNAME, TestCase
-from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 
 def test_null_id():

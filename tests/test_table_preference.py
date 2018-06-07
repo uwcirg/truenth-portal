@@ -2,6 +2,7 @@
 import json
 
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.table_preference import TablePreference

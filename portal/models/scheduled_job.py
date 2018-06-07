@@ -1,6 +1,6 @@
 """Scheduled Job module"""
-import re
 from datetime import datetime
+import re
 
 from celery.schedules import crontab
 

@@ -1,8 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
 
-import jsonschema
-import requests
 from flask import (
     Blueprint,
     Response,
@@ -18,6 +16,8 @@ from flask import (
 from flask_babel import gettext as _
 from flask_swagger import swagger
 from flask_user import roles_required
+import jsonschema
+import requests
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event

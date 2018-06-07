@@ -1,6 +1,7 @@
 """Test module for audit functionality"""
 from dateutil import parser
 from flask_webtest import SessionScope
+
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization

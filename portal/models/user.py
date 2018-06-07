@@ -1,16 +1,16 @@
 """User model """
-import time
+from StringIO import StringIO
 from cgi import escape
 from datetime import datetime
-from StringIO import StringIO
+import time
 
-import regex
 from dateutil import parser
 from flask import abort, current_app
 from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
+import regex
 from sqlalchemy import UniqueConstraint, and_, or_, text
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
