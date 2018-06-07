@@ -2,11 +2,18 @@
 {% block title %}{{super()}} Home{% endblock %}
 {% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
+    {% if config.MAINTENANCE_MESSAGE -%}
+      <div class="sys-maintenance">
+          <h4 class="title">{{_("Please note")}}</h4>
+          <h4 class="message">{{config.MAINTENANCE_MESSAGE | safe}}</h4>
+      </div>
+    {%- endif %}
     <main class="main" data-section="home">
       {% if init_login_modal %}<input type="hidden" id="initLoginModal" value="true" />{% endif %}
       {{ super() }}
       <div class="home-intro">
-        <div class="intro"><img class="intro__img intro__img--desktop" src="{{url_for('.static', filename='img/Home-Truck-Top-001.jpg') }}" alt="{{_('Truenth Home')}}"><img class="intro__img intro__img--mobile" src="{{url_for('.static', filename='img/Home-Truck-Top-Mobile.jpg') }}" alt="{{_('Truenth Home')}}">
+        <div class="intro">
+          <img class="intro__img intro__img--desktop" src="{{url_for('.static', filename='img/Home-Truck-Top-001.jpg') }}" alt="{{_('Truenth Home')}}"><img class="intro__img intro__img--mobile" src="{{url_for('.static', filename='img/Home-Truck-Top-Mobile.jpg') }}" alt="{{_('Truenth Home')}}">
           <div class="intro__content">
             <p class="intro__sub">{{_("TrueNTH is a collective approach to improving your quality of life throughout your prostate cancer journey.")}}</p><a class="intro__down js-scroll-down" data-target=".home-intro .intro">
               <figure></figure></a>
