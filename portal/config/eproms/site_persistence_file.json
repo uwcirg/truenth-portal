@@ -23,7 +23,6 @@
         "LOCALIZED_AFFILIATE_ORG = 'TrueNTH Global Registry'\n",
         "ORGS_W_CUSTOM_INVITES = ['TrueNTH Global Registry', 'IRONMAN']\n",
         "SHOW_WELCOME = False\n",
-        "MAINTENANCE_MESSAGE = 'Due to scheduled maintenance, this website will be unavailable during the following time:<br/>&nbsp;US: Saturday June 9, 13:00 - 21:00 Eastern.<br/>&nbsp;Australia: Sunday 10th June, 03:00 - 11:00 AEST.<br/>Thank you for your patience.'\n",
         "HIDE_TRUENTH_ID_FIELD = True\n",
         "TRUENTH_LINK_URL = False\n",
         "MOVEMER_LINK_URL = 'https://movember.com/'\n",

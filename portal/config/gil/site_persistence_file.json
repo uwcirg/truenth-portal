@@ -12,7 +12,6 @@
         "GIL = True\n",
         "ORGS_W_CUSTOM_INVITES = ['MUSIC']\n",
         "SHOW_WELCOME = True\n",
-        "MAINTENANCE_MESSAGE = 'Due to scheduled maintenance, this website will be unavailable on Saturday June 9, 1PM to 9PM Eastern. Thank you for your patience.'\n",
         "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'consent', 'clinical_questions', 'intervention_reports', 'procedures', 'gender', 'interventions']\n",
         "USER_FORGOT_PASSWORD_EMAIL_TEMPLATE = 'flask_user/emails/truenth_forgot_password'\n",
         "CONSENT_EDIT_PERMISSIBLE_ROLES=['patient', 'admin']\n",
