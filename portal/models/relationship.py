@@ -21,6 +21,7 @@ class Relationship(db.Model):
         """Print friendly format for logging, etc."""
         return "Relationship {0.name}".format(self)
 
+
 #Source definition for relationships, as dictionary {name: description,}
 STATIC_RELATIONSHIPS = {
     'partner':
@@ -35,6 +36,7 @@ STATIC_RELATIONSHIPS = {
 def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
+
 
 RELATIONSHIP = enum(**{r.upper(): r for r in STATIC_RELATIONSHIPS})
 

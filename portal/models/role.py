@@ -87,7 +87,8 @@ def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
 
-ROLE = enum(**{r.upper():r for r in STATIC_ROLES})
+
+ROLE = enum(**{r.upper(): r for r in STATIC_ROLES})
 ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
 
 
