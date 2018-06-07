@@ -1,5 +1,7 @@
-from urllib import urlencode
-from urlparse import parse_qsl, urlparse
+from future import standard_library
+standard_library.install_aliases()
+
+from urllib.parse import parse_qsl, urlencode, urlparse
 
 from flask import (
     Blueprint,

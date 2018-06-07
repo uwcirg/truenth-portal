@@ -1,9 +1,12 @@
+from future import standard_library
+standard_library.install_aliases()
+
 import base64
 import hashlib
 import hmac
 import json
 import time
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flask import abort, current_app
 

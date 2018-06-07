@@ -1,5 +1,8 @@
 """Persistence details for Model Classes"""
-from StringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+
+from io import StringIO
 import json
 import os
 

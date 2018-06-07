@@ -1,5 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+
 from datetime import datetime
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flask import (
     Blueprint,
