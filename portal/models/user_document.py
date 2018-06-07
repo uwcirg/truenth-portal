@@ -85,7 +85,11 @@ class UserDocument(db.Model):
 
 
     def get_file_contents(self):
-        filepath = os.path.join(current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"), self.uuid)
+        filepath = os.path.join(
+            current_app.root_path,
+            current_app.config.get("FILE_UPLOAD_DIR"),
+            self.uuid,
+        )
         if not os.path.exists(filepath):
             raise ValueError("could not find file")
         try:
