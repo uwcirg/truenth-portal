@@ -427,18 +427,27 @@ Ensure that C++ is installed -- if not, download from:
 https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
 Ensure that setuptools are up-to-date by running:
+
+.. code:: bash
+
     $ python -m pip install --upgrade pip setuptools
 
 Ensure that ez_setup is installed by running:
+
+.. code:: bash
+
     $ pip install ez_setup
 
 Install requirements by running:
+
+.. code:: bash
+
     $ pip install -r requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
 
-In $PATH\data\pg_hba.conf, change the bottom few lines to read:
+In $PATH\\data\pg_hba.conf, change the bottom few lines to read:
 
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
