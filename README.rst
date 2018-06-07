@@ -397,3 +397,67 @@ the ``docs/build/html/index.html`` file
 
     $ cd docs
     $ make html
+
+
+POSTGRESQL WINDOWS INSTALLATION GUIDE
+-------------------------------------
+
+Download
+~~~~~~~~
+
+Download PostgreSQL via:
+https://www.postgresql.org/download/windows/
+
+Creating the Database and User
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create the postgresql database, in pgAdmin click "databases" and "create"
+and enter the desired characteristics of the database, including the owner.
+To create the user, similarly in pgAdmin, click "login roles" and "create"
+and enter the desired characteristics of the user. Ensure that it has 
+permisssion to login.
+
+Configuration
+~~~~~~~~~~~~~
+
+Installing requirements
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Ensure that C++ is installed -- if not, download from:
+https://www.microsoft.com/en-us/download/details.aspx?id=44266
+
+Ensure that setuptools are up-to-date by running:
+    $ python -m pip install --upgrade pip setuptools
+
+Ensure that ez_setup is installed by running:
+    $ pip install ez_setup
+
+Install requirements by running:
+    $ pip install -r requirements.txt
+
+Configuration files
+^^^^^^^^^^^^^^^^^^^
+
+In $PATH\data\pg_hba.conf, change the bottom few lines to read:
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust
+
+Copy the default configuration file to the named configuration file
+    $ copy $PROJECT_HOME/instance/application.cfg.default $PROJECT_HOME/instance/application.cfg
+
+In application.cfg, (below), fill in the values on line 9 for user, password, localhost, portnum, and dbname
+user, password, and dbname were setup earlier in pgAdmin
+portnum can also be found in pgAdmin
+localhost should be 127.0.0.1
+SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'
+
+Testing
+~~~~~~~
+
+To test that the database is set up correctly, from a virtual environment run:
+    $ python ./bin/testconnection.py
