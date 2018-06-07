@@ -458,6 +458,8 @@ def qnr_document_id(
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
+    csv_null_value = r"\N"
+
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
         def __init__(self):
@@ -622,7 +624,7 @@ def generate_qnr_csv(qnr_bundle):
                 row = []
                 for column_name in columns:
                     column = row_data.get(column_name)
-                    column = "\N" if column is None else column
+                    column = csv_null_value if column is None else column
 
                     # Handle JSON column escaping/enclosing
                     if not isinstance(column, basestring):
