@@ -177,7 +177,6 @@
                     }, 50);
                 }).on("hidden.bs.modal", function() {
                     self.clearNew();
-                    //$("#psaDate").datepicker("update", "");
                 });
             },
             getCurrentUserId: function() {
@@ -476,8 +475,6 @@
                 var endY = Math.max(10, d3.max(data, function(d) { return d.result; }));
 
                 if(data.length === 1) {
-                    //var firstDate = new Date(data[0].graph_date);
-                    //xDomain = [data[0].graph_date, new Date(firstDate.setDate(firstDate.getDate() + 365))];
                     xDomain = [data[0].graph_date, maxDate];
                 }
 
@@ -630,7 +627,7 @@
                             .style("fill", "#777")
                             .classed("focused", true);
                         d3.select("#psaTrackerResultsTable tr[data-id='" + d.id + "']").classed("selected", true);
-                        tooltipContainer.transition().duration(200).style("opacity", .9);
+                        tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
                         tooltipContainer.html(d.result + "<br/>" + d.date)
                             .style("width", (String(d.date).length*8 + 10) + "px")
                             .style("height", 35 + "px")
