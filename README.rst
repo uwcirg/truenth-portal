@@ -452,8 +452,11 @@ In $PATH\\data\pg_hba.conf, change the bottom few lines to read:
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # IPv4 local connections:
+
 host    all             all             127.0.0.1/32            trust
+
 # IPv6 local connections:
+
 host    all             all             ::1/128                 trust
 
 Copy the default configuration file to the named configuration file
