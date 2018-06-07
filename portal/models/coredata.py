@@ -8,12 +8,11 @@ Interventions will sometimes require their own set of data, for which the
 `/api/coredata/*` endpoints exist.
 
 """
-from future.utils import with_metaclass
-import sys
 from abc import ABCMeta, abstractmethod
 import sys
 
 from flask import current_app
+from future.utils import with_metaclass
 
 from .audit import Audit
 from .fhir import CC

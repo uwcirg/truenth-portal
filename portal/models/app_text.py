@@ -7,9 +7,6 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
-from future.utils import with_metaclass
-
-import timeit
 from abc import ABCMeta, abstractmethod
 from string import Formatter
 import timeit
@@ -18,6 +15,7 @@ from urlparse import parse_qsl, urlparse
 
 from flask import current_app
 from flask_babel import gettext
+from future.utils import with_metaclass
 import requests
 from requests.exceptions import ConnectionError, MissingSchema
 

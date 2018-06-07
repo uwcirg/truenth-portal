@@ -1,8 +1,8 @@
 """Extension model"""
-from future.utils import with_metaclass
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from flask import abort
+from future.utils import with_metaclass
 import pytz
 
 from .coding import Coding
