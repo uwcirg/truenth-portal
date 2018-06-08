@@ -3,7 +3,7 @@ from future import standard_library
 standard_library.install_aliases()
 
 from collections import defaultdict
-from io import StringIO
+from io import BytesIO
 import os
 import re
 from subprocess import check_call
@@ -270,7 +270,7 @@ def download_zip_file(headers, project_id, uri, state):
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("zip file downloaded from smartling")
-    fp = StringIO(resp.content)
+    fp = BytesIO(resp.content)
     return ZipFile(fp, "r")
 
 
