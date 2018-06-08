@@ -144,7 +144,7 @@ gulp.task("portalLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps")) //path relative to the source file, can't use rootPath here
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PORTAL + ".css.map");
@@ -156,10 +156,13 @@ gulp.task("portalLess", function() {
  */
 gulp.task("gilLess", () => {
     gulp.src(lessPath + "/" + GIL + ".less")
-        .pipe(sourcemaps.init())
-        .pipe(postCSS())
-        .pipe(rename(GIL + ".css"))
-        .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
+        .pipe(sourcemaps.init({
+            sources: [lessPath + "/" + GIL + ".less"]
+        }))
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(GILPath + cssPath))
         .on("end", function() {
             replaceStd(GIL + ".css.map");
@@ -176,7 +179,7 @@ gulp.task("topnavLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps"))
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(TOPNAV + ".css.map");
@@ -190,7 +193,7 @@ gulp.task("psaTrackerLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps"))
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PSATRACKER + ".css.map");
