@@ -28,6 +28,8 @@
             loading: false,
             addErrorMessage: "",
             noResultMessage: this.i18next.t("No PSA results to display"),
+            saveText: this.i18next.t("Save"),
+            closeText: this.i18next.t("Close"),
             newItem: {
                 id: "",
                 result: "",
@@ -38,10 +40,22 @@
                 this.i18next.t("Date"),
                 this.i18next.t("PSA (ng/ml)")
             ],
+            intro: {
+                header: this.i18next.t("Track Your PSA"),
+                body: this.i18next.t("Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood."),
+                addText: this.i18next.t("ADD NEW PSA RESULT")
+            },
+            fields: {
+                resultLabel: this.i18next.t("PSA (ng/ml)"),
+                dateLabel: this.i18next.t("PSA Test Date"),
+                resultPlaceholder: this.i18next.t("Enter a number"),
+                datePlaceholder: this.i18next.t("d M yyyy, example: 1 Jan, 2017")
+            },
             items: [],
             history: {
+                title: this.i18next.t("PSA Result History"),
                 items: [],
-                label: this.i18next.t("History")
+                buttonLabel: this.i18next.t("History")
             },
             originals: [],
             resultRange: ["<= 4", ">= 2", ">= 3", ">= 4", ">= 5"],
@@ -73,10 +87,11 @@
             treatment: {
                 treatmentTextPrompt: this.i18next.t("Last Received Treatment:"),
                 treatmentDatePrompt: this.i18next.t("Treatment Date:"),
+                noTreatmentText: this.i18next.t("No treatment received as of today"),
                 data: []
             },
             modalLoading: false,
-            editLink: this.i18next.t("Edit"), 
+            editLink: this.i18next.t("Edit"),
             editTitle: this.i18next.t("Edit PSA Result"),
             addTitle: this.i18next.t("Add PSA Result")
         },
@@ -96,7 +111,9 @@
                 var self = this;
                 dependencies = dependencies || {};
                 for(var prop in dependencies) {
-                    self[prop] = dependencies[prop];
+                    if (dependencies.hasOwnProperty(prop)) {
+                        self[prop] = dependencies[prop];
+                    }
                 }
                 sessionStorage.removeItem(this.userIdKey);
                 this.getData(true);
@@ -105,15 +122,27 @@
                     self.initElementsEvents();
                 }, 300);
             },
+            isActedOn: function() {
+                return this.showRefresh;
+            },
+            isEdit: function() {
+                return this.newItem.edit;
+            },
             refresh: function() {
                 this.clearFilter();
                 this.getData();
+            },
+            getAddModalTitle: function() {
+                if (this.newItem.edit) {
+                    return this.editTitle;
+                }
+                return this.addTitle;
             },
             getRefreshMessage: function() {
                 return i18next.t("Click to reload the page and try again.");
             },
             validateResult: function(val) {
-                var isValid = !(isNaN(val) || parseInt(val) < 0);
+                var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > 9999);
                 if(!isValid) {
                     this.addErrorMessage = this.i18next.t("Result must be a number.");
                 } else {
@@ -171,7 +200,7 @@
                 });
                 $("#addPSAModal").on("shown.bs.modal", function() {
                     $("#psaResult").focus();
-                    $("#psaDate").datepicker("update", self.newItem.date||"");
+                    $("#psaDate").datepicker("update", self.newItem.date||new Date());
                     setTimeout(function() {
                         self.modalLoading = false; //allow time for setting value with it being visible to user
                     }, 50);
@@ -250,7 +279,7 @@
             showTreatment: function() {
                 return this.treatment.data.length > 0;
             },
-            getData: function(isInit) {
+            getData: function() {
                 var self = this;
                 this.loading = true;
                 this.tnthAjax.getClinical(this.getCurrentUserId(), false, function(data) {
@@ -258,7 +287,7 @@
                         $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         self.loading = false;
                         return false;
-                    } 
+                    }
                     if (!data.entry) {
                         $("#psaTrackerErrorMessageContainer").html(self.i18next.t("No result data found"));
                         self.loading = false;
@@ -292,16 +321,12 @@
                         self.history.items = tempResults.slice(10);
                     }
                     self.items = self.originals = results;
-                    if (!isInit) {
-                        self.filterData();
-                    }
+                    self.filterData();
                     setTimeout(function() {
                         self.drawGraph();
+                        self.loading = false;
                     }, 500);
                     $("#psaTrackerErrorMessageContainer").html("");
-                    setTimeout(function() {
-                        self.loading = false;
-                    }, 550);
                 });
             },
             showHistory: function() {
@@ -313,9 +338,8 @@
             },
             filterData: function(redraw) {
                 var results = this.originals, self = this;
-                if (this.filters.selectedFilterYearValue === "") {
-                    this.items = this.originals;
-                } else {
+                this.items = this.originals;
+                if (this.filters.selectedFilterYearValue !== "") {
                     results = $.grep(results, function(item) {
                         return parseInt(item.titleYear) === parseInt(self.filters.selectedFilterYearValue);
                     });
@@ -324,7 +348,6 @@
                 if (this.filters.selectedFilterResultRange) {
                     this.items = this.RANGE_ENUM[this.filters.selectedFilterResultRange](this.items);
                 }
-                this.showRefresh = true;
                 if (!redraw) {
                     return false;
                 }
@@ -333,16 +356,18 @@
                 }, 500);
             },
             filterDataByYearEvent: function(event) {
+                this.showRefresh = true;
                 this.filters.selectedFilterYearValue = event.target.value;
                 this.filterData(true);
             },
             filterDataByResultEvent: function(event) {
+                this.showRefresh = true;
                 this.filters.selectedFilterResultRange = event.target.value;
                 this.filterData(true);
             },
             showFilters: function() {
                 return this.originals.length > 1;
-            }, 
+            },
             postData: function() {
                 var cDate = "";
                 var self = this;
@@ -386,21 +411,12 @@
                     }
                 }
             },
-            drawGraph: function() {
-                /*
-                 * using d3 to draw graph
-                 */
+            drawGraph: function() { //using d3 library to draw graph
                 $("#psaTrackerGraph").html("");
                 var self = this;
                 var d3 = self.d3;
                 var i18next = self.i18next;
-                var WIDTH = 600,
-                    HEIGHT = 430,
-                    TOP = 50,
-                    RIGHT = 40,
-                    BOTTOM = 110,
-                    LEFT = 60,
-                    TIME_FORMAT = "%d %b %Y";
+                var WIDTH = 600, HEIGHT = 430, TOP = 50, RIGHT = 40, BOTTOM = 110, LEFT = 60, TIME_FORMAT = "%d %b %Y";
 
                 // Set the dimensions of the canvas / graph
                 var margin = { top: TOP, right: RIGHT, bottom: BOTTOM, left: LEFT },
@@ -408,14 +424,12 @@
                     height = HEIGHT - margin.top - margin.bottom;
 
                 var timeFormat = d3.time.format(TIME_FORMAT);
-                // Parse the date / time func
-                var parseDate = timeFormat.parse;
-
+                var parseDate = timeFormat.parse; // Parse the date / time func
                 var data = self.items;
 
                 data.forEach(function(d) {
                     d.graph_date = parseDate(d.date);
-                    d.result = isNaN(d.result) ? 0 : +d.result;
+                    d.result = isNaN(d.result) ? 0.1 : +d.result;
                 });
 
                 var minDate = d3.min(data, function(d) {
@@ -424,32 +438,36 @@
                 var maxDate = d3.max(data, function(d) {
                     return d.graph_date;
                 });
-
                 if (data.length === 1 || String(minDate) === String(maxDate)) {
                     var firstDate = new Date(minDate);
                     maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
                 }
-        
+
                 var treatmentDate;
                 if (self.treatment.data.length > 0) {
                     treatmentDate = parseDate(self.treatment.data[0].date);
                 }
+
                 var xDomain = d3.extent(data, function(d) { return d.graph_date; });
                 var bound = (width - margin.left - margin.right) / 10;
                 var x = d3.time.scale().range([bound, width - bound]);
-                var y = d3.scale.linear().range([height, 0]);
+                var y = d3.scale.log().range([height, 0]); //log scale
                 var DAY = 1000 * 60 * 60 * 24;
                 var DIFF = (new Date(maxDate) - new Date(minDate)) / DAY;
                 var INTERVAL = Math.ceil(DIFF / 9);
 
-                function handleTreatmentDate(minDate, maxDate) {
-                    var startMinDate, startMaxDate;
+
+                function handleTreatmentDate() {
                     if (minDate && treatmentDate.getTime() < minDate.getTime()) {
-                        startMinDate = new Date(minDate);
+                        var startMinDate = new Date(minDate);
                         treatmentDate = new Date(startMinDate.setUTCDate(startMinDate.getUTCDate() - Math.floor(INTERVAL/2)));
+                        return;
                     }
-                    if (maxDate && treatmentDate.getTime() > maxDate.getTime()) {
-                        startMaxDate = new Date(maxDate);
+                    if (!maxDate) {
+                        return;
+                    }
+                    if (treatmentDate.getTime() > maxDate.getTime()) {
+                        var startMaxDate = new Date(maxDate);
                         treatmentDate =  new Date(startMaxDate.setUTCDate(startMaxDate.getUTCDate() + Math.floor(INTERVAL/2)));
                     }
                 }
@@ -458,6 +476,7 @@
                     var startTime = new Date(t0), endTime = new Date(t1), times = [], lastInterval, dateTime;
                     startTime.setUTCDate(startTime.getUTCDate());
                     endTime.setUTCDate(endTime.getUTCDate());
+                    INTERVAL = INTERVAL || 30; //need to make sure interval has value
                     while(startTime <= endTime) {
                         dateTime = new Date(startTime);
                         startTime.setUTCDate(startTime.getUTCDate() + INTERVAL);
@@ -471,16 +490,17 @@
                     return times;
                 }
 
-                // Scale the range of the data
-                var endY = Math.max(10, d3.max(data, function(d) { return d.result; }));
+                function logTickFormat(d) {
+                    var log = Math.log(d) / Math.LN10;
+                    return Math.abs(Math.round(log) - log) < 1e-6 ? d: "";
+                }
 
-                if(data.length === 1) {
+                if (data.length === 1) {
                     xDomain = [data[0].graph_date, maxDate];
                 }
 
                 x.domain(xDomain);
-                y.domain([0, parseInt(endY + (endY / (data.length + 1)))]);
-
+                y.domain([0.1, Math.pow(10, 4)]);
                 // Define the axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -491,13 +511,13 @@
 
                 var yAxis = d3.svg.axis()
                     .scale(y)
-                    .ticks(5)
+                    .ticks(10)
                     .orient("left")
+                    .tickFormat(logTickFormat)
                     .tickSize(0, 0, 0);
 
                 // Define the line
                 var valueline = d3.svg.line()
-                    .interpolate("linear")
                     .x(function(d) { return x(d.graph_date); })
                     .y(function(d) { return y(d.result); });
 
@@ -546,24 +566,28 @@
                     .attr("class", "grid grid-x")
                     .attr("transform", "translate(0," + height + ")")
                     .call(xAxis
-                        .tickSize(-height)
+                        .tickSize(-height, 0, 0)
                         .tickFormat("")
                     );
                 // add the Y gridlines
                 graphArea.append("g")
                     .attr("class", "grid grid-y")
                     .call(yAxis
-                        .tickSize(-width)
+                        .tickSize(-width, 0, 0)
+                        .tickValues(function() {
+                            return [0,1,2,3,4].map(function(n) {
+                                return Math.pow(10, n); //draw grid in log scale
+                            });
+                        })
                         .tickFormat("")
                     );
 
                 //add div for tooltip
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
-
                 //treatment line
                 if (treatmentDate) {
-                    handleTreatmentDate(minDate, maxDate);
+                    handleTreatmentDate();
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
                         .style("stroke", "#8b6e3c80")
@@ -579,7 +603,7 @@
                         .attr("x", x(treatmentDate) + 6)
                         .attr("y", height - 6)
                         .attr("xlink:href", "#arrow");
-                   
+
                     var RECT_HEIGHT = 25, RECT_WIDTH = 70;
                     graphArea.append("rect")
                         .attr("x", x(treatmentDate) - RECT_WIDTH/2)
@@ -588,8 +612,7 @@
                         .attr("height", RECT_HEIGHT)
                         .style("stroke", "#777")
                         .style("stroke-width", "0.5")
-                        .style("fill", "#FFF")
-                        .classed("treatment-rect", true);
+                        .style("fill", "#FFF");
                     graphArea.append("text")
                         .attr("x", x(treatmentDate))
                         .attr("y", 40)
@@ -600,7 +623,7 @@
                         .style("letter-spacing", "2px")
                         .text(i18next.t("treatment"));
                 }
-               
+
                 // Add the valueline path.
                 graphArea.append("path")
                     .attr("class", "line")
@@ -612,8 +635,8 @@
                 graphArea.selectAll("circle").data(data)
                     .enter().append("circle")
                     .transition()
-                    .duration(850)
-                    .delay(function(d, i) { return i * 3; })
+                    .duration(750)
+                    .delay(function(d, i) { return i * 5; })
                     .attr("r", circleRadius)
                     .attr("class", "circle")
                     .attr("cx", function(d) { return x(d.graph_date); })
@@ -626,15 +649,15 @@
                             .style("stroke-width", "2")
                             .style("fill", "#777")
                             .classed("focused", true);
-                        d3.select("#psaTrackerResultsTable tr[data-id='" + d.id + "']").classed("selected", true);
+                        var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
                         tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
                         tooltipContainer.html(d.result + "<br/>" + d.date)
-                            .style("width", (String(d.date).length*8 + 10) + "px")
+                            .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
-                            .style("left", (d3.event.pageX - 48) + "px")     
-                            .style("top", (d3.event.pageY - 48) + "px");  
+                            .style("left", (d3.event.pageX - TOOLTIP_WIDTH/2) + "px")
+                            .style("top", (d3.event.pageY - TOOLTIP_WIDTH/2) + "px");
                     })
-                    .on("mouseout", function(d) {
+                    .on("mouseout", function() {
                         var element = d3.select(this);
                         element.transition()
                             .duration(100)
@@ -643,8 +666,7 @@
                             .style("stroke-width", "1")
                             .style("fill", "#FFF")
                             .classed("focused", false);
-                        d3.select("#psaTrackerResultsTable tr[data-id='" + d.id + "']").classed("selected", false);
-                        tooltipContainer.transition().duration(500).style("opacity", 0);   
+                        tooltipContainer.transition().duration(500).style("opacity", 0);
                     })
                     .on("click", self.onEdit);
 
@@ -661,7 +683,7 @@
                         return y(d.result);
                     })
                     .attr("text-anchor", "middle")
-                    .attr("dy", "-1em")
+                    .attr("dy", "-0.6em")
                     .attr("font-size", "11px")
                     .style("stroke-width", "2")
                     .attr("font-weight", "900")

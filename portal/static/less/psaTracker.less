@@ -7,6 +7,7 @@
 @selectedColor: #777;
 @hoverColor: #FFF;
 @tooltipColor: #374550;
+@markerColor: #8a6d3b;
 
 .filter-control {
     -webkit-appearance: none;
@@ -37,6 +38,11 @@
       width: 0;
       transform: translateY(-50%);
     }  
+}
+.marker {
+    stroke: @markerColor;
+    fill: @markerColor;
+    stroke-width: 1;
 }
 #mainPsaApp {
     margin-top: 1em;
@@ -86,6 +92,7 @@ option.select-option {
 	margin-top: 2em;
     position: relative;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 1.5em 0;
@@ -94,6 +101,11 @@ option.select-option {
     box-shadow: 2px 1px 1px 1px @psaTrackerBorderColor;
     overflow-y: auto;
     min-height: 400px;
+}
+@media (min-width: 1200px) {
+    #psaTrackerResultsContainer {
+        align-items: flex-start;
+    }
 }
 #psaTrackerDataSidebar {
     .btn {
@@ -183,8 +195,15 @@ option.select-option {
     }
     input {
 	   height: 2.2em;
-       min-width: 260px;
+       min-width: 200px;
        padding: 0.5em;
+    }
+}
+@media (min-width: 500px) {
+    #psaTrackerAddTable {
+        input {
+            min-width: 260px;
+        }
     }
 }
 #addPSAModal {
@@ -197,6 +216,7 @@ option.select-option {
         width: 520px;
         max-width: 100%;
         padding: 1em 0;
+        margin: auto;
     }
     table {
         word-wrap: break-word;
