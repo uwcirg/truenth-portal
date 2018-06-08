@@ -21,7 +21,7 @@ from .models.audit import Audit
 # initial goal was to isolate all auditable events to one log handler
 # revised to be a level less than ERROR, so auditable events aren't
 # considered errors for error mail handling (see SMTPHandler)
-AUDIT = (logging.WARN + logging.ERROR) / 2
+AUDIT = int((logging.WARN + logging.ERROR) / 2)
 
 
 def auditable_event(message, user_id, subject_id, context="other"):
