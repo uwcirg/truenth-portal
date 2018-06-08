@@ -1,6 +1,9 @@
 """Module for i18n methods and functionality"""
-from cStringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+
 from collections import defaultdict
+from io import StringIO
 import os
 import re
 from subprocess import check_call

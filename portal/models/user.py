@@ -1,7 +1,10 @@
 """User model """
-from StringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+
 from cgi import escape
 from datetime import datetime
+from io import StringIO
 import time
 
 from dateutil import parser

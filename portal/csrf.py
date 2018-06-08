@@ -1,3 +1,4 @@
+from builtins import str
 from flask import Blueprint, abort, current_app, request
 from flask_wtf.csrf import CSRFProtect
 
@@ -36,7 +37,7 @@ class CSRFProtectPortal(CSRFProtect):
         # Add to super class' exempt list
         super(CSRFProtectPortal, self).exempt(view)
 
-        if isinstance(view, basestring):
+        if isinstance(view, str):
             view_location = view
         else:
             view_location = '%s.%s' % (view.__module__, view.__name__)

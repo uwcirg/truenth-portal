@@ -1,7 +1,10 @@
-from StringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+
 from collections import defaultdict
 import csv
 from datetime import datetime
+from io import StringIO
 from time import strftime
 
 from flask import Blueprint, make_response, render_template, request
