@@ -2,15 +2,74 @@
 @psaTrackerBorderColor: #eff0f1;
 @psaTrackerTableHeaderBgColor: #496470;
 @psaTrackerStrokeColor: #777;
-@psaTrackerHoverBgColor: #eff0f1;
+@psaTrackerHoverBgColor: #b0bdc3;
 @legendTextColor: #333;
+@selectedColor: #777;
+@hoverColor: #FFF;
+@tooltipColor: #374550;
+@markerColor: #8a6d3b;
 
+.filter-control {
+    -webkit-appearance: none;
+    height: 2.3em;
+    outline: none;
+}
+.tooltip {
+    position: absolute;         
+    text-align: center;         
+    width: 60px;                    
+    height: 28px;                   
+    padding: 2px;               
+    font: 12px sans-serif;      
+    background: @tooltipColor;
+    color: #FFF;
+    border: 0px;        
+    border-radius: 4px;         
+    pointer-events: none; 
+    &:after {
+      border-top: 10px solid @tooltipColor;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      top: 100%;
+      content: " ";
+      height: 0;
+      left: 45%;
+      position: absolute;
+      width: 0;
+      transform: translateY(-50%);
+    }  
+}
+.marker {
+    stroke: @markerColor;
+    fill: @markerColor;
+    stroke-width: 1;
+}
 #mainPsaApp {
     margin-top: 1em;
 }
 #mainPsaApp section {
     margin-top: 2em;
     margin-bottom: 2em;
+}
+.focused {
+    cursor: pointer;
+}
+
+select,
+.filter-control,
+option.select-option {
+    color: #848688;
+}
+.refresh {
+    margin: 0 0.5em;
+    padding: 0.5em;
+    display: inline-block;
+    border: 1px solid;
+    border-radius: 2px;
+    &:hover {
+        cursor: pointer;
+        color: @psaTrackerHoverBgColor;
+    }
 }
 .psa-tracker-title {
 	background-color: #374550;
@@ -33,6 +92,7 @@
 	margin-top: 2em;
     position: relative;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 1.5em 0;
@@ -41,6 +101,35 @@
     box-shadow: 2px 1px 1px 1px @psaTrackerBorderColor;
     overflow-y: auto;
     min-height: 400px;
+}
+@media (min-width: 1200px) {
+    #psaTrackerResultsContainer {
+        align-items: flex-start;
+    }
+}
+#psaTrackerDataSidebar {
+    .btn {
+        font-size: 12px;
+        margin: 1em 0;
+    }
+}
+#psaTrackerTreatmentContainer {
+    position: relative;
+    transition: -webkit-transform .5s 2s ease;
+    transition: transform .5s 2s ease;
+    -webkit-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+    border: 2px solid #bf9d9d;
+    padding: 1em 0.5em;
+    margin: 1em auto;
+    max-width: 100%;
+    font-size: 14px;
+    &.inactive {
+        -webkit-transform: translateX(-150%);
+        -ms-transform: translateX(-150%);
+        transform: translateX(-150%);
+    }
 }
 
 @media (min-width: 992px) {
@@ -51,8 +140,12 @@
     #psaTrackerResultsContainer {
         overflow-y: hidden;
     }
+    #psaTrackerTreatmentContainer {
+        max-width: 90%;
+    }
 }
-#psaTrackerResultsTable {
+#psaTrackerResultsTable,
+#psaTrackerHistoryTable {
     TH, TD {
         padding: 0.5em 1em;
         border: 1px solid @psaTrackerStrokeColor;
@@ -61,8 +154,14 @@
         letter-spacing: 1px;
         padding: 0.8em;
     }
+    TR.result-row {
+        border: 1px solid;
+    }
+    TR.result-row.selected,
     TR.result-row:hover {
-        background-color: @psaTrackerHoverBgColor;
+        /*border: solid 2px @selectedColor; */
+        background: @psaTrackerHoverBgColor;
+        color: @hoverColor;
     }
     .result-cell{
         input {
@@ -74,9 +173,19 @@
             &:hover {
                 cursor:pointer;
                 text-decoration: underline;
-                color: #496470;
+                color: @hoverColor;
                 cursor: pointer;
             }
+        }
+    }
+}
+#PSAHistoryModal {
+    .modal-dialog {
+        width: 400px;
+        max-width: 100%;
+        .body-content {
+            max-height: 450px;
+            overflow-y: auto;
         }
     }
 }
@@ -86,8 +195,15 @@
     }
     input {
 	   height: 2.2em;
-       min-width: 260px;
+       min-width: 200px;
        padding: 0.5em;
+    }
+}
+@media (min-width: 500px) {
+    #psaTrackerAddTable {
+        input {
+            min-width: 260px;
+        }
     }
 }
 #addPSAModal {
@@ -100,6 +216,7 @@
         width: 520px;
         max-width: 100%;
         padding: 1em 0;
+        margin: auto;
     }
     table {
         word-wrap: break-word;
@@ -127,7 +244,7 @@
 #psaTrackerNoResultContainer {
     margin-top: 1em;
     margin-bottom: 1em;
-    background: @psaTrackerHoverBgColor;
+    background: #e8e8ea;
     min-height: 10em;
     padding: 4.25em 1em;
 }
@@ -194,8 +311,18 @@
         font-weight: 600;
     }
 }
+.info-link {
+    text-decoration: underline;
+    font-weight: bold;
+}
 @media (min-width: 992px) {
     #psaTrackerGraphContainer {
         margin-top: 1.5em;
+    }
+    #psaTrackerDataSidebar {
+        .btn {
+            font-size: 0.85em;
+            margin: 0; 
+        }
     }
 }

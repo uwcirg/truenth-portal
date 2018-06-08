@@ -33,6 +33,7 @@ const GIL = "gil";
 const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
+const PSATRACKER = "psaTracker";
 const jsMainFiles = [jsPath + "/i18next-config.js", jsPath + "/utility.js", jsPath + "/main.js"];
 
 // fetch command line arguments
@@ -182,6 +183,20 @@ gulp.task("topnavLess", function() {
         });
     return true;
 });
+
+gulp.task("psaTrackerLess", function() {
+    gulp.src(lessPath + "/" + PSATRACKER + ".less")
+        .pipe(sourcemaps.init())
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(sourcemaps.write("../maps"))
+        .pipe(gulp.dest(cssPath))
+        .on("end", function() {
+            replaceStd(PSATRACKER + ".css.map");
+        });
+    return true;
+});
 /*
  * running watch task will update css automatically in vivo
  * useful during development
@@ -197,4 +212,7 @@ gulp.task("watchGil", function() {
 });
 gulp.task("watchTopnav", function() {
     gulp.watch(lessPath + "/topnav.less", ["topnavLess"]);
+});
+gulp.task("watchPsaTracker", function() {
+    gulp.watch(lessPath + "/" + PSATRACKER + ".less", ["psaTrackerLess"]);
 });
