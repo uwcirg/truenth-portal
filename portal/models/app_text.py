@@ -14,8 +14,7 @@ import requests
 from requests.exceptions import MissingSchema, ConnectionError
 import timeit
 from string import Formatter
-from urllib import urlencode
-from urlparse import parse_qsl, urlparse
+from future.moves.urllib.parse import urlencode, parse_qsl, urlparse
 
 from ..database import db
 
@@ -400,7 +399,7 @@ class UnversionedResource(object):
         if self._asset:
             try:
                 return self._asset.format(**self.variables)
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing asset variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -465,7 +464,7 @@ class VersionedResource(object):
         if self._asset:
             try:
                 return self._asset.format(**self.variables)
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing asset variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -572,7 +571,7 @@ class MailResource(object):
                 else:
                     formatted = unicode(self._subject).format(**self.variables)
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing subject variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -593,7 +592,7 @@ class MailResource(object):
                     formatted += "\n"
                     formatted += self.footer
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -611,7 +610,7 @@ class MailResource(object):
                 else:
                     formatted = unicode(self._footer).format(**self.variables)
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing footer variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))

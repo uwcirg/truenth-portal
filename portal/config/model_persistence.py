@@ -2,7 +2,7 @@
 from flask import current_app
 import json
 import os
-from StringIO import StringIO
+from io import BytesIO
 from sqlalchemy import exc
 
 from ..database import db
@@ -88,10 +88,10 @@ class ModelPersistence(object):
         with open(self.filename, 'r') as f:
             try:
                 data = json.load(f)
-            except ValueError, e:
+            except ValueError:
                 msg = "Ill formed JSON in {}".format(self.filename)
                 self._log(msg)
-                raise ValueError(e, msg)
+                raise ValueError(msg)
         self.__verify_header__(data)
         return data
 

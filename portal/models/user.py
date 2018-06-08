@@ -10,7 +10,8 @@ from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
 from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
-from StringIO import StringIO
+#from io import BytesIO
+from past.builtins import basestring
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import regex
