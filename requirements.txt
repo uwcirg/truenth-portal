@@ -99,7 +99,7 @@ wcwidth==0.1.7
 WebOb==1.8.2
 WebTest==2.0.29
 Werkzeug==0.14.1
-WTForms==2.2
+WTForms==2.2.1
 xvfbwrapper==0.2.9
 -e .
 
