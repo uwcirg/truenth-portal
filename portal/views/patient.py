@@ -71,7 +71,7 @@ def patient_search():
 
     """
     search_params = {}
-    for k,v in request.args.items():
+    for k, v in request.args.items():
         if k == 'email':
             search_params[k] = v
         elif k == 'identifier':

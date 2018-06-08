@@ -113,5 +113,5 @@ class Telecom(object):
         telecom = {}
         for cp in self.contact_points:
             if cp:
-                telecom[(cp.system,cp.use)] = cp.value
+                telecom[(cp.system, cp.use)] = cp.value
         return telecom

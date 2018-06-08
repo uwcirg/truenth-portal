@@ -30,14 +30,14 @@ class TestTelecom(TestCase):
         self.assertEqual(tc.email, "hq@HL7.org")
 
     def test_telecom_as_fhir(self):
-        cp = ContactPoint(system='phone',use='work',value='123-4567')
-        tc = Telecom(email='hq@HL7.org',contact_points=[cp])
+        cp = ContactPoint(system='phone', use='work', value='123-4567')
+        tc = Telecom(email='hq@HL7.org', contact_points=[cp])
         data = tc.as_fhir()
         self.assertEqual(len(data), 2)
 
     def test_telecom_cp_dict(self):
-        cp = ContactPoint(system='phone',use='work',value='123-4567')
-        tc = Telecom(email='hq@HL7.org',contact_points=[cp])
+        cp = ContactPoint(system='phone', use='work', value='123-4567')
+        tc = Telecom(email='hq@HL7.org', contact_points=[cp])
         data = tc.cp_dict()
         self.assertEqual(len(data), 1)
         self.assertEqual(data.get(('phone', 'work')), '123-4567')
@@ -54,7 +54,7 @@ class TestTelecom(TestCase):
         self.assertEqual(cp.value, "867-5309")
 
     def test_contactpoint_as_fhir(self):
-        cp = ContactPoint(system='phone',use='work',value='867-5309')
+        cp = ContactPoint(system='phone', use='work', value='867-5309')
         data = cp.as_fhir()
         self.assertEqual(len(data), 3)
         self.assertEqual(data['value'], '867-5309')

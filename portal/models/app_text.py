@@ -17,6 +17,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse
 
 from flask import current_app
 from flask_babel import gettext
+from future.utils import with_metaclass
 import requests
 from requests.exceptions import ConnectionError, MissingSchema
 
@@ -121,14 +122,13 @@ class AppText(db.Model):
         return d
 
 
-class AppTextModelAdapter(object):
+class AppTextModelAdapter(with_metaclass(ABCMeta, object)):
     """Several special purpose patterns used for lookups
 
     Make access consistent and easy for model classes where appropriate
 
     Abstract base class - defining methods each model adapter needs
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def name_key(**kwargs):

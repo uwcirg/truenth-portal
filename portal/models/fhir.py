@@ -397,7 +397,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         questionnaire_response.document["encounter"] = encounter_fhir
 
         questionnaire_response.document["subject"] = {
-            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+            k: v for k, v in subject.as_fhir().items() if k in patient_fields
         }
 
         if subject.organizations:
@@ -422,11 +422,11 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
     bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(annotated_questionnaire_responses),
+        'resourceType': 'Bundle',
+        'updated': FHIR_datetime.now(),
+        'total': len(annotated_questionnaire_responses),
         'type': 'searchset',
-        'entry':annotated_questionnaire_responses,
+        'entry': annotated_questionnaire_responses,
     }
 
     return bundle
@@ -486,7 +486,7 @@ def generate_qnr_csv(qnr_bundle):
     def get_identifier(id_list, **kwargs):
         """Return first identifier object matching kwargs"""
         for identifier in id_list:
-            for k,v in kwargs.items():
+            for k, v in kwargs.items():
                 if identifier.get(k) != v:
                     break
             else:
@@ -662,7 +662,7 @@ def fetch_local_valueset(valueSet):
     response = valueset_nhhd_291036()
     data = json.loads(response.data)
     return parse_concepts(data['codeSystem']['concept'],
-                          system='{}/{}'.format(TRUENTH_VALUESET,valueSet))
+                          system='{}/{}'.format(TRUENTH_VALUESET, valueSet))
 
 
 def add_static_concepts(only_quick=False):

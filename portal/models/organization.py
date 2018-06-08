@@ -160,7 +160,7 @@ class Organization(db.Model):
         if self._phone:
             self._phone.value = val
         else:
-            self._phone = ContactPoint(system='phone',use='work',value=val)
+            self._phone = ContactPoint(system='phone', use='work', value=val)
 
     @property
     def default_locale(self):
@@ -283,8 +283,8 @@ class Organization(db.Model):
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone','work')) \
-                or telecom_cps.get(('phone',None))
+            self.phone = telecom_cps.get(('phone', 'work')) \
+                or telecom_cps.get(('phone', None))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
@@ -297,8 +297,12 @@ class Organization(db.Model):
         self.partOf_id = (
             Reference.parse(data['partOf']).id if data.get('partOf')
             else None)
-        for attr in ('use_specific_codings','race_codings',
-                    'ethnicity_codings','indigenous_codings'):
+        for attr in (
+            'use_specific_codings',
+            'race_codings',
+            'ethnicity_codings',
+            'indigenous_codings',
+        ):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
@@ -381,16 +385,16 @@ class Organization(db.Model):
         orgs = [o.as_fhir(include_empties=include_empties) for o in query]
 
         bundle = {
-            'resourceType':'Bundle',
-            'updated':FHIR_datetime.now(),
-            'total':len(orgs),
+            'resourceType': 'Bundle',
+            'updated': FHIR_datetime.now(),
+            'total': len(orgs),
             'type': 'searchset',
             'link': {
-                'rel':'self',
-                'href':url_for(
+                'rel': 'self',
+                'href': url_for(
                     'org_api.organization_search', _external=True),
             },
-            'entry':orgs,
+            'entry': orgs,
         }
         return bundle
 

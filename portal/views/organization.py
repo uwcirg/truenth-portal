@@ -71,7 +71,7 @@ def organization_search():
     filter = None
     found_ids = []
     system, value = None, None
-    for k,v in request.args.items():
+    for k, v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
                 abort(400, "state search requires two letter state code")

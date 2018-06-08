@@ -142,7 +142,7 @@ def capture_next_view_function(real_function):
             validate_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
-                    session['next'], real_function.func_name))
+                    session['next'], real_function.__name__))
         if request.args.get('suspend_initial_queries'):
             session['suspend_initial_queries'] = request.args.get(
                 'suspend_initial_queries')

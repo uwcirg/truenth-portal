@@ -207,7 +207,7 @@ class TestUser(TestCase):
 
     def test_delete_user(self):
         actor = self.add_user('actor')
-        user, actor = map(db.session.merge,(self.test_user, actor))
+        user, actor = map(db.session.merge, (self.test_user, actor))
         user_id, actor_id = user.id, actor.id
         self.promote_user(user=actor, role_name=ROLE.ADMIN)
         self.login(user_id=actor_id)
@@ -224,7 +224,7 @@ class TestUser(TestCase):
     def test_delete_lock(self):
         """changing attributes on a deleted user should raise"""
         actor = self.add_user('actor')
-        user, actor = map(db.session.merge,(self.test_user, actor))
+        user, actor = map(db.session.merge, (self.test_user, actor))
         user.delete_user(acting_user=actor)
 
         with self.assertRaises(ValueError):
@@ -495,7 +495,7 @@ class TestUser(TestCase):
         org_evens = Organization(name='odds')
         org_odds = Organization(name='odds')
         with SessionScope(db):
-            map(db.session.add,(org_evens, org_odds))
+            map(db.session.add, (org_evens, org_odds))
 
             for i in range(5):
                 user = self.add_user(username='test_user{}@foo.com'.format(i))
@@ -794,7 +794,7 @@ class TestUser(TestCase):
             db.session.add(uc_y)
             db.session.add(uc_z)
             db.session.commit()
-        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge, (
             patient_w, patient_x, patient_y, patient_z))
 
         ###
@@ -836,7 +836,7 @@ class TestUser(TestCase):
 
         with SessionScope(db):
             db.session.commit()
-        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge, (
             patient_w, patient_x, patient_y, patient_z))
 
         # top level staff can view all, edit none
@@ -910,7 +910,7 @@ class TestUser(TestCase):
         self.promote_user(staff_z, ROLE.STAFF)
         staff_z.organizations.append(org_10031)
 
-        staff_x, staff_y, staff_z = map(db.session.merge,(
+        staff_x, staff_y, staff_z = map(db.session.merge, (
             staff_x, staff_y, staff_z))
 
         ###
@@ -1052,9 +1052,11 @@ class TestUser(TestCase):
                                  birthdate=user.birthdate)
         self.assertEqual(score, 100)  # should be perfect match
 
-        score = user.fuzzy_match(first_name=user.first_name,
-                                 last_name=user.last_name,
-                                 birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
+        score = user.fuzzy_match(
+            first_name=user.first_name,
+            last_name=user.last_name,
+            birthdate=datetime.strptime("01-31-1951", '%m-%d-%Y'),
+        )
         self.assertEqual(score, 0)  # incorrect birthdate returns 0
 
         score = user.fuzzy_match(first_name=user.first_name,

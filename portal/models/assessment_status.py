@@ -283,7 +283,7 @@ class AssessmentStatus(object):
     def instruments_completed(self, classfication=None):
         """Return list of completed questionnaires"""
         results = [
-            name for name,data in
+            name for name, data in
             self._status_by_classification(classfication).items()
             if 'completed' in data]
         return results

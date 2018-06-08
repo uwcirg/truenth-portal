@@ -53,16 +53,22 @@ def upsert_to_template_file():
     db_translatables = get_db_strings()
     if db_translatables:
         try:
-            with open(os.path.join(current_app.root_path, "translations/messages.pot"),"r+") as potfile:
+            with open(
+                os.path.join(
+                    current_app.root_path,
+                    "translations/messages.pot",
+                ),
+                "r+",
+            ) as potfile:
                 potlines = potfile.readlines()
                 for i, line in enumerate(potlines):
                     if line.split() and (line.split()[0] == "msgid"):
-                        msgid = line.split(" ",1)[1].strip()
+                        msgid = line.split(" ", 1)[1].strip()
                         if msgid in db_translatables:
                             for location in db_translatables[msgid]:
                                 locstring = "# " + location + "\n"
                                 if not any(t == locstring for t in potlines[i-4:i]):
-                                    potlines.insert(i,locstring)
+                                    potlines.insert(i, locstring)
                             del db_translatables[msgid]
                 for entry, locations in db_translatables.items():
                     if entry:
@@ -223,7 +229,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state):
             headers=headers,
         )
         for langfile in zfp.namelist():
-            langcode = re.sub('-','_',langfile.split('/')[0])
+            langcode = re.sub('-', '_', langfile.split('/')[0])
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))

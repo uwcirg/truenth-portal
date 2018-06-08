@@ -18,7 +18,7 @@ class TestI18n(TestCase):
         language_name = "Australian English"
 
         test_user = User.query.get(TEST_USER_ID)
-        test_user.locale = (language,language_name)
+        test_user.locale = (language, language_name)
 
         login_user(test_user)
         self.assertEqual(get_locale(), language)
