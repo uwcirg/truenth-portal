@@ -24,7 +24,7 @@ docutils==0.14
 dogpile.cache==0.6.5
 Flask==1.0.2
 Flask-Babel==0.11.2
-git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=Flask-Dogpile-Cache-0.3.2
+-e git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache-0.3.2
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
 Flask-Migrate==2.1.1
