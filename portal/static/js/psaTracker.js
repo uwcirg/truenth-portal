@@ -8,10 +8,7 @@
             },
             "filter-control": {
                 props: ["id", "prompt", "selectedvalue", "items"],
-                template: "<select v-bind:id='id' class='form-control filter-control' v-on:change='$emit(\"changeevent\", $event)'>\
-                        <option value='' class='select-option'>{{prompt}}</option>\
-                        <option v-bind:value='item' v-for='item in items' v-bind:selected='item == selectedvalue'>{{item}}</option>\
-                        </select>"
+                template: "<select v-bind:id='id' class='form-control filter-control' v-on:change='$emit(\"changeevent\", $event)'><option value='' class='select-option'>{{prompt}}</option><option v-bind:value='item' v-for='item in items' v-bind:selected='item == selectedvalue'>{{item}}</option></select>"
             }
         },
         errorCaptured: function(Error, Component, info) {
