@@ -1,7 +1,15 @@
 (function() {
     var psaApp = window.psaApp = new Vue({ /*global Vue*/
         el: "#mainPsaApp",
-        components: {
+        components: { //only re-usable components for now
+            "refresh-icon": {
+                props: ["title"],
+                template: "<span class='glyphicon glyphicon-refresh refresh' aria-hidden='true' v-on:click='$emit(\"refresh\")' v-bind:title='title'></span>"
+            },
+            "filter-control": {
+                props: ["id", "prompt", "selectedvalue", "items"],
+                template: "<select v-bind:id='id' class='form-control filter-control' v-on:change='$emit(\"changeevent\", $event)'><option value='' class='select-option'>{{prompt}}</option><option v-bind:value='item' v-for='item in items' v-bind:selected='item == selectedvalue'>{{item}}</option></select>"
+            }
         },
         errorCaptured: function(Error, Component, info) {
             console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
@@ -13,8 +21,10 @@
             if(errorElement) {
                 errorElement.innerHTML = "Error occurred initializing PSA Tracker Vue instance.";
             }
-            console.warn("PSA Tracker Vue instance threw an error: ", vm, this);
-            console.error("Error thrown: ", err);
+            if (window.console) {
+                console.warn("PSA Tracker Vue instance threw an error: ", vm, this);
+                console.error("Error thrown: ", err); /*console global */
+            }
         },
         created: function() {
             VueErrorHandling(); /*global VueErrorHandling */
@@ -55,7 +65,8 @@
             history: {
                 title: this.i18next.t("PSA Result History"),
                 items: [],
-                buttonLabel: this.i18next.t("History")
+                buttonLabel: this.i18next.t("History"),
+                sidenote: ""
             },
             originals: [],
             resultRange: ["<= 4", ">= 2", ">= 3", ">= 4", ">= 5"],
@@ -259,15 +270,16 @@
             getProcedure: function() {
                 var self = this;
                 this.tnthAjax.getProc(this.getCurrentUserId(), false, function(data) {
-                    if (!data || !data.entry || data.entry.length === 0) { return false; }
-                    data.entry.sort(function(a, b) {
-                        return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
-                    });
+                    if (!data) { return false; }
+                    data.entry = data.entry || [];
                     var treatmentData = $.grep(data.entry, function(item) {
                         var code = item.resource.code.coding[0].code;
                         return code !== SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE && code !== SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE;
                     });
                     if (treatmentData.length === 0) { return false; }
+                    treatmentData.sort(function(a, b) {
+                        return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
+                    });
                     self.treatment.data = [treatmentData.map(function(item) {
                         return {
                             "display": item.resource.code.coding[0].display,
@@ -318,7 +330,8 @@
                     if(results.length > 10) {
                         var tempResults = results;
                         results = results.slice(0, 10);
-                        self.history.items = tempResults.slice(10);
+                        self.history.items = tempResults.slice(10, 20);
+                        self.history.sidenote = String(i18next.t("* Ten Results since {year}")).replace("{year}", self.getHistoryMinYear());
                     }
                     self.items = self.originals = results;
                     self.filterData();
@@ -331,6 +344,18 @@
             },
             showHistory: function() {
                 $("#PSAHistoryModal").modal("show");
+            },
+            getHistoryMinYear: function() {
+                if (this.history.items.length === 0) {
+                    return false;
+                }
+                var yearArray = this.history.items.map(function(item) {
+                    return (new Date(item.date)).getFullYear();
+                });
+                yearArray.sort(function(a, b) {
+                    return a - b;
+                });
+                return yearArray[0];
             },
             clearFilter: function() {
                 this.filters.selectedFilterResultRange = "";
@@ -411,6 +436,53 @@
                     }
                 }
             },
+            __handleTreatmentDate: function(minDate, maxDate, step) { //use internally
+                if (this.treatment.data.length === 0) {
+                    return false;
+                }
+                step = Math.floor(step/2); //should throw error if no value provided
+                var treatmentDate = new Date(this.treatment.data[0].date);
+                if (treatmentDate.getTime() < minDate.getTime()) {
+                    var startMinDate = new Date(minDate);
+                    return new Date(startMinDate.setUTCDate(startMinDate.getUTCDate() - step));
+                }
+                if (treatmentDate.getTime() > maxDate.getTime()) {
+                    var startMaxDate = new Date(maxDate);
+                    return new Date(startMaxDate.setUTCDate(startMaxDate.getUTCDate() + step));
+                }
+                return treatmentDate;
+            },
+            getDayInMiliseconds: function() {
+                return 1000 * 60 * 60 * 24;
+            }, 
+            getInterval: function(minDate, maxDate, step) {
+                step = step || 10;
+                if (!maxDate || !minDate) {
+                    return step;
+                }
+                var DAY = this.getDayInMiliseconds();
+                var DIFF = (new Date(maxDate) - new Date(minDate)) / DAY;
+                return Math.ceil(DIFF / step);
+            },
+            logTickFormat: function(d) {
+                var log = Math.log(d) / Math.LN10;
+                return Math.abs(Math.round(log) - log) < 1e-6 ? d: "";
+            },
+            dateTicks: function(t0, t1) {
+                var startTime = new Date(t0), endTime = new Date(t1), times = [], dateTime;
+                var INTERVAL = this.getInterval(t0, t1, 10) || 30;
+                startTime.setUTCDate(startTime.getUTCDate());
+                endTime.setUTCDate(endTime.getUTCDate());
+                while(startTime <= endTime) {
+                    dateTime = new Date(startTime);
+                    startTime.setUTCDate(startTime.getUTCDate() + INTERVAL);
+                    times.push(dateTime);
+                    if (startTime > endTime) {
+                        times.push(new Date(endTime));
+                    }
+                }
+                return times;
+            },
             drawGraph: function() { //using d3 library to draw graph
                 $("#psaTrackerGraph").html("");
                 var self = this;
@@ -438,65 +510,17 @@
                 var maxDate = d3.max(data, function(d) {
                     return d.graph_date;
                 });
-                if (data.length === 1 || String(minDate) === String(maxDate)) {
-                    var firstDate = new Date(minDate);
-                    maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
-                }
-
-                var treatmentDate;
-                if (self.treatment.data.length > 0) {
-                    treatmentDate = parseDate(self.treatment.data[0].date);
-                }
-
+            
                 var xDomain = d3.extent(data, function(d) { return d.graph_date; });
                 var bound = (width - margin.left - margin.right) / 10;
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
-                var DAY = 1000 * 60 * 60 * 24;
-                var DIFF = (new Date(maxDate) - new Date(minDate)) / DAY;
-                var INTERVAL = Math.ceil(DIFF / 9);
+                var INTERVAL = self.getInterval(minDate, maxDate, 10);
 
-
-                function handleTreatmentDate() {
-                    if (minDate && treatmentDate.getTime() < minDate.getTime()) {
-                        var startMinDate = new Date(minDate);
-                        treatmentDate = new Date(startMinDate.setUTCDate(startMinDate.getUTCDate() - Math.floor(INTERVAL/2)));
-                        return;
-                    }
-                    if (!maxDate) {
-                        return;
-                    }
-                    if (treatmentDate.getTime() > maxDate.getTime()) {
-                        var startMaxDate = new Date(maxDate);
-                        treatmentDate =  new Date(startMaxDate.setUTCDate(startMaxDate.getUTCDate() + Math.floor(INTERVAL/2)));
-                    }
-                }
-
-                function customTickFunc(t0, t1) {
-                    var startTime = new Date(t0), endTime = new Date(t1), times = [], lastInterval, dateTime;
-                    startTime.setUTCDate(startTime.getUTCDate());
-                    endTime.setUTCDate(endTime.getUTCDate());
-                    INTERVAL = INTERVAL || 30; //need to make sure interval has value
-                    while(startTime <= endTime) {
-                        dateTime = new Date(startTime);
-                        startTime.setUTCDate(startTime.getUTCDate() + INTERVAL);
-                        lastInterval = (new Date(startTime) - new Date(endTime)) / DAY;
-                        times.push(dateTime);
-                    }
-                    if (startTime > endTime && (Math.ceil(lastInterval) < INTERVAL / 2)) {
-                        times.push(new Date(startTime));
-                        maxDate = new Date(startTime);
-                    }
-                    return times;
-                }
-
-                function logTickFormat(d) {
-                    var log = Math.log(d) / Math.LN10;
-                    return Math.abs(Math.round(log) - log) < 1e-6 ? d: "";
-                }
-
-                if (data.length === 1) {
-                    xDomain = [data[0].graph_date, maxDate];
+                if (data.length === 1 || String(minDate) === String(maxDate)) {
+                    var firstDate = new Date(minDate);
+                    maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
+                    xDomain = [minDate, maxDate];
                 }
 
                 x.domain(xDomain);
@@ -505,7 +529,7 @@
                 var xAxis = d3.svg.axis()
                     .scale(x)
                     .orient("bottom")
-                    .ticks(customTickFunc)
+                    .ticks(self.dateTicks)
                     .tickSize(0, 0, 0)
                     .tickFormat(timeFormat);
 
@@ -513,7 +537,7 @@
                     .scale(y)
                     .ticks(10)
                     .orient("left")
-                    .tickFormat(logTickFormat)
+                    .tickFormat(self.logTickFormat)
                     .tickSize(0, 0, 0);
 
                 // Define the line
@@ -586,8 +610,8 @@
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
                 //treatment line
+                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, INTERVAL);
                 if (treatmentDate) {
-                    handleTreatmentDate();
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
                         .style("stroke", "#8b6e3c80")

@@ -17,7 +17,9 @@
         {% raw -%}
             <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">
                 {{noResultMessage}}
-                <span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" v-if="isActedOn()" v-on:click="refresh" v-bind:title="getRefreshMessage()"></span>
+                <span v-if="isActedOn()">
+                    <refresh-icon v-on:refresh="refresh" v-bind:title="getRefreshMessage()"></refresh-icon>
+                </span>
             </div>
             <div id="psaTrackerResultsContainer" v-if="items.length > 0">
                 <div class="psaTrackerLoader" v-bind:class="{ 'tnth-hide': !loading }"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
@@ -28,16 +30,10 @@
                         </THEAD>
                         <tr v-if="showFilters()">
                             <td>
-                                <select id="psaTrackerYearFilter" class="form-control filter-control" v-on:change="filterDataByYearEvent">
-                                    <option value="" class="select-option">{{filters.filterYearPrompt}}</option>
-                                    <option v-bind:value="item" v-for="item in yearList" v-bind:selected="item == filters.selectedFilterYearValue">{{item}}</option>
-                                </select>
+                                <filter-control v-bind:id="'psaTrackerYearFilter'" v-bind:prompt="filters.filterYearPrompt" v-bind:items="yearList" v-bind:selectedvalue="filters.selectedFilterYearValue" v-on:changeevent="filterDataByYearEvent"></filter-control>
                             </td>
                             <td>
-                                <select id="psaTrackerResultFilter" class="form-control filter-control" v-on:change="filterDataByResultEvent">
-                                    <option value="" class="select-option">{{filters.filterResultPrompt}}</option>
-                                    <option v-bind:value="item" v-for="item in resultRange" v-bind:selected="item == filters.selectedFilterResultRange">{{item}}</option>
-                                </select>
+                                <filter-control v-bind:id="'psaTrackerResultFilter'" v-bind:prompt="filters.filterResultPrompt" v-bind:items="resultRange" v-bind:selectedvalue="filters.selectedFilterResultRange" v-on:changeevent="filterDataByResultEvent"></filter-control>
                             </td>
                         </tr>
                         <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row">
@@ -112,6 +108,7 @@
                         <THEAD class="psa-tracker-table-header"><TH v-for="item in headers" v-html="item">{{item}}</TH></THEAD>
                         <TR v-for="item in history.items"><TD v-html="item.date"></TD><TD v-html="item.result"></TD></TR>
                     </table>
+                    <div class="text-warning sidenote" v-html="history.sidenote"></div>
                 </div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal" v-html="closeText"></button></div>
