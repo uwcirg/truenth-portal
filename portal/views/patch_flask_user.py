@@ -12,7 +12,7 @@ from flask_user.views import _endpoint_url
 def patch_make_safe_url(url):
     """Patch flask_user.make_safe_url() to include '?'
 
-    Turns an usafe absolute URL into a safe relative URL by removing
+    Turns an unsafe absolute URL into a safe relative URL by removing
     the scheme and the hostname
     Example:
         make_safe_url('http://hostname/path1/path2?q1=v1&q2=v2#fragment')
@@ -20,8 +20,9 @@ def patch_make_safe_url(url):
 
     """
     parts = urlsplit(url)
+    no_scheme, no_hostname = u'', u''
     safe_url = urlunsplit(
-        (None, None, parts.path, parts.query, parts.fragment))
+        (no_scheme, no_hostname, parts.path, parts.query, parts.fragment))
     return safe_url
 
 
