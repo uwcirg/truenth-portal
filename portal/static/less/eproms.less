@@ -108,6 +108,53 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
+/* landing page/un-authenticated page only */
+.watermark-nowrapper {
+  position: absolute;
+  top: 8em;
+  right: 0;
+  z-index: 1000;
+  font-weight: normal;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.7em;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  padding: 1em;
+  background-color: transparent;
+  color: #FFF;
+}
+.watermark-nowrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  font-weight: normal;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.7em;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  padding: 0.1em 0;
+  background-color: transparent;
+  color: #603b00;
+  background-color: #eeab50;
+}
+@media (min-width: 641px) {
+  .watermark-nowrapper {
+    font-size: 0.7em;
+    top: 0;
+  }
+}
+@media (min-width: 992px) {
+  .watermark-nowrapper {
+    padding: 0;
+    width: 100%;
+    font-size: 0.85em;
+  }
+}
 .sys-maintenance {
   margin: 1em auto;
   padding: 2px 8px 14px;
@@ -2060,7 +2107,7 @@ div.footer-wrapper.right-panel {
 }
 
 #createUserLink {
-  max-width: 100%;
+  max-width: 350px;
   height: 3em;
   display: inline-block;
   min-width: 300px;
@@ -3283,13 +3330,11 @@ div.timezone-warning.text-warning {
   .tnth-splash {
     .headline {
       font-weight: bold;
-      font-size: @splashFontSize;
       margin-bottom: 1em;
     }
     .feature-btn-primary {
       font-weight: bold;
       padding: 0.7em 2.5em;
-      font-size: @splashFontSize;
     }
   }
   .tnth-splash-bottom-link {
