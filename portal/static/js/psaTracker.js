@@ -515,13 +515,15 @@
                 var bound = (width - margin.left - margin.right) / 10;
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
-                var INTERVAL = self.getInterval(minDate, maxDate, 10);
+                
 
                 if (data.length === 1 || String(minDate) === String(maxDate)) {
                     var firstDate = new Date(minDate);
                     maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
                     xDomain = [minDate, maxDate];
                 }
+
+                var INTERVAL = self.getInterval(minDate, maxDate, 10);
 
                 x.domain(xDomain);
                 y.domain([0.1, Math.pow(10, 4)]);
