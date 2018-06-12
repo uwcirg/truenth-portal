@@ -1,4 +1,4 @@
-from future import standard_library
+from future import standard_library # isort:skip
 standard_library.install_aliases()
 import _thread
 
