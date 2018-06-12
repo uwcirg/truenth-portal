@@ -687,7 +687,7 @@ class TestTnthAssessmentStatus(TestQuestionnaireSetup):
 
     def test_no_start_date(self):
         # W/O a biopsy (i.e. event start date), no questionnaries
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         # toggle default setup - set biopsy false for test user
         self.login()
         self.test_user = db.session.merge(self.test_user)

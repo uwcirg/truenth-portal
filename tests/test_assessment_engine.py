@@ -131,8 +131,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Upload incomplete QNR
         in_progress_response = self.client.post(
@@ -191,8 +191,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),

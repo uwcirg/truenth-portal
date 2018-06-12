@@ -164,7 +164,7 @@ def practitioner_get(id_or_code):
 
 @practitioner_api.route('/practitioner', methods=('POST',))
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_post():
     """Add a new practitioner.  Updates should use PUT
 
@@ -228,7 +228,7 @@ def practitioner_post():
 @practitioner_api.route('/practitioner/<string:id_or_code>',
                         methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_put(id_or_code):
     """Update practitioner via FHIR Resource Practitioner. New should POST
 

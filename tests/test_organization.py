@@ -298,7 +298,7 @@ class TestOrganization(TestCase):
         self.assertEqual(len(bundle['entry']), 3)
 
     def test_organization_put(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         with open(os.path.join(
             os.path.dirname(__file__),
@@ -336,7 +336,7 @@ class TestOrganization(TestCase):
 
     def test_organization_put_update(self):
         # confirm unmentioned fields persist
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         en_AU = LocaleConstants().AustralianEnglish
@@ -380,7 +380,7 @@ class TestOrganization(TestCase):
 
     def test_organization_extension_update(self):
         # confirm clearing one of several extensions works
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         en_AU = LocaleConstants().AustralianEnglish
@@ -444,7 +444,7 @@ class TestOrganization(TestCase):
 
         # the 002-burgers-card org refers to another - should fail
         # prior to adding the parent (partOf) org
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.post('/api/organization',
                            content_type='application/json',
@@ -458,7 +458,7 @@ class TestOrganization(TestCase):
                 Organization.id > 0).limit(2)]
 
         # use api to delete one and confirm the other remains
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.delete('/api/organization/{}'.format(org2_id))
         self.assert200(rv)
@@ -490,7 +490,7 @@ class TestOrganization(TestCase):
             os.path.dirname(__file__),
             'organization-example-gastro.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         before = Organization.query.count()
         rv = self.client.post('/api/organization',
@@ -553,7 +553,7 @@ class TestOrganization(TestCase):
         # test staff with several org associations produces correct list
         self.deepen_org_tree()
         # Make staff with org associations at two levels
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
 
         orgs = Organization.query.filter(Organization.id.in_((101, 102)))
         for o in orgs:
@@ -588,7 +588,7 @@ class TestOrganization(TestCase):
     def test_visible_patients_on_none(self):
         # Add none of the above to users orgs
         self.test_user.organizations.append(Organization.query.get(0))
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
 
         patients_list = OrgTree().visible_patients(self.test_user)

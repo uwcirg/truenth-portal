@@ -288,7 +288,10 @@ def access_via_token(token, next_step=None):
 
     # Valid token - confirm user id looks legit
     user = get_user_or_abort(user_id)
-    not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
+    not_allowed = {
+        ROLE.ADMIN.value,
+        ROLE.APPLICATION_DEVELOPER.value,
+        ROLE.SERVICE.value}
     has = {role.name for role in user.roles}
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
@@ -311,12 +314,12 @@ def access_via_token(token, next_step=None):
     # always available
     session['locale_code'] = user.locale_code
 
-    if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
+    if {ROLE.WRITE_ONLY.value, ROLE.ACCESS_ON_VERIFY.value}.intersection(has):
         # write only users with special role skip the challenge protocol
-        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
+        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE.value in has:
 
             # access_on_verify users are REQUIRED to verify
-            if ROLE.ACCESS_ON_VERIFY in has:
+            if ROLE.ACCESS_ON_VERIFY.value in has:
                 current_app.logger.error(
                     "ACCESS_ON_VERIFY {} has disallowed role "
                     "PROMOTE_WITHOUT_IDENTITY_CHALLENGE".format(user))
@@ -342,7 +345,7 @@ def access_via_token(token, next_step=None):
                 "verify".format(user))
             abort(400, "invalid state - can't continue")
 
-        if ROLE.ACCESS_ON_VERIFY in has:
+        if ROLE.ACCESS_ON_VERIFY.value in has:
             # Send user to verify, and then follow post login flow
             session['challenge.access_on_verify'] = True
             session['challenge.next_url'] = url_for('auth.next_after_login')
@@ -489,10 +492,10 @@ def initial_queries():
 
     org = user.first_top_organization()
     role = None
-    for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+    for r in (ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value):
         if user.has_role(r):
             # treat staff_admins as staff for this lookup
-            r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+            r = ROLE.STAFF.value if r == ROLE.STAFF_ADMIN.value else r
             role = r
     terms = get_terms(user.locale_code, org, role)
     # need this at all time now for ui
@@ -505,7 +508,7 @@ def initial_queries():
 
 
 @portal.route('/admin')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def admin():
     """user admin view function"""
@@ -611,7 +614,7 @@ def profile(user_id):
 
 
 @portal.route('/patient-invite-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_invite_email(user_id):
     """Patient Invite Email Content"""
@@ -637,7 +640,7 @@ def patient_invite_email(user_id):
 
 
 @portal.route('/patient-reminder-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
@@ -693,7 +696,7 @@ def contact_sent(message_id):
 
 
 @portal.route('/psa-tracker')
-@roles_required(ROLE.PATIENT)
+@roles_required(ROLE.PATIENT.value)
 @oauth.require_oauth()
 def psa_tracker():
     return render_template('psa_tracker.html', user=current_user())
@@ -708,7 +711,7 @@ class SettingsForm(FlaskForm):
 
 
 @portal.route('/settings', methods=['GET', 'POST'])
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def settings():
     """settings panel for admins"""
@@ -815,7 +818,7 @@ def config_settings(config_key):
 
 
 @portal.route('/research')
-@roles_required([ROLE.RESEARCHER])
+@roles_required([ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def research_dashboard():
     """Research Dashboard
@@ -827,7 +830,7 @@ def research_dashboard():
 
 
 @portal.route('/reporting')
-@roles_required([ROLE.ADMIN, ROLE.ANALYST])
+@roles_required([ROLE.ADMIN.value, ROLE.ANALYST.value])
 @oauth.require_oauth()
 def reporting_dashboard():
     """Executive Reporting Dashboard
@@ -966,7 +969,7 @@ def celery_result(task_id):
 
 
 @portal.route('/communicate')
-@roles_required([ROLE.ADMIN])
+@roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
 def communications_dashboard():
     """Communications Dashboard
@@ -983,7 +986,7 @@ def communications_dashboard():
 
 
 @portal.route('/communicate/preview/<int:comm_id>')
-@roles_required([ROLE.ADMIN])
+@roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
 def preview_communication(comm_id):
     """Communication message preview"""
@@ -997,7 +1000,7 @@ def preview_communication(comm_id):
 
 
 @portal.route("/communicate/<email_or_id>")
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def communicate(email_or_id):
     """Direct call to trigger communications to given user.

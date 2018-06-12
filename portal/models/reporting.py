@@ -45,7 +45,7 @@ def get_reporting_stats():
     interventions = Intervention.query.all()
 
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST):
+        if user.has_role(ROLE.TEST.value):
             continue
 
         for role in user.roles:
@@ -64,7 +64,8 @@ def get_reporting_stats():
                        for obs in user.observations):
                     stats['patients']['meta'] += 1
 
-        if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER):
+        if (user.has_role(ROLE.PATIENT.value) or
+                user.has_role(ROLE.PARTNER.value)):
             for interv in interventions:
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
@@ -120,7 +121,8 @@ def overdue_stats_by_org():
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST) or not user.has_role(ROLE.PATIENT):
+        if (user.has_role(ROLE.TEST.value) or not
+                user.has_role(ROLE.PATIENT.value)):
             continue
         overdue = calculate_days_overdue(user)
         if overdue > 0:
@@ -141,7 +143,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if not (user.has_role(ROLE.STAFF) and user.email_ready()[0]
+        if not (user.has_role(ROLE.STAFF.value) and user.email_ready()[0]
                 and (top_org in ot.find_top_level_org(user.organizations))):
             continue
 

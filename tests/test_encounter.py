@@ -65,13 +65,13 @@ class TestEncounter(TestCase):
 
     def test_login_as(self):
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.WRITE_ONLY)
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.WRITE_ONLY.value)
         self.test_user = db.session.merge(self.test_user)
         consented_org = self.test_user.valid_consents[0].organization_id
         staff_user = self.add_user(username='staff@example.com')
         staff_user.organizations.append(Organization.query.get(consented_org))
-        self.promote_user(user=staff_user, role_name=ROLE.STAFF)
+        self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
         self.assertTrue(staff_user.current_encounter)
@@ -87,13 +87,13 @@ class TestEncounter(TestCase):
 
     def test_login_as(self):
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
         consented_org = self.test_user.valid_consents[0].organization_id
         staff_user = self.add_user(username='staff@example.com')
         staff_user.organizations.append(Organization.query.get(consented_org))
-        self.promote_user(user=staff_user, role_name=ROLE.ADMIN)
-        self.promote_user(user=staff_user, role_name=ROLE.STAFF)
+        self.promote_user(user=staff_user, role_name=ROLE.ADMIN.value)
+        self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
         self.assertTrue(staff_user.current_encounter)

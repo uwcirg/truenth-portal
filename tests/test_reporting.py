@@ -62,11 +62,11 @@ class TestReporting(TestCase):
                                        (user1, user2, user3, org))
         userid = user1.id
 
-        self.promote_user(user=user1, role_name=ROLE.PATIENT)
-        self.promote_user(user=user2, role_name=ROLE.PATIENT)
-        self.promote_user(user=user3, role_name=ROLE.PATIENT)
-        self.promote_user(user=user2, role_name=ROLE.PARTNER)
-        self.promote_user(user=user3, role_name=ROLE.STAFF)
+        self.promote_user(user=user1, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user2, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user3, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user2, role_name=ROLE.PARTNER.value)
+        self.promote_user(user=user3, role_name=ROLE.STAFF.value)
 
         with SessionScope(db):
             for i in range(5):
@@ -108,7 +108,7 @@ class TestReporting(TestCase):
         self.assertEqual(len(stats2['encounters']['all']), 5)
 
     def test_overdue_stats(self):
-        self.promote_user(user=self.test_user, role_name=ROLE.PATIENT)
+        self.promote_user(user=self.test_user, role_name=ROLE.PATIENT.value)
 
         rp = ResearchProtocol(name='proto')
         with SessionScope(db):

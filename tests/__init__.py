@@ -151,7 +151,7 @@ class TestCase(Base):
 
     def add_client(self):
         """Prep db with a test client for test user"""
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         client_id = 'test_client'
         client = Client(client_id=client_id,
                 _redirect_uris='http://localhost',

@@ -47,7 +47,7 @@ class TestDemographics(TestCase):
 
     def test_demographics404(self):
         self.login()
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         rv = self.client.get('/api/demographics/666')
         self.assert404(rv)
 
@@ -372,7 +372,7 @@ class TestDemographics(TestCase):
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
 
         top = OrgTree().find(
@@ -432,7 +432,7 @@ class TestDemographics(TestCase):
 
     def test_deceased_undead(self):
         "Confirm we can remove time of death via deceasedBoolean: False"
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         d_audit = Audit(
             user_id=TEST_USER_ID, subject_id=TEST_USER_ID, context='user',
             comment="time of death for user {}".format(TEST_USER_ID))

@@ -124,7 +124,7 @@ class TestPractitioner(TestCase):
             ]
         }
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         resp = self.client.post('/api/practitioner', data=json.dumps(data),
@@ -195,7 +195,7 @@ class TestPractitioner(TestCase):
             ]
         }
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test update by ID

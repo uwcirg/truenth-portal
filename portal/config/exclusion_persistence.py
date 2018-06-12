@@ -18,26 +18,26 @@ def auth_providers_filter():
     """Return query restricted to application developer users"""
     return (
         AuthProviderPersistable.query.join(User).join(UserRoles).join(
-            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
+            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER.value))
 
 
 def client_users_filter():
     """Return query restricted to service users and those with client FKs"""
     return (
         User.query.join(Client).union(User.query.join(UserRoles).join(
-            Role).filter(Role.name == ROLE.SERVICE)))
+            Role).filter(Role.name == ROLE.SERVICE.value)))
 
 
 def relationship_filter():
     """Return query restricted to sponsor relationships (service users) """
     return UserRelationship.query.join(Relationship).filter(
-        Relationship.name == RELATIONSHIP.SPONSOR)
+        Relationship.name == RELATIONSHIP.SPONSOR.value)
 
 
 def service_token_filter():
     """Return query restricted to tokens owned by service users"""
     return Token.query.join(User).join(UserRoles).join(Role).filter(
-        Role.name == ROLE.SERVICE)
+        Role.name == ROLE.SERVICE.value)
 
 
 StagingExclusions = namedtuple(

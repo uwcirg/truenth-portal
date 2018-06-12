@@ -93,7 +93,7 @@ class TestUser(TestCase):
         # admins can test for other users
         request = '/api/unique_email?email={}&user_id={}'.format(
             urllib.quote(email), TEST_USER_ID)
-        self.promote_user(second, ROLE.ADMIN)
+        self.promote_user(second, ROLE.ADMIN.value)
         rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
@@ -209,7 +209,7 @@ class TestUser(TestCase):
         actor = self.add_user('actor')
         user, actor = map(db.session.merge, (self.test_user, actor))
         user_id, actor_id = user.id, actor.id
-        self.promote_user(user=actor, role_name=ROLE.ADMIN)
+        self.promote_user(user=actor, role_name=ROLE.ADMIN.value)
         self.login(user_id=actor_id)
         rv = self.client.delete('/api/user/{}'.format(user_id))
         self.assert200(rv)
@@ -237,7 +237,7 @@ class TestUser(TestCase):
         deleted, actor = map(db.session.merge, (deleted, actor))
         deleted_id, actor_id = deleted.id, actor.id
         deleted_email, actor_email = deleted.email, actor.email
-        self.promote_user(user=actor, role_name=ROLE.ADMIN)
+        self.promote_user(user=actor, role_name=ROLE.ADMIN.value)
         with SessionScope(db):
             db.session.commit()
         deleted = db.session.merge(deleted)
@@ -373,7 +373,7 @@ class TestUser(TestCase):
         self.assertEqual(new_user.last_name, family)
         self.assertEqual(new_user.username, None)
         self.assertEqual(len(new_user.roles), 0)
-        roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
+        roles = {"roles": [{"name": ROLE.PATIENT.value}]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
@@ -393,7 +393,7 @@ class TestUser(TestCase):
                           'agreement_url': 'http://fake.org',
                           'staff_editable': True,
                           'send_reminders': False}],
-            'roles': [{'name': ROLE.PATIENT}]}
+            'roles': [{'name': ROLE.PATIENT.value}]}
 
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
@@ -417,7 +417,7 @@ class TestUser(TestCase):
         staff.organizations.append(org)
         staff.organizations.append(org2)
         staff_id = staff.id
-        self.promote_user(user=staff, role_name=ROLE.STAFF)
+        self.promote_user(user=staff, role_name=ROLE.STAFF.value)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -425,7 +425,7 @@ class TestUser(TestCase):
                         'agreement_url': 'http://fake.org',
                         'staff_editable': True,
                         'send_reminders': False}],
-            'roles': [{'name': ROLE.PATIENT}],
+            'roles': [{'name': ROLE.PATIENT.value}],
             }
         self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
@@ -455,7 +455,7 @@ class TestUser(TestCase):
         self.assertEqual(new_user.last_name, family)
         self.assertEqual(new_user.username, None)
         self.assertEqual(len(new_user.roles), 1)
-        roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
+        roles = {"roles": [{"name": ROLE.PATIENT.value}]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
@@ -474,7 +474,7 @@ class TestUser(TestCase):
         staff.organizations.append(org)
         staff.organizations.append(org2)
         staff_id = staff.id
-        self.promote_user(user=staff, role_name=ROLE.STAFF)
+        self.promote_user(user=staff, role_name=ROLE.STAFF.value)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -482,7 +482,7 @@ class TestUser(TestCase):
                         'agreement_url': 'http://fake.org',
                         'staff_editable': True,
                         'send_reminders': False}],
-            'roles': [{'name': ROLE.PARTNER}],
+            'roles': [{'name': ROLE.PARTNER.value}],
             }
         self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
@@ -517,16 +517,16 @@ class TestUser(TestCase):
             all([int(pattern.match(o.username).groups()[0]) % 2 for o in odds]))
 
     def test_default_role(self):
-        self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
         rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
         self.assertEqual(len(result_roles['roles']), 2)
         received = [r['name'] for r in result_roles['roles']]
-        self.assertTrue(ROLE.PATIENT in received)
-        self.assertTrue(ROLE.STAFF in received)
+        self.assertTrue(ROLE.PATIENT.value in received)
+        self.assertTrue(ROLE.STAFF.value in received)
         display_names = [r['display_name'] for r in result_roles['roles']]
         self.assertTrue('Patient' in display_names)
         self.assertTrue('Staff' in display_names)
@@ -545,12 +545,12 @@ class TestUser(TestCase):
 
     def test_roles_add(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER},
-                {"name": ROLE.PATIENT},
-                {"name": ROLE.ADMIN}
+                {"name": ROLE.APPLICATION_DEVELOPER.value},
+                {"name": ROLE.PATIENT.value},
+                {"name": ROLE.ADMIN.value}
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -568,11 +568,11 @@ class TestUser(TestCase):
 
     def test_roles_post(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER},
-                {"name": ROLE.PATIENT}
+                {"name": ROLE.APPLICATION_DEVELOPER.value},
+                {"name": ROLE.PATIENT.value}
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -586,11 +586,11 @@ class TestUser(TestCase):
 
     def test_roles_duplicate_add(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER},
+                {"name": ROLE.APPLICATION_DEVELOPER.value},
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.ADMIN.value)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -606,11 +606,11 @@ class TestUser(TestCase):
     def test_roles_duplicate_post(self):
         """POST shouldn't allow duplicates"""
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER},
+                {"name": ROLE.APPLICATION_DEVELOPER.value},
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.ADMIN.value)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         rv = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -622,12 +622,12 @@ class TestUser(TestCase):
 
     def test_roles_delete_via_put(self):
         "delete via PUT of less than all current roles"
-        self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.ADMIN.value)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         data = {"roles": [
-                {"name": ROLE.ADMIN},
-                {"name": ROLE.APPLICATION_DEVELOPER},
+                {"name": ROLE.ADMIN.value},
+                {"name": ROLE.APPLICATION_DEVELOPER.value},
                 ]}
 
         self.login()
@@ -642,10 +642,10 @@ class TestUser(TestCase):
         self.assertEqual(len(user.roles), 2)
 
     def test_roles_delete(self):
-        self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
-        data = {"roles": [{"name": ROLE.PATIENT}]}
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.ADMIN.value)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
+        data = {"roles": [{"name": ROLE.PATIENT.value}]}
 
         self.login()
         rv = self.client.delete(
@@ -660,11 +660,11 @@ class TestUser(TestCase):
 
     def test_roles_nochange(self):
         data = {"roles": [
-                {"name": ROLE.PATIENT},
-                {"name": ROLE.ADMIN}
+                {"name": ROLE.PATIENT.value},
+                {"name": ROLE.ADMIN.value}
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -679,11 +679,11 @@ class TestUser(TestCase):
     def test_prevent_service_role(self):
         "Don't allow promotion of accounts to service"
         data = {"roles": [
-                {"name": ROLE.SERVICE},
-                {"name": ROLE.ADMIN}
+                {"name": ROLE.SERVICE.value},
+                {"name": ROLE.ADMIN.value}
                 ]}
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
@@ -700,9 +700,9 @@ class TestUser(TestCase):
         member_of.organizations.append(org)
         audit = Audit(comment='test data', user_id=TEST_USER_ID,
             subject_id=TEST_USER_ID)
-        self.promote_user(user, ROLE.STAFF)
-        self.promote_user(u2, ROLE.PATIENT)
-        self.promote_user(member_of, ROLE.PATIENT)
+        self.promote_user(user, ROLE.STAFF.value)
+        self.promote_user(u2, ROLE.PATIENT.value)
+        self.promote_user(member_of, ROLE.PATIENT.value)
         user, org, u2, member_of = map(
             db.session.merge, (user, org, u2, member_of))
         consent = UserConsent(
@@ -741,20 +741,20 @@ class TestUser(TestCase):
                       subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
-        self.promote_user(staff_top, ROLE.STAFF)
+        self.promote_user(staff_top, ROLE.STAFF.value)
         staff_top.organizations.append(org_102)
 
         staff_leaf = self.add_user('Staff 10031')
-        self.promote_user(staff_leaf, ROLE.STAFF)
+        self.promote_user(staff_leaf, ROLE.STAFF.value)
         staff_leaf.organizations.append(org_10031)
 
         staff_mid = self.add_user('Staff 1002')
-        self.promote_user(staff_mid, ROLE.STAFF)
+        self.promote_user(staff_mid, ROLE.STAFF.value)
         staff_mid.organizations.append(org_1002)
 
         patient_w = self.add_user('patient w')
         patient_w_id = patient_w.id
-        self.promote_user(patient_w, ROLE.PATIENT)
+        self.promote_user(patient_w, ROLE.PATIENT.value)
         patient_w.organizations.append(org_10032)
         uc_w = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -763,7 +763,7 @@ class TestUser(TestCase):
 
         patient_x = self.add_user('patient x')
         patient_x_id = patient_x.id
-        self.promote_user(patient_x, ROLE.PATIENT)
+        self.promote_user(patient_x, ROLE.PATIENT.value)
         patient_x.organizations.append(org_10032)
         uc_x = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -772,7 +772,7 @@ class TestUser(TestCase):
 
         patient_y = self.add_user('patient y')
         patient_y_id = patient_y.id
-        self.promote_user(patient_y, ROLE.PATIENT)
+        self.promote_user(patient_y, ROLE.PATIENT.value)
         patient_y.organizations.append(org_102)
         uc_y = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -781,7 +781,7 @@ class TestUser(TestCase):
 
         patient_z = self.add_user('patient z')
         patient_z_id = patient_z.id
-        self.promote_user(patient_z, ROLE.PATIENT)
+        self.promote_user(patient_z, ROLE.PATIENT.value)
         patient_z.organizations.append(org_10031)
         uc_z = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -879,35 +879,35 @@ class TestUser(TestCase):
         org_10032 = Organization.query.get(10032)
 
         staff_admin_top = self.add_user('staff_admin 102')
-        self.promote_user(staff_admin_top, ROLE.STAFF_ADMIN)
+        self.promote_user(staff_admin_top, ROLE.STAFF_ADMIN.value)
         staff_admin_top.organizations.append(org_102)
 
         staff_admin_leaf = self.add_user('staff_admin 10031')
-        self.promote_user(staff_admin_leaf, ROLE.STAFF_ADMIN)
+        self.promote_user(staff_admin_leaf, ROLE.STAFF_ADMIN.value)
         staff_admin_leaf.organizations.append(org_10031)
 
         staff_admin_mid = self.add_user('staff_admin 1002')
-        self.promote_user(staff_admin_mid, ROLE.STAFF_ADMIN)
+        self.promote_user(staff_admin_mid, ROLE.STAFF_ADMIN.value)
         staff_admin_mid.organizations.append(org_1002)
 
         staff_w = self.add_user('staff w')
         staff_w_id = staff_w.id
-        self.promote_user(staff_w, ROLE.STAFF)
+        self.promote_user(staff_w, ROLE.STAFF.value)
         staff_w.organizations.append(org_10032)
 
         staff_x = self.add_user('staff x')
         staff_x_id = staff_x.id
-        self.promote_user(staff_x, ROLE.STAFF)
+        self.promote_user(staff_x, ROLE.STAFF.value)
         staff_x.organizations.append(org_10032)
 
         staff_y = self.add_user('staff y')
         staff_y_id = staff_y.id
-        self.promote_user(staff_y, ROLE.STAFF)
+        self.promote_user(staff_y, ROLE.STAFF.value)
         staff_y.organizations.append(org_102)
 
         staff_z = self.add_user('staff z')
         staff_z_id = staff_z.id
-        self.promote_user(staff_z, ROLE.STAFF)
+        self.promote_user(staff_z, ROLE.STAFF.value)
         staff_z.organizations.append(org_10031)
 
         staff_x, staff_y, staff_z = map(db.session.merge, (
@@ -988,7 +988,7 @@ class TestUser(TestCase):
 
         ur = UserRelationship.query.filter_by(
             other_user_id=other_user.id).first()
-        self.assertEqual(ur.relationship.name, RELATIONSHIP.PARTNER)
+        self.assertEqual(ur.relationship.name, RELATIONSHIP.PARTNER.value)
 
     def test_put_relationships(self):
         """PUT defines the whole list for a user - deletes unnamed existing"""
@@ -1040,7 +1040,7 @@ class TestUser(TestCase):
         # but the one PUT should remain
         ur = UserRelationship.query.filter_by(
             other_user_id=TEST_USER_ID).first()
-        self.assertEqual(ur.relationship.name, RELATIONSHIP.SPONSOR)
+        self.assertEqual(ur.relationship.name, RELATIONSHIP.SPONSOR.value)
 
     def test_fuzzy_match(self):
         self.test_user.birthdate = "01-31-1950"
@@ -1101,7 +1101,7 @@ class TestUser(TestCase):
         with SessionScope(db):
             self.test_user.password = None  # mock pre-registered user
             self.test_user.birthdate = '02-05-1968'
-            self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY)
+            self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY.value)
             other = self.add_user('other@foo.com', first_name='newFirst',
                                   last_name='Better')
             other.password = 'phoney'
@@ -1128,7 +1128,7 @@ class TestUser(TestCase):
                             {o.name for o in orgs})
 
     def test_password_reset(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         rv = self.client.post('/api/user/{}/password_reset'.format(TEST_USER_ID),
@@ -1196,7 +1196,7 @@ class TestUser(TestCase):
             db.session.add(msg2)
             db.session.commit()
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         resp = self.client.get('/api/user/{}/messages'.format(TEST_USER_ID))
 
