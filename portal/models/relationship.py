@@ -35,7 +35,8 @@ STATIC_RELATIONSHIPS = {
 }
 
 
-RELATIONSHIP = Enum('RELATIONSHIP', {r.upper(): r for r in STATIC_RELATIONSHIPS})
+RELATIONSHIP = Enum(
+    'RELATIONSHIP', {r.upper(): r for r in STATIC_RELATIONSHIPS})
 
 
 def add_static_relationships():

@@ -64,7 +64,8 @@ def get_reporting_stats():
                        for obs in user.observations):
                     stats['patients']['meta'] += 1
 
-        if user.has_role(ROLE.PATIENT.value) or user.has_role(ROLE.PARTNER.value):
+        if (user.has_role(ROLE.PATIENT.value) or
+                user.has_role(ROLE.PARTNER.value)):
             for interv in interventions:
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
@@ -120,7 +121,8 @@ def overdue_stats_by_org():
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST.value) or not user.has_role(ROLE.PATIENT.value):
+        if (user.has_role(ROLE.TEST.value) or not
+                user.has_role(ROLE.PATIENT.value)):
             continue
         overdue = calculate_days_overdue(user)
         if overdue > 0:

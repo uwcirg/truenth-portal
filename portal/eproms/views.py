@@ -104,7 +104,8 @@ def home():
             'Missing inital data still needed: {}'.format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.INTERVENTION_STAFF.value):
+    if (user.has_role(ROLE.STAFF.value) or
+            user.has_role(ROLE.INTERVENTION_STAFF.value)):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
@@ -153,7 +154,8 @@ def terms_and_conditions():
     if user:
         organization = user.first_top_organization()
         role = None
-        if any(user.has_role(r) for r in (ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)):
+        if any(user.has_role(r) for r in (
+                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)):
             role = ROLE.STAFF.value
         elif user.has_role(ROLE.PATIENT.value):
             role = ROLE.PATIENT.value

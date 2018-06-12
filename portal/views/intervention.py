@@ -234,8 +234,10 @@ def user_intervention_set(intervention_name):
         abort (404, 'no such intervention {}'.format(intervention_name))
 
     # service account being used must belong to the intervention owner
-    if not (intervention.client and intervention.client.user.has_relationship(
-        relationship_name=RELATIONSHIP.SPONSOR.value, other_user=current_user())):
+    if not (intervention.client and
+            intervention.client.user.has_relationship(
+                relationship_name=RELATIONSHIP.SPONSOR.value,
+                other_user=current_user())):
         abort(401, "Service account sponsored by intervention owner required")
 
     if not request.json or 'user_id' not in request.json:

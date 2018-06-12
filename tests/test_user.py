@@ -373,7 +373,7 @@ class TestUser(TestCase):
         self.assertEqual(new_user.last_name, family)
         self.assertEqual(new_user.username, None)
         self.assertEqual(len(new_user.roles), 0)
-        roles = {"roles": [ {"name": ROLE.PATIENT.value}, ]}
+        roles = {"roles": [{"name": ROLE.PATIENT.value}]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
@@ -455,7 +455,7 @@ class TestUser(TestCase):
         self.assertEqual(new_user.last_name, family)
         self.assertEqual(new_user.username, None)
         self.assertEqual(len(new_user.roles), 1)
-        roles = {"roles": [ {"name": ROLE.PATIENT.value}, ]}
+        roles = {"roles": [{"name": ROLE.PATIENT.value}]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))

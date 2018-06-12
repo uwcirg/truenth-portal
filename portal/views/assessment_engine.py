@@ -647,7 +647,8 @@ def assessment(patient_id, instrument_id):
 
 
 @assessment_engine_api.route('/patient/assessment')
-@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
+@roles_required(
+    [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def get_assessments():
     """

@@ -134,7 +134,8 @@ def capture_next_view_function(real_function):
         or registering new accounts, to be merged with the write_only one.
 
         """
-        if current_user() and not current_user().has_role(ROLE.WRITE_ONLY.value):
+        if (current_user() and not
+                current_user().has_role(ROLE.WRITE_ONLY.value)):
             return redirect('/home')
 
         if request.args.get('next'):

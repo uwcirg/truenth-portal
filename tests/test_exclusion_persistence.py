@@ -326,7 +326,8 @@ class TestExclusionPersistence(TestCase):
         self.assertEqual(User.query.count(), 1)
         self.assertEqual(Token.query.count(), 0)
 
-        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT.value).one().id
+        patient_role_id = Role.query.filter_by(
+            name=ROLE.PATIENT.value).one().id
         patient_in_way = User(
             id=service_id, first_name='in the', last_name='way',
             email='intheway@here.com')

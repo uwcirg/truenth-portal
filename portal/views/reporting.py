@@ -115,7 +115,8 @@ def overdue(user):
 
 
 @reporting_api.route('/admin/overdue-numbers')
-@roles_required([ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
     ot = OrgTree()
@@ -127,7 +128,8 @@ def generate_numbers():
         "Days Overdue", "Organization"))
 
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.PATIENT.value) and not user.has_role(ROLE.TEST.value):
+        if (user.has_role(ROLE.PATIENT.value) and not
+                user.has_role(ROLE.TEST.value)):
             a_s = AssessmentStatus(user, as_of_date=datetime.utcnow())
             email = (
                 user.email.encode('ascii', 'ignore') if user.email else None)

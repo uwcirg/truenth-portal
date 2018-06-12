@@ -1448,8 +1448,9 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if any(self.has_role(r) for r in (ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
-               ) and other.has_role(ROLE.PATIENT.value):
+        if (any(self.has_role(r) for r in (
+                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)) and
+                other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
@@ -1483,7 +1484,8 @@ class User(db.Model, UserMixin):
                         if orgtree.at_or_below_ids(org_id, others_orgs):
                             return True
 
-        if self.has_role(ROLE.STAFF_ADMIN.value) and other.has_role(ROLE.STAFF.value):
+        if (self.has_role(ROLE.STAFF_ADMIN.value) and
+                other.has_role(ROLE.STAFF.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
