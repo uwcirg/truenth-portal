@@ -229,7 +229,7 @@
                 });
             },
             setTopLevelOrgs: function(callback) {
-                callback = callback || {};
+                callback = callback || function(){};
                 var self = this;
                 if (this.topLevelOrgs.length > 0 || !this.currentUserId) {
                     callback();
