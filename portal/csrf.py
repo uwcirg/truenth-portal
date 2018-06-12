@@ -1,4 +1,5 @@
 from builtins import str
+
 from flask import Blueprint, abort, current_app, request
 from flask_wtf.csrf import CSRFProtect
 

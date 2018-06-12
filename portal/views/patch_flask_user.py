@@ -1,5 +1,5 @@
 """workarounds to flask_user problems"""
-from future import standard_library
+from future import standard_library # isort:skip
 standard_library.install_aliases()
 
 from urllib.parse import urlsplit, urlunsplit
