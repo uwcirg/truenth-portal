@@ -283,7 +283,6 @@
                 if (!this.currentUserId || !this.isPatient()) {
                     return false;
                 }
-                var self = this;
                 this.setTopLevelOrgs(this.handleMedidataRaveFields);
             },
             setDemoData: function(params, callback) {
