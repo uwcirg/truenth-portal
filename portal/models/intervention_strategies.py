@@ -538,6 +538,9 @@ def observation_check(display, boolean_value):
       TRUENTH_CLINICAL_CODE_SYSTEM
     :param boolean_value: ValueQuantity boolean true or false expected
 
+    NB a history of observations is maintained, with the most recent taking
+    precedence.
+
     """
     try:
         coding = Coding.query.filter_by(
@@ -545,8 +548,8 @@ def observation_check(display, boolean_value):
     except NoResultFound:
         raise ValueError("coding.display '{}' not found".format(display))
     try:
-        cc_id = CodeableConcept.query.filter(
-            CodeableConcept.codings.contains(coding)).one().id
+        cc = CodeableConcept.query.filter(
+            CodeableConcept.codings.contains(coding)).one()
     except NoResultFound:
         raise ValueError("codeable_concept'{}' not found".format(coding))
 
@@ -558,8 +561,8 @@ def observation_check(display, boolean_value):
         raise ValueError("boolean_value must be 'true' or 'false'")
 
     def user_has_matching_observation(intervention, user):
-        obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
-        if obs and obs[0].value_quantity == vq:
+        value, status = user.fetch_value_status_for_concept(codeable_concept=cc)
+        if value == vq:
             _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
