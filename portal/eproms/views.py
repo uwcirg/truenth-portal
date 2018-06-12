@@ -104,11 +104,11 @@ def home():
             'Missing inital data still needed: {}'.format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
+    if user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.INTERVENTION_STAFF.value):
         return redirect(url_for('patients.patients_root'))
-    if user.has_role(ROLE.RESEARCHER):
+    if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
-    if user.has_role(ROLE.STAFF_ADMIN):
+    if user.has_role(ROLE.STAFF_ADMIN.value):
         return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
@@ -127,7 +127,7 @@ def privacy():
     if user:
         organization = user.first_top_organization()
         role = None
-        for r in (ROLE.STAFF, ROLE.PATIENT):
+        for r in (ROLE.STAFF.value, ROLE.PATIENT.value):
             if user.has_role(r):
                 role = r
         # only include role and organization if both are defined
@@ -153,10 +153,10 @@ def terms_and_conditions():
     if user:
         organization = user.first_top_organization()
         role = None
-        if any(user.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)):
-            role = ROLE.STAFF
-        elif user.has_role(ROLE.PATIENT):
-            role = ROLE.PATIENT
+        if any(user.has_role(r) for r in (ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)):
+            role = ROLE.STAFF.value
+        elif user.has_role(ROLE.PATIENT.value):
+            role = ROLE.PATIENT.value
         if not all((role, organization)):
             role, organization = None, None
 
@@ -236,7 +236,7 @@ def contact():
 
 
 @eproms.route('/website-consent-script/<int:patient_id>', methods=['GET'])
-@roles_required(ROLE.STAFF)
+@roles_required(ROLE.STAFF.value)
 @oauth.require_oauth()
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
@@ -254,7 +254,7 @@ def website_consent_script(patient_id):
     NOTE, we are getting PATIENT's website consent terms here
     as STAFF member needs to read the terms to the patient
     """
-    terms = get_terms(user.locale_code, org, ROLE.PATIENT)
+    terms = get_terms(user.locale_code, org, ROLE.PATIENT.value)
     top_org = patient.first_top_organization()
     declaration_form = VersionedResource(
         app_text(WebsiteDeclarationForm_ATMA.name_key(organization=top_org)),
@@ -267,7 +267,7 @@ def website_consent_script(patient_id):
 
 
 @eproms.route('/resources', methods=['GET'])
-@roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def resources():
     user = current_user()
@@ -288,7 +288,7 @@ def resources():
 
 
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])
-@roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN])
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def work_instruction(tag):
     user = current_user()

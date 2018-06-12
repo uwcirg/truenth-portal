@@ -7,6 +7,8 @@ To extend the list of roles, add name: description pairs to the
 STATIC_RELATIONSHIPS dict within, and rerun the seed command above.
 
 """
+from enum import Enum
+
 from ..database import db
 
 
@@ -33,12 +35,7 @@ STATIC_RELATIONSHIPS = {
 }
 
 
-def enum(**items):
-    """Convert dictionary to Enumeration for direct access"""
-    return type('Enum', (), items)
-
-
-RELATIONSHIP = enum(**{r.upper(): r for r in STATIC_RELATIONSHIPS})
+RELATIONSHIP = Enum('RELATIONSHIP', {r.upper(): r for r in STATIC_RELATIONSHIPS})
 
 
 def add_static_relationships():

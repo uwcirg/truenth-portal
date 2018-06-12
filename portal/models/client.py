@@ -171,7 +171,7 @@ class Client(db.Model):
 
     def lookup_service_token(self):
         sponsor_relationship = [r for r in self.user.relationships if
-                                r.relationship.name == RELATIONSHIP.SPONSOR]
+                                r.relationship.name == RELATIONSHIP.SPONSOR.value]
         if sponsor_relationship:
             if len(sponsor_relationship) != 1:
                 raise ValueError(

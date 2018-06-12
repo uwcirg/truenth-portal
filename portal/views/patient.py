@@ -102,7 +102,7 @@ def patient_search():
         user = match.one()
         try:
             current_user().check_role(permission='view', other_id=user.id)
-            if user.has_role(ROLE.PATIENT):
+            if user.has_role(ROLE.PATIENT.value):
                 return demographics(patient_id=user.id)
         except Unauthorized:
             # Mask unauthorized as a not-found.  Don't want unauthed users

@@ -21,7 +21,7 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
 @patients.route('/')
-@roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patients_root():
     """patients view function, intended for staff
@@ -32,7 +32,7 @@ def patients_root():
     """
     user = current_user()
     patient_role_id = Role.query.filter(
-        Role.name == ROLE.PATIENT).with_entities(Role.id).first()
+        Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()
 
     # empty patient query list to start, unionize with other relevant lists
     patients = User.query.filter(User.id == -1)
@@ -43,7 +43,7 @@ def patients_root():
                          UserConsent.expires > now))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
 
-    if user.has_role(ROLE.STAFF):
+    if user.has_role(ROLE.STAFF.value):
         pref_org_list = None
         # check user table preference for organization filters
         pref = TablePreference.query.filter_by(table_name='patientList',
@@ -86,7 +86,7 @@ def patients_root():
                      UserOrganization.organization_id.in_(org_list)))
         patients = patients.union(org_patients)
 
-    if user.has_role(ROLE.INTERVENTION_STAFF):
+    if user.has_role(ROLE.INTERVENTION_STAFF.value):
         uis = UserIntervention.query.filter(UserIntervention.user_id == user.id)
         ui_list = [ui.intervention_id for ui in uis]
 
@@ -104,8 +104,8 @@ def patients_root():
         patients = patients.union(ui_patients)
 
     # only show test users to admins
-    if not user.has_role(ROLE.ADMIN):
-        patients = [patient for patient in patients if not patient.has_role(ROLE.TEST)]
+    if not user.has_role(ROLE.ADMIN.value):
+        patients = [patient for patient in patients if not patient.has_role(ROLE.TEST.value)]
 
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
@@ -124,7 +124,7 @@ def patients_root():
 
 
 @patients.route('/patient-profile-create')
-@roles_required(ROLE.STAFF)
+@roles_required(ROLE.STAFF.value)
 @oauth.require_oauth()
 def patient_profile_create():
     user = current_user()
@@ -150,7 +150,7 @@ def session_report(subject_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""

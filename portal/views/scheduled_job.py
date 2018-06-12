@@ -22,7 +22,7 @@ scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 
 
 @scheduled_job_api.route('/scheduled_jobs')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def jobs_list():
     """scheduled jobs view function, intended for admins
@@ -44,7 +44,7 @@ def jobs_list():
 
 
 @scheduled_job_api.route('/api/scheduled_job', methods=('POST',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def create_job():
     try:
@@ -67,7 +67,7 @@ def create_job():
 
 
 @scheduled_job_api.route('/api/scheduled_job/<int:job_id>', methods=('PUT',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def update_job(job_id):
     check_int(job_id)
@@ -91,7 +91,7 @@ def update_job(job_id):
 
 
 @scheduled_job_api.route('/api/scheduled_job/<int:job_id>')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def get_job(job_id):
     job = ScheduledJob.query.get(job_id)
@@ -102,7 +102,7 @@ def get_job(job_id):
 
 @scheduled_job_api.route(
     '/api/scheduled_job/<int:job_id>', methods=('DELETE',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def delete_job(job_id):
     job = ScheduledJob.query.get(job_id)
@@ -119,7 +119,7 @@ def delete_job(job_id):
 
 @scheduled_job_api.route(
     '/api/scheduled_job/<int:job_id>/trigger', methods=('POST',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def trigger_job(job_id):
     job = ScheduledJob.query.get(job_id)

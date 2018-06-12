@@ -20,7 +20,7 @@ staff = Blueprint('staff', __name__)
 
 
 @staff.route('/staff-registration-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def staff_registration_email(user_id):
     """Staff Registration Email Content"""
@@ -44,7 +44,7 @@ def staff_registration_email(user_id):
 
 
 @staff.route('/staff-profile-create')
-@roles_required(ROLE.STAFF_ADMIN)
+@roles_required(ROLE.STAFF_ADMIN.value)
 @oauth.require_oauth()
 def staff_profile_create():
     user = current_user()
@@ -67,7 +67,7 @@ def staff_profile_create():
 
 
 @staff.route('/staff_profile/<int:user_id>')
-@roles_required(ROLE.STAFF_ADMIN)
+@roles_required(ROLE.STAFF_ADMIN.value)
 @oauth.require_oauth()
 def staff_profile(user_id):
     """staff profile view function"""
@@ -94,7 +94,7 @@ def staff_profile(user_id):
 
 
 @staff.route('/staff')
-@roles_required(ROLE.STAFF_ADMIN)
+@roles_required(ROLE.STAFF_ADMIN.value)
 @oauth.require_oauth()
 def staff_index():
     """staff view function, intended for staff admin
@@ -107,11 +107,11 @@ def staff_index():
 
     ot = OrgTree()
     staff_role_id = Role.query.filter(
-        Role.name == ROLE.STAFF).with_entities(Role.id).first()
+        Role.name == ROLE.STAFF.value).with_entities(Role.id).first()
     admin_role_id = Role.query.filter(
-        Role.name == ROLE.ADMIN).with_entities(Role.id).first()
+        Role.name == ROLE.ADMIN.value).with_entities(Role.id).first()
     staff_admin_role_id = Role.query.filter(
-        Role.name == ROLE.STAFF_ADMIN).with_entities(Role.id).first()
+        Role.name == ROLE.STAFF_ADMIN.value).with_entities(Role.id).first()
 
     # empty patient query list to start, unionize with other relevant lists
     staff_list = User.query.filter(User.id == -1)
@@ -152,8 +152,8 @@ def staff_index():
     staff_list = staff_list.union(org_staff).all()
 
     # only show test users to admins
-    if not user.has_role(ROLE.ADMIN):
-        staff_list = [s for s in staff_list if not s.has_role(ROLE.TEST)]
+    if not user.has_role(ROLE.ADMIN.value):
+        staff_list = [s for s in staff_list if not s.has_role(ROLE.TEST.value)]
 
     return render_template(
         'admin/staff_by_org.html', staff_list=staff_list,

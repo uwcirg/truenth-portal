@@ -50,7 +50,7 @@ class TestCoredata(TestCase):
         """Partner doesn't need dx etc., set min and check pass"""
         self.config_as(TRUENTH)
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PARTNER)
+        self.promote_user(role_name=ROLE.PARTNER.value)
         self.test_user = db.session.merge(self.test_user)
         self.assertTrue(Coredata().initial_obtained(self.test_user))
 
@@ -58,7 +58,7 @@ class TestCoredata(TestCase):
         """Patient has additional requirements"""
         self.config_as(TRUENTH)
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
         # Prior to adding clinical data, should return false
         Coredata()
@@ -79,7 +79,7 @@ class TestCoredata(TestCase):
     def test_still_needed(self):
         """Query for list of missing datapoints in legible format"""
         self.config_as(TRUENTH)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
@@ -96,7 +96,7 @@ class TestCoredata(TestCase):
     def test_eproms_staff(self):
         """Eproms staff: privacy policy and website terms of use"""
         self.config_as(EPROMS)
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
@@ -108,7 +108,7 @@ class TestCoredata(TestCase):
     def test_eproms_patient(self):
         """Eproms patient: all ToU but stored form"""
         self.config_as(EPROMS)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
@@ -120,9 +120,9 @@ class TestCoredata(TestCase):
     def test_enter_manually_interview_assisted(self):
         "interview: subject_website_consent and stored_web_consent_form"
         self.config_as(EPROMS)
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         patient = self.add_user('patient')
-        self.promote_user(patient, role_name=ROLE.PATIENT)
+        self.promote_user(patient, role_name=ROLE.PATIENT.value)
         self.test_user, patient = map(
             db.session.merge, (self.test_user, patient))
 
@@ -136,9 +136,9 @@ class TestCoredata(TestCase):
     def test_enter_manually_paper(self):
         "paper: subject_website_consent"
         self.config_as(EPROMS)
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.STAFF.value)
         patient = self.add_user('patient')
-        self.promote_user(patient, role_name=ROLE.PATIENT)
+        self.promote_user(patient, role_name=ROLE.PATIENT.value)
         self.test_user, patient = map(
             db.session.merge, (self.test_user, patient))
 
@@ -161,7 +161,7 @@ class TestCoredata(TestCase):
         self.config_as(
             system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
         self.test_user.organizations.append(music_org)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         user = db.session.merge(self.test_user)
         needed = Coredata().still_needed(user)

@@ -116,7 +116,7 @@ def initiate_encounter(user, auth_method):
 
     # Service users appear to have provided password, but get their
     # own special label
-    if user.has_role(ROLE.SERVICE):
+    if user.has_role(ROLE.SERVICE.value):
         auth_method = 'service_token_authenticated'
 
     # Initiate new as directed

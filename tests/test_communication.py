@@ -125,7 +125,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # with no timezone
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         self.bless_with_basics(setdate=dt)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         user = db.session.merge(self.test_user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
@@ -168,7 +168,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=13))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
@@ -188,7 +188,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=14))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
@@ -206,7 +206,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=14))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
 
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -223,7 +223,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=22))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
 
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -242,7 +242,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=22))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
         self.test_user.email = NO_EMAIL_PREFIX
         with SessionScope(db):
@@ -260,7 +260,7 @@ class TestCommunication(TestQuestionnaireSetup):
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(backdate=relativedelta(days=14))
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.mark_localized()
         mock_qr(instrument_id='eproms_add')
         mock_qr(instrument_id='epic26')
@@ -355,7 +355,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # Prior to days passing, no message should be generated
         mock_communication_request('symptom_tracker', '{"days": 90}')
 
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         self.add_required_clinical_data(backdate=relativedelta(days=89))
         self.test_user = db.session.merge(self.test_user)
@@ -373,7 +373,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # Symptom Tracker QB with completed shouldn't fire
         mock_communication_request('symptom_tracker', '{"days": 90}')
 
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
@@ -395,7 +395,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         mock_communication_request('symptom_tracker', '{"days": 30}')
 
         self.app.config['NO_CHALLENGE_WO_DATA'] = False
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         self.add_required_clinical_data(backdate=relativedelta(days=31))
         self.test_user = db.session.merge(self.test_user)
@@ -417,7 +417,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # Symptom Tracker QB on metastatic patient shouldn't qualify
         mock_communication_request('symptom_tracker', '{"days": 90}')
 
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)
@@ -440,7 +440,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # Newer procedure should alter trigger date and suspend message
         mock_communication_request('symptom_tracker', '{"days": 90}')
 
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         self.add_required_clinical_data(backdate=relativedelta(days=91))
         self.test_user = db.session.merge(self.test_user)

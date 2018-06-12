@@ -58,7 +58,7 @@ class TestGroup(TestCase):
     def test_group_post(self):
         grp = Group(name='test', description='test group')
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.post('/api/group/',
                           content_type='application/json',
@@ -76,7 +76,7 @@ class TestGroup(TestCase):
             db.session.add(grp)
             db.session.commit()
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         improved_grp = Group(name='changed_name', description='Updated')

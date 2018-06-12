@@ -884,8 +884,8 @@ class OrgTree(object):
         from .user_consent import UserConsent
 
         if not (
-            staff_user.has_role(ROLE.STAFF) or
-            staff_user.has_role(ROLE.STAFF_ADMIN)):
+            staff_user.has_role(ROLE.STAFF.value) or
+            staff_user.has_role(ROLE.STAFF_ADMIN.value)):
             raise Unauthorized("visible_patients() exclusive to staff use")
 
         staff_user_orgs = set()
@@ -895,7 +895,7 @@ class OrgTree(object):
         if not staff_user_orgs:
             return []
 
-        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT).one().id
+        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT.value).one().id
         now = datetime.utcnow()
         query = db.session.query(User.id).join(
             UserRoles).join(UserConsent).join(UserOrganization).filter(

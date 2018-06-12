@@ -29,7 +29,7 @@ class TestScheduledJob(TestCase):
             sj.schedule = invalid_schedule
 
     def test_job_upsert(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test new job POST
@@ -62,7 +62,7 @@ class TestScheduledJob(TestCase):
         self.assertEqual(resp.json['schedule'], '0 0 0 0 0')
 
     def test_job_get(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         job = ScheduledJob(name="test_get", task="test", schedule="0 0 * * *")
@@ -80,7 +80,7 @@ class TestScheduledJob(TestCase):
         self.assert404(resp)
 
     def test_job_delete(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         job = ScheduledJob(name="test_del", task="test", schedule="0 0 * * *")
@@ -98,7 +98,7 @@ class TestScheduledJob(TestCase):
         self.assert404(resp)
 
     def test_active_check(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test standard scheduler job run of active job
@@ -134,7 +134,7 @@ class TestScheduledJob(TestCase):
         self.assertEqual(resp.split()[-1], 'Test')
 
     def test_job_trigger(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test standard task

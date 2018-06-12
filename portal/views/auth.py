@@ -134,7 +134,7 @@ def capture_next_view_function(real_function):
         or registering new accounts, to be merged with the write_only one.
 
         """
-        if current_user() and not current_user().has_role(ROLE.WRITE_ONLY):
+        if current_user() and not current_user().has_role(ROLE.WRITE_ONLY.value):
             return redirect('/home')
 
         if request.args.get('next'):
@@ -205,7 +205,7 @@ def next_after_login():
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
         assert (invited_user == current_user())
-        assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY))
+        assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
         user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
@@ -426,7 +426,7 @@ def login(provider_name):
 
 
 @auth.route('/login-as/<user_id>')
-@roles_required(ROLE.STAFF)
+@roles_required(ROLE.STAFF.value)
 @oauth.require_oauth()
 def login_as(user_id, auth_method='staff_authenticated'):
     """Provide direct login w/o auth to user account, but only if qualified
@@ -449,8 +449,8 @@ def login_as(user_id, auth_method='staff_authenticated'):
     target_user = get_user_or_abort(user_id)
 
     # Guard against abuse
-    if not (target_user.has_role(role_name=ROLE.PATIENT) or
-            target_user.has_role(role_name=ROLE.PARTNER)):
+    if not (target_user.has_role(role_name=ROLE.PATIENT.value) or
+            target_user.has_role(role_name=ROLE.PARTNER.value)):
         abort(401, 'not authorized to assume identity of requested user')
 
     auditable_event("assuming identity of user {}".format(user_id),
@@ -460,7 +460,7 @@ def login_as(user_id, auth_method='staff_authenticated'):
     logout(prevent_redirect=True, reason="forced from login_as")
     session['login_as_id'] = user_id
 
-    if target_user.has_role(role_name=ROLE.WRITE_ONLY):
+    if target_user.has_role(role_name=ROLE.WRITE_ONLY.value):
         target_user.mask_email()  # necessary in case registration is attempted
     login_user(target_user, auth_method)
     return next_after_login()

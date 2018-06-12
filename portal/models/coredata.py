@@ -221,7 +221,7 @@ class DobData(CoredataPoint):
 
     def required(self, user, **kwargs):
         # DOB is only required for patient
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -243,7 +243,7 @@ class RaceData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -261,7 +261,7 @@ class EthnicityData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -279,7 +279,7 @@ class IndigenousData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -306,7 +306,7 @@ class OrgData(CoredataPoint):
         if SR_user(user) or CP_user(user):
             return False
         if any(map(
-                user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
+                user.has_role, (ROLE.PATIENT.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value))):
             return True
         return False
 
@@ -322,7 +322,7 @@ class ClinicalData(CoredataPoint):
     def required(self, user, **kwargs):
         if SR_user(user):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
     def optional(self, user, **kwargs):
         return False
@@ -347,7 +347,7 @@ class LocalizedData(CoredataPoint):
             # on these systems, we don't ask about localized - let
             # the org check worry about that
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
     def optional(self, user, **kwargs):
         return False
@@ -417,7 +417,7 @@ class Subject_Website_ConsentData(TOU_core):
     def required(self, user, **kwargs):
         if not super(self.__class__, self).required(user, **kwargs):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
 
 class Stored_Website_Consent_FormData(TOU_core):
@@ -427,7 +427,7 @@ class Stored_Website_Consent_FormData(TOU_core):
         if (not super(self.__class__, self).required(user, **kwargs) or
                 not enter_manually_interview_assisted(user, **kwargs)):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
 
 class Privacy_PolicyData(TOU_core):
