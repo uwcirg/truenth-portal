@@ -561,7 +561,8 @@ def observation_check(display, boolean_value):
         raise ValueError("boolean_value must be 'true' or 'false'")
 
     def user_has_matching_observation(intervention, user):
-        value, status = user.fetch_value_status_for_concept(codeable_concept=cc)
+        value, status = user.fetch_value_status_for_concept(
+            codeable_concept=cc)
         if value == vq:
             _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
