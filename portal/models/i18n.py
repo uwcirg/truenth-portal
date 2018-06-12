@@ -66,38 +66,41 @@ def upsert_to_template_file():
     db_translatables.update(get_db_strings())
     db_translatables.update(get_static_strings())
 
-    if db_translatables:
-        try:
-            with open(
-                os.path.join(
-                    current_app.root_path,
-                    "translations/messages.pot",
-                ),
-                "r+",
-            ) as potfile:
-                potlines = potfile.readlines()
-                for i, line in enumerate(potlines):
-                    if line.split() and (line.split()[0] == "msgid"):
-                        msgid = line.split(" ", 1)[1].strip()
-                        if msgid in db_translatables:
-                            for location in db_translatables[msgid]:
-                                locstring = "# " + location + "\n"
-                                if not any(t == locstring for t in potlines[i-4:i]):
-                                    potlines.insert(i, locstring)
-                            del db_translatables[msgid]
-                for entry, locations in db_translatables.items():
-                    if entry:
-                        for loc in locations:
-                            potlines.append("# " + loc + "\n")
-                        potlines.append("msgid " + entry + "\n")
-                        potlines.append("msgstr \"\"\n")
-                        potlines.append("\n")
-                potfile.truncate(0)
-                potfile.seek(0)
-                potfile.writelines(potlines)
-        except:
-            exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-            sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
+    if not db_translatables:
+        current_app.logger.warn("no DB strings extracted")
+        return
+
+    try:
+        with open(
+            os.path.join(
+                current_app.root_path,
+                "translations/messages.pot",
+            ),
+            "r+",
+        ) as potfile:
+            potlines = potfile.readlines()
+            for i, line in enumerate(potlines):
+                if line.split() and (line.split()[0] == "msgid"):
+                    msgid = line.split(" ", 1)[1].strip()
+                    if msgid in db_translatables:
+                        for location in db_translatables[msgid]:
+                            locstring = "# " + location + "\n"
+                            if not any(t == locstring for t in potlines[i-4:i]):
+                                potlines.insert(i, locstring)
+                        del db_translatables[msgid]
+            for entry, locations in db_translatables.items():
+                if entry:
+                    for loc in locations:
+                        potlines.append("# " + loc + "\n")
+                    potlines.append("msgid " + entry + "\n")
+                    potlines.append("msgstr \"\"\n")
+                    potlines.append("\n")
+            potfile.truncate(0)
+            potfile.seek(0)
+            potfile.writelines(potlines)
+    except:
+        exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+        sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
 
 
 def fix_references(pot_fpath):
