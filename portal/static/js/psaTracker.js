@@ -134,7 +134,7 @@
                 }, 300);
             },
             isActedOn: function() {
-                return this.showRefresh;
+                return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
             },
             isEdit: function() {
                 return this.newItem.edit;
@@ -331,7 +331,7 @@
                         var tempResults = results;
                         results = results.slice(0, 10);
                         self.history.items = tempResults.slice(10, 20);
-                        self.history.sidenote = String(i18next.t("* Ten Results since {year}")).replace("{year}", self.getHistoryMinYear());
+                        self.history.sidenote = String(i18next.t("* Ten results since {year}")).replace("{year}", self.getHistoryMinYear());
                     }
                     self.items = self.originals = results;
                     self.filterData();
@@ -661,8 +661,8 @@
                 graphArea.selectAll("circle").data(data)
                     .enter().append("circle")
                     .transition()
-                    .duration(750)
-                    .delay(function(d, i) { return i * 5; })
+                    .duration(850)
+                    .delay(function(d, i) { return i * 7; })
                     .attr("r", circleRadius)
                     .attr("class", "circle")
                     .attr("cx", function(d) { return x(d.graph_date); })
@@ -670,7 +670,7 @@
                 graphArea.selectAll("circle")
                     .on("mouseover", function(d) {
                         var element = d3.select(this);
-                        element.transition().duration(100).attr("r", circleRadius * 2);
+                        element.transition().duration(100).attr("r", circleRadius * 2.3);
                         element.style("stroke", "#FFF")
                             .style("stroke-width", "2")
                             .style("fill", "#777")
