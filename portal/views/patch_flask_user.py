@@ -1,14 +1,18 @@
 """workarounds to flask_user problems"""
-from urlparse import urlsplit, urlunsplit
+from future import standard_library # isort:skip
+standard_library.install_aliases()
+
+from urllib.parse import urlsplit, urlunsplit
+
 from flask import current_app, flash, redirect, request, url_for
-from flask_babel import gettext as _
+from flask_babel import force_locale, gettext as _
 from flask_user.views import _endpoint_url
 
 
 def patch_make_safe_url(url):
     """Patch flask_user.make_safe_url() to include '?'
 
-    Turns an usafe absolute URL into a safe relative URL by removing
+    Turns an unsafe absolute URL into a safe relative URL by removing
     the scheme and the hostname
     Example:
         make_safe_url('http://hostname/path1/path2?q1=v1&q2=v2#fragment')
@@ -16,8 +20,9 @@ def patch_make_safe_url(url):
 
     """
     parts = urlsplit(url)
+    no_scheme, no_hostname = u'', u''
     safe_url = urlunsplit(
-        (None, None, parts.path, parts.query, parts.fragment))
+        (no_scheme, no_hostname, parts.path, parts.query, parts.fragment))
     return safe_url
 
 
@@ -41,7 +46,8 @@ def patch_forgot_password():
         user, user_email = user_manager.find_user_by_email(email)
 
         if user:
-            user_manager.send_reset_password_email(email)
+            with force_locale(user.locale_code):
+                user_manager.send_reset_password_email(email)
 
         # Prepare one-time system message
         flash(_("If the email address '%(email)s' is in the system, a "

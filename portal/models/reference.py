@@ -1,11 +1,12 @@
 """Reference module - encapsulate FHIR Reference type"""
 import re
+
 from sqlalchemy import and_
 
 from ..database import db
+from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 from .identifier import Identifier
 from .intervention import Intervention
-from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 
 class MissingReference(Exception):

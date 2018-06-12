@@ -100,8 +100,7 @@ class TestCase(Base):
             print("found existing test_user at {}".format(test_user.id))
 
         if test_user.id != TEST_USER_ID:
-            print("apparent cruft from last run (test_user_id: %d)"\
-                    % test_user.id)
+            print("apparent cruft from last run (test_user_id: %d)" % test_user.id)
             print("try again...")
             self.tearDown()
             self.setUp()

@@ -2,8 +2,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.fhir import Coding, CodeableConcept
-
+from portal.models.fhir import CodeableConcept, Coding
 
 """empty message
 

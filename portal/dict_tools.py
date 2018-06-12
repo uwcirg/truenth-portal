@@ -1,6 +1,7 @@
 """Module for additional dictionary tools/utilities"""
 import numbers
 
+
 def dict_compare(d1, d2):
     """Deep order independent comparison of two dictionaries
 
@@ -37,15 +38,15 @@ def dict_match(newd, oldd, diff_stream):
     else:
         if added:
             diff_stream.write(
-                "added {}\n".format({k:newd.get(k) for k in added}))
+                u"added {}\n".format({k:newd.get(k) for k in added}))
         if removed:
             diff_stream.write(
-                "removed {}\n".format({k:oldd.get(k) for k in removed}))
+                u"removed {}\n".format({k:oldd.get(k) for k in removed}))
         if modified:
             for k in modified.keys():
                 diff_stream.write(
                     u"replace {} with {}\n".format(
-                        {k:oldd.get(k)},{k:newd.get(k)}))
+                        {k: oldd.get(k)}, {k: newd.get(k)}))
         return False
 
 

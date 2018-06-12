@@ -1,5 +1,7 @@
-from portal.dict_tools import strip_empties, dict_match, dict_compare
 import io
+
+from portal.dict_tools import dict_compare, dict_match, strip_empties
+
 
 def test_shallow_empty():
     d = {'one': 1, 'two': 'two', 'three': [3], 'four': None}

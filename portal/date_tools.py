@@ -1,10 +1,11 @@
 """Module for additional datetime tools/utilities"""
 from datetime import date, datetime
+import json
+
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from flask import abort, current_app
 from flask_babel import gettext as _
-import json
 import pytz
 
 

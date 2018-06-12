@@ -1,16 +1,20 @@
 """Unit test module for app_text"""
+from urllib import unquote_plus
+from urlparse import parse_qsl, urlparse
+
 from flask import render_template_string
 from flask_webtest import SessionScope
 
 from portal.extensions import db
-from portal.models.app_text import AppText, app_text, VersionedResource
-from portal.models.app_text import UnversionedResource, MailResource
+from portal.models.app_text import (
+    AppText,
+    MailResource,
+    UnversionedResource,
+    VersionedResource,
+    app_text,
+)
 from portal.models.user import User
-from tests import TestCase, TEST_USER_ID
-
-
-from urlparse import urlparse, parse_qsl
-from urllib import unquote_plus
+from tests import TEST_USER_ID, TestCase
 
 
 class Url(object):
@@ -86,10 +90,10 @@ class TestAppText(TestCase):
         sample_error = (
             "Could not retrieve remove content - Server could not be reached")
         result = VersionedResource(sample_url, locale_code=None)
-        self.assertEquals(result.error_msg, sample_error)
-        self.assertEquals(result.url, sample_url)
+        self.assertEqual(result.error_msg, sample_error)
+        self.assertEqual(result.url, sample_url)
         # self.asset should still work (and equal the error text)
-        self.assertEquals(result.asset, sample_error)
+        self.assertEqual(result.asset, sample_error)
 
     def test_asset_variable_replacement(self):
         test_user = User.query.get(TEST_USER_ID)
@@ -103,14 +107,14 @@ class TestAppText(TestCase):
                                        asset=test_asset,
                                        variables=test_vars)
         rf_id = int(resource.asset.split()[-1])
-        self.assertEquals(rf_id, TEST_USER_ID)
+        self.assertEqual(rf_id, TEST_USER_ID)
 
         invalid_asset = "Not a real {variable}!"
         resource = UnversionedResource(test_url,
                                        asset=invalid_asset,
                                        variables=test_vars)
         error_key = resource.asset.split()[-1]
-        self.assertEquals(error_key, "u'variable'")
+        self.assertEqual(error_key, "u'variable'")
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",
@@ -119,20 +123,20 @@ class TestAppText(TestCase):
                     "footerkey": "foot"}
         tmr = MailResource(None, locale_code='en_AU', variables=testvars)
 
-        self.assertEquals(tmr.subject, "TESTING SUBJECT")
-        self.assertEquals(tmr.body.splitlines()[0], "TESTING BODY")
-        self.assertEquals(tmr.body.splitlines()[1], "TESTING FOOTER")
+        self.assertEqual(tmr.subject, "TESTING SUBJECT")
+        self.assertEqual(tmr.body.splitlines()[0], "TESTING BODY")
+        self.assertEqual(tmr.body.splitlines()[1], "TESTING FOOTER")
 
         tmr._subject = "Replace this: {subjkey}"
         tmr._body = "Replace these: {bodykey1} and {bodykey2}"
         tmr._footer = "Replace this: {footerkey}"
 
-        self.assertEquals(tmr.subject.split()[-1], "test")
-        self.assertEquals(tmr.body.splitlines()[0].split()[-1], "456")
-        self.assertEquals(tmr.body.splitlines()[1].split()[-1], "foot")
-        self.assertEquals(set(tmr.variable_list), set(testvars.keys()))
+        self.assertEqual(tmr.subject.split()[-1], "test")
+        self.assertEqual(tmr.body.splitlines()[0].split()[-1], "456")
+        self.assertEqual(tmr.body.splitlines()[1].split()[-1], "foot")
+        self.assertEqual(set(tmr.variable_list), set(testvars.keys()))
         self.assertTrue(testvars['bodykey1'] in tmr.body)
 
         # test footer optionality
         tmr._footer = None
-        self.assertEquals(len(tmr.body.splitlines()), 1)
+        self.assertEqual(len(tmr.body.splitlines()), 1)

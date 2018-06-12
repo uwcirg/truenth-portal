@@ -1,13 +1,7 @@
 """Unit test module for Demographics API"""
-from flask_webtest import SessionScope
-from tests import (
-    TestCase,
-    IMAGE_URL,
-    LAST_NAME,
-    FIRST_NAME,
-    TEST_USERNAME,
-    TEST_USER_ID)
 import json
+
+from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -18,6 +12,14 @@ from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
 from portal.system_uri import US_NPI
+from tests import (
+    FIRST_NAME,
+    IMAGE_URL,
+    LAST_NAME,
+    TEST_USER_ID,
+    TEST_USERNAME,
+    TestCase,
+)
 
 
 class TestDemographics(TestCase):
@@ -27,20 +29,20 @@ class TestDemographics(TestCase):
         rv = self.client.get('/api/demographics')
 
         fhir = json.loads(rv.data)
-        self.assertEquals(len(fhir['identifier']), 2)
-        self.assertEquals(fhir['resourceType'], 'Patient')
-        self.assertEquals(fhir['name']['family'], LAST_NAME)
-        self.assertEquals(fhir['name']['given'], FIRST_NAME)
-        self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
+        self.assertEqual(len(fhir['identifier']), 2)
+        self.assertEqual(fhir['resourceType'], 'Patient')
+        self.assertEqual(fhir['name']['family'], LAST_NAME)
+        self.assertEqual(fhir['name']['given'], FIRST_NAME)
+        self.assertEqual(fhir['photo'][0]['url'], IMAGE_URL)
         # confirm default timezone appears
         tz = [ext for ext in fhir['extension'] if
               ext['url'].endswith('timezone')]
-        self.assertEquals('UTC', tz[0]['timezone'])
-        self.assertEquals(False, fhir['deceasedBoolean'])
+        self.assertEqual('UTC', tz[0]['timezone'])
+        self.assertEqual(False, fhir['deceasedBoolean'])
 
         # confirm empties aren't present in extension; i.e. only 'url' key
         self.assertFalse([e for e in fhir['extension'] if len(e.keys()) == 1])
-        self.assertEquals(len(fhir['telecom']), 1)
+        self.assertEqual(len(fhir['telecom']), 1)
         self.assertTrue(fhir['telecom'][0]['value'], TEST_USERNAME)
 
     def test_demographics404(self):
@@ -118,38 +120,38 @@ class TestDemographics(TestCase):
         for item in fhir['telecom']:
             if item['system'] == 'phone':
                 if item['use'] == 'home':
-                    self.assertEquals(alt_phone, item['value'])
+                    self.assertEqual(alt_phone, item['value'])
                 elif item['use'] == 'mobile':
-                    self.assertEquals(phone, item['value'])
+                    self.assertEqual(phone, item['value'])
                 else:
                     self.fail(
                         'unexpected telecom use: {}'.format(item['use']))
             else:
                 self.fail(
                     'unexpected telecom system: {}'.format(item['system']))
-        self.assertEquals(fhir['birthDate'], dob)
-        self.assertEquals(fhir['deceasedDateTime'], dod)
-        self.assertEquals(fhir['gender'], gender.lower())
-        self.assertEquals(fhir['name']['family'], family)
-        self.assertEquals(fhir['name']['given'], given)
+        self.assertEqual(fhir['birthDate'], dob)
+        self.assertEqual(fhir['deceasedDateTime'], dod)
+        self.assertEqual(fhir['gender'], gender.lower())
+        self.assertEqual(fhir['name']['family'], family)
+        self.assertEqual(fhir['name']['given'], given)
         # ignore added timezone and empty extensions
-        self.assertEquals(2, len(
+        self.assertEqual(2, len(
             [ext for ext in fhir['extension']
              if 'valueCodeableConcept' in ext]))
-        self.assertEquals(3, len(fhir['careProvider']))
+        self.assertEqual(3, len(fhir['careProvider']))
         self.assertTrue(Reference.practitioner(pract_id).as_fhir() in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         self.assertTrue(user._email.startswith('__no_email__'))
         self.assertTrue(user.email is None)
-        self.assertEquals(user.first_name, given)
-        self.assertEquals(user.last_name, family)
-        self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
-        self.assertEquals(['1096-7',], [c.code for c in user.races])
-        self.assertEquals(user.organizations.count(), 2)
-        self.assertEquals(user.organizations[0].name, org_name)
-        self.assertEquals(user.organizations[1].name, org2_name)
-        self.assertEquals(user.practitioner_id, pract_id)
+        self.assertEqual(user.first_name, given)
+        self.assertEqual(user.last_name, family)
+        self.assertEqual(['2162-6'], [c.code for c in user.ethnicities])
+        self.assertEqual(['1096-7'], [c.code for c in user.races])
+        self.assertEqual(user.organizations.count(), 2)
+        self.assertEqual(user.organizations[0].name, org_name)
+        self.assertEqual(user.organizations[1].name, org2_name)
+        self.assertEqual(user.practitioner_id, pract_id)
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
@@ -165,7 +167,7 @@ class TestDemographics(TestCase):
         rv = self.client.get('/api/demographics')
 
         fhir = json.loads(rv.data)
-        self.assertEquals(len(fhir['identifier']), 4)
+        self.assertEqual(len(fhir['identifier']), 4)
 
         # put a study identifier
         study_id = {
@@ -176,7 +178,7 @@ class TestDemographics(TestCase):
                 content_type='application/json',
                 data=json.dumps(fhir))
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.identifiers), 5)
+        self.assertEqual(len(user.identifiers), 5)
 
     def test_bogus_identifiers(self):
         # empty string values causing problems - prevent insertion
@@ -184,7 +186,7 @@ class TestDemographics(TestCase):
         rv = self.client.get('/api/demographics')
 
         fhir = json.loads(rv.data)
-        self.assertEquals(len(fhir['identifier']), 2)
+        self.assertEqual(len(fhir['identifier']), 2)
 
         # put a study identifier
         study_id = {
@@ -197,7 +199,7 @@ class TestDemographics(TestCase):
             data=json.dumps(fhir))
         self.assert400(rv)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.identifiers), 2)
+        self.assertEqual(len(user.identifiers), 2)
 
     def test_demographics_update_email(self):
         data = {"resourceType": "Patient",
@@ -214,7 +216,7 @@ class TestDemographics(TestCase):
             content_type='application/json', data=json.dumps(data))
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.email, 'updated@email.com')
+        self.assertEqual(user.email, 'updated@email.com')
 
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
@@ -241,8 +243,8 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(user.last_name, 'family')
-        self.assertEquals(user.first_name, 'given')
+        self.assertEqual(user.last_name, 'family')
+        self.assertEqual(user.first_name, 'given')
 
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
@@ -284,8 +286,8 @@ class TestDemographics(TestCase):
 
         self.assert200(rv)
         user = db.session.merge(self.test_user)
-        self.assertEquals(user.organizations.count(), 1)
-        self.assertEquals(user.organizations[0].name, org_name)
+        self.assertEqual(user.organizations.count(), 1)
+        self.assertEqual(user.organizations[0].name, org_name)
 
     def test_demographics_delete_ref(self):
         # existing careProvider should get removed
@@ -325,8 +327,8 @@ class TestDemographics(TestCase):
         user = db.session.merge(self.test_user)
 
         # confirm only the one sent via API is intact.
-        self.assertEquals(user.organizations.count(), 1)
-        self.assertEquals(user.organizations[0].name, 'test org')
+        self.assertEqual(user.organizations.count(), 1)
+        self.assertEqual(user.organizations[0].name, 'test org')
 
     def test_demographics_identifier_ref(self):
         # referencing careProvider by (unique) external Identifier
@@ -363,9 +365,9 @@ class TestDemographics(TestCase):
 
         self.assert200(rv)
         user, pract = map(db.session.merge, (self.test_user, pract))
-        self.assertEquals(user.organizations.count(), 1)
-        self.assertEquals(user.organizations[0].name, org_name)
-        self.assertEquals(user.practitioner_id, pract.id)
+        self.assertEqual(user.organizations.count(), 1)
+        self.assertEqual(user.organizations[0].name, org_name)
+        self.assertEqual(user.practitioner_id, pract.id)
 
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
@@ -418,9 +420,9 @@ class TestDemographics(TestCase):
         for item in fhir['telecom']:
             if item['system'] == 'phone':
                 if item['use'] == 'mobile':
-                    self.assertEquals(item['value'], '867-5309')
+                    self.assertEqual(item['value'], '867-5309')
                 elif item['use'] == 'home':
-                    self.assertEquals(item['value'], None)
+                    self.assertEqual(item['value'], None)
                 else:
                     self.fail(
                         'unexpected telecom use: {}'.format(item['use']))

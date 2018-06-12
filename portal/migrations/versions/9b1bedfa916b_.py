@@ -1,5 +1,6 @@
-from alembic import op
 import re
+
+from alembic import op
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.app_text import AppText

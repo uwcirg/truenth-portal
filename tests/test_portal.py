@@ -1,21 +1,22 @@
 """Unit test module for portal views"""
 
 from datetime import datetime
-from flask_webtest import SessionScope
-from flask_swagger import swagger
-from swagger_spec_validator import validate_spec_url
 import tempfile
 import urllib
+
+from flask_swagger import swagger
+from flask_webtest import SessionScope
+from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
 from portal.extensions import db
 from portal.factories.app import create_app
 from portal.models.intervention import INTERVENTION, UserIntervention
+from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from portal.models.user import get_user, User
-from portal.models.message import EmailMessage
-from tests import TestCase, TEST_USER_ID
+from portal.models.user import User, get_user
+from tests import TEST_USER_ID, TestCase
 
 
 class TestPortal(TestCase):
@@ -178,7 +179,7 @@ class TestPortal(TestCase):
         """Request to view non existant message should 404"""
         self.login()
         rv = self.client.get('/invite/404')
-        self.assertEquals(rv.status_code, 404)
+        self.assertEqual(rv.status_code, 404)
 
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
@@ -223,9 +224,9 @@ class TestPortal(TestCase):
         lr_group = self.app.config['LR_GROUP']
         rv = self.client.get('/api/settings/lr_group')
         self.assert200(rv)
-        self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
+        self.assertEqual(rv.json.get('LR_GROUP'), lr_group)
         rv2 = self.client.get('/api/settings/bad_value')
-        self.assertEquals(rv2.status_code, 400)
+        self.assertEqual(rv2.status_code, 400)
 
 
 class TestPortalEproms(TestCase):

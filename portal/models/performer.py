@@ -1,9 +1,10 @@
 """Performer module - encapsulate the FHIR Performer resource"""
 import json
+
 from sqlalchemy import UniqueConstraint
 
-from .codeable_concept import CodeableConcept
 from ..database import db
+from .codeable_concept import CodeableConcept
 
 
 class Performer(db.Model):

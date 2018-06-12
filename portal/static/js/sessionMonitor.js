@@ -49,6 +49,9 @@ var SessionMonitorObj = function() {
                       });
                     },
                     logout: function() {
+                      if (typeof(sessionStorage) !== "undefined") {
+                        sessionStorage.clear();
+                      }
                       window.location.href = l.logoutUrl;
                     },
                     onwarning: function() {

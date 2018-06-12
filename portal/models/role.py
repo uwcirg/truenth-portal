@@ -11,10 +11,7 @@ STATIC_ROLES dict within.
 
 """
 from ..database import db
-try: # in Python 3
-    from collections import UserDict
-except ImportError: # for Python 2
-    from UserDict import IterableUserDict as UserDict
+
 
 class Role(db.Model):
     """SQLAlchemy class for `roles` table"""
@@ -26,8 +23,23 @@ class Role(db.Model):
     def __str__(self):
         return "Role {}".format(self.name)
 
+    def as_json(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'display_name': self.display_name}
+
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
+
+
 #Source definition for roles, as dictionary {name: description,}
-STATIC_ROLES = UserDict({
+STATIC_ROLES = {
     'access_on_verify':
         'Provides access prior to registration, on verification',
     'admin':
@@ -68,14 +80,15 @@ STATIC_ROLES = UserDict({
     'write_only':
         'Limited access account, write only, cannot view data from '
         'previous sessions',
-})
+}
 
 
 def enum(**items):
     """Convert dictionary to Enumeration for direct access"""
     return type('Enum', (), items)
 
-ROLE = enum(**{str(r).upper():r for r in STATIC_ROLES})
+
+ROLE = enum(**{r.upper(): r for r in STATIC_ROLES})
 ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
 
 

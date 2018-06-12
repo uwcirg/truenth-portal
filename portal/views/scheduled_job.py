@@ -1,6 +1,12 @@
 """Views for Scheduled Jobs"""
-from flask import abort, jsonify, Blueprint, request
-from flask import render_template, current_app
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 
 from ..audit import auditable_event
@@ -11,7 +17,6 @@ from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
 from .portal import check_int
-
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 

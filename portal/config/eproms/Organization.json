@@ -1457,6 +1457,11 @@
           "value": "TNG"
         },
         {
+          "system": "http://us.truenth.org/identity-codes/psa-tracker-group",
+          "use": "usual",
+          "value": "TNG"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/symptom-tracker-group",
           "use": "secondary",
           "value": "self_management"

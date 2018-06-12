@@ -1,8 +1,9 @@
 """Unit test module for stat reporting"""
 from datetime import datetime
+from re import search
+
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-from re import search
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
@@ -10,8 +11,10 @@ from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html

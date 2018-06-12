@@ -1,18 +1,19 @@
 """Unit test module for user document logic"""
-from tempfile import NamedTemporaryFile
 from StringIO import StringIO
 from datetime import datetime
+import os
+from tempfile import NamedTemporaryFile
+
 from flask import current_app
 from flask_webtest import SessionScope
-import os
 
-from tests import TestCase, TEST_USER_ID
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.auth import create_service_token
 from portal.models.intervention import INTERVENTION
-from portal.models.user_document import UserDocument
 from portal.models.user import get_user
+from portal.models.user_document import UserDocument
+from tests import TEST_USER_ID, TestCase
 
 
 class TestUserDocument(TestCase):
@@ -36,14 +37,14 @@ class TestUserDocument(TestCase):
         rv = self.client.get(
             '/api/user/{}/user_documents'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['user_documents']), 2)
+        self.assertEqual(len(rv.json['user_documents']), 2)
         # tests document_type filter
         rv = self.client.get(
             '/api/user/{}/user_documents?document_type=TestFile'.format(
                 TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['user_documents']), 1)
-        self.assertEquals(
+        self.assertEqual(len(rv.json['user_documents']), 1)
+        self.assertEqual(
             rv.json['user_documents'][0]['uploaded_at'],
             FHIR_datetime.as_fhir(now))
 
@@ -73,11 +74,11 @@ class TestUserDocument(TestCase):
                             current_app.config.get("FILE_UPLOAD_DIR"),
                             str(udoc.uuid))
         with open(fpath, 'r') as udoc_file:
-            self.assertEqual(udoc_file.read(),test_contents)
+            self.assertEqual(udoc_file.read(), test_contents)
         os.remove(fpath)
 
-        self.assertEquals(udoc.user_id, TEST_USER_ID)
-        self.assertEquals(udoc.intervention.description,
+        self.assertEqual(udoc.user_id, TEST_USER_ID)
+        self.assertEqual(udoc.intervention.description,
                           INTERVENTION.SEXUAL_RECOVERY.description)
 
 
@@ -98,6 +99,6 @@ class TestUserDocument(TestCase):
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
         rv = self.client.get('/api/user/{}/user_documents/{}'.format(
-                            TEST_USER_ID,udoc.id))
+                            TEST_USER_ID, udoc.id))
         self.assert200(rv)
-        self.assertEqual(rv.data,test_contents)
+        self.assertEqual(rv.data, test_contents)

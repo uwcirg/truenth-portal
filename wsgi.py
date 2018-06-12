@@ -2,8 +2,9 @@
 
 """
 
-from portal.factories.app import create_app
 from werkzeug.contrib.fixers import ProxyFix
+
+from portal.factories.app import create_app
 
 # WSGI object is named "application" by default
 # https://modwsgi.readthedocs.io/en/develop/configuration-directives/WSGICallableObject.html

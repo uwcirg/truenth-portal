@@ -24,9 +24,7 @@
 <div id="fullSizeBox" class="box-min-500">
     <img  src="{{ url_for('.static', filename='img/spacer.jpg') }}" class="tnth-image img-responsive hidden-xs" style="visibility:hidden" alt="spacer image"/>
     <div id="fullSizeContainer">
-
         <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="{{_('TrueNTH')}}" /></a></div>
-
         <div id="wellContainer">
             <div class="tnth-splash">
                 <div id="wellContent">
@@ -34,6 +32,12 @@
                         <div style="margin-bottom: 1em">{{ app_text('landing title') }}</div>
                         {{ app_text('landing sub-title') }}
                     </div>
+                    {% if config.MAINTENANCE_MESSAGE -%}
+                        <div class="sys-maintenance">
+                            <h4 class="title">{{_("Please note")}}
+                            <h4 class="message">{{config.MAINTENANCE_MESSAGE | safe}}</h4>
+                        </div>
+                    {%- endif %}
                     <a href="/go" class="btn feature-btn feature-btn-primary">{{ _("Register") }}</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-primary">{{ _("Log in") }}</a>
                     {% if timed_out %}
                         <div id="timeOutMessageContainer">

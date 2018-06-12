@@ -7,24 +7,27 @@ to life and properly control the visibility of a intervention card?
 
 """
 from datetime import datetime
-from flask_webtest import SessionScope
 import os
-from tests import TestCase, TEST_USER_ID
 
-from portal.extensions import db
+from flask_webtest import SessionScope
+
 from portal.config.site_persistence import SitePersistence
+from portal.extensions import db
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
+from tests import TEST_USER_ID, TestCase
 
 
 class TestSitePersistence(TestCase):
@@ -98,18 +101,18 @@ class TestSitePersistence(TestCase):
         # confirm we see a sample of changes from the
         # defauls in add_static_interventions call
         # to what's expected in the persistence file
-        self.assertEquals(
+        self.assertEqual(
             INTERVENTION.CARE_PLAN.card_html,
             ('<p>Organization and '
              'support for the many details of life as a prostate cancer '
              'survivor</p>'))
-        self.assertEquals(
+        self.assertEqual(
             INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
-        self.assertEquals(
+        self.assertEqual(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
 
     def test_app_text(self):
-        self.assertEquals(app_text('landing title'), 'Welcome to TrueNTH')
+        self.assertEqual(app_text('landing title'), 'Welcome to TrueNTH')
 
     def test_questionnaire_banks_recurs(self):
         # set up a few recurring instances
@@ -164,8 +167,8 @@ class TestSitePersistence(TestCase):
         results = mr_qb.as_json()
 
         copy = QuestionnaireBank.from_json(results)
-        self.assertEquals(copy.name, mr_qb.name)
-        self.assertEquals(copy.recurs, [initial_recur, every_six_thereafter])
+        self.assertEqual(copy.name, mr_qb.name)
+        self.assertEqual(copy.recurs, [initial_recur, every_six_thereafter])
 
         # now, modify the persisted form, remove one recur and add another
         new_recur = Recur(
@@ -176,7 +179,7 @@ class TestSitePersistence(TestCase):
             initial_recur.as_json(), new_recur.as_json()]
         updated_copy = QuestionnaireBank.from_json(results)
 
-        self.assertEquals(
+        self.assertEqual(
             [r.as_json() for r in updated_copy.recurs],
             [r.as_json() for r in (initial_recur, new_recur)])
 
@@ -196,4 +199,4 @@ class TestEpromsSitePersistence(TestCase):
         self.assertTrue(Organization.query.count() > 5)
         tngr = Organization.query.filter(
             Organization.name=='TrueNTH Global Registry').one()
-        self.assertEquals(tngr.id, 10000)
+        self.assertEqual(tngr.id, 10000)

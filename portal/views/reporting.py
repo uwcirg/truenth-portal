@@ -1,11 +1,15 @@
-import csv
+from future import standard_library # isort:skip
+standard_library.install_aliases()
+
 from collections import defaultdict
+import csv
 from datetime import datetime
-from flask import Blueprint, render_template, make_response, request
+from io import StringIO
+from time import strftime
+
+from flask import Blueprint, make_response, render_template, request
 from flask_babel import gettext as _
 from flask_user import roles_required
-from StringIO import StringIO
-from time import strftime
 
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus

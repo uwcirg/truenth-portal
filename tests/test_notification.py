@@ -3,7 +3,7 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.notification import Notification, UserNotification
-from tests import TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase
 
 
 class TestNotification(TestCase):
@@ -37,8 +37,8 @@ class TestNotification(TestCase):
             '/api/user/{}/notification'.format(TEST_USER_ID))
         self.assert200(resp)
 
-        self.assertEquals(len(resp.json['notifications']), 1)
-        self.assertEquals(resp.json['notifications'][0]['name'], 'test')
+        self.assertEqual(len(resp.json['notifications']), 1)
+        self.assertEqual(resp.json['notifications'][0]['name'], 'test')
         self.assertTrue(resp.json['notifications'][0]['created_at'])
 
     def test_usernotification_delete(self):

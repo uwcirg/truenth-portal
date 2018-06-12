@@ -2,8 +2,8 @@
 # Parses and remaps DB URLs into standard psql environment variables
 # https://www.postgresql.org/docs/9.6/static/libpq-envars.html
 
-from urlparse import urlparse
 from os import environ
+from urlparse import urlparse
 
 
 def get_db_url():

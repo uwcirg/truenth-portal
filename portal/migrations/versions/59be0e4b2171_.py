@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from portal.models.audit import Audit
 from portal.models.user_consent import UserConsent
 
-
 """empty message
 
 Revision ID: 59be0e4b2171

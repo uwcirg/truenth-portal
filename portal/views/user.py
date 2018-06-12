@@ -1,15 +1,16 @@
 """User API view functions"""
 from datetime import datetime
+
 from flask import (
-    abort,
     Blueprint,
+    abort,
     current_app,
     jsonify,
     make_response,
     redirect,
     request,
     session,
-    url_for
+    url_for,
 )
 from flask_user import roles_required
 from sqlalchemy import and_
@@ -17,12 +18,11 @@ from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
-from .auth import logout
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
-from ..models.app_text import app_text, MailResource, UserInviteEmail_ATMA
+from ..models.app_text import MailResource, UserInviteEmail_ATMA, app_text
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
 from ..models.auth import Token
@@ -33,19 +33,20 @@ from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.questionnaire_bank import QuestionnaireBank
-from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
+from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.user import (
+    User,
+    UserRelationship,
     current_user,
     get_user_or_abort,
     permanently_delete_user,
-    User,
-    UserRelationship,
-    validate_email
+    validate_email,
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from .auth import logout
 from .portal import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
@@ -379,7 +380,7 @@ def access_url(user_id):
     current_user().check_role(permission='edit', other_id=user_id)
     user = get_user_or_abort(user_id)
     not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
-    has = set([role.name for role in user.roles])
+    has = {role.name for role in user.roles}
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
 

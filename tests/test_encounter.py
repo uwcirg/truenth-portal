@@ -1,9 +1,9 @@
 """Unit test module for Encounter API and model"""
-import dateutil
 import json
 import os
 import time
-from tests import TestCase, TEST_USER_ID
+
+import dateutil
 from flask_webtest import SessionScope
 
 from portal.extensions import db
@@ -11,6 +11,7 @@ from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import INVITE_PREFIX
+from tests import TEST_USER_ID, TestCase
 
 
 class TestEncounter(TestCase):
@@ -21,9 +22,9 @@ class TestEncounter(TestCase):
             data = json.load(fhir_data)
 
         enc = Encounter.from_fhir(data)
-        self.assertEquals(enc.status, 'finished')
-        self.assertEquals(enc.auth_method, 'password_authenticated')
-        self.assertEquals(enc.start_time, dateutil.parser.parse("2013-05-05"))
+        self.assertEqual(enc.status, 'finished')
+        self.assertEqual(enc.auth_method, 'password_authenticated')
+        self.assertEqual(enc.start_time, dateutil.parser.parse("2013-05-05"))
 
     def test_encounter_as_fhir(self):
         enc = Encounter(status='planned', auth_method='url_authenticated',
@@ -35,13 +36,13 @@ class TestEncounter(TestCase):
             db.session.add(enc)
             db.session.commit()
         enc = db.session.merge(enc)
-        self.assertEquals(enc.status, data['status'])
-        self.assertEquals(enc.auth_method, data['auth_method'])
+        self.assertEqual(enc.status, data['status'])
+        self.assertEqual(enc.auth_method, data['auth_method'])
 
     def test_encounter_on_login(self):
         self.login()
-        self.assertEquals(len(self.test_user.encounters), 1)
-        self.assertEquals(
+        self.assertEqual(len(self.test_user.encounters), 1)
+        self.assertEqual(
             self.test_user.current_encounter.auth_method,
             'password_authenticated')
 
@@ -58,7 +59,7 @@ class TestEncounter(TestCase):
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        self.assertEquals(
+        self.assertEqual(
             service_user.current_encounter.auth_method,
             'service_token_authenticated')
 
@@ -78,8 +79,8 @@ class TestEncounter(TestCase):
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
         rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
-        self.assertEquals(302, rv.status_code)  # sent to next_after_login
-        self.assertEquals(
+        self.assertEqual(302, rv.status_code)  # sent to next_after_login
+        self.assertEqual(
             self.test_user.current_encounter.auth_method,
             'staff_authenticated')
         self.assertTrue(self.test_user._email.startswith(INVITE_PREFIX))
@@ -101,6 +102,6 @@ class TestEncounter(TestCase):
         self.test_user = db.session.merge(self.test_user)
         rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         # should return 401 as test user isn't a patient or partner
-        self.assertEquals(401, rv.status_code)
+        self.assertEqual(401, rv.status_code)
         self.assertFalse(self.test_user.current_encounter)
         self.assertTrue(staff_user.current_encounter)

@@ -1,8 +1,8 @@
 """Intervention API view functions"""
-from flask import abort, Blueprint, jsonify
-from flask import current_app, request
-from flask_user import roles_required
 import json
+
+from flask import Blueprint, abort, current_app, jsonify, request
+from flask_user import roles_required
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Unauthorized
 
@@ -11,13 +11,12 @@ from ..database import db
 from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.group import Group, UserGroup
-from ..models.intervention import access_types, INTERVENTION, UserIntervention
+from ..models.intervention import INTERVENTION, UserIntervention, access_types
 from ..models.intervention_strategies import AccessStrategy
 from ..models.message import EmailMessage
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..models.user import current_user, User
-
+from ..models.user import User, current_user
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 

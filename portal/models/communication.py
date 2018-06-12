@@ -1,26 +1,27 @@
 """Communication model"""
 from collections import MutableMapping
 from datetime import datetime
-from flask import current_app, url_for
-from flask_babel import gettext as _, force_locale
-import regex
 from smtplib import SMTPRecipientsRefused
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
 from string import Formatter
 
-from .app_text import MailResource
+from flask import current_app, url_for
+from flask_babel import force_locale
+from flask_babel import gettext as _
+import regex
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
+
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import localize_datetime
 from ..extensions import user_manager
+from ..trace import dump_trace, establish_trace, trace
+from .app_text import MailResource
 from .intervention import INTERVENTION
 from .message import EmailMessage
 from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
-from ..trace import dump_trace, establish_trace, trace
 from .user import User
-
 
 # https://www.hl7.org/fhir/valueset-event-status.html
 event_status_types = ENUM(

@@ -1,8 +1,8 @@
 """Model classes for message data"""
 from datetime import datetime
 from textwrap import fill
-from flask_mail import Message
-from flask_mail import email_dispatched
+
+from flask_mail import Message, email_dispatched
 
 from ..audit import auditable_event
 from ..database import db

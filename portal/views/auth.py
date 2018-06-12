@@ -4,19 +4,31 @@ from datetime import datetime
 import hashlib
 import hmac
 import json
-import requests
+
 from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError, ConfigError
 from flask import (
-    Blueprint, jsonify, redirect, current_app, make_response,
-    render_template, request, session, abort, url_for)
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import (
     user_changed_password,
     user_logged_in,
     user_registered,
-    user_reset_password)
+    user_reset_password,
+)
+import requests
+
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -27,8 +39,12 @@ from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import add_authomatic_user
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import (
+    User,
+    add_authomatic_user,
+    current_user,
+    get_user_or_abort,
+)
 
 auth = Blueprint('auth', __name__)
 
@@ -126,7 +142,7 @@ def capture_next_view_function(real_function):
             validate_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
-                    session['next'], real_function.func_name))
+                    session['next'], real_function.__name__))
         if request.args.get('suspend_initial_queries'):
             session['suspend_initial_queries'] = request.args.get(
                 'suspend_initial_queries')

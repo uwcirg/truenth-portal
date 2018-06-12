@@ -1,11 +1,15 @@
 """Unit test module for Selenium testing"""
-import os, sys, unittest, xvfbwrapper
-from selenium import webdriver
+import os
+import sys
+import unittest
 
 from flask_testing import LiveServerTestCase
+from selenium import webdriver
+import xvfbwrapper
 
 from tests import TestCase
-from pages import LoginPage
+
+from .pages import LoginPage
 
 
 @unittest.skipUnless(

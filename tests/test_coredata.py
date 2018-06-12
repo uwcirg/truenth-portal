@@ -1,12 +1,11 @@
 """Coredata tests"""
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-
+from tests import TEST_USER_ID, TestCase
 
 TRUENTH = 'TrueNTH'
 EPROMS = 'ePROMs'
@@ -73,9 +72,9 @@ class TestCoredata(TestCase):
         # should leave only indigenous, race and ethnicity as options
         # and nothing required
         self.assertTrue(Coredata().initial_obtained(self.test_user))
-        expect = set(('race', 'ethnicity', 'indigenous'))
+        expect = {'race', 'ethnicity', 'indigenous'}
         found = set(Coredata().optional(self.test_user))
-        self.assertEquals(found, expect)
+        self.assertEqual(found, expect)
 
     def test_still_needed(self):
         """Query for list of missing datapoints in legible format"""
@@ -92,7 +91,7 @@ class TestCoredata(TestCase):
 
         # needed should match required (minus 'name', 'role')
         required = Coredata().required(self.test_user)
-        self.assertEquals(set(required) - set(needed), set(('name', 'role')))
+        self.assertEqual(set(required) - set(needed), {'name', 'role'})
 
     def test_eproms_staff(self):
         """Eproms staff: privacy policy and website terms of use"""
@@ -174,6 +173,6 @@ class TestCoredata(TestCase):
         passed = False
         for entry in resp.json['still_needed']:
             if entry['field'] == WEB_TOU:
-                self.assertEquals(entry['collection_method'], 'ACCEPT_ON_NEXT')
+                self.assertEqual(entry['collection_method'], 'ACCEPT_ON_NEXT')
                 passed = True
         self.assertTrue(passed)

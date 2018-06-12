@@ -9,12 +9,14 @@ Interventions will sometimes require their own set of data, for which the
 
 """
 from abc import ABCMeta, abstractmethod
-from flask import current_app
 import sys
 
+from flask import current_app
+from future.utils import with_metaclass
+
 from .audit import Audit
-from .intervention import UserIntervention, INTERVENTION
 from .fhir import CC
+from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
 from .role import ROLE
 from .tou import ToU
@@ -107,9 +109,8 @@ class Coredata(object):
         return setattr(self.instance, name, value)
 
 
-class CoredataPoint(object):
+class CoredataPoint(with_metaclass(ABCMeta, object)):
     """Abstract base class - defining methods each datapoint needs"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def required(self, user, **kwargs):

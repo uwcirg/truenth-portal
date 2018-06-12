@@ -1,8 +1,9 @@
 """Organization related views module"""
-from flask import abort, current_app, Blueprint, jsonify, request
-from flask_user import roles_required
 import json
-from sqlalchemy import exc, and_
+
+from flask import Blueprint, abort, current_app, jsonify, request
+from flask_user import roles_required
+from sqlalchemy import and_, exc
 
 from ..audit import auditable_event
 from ..database import db
@@ -13,7 +14,6 @@ from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import PRACTICE_REGION
-
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
@@ -71,7 +71,7 @@ def organization_search():
     filter = None
     found_ids = []
     system, value = None, None
-    for k,v in request.args.items():
+    for k, v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
                 abort(400, "state search requires two letter state code")
@@ -229,7 +229,7 @@ def organization_delete(organization_id):
     try:
         db.session.delete(org)
         db.session.commit()
-    except exc.IntegrityError, e:
+    except exc.IntegrityError as e:
         message = "Cannot delete organization with related entities"
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
@@ -300,7 +300,7 @@ def organization_post():
         abort(400, "Requires FHIR resourceType of 'Organization'")
     try:
         org = Organization.from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.add(org)
     db.session.commit()
@@ -377,7 +377,7 @@ def organization_put(organization_id):
         complete = org.as_fhir(include_empties=True)
         complete.update(request.json)
         org.update_from_fhir(complete)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated organization from input {}".format(

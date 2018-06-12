@@ -1,10 +1,12 @@
 from __future__ import print_function
+
+from StringIO import StringIO
+import sys
+
 from alembic import op
 from flask import current_app
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
-from StringIO import StringIO
-import sys
 
 from portal.dict_tools import dict_match
 from portal.models.fhir import QuestionnaireResponse

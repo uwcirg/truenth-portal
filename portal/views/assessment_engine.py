@@ -1,5 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
+
 from flask import (
     Blueprint,
     Response,
@@ -23,20 +24,23 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
-from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.assessment_status import overall_assessment_status
+from ..models.assessment_status import (
+    AssessmentStatus,
+    invalidate_assessment_status_cache,
+    overall_assessment_status,
+)
 from ..models.client import validate_origin
 from ..models.fhir import (
-    aggregate_responses,
     EC,
+    QuestionnaireResponse,
+    aggregate_responses,
     generate_qnr_csv,
-    QuestionnaireResponse)
+)
 from ..models.intervention import INTERVENTION
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import User, current_user, get_user_or_abort
 from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
@@ -628,15 +632,15 @@ def assessment(patient_id, instrument_id):
         documents.append(qnr.document)
 
     bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(documents),
+        'resourceType': 'Bundle',
+        'updated': FHIR_datetime.now(),
+        'total': len(documents),
         'type': 'searchset',
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
-        'entry':documents,
+        'entry': documents,
     }
 
     return jsonify(bundle)
@@ -745,8 +749,8 @@ def get_assessments():
     )
     bundle.update({
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
     })
 

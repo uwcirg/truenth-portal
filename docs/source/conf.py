@@ -13,8 +13,9 @@
 # serve to show the default.
 
 import datetime
-import sys
 import os
+import sys
+
 import pkginfo
 
 metadata = pkginfo.Develop(
@@ -54,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = metadata.summary
-project_slug = project.replace(" ","")
+project_slug = project.replace(" ", "")
 
 now = datetime.datetime.now()
 author = metadata.author

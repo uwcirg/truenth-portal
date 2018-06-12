@@ -1,15 +1,16 @@
 """Test module for patient specific APIs"""
 from datetime import datetime
-from flask_webtest import SessionScope
 import json
 
-from portal.extensions import db
+from flask_webtest import SessionScope
+
 from portal.date_tools import FHIR_datetime
+from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.identifier import Identifier, UserIdentifier
 from portal.models.role import ROLE
 from portal.models.user import User
-from tests import TestCase, TEST_USERNAME, TEST_USER_ID
+from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 
 
 class TestPatient(TestCase):
@@ -101,7 +102,7 @@ class TestPatient(TestCase):
         self.assert200(rv)
         user = User.query.get(TEST_USER_ID)
         self.assertTrue(user.birthdate)
-        self.assertEquals(user.birthdate.strftime("%Y-%m-%d"), "1976-07-04")
+        self.assertEqual(user.birthdate.strftime("%Y-%m-%d"), "1976-07-04")
 
     def test_deceased(self):
         self.promote_user(role_name=ROLE.PATIENT)

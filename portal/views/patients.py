@@ -1,6 +1,7 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, jsonify, render_template
-from flask import current_app
+from datetime import datetime
+
+from flask import Blueprint, abort, current_app, jsonify, render_template
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -10,12 +11,11 @@ from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import visit_name
-from ..models.role import Role, ROLE
+from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
-from ..models.user import User, current_user, get_user_or_abort, UserRoles
+from ..models.user import User, UserRoles, current_user, get_user_or_abort
 from ..models.user_consent import UserConsent
 from .portal import check_int
-from datetime import datetime
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 

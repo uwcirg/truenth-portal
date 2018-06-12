@@ -4,19 +4,19 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
-from flask import abort, Blueprint, jsonify, request
 import json
+
+from flask import Blueprint, abort, jsonify, request
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..database import db
-from .demographics import demographics
 from ..extensions import oauth
 from ..models.identifier import Identifier, UserIdentifier
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort, User
-
+from ..models.user import User, current_user, get_user_or_abort
+from .demographics import demographics
 
 patient_api = Blueprint('patient_api', __name__)
 
@@ -71,7 +71,7 @@ def patient_search():
 
     """
     search_params = {}
-    for k,v in request.args.items():
+    for k, v in request.args.items():
         if k == 'email':
             search_params[k] = v
         elif k == 'identifier':

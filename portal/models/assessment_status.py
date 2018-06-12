@@ -1,13 +1,14 @@
 """AssessmentStatus module"""
 from collections import OrderedDict
 from datetime import datetime
+
 from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
+from ..trace import trace
 from .fhir import QuestionnaireResponse, qnr_document_id
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
-from ..trace import trace
 from .user import User
 
 
@@ -282,7 +283,7 @@ class AssessmentStatus(object):
     def instruments_completed(self, classfication=None):
         """Return list of completed questionnaires"""
         results = [
-            name for name,data in
+            name for name, data in
             self._status_by_classification(classfication).items()
             if 'completed' in data]
         return results

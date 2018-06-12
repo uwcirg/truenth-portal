@@ -1,13 +1,8 @@
 """Intervention Module"""
 from flask import current_app
-
-try: # in Python 3
-    from collections import UserDict
-except ImportError: # for Python 2
-    from UserDict import IterableUserDict as UserDict
 from sqlalchemy import and_
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..database import db
 from ..dict_tools import strip_empties
@@ -95,15 +90,16 @@ class Intervention(db.Model):
         The id is also independent - return the rest of the not null
         fields as a simple json dict.
 
-        NB for staging exclusions to function, link_url is now included.
-        Take care to remove it from persistence files where it is NOT
-        portable.
+        NB for staging exclusions to function, link_url and client_id
+        are now included. Take care to remove it from persistence files
+        where it is NOT portable, for example, when generating persistence
+        files programmatically.
 
         """
         d = {'resourceType': 'Intervention'}
         for attr in ('name', 'description', 'card_html', 'link_label',
                      'status_text', 'public_access', 'display_rank',
-                     'subscribed_events', 'link_url'):
+                     'subscribed_events', 'link_url', 'client_id'):
             if getattr(self, attr, None) is not None:
                 d[attr] = getattr(self, attr)
 
@@ -124,7 +120,7 @@ class Intervention(db.Model):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
-        # link_url is special - generally we don't pull links
+        # link_url and client_id are special - generally we don't pull
         # from persisted format as each instance is configured to
         # communicate with distinct interventions.  As it is used
         # for prod -> staging, warn if seen on any other system
@@ -134,6 +130,12 @@ class Intervention(db.Model):
                     "IMPORTING non-portable intervention({}) link_url: '{}'"
                     "".format(self.name, data['link_url']))
             self.link_url = data['link_url']
+        if 'client_id' in data and self.client_id != data['client_id']:
+            if current_app.config.get("SYSTEMT_TYPE", '').lower() != 'staging':
+                current_app.logger.warn(
+                    "IMPORTING non-portable intervention({}) client_id: '{}'"
+                    "".format(self.name, data['client_id']))
+            self.client_id = data['client_id']
 
         return self
 
@@ -278,7 +280,7 @@ class UserIntervention(db.Model):
         return q.count() > 0
 
 
-STATIC_INTERVENTIONS = UserDict({
+STATIC_INTERVENTIONS = {
     'assessment_engine': 'Assessment Engine',
     'care_plan': 'Care Plan',
     'community_of_wellness': 'Community of Wellness',
@@ -289,7 +291,8 @@ STATIC_INTERVENTIONS = UserDict({
     'self_management': 'Self Management',
     'sexual_recovery': 'Sexual Recovery',
     'social_support': 'Social Support Network',
-    'default': 'OTHER: not yet officially supported'})
+    'default': 'OTHER: not yet officially supported',
+}
 
 
 def add_static_interventions():

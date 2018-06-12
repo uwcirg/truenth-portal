@@ -33,6 +33,7 @@ const GIL = "gil";
 const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
+const PSATRACKER = "psaTracker";
 const jsMainFiles = [jsPath + "/i18next-config.js", jsPath + "/utility.js", jsPath + "/main.js"];
 
 // fetch command line arguments
@@ -143,7 +144,7 @@ gulp.task("portalLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps")) //path relative to the source file, can't use rootPath here
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PORTAL + ".css.map");
@@ -155,10 +156,13 @@ gulp.task("portalLess", function() {
  */
 gulp.task("gilLess", () => {
     gulp.src(lessPath + "/" + GIL + ".less")
-        .pipe(sourcemaps.init())
-        .pipe(postCSS())
-        .pipe(rename(GIL + ".css"))
-        .pipe(sourcemaps.write("../../../"+mapPath)) //path relative to the source file
+        .pipe(sourcemaps.init({
+            sources: [lessPath + "/" + GIL + ".less"]
+        }))
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(GILPath + cssPath))
         .on("end", function() {
             replaceStd(GIL + ".css.map");
@@ -175,10 +179,24 @@ gulp.task("topnavLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write("../maps"))
+        .pipe(sourcemaps.write({destPath: mapPath}))
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(TOPNAV + ".css.map");
+        });
+    return true;
+});
+
+gulp.task("psaTrackerLess", function() {
+    gulp.src(lessPath + "/" + PSATRACKER + ".less")
+        .pipe(sourcemaps.init())
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(gulp.dest(cssPath))
+        .on("end", function() {
+            replaceStd(PSATRACKER + ".css.map");
         });
     return true;
 });
@@ -197,4 +215,7 @@ gulp.task("watchGil", function() {
 });
 gulp.task("watchTopnav", function() {
     gulp.watch(lessPath + "/topnav.less", ["topnavLess"]);
+});
+gulp.task("watchPsaTracker", function() {
+    gulp.watch(lessPath + "/" + PSATRACKER + ".less", ["psaTrackerLess"]);
 });

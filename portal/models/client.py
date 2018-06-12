@@ -1,15 +1,19 @@
+from future import standard_library # isort:skip
+standard_library.install_aliases()
+
 import base64
 import hashlib
 import hmac
 import json
 import time
-from flask import current_app, abort
-from urlparse import urlparse
+from urllib.parse import urlparse
 
-from .auth import Token
+from flask import abort, current_app
+
 from ..database import db
 from ..extensions import oauth
 from ..factories.celery import create_celery
+from .auth import Token
 from .intervention import Intervention, UserIntervention
 from .relationship import RELATIONSHIP
 

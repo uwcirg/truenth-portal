@@ -3,7 +3,6 @@ from flask import Blueprint, jsonify
 
 from ..system_uri import NHHD_291036, TRUENTH_VALUESET_NHHD_291036
 
-
 fhir_api = Blueprint('fhir_api', __name__, url_prefix='/fhir')
 
 @fhir_api.route('/valueset/{}'.format(NHHD_291036))

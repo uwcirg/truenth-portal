@@ -1,12 +1,14 @@
 """Questionnaire Bank module"""
 from collections import namedtuple
-from datetime import datetime, MAXYEAR
+from datetime import MAXYEAR, datetime
+
 from flask import current_app, url_for
-from sqlalchemy import UniqueConstraint, CheckConstraint
+from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
+from ..trace import trace
 from .fhir import CC, QuestionnaireResponse
 from .intervention import Intervention
 from .intervention_strategies import observation_check
@@ -14,8 +16,6 @@ from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
-from ..trace import trace
-
 
 classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
@@ -77,6 +77,14 @@ class QuestionnaireBank(db.Model):
         """Print friendly format for logging, etc."""
         return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
             self)
+
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
 
     @classmethod
     def from_json(cls, data):

@@ -7,6 +7,7 @@ Groups should not be used to grant or restrict access - see `Role`.
 
 """
 import re
+
 from sqlalchemy import UniqueConstraint
 from werkzeug.exceptions import BadRequest
 

@@ -1,7 +1,10 @@
+from future import standard_library # isort:skip
+standard_library.install_aliases()
 import _thread
 from sqlalchemy.orm.util import class_mapper
 
 from ..database import db
+
 
 def _is_sql_wrapper(instance):
     """Determines if instance is a SQLAlchemy wrapper (ORM instance)"""

@@ -1,23 +1,29 @@
 """Module for i18n methods and functionality"""
-import os
-import re
-import requests
-import sys
-import tempfile
+from future import standard_library # isort:skip
+standard_library.install_aliases()
 
 from collections import defaultdict
-from cStringIO import StringIO
-from flask import current_app, has_request_context, session
-from polib import pofile
+from io import BytesIO
+import os
+import re
 from subprocess import check_call
+import sys
+import tempfile
 from zipfile import ZipFile
 
-from .app_text import AppText
+from flask import current_app, has_request_context, session
+from polib import pofile
+import requests
+
 from ..extensions import babel
+from .app_text import AppText
 from .intervention import Intervention
 from .organization import Organization
+from .questionnaire_bank import QuestionnaireBank
 from .research_protocol import ResearchProtocol
+from .role import Role
 from .user import current_user
+
 
 def get_db_strings():
     msgid_map = defaultdict(set)
@@ -25,7 +31,9 @@ def get_db_strings():
         AppText: ('custom_text',),
         Intervention: ('description', 'card_html'),
         Organization: ('name',),
-        ResearchProtocol: ('name',),
+        QuestionnaireBank: ('display_name',),
+        ResearchProtocol: ('display_name',),
+        Role: ('display_name',)
     }
 
     for model, fields in i18n_fields.items():
@@ -45,16 +53,22 @@ def upsert_to_template_file():
     db_translatables = get_db_strings()
     if db_translatables:
         try:
-            with open(os.path.join(current_app.root_path, "translations/messages.pot"),"r+") as potfile:
+            with open(
+                os.path.join(
+                    current_app.root_path,
+                    "translations/messages.pot",
+                ),
+                "r+",
+            ) as potfile:
                 potlines = potfile.readlines()
                 for i, line in enumerate(potlines):
                     if line.split() and (line.split()[0] == "msgid"):
-                        msgid = line.split(" ",1)[1].strip()
+                        msgid = line.split(" ", 1)[1].strip()
                         if msgid in db_translatables:
                             for location in db_translatables[msgid]:
                                 locstring = "# " + location + "\n"
                                 if not any(t == locstring for t in potlines[i-4:i]):
-                                    potlines.insert(i,locstring)
+                                    potlines.insert(i, locstring)
                             del db_translatables[msgid]
                 for entry, locations in db_translatables.items():
                     if entry:
@@ -215,7 +229,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state):
             headers=headers,
         )
         for langfile in zfp.namelist():
-            langcode = re.sub('-','_',langfile.split('/')[0])
+            langcode = re.sub('-', '_', langfile.split('/')[0])
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
@@ -262,7 +276,7 @@ def download_zip_file(headers, project_id, uri, state):
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("zip file downloaded from smartling")
-    fp = StringIO(resp.content)
+    fp = BytesIO(resp.content)
     return ZipFile(fp, "r")
 
 
