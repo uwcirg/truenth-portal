@@ -268,6 +268,60 @@ class TestIntervention(TestCase):
         self.assertTrue(cp.display_for_user(user).access)
         self.assertTrue(cp.quick_access_check(user))
 
+    def test_diag_changed_stategy(self):
+        """Test strategy for altered diagnosis"""
+        # Add access strategies to the care plan intervention
+        cp = INTERVENTION.CARE_PLAN
+        cp.public_access = False  # turn off public access to force strategy
+        cp_id = cp.id
+
+        with SessionScope(db):
+            d = {'function': 'observation_check',
+                 'kwargs': [{'name': 'display', 'value':
+                             CC.PCaDIAG.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'true'}]}
+            strat = AccessStrategy(
+                name="has PCa diagnosis",
+                intervention_id=cp_id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        cp = INTERVENTION.CARE_PLAN
+        user = db.session.merge(self.test_user)
+
+        # Prior to PCa dx, user shouldn't have access
+        self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
+
+        # Bless the test user with PCa diagnosis
+        self.login()
+        now = datetime.utcnow()
+        before = now - relativedelta(hours=1)
+        user.save_observation(
+            codeable_concept=CC.PCaDIAG, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='registered', issued=before)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        self.assertTrue(cp.display_for_user(user).access)
+        self.assertTrue(cp.quick_access_check(user))
+
+        # Now post a *NEW* value taking away PCa dx, should eclipse old value
+        # and tak away access
+        user.save_observation(
+            codeable_concept=CC.PCaDIAG, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='registered', issued=now)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        self.assertFalse(cp.display_for_user(user).access)
+        self.assertFalse(cp.quick_access_check(user))
+
+
     def test_no_tx(self):
         """Test strategy for not starting treatment"""
         # Add access strategies to the care plan intervention
