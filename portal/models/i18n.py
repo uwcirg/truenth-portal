@@ -59,7 +59,10 @@ def get_static_strings():
         'Overdue',
         'Expired',
     )
-    return {s: {'assessment_status: %s' % s} for s in status_strings}
+    return {
+        '"{}"'.format(s):
+            {'assessment_status: %s' % s} for s in status_strings
+    }
 
 def upsert_to_template_file():
     db_translatables = {}
