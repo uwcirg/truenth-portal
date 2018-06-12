@@ -29,9 +29,9 @@ class TestDateTools(TestCase):
         self.assertTrue('acceptance date' in str(e.exception))
 
     def test_localize_datetime_none(self):
-        self.assertEqual(localize_datetime(None,None), '')
+        self.assertEqual(localize_datetime(None, None), '')
 
     def test_localize_datetime_no_user(self):
         input_date = datetime.strptime('Jun 11 2012', '%b %d %Y')
         expected = '11 Jun 2012'
-        self.assertEqual(localize_datetime(input_date,None),expected)
+        self.assertEqual(localize_datetime(input_date, None), expected)
