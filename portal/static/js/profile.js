@@ -228,17 +228,31 @@
                     return {"done": true};
                 });
             },
-            setTopLevelOrgs: function(data) {
-                if (data && data.careProvider) {
-                    var orgTool = this.getOrgTool();
+            setTopLevelOrgs: function(callback) {
+                callback = callback || {};
+                var self = this;
+                if (this.topLevelOrgs.length > 0 || !this.currentUserId) {
+                    callback();
+                    return;
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "/api/demographics/"+this.currentUserId
+                }).done(function(data) {
+                    if (!data || !data.careProvider) {
+                        callback();
+                        return;
+                    }
+                    var orgTool = self.getOrgTool();
                     var userOrgs = data.careProvider.map(function(item) {
                         return item.reference.split("/").pop();
                     });
                     var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(userOrgs);
-                    this.topLevelOrgs = topLevelOrgs.map(function(orgId) {
+                    self.topLevelOrgs = topLevelOrgs.map(function(orgId) {
                         return orgTool.getOrgName(orgId);
                     });
-                }
+                    callback();
+                });
             },
             isUserEmailReady: function() {
                 return this.userEmailReady;
@@ -257,28 +271,20 @@
                 fieldId = fieldId || "";
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
-            setDisableFields: function() {
-                if (!this.settings.MEDIDATA_RAVE_FIELDS) {
+            handleMedidataRaveFields: function() {
+                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) {
                     return false;
                 }
-                if (this.topLevelOrgs.length > 0 && this.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                    this.disableFields = this.settings.MEDIDATA_RAVE_FIELDS;
-                    return this.disableFields;
+                if (this.topLevelOrgs.indexOf(this.settings.MEDIDATA_RAVE_ORG) !== -1) {
+                    $.merge(this.disableFields, this.settings.MEDIDATA_RAVE_FIELDS);
                 }
-                if (this.currentUserId) {
-                    var self = this;
-                    $.ajax({
-                        type: "GET",
-                        url: "/api/demographics/"+this.currentUserId
-                    }).done(function(data) {
-                        if (data) {
-                            self.setTopLevelOrgs(data);
-                        }
-                        if (self.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                            self.disableFields = self.settings.MEDIDATA_RAVE_FIELDS;
-                        }
-                    });
+            },
+            setDisableFields: function() {
+                if (!this.currentUserId || !this.isPatient()) {
+                    return false;
                 }
+                var self = this;
+                this.setTopLevelOrgs(this.handleMedidataRaveFields);
             },
             setDemoData: function(params, callback) {
                 var self = this;
@@ -291,7 +297,6 @@
                     if (data) {
                         self.demo.data = data;
                         self.setUserEmailReady();
-                        self.setTopLevelOrgs(data);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
                                 if (item.system === "email") {
@@ -433,6 +438,15 @@
             isAdmin: function() {
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
+            isPatient: function() {
+                if (this.mode === "createPatientAccount" || $("#profileMainContent").hasClass("patient-view")) {
+                    return true;
+                } 
+                if (this.userRoles.length === 0) { //this is a blocking call if not cached, so avoid it if possible
+                    this.initUserRoles({sync:true});
+                }
+                return this.userRoles.indexOf("patient") !== -1;
+            },
             isStaff: function() {
                 return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
             },
@@ -509,7 +523,7 @@
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
                                 setTimeout(function() {
-                                    var customErrorField = $("#" + o.attr("data-error-field"))
+                                    var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
                                         var errorBlock = parentContainer.find(".help-block");
@@ -697,20 +711,21 @@
                 setTimeout(function() {
                     var customErrorField = $("#" + o.attr("data-error-field"));
                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                    if (!hasError) {
-                        editButton.attr("disabled", true);
-                        data.resourceType = data.resourceType || "Patient";
-                        self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                            self.setDemoData();
-                            var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                            formGroup.removeClass("has-error");
-                            formGroup.find(".help-block.with-errors").html("");
-                            setTimeout(function() {
-                                editButton.attr("disabled", false);
-                            }, 150);
-                        });
+                    if (hasError) {
+                        editButton.attr("disabled", false);
+                        return;
                     }
-                    editButton.attr("disabled", hasError);
+                    editButton.attr("disabled", true);
+                    data.resourceType = data.resourceType || "Patient";
+                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                        self.setDemoData();
+                        var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                        formGroup.removeClass("has-error");
+                        formGroup.find(".help-block.with-errors").html("");
+                        setTimeout(function() {
+                            editButton.attr("disabled", false);
+                        }, 350);
+                    });
                 }, 250);
             },
             getTelecomData: function() {
@@ -2196,7 +2211,8 @@
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
             },
-            initUserRoles: function() {
+            initUserRoles: function(params) {
+                if (!this.subjectId) { return false; }
                 var self = this;
                 this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
                     if (data.roles) {
@@ -2204,7 +2220,7 @@
                             return role.name;
                         });
                     }
-                }, {useWorker: true});
+                }, params);
             },
             initRolesListSection: function() {
                 var self = this;

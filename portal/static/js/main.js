@@ -901,20 +901,36 @@ var tnthAjax = {
     },
     "getDemo": function(userId, params, callback) {
         callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User id is required.")});
+            return false;
+        }
         params = params || {};
+        var demoDataKey = "demoData_"+userId;
+        if (sessionStorage.getItem(demoDataKey)) {
+            callback(JSON.parse(sessionStorage.getItem(demoDataKey)));
+            return;
+        }
         this.sendRequest("/api/demographics/" + userId, "GET", userId, params, function(data) {
-            if (!data.error) {
-                $(".get-demo-error").html("");
-                callback(data);
-            } else {
-                var errorMessage = i18next.t("Server error occurred retrieving demographics information.");
+            var errorMessage = "";
+            if (data.error) {
+                errorMessage = i18next.t("Server error occurred retrieving demographics information.");
                 $(".get-demo-error").html(errorMessage);
                 callback({"error": errorMessage});
+                return false;
             }
+            $(".get-demo-error").html(errorMessage);
+            sessionStorage.setItem(demoDataKey, JSON.stringify(data));
+            callback(data);
         });
     },
     "putDemo": function(userId, toSend, targetField, sync, callback) {
         callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User Id is required")});
+            return false;
+        }
+        sessionStorage.removeItem("demoData_"+userId);
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".put-demo-error").html("");

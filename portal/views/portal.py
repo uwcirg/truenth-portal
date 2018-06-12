@@ -798,7 +798,8 @@ def config_settings(config_key):
         'PRE_REGISTERED_ROLES',
         'SYSTEM',
         'SHOW_PROFILE_MACROS',
-        'MEDIDATA_RAVE_FIELDS'
+        'MEDIDATA_RAVE_FIELDS',
+        'MEDIDATA_RAVE_ORG'
     )
     if config_key:
         key = config_key.upper()
