@@ -50,7 +50,9 @@ def get_db_strings():
     return msgid_map
 
 def upsert_to_template_file():
-    db_translatables = get_db_strings()
+    db_translatables = {}
+    db_translatables.update(get_db_strings())
+
     if db_translatables:
         try:
             with open(
