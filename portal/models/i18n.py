@@ -49,9 +49,22 @@ def get_db_strings():
                 ))
     return msgid_map
 
+
+def get_static_strings():
+    """Manually add strings that are otherwise difficult to extract"""
+    status_strings = (
+        'Completed',
+        'Due',
+        'In Progress',
+        'Overdue',
+        'Expired',
+    )
+    return {s: {'assessment_status: %s' % s} for s in status_strings}
+
 def upsert_to_template_file():
     db_translatables = {}
     db_translatables.update(get_db_strings())
+    db_translatables.update(get_static_strings())
 
     if db_translatables:
         try:
