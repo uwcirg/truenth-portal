@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from flask import Blueprint, abort, current_app, jsonify, render_template
+from flask_babel import gettext as _
 from flask_user import roles_required
 from sqlalchemy import and_
 
