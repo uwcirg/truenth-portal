@@ -83,22 +83,24 @@ def upsert_to_template_file():
         ) as potfile:
             potlines = potfile.readlines()
             for i, line in enumerate(potlines):
-                if line.split() and (line.split()[0] == "msgid"):
-                    msgid = line.split(" ", 1)[1].strip()
-                    if msgid not in db_translatables:
-                        continue
-                    for location in db_translatables[msgid]:
-                        locstring = "# " + location + "\n"
-                        if not any(t == locstring for t in potlines[i-4:i]):
-                            potlines.insert(i, locstring)
-                    del db_translatables[msgid]
+                if not line.split() or (line.split()[0] != "msgid"):
+                    continue
+                msgid = line.split(" ", 1)[1].strip()
+                if msgid not in db_translatables:
+                    continue
+                for location in db_translatables[msgid]:
+                    locstring = "# " + location + "\n"
+                    if not any(t == locstring for t in potlines[i-4:i]):
+                        potlines.insert(i, locstring)
+                del db_translatables[msgid]
             for entry, locations in db_translatables.items():
-                if entry:
-                    for loc in locations:
-                        potlines.append("# " + loc + "\n")
-                    potlines.append("msgid " + entry + "\n")
-                    potlines.append("msgstr \"\"\n")
-                    potlines.append("\n")
+                if not entry:
+                    continue
+                for loc in locations:
+                    potlines.append("# " + loc + "\n")
+                potlines.append("msgid " + entry + "\n")
+                potlines.append("msgstr \"\"\n")
+                potlines.append("\n")
             potfile.truncate(0)
             potfile.seek(0)
             potfile.writelines(potlines)
