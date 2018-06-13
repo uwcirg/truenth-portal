@@ -66,7 +66,7 @@ class BaseConfig(object):
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
     LOG_LEVEL = 'DEBUG'
 
-    GIL = os.environ.get('GIL','true').lower() == 'true'
+    GIL = os.environ.get('GIL', 'true').lower() == 'true'
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
     SS_TIMEOUT = 60 * 60  # seconds for session cookie, reset on ping
