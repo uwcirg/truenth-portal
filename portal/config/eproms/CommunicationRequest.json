@@ -543,6 +543,176 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
+          "value": "IRONMAN Recurring | 6 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 6 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 6 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 6 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 6 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 6 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 6 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 6 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 6 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 6 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
           "value": "IRONMAN Recurring | 9 Month Reminder (1)"
         }
       ],
@@ -713,14 +883,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Recurring | 6 Month Reminder (1)"
+          "value": "IRONMAN Recurring | 12 Month Reminder (1)"
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"days\": 0}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -730,14 +900,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Recurring | 6 Month Reminder (1)"
+          "value": "IRONMAN v3 Recurring | 12 Month Reminder (1)"
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"days\": 0}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -747,14 +917,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Recurring | 6 Month Reminder (2)"
+          "value": "IRONMAN Recurring | 12 Month Reminder (2)"
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -764,14 +934,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Recurring | 6 Month Reminder (2)"
+          "value": "IRONMAN v3 Recurring | 12 Month Reminder (2)"
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -781,14 +951,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Recurring | 6 Month Reminder (3)"
+          "value": "IRONMAN Recurring | 12 Month Reminder (3)"
         }
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -798,14 +968,14 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Recurring | 6 Month Reminder (3)"
+          "value": "IRONMAN v3 Recurring | 12 Month Reminder (3)"
         }
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -815,12 +985,250 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Recurring | 6 Month Reminder (4)"
+          "value": "IRONMAN Recurring | 12 Month Reminder (4)"
         }
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"weeks\": 3}",
       "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 12 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 12 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 12 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 15 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 15 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 15 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 15 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 15 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 15 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 15 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 15 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 15 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 15 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 18 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
       },
@@ -832,12 +1240,12 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Recurring | 6 Month Reminder (4)"
+          "value": "IRONMAN v3 Recurring | 18 Month Reminder (1)"
         }
       ],
-      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
-      "notify_post_qb_start": "{\"weeks\": 3}",
-      "qb_iteration": 0,
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
       },
@@ -849,12 +1257,12 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Recurring | 6 Month Final Reminder"
+          "value": "IRONMAN Recurring | 18 Month Reminder (2)"
         }
       ],
-      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
-      "notify_post_qb_start": "{\"weeks\": 4}",
-      "qb_iteration": 0,
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
       },
@@ -866,14 +1274,796 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Recurring | 6 Month Final Reminder"
+          "value": "IRONMAN v3 Recurring | 18 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 18 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 18 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 18 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 18 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 18 Month Final Reminder"
         }
       ],
       "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
       "notify_post_qb_start": "{\"weeks\": 4}",
-      "qb_iteration": 0,
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 18 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 21 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 21 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 21 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 21 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 21 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 21 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 21 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 21 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 21 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 21 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 3,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 24 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 24 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 24 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 24 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 24 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 24 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 24 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 24 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 24 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 24 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 1,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 30 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 30 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 30 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 30 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 30 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 30 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 30 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 30 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 30 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 30 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_6mo_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 36 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 36 Month Reminder (1)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"days\": 0}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 36 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 36 Month Reminder (2)"
+        }
+      ],
+      "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 36 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 36 Month Reminder (3)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 36 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 36 Month Reminder (4)"
+        }
+      ],
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN Recurring | 36 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_recurring_annual_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "IRONMAN v3 Recurring | 36 Month Final Reminder"
+        }
+      ],
+      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "notify_post_qb_start": "{\"weeks\": 4}",
+      "qb_iteration": 2,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_annual_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
