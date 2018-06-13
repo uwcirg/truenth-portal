@@ -139,13 +139,13 @@
                     "purged": "Purged / Removed"
                 },
                 consentItems: [],
+                currentItems: [],
+                historyItems: [],
                 touObj: [],
                 consentDisplayRows: [],
                 consentListErrorMessage: "",
                 consentLoading: false,
-                showInitialConsentTerms: false,
-                hasCurrentConsent: false,
-                hasConsentHistory: false
+                showInitialConsentTerms: false
             },
             assessment: {
                 assessmentListItems: [], assessmentListError: ""
@@ -228,17 +228,31 @@
                     return {"done": true};
                 });
             },
-            setTopLevelOrgs: function(data) {
-                if (data && data.careProvider) {
-                    var orgTool = this.getOrgTool();
+            setTopLevelOrgs: function(callback) {
+                callback = callback || function(){};
+                var self = this;
+                if (this.topLevelOrgs.length > 0 || !this.currentUserId) {
+                    callback();
+                    return;
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "/api/demographics/"+this.currentUserId
+                }).done(function(data) {
+                    if (!data || !data.careProvider) {
+                        callback();
+                        return;
+                    }
+                    var orgTool = self.getOrgTool();
                     var userOrgs = data.careProvider.map(function(item) {
                         return item.reference.split("/").pop();
                     });
                     var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(userOrgs);
-                    this.topLevelOrgs = topLevelOrgs.map(function(orgId) {
+                    self.topLevelOrgs = topLevelOrgs.map(function(orgId) {
                         return orgTool.getOrgName(orgId);
                     });
-                }
+                    callback();
+                });
             },
             isUserEmailReady: function() {
                 return this.userEmailReady;
@@ -257,28 +271,19 @@
                 fieldId = fieldId || "";
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
-            setDisableFields: function() {
-                if (!this.settings.MEDIDATA_RAVE_FIELDS) {
+            handleMedidataRaveFields: function() {
+                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) {
                     return false;
                 }
-                if (this.topLevelOrgs.length > 0 && this.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                    this.disableFields = this.settings.MEDIDATA_RAVE_FIELDS;
-                    return this.disableFields;
+                if (this.topLevelOrgs.indexOf(this.settings.MEDIDATA_RAVE_ORG) !== -1) {
+                    $.merge(this.disableFields, this.settings.MEDIDATA_RAVE_FIELDS);
                 }
-                if (this.currentUserId) {
-                    var self = this;
-                    $.ajax({
-                        type: "GET",
-                        url: "/api/demographics/"+this.currentUserId
-                    }).done(function(data) {
-                        if (data) {
-                            self.setTopLevelOrgs(data);
-                        }
-                        if (self.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                            self.disableFields = self.settings.MEDIDATA_RAVE_FIELDS;
-                        }
-                    });
+            },
+            setDisableFields: function() {
+                if (!this.currentUserId || !this.isPatient()) {
+                    return false;
                 }
+                this.setTopLevelOrgs(this.handleMedidataRaveFields);
             },
             setDemoData: function(params, callback) {
                 var self = this;
@@ -291,7 +296,6 @@
                     if (data) {
                         self.demo.data = data;
                         self.setUserEmailReady();
-                        self.setTopLevelOrgs(data);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
                                 if (item.system === "email") {
@@ -433,6 +437,15 @@
             isAdmin: function() {
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
+            isPatient: function() {
+                if (this.mode === "createPatientAccount" || $("#profileMainContent").hasClass("patient-view")) {
+                    return true;
+                }
+                if (this.userRoles.length === 0) { //this is a blocking call if not cached, so avoid it if possible
+                    this.initUserRoles({sync:true});
+                }
+                return this.userRoles.indexOf("patient") !== -1;
+            },
             isStaff: function() {
                 return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
             },
@@ -509,7 +522,7 @@
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
                                 setTimeout(function() {
-                                    var customErrorField = $("#" + o.attr("data-error-field"))
+                                    var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
                                         var errorBlock = parentContainer.find(".help-block");
@@ -697,20 +710,21 @@
                 setTimeout(function() {
                     var customErrorField = $("#" + o.attr("data-error-field"));
                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                    if (!hasError) {
-                        editButton.attr("disabled", true);
-                        data.resourceType = data.resourceType || "Patient";
-                        self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                            self.setDemoData();
-                            var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                            formGroup.removeClass("has-error");
-                            formGroup.find(".help-block.with-errors").html("");
-                            setTimeout(function() {
-                                editButton.attr("disabled", false);
-                            }, 150);
-                        });
+                    if (hasError) {
+                        editButton.attr("disabled", false);
+                        return;
                     }
-                    editButton.attr("disabled", hasError);
+                    editButton.attr("disabled", true);
+                    data.resourceType = data.resourceType || "Patient";
+                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                        self.setDemoData();
+                        var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                        formGroup.removeClass("has-error");
+                        formGroup.find(".help-block.with-errors").html("");
+                        setTimeout(function() {
+                            editButton.attr("disabled", false);
+                        }, 350);
+                    });
                 }, 250);
             },
             getTelecomData: function() {
@@ -1619,6 +1633,25 @@
                     });
                 });
             },
+            getNoOrgDisplay: function() {
+                return "<p class='text-muted'>"+this.modules.i18next.t("No affiliated clinic")+"</p>";
+            },
+            getOrgsDisplay: function() {
+                if (!this.demo.data.careProvider || this.demo.data.careProvider.length === 0) {
+                    return this.getNoOrgDisplay();
+                }
+                /* example return from api demographics: [{ display: Duke, reference: "api/organization/1301"}, {"display":"Arvin George","reference":"api/practitioner/1851648521?system=http://hl7.org/fhir/sid/us-npi"}]
+                 * NOTE: need to exclude displays other than organization */
+                var self = this;
+                var arrDisplay = this.demo.data.careProvider.map(function(item) {
+                    if (String(item.reference) === "api/organization/0") { //organization id = 0
+                        return self.getNoOrgDisplay();
+                    }
+                    return (item.reference.match(/^api\/organization/gi) ? "<p>"+item.display+"</p>": "");
+                });
+
+                return arrDisplay.join("");
+            },
             updateOrgs: function(targetField, sync) {
                 var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val(), userId=this.subjectId;
                 var self = this;
@@ -1646,7 +1679,7 @@
                 if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
                     demoArray.careProvider = [{reference: "api/organization/" + 0}];
                 }
-                self.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync);
+                this.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync, this.setDemoData);
             },
             getConsentModal: function(parentOrg) {
                 var orgTool = this.getOrgTool();
@@ -2196,7 +2229,8 @@
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
             },
-            initUserRoles: function() {
+            initUserRoles: function(params) {
+                if (!this.subjectId) { return false; }
                 var self = this;
                 this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
                     if (data.roles) {
@@ -2204,7 +2238,7 @@
                             return role.name;
                         });
                     }
-                }, {useWorker: true});
+                }, params);
             },
             initRolesListSection: function() {
                 var self = this;
@@ -2302,16 +2336,16 @@
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
                 var content = "<tr>";
                 var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item)
+                    content: self.getConsentOrgDisplayName(item) + "<div class='smaller-text text-muted'>" + this.orgTool.getOrgName(item.organization_id) + "</div>"
                 }, {
                     content: sDisplay
                 }, {
                     content: self.modules.tnthDates.formatDateString(item.signed)
 
                 }, {
-                    content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"
+                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||self.modules.tnthDates.formatDateString(item.signed,"iso")) + "</span>"
                 }, {
-                    content: (item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
+                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2342,7 +2376,7 @@
             getDeletedDisplayDate: function(item) {
                 if (!item) {return "";}
                 var deleteDate = item.deleted ? item.deleted.lastUpdated : "";
-                return deleteDate.replace("T", " ");
+                return this.modules.tnthDates.formatDateString(deleteDate, "yyyy-mm-dd hh:mm:ss");
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2569,17 +2603,24 @@
                     }), 100);
                 });
             },
+            showConsentHistory: function() {
+               return !this.consent.consentLoading && this.isConsentEditable() && this.hasConsentHistory();
+            },
+            hasConsentHistory: function() {
+                return this.consent.historyItems.length > 0;
+            },
+            hasCurrentConsent: function() {
+                return this.consent.currentItems.length > 0;
+            },
             getConsentHistory: function(options) {
                 if (!options) {options = {};}
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = $.grep(self.consent.consentItems, function(item) { //iltered out deleted items from all consents
-                    return !(/null/.test(item.agreement_url)) && item.deleted;
-                });
-                items = items.sort(function(a, b) { //sort items by last updated date in descending order
+                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
                     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
                 });
+                items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2623,17 +2664,18 @@
                 }
 
                 var existingOrgs = {};
-                this.consent.consentItems.forEach(function(item, index) {
-                    if (item.deleted) {
-                        self.consent.hasConsentHistory = true;
-                        return true;
-                    }
+                this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
+                    return !item.hasOwnProperty("deleted");
+                });
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                    return item.hasOwnProperty("deleted");
+                });
+                this.consent.currentItems.forEach(function(item, index) {
                     if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-                this.consent.hasCurrentConsent = Object.keys(existingOrgs).length > 0;
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2647,7 +2689,7 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                 }, 50);
-                if (self.isConsentEditable() && self.consent.hasConsentHistory) {
+                if (this.showConsentHistory()) {
                     $("#viewConsentHistoryButton").on("click", function(e) {
                         e.preventDefault();
                         self.getConsentHistory();

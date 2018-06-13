@@ -55,7 +55,7 @@ class TestAudit(TestCase):
 
     def test_empty(self):
         "no audit for user should still function"
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
@@ -68,7 +68,7 @@ class TestAudit(TestCase):
             db.session.add(audit)
             db.session.commit()
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
@@ -87,8 +87,8 @@ class TestAudit(TestCase):
 
     def test_staff_access(self):
         staff = self.add_user('provider@example.com')
-        self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(staff, role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(staff, role_name=ROLE.STAFF.value)
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         staff.organizations.append(org)

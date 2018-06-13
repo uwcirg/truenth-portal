@@ -428,7 +428,7 @@ class TestIntervention(TestCase):
                   'value': 'not_in_role_list'},
                  {'name': 'strategy_2_kwargs',
                   'value': [{'name': 'role_list',
-                             'value': [ROLE.WRITE_ONLY]}]}
+                             'value': [ROLE.WRITE_ONLY.value]}]}
                  ]
             }
 
@@ -448,7 +448,7 @@ class TestIntervention(TestCase):
         self.assertTrue(sm.quick_access_check(user))
 
         # Add WRITE_ONLY to user's roles
-        add_role(user, ROLE.WRITE_ONLY)
+        add_role(user, ROLE.WRITE_ONLY.value)
         with SessionScope(db):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
@@ -483,7 +483,7 @@ class TestIntervention(TestCase):
              'function': 'in_role_list',
              'kwargs': [
                  {'name': 'role_list',
-                  'value': [ROLE.PATIENT]}]
+                  'value': [ROLE.PATIENT.value]}]
             }
 
         with SessionScope(db):
@@ -501,7 +501,7 @@ class TestIntervention(TestCase):
         self.assertFalse(sm.quick_access_check(user))
 
         # Add PATIENT to user's roles
-        add_role(user, ROLE.PATIENT)
+        add_role(user, ROLE.PATIENT.value)
         with SessionScope(db):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
@@ -617,7 +617,7 @@ class TestIntervention(TestCase):
 
     def test_strat_view(self):
         """Test strategy view functions"""
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         d = {
             'name': 'unit test example',
@@ -644,7 +644,7 @@ class TestIntervention(TestCase):
 
     def test_strat_dup_rank(self):
         """Rank must be unique"""
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         d = {
             'name': 'unit test example',
@@ -948,7 +948,7 @@ class TestIntervention(TestCase):
                  'value': 'not_in_role_list'},
                 {'name': 'strategy_5_kwargs',
                  'value': [{'name': 'role_list',
-                            'value': [ROLE.WRITE_ONLY]}]}
+                            'value': [ROLE.WRITE_ONLY.value]}]}
             ]
         }
         with SessionScope(db):
@@ -989,7 +989,7 @@ class TestIntervention(TestCase):
         self.assertTrue(ds_p3p.display_for_user(user).access)
 
         # Finally, add the WRITE_ONLY group and it should disappear
-        add_role(user, ROLE.WRITE_ONLY)
+        add_role(user, ROLE.WRITE_ONLY.value)
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -1000,7 +1000,7 @@ class TestIntervention(TestCase):
         sm = INTERVENTION.SELF_MANAGEMENT
         sm.public_access = False
         user = self.test_user
-        add_role(user, ROLE.PATIENT)
+        add_role(user, ROLE.PATIENT.value)
         sm_identifier = Identifier(
             value='self_management', system=DECISION_SUPPORT_GROUP)
         uw = Organization(
@@ -1036,7 +1036,7 @@ class TestIntervention(TestCase):
                  'value': 'in_role_list'},
                 {'name': 'strategy_2_kwargs',
                  'value': [{'name': 'role_list',
-                            'value': [ROLE.PATIENT]}]},
+                            'value': [ROLE.PATIENT.value]}]},
                 # Has Localized PCa (strat 3)
                 {'name': 'strategy_3',
                  'value': 'observation_check'},
@@ -1169,7 +1169,7 @@ class TestIntervention(TestCase):
             INTERVENTION.phoney
 
         self.login()
-        self.promote_user(role_name=ROLE.SERVICE)
+        self.promote_user(role_name=ROLE.SERVICE.value)
         data = {'user_id': TEST_USER_ID, 'access': "granted"}
         rv = self.client.put('/api/intervention/phoney', data=data)
         self.assert404(rv)
@@ -1208,7 +1208,7 @@ class TestEpromsStrategies(TestCase):
 
     def test_self_mgmt(self):
         """Patient w/ Southampton org should get access to self_mgmt"""
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         southampton = Organization.query.filter_by(name='Southampton').one()
         self.test_user.organizations.append(southampton)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
@@ -1223,7 +1223,7 @@ class TestEpromsStrategies(TestCase):
 
     def test_self_mgmt_org_denied(self):
         """Patient w/o Southampton org should NOT get self_mgmt access"""
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
         user = db.session.merge(self.test_user)
         self.assertFalse(self_mgmt.quick_access_check(user))

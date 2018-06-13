@@ -128,7 +128,7 @@ class ClientEditForm(FlaskForm):
 
 
 @client_api.route('/client', methods=('GET', 'POST'))
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_reg():
     """client registration
@@ -213,7 +213,7 @@ def client_reg():
 
 
 @client_api.route('/client/<client_id>', methods=('GET', 'POST'))
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_edit(client_id):
     """client edit
@@ -376,7 +376,7 @@ def client_edit(client_id):
 
 
 @client_api.route('/clients')
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN])
+@roles_required([ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value])
 @oauth.require_oauth()
 def clients_list():
     """clients list
@@ -412,7 +412,7 @@ def clients_list():
 
     """
     user = current_user()
-    if user.has_role(ROLE.ADMIN):
+    if user.has_role(ROLE.ADMIN.value):
         clients = Client.query.all()
     else:
         clients = Client.query.filter_by(user_id=user.id).all()

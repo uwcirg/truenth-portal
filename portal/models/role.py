@@ -4,12 +4,14 @@ Role data lives in the `roles` table, populated via:
     `flask seed`
 
 To restrict access to a given role, use the ROLE object:
-    @roles_required(ROLE.ADMIN)
+    @roles_required(ROLE.ADMIN.value)
 
 To extend the list of roles, add name: description pairs to the
 STATIC_ROLES dict within.
 
 """
+from enum import Enum
+
 from ..database import db
 
 
@@ -83,14 +85,8 @@ STATIC_ROLES = {
 }
 
 
-def enum(**items):
-    """Convert dictionary to Enumeration for direct access"""
-    return type('Enum', (), items)
-
-
-ROLE = enum(**{r.upper(): r for r in STATIC_ROLES})
-ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
-
+ROLE = Enum('ROLE', {r.upper(): r for r in STATIC_ROLES})
+ALL_BUT_WRITE_ONLY = [r.value for r in ROLE if r.value != 'write_only']
 
 def add_static_roles():
     """Seed database with default static roles

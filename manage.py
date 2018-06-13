@@ -210,7 +210,7 @@ def password_reset(email, password, actor):
         target_user = User.query.filter(User.email == email).one()
     except NoResultFound:
         raise ValueError("email for target user not found")
-    if not acting_user.has_role(ROLE.ADMIN):
+    if not acting_user.has_role(ROLE.ADMIN.value):
         raise ValueError("Actor must be an admin")
     if not password or len(str(password)) < 8:
         raise ValueError("requires a valid password")

@@ -647,7 +647,8 @@ def assessment(patient_id, instrument_id):
 
 
 @assessment_engine_api.route('/patient/assessment')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.RESEARCHER])
+@roles_required(
+    [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def get_assessments():
     """
@@ -1392,7 +1393,7 @@ def invalidate(user_id):
 
 
 @assessment_engine_api.route('/present-needed')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_needed():
     """Look up needed and in process q's for user and then present_assessment
@@ -1436,7 +1437,7 @@ def present_needed():
 
 
 @assessment_engine_api.route('/present-assessment')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine

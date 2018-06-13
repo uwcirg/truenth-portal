@@ -16,7 +16,7 @@ from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 class TestPatient(TestCase):
 
     def test_email_search(self):
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         rv = self.client.get(
             '/api/patient?email={}'.format(TEST_USERNAME),
@@ -35,7 +35,7 @@ class TestPatient(TestCase):
 
     def test_inadequate_perms(self):
         dummy = self.add_user(username='dummy@example.com')
-        self.promote_user(user=dummy, role_name=ROLE.PATIENT)
+        self.promote_user(user=dummy, role_name=ROLE.PATIENT.value)
         self.login()
         rv = self.client.get(
             '/api/patient?email={}'.format('dummy@example.com'),
@@ -50,7 +50,7 @@ class TestPatient(TestCase):
             db.session.add(ident)
             db.session.add(ui)
             db.session.commit()
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         ident = db.session.merge(ident)
         rv = self.client.get(
@@ -65,7 +65,7 @@ class TestPatient(TestCase):
             db.session.add(ident)
             db.session.add(ui)
             db.session.commit()
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         ident = db.session.merge(ident)
         # modify the system to mis match
@@ -83,7 +83,7 @@ class TestPatient(TestCase):
             db.session.add(ident)
             db.session.add(ui)
             db.session.commit()
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         ident = db.session.merge(ident)
         rv = self.client.get(
@@ -92,7 +92,7 @@ class TestPatient(TestCase):
         self.assert400(rv)
 
     def test_birthDate(self):
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         data = {'birthDate': '1976-07-04'}
         rv = self.client.post(
@@ -105,7 +105,7 @@ class TestPatient(TestCase):
         self.assertEqual(user.birthdate.strftime("%Y-%m-%d"), "1976-07-04")
 
     def test_deceased(self):
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         now = FHIR_datetime.as_fhir(datetime.utcnow())
         data = {'deceasedDateTime': now}
@@ -119,7 +119,7 @@ class TestPatient(TestCase):
 
     def test_deceased_undead(self):
         """POST should allow reversal if already deceased"""
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PATIENT.value)
         d_audit = Audit(
             user_id=TEST_USER_ID, subject_id=TEST_USER_ID, context='user',
             comment="time of death for user {}".format(TEST_USER_ID))

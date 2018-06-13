@@ -87,7 +87,7 @@ class TestSitePersistence(TestCase):
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
             status=None, issued=None)
-        self.promote_user(user, role_name=ROLE.PATIENT)
+        self.promote_user(user, role_name=ROLE.PATIENT.value)
         with SessionScope(db):
             db.session.commit()
         user = db.session.merge(user)
