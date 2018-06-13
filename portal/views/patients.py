@@ -114,7 +114,7 @@ def patients_root():
         patient_list = []
         for patient in patients:
             a_s, qbd = overall_assessment_status(patient.id)
-            patient.assessment_status = a_s
+            patient.assessment_status = _(a_s)
             patient.current_qb = visit_name(qbd)
             patient_list.append(patient)
         patients = patient_list
