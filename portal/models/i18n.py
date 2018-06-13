@@ -85,12 +85,13 @@ def upsert_to_template_file():
             for i, line in enumerate(potlines):
                 if line.split() and (line.split()[0] == "msgid"):
                     msgid = line.split(" ", 1)[1].strip()
-                    if msgid in db_translatables:
-                        for location in db_translatables[msgid]:
-                            locstring = "# " + location + "\n"
-                            if not any(t == locstring for t in potlines[i-4:i]):
-                                potlines.insert(i, locstring)
-                        del db_translatables[msgid]
+                    if msgid not in db_translatables:
+                        continue
+                    for location in db_translatables[msgid]:
+                        locstring = "# " + location + "\n"
+                        if not any(t == locstring for t in potlines[i-4:i]):
+                            potlines.insert(i, locstring)
+                    del db_translatables[msgid]
             for entry, locations in db_translatables.items():
                 if entry:
                     for loc in locations:
