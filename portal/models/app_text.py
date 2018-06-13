@@ -7,6 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from builtins import str
 from future import standard_library # isort:skip
 standard_library.install_aliases()
 
@@ -378,7 +379,7 @@ class UnversionedResource(object):
         self.url = url
         self.variables = variables or {}
         if asset:
-            self._asset = unicode(asset)
+            self._asset = str(asset)
         else:
             try:
                 response = time_request(url)
@@ -570,10 +571,10 @@ class MailResource(object):
         if self._subject:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._subject).format(
+                    formatted = (str(self._subject)).format(
                         **self.variables.minimal_subdict(self._subject))
                 else:
-                    formatted = unicode(self._subject).format(**self.variables)
+                    formatted = (str(self._subject)).format(**self.variables)
                 return formatted
             except KeyError as e:
                 self.error_msg = "Missing subject variable {}".format(e)
@@ -588,10 +589,10 @@ class MailResource(object):
         if self._body:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._body).format(
+                    formatted = (str(self._body)).format(
                         **self.variables.minimal_subdict(self._body))
                 else:
-                    formatted = unicode(self._body).format(**self.variables)
+                    formatted = (str((self._body))).format(**self.variables)
                 if self._footer:
                     formatted += "\n"
                     formatted += self.footer
@@ -609,10 +610,10 @@ class MailResource(object):
         if self._footer:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._footer).format(
+                    formatted = (str(self._footer)).format(
                         **self.variables.minimal_subdict(self._footer))
                 else:
-                    formatted = unicode(self._footer).format(**self.variables)
+                    formatted = (str(self._footer)).format(**self.variables)
                 return formatted
             except KeyError as e:
                 self.error_msg = "Missing footer variable {}".format(e)

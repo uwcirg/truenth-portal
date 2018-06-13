@@ -27,7 +27,7 @@ class Identifier(db.Model):
     @value.setter
     def value(self, value):
         # Force to text
-        self._value = unicode(value)
+        self._value = str(value)
         # Don't allow empty string
         if not len(self._value):
             raise TypeError("<empty string>")

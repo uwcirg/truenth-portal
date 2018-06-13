@@ -3,9 +3,8 @@ import json
 
 from werkzeug.exceptions import BadRequest
 
-from portal.date_tools import FHIR_datetime, RelativeDelta
+from portal.date_tools import FHIR_datetime, RelativeDelta, localize_datetime
 from tests import TestCase
-
 
 class TestDateTools(TestCase):
 
@@ -28,3 +27,11 @@ class TestDateTools(TestCase):
         with self.assertRaises(BadRequest) as e:
             dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
         self.assertTrue('acceptance date' in str(e.exception))
+
+    def test_localize_datetime_none(self):
+        self.assertEqual(localize_datetime(None, None), '')
+
+    def test_localize_datetime_no_user(self):
+        input_date = datetime.strptime('Jun 01 2012', '%b %d %Y')
+        expected = '1 Jun 2012'
+        self.assertEqual(localize_datetime(input_date, None), expected)
