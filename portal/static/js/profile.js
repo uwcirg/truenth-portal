@@ -1644,7 +1644,7 @@
                  * NOTE: need to exclude displays other than organization */
                 var self = this;
                 var arrDisplay = this.demo.data.careProvider.map(function(item) {
-                    if (item.reference.match(/^api\/organization\/0$/gi)) { //organization id = 0
+                    if (String(item.reference) === "api/organization/0") { //organization id = 0
                         return self.getNoOrgDisplay();
                     }
                     return (item.reference.match(/^api\/organization/gi) ? "<p>"+item.display+"</p>": "");
