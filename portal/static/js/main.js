@@ -181,6 +181,11 @@ OrgTool.prototype.findOrg = function(entry, orgId) {
     }
     return org;
 };
+OrgTool.prototype.getOrgName = function(orgId) {
+    var org = this.orgsList[orgId];
+    if (!org) return "";
+    return org.name;
+};
 OrgTool.prototype.populateOrgsList = function(items) {
     var entry = items, self = this, parentId, orgsList = {};
     if (Object.keys(this.orgsList).length === 0) {
@@ -1913,7 +1918,7 @@ var tnthDates = {
         var locale = "";
         if (sessionLocale) {
             return sessionLocale;
-        } 
+        }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
         }

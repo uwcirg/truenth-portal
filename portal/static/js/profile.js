@@ -139,13 +139,13 @@
                     "purged": "Purged / Removed"
                 },
                 consentItems: [],
+                currentItems: [],
+                historyItems: [],
                 touObj: [],
                 consentDisplayRows: [],
                 consentListErrorMessage: "",
                 consentLoading: false,
-                showInitialConsentTerms: false,
-                hasCurrentConsent: false,
-                hasConsentHistory: false
+                showInitialConsentTerms: false
             },
             assessment: {
                 assessmentListItems: [], assessmentListError: ""
@@ -2317,16 +2317,16 @@
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
                 var content = "<tr>";
                 var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item)
+                    content: self.getConsentOrgDisplayName(item) + "<div class='smaller-text text-muted'>" + this.orgTool.getOrgName(item.organization_id) + "</div>"
                 }, {
                     content: sDisplay
                 }, {
                     content: self.modules.tnthDates.formatDateString(item.signed)
 
                 }, {
-                    content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"
+                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||self.modules.tnthDates.formatDateString(item.signed,"iso")) + "</span>"
                 }, {
-                    content: (item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
+                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2357,7 +2357,7 @@
             getDeletedDisplayDate: function(item) {
                 if (!item) {return "";}
                 var deleteDate = item.deleted ? item.deleted.lastUpdated : "";
-                return deleteDate.replace("T", " ");
+                return this.modules.tnthDates.formatDateString(deleteDate, "yyyy-mm-dd hh:mm:ss");
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2584,17 +2584,24 @@
                     }), 100);
                 });
             },
+            showConsentHistory: function() {
+               return !this.consent.consentLoading && this.isConsentEditable() && this.hasConsentHistory();
+            },
+            hasConsentHistory: function() {
+                return this.consent.historyItems.length > 0;
+            },
+            hasCurrentConsent: function() {
+                return this.consent.currentItems.length > 0;
+            },
             getConsentHistory: function(options) {
                 if (!options) {options = {};}
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = $.grep(self.consent.consentItems, function(item) { //iltered out deleted items from all consents
-                    return !(/null/.test(item.agreement_url)) && item.deleted;
-                });
-                items = items.sort(function(a, b) { //sort items by last updated date in descending order
+                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
                     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
                 });
+                items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2638,17 +2645,18 @@
                 }
 
                 var existingOrgs = {};
-                this.consent.consentItems.forEach(function(item, index) {
-                    if (item.deleted) {
-                        self.consent.hasConsentHistory = true;
-                        return true;
-                    }
+                this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
+                    return !item.hasOwnProperty("deleted")
+                });
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                    return item.hasOwnProperty("deleted");
+                });
+                this.consent.currentItems.forEach(function(item, index) {
                     if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-                this.consent.hasCurrentConsent = Object.keys(existingOrgs).length > 0;
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2662,7 +2670,7 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                 }, 50);
-                if (self.isConsentEditable() && self.consent.hasConsentHistory) {
+                if (this.showConsentHistory()) {
                     $("#viewConsentHistoryButton").on("click", function(e) {
                         e.preventDefault();
                         self.getConsentHistory();

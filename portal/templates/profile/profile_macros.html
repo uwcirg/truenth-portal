@@ -651,11 +651,11 @@
     {% if person %}
         <div id="profileConsentList">
             <div id="consentListLoad" v-show="consent.consentLoading"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
-            <div v-if="!consent.hasCurrentConsent" class="text-muted">{{_("No consent record found")}}</div>
+            <div v-if="!hasCurrentConsent()" class="text-muted">{{_("No consent record found")}}</div>
             {% raw %}
                 <div id="consentListErrorMessageContainer" class="error-message">{{consent.consentListErrorMessage}}</div>
             {% endraw %}
-            <table id='consentListTable' class='table-bordered table-condensed table-responsive' style="width: 100%; max-width:100%" v-show="consent.hasCurrentConsent">
+            <table id='consentListTable' class='table-bordered table-condensed table-responsive' v-show="hasCurrentConsent()">
                 <THEAD>
                     <TH v-for="item in consent.consentHeaderArray" v-html="item" class="consentlist-header"></TH>
                 </THEAD>
@@ -683,7 +683,7 @@
                 </TBODY>
             </table>
         </div>
-        <div id="profileConsentHistory" v-show="isConsentEditable() && consent.hasConsentHistory">
+        <div id="profileConsentHistory" v-show="showConsentHistory()">
             <br/><button id="viewConsentHistoryButton" class='btn btn-tnth-primary sm-btn'>{{_("History")}}</button>
             <div class="modal fade" id="consentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="consentHistoryModal">
                 <div class="modal-dialog" role="document">
