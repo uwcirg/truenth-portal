@@ -137,5 +137,5 @@ def localize_datetime(dt, user):
         best = local.astimezone(tz)
     else:
         best = dt
-    d, m, y = best.strftime('%d %b %Y').split()
+    d, m, y = best.strftime('%-d %b %Y').split()
     return ' '.join((d, _(m), y))
