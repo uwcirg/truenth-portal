@@ -440,7 +440,7 @@
             isPatient: function() {
                 if (this.mode === "createPatientAccount" || $("#profileMainContent").hasClass("patient-view")) {
                     return true;
-                } 
+                }
                 if (this.userRoles.length === 0) { //this is a blocking call if not cached, so avoid it if possible
                     this.initUserRoles({sync:true});
                 }
@@ -1633,6 +1633,24 @@
                     });
                 });
             },
+            getNoOrgDisplay: function() {
+                return "<p class='text-muted'>"+this.modules.i18next.t("No affiliated clinic")+"</p>";
+            },
+            getOrgsDisplay: function() {
+                if (!this.demo.data.careProvider || this.demo.data.careProvider.length === 0) {
+                    return this.getNoOrgDisplay();
+                }
+                /* example return from api demographics: { display: Duke, reference: "api/organization/1301"} */
+                var self = this;
+                var arrDisplay = this.demo.data.careProvider.map(function(item) {
+                    if (item.reference.match(/^api\/organization\/0$/gi)) { //organization id = 0
+                        return self.getNoOrgDisplay();
+                    }
+                    return (item.reference.match(/^api\/organization/gi) ? "<p>"+item.display+"</p>": "");
+                });
+
+                return arrDisplay.join("");
+            },
             updateOrgs: function(targetField, sync) {
                 var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val(), userId=this.subjectId;
                 var self = this;
@@ -1660,7 +1678,7 @@
                 if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
                     demoArray.careProvider = [{reference: "api/organization/" + 0}];
                 }
-                self.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync);
+                this.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync, this.setDemoData);
             },
             getConsentModal: function(parentOrg) {
                 var orgTool = this.getOrgTool();
@@ -2646,7 +2664,7 @@
 
                 var existingOrgs = {};
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
-                    return !item.hasOwnProperty("deleted")
+                    return !item.hasOwnProperty("deleted");
                 });
                 this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
                     return item.hasOwnProperty("deleted");

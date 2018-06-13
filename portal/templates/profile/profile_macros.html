@@ -469,12 +469,7 @@
 
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
     {% call viewSection(id="userOrgs_view") -%}
-        <div v-if="demo.data.careProvider && demo.data.careProvider.length > 0">
-            {% raw %}
-                <p v-for="item in demo.data.careProvider">{{item.display}}</p>
-            {% endraw %}
-        </div>
-        <div class="text-muted" v-else>{{_("No affiliated clinic")}}</p></div>
+        <div v-html="getOrgsDisplay()"></div>
     {%- endcall %}
     {% call editSection() -%}
         <div id="clinics" data-loader-container="true" data-profile-section-id="orgsstateselector" data-save-container-id="clinics">
@@ -515,12 +510,7 @@
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, consent_agreements, current_user) -%}
     {% call viewSection(id="userOrgs_view") -%}
-        <div v-if="demo.data.careProvider && demo.data.careProvider.length > 0">
-            {% raw %}
-                <p v-for="item in demo.data.careProvider" >{{item.display}}</p>
-            {% endraw %}
-        </div>
-        <p class="text-muted" v-else>{{_("No affiliated clinic")}}</p>
+        <div v-html="getOrgsDisplay()"></div>
     {%- endcall %}
     {% call editSection() %}
         <div id="clinics" data-profile-section-id="orgs" data-save-container-id="clinics">
