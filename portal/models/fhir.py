@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 import json
 
 from flask import abort, current_app, url_for
+from past.builtins import basestring
 import requests
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -25,7 +26,6 @@ from .locale import LocaleConstants
 from .organization import OrgTree
 from .performer import Performer
 from .reference import Reference
-from past.builtins import basestring
 
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
