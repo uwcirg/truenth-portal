@@ -447,17 +447,18 @@ Install requirements by running:
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
 
-In $PATH\\data\pg_hba.conf, change the bottom few lines to read:
+In ''$PATH\\data\pg_hba.conf'', change the bottom few lines to read::
 
-# TYPE  DATABASE        USER            ADDRESS                 METHOD
+    # TYPE  DATABASE        USER            ADDRESS                 METHOD
+    
+    # IPv4 local connections:
+    
+    host    all             all             127.0.0.1/32            trust
+    
+    # IPv6 local connections:
+    
+    host    all             all             ::1/128                 trust
 
-# IPv4 local connections:
-
-host    all             all             127.0.0.1/32            trust
-
-# IPv6 local connections:
-
-host    all             all             ::1/128                 trust
 
 Copy the default configuration file to the named configuration file
 
@@ -465,10 +466,15 @@ Copy the default configuration file to the named configuration file
 
     $ copy $PROJECT_HOME/instance/application.cfg.default $PROJECT_HOME/instance/application.cfg
 
-In application.cfg, (below), fill in the values on line 9 for user, password, localhost, portnum, and dbname
-user, password, and dbname were setup earlier in pgAdmin
-portnum can also be found in pgAdmin
+In application.cfg, (below), fill in the values for SQLALCHEMY_DATABASE_URI for user, password,
+localhost, portnum, and dbname.
+
+user, password, and dbname were setup earlier in pgAdmin.
+
+portnum can also be found in pgAdmin.
+
 localhost should be 127.0.0.1
+
 SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'
 
 Testing
