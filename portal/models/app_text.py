@@ -7,11 +7,11 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from builtins import str
 from future import standard_library # isort:skip
 standard_library.install_aliases()
 
 from abc import ABCMeta, abstractmethod
-from builtins import str
 from string import Formatter
 import timeit
 from urllib.parse import parse_qsl, urlencode, urlparse
