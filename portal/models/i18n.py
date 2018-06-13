@@ -19,7 +19,7 @@ from ..extensions import babel
 from .app_text import AppText
 from .intervention import Intervention
 from .organization import Organization
-from .questionnaire_bank import QuestionnaireBank
+from .questionnaire_bank import QuestionnaireBank, classification_types_enum
 from .research_protocol import ResearchProtocol
 from .role import Role
 from .user import current_user
@@ -52,6 +52,7 @@ def get_db_strings():
 
 def get_static_strings():
     """Manually add strings that are otherwise difficult to extract"""
+    msgid_map = {}
     status_strings = (
         'Completed',
         'Due',
@@ -59,10 +60,21 @@ def get_static_strings():
         'Overdue',
         'Expired',
     )
-    return {
+    msgid_map.update({
         '"{}"'.format(s):
             {'assessment_status: %s' % s} for s in status_strings
+    })
+
+    enum_options = {
+        classification_types_enum: ('title',),
     }
+    for enum, options in enum_options.items():
+        for value in enum.enums:
+            for function_name in options:
+                value = getattr(value, function_name)()
+            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(enum.name, value)}
+    return msgid_map
+
 
 def upsert_to_template_file():
     db_translatables = {}
