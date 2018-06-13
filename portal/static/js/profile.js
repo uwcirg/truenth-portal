@@ -1640,7 +1640,8 @@
                 if (!this.demo.data.careProvider || this.demo.data.careProvider.length === 0) {
                     return this.getNoOrgDisplay();
                 }
-                /* example return from api demographics: { display: Duke, reference: "api/organization/1301"} */
+                /* example return from api demographics: [{ display: Duke, reference: "api/organization/1301"}, {"display":"Arvin George","reference":"api/practitioner/1851648521?system=http://hl7.org/fhir/sid/us-npi"}]
+                 * NOTE: need to exclude displays other than organization */
                 var self = this;
                 var arrDisplay = this.demo.data.careProvider.map(function(item) {
                     if (item.reference.match(/^api\/organization\/0$/gi)) { //organization id = 0
