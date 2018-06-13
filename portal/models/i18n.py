@@ -67,11 +67,11 @@ def get_static_strings():
 def upsert_to_template_file():
     db_translatables = {}
     db_translatables.update(get_db_strings())
-    db_translatables.update(get_static_strings())
-
     if not db_translatables:
         current_app.logger.warn("no DB strings extracted")
         return
+
+    db_translatables.update(get_static_strings())
 
     try:
         with open(
