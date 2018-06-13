@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 import json
 
 from flask import abort, current_app, url_for
+from past.builtins import basestring
 import requests
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -25,7 +26,6 @@ from .locale import LocaleConstants
 from .organization import OrgTree
 from .performer import Performer
 from .reference import Reference
-from past.builtins import basestring
 
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
@@ -652,9 +652,9 @@ def fetch_HL7_V3_Namespace(valueSet):
         valueSet=valueSet)
     response = requests.get(src_url)
     load = response.text
-    data = json.loads(load)
+    #data = json.loads(load)
     return parse_concepts(
-        data['concept'],
+        response.json()['concept'],
         system='http://hl7.org/fhir/v3/{}'.format(valueSet)
     )
 

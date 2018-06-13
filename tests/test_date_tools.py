@@ -32,6 +32,6 @@ class TestDateTools(TestCase):
         self.assertEqual(localize_datetime(None, None), '')
 
     def test_localize_datetime_no_user(self):
-        input_date = datetime.strptime('Jun 11 2012', '%b %d %Y')
-        expected = '11 Jun 2012'
+        input_date = datetime.strptime('Jun 01 2012', '%b %d %Y')
+        expected = '1 Jun 2012'
         self.assertEqual(localize_datetime(input_date, None), expected)
