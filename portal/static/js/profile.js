@@ -182,7 +182,6 @@
                         replace("{pageFrom}", pageFrom).
                         replace("{pageTo}", pageTo).
                         replace("{totalRows}", totalRows);
-                    $(".pagination-detail .pagination-info").html(rowInfo);
                     return rowInfo;
                 },
                 formatAllRows: function() {
