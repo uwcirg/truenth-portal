@@ -86,10 +86,7 @@ STATIC_ROLES = {
 
 
 ROLE = Enum('ROLE', {r.upper(): r for r in STATIC_ROLES})
-ALL_BUT_WRITE_ONLY = Enum(
-    'ALL_BUT_WRITE_ONLY',
-    {r.upper(): r for r in STATIC_ROLES if r != 'write_only'})
-
+ALL_BUT_WRITE_ONLY = [r.value for r in ROLE if r.value != 'write_only']
 
 def add_static_roles():
     """Seed database with default static roles
