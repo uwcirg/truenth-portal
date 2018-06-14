@@ -1,4 +1,8 @@
 """Unit test module for app_text"""
+
+from future.standard_library import install_aliases # isort:skip
+install_aliases()
+
 from urllib.parse import parse_qsl, urlparse, unquote_plus
 
 from flask import render_template_string

@@ -7,6 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from __future__ import unicode_literals
 from builtins import str
 from future import standard_library # isort:skip
 standard_library.install_aliases()
