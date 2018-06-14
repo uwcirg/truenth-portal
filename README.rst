@@ -475,7 +475,7 @@ portnum can also be found in pgAdmin.
 
 localhost should be 127.0.0.1
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'
+``SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'``
 
 Testing
 ~~~~~~~
