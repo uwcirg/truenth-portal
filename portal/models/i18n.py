@@ -1,6 +1,6 @@
 """Module for i18n methods and functionality"""
 from future import standard_library # isort:skip
-standard_library.install_aliases()
+standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
 from io import BytesIO
