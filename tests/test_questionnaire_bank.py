@@ -551,6 +551,18 @@ class TestQuestionnaireBank(TestCase):
         qbd_i2 = qbd._replace(iteration=1)
         self.assertEqual("Month 18", visit_name(qbd_i2))
 
+    def test_visit_9mo(self):
+        crv = self.setup_qbs()
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=9))
+        self.bless_with_basics(setdate=backdate)
+        self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
+
+        qbd = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=nowish + timedelta(hours=1))
+        self.assertEqual("Month 9", visit_name(qbd))
+
     def test_user_current_qb(self):
         crv = self.setup_qbs()
         backdate, nowish = associative_backdate(
