@@ -807,14 +807,18 @@ class TestQuestionnaireBank(TestCase):
         # Two weeks ago, still on rp v2, should be in 3mo recurrence
         user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
-        v2qb = a_s.qb_data.qb
-        self.assertEqual('CRV_recurring_3mo_period v2', a_s.qb_data.qb.name)
+        v2qb = a_s.qb_data.qbd.questionnaire_bank
+        self.assertEqual(
+            'CRV_recurring_3mo_period v2',
+            a_s.qb_data.qbd.questionnaire_bank.name)
         self.assertEqual(
             ['epic26_v2'], a_s.instruments_needing_full_assessment())
 
         # Now, should still be rp v3, 3mo recurrence
         a_s = AssessmentStatus(user=user, as_of_date=now)
-        self.assertEqual('CRV_recurring_3mo_period v3', a_s.qb_data.qb.name)
+        self.assertEqual(
+            'CRV_recurring_3mo_period v3',
+            a_s.qb_data.qbd.questionnaire_bank.name)
         self.assertEqual(
             ['epic26_v3'], a_s.instruments_needing_full_assessment())
 
@@ -828,5 +832,9 @@ class TestQuestionnaireBank(TestCase):
 
         # Current should also be completed, even tho protocol changed
         a_s = AssessmentStatus(user=user, as_of_date=now)
-        qb = QuestionnaireBank.qbs_for_user(user, classification='recurring', as_of_date=now)
         self.assertEqual('Completed', a_s.overall_status)
+
+        # Should see both as candidates
+        qbds = QuestionnaireBank.qbs_for_user(
+            user, classification='recurring', as_of_date=now)
+        self.assertEqual(len(qbds), 2)
