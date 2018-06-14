@@ -4,6 +4,7 @@ from future.standard_library import install_aliases  # isort:skip
 install_aliases()
 
 from urllib.parse import parse_qsl, urlparse, unquote_plus
+import sys
 
 from flask import render_template_string
 from flask_webtest import SessionScope
@@ -117,9 +118,10 @@ class TestAppText(TestCase):
                                        asset=invalid_asset,
                                        variables=test_vars)
         error_key = resource.asset.split()[-1]
-        if (error_key.startswith("u")):
-            error_key = error_key[1:]
-        self.assertEqual(error_key, "'variable'")
+        if sys.version_info[0] < 3:
+            self.assertEqual(error_key, "u'variable'")
+        else:
+            self.assertEqual(error_key, "'variable'")
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",
