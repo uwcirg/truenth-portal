@@ -62,4 +62,10 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
 fi
 
 docker-compose pull
-docker-compose up -d web
+# Capture stderr to check for restarted containers
+restarted_containers="$(sudo docker-compose up -d web 3>&2 2>&1 1>&3 3>&- | tee >(cat - >&2))"
+
+# Set celery CPU limit after start
+if [ echo "$restarted_containers" | grep --quiet celery ]; then
+    docker container update --cpus .3 "$(docker-compose ps --quiet celeryworker)"
+fi
