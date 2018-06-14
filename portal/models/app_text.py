@@ -89,7 +89,7 @@ class AppText(db.Model):
 
     def __repr__(self):
         return "{} ({}, {})".format(self.__class__.__name__,
-                                    self.name, str(self))
+                                    self.name, self)
 
     def __str__(self):
         if self.custom_text:
@@ -572,10 +572,10 @@ class MailResource(object):
         if self._subject:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = (str(self._subject)).format(
+                    formatted = (self._subject).format(
                         **self.variables.minimal_subdict(self._subject))
                 else:
-                    formatted = (str(self._subject)).format(**self.variables)
+                    formatted = (self._subject).format(**self.variables)
                 return formatted
             except KeyError as e:
                 self.error_msg = "Missing subject variable {}".format(e)
@@ -590,10 +590,10 @@ class MailResource(object):
         if self._body:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = (str(self._body)).format(
+                    formatted = (self._body).format(
                         **self.variables.minimal_subdict(self._body))
                 else:
-                    formatted = (str((self._body))).format(**self.variables)
+                    formatted = (str(self._body)).format(**self.variables)
                 if self._footer:
                     formatted += "\n"
                     formatted += self.footer
@@ -611,10 +611,10 @@ class MailResource(object):
         if self._footer:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = (str(self._footer)).format(
+                    formatted = (self._footer).format(
                         **self.variables.minimal_subdict(self._footer))
                 else:
-                    formatted = (str(self._footer)).format(**self.variables)
+                    formatted = (self._footer).format(**self.variables)
                 return formatted
             except KeyError as e:
                 self.error_msg = "Missing footer variable {}".format(e)
