@@ -458,7 +458,14 @@
                 return treatmentDate;
             },
             getNearestPow10: function(n){ //find the closest power of 10 given a number
-              return Math.pow(10, Math.round( Math.log(n) / Math.log(10))+1);
+              return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
+            },
+            getRange: function getRange(size, startAt, step) {
+                var arr = []; size=size||10; startAt=startAt||0; step = step||1;
+                for (var index=startAt; index < size; index++) {
+                    arr.push(step*index);
+                }
+                return arr;
             },
             getDayInMiliseconds: function() {
                 return 1000 * 60 * 60 * 24;
@@ -611,7 +618,10 @@
                     .call(yAxis
                         .tickSize(-width, 0, 0)
                         .tickValues(function() {
-                            return [0,1,2,3,4].map(function(n) {
+                            return self.getRange(9,-1,0.5).map(function(n) { //finer lines between each log base 10 line
+                                if (Math.pow(10, n) > self.getNearestPow10(maxResult)) {
+                                    return self.getNearestPow10(maxResult);
+                                }
                                 return Math.pow(10, n); //draw grid in log scale
                             });
                         })
