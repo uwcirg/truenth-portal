@@ -1,7 +1,6 @@
 """Unit test module for app_text"""
-
-from future.standard_library import install_aliases  # isort:skip
-install_aliases()
+from future import standard_library  # isort:skip
+standard_library.install_aliases()  # noqa: E402
 
 import sys
 from urllib.parse import parse_qsl, unquote_plus, urlparse
