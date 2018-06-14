@@ -462,10 +462,7 @@
             },
             getRange: function getRange(size, startAt, step) {
                 var arr = []; size=size||10; startAt=startAt||0; step = step||1;
-                if (startAt < 0) {
-                    arr.push(startAt);
-                }
-                for (var index=0; index < size; index++) {
+                for (var index=startAt; index < size; index++) {
                     arr.push(step*index);
                 }
                 return arr;
@@ -621,7 +618,7 @@
                     .call(yAxis
                         .tickSize(-width, 0, 0)
                         .tickValues(function() {
-                            return self.getRange(9,-0.5,0.5).map(function(n) { //finer lines between each log base 10 line
+                            return self.getRange(9,-1,0.5).map(function(n) { //finer lines between each log base 10 line
                                 if (Math.pow(10, n) > self.getNearestPow10(maxResult)) {
                                     return self.getNearestPow10(maxResult);
                                 }
