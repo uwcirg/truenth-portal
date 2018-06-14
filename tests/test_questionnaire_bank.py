@@ -811,6 +811,7 @@ class TestQuestionnaireBank(TestCase):
         self.assertEqual(
             'CRV_recurring_3mo_period v2',
             a_s.qb_data.qbd.questionnaire_bank.name)
+        self.assertEqual('CRV_recurring_3mo_period v2', a_s.qb_name)
         self.assertEqual(
             ['epic26_v2'], a_s.instruments_needing_full_assessment())
 
