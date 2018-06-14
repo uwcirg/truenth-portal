@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 import json
 
 from flask import abort, current_app, url_for
+from past.builtins import basestring
 import requests
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -651,17 +652,13 @@ def fetch_HL7_V3_Namespace(valueSet):
         valueSet=valueSet)
     response = requests.get(src_url)
     load = response.text
-    data = json.loads(load)
-    return parse_concepts(
-        data['concept'],
-        system='http://hl7.org/fhir/v3/{}'.format(valueSet)
-    )
+    return parse_concepts(response.json()['concept'],
+                          system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
 def fetch_local_valueset(valueSet):
     """Pull and parse the named valueSet from our local definition"""
     response = valueset_nhhd_291036()
-    data = json.loads(response.data)
-    return parse_concepts(data['codeSystem']['concept'],
+    return parse_concepts(response.json['codeSystem']['concept'],
                           system='{}/{}'.format(TRUENTH_VALUESET, valueSet))
 
 
