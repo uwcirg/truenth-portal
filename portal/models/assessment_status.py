@@ -206,8 +206,7 @@ class AssessmentStatus(object):
                 ", iteration {}".format(self.qb_data.qbd.iteration) )
             return (
                 "{0.user} has overall status '{0.overall_status}' for "
-                "QuestionnaireBank {0.qb_data.qbd.questionnaire_bank.name}"
-                "{1}".format(self, iteration))
+                "QuestionnaireBank {0.qb_name}{1}".format(self, iteration))
         return "{0.user} has overall status '{0.overall_status}'".format(self)
 
     @property
