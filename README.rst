@@ -447,7 +447,7 @@ Install requirements by running:
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
 
-In ''$PATH\\data\pg_hba.conf'', change the bottom few lines to read::
+In ``$PATH\\data\pg_hba.conf`` , change the bottom few lines to read::
 
     # TYPE  DATABASE        USER            ADDRESS                 METHOD
     
@@ -466,7 +466,7 @@ Copy the default configuration file to the named configuration file
 
     $ copy $PROJECT_HOME/instance/application.cfg.default $PROJECT_HOME/instance/application.cfg
 
-In application.cfg, (below), fill in the values for SQLALCHEMY_DATABASE_URI for user, password,
+In ``application.cfg``, (below), fill in the values for ``SQLALCHEMY_DATABASE_URI`` for user, password,
 localhost, portnum, and dbname.
 
 user, password, and dbname were setup earlier in pgAdmin.
