@@ -10,7 +10,7 @@
         {% raw -%}
             <h2 class="tnth-header heading">{{intro.header}}</h2>
             {{intro.body}}
-            <div id="psaTrackerButtonsContainer"><button class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</button></div>
+            <div id="psaTrackerButtonsContainer"><button id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</button></div>
         {%- endraw %}
     </section>
     <section>
@@ -89,8 +89,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!isValidData()" v-html="saveText"></button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" v-html="closeText"></button>
+                <div v-bind:class="{'tnth-hide':!savingInProgress}"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                <div v-bind:class="{'tnth-hide': savingInProgress}">
+                    <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!isValidData()" v-html="saveText"></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" v-html="closeText"></button>
+                </div>
             </div>
           </div>
         </div>
