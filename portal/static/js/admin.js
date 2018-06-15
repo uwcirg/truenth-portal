@@ -285,7 +285,7 @@
             },
             setUserRoles: function(callback) {
                 callback = callback || function() {};
-                var self = this;
+                var self = this, tnthAjax = this.getDependency("tnthAjax");
                 tnthAjax.getRoles(this.userId, function(data) {
                     if (!data || data.error) {
                         callback({"error": i18next.t("Error occurred setting user roles")});
