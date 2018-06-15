@@ -61,5 +61,16 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     > "/tmp/${dump_filename}.sql"
 fi
 
+echo "Updating images..."
 docker-compose pull
-docker-compose up -d web
+echo "Starting containers..."
+# Capture stderr to check for restarted containers
+# shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
+# allows output to terminal and saving to local variable
+restarted_containers="$(docker-compose up -d web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
+
+# Set celery CPU limit after start
+if echo "$restarted_containers" | grep --quiet 'Creating.*celeryworker'; then
+    echo "Applying CPU limit to celery worker..."
+    docker container update --cpus .3 "$(docker-compose ps --quiet celeryworker)"
+fi

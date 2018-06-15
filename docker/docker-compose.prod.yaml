@@ -5,7 +5,7 @@ services:
   web:
     restart: unless-stopped
 
-  celery:
+  celeryworker:
     restart: unless-stopped
 
   celerybeat:
