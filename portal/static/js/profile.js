@@ -38,11 +38,11 @@
             this.onBeforeSectionsLoad();
             this.getOrgTool();
             this.setUserSettings();
+            this.setCurrentUserOrgs();
             this.initStartTime = new Date();
             this.initChecks.push({done: false});
             this.setDemoData({useWorker: true}, function() {
                 self.onInitChecksDone();
-                self.setUserOrgs();
             });
             if (this.currentUserId) { //get user roles - note using the current user Id - so we can determine: if user is an admin, if he/she can edit the consent, etc.
                 this.initChecks.push({done: false});
@@ -54,15 +54,13 @@
                 }, {useWorker: true});
             }
             this.initChecks.push({ done: false});
-            this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, {useWorker: true}, function(data) { //get config settings
-                var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
-                if (data) {
-                    self.settings = data;
-                    if (data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { //for use by UI later, e.g. handle consent submission
-                        self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + "");
-                    }
-                }
+            this.setConfiguration({useWorker:true}, function(data) { //get config settings
                 self.onInitChecksDone();
+                var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
+                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { 
+                    return false;
+                }
+                self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + ""); //for use by UI later, e.g. handle consent submission
             });
         },
         mounted: function() {
@@ -71,16 +69,13 @@
                 self.initEndTime = new Date();
                 var elapsedTime = self.initEndTime - self.initStartTime;
                 elapsedTime /= 1000;
-                var checkFinished = true;
-                if (self.initChecks.length > 0) {
-                    checkFinished = (self.initChecks).filter(function(item) { return item.done === true;}).length === (self.initChecks).length;
-                }
+                var checkFinished = self.initChecks.length === 0;
                 if (checkFinished || (elapsedTime >= 5)) {
                     clearInterval(self.initIntervalId);
                     self.onSectionsDidLoad();
                     self.initSections(function() { self.handleOptionalCoreData();});
                 }
-            }, 10);
+            }, 30);
         },
         data: {
             subjectId: "",
@@ -217,6 +212,18 @@
             notProvidedText: function() {
                 return i18next.t("not provided");
             },
+            setConfiguration: function(params, callback) {
+                callback = callback || function() {};
+                var self = this;
+                this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, params, function(data) { //get config settings
+                    if (!data || data.error) {
+                        callback({error: self.modules.i18next.t("Unable to set user settings.")});
+                        return false;
+                    }
+                    self.settings = data;
+                    callback(data);
+                });
+            },
             setBootstrapTableConfig: function(config) {
                 if (!config) {
                     return this.bootstrapTableConfig;
@@ -225,21 +232,32 @@
                 }
             },
             onInitChecksDone: function() {
-                this.initChecks = this.initChecks.map(function() {
-                    return {"done": true};
-                });
+                if (this.initChecks.length === 0) {
+                    return false;
+                }
+                this.initChecks.pop();
             },
-            setUserOrgs: function() {
-                if (!this.currentUserId || !this.demo.data || !this.demo.data.careProvider) {
+            setCurrentUserOrgs: function(params, callback) {
+                callback = callback||function(){};
+                if (!this.currentUserId) {
+                    callback({"error": "Current user id is required."});
                     return;
                 }
-                var orgTool = this.getOrgTool();
-                this.userOrgs = this.demo.data.careProvider.map(function(item) {
-                    return item.reference.split("/").pop();
-                });
-                var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(this.userOrgs);
-                this.topLevelOrgs = topLevelOrgs.map(function(item) {
-                    return orgTool.getOrgName(item);
+                var self = this;
+                this.modules.tnthAjax.getDemo(this.currentUserId, params, function(data) { //setting current user's (not subject's)
+                    if (!data || data.error) {
+                        callback({"error": self.modules.i18next.t("Unable to set current user orgs")});
+                        return false;
+                    }
+                    var orgTool = self.getOrgTool();
+                    self.userOrgs = data.careProvider.map(function(item) {
+                        return item.reference.split("/").pop();
+                    });
+                    var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(self.userOrgs);
+                    self.topLevelOrgs = topLevelOrgs.map(function(item) {
+                        return orgTool.getOrgName(item);
+                    });
+                    callback(data);
                 });
             },
             isUserEmailReady: function() {
@@ -259,14 +277,18 @@
                 fieldId = fieldId || "";
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
-            handleMedidataRaveFields: function() {
+            handleMedidataRaveFields: function(params) {
                 if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) { //expected config example: MEDIDATA_RAVE_FIELDS = ['deceased', 'studyid', 'consent_status', 'dob', 'org'] and MEDIDATA_RAVE_ORG = 'IRONMAN'
                     return false;
                 }
-                if (this.topLevelOrgs.indexOf(this.settings.MEDIDATA_RAVE_ORG) !== -1) {
-                    $.merge(this.disableFields, this.settings.MEDIDATA_RAVE_FIELDS);
-                    this.setDisableAccount();
-                }
+                var self = this;
+                this.setCurrentUserOrgs(params, function() {
+                    if (self.topLevelOrgs.indexOf(self.settings.MEDIDATA_RAVE_ORG) === -1) {
+                        return false;
+                    }
+                    $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
+                    self.setDisableAccountCreation(); //disable account creation
+                });
             },
             setDisableEditButtons: function() {
                 if (this.disableFields.length === 0) {
@@ -283,17 +305,20 @@
                     }
                 });
             },
-            setDisableAccount: function() {
+            setDisableAccountCreation: function() {
                 if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
                     $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
                 }
             },
-            setDisableFields: function() {
+            setDisableFields: function(params) {
                 if (!this.currentUserId || this.isAdmin() || !this.isPatient()) {
                     return false;
                 }
-                this.handleMedidataRaveFields();
-                this.setDisableEditButtons();
+                var self = this;
+                this.setConfiguration(params, function() { //make sure settings are there
+                    self.handleMedidataRaveFields();
+                    self.setDisableEditButtons();
+                });
             },
             setDemoData: function(params, callback) {
                 var self = this;

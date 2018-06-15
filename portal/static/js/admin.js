@@ -258,7 +258,10 @@
                     var match = $.grep(self.topLevelOrgs, function(org) {
                         return data.MEDIDATA_RAVE_ORG === org;
                     });
-                    $("#createUserLink").attr("disabled", match.length > 0);
+                    if (match.length === 0) {
+                        return false;
+                    }
+                    $("#patientListOptions .or, #createUserLink").addClass("disabled").css("display", "none");
                 });
             },
             handleDisableFields: function() {

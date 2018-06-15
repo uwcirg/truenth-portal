@@ -1253,7 +1253,7 @@ div.footer-wrapper.right-panel {
       display: flex;
       justify-content: space-between;
       max-width: 100%;
-      margin: 0 auto;
+      margin: 1em auto;
       label {
         font-weight: normal;
         margin: 2px;
@@ -1351,6 +1351,14 @@ div.footer-wrapper.right-panel {
 #staffListOptions {
   display:flex;
   flex-direction: column;
+}
+#patientListOptions {
+  margin-bottom: 1.5em;
+  border-bottom: solid 1px #eee;
+  padding: 0.5em 0;
+}
+#patientListOptions.disabled {
+  height: 40px;
 }
 .download-wrapper,
 .download-break {
