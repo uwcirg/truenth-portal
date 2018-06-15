@@ -32,7 +32,13 @@
                     {%- endif %}
                 {%- else -%}
                     {% call render_card_content(intervention, display) %}
-                        <div class="portal-description-body">{{ display.card_html | safe }}</div>
+                        <div class="portal-description-body">
+                            {%- if display.card_html -%}
+                                {{ display.card_html | safe }}
+                            {%- else -%}
+                                {{_("Not available")}}
+                            {%- endif -%}
+                        </div>
                     {% endcall %}
                 {%- endif -%}
             </div>
@@ -49,7 +55,13 @@
         <div class="button-container">
             {%- if not display.link_url -%}
                <div class="button-container {{class}}">
-                    <a class="btn-lg btn-tnth-primary disabled" href="#">{{ display.link_label }}</a>
+                    <a class="btn-lg btn-tnth-primary disabled" href="#">
+                        {%- if display.link_label -%}
+                            {{ display.link_label }}
+                        {%- else -%}
+                            {{_("Not available")}}
+                        {%- endif -%}
+                    </a>
                 </div>
             {%- else -%}
                 <div class="button-container">
