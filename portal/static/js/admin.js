@@ -45,7 +45,9 @@
             configured: false,
             initIntervalId: 0,
             sortFilterEnabled: false,
+            isAdmin: false,
             userId: null,
+            userRoles: [],
             userOrgs: [],
             topLevelOrgs: [],
             orgTool: null,
@@ -261,7 +263,47 @@
                     if (match.length === 0) {
                         return false;
                     }
-                    $("#patientListOptions .or, #createUserLink").addClass("disabled").css("display", "none");
+                    self.setCreateAccountVis(true);
+                    self.checkAdmin();
+                });
+            },
+            setCreateAccountVis: function(hide) {
+                var createAccountElements = $("#patientListOptions .or, #createUserLink");
+                if (hide) {
+                    createAccountElements.css("display", "none");
+                    return;
+                }
+                createAccountElements.css("display", "block");
+            },
+            getUserRoles: function(callback) {
+                callback = callback || function() {};
+                if (this.userRoles.length > 0) {
+                    callback(this.userRoles);
+                    return;
+                }
+                this.setUserRoles(callback);
+            },
+            setUserRoles: function(callback) {
+                callback = callback || function() {};
+                var self = this;
+                tnthAjax.getRoles(this.userId, function(data) {
+                    if (!data || data.error) {
+                        callback({"error": i18next.t("Error occurred setting user roles")});
+                        return false;
+                    }
+                    self.userRoles = data.roles.map(function(item) {
+                        return item.name;
+                    });
+                    self.isAdmin = self.userRoles.indexOf("admin") !== -1;
+                    callback();
+                });
+            },
+            checkAdmin: function() {
+                var self = this;
+                this.getUserRoles(function() {
+                    if (self.isAdmin) {
+                        self.setCreateAccountVis(); //allow admin user to create account
+                    }
                 });
             },
             handleDisableFields: function() {
