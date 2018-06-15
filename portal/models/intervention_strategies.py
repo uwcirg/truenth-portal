@@ -269,7 +269,7 @@ def update_card_html_on_completion():
                     'Due', 'Overdue', 'In Progress'):
                 greeting = _(u"Hi {}").format(user.display_name)
 
-                qb = assessment_status.qb_data.qb
+                qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
                 utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start

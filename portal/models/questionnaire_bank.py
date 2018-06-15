@@ -393,7 +393,9 @@ class QuestionnaireBank(db.Model):
                 last_found = qbd._replace(questionnaire_bank=qb)
 
                 if qbd.relative_start <= as_of_date and as_of_date < expiry:
+                    trace("most_recent found {}".format(last_found))
                     return last_found
+        trace("most_recent found {}".format(last_found))
         return last_found
 
     @staticmethod

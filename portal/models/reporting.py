@@ -106,7 +106,7 @@ def calculate_days_overdue(user):
     a_s = AssessmentStatus(user, as_of_date=now)
     if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
         return 0
-    qb = a_s.qb_data.qb
+    qb = a_s.qb_data.qbd.questionnaire_bank
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
