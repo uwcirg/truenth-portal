@@ -6,6 +6,7 @@ from werkzeug.exceptions import BadRequest
 from portal.date_tools import FHIR_datetime, RelativeDelta, localize_datetime
 from tests import TestCase
 
+
 class TestDateTools(TestCase):
 
     def test_relative_delta(self):

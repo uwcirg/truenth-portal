@@ -1,10 +1,9 @@
 """Unit test module for app_text"""
+from future import standard_library  # isort:skip
+standard_library.install_aliases()  # noqa: E402
 
-from future.standard_library import install_aliases  # isort:skip
-install_aliases()
-
-from urllib.parse import parse_qsl, urlparse, unquote_plus
 import sys
+from urllib.parse import parse_qsl, unquote_plus, urlparse
 
 from flask import render_template_string
 from flask_webtest import SessionScope
