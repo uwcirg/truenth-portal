@@ -188,7 +188,6 @@ def post_patient_dob(patient_id):
     the /api/demographics API should be preferred.
 
     ---
-    operationId: dob
     tags:
       - Patient
     produces:
