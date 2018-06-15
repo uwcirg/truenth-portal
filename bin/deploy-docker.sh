@@ -65,6 +65,8 @@ echo "Updating images..."
 docker-compose pull
 echo "Starting containers..."
 # Capture stderr to check for restarted containers
+# shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
+# allows output to terminal and saving to local variable
 restarted_containers="$(docker-compose up -d web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
 
 # Set celery CPU limit after start
