@@ -154,7 +154,10 @@ class QuestionnaireBankDetails(object):
 
     def overall_status(self):
         """Returns the `overall_status` for the given QB"""
-        if not (self.qbd.questionnaire_bank and self.qbd.questionnaire_bank.trigger_date):
+        if not (
+            self.qbd.questionnaire_bank and
+            self.qbd.questionnaire_bank.trigger_date
+        ):
             return 'Expired'
         status_strings = [v['status'] for v in self.status_by_q.values()]
         if all((status_strings[0] == status for status in status_strings)):
@@ -202,8 +205,10 @@ class AssessmentStatus(object):
     def __str__(self):
         """Present friendly format for logging, etc."""
         if self.qb_data.qbd.questionnaire_bank:
-            iteration = ('' if self.qb_data.qbd.iteration is None else
-                ", iteration {}".format(self.qb_data.qbd.iteration) )
+            iteration = (
+                '' if self.qb_data.qbd.iteration is None
+                else ", iteration {}".format(self.qb_data.qbd.iteration)
+            )
             return (
                 "{0.user} has overall status '{0.overall_status}' for "
                 "QuestionnaireBank {0.qb_name}{1}".format(self, iteration))
@@ -347,8 +352,9 @@ class AssessmentStatus(object):
                     # belongs to a different questionnaire bank
                     qb_id = self.qb_data.qbd.questionnaire_bank.id
                     if name not in (
-                            q.name for q in
-                            self.qb_data.qbd.questionnaire_bank.questionnaires):
+                        q.name
+                        for q in self.qb_data.qbd.questionnaire_bank.questionnaires
+                    ):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
                         qb_id = indef_qb.questionnaire_bank.id
