@@ -119,6 +119,10 @@
               {
                 "name": "boolean_value",
                 "value": "true"
+              },
+              {
+                "name": "invert_logic",
+                "value": "true"
               }
             ]
           }
