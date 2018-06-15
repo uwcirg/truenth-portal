@@ -44,6 +44,8 @@ matrix:
     - env: TOXENV=py27
     - env: TOXENV=py34
       python: "3.4"
+      addons:
+        postgresql: "9.4"
     - env: TOXENV=translations PERSISTENCE_DIR="gil"
     - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=docs
