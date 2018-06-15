@@ -40,4 +40,3 @@ class TestDateTools(TestCase):
         with self.assertRaises(BadRequest) as e:
             dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
         self.assertTrue('acceptance date' in str(e.exception))
-        
