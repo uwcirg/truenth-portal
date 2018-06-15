@@ -544,6 +544,30 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             set(a_s.instruments_needing_full_assessment()),
             metastatic_3)
 
+        # confirm iteration 0
+        self.assertEquals(a_s.qb_data.qbd.iteration, 0)
+
+    def test_2nd_recur_due(self):
+
+        # backdate so baseline q's have expired, and we within the 2nd
+        # recurrence window
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=9, hours=1))
+        self.bless_with_basics(setdate=backdate)
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
+        self.assertEqual(a_s.overall_status, "Due")
+
+        # in the initial window w/ no questionnaires submitted
+        # should include all from initial recur
+        self.assertEqual(
+            set(a_s.instruments_needing_full_assessment()),
+            metastatic_3)
+
+        # however, we should be looking at iteration 2 (zero index)!
+        self.assertEquals(a_s.qb_data.qbd.iteration, 1)
+
     def test_initial_recur_baseline_done(self):
         # backdate to be within the first recurrence window
 

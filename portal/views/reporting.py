@@ -1,5 +1,5 @@
 from future import standard_library # isort:skip
-standard_library.install_aliases()
+standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
 import csv
@@ -102,7 +102,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
 def overdue(user):
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
-    qb = a_s.qb_data.qb
+    qb = a_s.qb_data.qbd.questionnaire_bank
     if not qb:
         return "No QB"
     trigger_date = qb.trigger_date(user)
@@ -134,7 +134,7 @@ def generate_numbers():
             email = (
                 user.email.encode('ascii', 'ignore') if user.email else None)
             od = overdue(user)
-            qb = a_s.qb_data.qb.name if a_s.qb_data.qb else None
+            qb = a_s.qb_name
             for org in user.organizations:
                 top = ot.find_top_level_org([org])
                 org_name = "{}: {}".format(

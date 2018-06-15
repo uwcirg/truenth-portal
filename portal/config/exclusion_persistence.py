@@ -1,13 +1,12 @@
 from collections import namedtuple
 
-from .model_persistence import ModelPersistence, require
 from ..models.auth import AuthProviderPersistable, Token
 from ..models.client import Client
 from ..models.intervention import Intervention
-from ..models.relationship import Relationship, RELATIONSHIP
-from ..models.role import Role, ROLE
+from ..models.relationship import RELATIONSHIP, Relationship
+from ..models.role import ROLE, Role
 from ..models.user import User, UserRelationship, UserRoles
-
+from .model_persistence import ModelPersistence, require
 
 # StagingExclusions capture details exclusive of a full db overwrite
 # that are to be restored *after* db migration.  For example, when

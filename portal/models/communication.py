@@ -5,8 +5,7 @@ from smtplib import SMTPRecipientsRefused
 from string import Formatter
 
 from flask import current_app, url_for
-from flask_babel import force_locale
-from flask_babel import gettext as _
+from flask_babel import force_locale, gettext as _
 import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM

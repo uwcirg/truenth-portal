@@ -3,13 +3,7 @@ from collections import namedtuple
 
 from flask import current_app
 
-from .config_persistence import export_config, import_config
 from ..database import db
-from .exclusion_persistence import (
-    ExclusionPersistence,
-    preflight,
-    staging_exclusions,
-)
 from ..models.app_text import AppText
 from ..models.coding import Coding
 from ..models.communication_request import CommunicationRequest
@@ -21,6 +15,12 @@ from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
 from ..models.scheduled_job import ScheduledJob
+from .config_persistence import export_config, import_config
+from .exclusion_persistence import (
+    ExclusionPersistence,
+    preflight,
+    staging_exclusions,
+)
 from .model_persistence import ModelPersistence
 
 # NB - order MATTERS, as any type depending on another must find

@@ -26,7 +26,7 @@
             this.dataError = true;
             var errorElement = document.getElementById("profileErrorMessage");
             if (errorElement) {
-                errorElement.innerHTML = "Error occurred initializing Admin Vue instance.";
+                errorElement.innerHTML = "Error occurred initializing Profile  Vue instance.";
             }
             console.warn("Profile Vue instance threw an error: ", vm, this);
             console.error("Error thrown: ", err);
@@ -36,11 +36,13 @@
             VueErrorHandling(); /*global VueErrorHandling */
             this.registerDependencies();
             this.onBeforeSectionsLoad();
+            this.getOrgTool();
             this.setUserSettings();
             this.initStartTime = new Date();
             this.initChecks.push({done: false});
             this.setDemoData({useWorker: true}, function() {
                 self.onInitChecksDone();
+                self.setUserOrgs();
             });
             if (this.currentUserId) { //get user roles - note using the current user Id - so we can determine: if user is an admin, if he/she can edit the consent, etc.
                 this.initChecks.push({done: false});
@@ -65,7 +67,6 @@
         },
         mounted: function() {
             var self = this;
-            this.getOrgTool();
             this.initIntervalId = setInterval(function() { //wait for ajax calls to finish
                 self.initEndTime = new Date();
                 var elapsedTime = self.initEndTime - self.initStartTime;
@@ -91,6 +92,7 @@
             initChecks: [],
             initIntervalId: 0,
             currentUserRoles: [],
+            userOrgs: [],
             userRoles: [],
             userEmailReady: true,
             userEmailReadyMessage: "",
@@ -182,7 +184,6 @@
                         replace("{pageFrom}", pageFrom).
                         replace("{pageTo}", pageTo).
                         replace("{totalRows}", totalRows);
-                    $(".pagination-detail .pagination-info").html(rowInfo);
                     return rowInfo;
                 },
                 formatAllRows: function() {
@@ -228,30 +229,17 @@
                     return {"done": true};
                 });
             },
-            setTopLevelOrgs: function(callback) {
-                callback = callback || function(){};
-                var self = this;
-                if (this.topLevelOrgs.length > 0 || !this.currentUserId) {
-                    callback();
+            setUserOrgs: function() {
+                if (!this.currentUserId || !this.demo.data || !this.demo.data.careProvider) {
                     return;
                 }
-                $.ajax({
-                    type: "GET",
-                    url: "/api/demographics/"+this.currentUserId
-                }).done(function(data) {
-                    if (!data || !data.careProvider) {
-                        callback();
-                        return;
-                    }
-                    var orgTool = self.getOrgTool();
-                    var userOrgs = data.careProvider.map(function(item) {
-                        return item.reference.split("/").pop();
-                    });
-                    var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(userOrgs);
-                    self.topLevelOrgs = topLevelOrgs.map(function(orgId) {
-                        return orgTool.getOrgName(orgId);
-                    });
-                    callback();
+                var orgTool = this.getOrgTool();
+                this.userOrgs = this.demo.data.careProvider.map(function(item) {
+                    return item.reference.split("/").pop();
+                });
+                var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(this.userOrgs);
+                this.topLevelOrgs = topLevelOrgs.map(function(item) {
+                    return orgTool.getOrgName(item);
                 });
             },
             isUserEmailReady: function() {
@@ -272,18 +260,40 @@
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
             handleMedidataRaveFields: function() {
-                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) {
+                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) { //expected config example: MEDIDATA_RAVE_FIELDS = ['deceased', 'studyid', 'consent_status', 'dob', 'org'] and MEDIDATA_RAVE_ORG = 'IRONMAN'
                     return false;
                 }
                 if (this.topLevelOrgs.indexOf(this.settings.MEDIDATA_RAVE_ORG) !== -1) {
                     $.merge(this.disableFields, this.settings.MEDIDATA_RAVE_FIELDS);
+                    this.setDisableAccount();
+                }
+            },
+            setDisableEditButtons: function() {
+                if (this.disableFields.length === 0) {
+                    return false;
+                }
+                var self = this;
+                $("#profileMainContent .profile-item-container").each(function() { //disable field/section that is listed in disable field array
+                    var dataSection = this.getAttribute("data-sections"); 
+                    if (!dataSection) {
+                        return true;
+                    }
+                    if (self.isDisableField(dataSection)){ //hide edit button for the section
+                        $(this).children(".profile-item-edit-btn").css("display", "none"); 
+                    }
+                });
+            },
+            setDisableAccount: function() {
+                if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
+                    $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
                 }
             },
             setDisableFields: function() {
-                if (!this.currentUserId || !this.isPatient()) {
+                if (!this.currentUserId || this.isAdmin() || !this.isPatient()) {
                     return false;
                 }
-                this.setTopLevelOrgs(this.handleMedidataRaveFields);
+                this.handleMedidataRaveFields();
+                this.setDisableEditButtons();
             },
             setDemoData: function(params, callback) {
                 var self = this;
@@ -1211,10 +1221,6 @@
                 }
                 if (String(this.demo.data.deceasedBoolean).toLowerCase() === "true") {
                     $("#boolDeath").prop("checked", true);
-                }
-                if (this.isDisableField("deceased")) {
-                    $("#profileDeceasedSection").removeClass("editable");
-                    return;
                 }
                 this.__convertToNumericField($("#deathDay, #deathYear"));
                 $("#boolDeath").on("click", function() {

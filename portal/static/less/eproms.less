@@ -108,6 +108,16 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  background: #FFF;
+  opacity: 0.5;
+}
 /* landing page/un-authenticated page only */
 .watermark-nowrapper {
   position: absolute;
@@ -2290,12 +2300,16 @@ input.clinic {
   }
 }
 .create-account-container {
+  position: relative;
   padding: 2em;
   width: 100%;
   max-width: 100%;
   border: solid 2px @wellColor;
   background-color: @wellColor;
   overflow: hidden;
+}
+#accountCreationContentContainer {
+  position: relative;
 }
 #accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 114px;

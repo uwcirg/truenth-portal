@@ -414,7 +414,7 @@ Creating the Database and User
 To create the postgresql database, in pgAdmin click "databases" and "create"
 and enter the desired characteristics of the database, including the owner.
 To create the user, similarly in pgAdmin, click "login roles" and "create"
-and enter the desired characteristics of the user. Ensure that it has 
+and enter the desired characteristics of the user. Ensure that it has
 permisssion to login.
 
 Configuration
@@ -447,16 +447,16 @@ Install requirements by running:
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
 
-In ''$PATH\\data\pg_hba.conf'', change the bottom few lines to read::
+In ``$PATH\\data\pg_hba.conf`` , change the bottom few lines to read::
 
     # TYPE  DATABASE        USER            ADDRESS                 METHOD
-    
+
     # IPv4 local connections:
-    
+
     host    all             all             127.0.0.1/32            trust
-    
+
     # IPv6 local connections:
-    
+
     host    all             all             ::1/128                 trust
 
 
@@ -466,7 +466,7 @@ Copy the default configuration file to the named configuration file
 
     $ copy $PROJECT_HOME/instance/application.cfg.default $PROJECT_HOME/instance/application.cfg
 
-In application.cfg, (below), fill in the values for SQLALCHEMY_DATABASE_URI for user, password,
+In ``application.cfg``, (below), fill in the values for ``SQLALCHEMY_DATABASE_URI`` for user, password,
 localhost, portnum, and dbname.
 
 user, password, and dbname were setup earlier in pgAdmin.
@@ -475,7 +475,7 @@ portnum can also be found in pgAdmin.
 
 localhost should be 127.0.0.1
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'
+``SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost:portnum/dbname'``
 
 Testing
 ~~~~~~~

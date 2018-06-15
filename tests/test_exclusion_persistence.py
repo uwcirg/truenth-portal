@@ -6,18 +6,18 @@ from tempfile import mkdtemp
 from flask_webtest import SessionScope
 
 from portal.config.exclusion_persistence import (
-    client_users_filter,
     ExclusionPersistence,
+    client_users_filter,
     staging_exclusions,
 )
 from portal.config.site_persistence import SitePersistence
 from portal.database import db
 from portal.models.auth import AuthProvider, Token, create_service_token
 from portal.models.client import Client
-from tests import TEST_USER_ID, TestCase
-from portal.models.intervention import Intervention, INTERVENTION
-from portal.models.role import Role, ROLE
+from portal.models.intervention import INTERVENTION, Intervention
+from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRelationship, UserRoles
+from tests import TEST_USER_ID, TestCase
 
 
 class TestExclusionPersistence(TestCase):

@@ -3,6 +3,7 @@ from collections import namedtuple
 from datetime import MAXYEAR, datetime
 
 from flask import current_app, url_for
+from flask_babel import gettext as _
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -392,7 +393,9 @@ class QuestionnaireBank(db.Model):
                 last_found = qbd._replace(questionnaire_bank=qb)
 
                 if qbd.relative_start <= as_of_date and as_of_date < expiry:
+                    trace("most_recent found {}".format(last_found))
                     return last_found
+        trace("most_recent found {}".format(last_found))
         return last_found
 
     @staticmethod
@@ -635,5 +638,5 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
-        return "Month {}".format(total)
-    return qbd.questionnaire_bank.classification.title()
+        return _('Month %(month_total)d', month_total=total)
+    return _(qbd.questionnaire_bank.classification.title())

@@ -76,7 +76,7 @@ python-Levenshtein==0.12.0
 pytz==2018.4
 PyYAML==3.12
 redis==2.10.6
-requests==2.19.0
+requests==2.19.1
 requests-cache==0.4.13
 requests-oauthlib==1.0.0
 regex==2018.06.09

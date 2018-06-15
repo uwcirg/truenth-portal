@@ -36,6 +36,7 @@
             clinicalDisplay: "psa",
             clinicalSystem: "http://us.truenth.org/clinical-codes",
             loading: false,
+            savingInProgress: false,
             addErrorMessage: "",
             noResultMessage: this.i18next.t("No PSA results to display"),
             saveText: this.i18next.t("Save"),
@@ -203,6 +204,10 @@
                 $("#psaResult").on("change", function() {
                     self.validateResult($(this).val());
                 });
+
+                $("#psaTrackerBtnAddNew").on("click", function() {
+                    self.clearNew();
+                });
                 /*
                  * modal event
                  */
@@ -215,8 +220,6 @@
                     setTimeout(function() {
                         self.modalLoading = false; //allow time for setting value with it being visible to user
                     }, 50);
-                }).on("hidden.bs.modal", function() {
-                    self.clearNew();
                 });
             },
             getCurrentUserId: function() {
@@ -416,16 +419,18 @@
                     method = "PUT";
                     url = url + "/" + this.newItem.id;
                 }
-
-                this.tnthAjax.sendRequest(url, method, userId, { data: JSON.stringify(obsArray) }, function(data) {
+                this.savingInProgress = true;
+                this.tnthAjax.sendRequest(url, method, userId, { data: JSON.stringify(obsArray), async: true }, function(data) {
                     if(data.error) {
                         self.addErrorMessage = self.i18next.t("Server error occurred adding PSA result.");
                     } else {
                         $("#addPSAModal").modal("hide");
                         self.getData();
-                        self.clearNew();
                         self.addErrorMessage = "";
                     }
+                    setTimeout(function() {
+                        self.savingInProgress = false;
+                    }, 550);
                 });
             },
             clearNew: function() {
@@ -452,9 +457,19 @@
                 }
                 return treatmentDate;
             },
+            getNearestPow10: function(n){ //find the closest power of 10 given a number
+              return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
+            },
+            getRange: function getRange(size, startAt, step) {
+                var arr = []; size=size||10; startAt=startAt||0; step = step||1;
+                for (var index=startAt; index < size; index++) {
+                    arr.push(step*index);
+                }
+                return arr;
+            },
             getDayInMiliseconds: function() {
                 return 1000 * 60 * 60 * 24;
-            }, 
+            },
             getInterval: function(minDate, maxDate, step) {
                 step = step || 10;
                 if (!maxDate || !minDate) {
@@ -510,12 +525,14 @@
                 var maxDate = d3.max(data, function(d) {
                     return d.graph_date;
                 });
-            
+                var maxResult = d3.max(data, function(d) {
+                    return d.result;
+                });
+
                 var xDomain = d3.extent(data, function(d) { return d.graph_date; });
                 var bound = (width - margin.left - margin.right) / 10;
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
-                
 
                 if (data.length === 1 || String(minDate) === String(maxDate)) {
                     var firstDate = new Date(minDate);
@@ -526,7 +543,7 @@
                 var INTERVAL = self.getInterval(minDate, maxDate, 10);
 
                 x.domain(xDomain);
-                y.domain([0.1, Math.pow(10, 4)]);
+                y.domain([0.1, self.getNearestPow10(maxResult)]); //scale to the closest power of 10 based on the maximum result
                 // Define the axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -601,7 +618,10 @@
                     .call(yAxis
                         .tickSize(-width, 0, 0)
                         .tickValues(function() {
-                            return [0,1,2,3,4].map(function(n) {
+                            return self.getRange(9,-1,0.5).map(function(n) { //finer lines between each log base 10 line
+                                if (Math.pow(10, n) > self.getNearestPow10(maxResult)) {
+                                    return self.getNearestPow10(maxResult);
+                                }
                                 return Math.pow(10, n); //draw grid in log scale
                             });
                         })

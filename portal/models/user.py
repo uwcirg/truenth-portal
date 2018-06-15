@@ -1,7 +1,7 @@
 """User model """
 from past.builtins import basestring
 from future import standard_library # isort:skip
-standard_library.install_aliases()
+standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
 from datetime import datetime
@@ -14,6 +14,7 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
+from past.builtins import basestring
 import regex
 from sqlalchemy import UniqueConstraint, and_, or_, text
 from sqlalchemy.dialects.postgresql import ENUM
