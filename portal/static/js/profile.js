@@ -283,10 +283,11 @@
                 }
                 var self = this;
                 this.setCurrentUserOrgs(params, function() {
-                    if (self.topLevelOrgs.indexOf(self.settings.MEDIDATA_RAVE_ORG) !== -1) {
-                        $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
-                        self.setDisableAccountCreation(); //disable account creation
+                    if (self.topLevelOrgs.indexOf(self.settings.MEDIDATA_RAVE_ORG) === -1) {
+                        return false;
                     }
+                    $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
+                    self.setDisableAccountCreation(); //disable account creation
                 });
             },
             setDisableEditButtons: function() {
