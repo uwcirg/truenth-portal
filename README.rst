@@ -414,7 +414,7 @@ Creating the Database and User
 To create the postgresql database, in pgAdmin click "databases" and "create"
 and enter the desired characteristics of the database, including the owner.
 To create the user, similarly in pgAdmin, click "login roles" and "create"
-and enter the desired characteristics of the user. Ensure that it has 
+and enter the desired characteristics of the user. Ensure that it has
 permisssion to login.
 
 Configuration
@@ -450,13 +450,13 @@ Configuration files
 In ``$PATH\\data\pg_hba.conf`` , change the bottom few lines to read::
 
     # TYPE  DATABASE        USER            ADDRESS                 METHOD
-    
+
     # IPv4 local connections:
-    
+
     host    all             all             127.0.0.1/32            trust
-    
+
     # IPv6 local connections:
-    
+
     host    all             all             ::1/128                 trust
 
 
