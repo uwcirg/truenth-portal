@@ -156,7 +156,7 @@
             validateResult: function(val) {
                 var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > 9999);
                 if(!isValid) {
-                    this.addErrorMessage = this.i18next.t("Result must be a number.");
+                    this.addErrorMessage = this.i18next.t("Result must be a number and within valid range (less than 9999).");
                 } else {
                     this.addErrorMessage = "";
                 }
@@ -461,7 +461,14 @@
                 return treatmentDate;
             },
             getNearestPow10: function(n){ //find the closest power of 10 given a number
-                return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
+                var base = Math.log(n) / Math.LN10;
+                if (base >= Math.ceil(base)-0.1) {
+                    base = base + 1; //accounting for when log of number is perfect integer, 1, 10, 100, 1000, so need to draw next grid line up
+                }
+                else {
+                    base = Math.ceil(base);
+                }
+                return Math.pow(10, base);
             },
             getRange: function getRange(size, startAt, step) {
                 var arr = []; size=size||10; startAt=startAt||0; step = step||1;
