@@ -163,6 +163,9 @@
                 return isValid;
             },
             validateDate: function(date) {
+                if (!date || date.length <= 9) { //don't show validation error until enough characters are entered, just return false
+                    return false;
+                }
                 var isValid = this.tnthDates.isValidDefaultDateFormat(date);
                 if(!isValid) {
                     this.addErrorMessage = this.i18next.t("Date must be in the valid format.");
@@ -188,13 +191,12 @@
                 }).on("hide", function() {
                     $("#psaDate").trigger("blur");
                 });
-                $("#psaDate").on("blur", function() {
+                $("#psaDate").on("change blur", function() {
                     var newDate = $(this).val();
-                    if(newDate) {
-                        if(self.validateDate(newDate)) {
-                            self.newItem.date = newDate;
-                        }
+                    if (!newDate || !self.validateDate(newDate)) {
+                        return false;
                     }
+                    self.newItem.date = newDate;
                 }).on("focus", function() {
                     self.modalLoading = false;
                 });
@@ -440,6 +442,7 @@
                         self.newItem[prop] = "";
                     }
                 }
+                $("#psaDate").datepicker("update", "");
             },
             __handleTreatmentDate: function(minDate, maxDate, step) { //use internally
                 if (this.treatment.data.length === 0) {
@@ -458,7 +461,7 @@
                 return treatmentDate;
             },
             getNearestPow10: function(n){ //find the closest power of 10 given a number
-              return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
+                return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
             },
             getRange: function getRange(size, startAt, step) {
                 var arr = []; size=size||10; startAt=startAt||0; step = step||1;
@@ -534,13 +537,11 @@
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
 
-                if (data.length === 1 || String(minDate) === String(maxDate)) {
-                    var firstDate = new Date(minDate);
+                if (data.length <= 2 || String(minDate) === String(maxDate)) {
+                    var firstDate = new Date(maxDate);
                     maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
                     xDomain = [minDate, maxDate];
                 }
-
-                var INTERVAL = self.getInterval(minDate, maxDate, 10);
 
                 x.domain(xDomain);
                 y.domain([0.1, self.getNearestPow10(maxResult)]); //scale to the closest power of 10 based on the maximum result
@@ -632,7 +633,7 @@
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
                 //treatment line
-                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, INTERVAL);
+                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 10));
                 if (treatmentDate) {
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
