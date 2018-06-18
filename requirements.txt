@@ -62,7 +62,7 @@ pkginfo==1.4.2
 pluggy==0.6.0
 polib==1.1.0
 prompt-toolkit==2.0.3
-psycopg2==2.7.4
+psycopg2==2.7.5
 ptyprocess==0.5.2
 py==1.5.3
 pycparser==2.18
