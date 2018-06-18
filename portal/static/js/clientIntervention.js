@@ -6,5 +6,5 @@ $(document).ready(function(){ /*global $ */
     $("body").on("click","#cancelDel",function(){
         $("#confirmDel").popover("hide");
     });
-
 });
+
