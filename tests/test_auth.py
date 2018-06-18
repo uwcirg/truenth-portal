@@ -1,4 +1,6 @@
 """Unit test module for auth"""
+from __future__ import unicode_literals  # isort:skip
+
 import datetime
 
 from flask import url_for
