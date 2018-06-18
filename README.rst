@@ -270,7 +270,7 @@ Upgrade
 
 Anytime a database (might) need an upgrade, run the manage script with
 the ``db upgrade`` arguments (or run the `deployment
-script <#install-the-lastest-package-and-dependencies>`__)
+script <#install-the-latest-package-and-dependencies>`__)
 
 This is idempotent process, meaning it's safe to run again on a database
 that already received the upgrade.
@@ -285,7 +285,7 @@ Schema Changes
 ^^^^^^^^^^^^^^
 
 Update the python source files containing table definitions (typically
-classes derrived from db.Model) and run the manage script to sniff out
+classes derived from db.Model) and run the manage script to sniff out
 the code changes and generate the necessary migration steps:
 
 .. code:: bash
@@ -315,7 +315,7 @@ activated)
     $ nosetests
 
 Alternatively, run a single modules worth of tests, telling nose to not
-supress standard out (vital for debugging) and to stop on first error:
+suppress standard out (vital for debugging) and to stop on first error:
 
 .. code:: bash
 
@@ -339,7 +339,7 @@ To run a specific tox environment, "docs" or the docgen environment in this case
 
 Tox will also run the environment specified by the ``TOXENV`` environment variable, as configured in the TravisCI integration.
 
-Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analgous the above nosetests invocation):
+Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analogous the above nosetests invocation):
 
 .. code:: bash
 
@@ -360,7 +360,7 @@ UI/Integration (Selenium) Testing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 UI integration/acceptance testing is performed by Selenium and is
-included in the test suite and continuous intergration setup.
+included in the test suite and continuous integration setup.
 Specifically, `Sauce Labs
 integration <https://docs.travis-ci.com/user/sauce-connect>`__ with
 TravisCI allows Selenium tests to be run with any number of browser/OS
@@ -377,7 +377,7 @@ Tox the virtual environment that corresponds to the UI tests (``ui``):
 Dependency Management
 ---------------------
 
-Project dependencies are hardcoded to specific versions (see
+Project dependencies are hard-coded to specific versions (see
 ``requirements.txt``) known to be compatible with Shared Services to
 prevent dependency updates from breaking existing code.
 
@@ -389,7 +389,7 @@ need for review, assuming they pass continuous integration.
 Documentation
 -------------
 
-Docs are built seperately via sphinx. Change to the docs directory and
+Docs are built separately via sphinx. Change to the docs directory and
 use the contained Makefile to build - then view in browser starting with
 the ``docs/build/html/index.html`` file
 
@@ -415,7 +415,7 @@ To create the postgresql database, in pgAdmin click "databases" and "create"
 and enter the desired characteristics of the database, including the owner.
 To create the user, similarly in pgAdmin, click "login roles" and "create"
 and enter the desired characteristics of the user. Ensure that it has
-permisssion to login.
+permission to login.
 
 Configuration
 ~~~~~~~~~~~~~
