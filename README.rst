@@ -307,19 +307,19 @@ values for the {user, password, database} as defined in the
 ``TestConfig`` class within ``portal.config.py``
 
 All test modules under the ``tests`` directory can be executed via
-``nosetests`` (again from project root with the virtual environment
+``py.test`` (again from project root with the virtual environment
 activated)
 
 .. code:: bash
 
-    $ nosetests
+    $ py.test
 
-Alternatively, run a single modules worth of tests, telling nose to not
+Alternatively, run a single modules worth of tests, telling py.test to not
 suppress standard out (vital for debugging) and to stop on first error:
 
 .. code:: bash
 
-    $ nosetests -sx tests.test_intervention
+    $ py.test tests/test_intervention.py
 
 Tox
 ~~~
@@ -339,11 +339,11 @@ To run a specific tox environment, "docs" or the docgen environment in this case
 
 Tox will also run the environment specified by the ``TOXENV`` environment variable, as configured in the TravisCI integration.
 
-Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analogous the above nosetests invocation):
+Tox will pass any options after -- to the test runner, py.test. To run tests only from a certain module (analogous the above py.test invocation):
 
 .. code:: bash
 
-    $ tox -- -sx tests.test_intervention
+    $ tox -- tests/test_intervention.py
 
 Continuous Integration
 ~~~~~~~~~~~~~~~~~~~~~~
