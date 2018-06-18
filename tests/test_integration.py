@@ -8,9 +8,9 @@ import pytest
 from selenium import webdriver
 import xvfbwrapper
 
-from .pages import LoginPage
 from tests import TestCase
 
+from .pages import LoginPage
 
 if not pytest.config.getoption("--include-ui-testing"):
     pytest.skip(
