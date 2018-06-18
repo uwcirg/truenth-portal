@@ -81,7 +81,7 @@ class TestAuth(TestCase):
         self.login()
         rv = self.client.post('/client',
                 data=dict(application_origins="bad data in"))
-        self.assertTrue("Invalid URL" in rv.data)
+        self.assertTrue(bytes("Invalid URL",'UTF-8') in rv.data)
 
     def test_client_edit(self):
         """Test editing a client application"""
@@ -106,7 +106,7 @@ class TestAuth(TestCase):
         # 200 response, because page is reloaded with validation errors
         self.assert200(rv2)
         error_text = 'URL host must match a provided Application Origin URL'
-        self.assertTrue(error_text in rv2.data)
+        self.assertTrue(bytes(error_text,"UTF-8") in rv2.data)
 
         client = Client.query.get('test_client')
         self.assertNotEqual(client.callback_url, invalid_url)
