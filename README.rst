@@ -124,7 +124,7 @@ correct libraries are installed:
 
 .. code:: bash
 
-    pip install -r requirements.txt
+    pip install --requirements requirements.txt
 
 COMMAND LINE INTERFACE
 ----------------------
@@ -233,7 +233,7 @@ Should the need ever arise to purge the queue of jobs, run the following
 
 .. code:: bash
 
-    $ celery -A portal.celery_worker.celery purge
+    $ celery --app portal.celery_worker.celery purge
 
 DATABASE
 --------
@@ -442,7 +442,7 @@ Install requirements by running:
 
 .. code:: bash
 
-    $ pip install -r requirements.txt
+    $ pip install --requirements requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
