@@ -426,13 +426,13 @@ Installing requirements
 Ensure that C++ is installed -- if not, download from:
 https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
-Ensure that setuptools are up-to-date by running:
+Ensure that ``setuptools`` is up-to-date by running:
 
 .. code:: bash
 
     $ python -m pip install --upgrade pip setuptools
 
-Ensure that ez_setup is installed by running:
+Ensure that ``ez_setup`` is installed by running:
 
 .. code:: bash
 
