@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 
+import pytest
 from werkzeug.exceptions import BadRequest
 
 import pytest
@@ -18,7 +19,6 @@ def test_localize_datetime_no_user():
     expected = '1 Jun 2012'
     assert localize_datetime(dt=input_date, user=None) == expected
 
-
 def test_relative_delta():
     d = {'months': 3, 'days': -14}
     rd = RelativeDelta(json.dumps(d))
@@ -26,7 +26,7 @@ def test_relative_delta():
     # feb + 3 = may; 15 - 14 = 1
     expected = datetime.strptime('May 1 2016', '%b %d %Y')
     assert feb_15_leap_year + rd == expected
-
+    
     # singular param raises error
     d = {'month': 5}
     with pytest.raises(ValueError):

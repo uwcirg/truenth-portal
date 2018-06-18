@@ -41,6 +41,7 @@
             noResultMessage: this.i18next.t("No PSA results to display"),
             saveText: this.i18next.t("Save"),
             closeText: this.i18next.t("Close"),
+            MAX_RESULT: 10000,
             newItem: {
                 id: "",
                 result: "",
@@ -154,15 +155,18 @@
                 return i18next.t("Click to reload the page and try again.");
             },
             validateResult: function(val) {
-                var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > 9999);
+                var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > this.MAX_RESULT);
                 if(!isValid) {
-                    this.addErrorMessage = this.i18next.t("Result must be a number.");
-                } else {
-                    this.addErrorMessage = "";
+                    this.addErrorMessage = this.i18next.t("Result must be a number and within valid range (less than {max_result}).").replace("{max_result}", this.MAX_RESULT);
+                    return false;
                 }
+                this.addErrorMessage = "";
                 return isValid;
             },
             validateDate: function(date) {
+                if (!date || date.length <= 9) { //don't show validation error until enough characters are entered, just return false
+                    return false;
+                }
                 var isValid = this.tnthDates.isValidDefaultDateFormat(date);
                 if(!isValid) {
                     this.addErrorMessage = this.i18next.t("Date must be in the valid format.");
@@ -188,20 +192,19 @@
                 }).on("hide", function() {
                     $("#psaDate").trigger("blur");
                 });
-                $("#psaDate").on("blur", function() {
+                $("#psaDate").on("change blur", function() {
                     var newDate = $(this).val();
-                    if(newDate) {
-                        if(self.validateDate(newDate)) {
-                            self.newItem.date = newDate;
-                        }
+                    if (!newDate || !self.validateDate(newDate)) {
+                        return false;
                     }
+                    self.newItem.date = newDate;
                 }).on("focus", function() {
                     self.modalLoading = false;
                 });
                 /*
                  * new result field event
                  */
-                $("#psaResult").on("change", function() {
+                $("#psaResult").on("blur", function() {
                     self.validateResult($(this).val());
                 });
 
@@ -440,6 +443,7 @@
                         self.newItem[prop] = "";
                     }
                 }
+                $("#psaDate").datepicker("update", "");
             },
             __handleTreatmentDate: function(minDate, maxDate, step) { //use internally
                 if (this.treatment.data.length === 0) {
@@ -458,7 +462,14 @@
                 return treatmentDate;
             },
             getNearestPow10: function(n){ //find the closest power of 10 given a number
-              return Math.pow(10, Math.ceil(Math.log(n) / Math.log(10)));
+                var base = Math.log(n) / Math.LN10;
+                if (base >= Math.ceil(base)-0.1) {
+                    base = base + 1; //accounting for when log of number is perfect integer, 1, 10, 100, 1000, so need to draw next grid line up
+                }
+                else {
+                    base = Math.ceil(base);
+                }
+                return Math.pow(10, base);
             },
             getRange: function getRange(size, startAt, step) {
                 var arr = []; size=size||10; startAt=startAt||0; step = step||1;
@@ -478,10 +489,6 @@
                 var DAY = this.getDayInMiliseconds();
                 var DIFF = (new Date(maxDate) - new Date(minDate)) / DAY;
                 return Math.ceil(DIFF / step);
-            },
-            logTickFormat: function(d) {
-                var log = Math.log(d) / Math.LN10;
-                return Math.abs(Math.round(log) - log) < 1e-6 ? d: "";
             },
             dateTicks: function(t0, t1) {
                 var startTime = new Date(t0), endTime = new Date(t1), times = [], dateTime;
@@ -534,16 +541,16 @@
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
 
-                if (data.length === 1 || String(minDate) === String(maxDate)) {
-                    var firstDate = new Date(minDate);
+                if (data.length <= 2 || String(minDate) === String(maxDate)) {
+                    var firstDate = new Date(maxDate);
                     maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
                     xDomain = [minDate, maxDate];
                 }
 
-                var INTERVAL = self.getInterval(minDate, maxDate, 10);
+                var maxResultInLog = self.getNearestPow10(maxResult);
 
                 x.domain(xDomain);
-                y.domain([0.1, self.getNearestPow10(maxResult)]); //scale to the closest power of 10 based on the maximum result
+                y.domain([0.1, maxResultInLog]); //scale to the closest power of 10 based on the maximum result
                 // Define the axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -556,7 +563,6 @@
                     .scale(y)
                     .ticks(10)
                     .orient("left")
-                    .tickFormat(self.logTickFormat)
                     .tickSize(0, 0, 0);
 
                 // Define the line
@@ -594,16 +600,6 @@
                     .attr("class", "axis-stroke")
                     .style("text-anchor", "start");
 
-                // Add the Y Axis
-                graphArea.append("g")
-                    .attr("class", "y axis y-axis")
-                    .call(yAxis)
-                    .selectAll("text")
-                    .attr("dx", "-2px")
-                    .attr("dy", "6px")
-                    .attr("class", "axis-stroke")
-                    .style("text-anchor", "end");
-
                 // add the X gridlines
                 graphArea.append("g")
                     .attr("class", "grid grid-x")
@@ -612,27 +608,34 @@
                         .tickSize(-height, 0, 0)
                         .tickFormat("")
                     );
-                // add the Y gridlines
+                // add the Y ticks and gridlines
                 graphArea.append("g")
                     .attr("class", "grid grid-y")
                     .call(yAxis
                         .tickSize(-width, 0, 0)
                         .tickValues(function() {
-                            return self.getRange(9,-1,0.5).map(function(n) { //finer lines between each log base 10 line
-                                if (Math.pow(10, n) > self.getNearestPow10(maxResult)) {
-                                    return self.getNearestPow10(maxResult);
-                                }
+                            return self.getRange(Math.log(maxResultInLog),-1,0.5).map(function(n) { //finer lines between each log base 10 line
                                 return Math.pow(10, n); //draw grid in log scale
                             });
                         })
-                        .tickFormat("")
-                    );
+                        .tickFormat(function(d) {
+                            if (d === parseInt(d)) { //this will only show tick values that are integers
+                                return d;
+                            }
+                            return "";
+                        })
+                    )
+                    .selectAll("text")
+                    .attr("dx", "-2px")
+                    .attr("dy", "6px")
+                    .attr("class", "axis-stroke")
+                    .style("text-anchor", "end");
 
                 //add div for tooltip
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
                 //treatment line
-                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, INTERVAL);
+                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 10));
                 if (treatmentDate) {
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
