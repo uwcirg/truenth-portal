@@ -11,7 +11,8 @@ import sys
 import tempfile
 from zipfile import ZipFile
 
-from flask import current_app, has_request_context, session
+from babel import negotiate_locale
+from flask import current_app, has_request_context, request, session
 from polib import pofile
 import requests
 
@@ -368,7 +369,13 @@ def get_locale():
 
     # look for session variable in pre-logged-in state
     # confirm request context - not available from celery tasks
-    if has_request_context() and session.get('locale_code'):
-        return session['locale_code']
-
+    if has_request_context():
+        if session.get('locale_code'):
+            return session['locale_code']
+        browser_default = negotiate_locale(
+            preferred=(l.replace('-', '_') for l in request.accept_languages.values()),
+            available=('sv_SE','en_US'),
+        )
+        if browser_default:
+            return browser_default
     return current_app.config.get("DEFAULT_LOCALE")
