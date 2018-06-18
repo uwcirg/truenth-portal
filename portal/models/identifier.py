@@ -48,6 +48,9 @@ class Identifier(db.Model):
     def __str__(self):
         return 'Identifier {0.use} {0.system} {0.value}'.format(self)
 
+    def __hash__(self):
+        return hash(self.system)*hash(self.value)
+
     def __eq__(self, other):
         ## Only compare (system, value), as per unique constraint
         return self.system == other.system and self.value == other.value
