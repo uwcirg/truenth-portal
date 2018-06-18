@@ -249,6 +249,9 @@
                         callback({"error": self.modules.i18next.t("Unable to set current user orgs")});
                         return false;
                     }
+                    if (!data.careProvider) {
+                        return false;
+                    }
                     var orgTool = self.getOrgTool();
                     self.userOrgs = data.careProvider.map(function(item) {
                         return item.reference.split("/").pop();
