@@ -473,7 +473,7 @@
             },
             getRange: function getRange(size, startAt, step) {
                 var arr = []; size=size||10; startAt=startAt||0; step = step||1;
-                for (var index=parseInt(startAt); index < size; index++) {
+                for (var index=startAt; index < size; index++) {
                     arr.push(step*index);
                 }
                 return arr;
