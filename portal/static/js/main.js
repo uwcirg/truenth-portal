@@ -1092,7 +1092,14 @@ var tnthAjax = {
             });
         }
     },
+    "removeCachedRoles": function(userId) {
+        sessionStorage.removeItem("userRole_"+userId);
+    },
     "putRoles": function(userId, toSend, targetField) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId + "/roles", "PUT", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1107,6 +1114,10 @@ var tnthAjax = {
         });
     },
     "deleteRoles": function(userId, toSend) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId, "GET", userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
