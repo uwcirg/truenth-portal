@@ -348,7 +348,7 @@ def clinical_set(patient_id):
     patient.
 
     ---
-    operationId: setPatientObservation
+    operationId: addPatientObservation
     tags:
       - Clinical
     produces:

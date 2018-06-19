@@ -91,7 +91,9 @@
       "resourceType": "Intervention"
     },
     {
+      "card_html": "<p>Remember to update your PSA score.</p>",
       "description": "PSA Tracker",
+      "link_label": "Track your PSA",
       "name": "psa_tracker",
       "public_access": false,
       "subscribed_events": 1,
