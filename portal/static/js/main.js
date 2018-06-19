@@ -929,13 +929,16 @@ var tnthAjax = {
             callback(data);
         });
     },
+    "clearDemoSessionData": function(userId) {
+        sessionStorage.removeItem("demoData_"+userId);
+    },
     "putDemo": function(userId, toSend, targetField, sync, callback) {
         callback = callback || function() {};
         if (!userId) {
             callback({"error": i18next.t("User Id is required")});
             return false;
         }
-        sessionStorage.removeItem("demoData_"+userId);
+        this.clearDemoSessionData(userId);
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".put-demo-error").html("");
