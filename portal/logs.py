@@ -23,7 +23,7 @@ class SSLSMTPHandler(SMTPHandler):
             port = self.mailport
             if not port:
                 port = smtplib.SMTP_PORT
-            smtp = smtplib.SMTP_SSL(self.mailhost, port, timeout=self._timeout)
+            smtp = smtplib.SMTP_SSL(host=self.mailhost, port=port, timeout=self._timeout)
 
             message = u'\r\n'.join((
                 u'From: {from_addr}',
