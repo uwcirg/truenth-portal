@@ -929,13 +929,16 @@ var tnthAjax = {
             callback(data);
         });
     },
+    "clearDemoSessionData": function(userId) {
+        sessionStorage.removeItem("demoData_"+userId);
+    },
     "putDemo": function(userId, toSend, targetField, sync, callback) {
         callback = callback || function() {};
         if (!userId) {
             callback({"error": i18next.t("User Id is required")});
             return false;
         }
-        sessionStorage.removeItem("demoData_"+userId);
+        this.clearDemoSessionData(userId);
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".put-demo-error").html("");
@@ -1089,7 +1092,14 @@ var tnthAjax = {
             });
         }
     },
+    "removeCachedRoles": function(userId) {
+        sessionStorage.removeItem("userRole_"+userId);
+    },
     "putRoles": function(userId, toSend, targetField) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId + "/roles", "PUT", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1104,6 +1114,10 @@ var tnthAjax = {
         });
     },
     "deleteRoles": function(userId, toSend) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId, "GET", userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
