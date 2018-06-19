@@ -17,7 +17,9 @@ from polib import pofile
 import requests
 
 from ..extensions import babel
+from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
+from .coding import Coding
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -373,8 +375,12 @@ def get_locale():
         if session.get('locale_code'):
             return session['locale_code']
         browser_pref = negotiate_locale(
-            preferred=(l.replace('-', '_') for l in request.accept_languages.values()),
-            available=('sv_SE','en_US'),
+            preferred=(
+                l.replace('-', '_') for l in request.accept_languages.values()
+            ),
+            available=(
+                c.code for c in Coding.query.filter_by(system=IETF_LANGUAGE_TAG)
+            ),
         )
         if browser_pref:
             return browser_pref
