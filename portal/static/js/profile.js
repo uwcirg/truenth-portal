@@ -573,7 +573,6 @@
                                         return false;
                                     }
                                     clearInterval(setDemoInterval);
-                                    console.log("seDemoInterval? ", setDemoInterval)
                                     o.trigger("updateDemoData");
                                 }, 10);
                             }
