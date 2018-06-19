@@ -1844,29 +1844,21 @@
                         $(this).find(".terms-wrapper").hide();
                     }
                 });
-                modalElements.find("input[name='toConsent']").each(function() {
-                    $(this).off("click").on("click", function(e) {
-                        e.stopPropagation();
-                        closeButtons.attr("disabled", true);
-                        var orgId = $(this).attr("data-org"), userId = __self.subjectId;
-                        $("#" + orgId + "_loader").show();
-                        if ($(this).val() === "yes") {
-                            if (!__self.modules.tnthAjax.hasConsent(userId, orgId)) {
-                                (function(orgId) {
-                                    var params = __self.CONSENT_ENUM.consented;
-                                    params.org = orgId;
-                                    params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
-                                    setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
-                                    setTimeout(function() {__self.removeObsoleteConsent();}, 250);
-                                })(orgId);
-                            }
-                        } else {
-                            __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
-                            setTimeout(function() {__self.removeObsoleteConsent();}, 100);
-                        }
-                        setTimeout(function() { __self.reloadConsentList(userId);}, 500);
-                        setTimeout(function() { modalElements.modal("hide");}, 250);
-                    });
+                modalElements.find("input[name='toConsent']").off("click").on("click", function(e) {
+                    e.stopPropagation();
+                    closeButtons.attr("disabled", true);
+                    var orgId = $(this).attr("data-org"), userId = __self.subjectId;
+                    $("#" + orgId + "_loader").show();
+                    if ($(this).val() === "yes") {
+                        var params = __self.CONSENT_ENUM.consented;
+                        params.org = orgId;
+                        params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
+                        setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
+                    } else {
+                        __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
+                    }
+                    setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(); }, 250);
+                    setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                 });
 
                 closeButtons.off("click").on("click", function(e) {
