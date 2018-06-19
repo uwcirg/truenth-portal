@@ -228,5 +228,5 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),
         )
         csv_string = download_response.get_data(as_text=True)
-        self.assertGreater(len(csv_string.split("\n")),1)
+        self.assertGreater(len(csv_string.split("\n")), 1)
         # Todo: use csv module for more robust test
