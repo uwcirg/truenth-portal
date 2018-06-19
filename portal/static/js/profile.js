@@ -57,7 +57,7 @@
             this.setConfiguration({useWorker:true}, function(data) { //get config settings
                 self.onInitChecksDone();
                 var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
-                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { 
+                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
                     return false;
                 }
                 self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + ""); //for use by UI later, e.g. handle consent submission
@@ -299,12 +299,12 @@
                 }
                 var self = this;
                 $("#profileMainContent .profile-item-container").each(function() { //disable field/section that is listed in disable field array
-                    var dataSection = this.getAttribute("data-sections"); 
+                    var dataSection = this.getAttribute("data-sections");
                     if (!dataSection) {
                         return true;
                     }
                     if (self.isDisableField(dataSection)){ //hide edit button for the section
-                        $(this).children(".profile-item-edit-btn").css("display", "none"); 
+                        $(this).children(".profile-item-edit-btn").css("display", "none");
                     }
                 });
             },
@@ -559,6 +559,8 @@
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
+                                var editButton = parentContainer.find(".profile-item-edit-btn");
+                                editButton.attr("disabled", true);
                                 setTimeout(function() {
                                     var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
@@ -566,9 +568,11 @@
                                         var errorBlock = parentContainer.find(".help-block");
                                         hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
-                                    if (!hasError) {
-                                        o.trigger("updateDemoData");
+                                    if (hasError) {
+                                        editButton.attr("disabled", false);
+                                        return false;
                                     }
+                                    o.trigger("updateDemoData");
                                 }, 250);
                             }
                         });
@@ -853,9 +857,11 @@
             },
             initNameSection: function() {
                 var self = this;
-                $("#firstname, #lastname").on("updateDemoData", function() {
-                    var fname = $.trim($("#firstname").val()), lname = $.trim($("#lastname").val());
-                    self.postDemoData($(this), {"name": {"given": fname, "family": lname}});
+                $("#firstname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"given": $.trim($(this).val())}});
+                });
+                $("#lastname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"family": $.trim($(this).val())}});
                 });
             },
             initBirthdaySection: function() {
