@@ -372,10 +372,10 @@ def get_locale():
     if has_request_context():
         if session.get('locale_code'):
             return session['locale_code']
-        browser_default = negotiate_locale(
+        browser_pref = negotiate_locale(
             preferred=(l.replace('-', '_') for l in request.accept_languages.values()),
             available=('sv_SE','en_US'),
         )
-        if browser_default:
-            return browser_default
+        if browser_pref:
+            return browser_pref
     return current_app.config.get("DEFAULT_LOCALE")
