@@ -1,9 +1,8 @@
 from datetime import datetime
 import json
 
-from werkzeug.exceptions import BadRequest
-
 import pytest
+from werkzeug.exceptions import BadRequest
 
 from portal.date_tools import FHIR_datetime, RelativeDelta, localize_datetime
 from tests import TestCase

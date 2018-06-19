@@ -49,7 +49,7 @@ class Identifier(db.Model):
         return 'Identifier {0.use} {0.system} {0.value}'.format(self)
 
     def __hash__(self):
-        return hash(self.system)*hash(self.value)
+        return hash(self.id) if self.id else hash(self.system)*hash(self.value)
 
     def __eq__(self, other):
         ## Only compare (system, value), as per unique constraint
