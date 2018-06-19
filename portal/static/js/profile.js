@@ -538,6 +538,7 @@
                 });
             },
             initFieldsEvent: function() {
+                var self = this;
                 $("#profileMainContent [data-loader-container]").each(function() {
                     var attachId = $(this).attr("id");
                     var targetFields = $(this).find("input, select");
@@ -555,13 +556,12 @@
                         }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
+                            self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //can't use cache data here as data is being updated
                             var valid = this.validity ? this.validity.valid : true;
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
-                                var editButton = parentContainer.find(".profile-item-edit-btn");
-                                editButton.attr("disabled", true);
-                                setTimeout(function() {
+                                var setDemoInterval = setInterval(function() {
                                     var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
@@ -569,11 +569,13 @@
                                         hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
                                     if (hasError) {
-                                        editButton.attr("disabled", false);
+                                        clearInterval(setDemoInterval);
                                         return false;
                                     }
+                                    clearInterval(setDemoInterval);
+                                    console.log("seDemoInterval? ", setDemoInterval)
                                     o.trigger("updateDemoData");
-                                }, 250);
+                                }, 10);
                             }
                         });
                     });
@@ -749,25 +751,21 @@
                 var o = field;
                 var parentContainer = field.closest(".profile-item-container");
                 var editButton = parentContainer.find(".profile-item-edit-btn");
-                setTimeout(function() {
-                    var customErrorField = $("#" + o.attr("data-error-field"));
-                    var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                    if (hasError) {
-                        editButton.attr("disabled", false);
-                        return;
-                    }
-                    editButton.attr("disabled", true);
-                    data.resourceType = data.resourceType || "Patient";
-                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                        self.setDemoData();
-                        var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                        formGroup.removeClass("has-error");
-                        formGroup.find(".help-block.with-errors").html("");
-                        setTimeout(function() {
-                            editButton.attr("disabled", false);
-                        }, 350);
-                    });
-                }, 250);
+                var customErrorField = $("#" + o.attr("data-error-field"));
+                var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
+                if (hasError) {
+                    editButton.attr("disabled", false);
+                    return;
+                }
+                editButton.attr("disabled", true);
+                data.resourceType = data.resourceType || "Patient";
+                self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                    self.setDemoData();
+                    var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                    formGroup.removeClass("has-error");
+                    formGroup.find(".help-block.with-errors").html("");
+                    editButton.attr("disabled", false);
+                });
             },
             getTelecomData: function() {
                 var telecom = [];
