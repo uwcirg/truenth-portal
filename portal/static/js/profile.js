@@ -330,7 +330,8 @@
                     callback();
                     return false;
                 }
-                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) {
+                this.modules.tnthAjax.clearDemoSessionData(this.subjectId); 
+                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) { //get demo returned cached data if there, but we need fresh data
                     if (data) {
                         self.demo.data = data;
                         self.setUserEmailReady();
