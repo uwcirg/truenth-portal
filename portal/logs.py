@@ -29,7 +29,8 @@ class SSLSMTPHandler(SMTPHandler):
                 'port': port,
                 'timeout': self._timeout,
             }
-            if self.use_ssl:
+            # todo: make `use_ssl` a proper attribute
+            if hasattr(self, 'use_ssl') and self.use_ssl:
                 smtp = smtplib.SMTP_SSL(**smtp_config)
             else:
                 smtp = smtplib.SMTP(**smtp_config)
