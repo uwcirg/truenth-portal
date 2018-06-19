@@ -211,12 +211,19 @@ To see all available options run:
 
     $ ./bin/deploy.sh -h
 
-Run the Central Services Server
+Run the Shared Services Server
 -------------------------------
+To run the flask development server, run the below command from an activated virtual environment
 
 .. code:: bash
 
-    $ flask runserver
+    $ flask run
+
+By default the flask dev server will run without the debugger and listen on port 5000 of localhost. To override these defaults, call ``flask run`` as follows
+
+.. code:: bash
+
+    $ FLASK_DEBUG=1 flask run --port 5001 --host 0.0.0.0
 
 Run the Celery Worker
 ---------------------
@@ -242,10 +249,10 @@ The value of ``SQLALCHEMY_DATABASE_URI`` defines which database engine
 and database to use.  Alternatively, the following environment
 variables may be used (and if defined, will be preferred):
 
-#. PGDATABASE
-#. PGUSER
-#. PGPASSWORD
-#. PGHOST
+#. ``PGDATABASE``
+#. ``PGUSER``
+#. ``PGPASSWORD``
+#. ``PGHOST``
 
 At this time, only PostgreSQL is supported.
 
