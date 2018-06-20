@@ -49,7 +49,7 @@ class Identifier(db.Model):
         return 'Identifier {0.use} {0.system} {0.value}'.format(self)
 
     def __key(self):
-        ## Only use (system, value), as per unique constraint
+        # Only use (system, value), as per unique constraint
         return (self.system, self.value)
 
     def __hash__(self):
