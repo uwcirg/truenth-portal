@@ -137,7 +137,8 @@
                     "consented": i18next.t("Consented / Enrolled"),
                     "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
                         "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
-                    "purged": "Purged / Removed"
+                    "purged": i18next.t("Purged / Removed"),
+                    "deleted": i18next.t("Replaced")
                 },
                 consentItems: [],
                 currentItems: [],
@@ -2396,7 +2397,7 @@
             },
             getConsentStatus: function(item) {
                 item = item || {};
-                if (item.deleted) { return "deleted"; }
+                if (item.deleted || String(item.status) === "deleted") { return "deleted"; }
                 if (item.expired && this.modules.tnthDates.getDateDiff(String(item.expires)) > 0) {
                     return "expired";
                 }
@@ -2418,6 +2419,7 @@
                     "default": "<span class='text-success small-text'>" + consentLabels.default+"</span>",
                     "consented": "<span class='text-success small-text'>" + consentLabels.consented + "</span>",
                     "withdrawn": "<span class='text-warning small-text withdrawn-label'>" + consentLabels.withdrawn + "</span>",
+                    "deleted": "<span class='text-danger small-text'>" + consentLabels.deleted + "</span>",
                     "purged": "<span class='text-danger small-text'>" + consentLabels.purged + "</span>",
                     "expired": "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>",
                 };
@@ -2431,6 +2433,9 @@
                         sDisplay = oDisplayText.purged;
                     } else {
                         sDisplay = oDisplayText.consented;
+                    }
+                    if (String(item.status) === "deleted") {
+                        sDisplay += "<span class='text-danger'> (</span>" + oDisplayText.deleted + "<span class='text-danger'>)</span>";
                     }
                     break;
                 case "expired":
@@ -2677,7 +2682,7 @@
                     return false;
                 }
                 this.getTerms(); //get terms of use if any
-                var self = this, dataArray = [];
+                var self = this, dataArray = []; 
                 if (data.consent_agreements && (data.consent_agreements).length > 0) {
                     dataArray = (data.consent_agreements).sort(function(a, b) {
                         return new Date(b.signed) - new Date(a.signed);
@@ -2694,10 +2699,10 @@
 
                 var existingOrgs = {};
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
-                    return !item.hasOwnProperty("deleted");
+                    return self.getConsentStatus(item) === "active";
                 });
                 this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
-                    return item.hasOwnProperty("deleted");
+                    return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
                     if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
@@ -2730,6 +2735,11 @@
                         }
                         $("#consentListTable").animate({opacity: 1});
                         clearInterval(self.consentListReadyIntervalId);
+                    }
+                    if (self.showConsentHistory()) {
+                        setTimeout(function() {
+                            $("#viewConsentHistoryButton").removeClass("tnth-hide");
+                        }, 550);
                     }
                 }, 50);
                 this.consent.consentLoading = false;
