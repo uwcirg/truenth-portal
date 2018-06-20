@@ -58,7 +58,6 @@ class Identifier(db.Model):
     def __eq__(self, other):
         return self.__key() == other.__key()
 
-
     def as_fhir(self):
         d = {}
         for k in ('use', 'system', 'value', 'assigner'):
