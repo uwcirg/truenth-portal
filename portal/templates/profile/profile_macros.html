@@ -25,7 +25,7 @@
     <div class="load-container save-loader-wrapper"><i id="{{container_id}}_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" aria-hidden="true"></i><i id="{{container_id}}_success" class="fa fa-check success-icon save-info" aria-hidden="true">{{_("Updated")}}</i><i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Update. System error.")}}</i></div>
 {%- endmacro %}
 {% macro emailReadyMessage() -%}
-    <email-ready-message v-bind:message="userEmailReadyMessage"></email-ready-message>
+    <email-ready-message v-bind:message="messages.userEmailReadyMessage"></email-ready-message>
 {%- endmacro %}
 {% macro profileDemo(person, current_user) -%}
     <div class="row" data-profile-section-id="demo">
@@ -304,9 +304,9 @@
                 </select>
             </div>
         </div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" disabled>{{ _("Send email") }}</button>
-        <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info"></div>
-        <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger"></div>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" disabled>{{ _("Send email") }}</button>
+        <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
+        <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
         {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
