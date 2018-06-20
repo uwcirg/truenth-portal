@@ -56,7 +56,7 @@ class Identifier(db.Model):
         return hash(self.__key())
 
     def __eq__(self, other):
-        return self.__key() == other.key()
+        return self.__key() == other.__key()
 
 
     def as_fhir(self):
