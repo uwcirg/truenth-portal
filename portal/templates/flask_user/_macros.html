@@ -92,23 +92,20 @@
 {% macro footer(splash_style=false, white_theme=False, user=None) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
-        <div class="col-xs-6 col-lg-8 footer-container">
-            <div class="copyright-container">
-                {{linksHTML(user)}}
-            </div>
-        </div>
-        <div class="col-xs-6 col-lg-4 footer-container logo-container">
-            <div class="pull-right">
-                {{logo(white_theme)}}
-            </div>
-        </div>
+        <div class="col-xs-6 col-lg-8 footer-container"><div class="copyright-container">{{linksHTML(user)}}</div></div>
+        <div class="col-xs-6 col-lg-4 footer-container logo-container"><div class="pull-right">{{logo(white_theme)}}</div></div>
     </div>
 </div>
 {%- endmacro %}
 {% macro linksHTML(user)-%}
     <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a>{%- if user -%}&nbsp;| <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a>{%- endif -%}{% if user or config.SHOW_PUBLIC_TERMS %}&nbsp;| <a href="{{PORTAL}}/terms">{{ _("Terms") }}</a></small></p>{%- endif -%}
-    <p><small class="copyright text-muted">&copy;{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small></p>
-    <input type="hidden" id="copyrightLocaleCode"  value="{{user.locale_code if user}}" />
+    <p>
+        <span>&copy;</span>
+        <small class="copyright text-muted en_us tnth-hide">{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).")}}</small>
+        <small class="copyright text-muted en_au tnth-hide">{{_("2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).")}}</small>
+        <small class="copyright text-muted en_nz tnth-hide">{{_("2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).")}}</small>
+        <small class="copyright text-muted default">{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small> 
+    </p>
 {%- endmacro %}
 {% macro logo(white_theme=False) -%}
     <a href="{%-if config.TRUENTH_LINK_URL-%}{{config.TRUENTH_LINK_URL}}{%-endif-%}" title="{{ _('Movember') }}" class="logo-link" target="_blank">{%-if white_theme -%}<img id="footerLogo" src="{{PORTAL}}{{url_for('static',filename='img/logo_white.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/truenth_logo.jpg')}}" alt="{{_('Movember logo')}}" />{%-endif-%}

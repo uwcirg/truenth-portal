@@ -2082,40 +2082,14 @@ var Global = {
         }, 100);
 
         setTimeout(function() {
-            var userLocale = $("#copyrightLocaleCode").val(), footerElements = $("#homeFooter .copyright");
-            var getContent = function(cc) {
-                var content = "";
-                switch (String(cc.toUpperCase())) {
-                case "US":
-                case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
-                    break;
-                case "AU":
-                case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
-                    break;
-                case "NZ":
-                case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
-                    break;
-                default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
-
-                }
-                return content;
-
-            };
-            if (userLocale) {
-                footerElements.html(getContent(userLocale));
-            } else {
-                $.getJSON("//freegeoip.net/json/?callback=?", function(data) {
-                    if (data && data.country_code) { //country code Australia AU New Zealand NZ USA US
-                        footerElements.html(getContent(data.country_code));
-                    } else {
-                        footerElements.html(getContent());
-                    }
-                });
+            var userLocale = tnthDates.getUserLocale(), copyrightElements = $("#homeFooter .copyright");
+            copyrightElements.addClass("tnth-hide");
+            var matchedElement = $("#homeFooter .copyright."+userLocale.toLowerCase());
+            if (matchedElement.length > 0) {
+                matchedElement.removeClass("tnth-hide");
+                return true;
             }
+            $("#homeFooter .copyright.default").removeClass("tnth-hide"); //default copyright text, if no matching user locale found, NOTE the default text is rendered in template so will be translated 
         }, 500);
     },
     "getNotification": function(callback) {
