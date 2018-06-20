@@ -90,7 +90,11 @@
             userOrgs: [],
             userRoles: [],
             userEmailReady: true,
-            userEmailReadyMessage: "",
+            messages: {
+                userEmailReadyMessage: "",
+                userInviteEmailInfoMessage: "",
+                userInviteEmailErrorMessage: "",
+            },
             mode: "profile",
             demo: { //skeleton
                 data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
@@ -273,7 +277,7 @@
                         return false;
                     }
                     self.userEmailReady = data.ready;
-                    self.userEmailReadyMessage = data.reason || "";
+                    self.messages.userEmailReadyMessage = data.reason || "";
                 });
             },
             isDisableField: function(fieldId) {
@@ -1055,97 +1059,90 @@
                     self.assessmentStatus(self.subjectId);
                 }
                 $(".email-selector").off("change").on("change", function() {
-                    var message = "";
+                    self.messages.userInviteEmailErrorMessage = "";
+                    self.messages.userInviteEmailInfoMessage = "";
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
-                    var messageContainer = $("#profile" + emailType + "EmailMessage");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
-                        $("#profile" + emailType + "EmailErrorMessage").html("");
-                        message = i18next.t("{emailType} email will be sent to {email}");
+                        var message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
-                        messageContainer.html(message);
+                        self.messages.userInviteEmailInfoMessage = message;
                         btnEmail.attr("disabled", false).removeClass("disabled");
                     } else {
-                        messageContainer.html("");
+                        self.messages.userInviteEmailInfoMessage = "";
                         btnEmail.attr("disabled", true).addClass("disabled");
                     }
+                });
+                $("#email").on("change", function() {
+                    self.messages.userInviteEmailInfoMessage = "";
+                    self.messages.userInviteEmailErrorMessage = "";
                 });
                 $(".btn-send-email").off("click").on("click", function(event) {
                     event.preventDefault();
                     event.stopPropagation();
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var emailTypeElem = $("#profile" + emailType + "EmailSelect"), selectedOption = emailTypeElem.children("option:selected");
-                    var infoMessageContainer = $("#profile" + emailType + "EmailMessage"), errorMessageContainer = $("#profile" + emailType + "EmailErrorMessage");
                     var btnSelf = $(this);
-                    if (selectedOption.val() !== "") {
-                        var emailUrl = selectedOption.attr("data-url"), email = $("#email").val(), subject = "", body = "", returnUrl = "";
-                        if (emailUrl) {
-                            $.ajax({ //get email content via API
-                                type: "GET",
-                                url: emailUrl,
-                                cache: false,
-                                async: false
-                            }).done(function(data) {
-                                if (data) {
-                                    subject = data.subject;
-                                    body = data.body;
-                                }
-                            }).fail(function(xhr) { //report error
-                                self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
-                            });
-                        } else {
-                            errorMessageContainer.append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
-                        }
-
-                        if (body && subject && email) {
-                            var inviteError = "";
-                            if (selectedOption.val() === "invite" && emailType === "registration") {
-                                returnUrl = self.getAccessUrl();
-                                if (returnUrl) {
-                                    body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
-                                } else {
-                                    inviteError = i18next.t("failed request to get email invite url");
-                                }
-                            }
-                            if (inviteError) {
-                                errorMessageContainer.html(inviteError);
-                            } else {
-                                self.modules.tnthAjax.invite(self.subjectId, {
-                                    "subject": subject,
-                                    "recipients": email,
-                                    "body": body
-                                }, function(data) {
-                                    if (!data.error) {
-                                        infoMessageContainer.html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
-                                        emailTypeElem.val("");
-                                        btnSelf.addClass("disabled");
-                                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
-                                            setTimeout(function() {
-                                                self.getEmailLog(self.subjectId, data);
-                                            }, 100);
-                                        });
-                                    } else {
-                                        errorMessageContainer.append("<div>" + i18next.t("Unable to send email") + "</div>");
-                                    }
-                                });
-                            }
-                        } else {
-                            errorMessageContainer.html("");
-                            errorMessageContainer.append("<div>" + i18next.t("Unable to send email.") + "</div>");
-                            if (!body) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email body content is missing.") + "</div>");
-                            }
-                            if (!subject) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email subject is missing.") + "</div>");
-                            }
-                            if (!email) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email address is missing.") + "</div>");
-                            }
-                        }
-                    } else {
-                        errorMessageContainer.text(i18next.t("You must select an email type"));
+                    if (selectedOption.val() === "") {
+                        return false;
                     }
+                    var emailUrl = selectedOption.attr("data-url"), email = $("#email").val(), subject = "", body = "", returnUrl = "";
+                    if (!emailUrl) {
+                        self.messages.userInviteEmailErrorMessage = i18next.t("Url for email content is unavailable.");
+                        return false;
+                    }
+                    $.ajax({ //get email content via API
+                        type: "GET",
+                        url: emailUrl,
+                        cache: false,
+                        async: false
+                    }).done(function(data) {
+                        if (data) {
+                            subject = data.subject;
+                            body = data.body;
+                            self.messages.userInviteEmailErrorMessage = "";
+                        }
+                    }).fail(function(xhr) { //report error
+                        self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
+                    });
+
+                    if (!body || !subject || !email) {
+                        var message = "<div>" + i18next.t("Unable to send email.") + "</div>";
+                        self.messages.userInviteEmailErrorMessage = message;
+                        return false;
+                    }
+                    var inviteError = "";
+                    if (selectedOption.val() === "invite" && emailType === "registration") {
+                        returnUrl = self.getAccessUrl();
+                        if (returnUrl) {
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                        } else {
+                            inviteError = i18next.t("failed request to get email invite url");
+                        }
+                    }
+                    if (inviteError) {
+                        self.messages.userInviteEmailErrorMessage = inviteError;
+                        return false;
+                    }
+                    self.modules.tnthAjax.invite(self.subjectId, {
+                        "subject": subject,
+                        "recipients": email,
+                        "body": body
+                    }, function(data) {
+                        if (data.error) {
+                            self.messages.userInviteEmailErrorMessage = i18next.t("Unable to send email");
+                            return false;
+                        }
+                        self.messages.userInviteEmailInfoMessage = "<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>";
+                        emailTypeElem.val("");
+                        btnSelf.addClass("disabled");
+                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
+                            setTimeout(function() {
+                                self.getEmailLog(self.subjectId, data);
+                            }, 100);
+                        });
+                    });
                 });
             },
             initStaffRegistrationEmailSection: function() {
