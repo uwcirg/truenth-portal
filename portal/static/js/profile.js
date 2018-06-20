@@ -1064,10 +1064,10 @@
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
                         messageContainer.html(message);
-                        btnEmail.removeClass("disabled");
+                        btnEmail.attr("disabled", false).removeClass("disabled");
                     } else {
                         messageContainer.html("");
-                        btnEmail.addClass("disabled");
+                        btnEmail.attr("disabled", true).addClass("disabled");
                     }
                 });
                 $(".btn-send-email").off("click").on("click", function(event) {

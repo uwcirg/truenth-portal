@@ -298,13 +298,13 @@
             {% endif %}
             <div class="email-selector-container">
                 <label id="send{{prefix}}EmailLabel" class="text-muted">{{_("Send email to patient")}}</label>
-                <select id="profile{{prefix}}EmailSelect" class="form-control bd-element {{prefix}}-email-selector email-selector" aria-labelledby="sendEmailLabel">
+                <select id="profile{{prefix}}EmailSelect" class="form-control bd-element {{prefix}}-email-selector email-selector" aria-labelledby="sendEmailLabel" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">
                     <option value="">{{_("Select Email...")}}</option>
                     {{caller()}}
                 </select>
             </div>
         </div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" disabled>{{ _("Send email") }}</button>
         <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info"></div>
         <div id="profile{{prefix}}EmailErrorMessage" class="send-email-error text-danger"></div>
         {{emailReadyMessage()}}
