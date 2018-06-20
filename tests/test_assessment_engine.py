@@ -1,6 +1,5 @@
 """Unit test module for Assessment Engine API"""
 import json
-import sys
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
