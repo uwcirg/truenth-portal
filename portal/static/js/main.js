@@ -874,35 +874,15 @@ var tnthAjax = {
         var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
         var __url = "/api/user/" + userId + "/consent", self = this;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
-            if (data && !data.error && data.consent_agreements && data.consent_agreements.length > 0) {
-                var d = data.consent_agreements;
-                d = d.sort(function(a, b) {
-                    return new Date(b.signed) - new Date(a.signed); //latest comes first
-                });
-                item = d[0];
-                expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
-                found = (item.deleted || expired > 0 || (item.staff_editable && item.include_in_reports && !item.send_reminders));
-                if (!found && (String(orgId) === String(item.organization_id))) {
-                    switch (filterStatus) {
-                    case "suspended":
-                        found = suspended;
-                        break;
-                    case "purged":
-                        found = true;
-                        break;
-                    case "consented":
-                        found = !suspended && item.staff_editable && item.send_reminders && item.include_in_reports;
-                        break;
-                    default:
-                        found = true; //default is to return both suspended and consented entries
-                    }
-                    if (found) { consentedOrgIds.push(orgId);}
-                }
-            } else {
+            if (!data || data.error || (data.consent_agreements && data.consent_agreements.length === 0)) {
                 return false;
             }
+            consentedOrgIds = $.grep(data.consent_agreements, function(item) {
+                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
+                return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && item.staff_editable && item.send_reminders && item.include_in_reports;
+            });
         });
-        return consentedOrgIds.length > 0 ? consentedOrgIds : null;
+        return consentedOrgIds.length;
     },
     "getDemo": function(userId, params, callback) {
         callback = callback || function() {};

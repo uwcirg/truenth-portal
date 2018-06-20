@@ -330,7 +330,7 @@
                     callback();
                     return false;
                 }
-                this.modules.tnthAjax.clearDemoSessionData(this.subjectId); 
+                this.modules.tnthAjax.clearDemoSessionData(this.subjectId);
                 this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) { //get demo returned cached data if there, but we need fresh data
                     if (data) {
                         self.demo.data = data;
@@ -1060,6 +1060,7 @@
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     var messageContainer = $("#profile" + emailType + "EmailMessage");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
+                        $("#profile" + emailType + "EmailErrorMessage").html("");
                         message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
@@ -1143,7 +1144,7 @@
                             }
                         }
                     } else {
-                        errorMessageContainer.text(i18next.t("You must select a email type"));
+                        errorMessageContainer.text(i18next.t("You must select an email type"));
                     }
                 });
             },
@@ -2364,7 +2365,7 @@
             },
             getConsentHistoryRow: function(item) {
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var content = "<tr>";
+                var content = "<tr " + (item.deleted?"class='history'":"") + ">";
                 var contentArray = [{
                     content: self.getConsentOrgDisplayName(item) + "<div class='smaller-text text-muted'>" + this.orgTool.getOrgName(item.organization_id) + "</div>"
                 }, {
@@ -2372,10 +2373,11 @@
                 }, {
                     content: self.modules.tnthDates.formatDateString(item.signed)
 
+                },
+                {
+                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||"<span class='text-muted'>--</span>") + "</span>"
                 }, {
-                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||self.modules.tnthDates.formatDateString(item.signed,"iso")) + "</span>"
-                }, {
-                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
+                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "<span class='text-muted'>--</span>")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2516,7 +2518,7 @@
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").each(function() {
-                    $(this).on("click", function() {
+                    $(this).off("click").on("click", function() { //remove pre-existing events as when consent list is re-drawn
                         var o = __self.CONSENT_ENUM[$(this).val()];
                         if (o) {
                             o.org = $(this).attr("data-orgId");
@@ -2706,6 +2708,20 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
+                if (this.showConsentHistory()) {
+                    $("#viewConsentHistoryButton").on("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.getConsentHistory();
+                    });
+                }
+                if (self.isConsentEditable()) {
+                    self.initConsentItemEvent();
+                }
+                if (self.isConsentEditable() && self.isTestEnvironment()) {
+                    self.initConsentDateEvents();
+                }
+
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2719,18 +2735,6 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                 }, 50);
-                if (this.showConsentHistory()) {
-                    $("#viewConsentHistoryButton").on("click", function(e) {
-                        e.preventDefault();
-                        self.getConsentHistory();
-                    });
-                }
-                if (self.isConsentEditable()) {
-                    self.initConsentItemEvent();
-                }
-                if (self.isConsentEditable() && self.isTestEnvironment()) {
-                    self.initConsentDateEvents();
-                }
                 this.consent.consentLoading = false;
             },
             __convertToNumericField: function(field) {
