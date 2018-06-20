@@ -57,7 +57,7 @@
             this.setConfiguration({useWorker:true}, function(data) { //get config settings
                 self.onInitChecksDone();
                 var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
-                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { 
+                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
                     return false;
                 }
                 self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + ""); //for use by UI later, e.g. handle consent submission
@@ -249,6 +249,9 @@
                         callback({"error": self.modules.i18next.t("Unable to set current user orgs")});
                         return false;
                     }
+                    if (!data.careProvider) {
+                        return false;
+                    }
                     var orgTool = self.getOrgTool();
                     self.userOrgs = data.careProvider.map(function(item) {
                         return item.reference.split("/").pop();
@@ -296,12 +299,12 @@
                 }
                 var self = this;
                 $("#profileMainContent .profile-item-container").each(function() { //disable field/section that is listed in disable field array
-                    var dataSection = this.getAttribute("data-sections"); 
+                    var dataSection = this.getAttribute("data-sections");
                     if (!dataSection) {
                         return true;
                     }
                     if (self.isDisableField(dataSection)){ //hide edit button for the section
-                        $(this).children(".profile-item-edit-btn").css("display", "none"); 
+                        $(this).children(".profile-item-edit-btn").css("display", "none");
                     }
                 });
             },
@@ -327,7 +330,8 @@
                     callback();
                     return false;
                 }
-                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) {
+                this.modules.tnthAjax.clearDemoSessionData(this.subjectId);
+                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) { //get demo returned cached data if there, but we need fresh data
                     if (data) {
                         self.demo.data = data;
                         self.setUserEmailReady();
@@ -535,6 +539,7 @@
                 });
             },
             initFieldsEvent: function() {
+                var self = this;
                 $("#profileMainContent [data-loader-container]").each(function() {
                     var attachId = $(this).attr("id");
                     var targetFields = $(this).find("input, select");
@@ -552,21 +557,25 @@
                         }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
+                            self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //seems there is a race condition here, make sure not to use cache data here as data is being updated
                             var valid = this.validity ? this.validity.valid : true;
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
-                                setTimeout(function() {
+                                var setDemoInterval = setInterval(function() {
                                     var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
                                         var errorBlock = parentContainer.find(".help-block");
                                         hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
-                                    if (!hasError) {
-                                        o.trigger("updateDemoData");
+                                    if (hasError) {
+                                        clearInterval(setDemoInterval);
+                                        return false;
                                     }
-                                }, 250);
+                                    clearInterval(setDemoInterval);
+                                    o.trigger("updateDemoData");
+                                }, 10);
                             }
                         });
                     });
@@ -742,25 +751,21 @@
                 var o = field;
                 var parentContainer = field.closest(".profile-item-container");
                 var editButton = parentContainer.find(".profile-item-edit-btn");
-                setTimeout(function() {
-                    var customErrorField = $("#" + o.attr("data-error-field"));
-                    var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                    if (hasError) {
-                        editButton.attr("disabled", false);
-                        return;
-                    }
-                    editButton.attr("disabled", true);
-                    data.resourceType = data.resourceType || "Patient";
-                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                        self.setDemoData();
-                        var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                        formGroup.removeClass("has-error");
-                        formGroup.find(".help-block.with-errors").html("");
-                        setTimeout(function() {
-                            editButton.attr("disabled", false);
-                        }, 350);
-                    });
-                }, 250);
+                var customErrorField = $("#" + o.attr("data-error-field"));
+                var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
+                if (hasError) {
+                    editButton.attr("disabled", false);
+                    return;
+                }
+                editButton.attr("disabled", true);
+                data.resourceType = data.resourceType || "Patient";
+                self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                    self.setDemoData();
+                    var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                    formGroup.removeClass("has-error");
+                    formGroup.find(".help-block.with-errors").html("");
+                    editButton.attr("disabled", false);
+                });
             },
             getTelecomData: function() {
                 var telecom = [];
@@ -850,9 +855,11 @@
             },
             initNameSection: function() {
                 var self = this;
-                $("#firstname, #lastname").on("updateDemoData", function() {
-                    var fname = $.trim($("#firstname").val()), lname = $.trim($("#lastname").val());
-                    self.postDemoData($(this), {"name": {"given": fname, "family": lname}});
+                $("#firstname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"given": $.trim($(this).val())}});
+                });
+                $("#lastname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"family": $.trim($(this).val())}});
                 });
             },
             initBirthdaySection: function() {
@@ -1053,14 +1060,15 @@
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     var messageContainer = $("#profile" + emailType + "EmailMessage");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
+                        $("#profile" + emailType + "EmailErrorMessage").html("");
                         message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
                         messageContainer.html(message);
-                        btnEmail.removeClass("disabled");
+                        btnEmail.attr("disabled", false).removeClass("disabled");
                     } else {
                         messageContainer.html("");
-                        btnEmail.addClass("disabled");
+                        btnEmail.attr("disabled", true).addClass("disabled");
                     }
                 });
                 $(".btn-send-email").off("click").on("click", function(event) {
@@ -1136,7 +1144,7 @@
                             }
                         }
                     } else {
-                        errorMessageContainer.text(i18next.t("You must select a email type"));
+                        errorMessageContainer.text(i18next.t("You must select an email type"));
                     }
                 });
             },
@@ -1841,29 +1849,21 @@
                         $(this).find(".terms-wrapper").hide();
                     }
                 });
-                modalElements.find("input[name='toConsent']").each(function() {
-                    $(this).off("click").on("click", function(e) {
-                        e.stopPropagation();
-                        closeButtons.attr("disabled", true);
-                        var orgId = $(this).attr("data-org"), userId = __self.subjectId;
-                        $("#" + orgId + "_loader").show();
-                        if ($(this).val() === "yes") {
-                            if (!__self.modules.tnthAjax.hasConsent(userId, orgId)) {
-                                (function(orgId) {
-                                    var params = __self.CONSENT_ENUM.consented;
-                                    params.org = orgId;
-                                    params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
-                                    setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
-                                    setTimeout(function() {__self.removeObsoleteConsent();}, 250);
-                                })(orgId);
-                            }
-                        } else {
-                            __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
-                            setTimeout(function() {__self.removeObsoleteConsent();}, 100);
-                        }
-                        setTimeout(function() { __self.reloadConsentList(userId);}, 500);
-                        setTimeout(function() { modalElements.modal("hide");}, 250);
-                    });
+                modalElements.find("input[name='toConsent']").off("click").on("click", function(e) {
+                    e.stopPropagation();
+                    closeButtons.attr("disabled", true);
+                    var orgId = $(this).attr("data-org"), userId = __self.subjectId;
+                    $("#" + orgId + "_loader").show();
+                    if ($(this).val() === "yes") {
+                        var params = __self.CONSENT_ENUM.consented;
+                        params.org = orgId;
+                        params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
+                        setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
+                    } else {
+                        __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
+                    }
+                    setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(); }, 250);
+                    setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                 });
 
                 closeButtons.off("click").on("click", function(e) {
@@ -2365,7 +2365,7 @@
             },
             getConsentHistoryRow: function(item) {
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var content = "<tr>";
+                var content = "<tr " + (item.deleted?"class='history'":"") + ">";
                 var contentArray = [{
                     content: self.getConsentOrgDisplayName(item) + "<div class='smaller-text text-muted'>" + this.orgTool.getOrgName(item.organization_id) + "</div>"
                 }, {
@@ -2373,10 +2373,11 @@
                 }, {
                     content: self.modules.tnthDates.formatDateString(item.signed)
 
+                },
+                {
+                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||"<span class='text-muted'>--</span>") + "</span>"
                 }, {
-                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||self.modules.tnthDates.formatDateString(item.signed,"iso")) + "</span>"
-                }, {
-                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
+                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "<span class='text-muted'>--</span>")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2517,7 +2518,7 @@
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").each(function() {
-                    $(this).on("click", function() {
+                    $(this).off("click").on("click", function() { //remove pre-existing events as when consent list is re-drawn
                         var o = __self.CONSENT_ENUM[$(this).val()];
                         if (o) {
                             o.org = $(this).attr("data-orgId");
@@ -2707,6 +2708,20 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
+                if (this.showConsentHistory()) {
+                    $("#viewConsentHistoryButton").on("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.getConsentHistory();
+                    });
+                }
+                if (self.isConsentEditable()) {
+                    self.initConsentItemEvent();
+                }
+                if (self.isConsentEditable() && self.isTestEnvironment()) {
+                    self.initConsentDateEvents();
+                }
+
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2720,18 +2735,6 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                 }, 50);
-                if (this.showConsentHistory()) {
-                    $("#viewConsentHistoryButton").on("click", function(e) {
-                        e.preventDefault();
-                        self.getConsentHistory();
-                    });
-                }
-                if (self.isConsentEditable()) {
-                    self.initConsentItemEvent();
-                }
-                if (self.isConsentEditable() && self.isTestEnvironment()) {
-                    self.initConsentDateEvents();
-                }
                 this.consent.consentLoading = false;
             },
             __convertToNumericField: function(field) {

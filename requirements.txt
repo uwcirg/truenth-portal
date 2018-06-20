@@ -2,7 +2,7 @@
 # See https://github.com/spotify/dh-virtualenv/issues/150
 --no-binary billiard,cffi,psycopg2
 
-alabaster==0.7.10
+alabaster==0.7.11
 alembic==0.9.9
 amqp==2.3.2
 anyjson==0.3.3
@@ -69,7 +69,7 @@ pycparser==2.18
 pycrypto==2.6.1
 pyflakes==2.0.0
 Pygments==2.2.0
-pytest==3.6.1
+pytest==3.6.2
 python-dateutil==2.7.3
 python-editor==1.0.3
 python-Levenshtein==0.12.0

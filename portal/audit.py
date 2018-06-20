@@ -52,7 +52,7 @@ def configure_audit_log(app):  # pragma: no cover
 
     """
     # Skip config when running tests or maintenance
-    if ('manage.py' in sys.argv and 'runserver' not in sys.argv) or\
+    if (sys.argv[0].endswith('/bin/flask') and 'run' not in sys.argv) or\
        app.testing:
         return
 
