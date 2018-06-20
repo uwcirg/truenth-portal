@@ -2518,7 +2518,7 @@
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").each(function() {
-                    $(this).off("click").on("click", function() {
+                    $(this).off("click").on("click", function() { //remove pre-existing events as when consent list is re-drawn
                         var o = __self.CONSENT_ENUM[$(this).val()];
                         if (o) {
                             o.org = $(this).attr("data-orgId");
