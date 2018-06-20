@@ -328,7 +328,7 @@ class TestCase(Base):
         org_102 = Organization(id=102, name='102')
         org_1001 = Organization(id=1001, name='1001', partOf_id=101)
         with SessionScope(db):
-            map(db.session.add, (org_101, org_102, org_1001))
+            [db.session.add(org) for org in (org_101, org_102, org_1001)]
             db.session.commit()
         OrgTree.invalidate_cache()
 
