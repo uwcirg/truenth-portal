@@ -181,6 +181,11 @@ OrgTool.prototype.findOrg = function(entry, orgId) {
     }
     return org;
 };
+OrgTool.prototype.getOrgName = function(orgId) {
+    var org = this.orgsList[orgId];
+    if (!org) return "";
+    return org.name;
+};
 OrgTool.prototype.populateOrgsList = function(items) {
     var entry = items, self = this, parentId, orgsList = {};
     if (Object.keys(this.orgsList).length === 0) {
@@ -869,52 +874,51 @@ var tnthAjax = {
         var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
         var __url = "/api/user/" + userId + "/consent", self = this;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
-            if (data && !data.error && data.consent_agreements && data.consent_agreements.length > 0) {
-                var d = data.consent_agreements;
-                d = d.sort(function(a, b) {
-                    return new Date(b.signed) - new Date(a.signed); //latest comes first
-                });
-                item = d[0];
-                expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
-                found = (item.deleted || expired > 0 || (item.staff_editable && item.include_in_reports && !item.send_reminders));
-                if (!found && (String(orgId) === String(item.organization_id))) {
-                    switch (filterStatus) {
-                    case "suspended":
-                        found = suspended;
-                        break;
-                    case "purged":
-                        found = true;
-                        break;
-                    case "consented":
-                        found = !suspended && item.staff_editable && item.send_reminders && item.include_in_reports;
-                        break;
-                    default:
-                        found = true; //default is to return both suspended and consented entries
-                    }
-                    if (found) { consentedOrgIds.push(orgId);}
-                }
-            } else {
+            if (!data || data.error || (data.consent_agreements && data.consent_agreements.length === 0)) {
                 return false;
             }
+            consentedOrgIds = $.grep(data.consent_agreements, function(item) {
+                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
+                return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && item.staff_editable && item.send_reminders && item.include_in_reports;
+            });
         });
-        return consentedOrgIds.length > 0 ? consentedOrgIds : null;
+        return consentedOrgIds.length;
     },
     "getDemo": function(userId, params, callback) {
         callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User id is required.")});
+            return false;
+        }
         params = params || {};
+        var demoDataKey = "demoData_"+userId;
+        if (sessionStorage.getItem(demoDataKey)) {
+            callback(JSON.parse(sessionStorage.getItem(demoDataKey)));
+            return;
+        }
         this.sendRequest("/api/demographics/" + userId, "GET", userId, params, function(data) {
-            if (!data.error) {
-                $(".get-demo-error").html("");
-                callback(data);
-            } else {
-                var errorMessage = i18next.t("Server error occurred retrieving demographics information.");
+            var errorMessage = "";
+            if (data.error) {
+                errorMessage = i18next.t("Server error occurred retrieving demographics information.");
                 $(".get-demo-error").html(errorMessage);
                 callback({"error": errorMessage});
+                return false;
             }
+            $(".get-demo-error").html(errorMessage);
+            sessionStorage.setItem(demoDataKey, JSON.stringify(data));
+            callback(data);
         });
+    },
+    "clearDemoSessionData": function(userId) {
+        sessionStorage.removeItem("demoData_"+userId);
     },
     "putDemo": function(userId, toSend, targetField, sync, callback) {
         callback = callback || function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User Id is required")});
+            return false;
+        }
+        this.clearDemoSessionData(userId);
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".put-demo-error").html("");
@@ -1068,7 +1072,14 @@ var tnthAjax = {
             });
         }
     },
+    "removeCachedRoles": function(userId) {
+        sessionStorage.removeItem("userRole_"+userId);
+    },
     "putRoles": function(userId, toSend, targetField) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId + "/roles", "PUT", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1083,6 +1094,10 @@ var tnthAjax = {
         });
     },
     "deleteRoles": function(userId, toSend) {
+        if (!userId) {
+            return false;
+        }
+        this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId, "GET", userId, {data: JSON.stringify(toSend)}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1897,7 +1912,7 @@ var tnthDates = {
         var locale = "";
         if (sessionLocale) {
             return sessionLocale;
-        } 
+        }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
         }

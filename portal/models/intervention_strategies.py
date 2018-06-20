@@ -269,7 +269,7 @@ def update_card_html_on_completion():
                     'Due', 'Overdue', 'In Progress'):
                 greeting = _(u"Hi {}").format(user.display_name)
 
-                qb = assessment_status.qb_data.qb
+                qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
                 utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start
@@ -531,12 +531,18 @@ def tx_begun(boolean_value):
     return user_has_desired_tx
 
 
-def observation_check(display, boolean_value):
+def observation_check(display, boolean_value, invert_logic=False):
     """Returns strategy function for a particular observation and logic value
 
     :param display: observation coding.display from
       TRUENTH_CLINICAL_CODE_SYSTEM
     :param boolean_value: ValueQuantity boolean true or false expected
+    :param invert_logic: Effective binary ``not`` to apply to test.  If set,
+      will return True only if given observation with boolean_value is NOT
+      defined for user
+
+    NB a history of observations is maintained, with the most recent taking
+    precedence.
 
     """
     try:
@@ -545,8 +551,8 @@ def observation_check(display, boolean_value):
     except NoResultFound:
         raise ValueError("coding.display '{}' not found".format(display))
     try:
-        cc_id = CodeableConcept.query.filter(
-            CodeableConcept.codings.contains(coding)).one().id
+        cc = CodeableConcept.query.filter(
+            CodeableConcept.codings.contains(coding)).one()
     except NoResultFound:
         raise ValueError("codeable_concept'{}' not found".format(coding))
 
@@ -558,12 +564,14 @@ def observation_check(display, boolean_value):
         raise ValueError("boolean_value must be 'true' or 'false'")
 
     def user_has_matching_observation(intervention, user):
-        obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
-        if obs and obs[0].value_quantity == vq:
+        value, status = user.fetch_value_status_for_concept(
+            codeable_concept=cc)
+        if value == vq:
             _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
-            return True
+            return True if not invert_logic else False
+        return False if not invert_logic else True
 
     return user_has_matching_observation
 

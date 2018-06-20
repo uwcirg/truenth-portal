@@ -27,7 +27,7 @@ class Identifier(db.Model):
     @value.setter
     def value(self, value):
         # Force to text
-        self._value = unicode(value)
+        self._value = str(value)
         # Don't allow empty string
         if not len(self._value):
             raise TypeError("<empty string>")
@@ -48,9 +48,15 @@ class Identifier(db.Model):
     def __str__(self):
         return 'Identifier {0.use} {0.system} {0.value}'.format(self)
 
+    def __key(self):
+        # Only use (system, value), as per unique constraint
+        return (self.system, self.value)
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def __eq__(self, other):
-        ## Only compare (system, value), as per unique constraint
-        return self.system == other.system and self.value == other.value
+        return self.__key() == other.__key()
 
     def as_fhir(self):
         d = {}

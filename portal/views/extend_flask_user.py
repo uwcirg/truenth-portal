@@ -24,7 +24,7 @@ def reset_password_view_function(token):
         # As they will fail the challenge without data to compare, provide
         # a back door.
         if not all((user.birthdate, user.first_name, user.last_name)):
-            if user.has_role(ROLE.ACCESS_ON_VERIFY):
+            if user.has_role(ROLE.ACCESS_ON_VERIFY.value):
                 message = (
                     "User missing required verify attribute not allowed "
                     "to bypass verify on p/w reset")

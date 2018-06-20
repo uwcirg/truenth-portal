@@ -1,6 +1,6 @@
 """Persistence details for Model Classes"""
-from future import standard_library
-standard_library.install_aliases()
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
 
 from io import StringIO
 import json

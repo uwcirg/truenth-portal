@@ -27,7 +27,7 @@
                <div class="terms-checkbox-container">
                {% set tou_url = terms['url'] if terms else '' %}
                <!-- note these checkboxes are selectively hidden based on user role-->
-               {% if user.has_role(ROLE.STAFF) or user.has_role(ROLE.STAFF_ADMIN) %}
+               {% if user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.STAFF_ADMIN.value) %}
                     <label class="terms-label tnth-hide">
                         <i class="fa fa-square-o fa-lg terms-tick-box"></i>
                         {% trans
@@ -420,7 +420,7 @@
     {%-if consent_agreements -%}
         {%- for org in consent_agreements -%}
            {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url if consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url if consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER.value) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
             {%- endif -%}
         {%- endfor -%}
     {%-endif-%}

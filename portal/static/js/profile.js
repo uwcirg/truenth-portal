@@ -26,7 +26,7 @@
             this.dataError = true;
             var errorElement = document.getElementById("profileErrorMessage");
             if (errorElement) {
-                errorElement.innerHTML = "Error occurred initializing Admin Vue instance.";
+                errorElement.innerHTML = "Error occurred initializing Profile  Vue instance.";
             }
             console.warn("Profile Vue instance threw an error: ", vm, this);
             console.error("Error thrown: ", err);
@@ -36,7 +36,9 @@
             VueErrorHandling(); /*global VueErrorHandling */
             this.registerDependencies();
             this.onBeforeSectionsLoad();
+            this.getOrgTool();
             this.setUserSettings();
+            this.setCurrentUserOrgs();
             this.initStartTime = new Date();
             this.initChecks.push({done: false});
             this.setDemoData({useWorker: true}, function() {
@@ -52,34 +54,28 @@
                 }, {useWorker: true});
             }
             this.initChecks.push({ done: false});
-            this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, {useWorker: true}, function(data) { //get config settings
-                var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
-                if (data) {
-                    self.settings = data;
-                    if (data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) { //for use by UI later, e.g. handle consent submission
-                        self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + "");
-                    }
-                }
+            this.setConfiguration({useWorker:true}, function(data) { //get config settings
                 self.onInitChecksDone();
+                var CONSENT_WITH_TOP_LEVEL_ORG = "CONSENT_WITH_TOP_LEVEL_ORG";
+                if (data.error || !data.hasOwnProperty(CONSENT_WITH_TOP_LEVEL_ORG)) {
+                    return false;
+                }
+                self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + ""); //for use by UI later, e.g. handle consent submission
             });
         },
         mounted: function() {
             var self = this;
-            this.getOrgTool();
             this.initIntervalId = setInterval(function() { //wait for ajax calls to finish
                 self.initEndTime = new Date();
                 var elapsedTime = self.initEndTime - self.initStartTime;
                 elapsedTime /= 1000;
-                var checkFinished = true;
-                if (self.initChecks.length > 0) {
-                    checkFinished = (self.initChecks).filter(function(item) { return item.done === true;}).length === (self.initChecks).length;
-                }
+                var checkFinished = self.initChecks.length === 0;
                 if (checkFinished || (elapsedTime >= 5)) {
                     clearInterval(self.initIntervalId);
                     self.onSectionsDidLoad();
                     self.initSections(function() { self.handleOptionalCoreData();});
                 }
-            }, 10);
+            }, 30);
         },
         data: {
             subjectId: "",
@@ -91,6 +87,7 @@
             initChecks: [],
             initIntervalId: 0,
             currentUserRoles: [],
+            userOrgs: [],
             userRoles: [],
             userEmailReady: true,
             userEmailReadyMessage: "",
@@ -139,13 +136,13 @@
                     "purged": "Purged / Removed"
                 },
                 consentItems: [],
+                currentItems: [],
+                historyItems: [],
                 touObj: [],
                 consentDisplayRows: [],
                 consentListErrorMessage: "",
                 consentLoading: false,
-                showInitialConsentTerms: false,
-                hasCurrentConsent: false,
-                hasConsentHistory: false
+                showInitialConsentTerms: false
             },
             assessment: {
                 assessmentListItems: [], assessmentListError: ""
@@ -182,7 +179,6 @@
                         replace("{pageFrom}", pageFrom).
                         replace("{pageTo}", pageTo).
                         replace("{totalRows}", totalRows);
-                    $(".pagination-detail .pagination-info").html(rowInfo);
                     return rowInfo;
                 },
                 formatAllRows: function() {
@@ -216,6 +212,18 @@
             notProvidedText: function() {
                 return i18next.t("not provided");
             },
+            setConfiguration: function(params, callback) {
+                callback = callback || function() {};
+                var self = this;
+                this.modules.tnthAjax.getConfiguration(this.currentUserId || this.subjectId, params, function(data) { //get config settings
+                    if (!data || data.error) {
+                        callback({error: self.modules.i18next.t("Unable to set user settings.")});
+                        return false;
+                    }
+                    self.settings = data;
+                    callback(data);
+                });
+            },
             setBootstrapTableConfig: function(config) {
                 if (!config) {
                     return this.bootstrapTableConfig;
@@ -224,21 +232,36 @@
                 }
             },
             onInitChecksDone: function() {
-                this.initChecks = this.initChecks.map(function() {
-                    return {"done": true};
-                });
+                if (this.initChecks.length === 0) {
+                    return false;
+                }
+                this.initChecks.pop();
             },
-            setTopLevelOrgs: function(data) {
-                if (data && data.careProvider) {
-                    var orgTool = this.getOrgTool();
-                    var userOrgs = data.careProvider.map(function(item) {
+            setCurrentUserOrgs: function(params, callback) {
+                callback = callback||function(){};
+                if (!this.currentUserId) {
+                    callback({"error": "Current user id is required."});
+                    return;
+                }
+                var self = this;
+                this.modules.tnthAjax.getDemo(this.currentUserId, params, function(data) { //setting current user's (not subject's)
+                    if (!data || data.error) {
+                        callback({"error": self.modules.i18next.t("Unable to set current user orgs")});
+                        return false;
+                    }
+                    if (!data.careProvider) {
+                        return false;
+                    }
+                    var orgTool = self.getOrgTool();
+                    self.userOrgs = data.careProvider.map(function(item) {
                         return item.reference.split("/").pop();
                     });
-                    var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(userOrgs);
-                    this.topLevelOrgs = topLevelOrgs.map(function(orgId) {
-                        return orgTool.getOrgName(orgId);
+                    var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(self.userOrgs);
+                    self.topLevelOrgs = topLevelOrgs.map(function(item) {
+                        return orgTool.getOrgName(item);
                     });
-                }
+                    callback(data);
+                });
             },
             isUserEmailReady: function() {
                 return this.userEmailReady;
@@ -257,28 +280,48 @@
                 fieldId = fieldId || "";
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
-            setDisableFields: function() {
-                if (!this.settings.MEDIDATA_RAVE_FIELDS) {
+            handleMedidataRaveFields: function(params) {
+                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) { //expected config example: MEDIDATA_RAVE_FIELDS = ['deceased', 'studyid', 'consent_status', 'dob', 'org'] and MEDIDATA_RAVE_ORG = 'IRONMAN'
                     return false;
                 }
-                if (this.topLevelOrgs.length > 0 && this.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                    this.disableFields = this.settings.MEDIDATA_RAVE_FIELDS;
-                    return this.disableFields;
+                var self = this;
+                this.setCurrentUserOrgs(params, function() {
+                    if (self.topLevelOrgs.indexOf(self.settings.MEDIDATA_RAVE_ORG) === -1) {
+                        return false;
+                    }
+                    $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
+                    self.setDisableAccountCreation(); //disable account creation
+                });
+            },
+            setDisableEditButtons: function() {
+                if (this.disableFields.length === 0) {
+                    return false;
                 }
-                if (this.currentUserId) {
-                    var self = this;
-                    $.ajax({
-                        type: "GET",
-                        url: "/api/demographics/"+this.currentUserId
-                    }).done(function(data) {
-                        if (data) {
-                            self.setTopLevelOrgs(data);
-                        }
-                        if (self.topLevelOrgs.indexOf("IRONMAN") !== -1) {
-                            self.disableFields = self.settings.MEDIDATA_RAVE_FIELDS;
-                        }
-                    });
+                var self = this;
+                $("#profileMainContent .profile-item-container").each(function() { //disable field/section that is listed in disable field array
+                    var dataSection = this.getAttribute("data-sections");
+                    if (!dataSection) {
+                        return true;
+                    }
+                    if (self.isDisableField(dataSection)){ //hide edit button for the section
+                        $(this).children(".profile-item-edit-btn").css("display", "none");
+                    }
+                });
+            },
+            setDisableAccountCreation: function() {
+                if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
+                    $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
                 }
+            },
+            setDisableFields: function(params) {
+                if (!this.currentUserId || this.isAdmin() || !this.isPatient()) {
+                    return false;
+                }
+                var self = this;
+                this.setConfiguration(params, function() { //make sure settings are there
+                    self.handleMedidataRaveFields();
+                    self.setDisableEditButtons();
+                });
             },
             setDemoData: function(params, callback) {
                 var self = this;
@@ -287,11 +330,11 @@
                     callback();
                     return false;
                 }
-                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) {
+                this.modules.tnthAjax.clearDemoSessionData(this.subjectId);
+                this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) { //get demo returned cached data if there, but we need fresh data
                     if (data) {
                         self.demo.data = data;
                         self.setUserEmailReady();
-                        self.setTopLevelOrgs(data);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
                                 if (item.system === "email") {
@@ -433,6 +476,15 @@
             isAdmin: function() {
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
+            isPatient: function() {
+                if (this.mode === "createPatientAccount" || $("#profileMainContent").hasClass("patient-view")) {
+                    return true;
+                }
+                if (this.userRoles.length === 0) { //this is a blocking call if not cached, so avoid it if possible
+                    this.initUserRoles({sync:true});
+                }
+                return this.userRoles.indexOf("patient") !== -1;
+            },
             isStaff: function() {
                 return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
             },
@@ -487,6 +539,7 @@
                 });
             },
             initFieldsEvent: function() {
+                var self = this;
                 $("#profileMainContent [data-loader-container]").each(function() {
                     var attachId = $(this).attr("id");
                     var targetFields = $(this).find("input, select");
@@ -504,21 +557,25 @@
                         }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
+                            self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //seems there is a race condition here, make sure not to use cache data here as data is being updated
                             var valid = this.validity ? this.validity.valid : true;
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
-                                setTimeout(function() {
-                                    var customErrorField = $("#" + o.attr("data-error-field"))
+                                var setDemoInterval = setInterval(function() {
+                                    var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
                                         var errorBlock = parentContainer.find(".help-block");
                                         hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
-                                    if (!hasError) {
-                                        o.trigger("updateDemoData");
+                                    if (hasError) {
+                                        clearInterval(setDemoInterval);
+                                        return false;
                                     }
-                                }, 250);
+                                    clearInterval(setDemoInterval);
+                                    o.trigger("updateDemoData");
+                                }, 10);
                             }
                         });
                     });
@@ -694,24 +751,21 @@
                 var o = field;
                 var parentContainer = field.closest(".profile-item-container");
                 var editButton = parentContainer.find(".profile-item-edit-btn");
-                setTimeout(function() {
-                    var customErrorField = $("#" + o.attr("data-error-field"));
-                    var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                    if (!hasError) {
-                        editButton.attr("disabled", true);
-                        data.resourceType = data.resourceType || "Patient";
-                        self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                            self.setDemoData();
-                            var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                            formGroup.removeClass("has-error");
-                            formGroup.find(".help-block.with-errors").html("");
-                            setTimeout(function() {
-                                editButton.attr("disabled", false);
-                            }, 150);
-                        });
-                    }
-                    editButton.attr("disabled", hasError);
-                }, 250);
+                var customErrorField = $("#" + o.attr("data-error-field"));
+                var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
+                if (hasError) {
+                    editButton.attr("disabled", false);
+                    return;
+                }
+                editButton.attr("disabled", true);
+                data.resourceType = data.resourceType || "Patient";
+                self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                    self.setDemoData();
+                    var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                    formGroup.removeClass("has-error");
+                    formGroup.find(".help-block.with-errors").html("");
+                    editButton.attr("disabled", false);
+                });
             },
             getTelecomData: function() {
                 var telecom = [];
@@ -801,9 +855,11 @@
             },
             initNameSection: function() {
                 var self = this;
-                $("#firstname, #lastname").on("updateDemoData", function() {
-                    var fname = $.trim($("#firstname").val()), lname = $.trim($("#lastname").val());
-                    self.postDemoData($(this), {"name": {"given": fname, "family": lname}});
+                $("#firstname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"given": $.trim($(this).val())}});
+                });
+                $("#lastname").on("updateDemoData", function() {
+                    self.postDemoData($(this), {"name": {"family": $.trim($(this).val())}});
                 });
             },
             initBirthdaySection: function() {
@@ -1004,14 +1060,15 @@
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     var messageContainer = $("#profile" + emailType + "EmailMessage");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
+                        $("#profile" + emailType + "EmailErrorMessage").html("");
                         message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
                         messageContainer.html(message);
-                        btnEmail.removeClass("disabled");
+                        btnEmail.attr("disabled", false).removeClass("disabled");
                     } else {
                         messageContainer.html("");
-                        btnEmail.addClass("disabled");
+                        btnEmail.attr("disabled", true).addClass("disabled");
                     }
                 });
                 $(".btn-send-email").off("click").on("click", function(event) {
@@ -1087,7 +1144,7 @@
                             }
                         }
                     } else {
-                        errorMessageContainer.text(i18next.t("You must select a email type"));
+                        errorMessageContainer.text(i18next.t("You must select an email type"));
                     }
                 });
             },
@@ -1197,10 +1254,6 @@
                 }
                 if (String(this.demo.data.deceasedBoolean).toLowerCase() === "true") {
                     $("#boolDeath").prop("checked", true);
-                }
-                if (this.isDisableField("deceased")) {
-                    $("#profileDeceasedSection").removeClass("editable");
-                    return;
                 }
                 this.__convertToNumericField($("#deathDay, #deathYear"));
                 $("#boolDeath").on("click", function() {
@@ -1619,6 +1672,25 @@
                     });
                 });
             },
+            getNoOrgDisplay: function() {
+                return "<p class='text-muted'>"+this.modules.i18next.t("No affiliated clinic")+"</p>";
+            },
+            getOrgsDisplay: function() {
+                if (!this.demo.data.careProvider || this.demo.data.careProvider.length === 0) {
+                    return this.getNoOrgDisplay();
+                }
+                /* example return from api demographics: [{ display: Duke, reference: "api/organization/1301"}, {"display":"Arvin George","reference":"api/practitioner/1851648521?system=http://hl7.org/fhir/sid/us-npi"}]
+                 * NOTE: need to exclude displays other than organization */
+                var self = this;
+                var arrDisplay = this.demo.data.careProvider.map(function(item) {
+                    if (String(item.reference) === "api/organization/0") { //organization id = 0
+                        return self.getNoOrgDisplay();
+                    }
+                    return (item.reference.match(/^api\/organization/gi) ? "<p>"+item.display+"</p>": "");
+                });
+
+                return arrDisplay.join("");
+            },
             updateOrgs: function(targetField, sync) {
                 var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val(), userId=this.subjectId;
                 var self = this;
@@ -1646,7 +1718,7 @@
                 if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
                     demoArray.careProvider = [{reference: "api/organization/" + 0}];
                 }
-                self.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync);
+                this.modules.tnthAjax.putDemo(userId, demoArray, targetField, sync, this.setDemoData);
             },
             getConsentModal: function(parentOrg) {
                 var orgTool = this.getOrgTool();
@@ -1777,29 +1849,21 @@
                         $(this).find(".terms-wrapper").hide();
                     }
                 });
-                modalElements.find("input[name='toConsent']").each(function() {
-                    $(this).off("click").on("click", function(e) {
-                        e.stopPropagation();
-                        closeButtons.attr("disabled", true);
-                        var orgId = $(this).attr("data-org"), userId = __self.subjectId;
-                        $("#" + orgId + "_loader").show();
-                        if ($(this).val() === "yes") {
-                            if (!__self.modules.tnthAjax.hasConsent(userId, orgId)) {
-                                (function(orgId) {
-                                    var params = __self.CONSENT_ENUM.consented;
-                                    params.org = orgId;
-                                    params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
-                                    setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
-                                    setTimeout(function() {__self.removeObsoleteConsent();}, 250);
-                                })(orgId);
-                            }
-                        } else {
-                            __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
-                            setTimeout(function() {__self.removeObsoleteConsent();}, 100);
-                        }
-                        setTimeout(function() { __self.reloadConsentList(userId);}, 500);
-                        setTimeout(function() { modalElements.modal("hide");}, 250);
-                    });
+                modalElements.find("input[name='toConsent']").off("click").on("click", function(e) {
+                    e.stopPropagation();
+                    closeButtons.attr("disabled", true);
+                    var orgId = $(this).attr("data-org"), userId = __self.subjectId;
+                    $("#" + orgId + "_loader").show();
+                    if ($(this).val() === "yes") {
+                        var params = __self.CONSENT_ENUM.consented;
+                        params.org = orgId;
+                        params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
+                        setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
+                    } else {
+                        __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
+                    }
+                    setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(); }, 250);
+                    setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                 });
 
                 closeButtons.off("click").on("click", function(e) {
@@ -2196,7 +2260,8 @@
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
             },
-            initUserRoles: function() {
+            initUserRoles: function(params) {
+                if (!this.subjectId) { return false; }
                 var self = this;
                 this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
                     if (data.roles) {
@@ -2204,7 +2269,7 @@
                             return role.name;
                         });
                     }
-                }, {useWorker: true});
+                }, params);
             },
             initRolesListSection: function() {
                 var self = this;
@@ -2300,18 +2365,19 @@
             },
             getConsentHistoryRow: function(item) {
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var content = "<tr>";
+                var content = "<tr " + (item.deleted?"class='history'":"") + ">";
                 var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item)
+                    content: self.getConsentOrgDisplayName(item) + "<div class='smaller-text text-muted'>" + this.orgTool.getOrgName(item.organization_id) + "</div>"
                 }, {
                     content: sDisplay
                 }, {
                     content: self.modules.tnthDates.formatDateString(item.signed)
 
+                },
+                {
+                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||"<span class='text-muted'>--</span>") + "</span>"
                 }, {
-                    content: "<span class='text-danger'>" + self.getDeletedDisplayDate(item) + "</span>"
-                }, {
-                    content: (item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "--")
+                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "<span class='text-muted'>--</span>")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2342,7 +2408,7 @@
             getDeletedDisplayDate: function(item) {
                 if (!item) {return "";}
                 var deleteDate = item.deleted ? item.deleted.lastUpdated : "";
-                return deleteDate.replace("T", " ");
+                return this.modules.tnthDates.formatDateString(deleteDate, "yyyy-mm-dd hh:mm:ss");
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2452,7 +2518,7 @@
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").each(function() {
-                    $(this).on("click", function() {
+                    $(this).off("click").on("click", function() { //remove pre-existing events as when consent list is re-drawn
                         var o = __self.CONSENT_ENUM[$(this).val()];
                         if (o) {
                             o.org = $(this).attr("data-orgId");
@@ -2569,17 +2635,24 @@
                     }), 100);
                 });
             },
+            showConsentHistory: function() {
+               return !this.consent.consentLoading && this.isConsentEditable() && this.hasConsentHistory();
+            },
+            hasConsentHistory: function() {
+                return this.consent.historyItems.length > 0;
+            },
+            hasCurrentConsent: function() {
+                return this.consent.currentItems.length > 0;
+            },
             getConsentHistory: function(options) {
                 if (!options) {options = {};}
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = $.grep(self.consent.consentItems, function(item) { //iltered out deleted items from all consents
-                    return !(/null/.test(item.agreement_url)) && item.deleted;
-                });
-                items = items.sort(function(a, b) { //sort items by last updated date in descending order
+                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
                     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
                 });
+                items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2623,17 +2696,32 @@
                 }
 
                 var existingOrgs = {};
-                this.consent.consentItems.forEach(function(item, index) {
-                    if (item.deleted) {
-                        self.consent.hasConsentHistory = true;
-                        return true;
-                    }
+                this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
+                    return !item.hasOwnProperty("deleted");
+                });
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                    return item.hasOwnProperty("deleted");
+                });
+                this.consent.currentItems.forEach(function(item, index) {
                     if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-                this.consent.hasCurrentConsent = Object.keys(existingOrgs).length > 0;
+                if (this.showConsentHistory()) {
+                    $("#viewConsentHistoryButton").on("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.getConsentHistory();
+                    });
+                }
+                if (self.isConsentEditable()) {
+                    self.initConsentItemEvent();
+                }
+                if (self.isConsentEditable() && self.isTestEnvironment()) {
+                    self.initConsentDateEvents();
+                }
+
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2647,18 +2735,6 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                 }, 50);
-                if (self.isConsentEditable() && self.consent.hasConsentHistory) {
-                    $("#viewConsentHistoryButton").on("click", function(e) {
-                        e.preventDefault();
-                        self.getConsentHistory();
-                    });
-                }
-                if (self.isConsentEditable()) {
-                    self.initConsentItemEvent();
-                }
-                if (self.isConsentEditable() && self.isTestEnvironment()) {
-                    self.initConsentDateEvents();
-                }
                 this.consent.consentLoading = false;
             },
             __convertToNumericField: function(field) {

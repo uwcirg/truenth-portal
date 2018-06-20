@@ -1,5 +1,5 @@
-from future import standard_library
-standard_library.install_aliases()
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
 import csv
@@ -21,7 +21,7 @@ reporting_api = Blueprint('reporting', __name__,)
 
 
 @reporting_api.route('/admin/overdue-table')
-@roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def overdue_table(top_org=None):
     """View for admin access to generated email content
@@ -102,7 +102,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
 def overdue(user):
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
-    qb = a_s.qb_data.qb
+    qb = a_s.qb_data.qbd.questionnaire_bank
     if not qb:
         return "No QB"
     trigger_date = qb.trigger_date(user)
@@ -115,7 +115,8 @@ def overdue(user):
 
 
 @reporting_api.route('/admin/overdue-numbers')
-@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
     ot = OrgTree()
@@ -127,12 +128,13 @@ def generate_numbers():
         "Days Overdue", "Organization"))
 
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.PATIENT) and not user.has_role(ROLE.TEST):
+        if (user.has_role(ROLE.PATIENT.value) and not
+                user.has_role(ROLE.TEST.value)):
             a_s = AssessmentStatus(user, as_of_date=datetime.utcnow())
             email = (
                 user.email.encode('ascii', 'ignore') if user.email else None)
             od = overdue(user)
-            qb = a_s.qb_data.qb.name if a_s.qb_data.qb else None
+            qb = a_s.qb_name
             for org in user.organizations:
                 top = ot.find_top_level_org([org])
                 org_name = "{}: {}".format(

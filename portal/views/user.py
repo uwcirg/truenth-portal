@@ -95,8 +95,9 @@ def me():
 
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                 ROLE.STAFF, ROLE.STAFF_ADMIN])
+@roles_required(
+    [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
+     ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 def account():
     """Create a user account
 
@@ -206,8 +207,8 @@ def account():
           permission to view requested user_id
     """
     acting_user = current_user()
-    if (acting_user.has_role(ROLE.ADMIN) or
-            acting_user.has_role(ROLE.SERVICE)):
+    if (acting_user.has_role(ROLE.ADMIN.value) or
+            acting_user.has_role(ROLE.SERVICE.value)):
         adequate_perms = True
     else:
         adequate_perms = False
@@ -277,7 +278,7 @@ def account():
 
 
 @user_api.route('/user/<int:user_id>', methods=['DELETE'])
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def delete_user(user_id):
     """Delete the named user from the system
@@ -331,8 +332,9 @@ def delete_user(user_id):
 
 @user_api.route('/user/<int:user_id>/access_url')
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                 ROLE.STAFF])
+@roles_required(
+    [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
+     ROLE.STAFF.value])
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
@@ -379,12 +381,15 @@ def access_url(user_id):
     """
     current_user().check_role(permission='edit', other_id=user_id)
     user = get_user_or_abort(user_id)
-    not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
+    not_allowed = {
+        ROLE.ADMIN.value,
+        ROLE.APPLICATION_DEVELOPER.value,
+        ROLE.SERVICE.value}
     has = {role.name for role in user.roles}
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
 
-    if {ROLE.ACCESS_ON_VERIFY, ROLE.WRITE_ONLY}.isdisjoint(has):
+    if {ROLE.ACCESS_ON_VERIFY.value, ROLE.WRITE_ONLY.value}.isdisjoint(has):
         # KEEP this restriction.  Weak authentication (which the
         # returned URL provides) should only be available for these roles
         abort(
@@ -1677,7 +1682,8 @@ def upload_user_document(user_id):
 
 @user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 def trigger_password_reset_email(user_id):
     """Trigger a password reset email for the specified user
 
@@ -1918,7 +1924,7 @@ def set_table_preferences(user_id, table_name):
 
 @user_api.route('/user/<int:user_id>/invite', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.SERVICE])
+@roles_required([ROLE.SERVICE.value])
 def invite(user_id):
     """Send invite email message to given user
 
@@ -2001,7 +2007,8 @@ def invite(user_id):
 
 @user_api.route('/user/<int:user_id>/messages')
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 def get_user_messages(user_id):
     """Returns simple JSON defining user email messages
 

@@ -177,7 +177,7 @@ def update_patient_loop(update_cache=True, queue_messages=True):
     Typically called as a scheduled_job - also directly from tests
     """
     patient_role_id = Role.query.filter(
-        Role.name == ROLE.PATIENT).with_entities(Role.id).first()[0]
+        Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()[0]
     valid_patients = User.query.join(
         UserRoles).filter(
             and_(User.id == UserRoles.user_id,

@@ -1,13 +1,12 @@
 from collections import namedtuple
 
-from .model_persistence import ModelPersistence, require
 from ..models.auth import AuthProviderPersistable, Token
 from ..models.client import Client
 from ..models.intervention import Intervention
-from ..models.relationship import Relationship, RELATIONSHIP
-from ..models.role import Role, ROLE
+from ..models.relationship import RELATIONSHIP, Relationship
+from ..models.role import ROLE, Role
 from ..models.user import User, UserRelationship, UserRoles
-
+from .model_persistence import ModelPersistence, require
 
 # StagingExclusions capture details exclusive of a full db overwrite
 # that are to be restored *after* db migration.  For example, when
@@ -18,26 +17,26 @@ def auth_providers_filter():
     """Return query restricted to application developer users"""
     return (
         AuthProviderPersistable.query.join(User).join(UserRoles).join(
-            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER))
+            Role).filter(Role.name == ROLE.APPLICATION_DEVELOPER.value))
 
 
 def client_users_filter():
     """Return query restricted to service users and those with client FKs"""
     return (
         User.query.join(Client).union(User.query.join(UserRoles).join(
-            Role).filter(Role.name == ROLE.SERVICE)))
+            Role).filter(Role.name == ROLE.SERVICE.value)))
 
 
 def relationship_filter():
     """Return query restricted to sponsor relationships (service users) """
     return UserRelationship.query.join(Relationship).filter(
-        Relationship.name == RELATIONSHIP.SPONSOR)
+        Relationship.name == RELATIONSHIP.SPONSOR.value)
 
 
 def service_token_filter():
     """Return query restricted to tokens owned by service users"""
     return Token.query.join(User).join(UserRoles).join(Role).filter(
-        Role.name == ROLE.SERVICE)
+        Role.name == ROLE.SERVICE.value)
 
 
 StagingExclusions = namedtuple(

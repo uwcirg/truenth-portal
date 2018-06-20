@@ -131,8 +131,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Upload incomplete QNR
         in_progress_response = self.client.post(
@@ -191,8 +191,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -226,6 +226,6 @@ class TestAssessmentEngine(TestCase):
         download_response = self.client.get(
             '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),
         )
-        csv_string = download_response.data
-        self.assertGreater(csv_string.split("\n"), 1)
+        csv_string = download_response.get_data(as_text=True)
+        assert len(csv_string.split("\n")) > 1
         # Todo: use csv module for more robust test

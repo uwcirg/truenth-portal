@@ -29,6 +29,7 @@
                     self.setColumnSelections();
                     self.getTablePreference(self.userId, self.tableIdentifier);
                     self.initOrgsList(org_list); /*global org_list*/
+                    self.handleDisableFields();
                     self.setRowItemEvent();
                     $("#adminTableContainer input[data-field='id']:checkbox").hide(); //hide checkbox for hidden id field from side menu
                     $("#patientReportModal").modal({"show": false});
@@ -44,8 +45,11 @@
             configured: false,
             initIntervalId: 0,
             sortFilterEnabled: false,
+            isAdmin: false,
             userId: null,
+            userRoles: [],
             userOrgs: [],
+            topLevelOrgs: [],
             orgTool: null,
             orgsSelector: {
                 selectAll: false,
@@ -243,6 +247,69 @@
                 $("#adminTable .filterControl input").attr("placeholder", i18next.t("Enter Text"));
                 $("#adminTable .filterControl select option[value='']").text(i18next.t("Select"));
             },
+            handleMedidataRave: function(params) {
+                if (!$("#adminTableContainer").hasClass("patient-view")) { //check if this is a patients list
+                    return false;
+                }
+                var self = this, tnthAjax = this.getDependency("tnthAjax");
+                params = params||{};
+                tnthAjax.sendRequest("/api/settings", "GET", this.userId, params, function(data) {
+                    if (!data || data.error || !data.MEDIDATA_RAVE_ORG) {
+                        return false;
+                    }
+                    var match = $.grep(self.topLevelOrgs, function(org) {
+                        return data.MEDIDATA_RAVE_ORG === org;
+                    });
+                    if (match.length === 0) {
+                        return false;
+                    }
+                    self.setCreateAccountVis(true);
+                    self.checkAdmin();
+                });
+            },
+            setCreateAccountVis: function(hide) {
+                var createAccountElements = $("#patientListOptions .or, #createUserLink");
+                if (hide) {
+                    createAccountElements.css("display", "none");
+                    return;
+                }
+                createAccountElements.css("display", "block");
+            },
+            getUserRoles: function(callback) {
+                callback = callback || function() {};
+                if (this.userRoles.length > 0) {
+                    callback(this.userRoles);
+                    return;
+                }
+                this.setUserRoles(callback);
+            },
+            setUserRoles: function(callback) {
+                callback = callback || function() {};
+                var self = this, tnthAjax = this.getDependency("tnthAjax");
+                tnthAjax.getRoles(this.userId, function(data) {
+                    if (!data || data.error) {
+                        callback({"error": i18next.t("Error occurred setting user roles")});
+                        return false;
+                    }
+                    self.userRoles = data.roles.map(function(item) {
+                        return item.name;
+                    });
+                    self.isAdmin = self.userRoles.indexOf("admin") !== -1;
+                    callback();
+                });
+            },
+            checkAdmin: function() {
+                var self = this;
+                this.getUserRoles(function() {
+                    if (self.isAdmin) {
+                        self.setCreateAccountVis(); //allow admin user to create account
+                    }
+                });
+            },
+            handleDisableFields: function() {
+                this.handleMedidataRave(); //a function specifically created to handle MedidataRave related stuff
+                //can do other things related to disabling fields here if need be
+            },
             setUserOrgs: function() {
                 if(!this.userId) { return false; }
                 var self = this;
@@ -277,6 +344,12 @@
                 }
                 return this.orgTool;
             },
+            setTopLevelOrgs: function() {
+                var self = this;
+                this.topLevelOrgs = (this.userOrgs).map(function(orgId) {
+                    return self.orgTool.getOrgName(self.orgTool.getTopLevelParentOrg(orgId));
+                });
+            },
             initOrgsList: function(requestOrgList) {
                 if($("#orglistSelector").length === 0) {
                     return false;
@@ -291,6 +364,7 @@
                     } else {
                         self.errorCollection.orgs = "";
                     }
+                    self.setTopLevelOrgs();
                     self.orgTool.populateUI(); //populate orgs dropdown UI
                     var hbOrgs = self.orgTool.getHereBelowOrgs(self.getUserOrgs()); //filter orgs UI based on user's orgs
                     self.orgTool.filterOrgs(hbOrgs);

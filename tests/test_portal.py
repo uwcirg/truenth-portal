@@ -83,8 +83,8 @@ class TestPortal(TestCase):
 
         self.bless_with_basics()
         self.login()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
@@ -127,11 +127,11 @@ class TestPortal(TestCase):
         # Generate a few users with a smattering of roles
         u1 = self.add_user(username='u1@foo.bar')
         u2 = self.add_user(username='u2@bar.foo')
-        self.promote_user(u1, role_name=ROLE.ADMIN)
-        self.promote_user(u2, role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(u1, role_name=ROLE.ADMIN.value)
+        self.promote_user(u2, role_name=ROLE.APPLICATION_DEVELOPER.value)
 
         # Test user needs admin role to view list
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         rv = self.client.get('/admin')
 
@@ -240,8 +240,8 @@ class TestPortalEproms(TestCase):
         return self._app
 
     def test_redirect_validation(self):
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.ADMIN.value)
+        self.promote_user(role_name=ROLE.STAFF.value)
 
         org = Organization(name='test org')
         user = get_user(TEST_USER_ID)

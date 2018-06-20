@@ -108,6 +108,16 @@ body {
   font-size: @baseMobileFontSize;
   text-rendering: optimizeLegibility;
 }
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  background: #FFF;
+  opacity: 0.5;
+}
 /* landing page/un-authenticated page only */
 .watermark-nowrapper {
   position: absolute;
@@ -1243,7 +1253,7 @@ div.footer-wrapper.right-panel {
       display: flex;
       justify-content: space-between;
       max-width: 100%;
-      margin: 0 auto;
+      margin: 1em auto;
       label {
         font-weight: normal;
         margin: 2px;
@@ -1341,6 +1351,14 @@ div.footer-wrapper.right-panel {
 #staffListOptions {
   display:flex;
   flex-direction: column;
+}
+#patientListOptions {
+  margin-bottom: 1.5em;
+  border-bottom: solid 1px #eee;
+  padding: 0.5em 0;
+}
+#patientListOptions.disabled {
+  height: 40px;
 }
 .download-wrapper,
 .download-break {
@@ -2290,6 +2308,7 @@ input.clinic {
   }
 }
 .create-account-container {
+  position: relative;
   padding: 2em;
   width: 100%;
   max-width: 100%;
@@ -2297,8 +2316,14 @@ input.clinic {
   background-color: @wellColor;
   overflow: hidden;
 }
+#accountCreationContentContainer {
+  position: relative;
+}
 #accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 114px;
+}
+#accountCreationContentContainer[data-account='staff'] #userOrgs {
+  margin-top: -1.5em;
 }
 #emailInfoText {
   display: none;
@@ -2889,6 +2914,11 @@ div.biopsy-option:last-of-type{
     vertical-align: top;
   }
 }
+#consentHistoryTable {
+  tr.history td {
+    background-color: #ececec;
+  }
+}
 
 .button--LR,
 .button--LR.data-show,
@@ -3041,6 +3071,7 @@ div.timezone-warning.text-warning {
 #userSessionListTable,
 #consentHistoryTable {
     font-size: @mobileSmallSize;
+    width: 100%;
     max-width: 100%;
 }
 /** Responsive sizes **/
@@ -3495,7 +3526,7 @@ div.timezone-warning.text-warning {
 
   #profileConsentHistory {
     .modal-dialog {
-      width: 65%;
+      width: 80%;
       max-width: 100%;
     }
   }

@@ -1,8 +1,10 @@
 """Module for common login hook"""
 
 from flask import session
-from flask_login import current_user as flask_login_current_user
-from flask_login import login_user as flask_user_login
+from flask_login import (
+    current_user as flask_login_current_user,
+    login_user as flask_user_login,
+)
 from flask_user import _call_or_get
 
 from .encounter import initiate_encounter

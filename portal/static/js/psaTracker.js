@@ -36,10 +36,12 @@
             clinicalDisplay: "psa",
             clinicalSystem: "http://us.truenth.org/clinical-codes",
             loading: false,
+            savingInProgress: false,
             addErrorMessage: "",
             noResultMessage: this.i18next.t("No PSA results to display"),
             saveText: this.i18next.t("Save"),
             closeText: this.i18next.t("Close"),
+            MAX_RESULT: 10000,
             newItem: {
                 id: "",
                 result: "",
@@ -134,7 +136,7 @@
                 }, 300);
             },
             isActedOn: function() {
-                return this.showRefresh;
+                return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
             },
             isEdit: function() {
                 return this.newItem.edit;
@@ -153,15 +155,18 @@
                 return i18next.t("Click to reload the page and try again.");
             },
             validateResult: function(val) {
-                var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > 9999);
+                var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > this.MAX_RESULT);
                 if(!isValid) {
-                    this.addErrorMessage = this.i18next.t("Result must be a number.");
-                } else {
-                    this.addErrorMessage = "";
+                    this.addErrorMessage = this.i18next.t("Result must be a number and within valid range (less than {max_result}).").replace("{max_result}", this.MAX_RESULT);
+                    return false;
                 }
+                this.addErrorMessage = "";
                 return isValid;
             },
             validateDate: function(date) {
+                if (!date || date.length <= 9) { //don't show validation error until enough characters are entered, just return false
+                    return false;
+                }
                 var isValid = this.tnthDates.isValidDefaultDateFormat(date);
                 if(!isValid) {
                     this.addErrorMessage = this.i18next.t("Date must be in the valid format.");
@@ -187,21 +192,24 @@
                 }).on("hide", function() {
                     $("#psaDate").trigger("blur");
                 });
-                $("#psaDate").on("blur", function() {
+                $("#psaDate").on("change blur", function() {
                     var newDate = $(this).val();
-                    if(newDate) {
-                        if(self.validateDate(newDate)) {
-                            self.newItem.date = newDate;
-                        }
+                    if (!newDate || !self.validateDate(newDate)) {
+                        return false;
                     }
+                    self.newItem.date = newDate;
                 }).on("focus", function() {
                     self.modalLoading = false;
                 });
                 /*
                  * new result field event
                  */
-                $("#psaResult").on("change", function() {
+                $("#psaResult").on("blur", function() {
                     self.validateResult($(this).val());
+                });
+
+                $("#psaTrackerBtnAddNew").on("click", function() {
+                    self.clearNew();
                 });
                 /*
                  * modal event
@@ -215,8 +223,6 @@
                     setTimeout(function() {
                         self.modalLoading = false; //allow time for setting value with it being visible to user
                     }, 50);
-                }).on("hidden.bs.modal", function() {
-                    self.clearNew();
                 });
             },
             getCurrentUserId: function() {
@@ -331,7 +337,7 @@
                         var tempResults = results;
                         results = results.slice(0, 10);
                         self.history.items = tempResults.slice(10, 20);
-                        self.history.sidenote = String(i18next.t("* Ten Results since {year}")).replace("{year}", self.getHistoryMinYear());
+                        self.history.sidenote = String(i18next.t("* Ten results since {year}")).replace("{year}", self.getHistoryMinYear());
                     }
                     self.items = self.originals = results;
                     self.filterData();
@@ -416,16 +422,18 @@
                     method = "PUT";
                     url = url + "/" + this.newItem.id;
                 }
-
-                this.tnthAjax.sendRequest(url, method, userId, { data: JSON.stringify(obsArray) }, function(data) {
+                this.savingInProgress = true;
+                this.tnthAjax.sendRequest(url, method, userId, { data: JSON.stringify(obsArray), async: true }, function(data) {
                     if(data.error) {
                         self.addErrorMessage = self.i18next.t("Server error occurred adding PSA result.");
                     } else {
                         $("#addPSAModal").modal("hide");
                         self.getData();
-                        self.clearNew();
                         self.addErrorMessage = "";
                     }
+                    setTimeout(function() {
+                        self.savingInProgress = false;
+                    }, 550);
                 });
             },
             clearNew: function() {
@@ -435,6 +443,7 @@
                         self.newItem[prop] = "";
                     }
                 }
+                $("#psaDate").datepicker("update", "");
             },
             __handleTreatmentDate: function(minDate, maxDate, step) { //use internally
                 if (this.treatment.data.length === 0) {
@@ -452,9 +461,26 @@
                 }
                 return treatmentDate;
             },
+            getNearestPow10: function(n){ //find the closest power of 10 given a number
+                var base = Math.log(n) / Math.LN10;
+                if (base >= Math.ceil(base)-0.1) {
+                    base = base + 1; //accounting for when log of number is perfect integer, 1, 10, 100, 1000, so need to draw next grid line up
+                }
+                else {
+                    base = Math.ceil(base);
+                }
+                return Math.pow(10, base);
+            },
+            getRange: function getRange(size, startAt, step) {
+                var arr = []; size=size||10; startAt=startAt||0; step = step||1;
+                for (var index=startAt; index < size; index++) {
+                    arr.push(step*index);
+                }
+                return arr;
+            },
             getDayInMiliseconds: function() {
                 return 1000 * 60 * 60 * 24;
-            }, 
+            },
             getInterval: function(minDate, maxDate, step) {
                 step = step || 10;
                 if (!maxDate || !minDate) {
@@ -463,10 +489,6 @@
                 var DAY = this.getDayInMiliseconds();
                 var DIFF = (new Date(maxDate) - new Date(minDate)) / DAY;
                 return Math.ceil(DIFF / step);
-            },
-            logTickFormat: function(d) {
-                var log = Math.log(d) / Math.LN10;
-                return Math.abs(Math.round(log) - log) < 1e-6 ? d: "";
             },
             dateTicks: function(t0, t1) {
                 var startTime = new Date(t0), endTime = new Date(t1), times = [], dateTime;
@@ -510,23 +532,25 @@
                 var maxDate = d3.max(data, function(d) {
                     return d.graph_date;
                 });
-            
+                var maxResult = d3.max(data, function(d) {
+                    return d.result;
+                });
+
                 var xDomain = d3.extent(data, function(d) { return d.graph_date; });
                 var bound = (width - margin.left - margin.right) / 10;
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
-                
 
-                if (data.length === 1 || String(minDate) === String(maxDate)) {
-                    var firstDate = new Date(minDate);
+                if (data.length <= 2 || String(minDate) === String(maxDate)) {
+                    var firstDate = new Date(maxDate);
                     maxDate = new Date(firstDate.setDate(firstDate.getDate() + 365));
                     xDomain = [minDate, maxDate];
                 }
 
-                var INTERVAL = self.getInterval(minDate, maxDate, 10);
+                var maxResultInLog = self.getNearestPow10(maxResult);
 
                 x.domain(xDomain);
-                y.domain([0.1, Math.pow(10, 4)]);
+                y.domain([0.1, maxResultInLog]); //scale to the closest power of 10 based on the maximum result
                 // Define the axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -539,7 +563,6 @@
                     .scale(y)
                     .ticks(10)
                     .orient("left")
-                    .tickFormat(self.logTickFormat)
                     .tickSize(0, 0, 0);
 
                 // Define the line
@@ -577,16 +600,6 @@
                     .attr("class", "axis-stroke")
                     .style("text-anchor", "start");
 
-                // Add the Y Axis
-                graphArea.append("g")
-                    .attr("class", "y axis y-axis")
-                    .call(yAxis)
-                    .selectAll("text")
-                    .attr("dx", "-2px")
-                    .attr("dy", "6px")
-                    .attr("class", "axis-stroke")
-                    .style("text-anchor", "end");
-
                 // add the X gridlines
                 graphArea.append("g")
                     .attr("class", "grid grid-x")
@@ -595,24 +608,34 @@
                         .tickSize(-height, 0, 0)
                         .tickFormat("")
                     );
-                // add the Y gridlines
+                // add the Y ticks and gridlines
                 graphArea.append("g")
                     .attr("class", "grid grid-y")
                     .call(yAxis
                         .tickSize(-width, 0, 0)
                         .tickValues(function() {
-                            return [0,1,2,3,4].map(function(n) {
+                            return self.getRange(Math.log(maxResultInLog),-1,0.5).map(function(n) { //finer lines between each log base 10 line
                                 return Math.pow(10, n); //draw grid in log scale
                             });
                         })
-                        .tickFormat("")
-                    );
+                        .tickFormat(function(d) {
+                            if (d === parseInt(d)) { //this will only show tick values that are integers
+                                return d;
+                            }
+                            return "";
+                        })
+                    )
+                    .selectAll("text")
+                    .attr("dx", "-2px")
+                    .attr("dy", "6px")
+                    .attr("class", "axis-stroke")
+                    .style("text-anchor", "end");
 
                 //add div for tooltip
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
                 //treatment line
-                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, INTERVAL);
+                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 10));
                 if (treatmentDate) {
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
@@ -661,8 +684,8 @@
                 graphArea.selectAll("circle").data(data)
                     .enter().append("circle")
                     .transition()
-                    .duration(750)
-                    .delay(function(d, i) { return i * 5; })
+                    .duration(850)
+                    .delay(function(d, i) { return i * 7; })
                     .attr("r", circleRadius)
                     .attr("class", "circle")
                     .attr("cx", function(d) { return x(d.graph_date); })
@@ -670,7 +693,7 @@
                 graphArea.selectAll("circle")
                     .on("mouseover", function(d) {
                         var element = d3.select(this);
-                        element.transition().duration(100).attr("r", circleRadius * 2);
+                        element.transition().duration(100).attr("r", circleRadius * 2.3);
                         element.style("stroke", "#FFF")
                             .style("stroke-width", "2")
                             .style("fill", "#777")

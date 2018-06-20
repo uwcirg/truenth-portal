@@ -55,7 +55,7 @@ class TestAuth(TestCase):
         self.app.config['NO_CHALLENGE_WO_DATA'] = False
         self.test_user.password = None
         self.test_user.birthdate = '1998-01-31'
-        self.promote_user(role_name=ROLE.ACCESS_ON_VERIFY)
+        self.promote_user(role_name=ROLE.ACCESS_ON_VERIFY.value)
         user = db.session.merge(self.test_user)
         email = user.email
         self.login()
@@ -66,7 +66,7 @@ class TestAuth(TestCase):
     def test_client_add(self):
         """Test adding a client application"""
         origins = "https://test.com https://two.com"
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         rv = self.client.post('/client', data=dict(
             application_origins=origins))
@@ -77,7 +77,7 @@ class TestAuth(TestCase):
 
     def test_client_bad_add(self):
         """Test adding a bad client application"""
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         rv = self.client.post('/client',
                 data=dict(application_origins="bad data in"))
@@ -186,7 +186,7 @@ class TestAuth(TestCase):
 
         # try to promote - which should fail
         self.assertRaises(RoleError, add_role, service_user,
-                          ROLE.APPLICATION_DEVELOPER)
+                          ROLE.APPLICATION_DEVELOPER.value)
         self.assertEqual(len(service_user.roles), 1)
 
     def test_token_status(self):

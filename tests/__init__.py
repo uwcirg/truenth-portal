@@ -1,10 +1,10 @@
 """ Unit tests for package
 
 to run:
-    nosetests
+    py.test
 
 options:
-    nosetests --help
+    py.test --help
 
 """
 from datetime import datetime
@@ -151,7 +151,7 @@ class TestCase(Base):
 
     def add_client(self):
         """Prep db with a test client for test user"""
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         client_id = 'test_client'
         client = Client(client_id=client_id,
                 _redirect_uris='http://localhost',
@@ -328,7 +328,7 @@ class TestCase(Base):
         org_102 = Organization(id=102, name='102')
         org_1001 = Organization(id=1001, name='1001', partOf_id=101)
         with SessionScope(db):
-            map(db.session.add, (org_101, org_102, org_1001))
+            [db.session.add(org) for org in (org_101, org_102, org_1001)]
             db.session.commit()
         OrgTree.invalidate_cache()
 
