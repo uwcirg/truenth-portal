@@ -124,7 +124,7 @@ correct libraries are installed:
 
 .. code:: bash
 
-    pip install -r requirements.txt
+    pip install --requirements requirements.txt
 
 COMMAND LINE INTERFACE
 ----------------------
@@ -211,12 +211,19 @@ To see all available options run:
 
     $ ./bin/deploy.sh -h
 
-Run the Central Services Server
+Run the Shared Services Server
 -------------------------------
+To run the flask development server, run the below command from an activated virtual environment
 
 .. code:: bash
 
-    $ flask runserver
+    $ flask run
+
+By default the flask dev server will run without the debugger and listen on port 5000 of localhost. To override these defaults, call ``flask run`` as follows
+
+.. code:: bash
+
+    $ FLASK_DEBUG=1 flask run --port 5001 --host 0.0.0.0
 
 Run the Celery Worker
 ---------------------
@@ -233,7 +240,7 @@ Should the need ever arise to purge the queue of jobs, run the following
 
 .. code:: bash
 
-    $ celery -A portal.celery_worker.celery purge
+    $ celery --app portal.celery_worker.celery purge
 
 DATABASE
 --------
@@ -242,10 +249,10 @@ The value of ``SQLALCHEMY_DATABASE_URI`` defines which database engine
 and database to use.  Alternatively, the following environment
 variables may be used (and if defined, will be preferred):
 
-#. PGDATABASE
-#. PGUSER
-#. PGPASSWORD
-#. PGHOST
+#. ``PGDATABASE``
+#. ``PGUSER``
+#. ``PGPASSWORD``
+#. ``PGHOST``
 
 At this time, only PostgreSQL is supported.
 
@@ -270,7 +277,7 @@ Upgrade
 
 Anytime a database (might) need an upgrade, run the manage script with
 the ``db upgrade`` arguments (or run the `deployment
-script <#install-the-lastest-package-and-dependencies>`__)
+script <#install-the-latest-package-and-dependencies>`__)
 
 This is idempotent process, meaning it's safe to run again on a database
 that already received the upgrade.
@@ -285,7 +292,7 @@ Schema Changes
 ^^^^^^^^^^^^^^
 
 Update the python source files containing table definitions (typically
-classes derrived from db.Model) and run the manage script to sniff out
+classes derived from db.Model) and run the manage script to sniff out
 the code changes and generate the necessary migration steps:
 
 .. code:: bash
@@ -307,19 +314,19 @@ values for the {user, password, database} as defined in the
 ``TestConfig`` class within ``portal.config.py``
 
 All test modules under the ``tests`` directory can be executed via
-``nosetests`` (again from project root with the virtual environment
+``py.test`` (again from project root with the virtual environment
 activated)
 
 .. code:: bash
 
-    $ nosetests
+    $ py.test
 
-Alternatively, run a single modules worth of tests, telling nose to not
-supress standard out (vital for debugging) and to stop on first error:
+Alternatively, run a single modules worth of tests, telling py.test to not
+suppress standard out (vital for debugging) and to stop on first error:
 
 .. code:: bash
 
-    $ nosetests -sx tests.test_intervention
+    $ py.test tests/test_intervention.py
 
 Tox
 ~~~
@@ -339,11 +346,11 @@ To run a specific tox environment, "docs" or the docgen environment in this case
 
 Tox will also run the environment specified by the ``TOXENV`` environment variable, as configured in the TravisCI integration.
 
-Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analgous the above nosetests invocation):
+Tox will pass any options after -- to the test runner, py.test. To run tests only from a certain module (analogous the above py.test invocation):
 
 .. code:: bash
 
-    $ tox -- -sx tests.test_intervention
+    $ tox -- tests/test_intervention.py
 
 Continuous Integration
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -360,7 +367,7 @@ UI/Integration (Selenium) Testing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 UI integration/acceptance testing is performed by Selenium and is
-included in the test suite and continuous intergration setup.
+included in the test suite and continuous integration setup.
 Specifically, `Sauce Labs
 integration <https://docs.travis-ci.com/user/sauce-connect>`__ with
 TravisCI allows Selenium tests to be run with any number of browser/OS
@@ -377,7 +384,7 @@ Tox the virtual environment that corresponds to the UI tests (``ui``):
 Dependency Management
 ---------------------
 
-Project dependencies are hardcoded to specific versions (see
+Project dependencies are hard-coded to specific versions (see
 ``requirements.txt``) known to be compatible with Shared Services to
 prevent dependency updates from breaking existing code.
 
@@ -389,7 +396,7 @@ need for review, assuming they pass continuous integration.
 Documentation
 -------------
 
-Docs are built seperately via sphinx. Change to the docs directory and
+Docs are built separately via sphinx. Change to the docs directory and
 use the contained Makefile to build - then view in browser starting with
 the ``docs/build/html/index.html`` file
 
@@ -415,7 +422,7 @@ To create the postgresql database, in pgAdmin click "databases" and "create"
 and enter the desired characteristics of the database, including the owner.
 To create the user, similarly in pgAdmin, click "login roles" and "create"
 and enter the desired characteristics of the user. Ensure that it has
-permisssion to login.
+permission to login.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -426,13 +433,13 @@ Installing requirements
 Ensure that C++ is installed -- if not, download from:
 https://www.microsoft.com/en-us/download/details.aspx?id=44266
 
-Ensure that setuptools are up-to-date by running:
+Ensure that ``setuptools`` is up-to-date by running:
 
 .. code:: bash
 
     $ python -m pip install --upgrade pip setuptools
 
-Ensure that ez_setup is installed by running:
+Ensure that ``ez_setup`` is installed by running:
 
 .. code:: bash
 
@@ -442,7 +449,7 @@ Install requirements by running:
 
 .. code:: bash
 
-    $ pip install -r requirements.txt
+    $ pip install --requirements requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^

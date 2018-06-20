@@ -35,18 +35,6 @@ MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
 migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
 
 
-@app.cli.command()
-def runserver():
-    # Todo: figure out how to override default host in `flask run`
-    # http://click.pocoo.org/5/commands/#overriding-defaults
-    app.run(
-        host='0.0.0.0',
-        threaded=True,
-        use_debugger=True,
-        use_reloader=True,
-    )
-
-
 def _run_alembic_command(args):
     """Helper to manage working directory and run given alembic commands"""
     # Alembic looks for the alembic.ini file in CWD

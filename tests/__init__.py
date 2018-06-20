@@ -1,10 +1,10 @@
 """ Unit tests for package
 
 to run:
-    nosetests
+    py.test
 
 options:
-    nosetests --help
+    py.test --help
 
 """
 from datetime import datetime
