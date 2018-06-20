@@ -881,7 +881,6 @@ var tnthAjax = {
                 var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
                 return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && item.staff_editable && item.send_reminders && item.include_in_reports;
             });
-            console.log(consentedOrgIds)
         });
         return consentedOrgIds.length;
     },
