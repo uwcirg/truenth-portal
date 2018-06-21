@@ -244,15 +244,11 @@ def update_card_html_on_completion():
                   <h2 class="portal-header">{greeting}</h2>
                   <p>{confirm}</p>
                   <p>{reminder}</p>
-                  <div class="button-callout">
-                    <figure id="portalScrollArrow"></figure>
-                  </div>
-                  <br/><br/>
-                  <div class="button-container portal-header-logout-container">
+                </div>
+                <div class="button-container portal-header-logout-container">
                     <a class="btn-lg btn-tnth-primary" href="/logout">
                       {logout}
                     </a>
-                  </div>
                 </div>""".format(greeting=greeting, confirm=confirm,
                                  reminder=reminder, logout=logout)
 
@@ -302,9 +298,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
@@ -319,9 +312,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if assessment_status.overall_status == "Completed":

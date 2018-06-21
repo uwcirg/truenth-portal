@@ -16,15 +16,7 @@ $(".btn-tnth-primary").on("click", function() {
     }
 });
 $(document).on("ready", function() {
-    $("#mainDiv").addClass("portal");
-    $("#portalScrollArrow").on("click", function() {
-        var t = $(".portal-main").offset().top;
-        if (parseInt(t) >= 90) {
-            $('html, body').animate({
-                scrollTop: t - 90
-            }, 1000);
-        }
-    });
+    $("body").addClass("portal");
 });
 
 
