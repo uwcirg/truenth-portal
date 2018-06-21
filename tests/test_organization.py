@@ -621,6 +621,21 @@ class TestOrganization(TestCase):
         self.assert200(rv)
         self.assertEqual(len(rv.json['organizations']), 2)
 
+    def test_user_org_bogus_identifier(self):
+        self.shallow_org_tree()
+        self.prep_org_w_identifier()
+        data = {'organizations': [
+            {'reference':
+                 'api/organization/123-45?system={}'.format(US_NPI[:-1])}
+        ]}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/organization'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert400(rv)
+
     def test_user_org_invalid_timezone_post(self):
         # only one org in list can be marked with `apply_to_user`
         self.shallow_org_tree()
