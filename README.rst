@@ -173,7 +173,7 @@ password.
 
 .. code:: bash
 
-    flask --email user@server.com --password reDacted! --role admin
+    flask add_user --email user@server.com --password reDacted! --role admin
 
 Password Reset
 ~~~~~~~~~~~~~~
