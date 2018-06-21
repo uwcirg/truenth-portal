@@ -620,3 +620,58 @@ class TestOrganization(TestCase):
 
         self.assert200(rv)
         self.assertEqual(len(rv.json['organizations']), 2)
+
+    def test_user_org_bogus_identifier(self):
+        self.shallow_org_tree()
+        self.prep_org_w_identifier()
+        data = {'organizations': [
+            {'reference':
+                 'api/organization/123-45?system={}'.format(US_NPI[:-1])}
+        ]}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/organization'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert400(rv)
+
+    def test_user_org_invalid_timezone_post(self):
+        # only one org in list can be marked with `apply_to_user`
+        self.shallow_org_tree()
+        data = {'organizations': [
+            {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
+            {'reference': 'api/organization/1001', 'timezone': "apply_to_user"}
+        ]}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/organization'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert400(rv)
+
+    def test_user_org_apply_defaults(self):
+        # apply org timezone and language defaults to user
+        self.shallow_org_tree()
+        sib = Organization.query.get(102)
+        sib.timezone = 'Europe/Rome'
+        parent = Organization.query.get(101)
+        parent.default_locale = 'en_AU'
+        with SessionScope(db):
+            db.session.commit()
+
+        data = {'organizations': [
+            {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
+            {'reference': 'api/organization/1001', 'language': "apply_to_user"}
+        ]}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/organization'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+        self.assertEquals(user.timezone, 'Europe/Rome')
+        self.assertEquals(user.locale_code, 'en_AU')

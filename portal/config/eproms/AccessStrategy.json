@@ -60,7 +60,7 @@
     },
     {
       "name": "PSA Tracker strategy",
-      "description": "Allow TNG Patients with localized PCa and w/o positive PCa dx",
+      "description": "Allow (TNG Patients AND localized PCa AND Tx Started) OR (TNG Patients AND w/o positive PCa dx)",
       "resourceType": "AccessStrategy",
       "intervention_name": "psa_tracker",
       "id": 3001,
@@ -69,60 +69,116 @@
         "kwargs": [
           {
             "name": "combinator",
-            "value": "all"
+            "value": "any"
           },
           {
             "name": "strategy_1",
-            "value": "limit_by_clinic_w_id"
+            "value": "combine_strategies"
           },
           {
             "name": "strategy_1_kwargs",
             "value": [
               {
-                "name": "identifier_value",
-                "value": "TNG"
+                "name": "combinator",
+                "value": "all"
               },
               {
-                "name": "identifier_system",
-                "value": "http://us.truenth.org/identity-codes/psa-tracker-group"
+                "name": "strategy_1",
+                "value": "limit_by_clinic_w_id"
+              },
+              {
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "identifier_value",
+                    "value": "TNG"
+                  },
+                  {
+                    "name": "identifier_system",
+                    "value": "http://us.truenth.org/identity-codes/psa-tracker-group"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "observation_check"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "display",
+                    "value": "PCa localized diagnosis"
+                  },
+                  {
+                    "name": "boolean_value",
+                    "value": "true"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_3",
+                "value": "tx_begun"
+              },
+              {
+                "name": "strategy_3_kwargs",
+                "value": [
+                  {
+                    "name": "boolean_value",
+                    "value": "true"
+                  }
+                ]
               }
             ]
           },
           {
             "name": "strategy_2",
-            "value": "observation_check"
+            "value": "combine_strategies"
           },
           {
             "name": "strategy_2_kwargs",
             "value": [
               {
-                "name": "display",
-                "value": "PCa localized diagnosis"
+                "name": "combinator",
+                "value": "all"
               },
               {
-                "name": "boolean_value",
-                "value": "true"
-              }
-            ]
-          },
-          {
-            "name": "strategy_3",
-            "value": "observation_check"
-          },
-          {
-            "name": "strategy_3_kwargs",
-            "value": [
-              {
-                "name": "display",
-                "value": "PCa diagnosis"
+                "name": "strategy_1",
+                "value": "limit_by_clinic_w_id"
               },
               {
-                "name": "boolean_value",
-                "value": "true"
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "identifier_value",
+                    "value": "TNG"
+                  },
+                  {
+                    "name": "identifier_system",
+                    "value": "http://us.truenth.org/identity-codes/psa-tracker-group"
+                  }
+                ]
               },
               {
-                "name": "invert_logic",
-                "value": "true"
+                "name": "strategy_2",
+                "value": "observation_check"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "display",
+                    "value": "PCa diagnosis"
+                  },
+                  {
+                    "name": "boolean_value",
+                    "value": "true"
+                  },
+                  {
+                    "name": "invert_logic",
+                    "value": "true"
+                  }
+                ]
               }
             ]
           }

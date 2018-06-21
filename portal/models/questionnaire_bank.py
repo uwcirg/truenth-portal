@@ -127,10 +127,22 @@ class QuestionnaireBank(db.Model):
             self.recurs.remove(unwanted)
             db.session.delete(unwanted)
 
+        def purge_rank_conflicts(questionnaire):
+            # if a different q is assigned to the same rank, it'll lead to
+            # an integrity error - must remove the stale first
+            match = [
+                q for q in self.questionnaires if
+                q.rank == questionnaire.rank]
+            if (match and match[0].questionnaire_id !=
+                    questionnaire.questionnaire_id):
+                self.questionnaires.remove(match[0])
+                db.session.delete(match[0])
+
         qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_json(
                 q)
+            purge_rank_conflicts(questionnaire)
             questionnaire.questionnaire_bank_id = self.id
             questionnaire = questionnaire.add_if_not_found(True)
             if questionnaire not in self.questionnaires:
