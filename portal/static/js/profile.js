@@ -2710,13 +2710,7 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-                if (this.showConsentHistory()) {
-                    $("#viewConsentHistoryButton").on("click", function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        self.getConsentHistory();
-                    });
-                }
+               
                 if (self.isConsentEditable()) {
                     self.initConsentItemEvent();
                 }
@@ -2737,6 +2731,11 @@
                         clearInterval(self.consentListReadyIntervalId);
                     }
                     if (self.showConsentHistory()) {
+                        $("#viewConsentHistoryButton").on("click", function(e) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation()
+                            self.getConsentHistory();
+                        });
                         setTimeout(function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
