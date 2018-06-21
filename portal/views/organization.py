@@ -534,7 +534,10 @@ def add_user_organizations(user_id):
                 applied.append(field)
 
     for item in request.json.get('organizations'):
-        org = Reference.parse(item)
+        try:
+            org = Reference.parse(item)
+        except MissingReference as e:
+            abort(400, "Organization {}".format(e))
         apply_defaults(item, org, applied_fields)
         if not isinstance(org, Organization):
             abort(400, "Expecting only `Organization` references")
