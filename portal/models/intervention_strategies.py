@@ -476,7 +476,7 @@ def update_card_html_on_completion():
                         portal-no-description-container full-width'>
                         <h4 class="portal-description-title">{header}</h4>
                         {message}
-                    </div>""".format(greeting=greeting, header=header,message=message)
+                    </div>""".format(greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
