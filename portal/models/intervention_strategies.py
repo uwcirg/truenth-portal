@@ -463,14 +463,20 @@ def update_card_html_on_completion():
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
             else:
+                greeting = _(u"Hi, %(full_name)s", full_name=user.display_name)
+                header = _(u"Questionnaire Expired")
                 message = _(
                     u"The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
                 card_html = u"""
+                    <div class="portal-header-container">
+                        <h2 class="portal-header">{greeting}</h2>
+                    </div>
                     <div class='portal-description
-                        portal-no-description-container'>
-                      {message}
-                    </div>""".format(message=message)
+                        portal-no-description-container full-width'>
+                        <h4 class="portal-description-title">{header}</h4>
+                        {message}
+                    </div>""".format(greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,

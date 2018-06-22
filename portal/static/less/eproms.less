@@ -1746,6 +1746,10 @@ body.portal .copyright-container  {
 @media (min-width: 992px) {
   .portal-description {
     margin: 1em;
+    &.full-width {
+      width: 96%;
+      min-height: 200px;
+    }
   }
 }
 .portal-no-description-container {
@@ -1754,8 +1758,20 @@ body.portal .copyright-container  {
   max-width: 100%;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
-  padding: 2em;
+  padding: 1.25em 2em;
+  & .portal-description-title {
+    font-size: @baseFontSize;
+    font-weight: bold;
+  }
 }
+@media (min-width: 992px) {
+  .portal-no-description-container {
+    & .portal-description-title {
+      font-size: 1em;
+    }
+  }
+}
+
 .portal-description-body {
   margin-top: 1em;
   text-align: center;

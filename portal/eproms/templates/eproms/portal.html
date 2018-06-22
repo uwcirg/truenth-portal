@@ -56,16 +56,14 @@
             {%- if not display.link_url -%}
                <div class="button-container {{class}}">
                     <a class="btn-lg btn-tnth-primary disabled" href="#">
-                        {%- if display.link_label -%}
-                            {{ display.link_label }}
-                        {%- else -%}
-                            {{_("Not available")}}
-                        {%- endif -%}
+                        {{display.link_label or _("Not Available")}}
                     </a>
                 </div>
             {%- else -%}
                 <div class="button-container">
-                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">{{ display.link_label }}</a>
+                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                    	{{display.link_label or _("Go to link")}}
+                	</a>
                 </div>
             {%- endif -%}
         </div>
