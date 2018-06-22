@@ -560,6 +560,9 @@
                         if ($(this).attr("data-update-on-validated")) {
                             triggerEvent = "blur";
                         }
+                        if (_isTouchDevice()) {
+                            triggerEvent = "touchend";
+                        }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
                             self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //seems there is a race condition here, make sure not to use cache data here as data is being updated
