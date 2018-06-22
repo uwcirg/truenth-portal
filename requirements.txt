@@ -63,7 +63,7 @@ pluggy==0.6.0
 polib==1.1.0
 prompt-toolkit==2.0.3
 psycopg2==2.7.5
-ptyprocess==0.5.2
+ptyprocess==0.6.0
 py==1.5.3
 pycparser==2.18
 pycrypto==2.6.1
@@ -79,7 +79,7 @@ redis==2.10.6
 requests==2.19.1
 requests-cache==0.4.13
 requests-oauthlib==1.0.0
-regex==2018.06.20
+regex==2018.06.21
 selenium==3.12.0
 simplegeneric==0.8.1
 six==1.11.0

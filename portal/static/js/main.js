@@ -832,24 +832,33 @@ var tnthAjax = {
     },
     withdrawConsent: function(userId, orgId, params, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-            return false;
-        }
-        if (!orgId) {
-            callback({"error": i18next.t("Organization id is required.")});
+        if (!userId || !orgId) {
+            callback({"error": i18next.t("User id and organization id are required.")});
             return false;
         }
         params = params || {};
-        this.sendRequest("/api/user/" + userId + "/consent/withdraw",
-            "POST",
-            userId, {sync: (params.sync ? true : false),data: JSON.stringify({organization_id: orgId})},
-            function(data) {
-                if (!data.error) { callback(data); } else {
-                    callback({"error": i18next.t("Error occurred setting consent status.")});
-                }
+        var self = this, arrConsent = [];
+        this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, params, function(data) {
+            if (data && data.consent_agreements && data.consent_agreements.length > 0) {
+                arrConsent = $.grep(data.consent_agreements, function(item) {
+                    var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
+                    return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && String(item.status) === "suspended";
+                });
             }
-        );
+            if (arrConsent.length > 0) { //don't send request if suspended consent already existed
+                return false;
+            }
+            self.sendRequest("/api/user/" + userId + "/consent/withdraw",
+            "POST",
+            userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
+            function(data) {
+                if (data.error) {
+                    callback({"error": i18next.t("Error occurred setting suspended consent status.")});
+                    return false;
+                }
+                callback(data);
+            });
+        });
     },
     getAllValidConsent: function(userId, orgId) {
         if (!userId || !orgId) { return false; }

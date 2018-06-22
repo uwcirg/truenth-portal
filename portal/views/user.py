@@ -805,6 +805,9 @@ def delete_user_consents(user_id):
         user_id=current_user().id, subject_id=user_id,
         comment="Deleted consent agreement", context='consent')
     remove_uc.status = 'deleted'
+    # The deleted consent may have altered the cached assessment
+    # status - invalidate this user's data at this time.
+    invalidate_assessment_status_cache(user_id=user_id)
     db.session.commit()
 
     return jsonify(message="ok")
