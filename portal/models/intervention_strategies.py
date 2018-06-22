@@ -244,15 +244,11 @@ def update_card_html_on_completion():
                   <h2 class="portal-header">{greeting}</h2>
                   <p>{confirm}</p>
                   <p>{reminder}</p>
-                  <div class="button-callout">
-                    <figure id="portalScrollArrow"></figure>
-                  </div>
-                  <br/><br/>
-                  <div class="button-container portal-header-logout-container">
+                </div>
+                <div class="button-container portal-header-logout-container">
                     <a class="btn-lg btn-tnth-primary" href="/logout">
                       {logout}
                     </a>
-                  </div>
                 </div>""".format(greeting=greeting, confirm=confirm,
                                  reminder=reminder, logout=logout)
 
@@ -302,9 +298,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
@@ -319,9 +312,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if assessment_status.overall_status == "Completed":
@@ -473,14 +463,20 @@ def update_card_html_on_completion():
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
             else:
+                greeting = _(u"Hi, %(full_name)s", full_name=user.display_name)
+                header = _(u"Questionnaire Expired")
                 message = _(
                     u"The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
                 card_html = u"""
+                    <div class="portal-header-container">
+                        <h2 class="portal-header">{greeting}</h2>
+                    </div>
                     <div class='portal-description
-                        portal-no-description-container'>
-                      {message}
-                    </div>""".format(message=message)
+                        portal-no-description-container full-width'>
+                        <h4 class="portal-description-title">{header}</h4>
+                        {message}
+                    </div>""".format(greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,

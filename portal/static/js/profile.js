@@ -90,7 +90,11 @@
             userOrgs: [],
             userRoles: [],
             userEmailReady: true,
-            userEmailReadyMessage: "",
+            messages: {
+                userEmailReadyMessage: "",
+                userInviteEmailInfoMessage: "",
+                userInviteEmailErrorMessage: "",
+            },
             mode: "profile",
             demo: { //skeleton
                 data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
@@ -133,7 +137,8 @@
                     "consented": i18next.t("Consented / Enrolled"),
                     "withdrawn": "<span data-eproms='true'>" + i18next.t("Withdrawn - Suspend Data Collection and Report Historic Data") + "</span>" +
                         "<span data-truenth='true'>" + i18next.t("Suspend Data Collection and Report Historic Data") + "</span>",
-                    "purged": "Purged / Removed"
+                    "purged": i18next.t("Purged / Removed"),
+                    "deleted": i18next.t("Replaced")
                 },
                 consentItems: [],
                 currentItems: [],
@@ -273,7 +278,7 @@
                         return false;
                     }
                     self.userEmailReady = data.ready;
-                    self.userEmailReadyMessage = data.reason || "";
+                    self.messages.userEmailReadyMessage = data.reason || "";
                 });
             },
             isDisableField: function(fieldId) {
@@ -1055,97 +1060,90 @@
                     self.assessmentStatus(self.subjectId);
                 }
                 $(".email-selector").off("change").on("change", function() {
-                    var message = "";
+                    self.messages.userInviteEmailErrorMessage = "";
+                    self.messages.userInviteEmailInfoMessage = "";
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
-                    var messageContainer = $("#profile" + emailType + "EmailMessage");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
-                        $("#profile" + emailType + "EmailErrorMessage").html("");
-                        message = i18next.t("{emailType} email will be sent to {email}");
+                        var message = i18next.t("{emailType} email will be sent to {email}");
                         message = message.replace("{emailType}", $(this).children("option:selected").text())
                             .replace("{email}", $("#email").val());
-                        messageContainer.html(message);
+                        self.messages.userInviteEmailInfoMessage = message;
                         btnEmail.attr("disabled", false).removeClass("disabled");
                     } else {
-                        messageContainer.html("");
+                        self.messages.userInviteEmailInfoMessage = "";
                         btnEmail.attr("disabled", true).addClass("disabled");
                     }
+                });
+                $("#email").on("change", function() {
+                    self.messages.userInviteEmailInfoMessage = "";
+                    self.messages.userInviteEmailErrorMessage = "";
                 });
                 $(".btn-send-email").off("click").on("click", function(event) {
                     event.preventDefault();
                     event.stopPropagation();
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
                     var emailTypeElem = $("#profile" + emailType + "EmailSelect"), selectedOption = emailTypeElem.children("option:selected");
-                    var infoMessageContainer = $("#profile" + emailType + "EmailMessage"), errorMessageContainer = $("#profile" + emailType + "EmailErrorMessage");
                     var btnSelf = $(this);
-                    if (selectedOption.val() !== "") {
-                        var emailUrl = selectedOption.attr("data-url"), email = $("#email").val(), subject = "", body = "", returnUrl = "";
-                        if (emailUrl) {
-                            $.ajax({ //get email content via API
-                                type: "GET",
-                                url: emailUrl,
-                                cache: false,
-                                async: false
-                            }).done(function(data) {
-                                if (data) {
-                                    subject = data.subject;
-                                    body = data.body;
-                                }
-                            }).fail(function(xhr) { //report error
-                                self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
-                            });
-                        } else {
-                            errorMessageContainer.append("<div>" + i18next.t("Url for email content is unavailable.") + "</div>");
-                        }
-
-                        if (body && subject && email) {
-                            var inviteError = "";
-                            if (selectedOption.val() === "invite" && emailType === "registration") {
-                                returnUrl = self.getAccessUrl();
-                                if (returnUrl) {
-                                    body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
-                                } else {
-                                    inviteError = i18next.t("failed request to get email invite url");
-                                }
-                            }
-                            if (inviteError) {
-                                errorMessageContainer.html(inviteError);
-                            } else {
-                                self.modules.tnthAjax.invite(self.subjectId, {
-                                    "subject": subject,
-                                    "recipients": email,
-                                    "body": body
-                                }, function(data) {
-                                    if (!data.error) {
-                                        infoMessageContainer.html("<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>");
-                                        emailTypeElem.val("");
-                                        btnSelf.addClass("disabled");
-                                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
-                                            setTimeout(function() {
-                                                self.getEmailLog(self.subjectId, data);
-                                            }, 100);
-                                        });
-                                    } else {
-                                        errorMessageContainer.append("<div>" + i18next.t("Unable to send email") + "</div>");
-                                    }
-                                });
-                            }
-                        } else {
-                            errorMessageContainer.html("");
-                            errorMessageContainer.append("<div>" + i18next.t("Unable to send email.") + "</div>");
-                            if (!body) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email body content is missing.") + "</div>");
-                            }
-                            if (!subject) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email subject is missing.") + "</div>");
-                            }
-                            if (!email) {
-                                errorMessageContainer.append("<div>" + i18next.t("Email address is missing.") + "</div>");
-                            }
-                        }
-                    } else {
-                        errorMessageContainer.text(i18next.t("You must select an email type"));
+                    if (selectedOption.val() === "") {
+                        return false;
                     }
+                    var emailUrl = selectedOption.attr("data-url"), email = $("#email").val(), subject = "", body = "", returnUrl = "";
+                    if (!emailUrl) {
+                        self.messages.userInviteEmailErrorMessage = i18next.t("Url for email content is unavailable.");
+                        return false;
+                    }
+                    $.ajax({ //get email content via API
+                        type: "GET",
+                        url: emailUrl,
+                        cache: false,
+                        async: false
+                    }).done(function(data) {
+                        if (data) {
+                            subject = data.subject;
+                            body = data.body;
+                            self.messages.userInviteEmailErrorMessage = "";
+                        }
+                    }).fail(function(xhr) { //report error
+                        self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
+                    });
+
+                    if (!body || !subject || !email) {
+                        var message = "<div>" + i18next.t("Unable to send email.") + "</div>";
+                        self.messages.userInviteEmailErrorMessage = message;
+                        return false;
+                    }
+                    var inviteError = "";
+                    if (selectedOption.val() === "invite" && emailType === "registration") {
+                        returnUrl = self.getAccessUrl();
+                        if (returnUrl) {
+                            body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                        } else {
+                            inviteError = i18next.t("failed request to get email invite url");
+                        }
+                    }
+                    if (inviteError) {
+                        self.messages.userInviteEmailErrorMessage = inviteError;
+                        return false;
+                    }
+                    self.modules.tnthAjax.invite(self.subjectId, {
+                        "subject": subject,
+                        "recipients": email,
+                        "body": body
+                    }, function(data) {
+                        if (data.error) {
+                            self.messages.userInviteEmailErrorMessage = i18next.t("Unable to send email");
+                            return false;
+                        }
+                        self.messages.userInviteEmailInfoMessage = "<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>";
+                        emailTypeElem.val("");
+                        btnSelf.addClass("disabled");
+                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
+                            setTimeout(function() {
+                                self.getEmailLog(self.subjectId, data);
+                            }, 100);
+                        });
+                    });
                 });
             },
             initStaffRegistrationEmailSection: function() {
@@ -2399,7 +2397,7 @@
             },
             getConsentStatus: function(item) {
                 item = item || {};
-                if (item.deleted) { return "deleted"; }
+                if (item.deleted || String(item.status) === "deleted") { return "deleted"; }
                 if (item.expired && this.modules.tnthDates.getDateDiff(String(item.expires)) > 0) {
                     return "expired";
                 }
@@ -2421,6 +2419,7 @@
                     "default": "<span class='text-success small-text'>" + consentLabels.default+"</span>",
                     "consented": "<span class='text-success small-text'>" + consentLabels.consented + "</span>",
                     "withdrawn": "<span class='text-warning small-text withdrawn-label'>" + consentLabels.withdrawn + "</span>",
+                    "deleted": "<span class='text-danger small-text'>" + consentLabels.deleted + "</span>",
                     "purged": "<span class='text-danger small-text'>" + consentLabels.purged + "</span>",
                     "expired": "<span class='text-warning'>&#10007; <br><span>(" + i18next.t("expired") + "</span>",
                 };
@@ -2434,6 +2433,9 @@
                         sDisplay = oDisplayText.purged;
                     } else {
                         sDisplay = oDisplayText.consented;
+                    }
+                    if (String(item.status) === "deleted") {
+                        sDisplay += "<span class='text-danger'> (</span>" + oDisplayText.deleted + "<span class='text-danger'>)</span>";
                     }
                     break;
                 case "expired":
@@ -2680,7 +2682,7 @@
                     return false;
                 }
                 this.getTerms(); //get terms of use if any
-                var self = this, dataArray = [];
+                var self = this, dataArray = []; 
                 if (data.consent_agreements && (data.consent_agreements).length > 0) {
                     dataArray = (data.consent_agreements).sort(function(a, b) {
                         return new Date(b.signed) - new Date(a.signed);
@@ -2697,10 +2699,10 @@
 
                 var existingOrgs = {};
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
-                    return !item.hasOwnProperty("deleted");
+                    return self.getConsentStatus(item) === "active";
                 });
                 this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
-                    return item.hasOwnProperty("deleted");
+                    return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
                     if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
@@ -2708,13 +2710,7 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-                if (this.showConsentHistory()) {
-                    $("#viewConsentHistoryButton").on("click", function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        self.getConsentHistory();
-                    });
-                }
+               
                 if (self.isConsentEditable()) {
                     self.initConsentItemEvent();
                 }
@@ -2733,6 +2729,16 @@
                         }
                         $("#consentListTable").animate({opacity: 1});
                         clearInterval(self.consentListReadyIntervalId);
+                    }
+                    if (self.showConsentHistory()) {
+                        $("#viewConsentHistoryButton").on("click", function(e) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation()
+                            self.getConsentHistory();
+                        });
+                        setTimeout(function() {
+                            $("#viewConsentHistoryButton").removeClass("tnth-hide");
+                        }, 550);
                     }
                 }, 50);
                 this.consent.consentLoading = false;
