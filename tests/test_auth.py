@@ -50,7 +50,7 @@ class TestAuth(TestCase):
         response = self.client.post('/user/register', data=data)
         assert response.status_code == 302
         new_user = User.query.filter_by(username=data['email']).first()
-        assert new_user.active == True
+        assert new_user.active is True
 
     def test_register_now(self):
         """Initiate process to register exiting account"""
@@ -82,7 +82,9 @@ class TestAuth(TestCase):
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         response = self.client.post('/client',
-                data=dict(application_origins="bad data in")).get_data(as_text=True)
+                                    data=
+                                    dict(application_origins="bad data in"))\
+            .get_data(as_text=True)
         assert "Invalid URL" in response
 
     def test_client_edit(self):
@@ -129,7 +131,7 @@ class TestAuth(TestCase):
         new_user = add_authomatic_user(authomatic_user, None)
 
         user = User.query.filter_by(email='test@test.org').first()
-        assert user.last_name == u'Bugn\xed'
+        assert user.last_name == 'Bugn\xed'
         assert new_user == user
 
     def test_callback_validation(self):
@@ -142,7 +144,7 @@ class TestAuth(TestCase):
         assert 200 == response.status_code
 
         client = Client.query.get('test_client')
-        assert client.callback_url == None
+        assert client.callback_url is None
 
     def test_service_account_creation(self):
         """Confirm we can create a service account and token"""
@@ -171,8 +173,8 @@ class TestAuth(TestCase):
         assert token
 
         # The token should have a very long life
-        assert token.expires > datetime.datetime.utcnow() + datetime.timedelta(days=364)
-
+        assert token.expires > datetime.datetime.utcnow()\
+            + datetime.timedelta(days=364)
 
     def test_service_account_promotion(self):
         """Confirm we can not promote a service account """
@@ -187,7 +189,7 @@ class TestAuth(TestCase):
 
         # try to promote - which should fail
         assert pytest.raises(RoleError, add_role, service_user,
-                          ROLE.APPLICATION_DEVELOPER.value)
+                             ROLE.APPLICATION_DEVELOPER.value)
 
         assert len(service_user.roles) == 1
 
@@ -211,7 +213,7 @@ class TestAuth(TestCase):
             headers={'Authorization': 'Bearer {}'.format(token.access_token)})
         assert 200 == response.status_code
         data = response.json
-        assert pytest.approx(30,5) == data['expires_in']
+        assert pytest.approx(30, 5) == data['expires_in']
 
     def test_token_status_wo_header(self):
         """Call for token_status w/o token should return 401"""
