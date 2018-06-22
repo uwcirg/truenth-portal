@@ -463,7 +463,7 @@ def update_card_html_on_completion():
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
             else:
-                greeting = _(u"Hi, {}").format(user.display_name)
+                greeting = _(u"Hi, %(full_name)s", full_name=user.display_name)
                 header = _(u"Questionnaire Expired")
                 message = _(
                     u"The assessment is no longer available.\n"
