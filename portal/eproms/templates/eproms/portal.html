@@ -65,7 +65,13 @@
                 </div>
             {%- else -%}
                 <div class="button-container">
-                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">{{ display.link_label }}</a>
+                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                    	{%-if display.link_label %}
+                    		{{ display.link_label }}
+                    	{%- else -%}
+                    		{{_("Go to link")}}
+                    	{%- endif -%}
+                	</a>
                 </div>
             {%- endif -%}
         </div>
