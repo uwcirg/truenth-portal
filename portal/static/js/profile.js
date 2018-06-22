@@ -560,8 +560,8 @@
                         if ($(this).attr("data-update-on-validated")) {
                             triggerEvent = "blur";
                         }
-                        if (_isTouchDevice()) {
-                            triggerEvent = "touchend";
+                        if (_isTouchDevice()) { /*_isTouchDevice global */
+                            triggerEvent = "touchend"; //account for mobile devices touch events
                         }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
