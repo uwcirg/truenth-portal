@@ -183,15 +183,25 @@ body {
   }
 }
 .save-loader-wrapper {
-  .load-icon {
-    margin-left:4px;
-    margin-top:5px;
-  }
+  position: relative;
+  min-height: 12px;
   .success-icon {
     color: green;
   }
   .error-icon {
     color: red;
+  }
+  .save-info {
+    position: absolute;
+    opacity: 0;
+     -webkit-transition: opacity 0.8s ease-in;
+    transition: opacity 0.8s ease-in;
+    font-size: @smallText;
+  }
+}
+@media (min-width: 768px) {
+  .save-loader-wrapper {
+    min-height: auto;
   }
 }
 .email-ready-message {
@@ -1299,14 +1309,6 @@ div.footer-wrapper.right-panel {
     font-weight: normal;
     max-width: 100%;
   }
-}
-
-.save-info {
-  opacity: 0;
-   -webkit-transition: opacity 0.8s ease-in;
-  transition: opacity 0.8s ease-in;
-  position: absolute;
-  font-size: @smallText;
 }
 #patientList {
   div.or {
