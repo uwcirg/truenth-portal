@@ -97,7 +97,7 @@ virtualenv==16.0.0
 waitress==1.1.0
 wcwidth==0.1.7
 WebOb==1.8.2
-WebTest==2.0.29
+WebTest==2.0.30
 Werkzeug==0.14.1
 WTForms==2.2.1
 xvfbwrapper==0.2.9
