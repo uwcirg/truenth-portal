@@ -1,8 +1,11 @@
 """Unit test module for organization model"""
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
 from datetime import datetime, timedelta
 import json
 import os
-from urllib import quote_plus
+from urllib.parse import quote_plus
 
 from flask_webtest import SessionScope
 

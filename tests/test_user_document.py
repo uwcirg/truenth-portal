@@ -1,5 +1,8 @@
 """Unit test module for user document logic"""
-from StringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from io import StringIO
 from datetime import datetime
 import os
 from tempfile import NamedTemporaryFile
