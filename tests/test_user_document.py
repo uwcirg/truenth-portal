@@ -1,6 +1,6 @@
 """Unit test module for user document logic"""
 from future import standard_library  # isort:skip
-standard_library.install_aliases()
+standard_library.install_aliases()  # noqa: E402
 from builtins import str
 from io import StringIO
 from datetime import datetime
