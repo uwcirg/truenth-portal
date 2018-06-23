@@ -5,10 +5,12 @@ from builtins import str
 from io import StringIO
 from datetime import datetime
 import os
+import sys
 from tempfile import NamedTemporaryFile
 
 from flask import current_app
 from flask_webtest import SessionScope
+import pytest
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -19,6 +21,8 @@ from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestUserDocument(TestCase):
     """User Document tests"""
 

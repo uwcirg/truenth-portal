@@ -1,11 +1,13 @@
 """Unit test module for portal views"""
 
 from datetime import datetime
+import sys
 import tempfile
 import urllib
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
+import pytest
 from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
@@ -19,6 +21,8 @@ from portal.models.user import User, get_user
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestPortal(TestCase):
     """Portal view tests"""
     def test_card_html(self):

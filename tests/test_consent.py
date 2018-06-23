@@ -1,10 +1,12 @@
 """Unit test module for user consent"""
 from datetime import datetime
 import json
+import sys
 
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -13,6 +15,8 @@ from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
 

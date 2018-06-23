@@ -5,9 +5,11 @@ from builtins import map
 from datetime import datetime, timedelta
 import json
 import os
+import sys
 from urllib.parse import quote_plus
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.coding import Coding
@@ -34,6 +36,8 @@ from portal.system_uri import (
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestOrganization(TestCase):
     """Organization model tests"""
 

@@ -1,9 +1,11 @@
 import json
 from os.path import join as path_join
 from shutil import rmtree
+import sys
 from tempfile import mkdtemp
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.config.exclusion_persistence import (
     ExclusionPersistence,
@@ -20,6 +22,8 @@ from portal.models.user import User, UserRelationship, UserRoles
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestExclusionPersistence(TestCase):
 
     def setUp(self):

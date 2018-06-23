@@ -1,8 +1,14 @@
 """Unit test module for telecom model"""
+import sys
+
+import pytest
+
 from portal.models.telecom import ContactPoint, Telecom
 from tests import TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestTelecom(TestCase):
     """Telecom model tests"""
 

@@ -8,8 +8,10 @@ to life and properly control the visibility of a intervention card?
 """
 from datetime import datetime
 import os
+import sys
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db
@@ -30,6 +32,8 @@ from portal.models.user import get_user
 from tests import TEST_USER_ID, TestCase
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestSitePersistence(TestCase):
 
     def setUp(self):
