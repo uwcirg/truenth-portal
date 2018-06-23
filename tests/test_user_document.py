@@ -2,7 +2,7 @@
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 from builtins import str
-from io import StringIO
+from io import BytesIO
 from datetime import datetime
 import os
 import sys
@@ -71,7 +71,7 @@ class TestUserDocument(TestCase):
         ) as temp_pdf:
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
-            tempfileIO = StringIO(temp_pdf.read())
+            tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
@@ -99,7 +99,7 @@ class TestUserDocument(TestCase):
         ) as temp_pdf:
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
-            tempfileIO = StringIO(temp_pdf.read())
+            tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
