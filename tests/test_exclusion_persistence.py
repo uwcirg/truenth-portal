@@ -21,7 +21,6 @@ from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRelationship, UserRoles
 from tests import TEST_USER_ID, TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestExclusionPersistence(TestCase):

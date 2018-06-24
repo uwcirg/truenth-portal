@@ -11,7 +11,6 @@ from portal.models.group import Group
 from portal.models.role import ROLE
 from tests import TEST_USER_ID, TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestGroup(TestCase):

@@ -2,8 +2,8 @@
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 from builtins import str
-from io import BytesIO
 from datetime import datetime
+from io import BytesIO
 import os
 import sys
 from tempfile import NamedTemporaryFile
@@ -19,7 +19,6 @@ from portal.models.intervention import INTERVENTION
 from portal.models.user import get_user
 from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
-
 
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)

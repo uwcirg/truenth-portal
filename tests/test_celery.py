@@ -5,7 +5,6 @@ import pytest
 
 from tests import TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestCelery(TestCase):

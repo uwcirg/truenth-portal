@@ -8,7 +8,6 @@ from portal.extensions import db
 from portal.models.notification import Notification, UserNotification
 from tests import TEST_USER_ID, TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestNotification(TestCase):

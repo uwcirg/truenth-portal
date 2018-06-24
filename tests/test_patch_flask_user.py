@@ -6,7 +6,6 @@ import pytest
 from portal.views.patch_flask_user import patch_make_safe_url
 from tests import TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestPathFlaskUser(TestCase):

@@ -12,7 +12,6 @@ from portal.models.role import ROLE
 from portal.system_uri import US_NPI
 from tests import TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestPractitioner(TestCase):

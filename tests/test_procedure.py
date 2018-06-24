@@ -24,7 +24,6 @@ from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestProcedure(TestCase):

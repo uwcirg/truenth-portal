@@ -31,7 +31,6 @@ from portal.models.role import ROLE
 from portal.models.user import get_user
 from tests import TEST_USER_ID, TestCase
 
-
 if sys.version_info.major > 2:
     pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestSitePersistence(TestCase):
