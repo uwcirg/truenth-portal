@@ -42,6 +42,7 @@ from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from .portal import check_int
+from ..trace import dump_trace, establish_trace
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
@@ -1750,6 +1751,9 @@ def patient_assessment_status(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
 
     now = datetime.utcnow()
+    trace = request.args.get('trace', False)
+    if trace:
+        establish_trace("BEGIN trace for assessment-status on {}".format(patient_id))
     assessment_status = AssessmentStatus(user=patient, as_of_date=now)
     assessment_overall_status = assessment_status.overall_status if assessment_status else None
 
@@ -1770,4 +1774,8 @@ def patient_assessment_status(patient_id):
         'completed_ids': assessment_status.instruments_completed(classfication='all'),
         'qb_name': assessment_status.qb_name
     }
+
+    if trace:
+        response['trace'] = dump_trace()
+
     return jsonify(response)
