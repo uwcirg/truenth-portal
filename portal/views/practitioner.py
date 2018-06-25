@@ -1,7 +1,8 @@
 """Practitioner API view functions"""
-from flask import abort, jsonify, Blueprint, request, url_for
-from flask_user import roles_required
 import json
+
+from flask import Blueprint, abort, jsonify, request, url_for
+from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..audit import auditable_event
@@ -14,7 +15,6 @@ from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
 from .portal import check_int
-
 
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 
@@ -164,7 +164,7 @@ def practitioner_get(id_or_code):
 
 @practitioner_api.route('/practitioner', methods=('POST',))
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_post():
     """Add a new practitioner.  Updates should use PUT
 
@@ -215,7 +215,7 @@ def practitioner_post():
     try:
         check_for_existing_external_id(request.json)
         practitioner = Practitioner.from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.add(practitioner)
     db.session.commit()
@@ -228,7 +228,7 @@ def practitioner_post():
 @practitioner_api.route('/practitioner/<string:id_or_code>',
                         methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_put(id_or_code):
     """Update practitioner via FHIR Resource Practitioner. New should POST
 
@@ -300,7 +300,7 @@ def practitioner_put(id_or_code):
     try:
         check_for_existing_external_id(request.json, practitioner.id)
         practitioner.update_from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated practitioner from input {}".format(

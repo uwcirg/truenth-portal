@@ -1,9 +1,15 @@
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker, make_transient
+from sqlalchemy.orm import make_transient, sessionmaker
 
-from portal.models.organization import Organization, UserOrganization, OrganizationLocale
-from portal.models.organization import OrganizationIdentifier, OrganizationAddress, OrgTree
+from portal.models.organization import (
+    Organization,
+    OrganizationAddress,
+    OrganizationIdentifier,
+    OrganizationLocale,
+    OrgTree,
+    UserOrganization,
+)
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.tou import ToU
 from portal.models.user_consent import UserConsent

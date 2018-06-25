@@ -6,14 +6,13 @@ Create Date: 2018-04-23 12:49:17.756737
 
 """
 from alembic import op
-from sqlalchemy import text
 import sqlalchemy as sa
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
 from portal.models.role import Role
 from portal.models.user import User, UserRoles
-
 
 Session = sessionmaker()
 

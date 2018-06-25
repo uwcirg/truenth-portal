@@ -1,18 +1,18 @@
 """CommunicationRequest model"""
-from flask import current_app
 from datetime import datetime
+
+from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
-from .assessment_status import overall_assessment_status
-from .communication import Communication
 from ..database import db
 from ..date_tools import RelativeDelta
-from .identifier import Identifier
-from .reference import Reference
 from ..system_uri import TRUENTH_CR_NAME
 from ..trace import trace
-
+from .assessment_status import overall_assessment_status
+from .communication import Communication
+from .identifier import Identifier
+from .reference import Reference
 
 # https://www.hl7.org/fhir/valueset-request-status.html
 request_status_types = ENUM(

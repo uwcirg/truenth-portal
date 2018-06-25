@@ -1,22 +1,23 @@
 """AssessmentStatus module"""
 from collections import OrderedDict
 from datetime import datetime
+
 from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
+from ..trace import trace
 from .fhir import QuestionnaireResponse, qnr_document_id
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
-from ..trace import trace
 from .user import User
 
 
-def recent_qnr_status(user, questionnaire_name, qb):
+def recent_qnr_status(user, questionnaire_name, qbd):
     """Look up recent status/timestamp for matching QuestionnaireResponse
 
     :param user: Patient to whom completed QuestionnaireResponses belong
     :param questionnaire_name: name of associated questionnaire
-    :param qb: QuestionnaireBank of associated questionnaire
+    :param qbd: QuestionnaireBank details for associated questionnaire
     :return: dictionary with authored (timestamp) of the most recent
         QuestionnaireResponse keyed by status found
 
@@ -27,11 +28,17 @@ def recent_qnr_status(user, questionnaire_name, qb):
         QuestionnaireResponse.document[
             ('questionnaire', 'reference')
         ].astext.endswith(questionnaire_name),
-        QuestionnaireResponse.questionnaire_bank_id == qb.id
+        QuestionnaireResponse.questionnaire_bank_id == qbd.questionnaire_bank.id
     ).order_by(
         QuestionnaireResponse.status,
         QuestionnaireResponse.authored.desc()).with_entities(
             QuestionnaireResponse.status, QuestionnaireResponse.authored)
+
+    if qbd.iteration is not None:
+        query = query.filter(
+            QuestionnaireResponse.qb_iteration == qbd.iteration)
+    else:
+        query = query.filter(QuestionnaireResponse.qb_iteration.is_(None))
 
     results = {}
     for qr in query:
@@ -83,28 +90,32 @@ def status_from_recents(recents, start, overdue, expired, as_of_date):
     return tmp
 
 
-def qb_status_dict(user, questionnaire_bank, as_of_date):
-    """Gather status details for a user on a given QB"""
+def qb_status_dict(user, qbd, as_of_date):
+    """Gather status details for a user on a given QBD"""
     d = OrderedDict()
-    if not questionnaire_bank:
+    if not qbd.questionnaire_bank:
         return d
-    trigger_date = questionnaire_bank.trigger_date(user)
+    trigger_date = qbd.questionnaire_bank.trigger_date(user)
     if not trigger_date:
         return d
-    start = questionnaire_bank.calculated_start(
-        trigger_date, as_of_date=as_of_date).relative_start
+    qbd_start = qbd.questionnaire_bank.calculated_start(
+        trigger_date, as_of_date=as_of_date)
+    # calculated_start does it's own lookup for iteration - should match
+    if qbd_start.iteration != qbd.iteration:
+        raise ValueError("iteration mismatch")
+    start = qbd.relative_start
     if not start:
         raise ValueError("no start for {} {}, can't continue".format(
-            user, questionnaire_bank))
-    overdue = questionnaire_bank.calculated_overdue(
+            user, qbd))
+    overdue = qbd.questionnaire_bank.calculated_overdue(
         trigger_date, as_of_date=as_of_date)
-    expired = questionnaire_bank.calculated_expiry(
+    expired = qbd.questionnaire_bank.calculated_expiry(
         trigger_date, as_of_date=as_of_date)
-    for q in questionnaire_bank.questionnaires:
-        recents = recent_qnr_status(user, q.name, questionnaire_bank)
+    for q in qbd.questionnaire_bank.questionnaires:
+        recents = recent_qnr_status(user, q.name, qbd)
         d[q.name] = status_from_recents(
             recents, start, overdue, expired, as_of_date=as_of_date)
-    trace("QuestionnaireBank status for {}:".format(questionnaire_bank.name))
+    trace("QuestionnaireBank status for {}:".format(qbd))
     for k, v in d.items():
         trace("  {}:{}".format(k, v))
     return d
@@ -117,19 +128,18 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
-    def __init__(self, user, as_of_date, qb=None):
+    def __init__(self, user, as_of_date):
         """ Initialize and lookup status for respective questionnaires
 
         :param user: subject for details
         :param as_of_date: None value implies now
-        :param qb: None value implies most_current_qb
 
         """
         self.user = user
-        self.qb = qb or QuestionnaireBank.most_current_qb(
-            user, as_of_date=as_of_date).questionnaire_bank
+        self.qbd = QuestionnaireBank.most_current_qb(
+            user, as_of_date=as_of_date)
         self.status_by_q = qb_status_dict(
-            user=user, questionnaire_bank=self.qb, as_of_date=as_of_date)
+            user=user, qbd=self.qbd, as_of_date=as_of_date)
 
     def completed_date(self):
         """Returns timestamp from most recent completed assessment"""
@@ -144,7 +154,10 @@ class QuestionnaireBankDetails(object):
 
     def overall_status(self):
         """Returns the `overall_status` for the given QB"""
-        if not (self.qb and self.qb.trigger_date):
+        if not (
+            self.qbd.questionnaire_bank and
+            self.qbd.questionnaire_bank.trigger_date
+        ):
             return 'Expired'
         status_strings = [v['status'] for v in self.status_by_q.values()]
         if all((status_strings[0] == status for status in status_strings)):
@@ -191,10 +204,14 @@ class AssessmentStatus(object):
 
     def __str__(self):
         """Present friendly format for logging, etc."""
-        if self.qb_data.qb:
+        if self.qb_data.qbd.questionnaire_bank:
+            iteration = (
+                '' if self.qb_data.qbd.iteration is None
+                else ", iteration {}".format(self.qb_data.qbd.iteration)
+            )
             return (
                 "{0.user} has overall status '{0.overall_status}' for "
-                "QuestionnaireBank {0.qb_data.qb.name}".format(self))
+                "QuestionnaireBank {0.qb_name}{1}".format(self, iteration))
         return "{0.user} has overall status '{0.overall_status}'".format(self)
 
     @property
@@ -214,7 +231,7 @@ class AssessmentStatus(object):
     @property
     def __organization(self):
         """Returns the top organization associated with users's QB or None"""
-        rp_id = self.qb_data.qb.research_protocol_id
+        rp_id = self.qb_data.qbd.questionnaire_bank.research_protocol_id
         for org in self.user.organizations:
             org_rp = org.research_protocol(self.as_of_date)
             if org_rp and org_rp.id == rp_id:
@@ -247,7 +264,7 @@ class AssessmentStatus(object):
     @property
     def qb_name(self):
         """Return name of applicable questionnaire bank if defined"""
-        return getattr(self.qb_data.qb, 'name', None)
+        return getattr(self.qb_data.qbd.questionnaire_bank, 'name', None)
 
     def enrolled_in_classification(self, classification):
         """Returns true if user has at least one q for given classification"""
@@ -270,19 +287,19 @@ class AssessmentStatus(object):
             # Assumes current by default
             results = self.qb_data.status_by_q
         if classification in ('all', 'indefinite'):
-            qb = QuestionnaireBank.qbs_for_user(
-                self.user, classification='indefinite',
-                as_of_date=self.as_of_date)
-            if qb:
-                assert len(qb) == 1
-                results.update(qb_status_dict(self.user, qb[0],
-                                              as_of_date=self.as_of_date))
+            # Add indefinite as requested
+            qbd = QuestionnaireBank.indefinite_qb(
+                user=self.user, as_of_date=self.as_of_date)
+            if qbd.questionnaire_bank:
+                results.update(
+                    qb_status_dict(self.user, qbd=qbd,
+                                   as_of_date=self.as_of_date))
         return results
 
     def instruments_completed(self, classfication=None):
         """Return list of completed questionnaires"""
         results = [
-            name for name,data in
+            name for name, data in
             self._status_by_classification(classfication).items()
             if 'completed' in data]
         return results
@@ -333,9 +350,11 @@ class AssessmentStatus(object):
                     # Look up the external id and append to results
                     # Look out for indefinite work in-progress, as it
                     # belongs to a different questionnaire bank
-                    qb_id = self.qb_data.qb.id
+                    qb_id = self.qb_data.qbd.questionnaire_bank.id
                     if name not in (
-                            q.name for q in self.qb_data.qb.questionnaires):
+                        q.name
+                        for q in self.qb_data.qbd.questionnaire_bank.questionnaires
+                    ):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
                         qb_id = indef_qb.questionnaire_bank.id

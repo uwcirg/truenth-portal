@@ -1,5 +1,6 @@
-from flask import current_app
 import os
+
+from flask import current_app
 
 from .config import SITE_CFG
 from .model_persistence import ModelPersistence

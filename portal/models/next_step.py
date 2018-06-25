@@ -1,5 +1,6 @@
 """Module for next_step logic"""
 from werkzeug.exceptions import BadRequest
+
 from .intervention import Intervention
 
 

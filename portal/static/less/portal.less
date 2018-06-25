@@ -110,7 +110,7 @@ body {
 }
 .save-loader-wrapper {
   .load-icon {
-    margin-left:4px; 
+    margin-left:4px;
     margin-top:5px;
   }
   .success-icon {
@@ -885,10 +885,13 @@ div.pull-right {
     margin: 0.8em auto;
   }
   td.reports-field {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    a {
+    .intervention-btn-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    & a,
+    .intervention-btn-container a {
       width: 4em;
       max-width: 100%;
       padding: 0.6em;
@@ -2707,6 +2710,7 @@ div.timezone-warning.text-warning {
 #consentListTable,
 #profileAuditLogTable {
     font-size: @mobileSmallSize;
+    width: 100%;
     max-width: 100%;
 }
 #profile-gender-list {

@@ -1,27 +1,41 @@
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
+
 from datetime import datetime
+from urllib.parse import urlparse
+
 from flask import (
-    Blueprint, redirect, current_app,
-    render_template, request, abort, url_for)
+    Blueprint,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_user import roles_required
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField, FormField, HiddenField,
-    SelectField, SelectMultipleField, StringField,
-    validators, widgets)
+from validators import url as url_validation
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
-from urlparse import urlparse
-from validators import url as url_validation
+from wtforms import (
+    BooleanField,
+    FormField,
+    HiddenField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    validators,
+    widgets,
+)
 
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.auth import create_service_token, Token
+from ..models.auth import Token, create_service_token
 from ..models.client import Client, validate_origin
-from ..models.intervention import (
-    INTERVENTION,
-    STATIC_INTERVENTIONS)
+from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import current_user
 
@@ -114,7 +128,7 @@ class ClientEditForm(FlaskForm):
 
 
 @client_api.route('/client', methods=('GET', 'POST'))
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_reg():
     """client registration
@@ -199,7 +213,7 @@ def client_reg():
 
 
 @client_api.route('/client/<client_id>', methods=('GET', 'POST'))
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_edit(client_id):
     """client edit
@@ -362,7 +376,7 @@ def client_edit(client_id):
 
 
 @client_api.route('/clients')
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN])
+@roles_required([ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value])
 @oauth.require_oauth()
 def clients_list():
     """clients list
@@ -398,7 +412,7 @@ def clients_list():
 
     """
     user = current_user()
-    if user.has_role(ROLE.ADMIN):
+    if user.has_role(ROLE.ADMIN.value):
         clients = Client.query.all()
     else:
         clients = Client.query.filter_by(user_id=user.id).all()

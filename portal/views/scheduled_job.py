@@ -1,6 +1,12 @@
 """Views for Scheduled Jobs"""
-from flask import abort, jsonify, Blueprint, request
-from flask import render_template, current_app
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 
 from ..audit import auditable_event
@@ -12,12 +18,11 @@ from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
 from .portal import check_int
 
-
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 
 
 @scheduled_job_api.route('/scheduled_jobs')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def jobs_list():
     """scheduled jobs view function, intended for admins
@@ -39,7 +44,7 @@ def jobs_list():
 
 
 @scheduled_job_api.route('/api/scheduled_job', methods=('POST',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def create_job():
     try:
@@ -62,7 +67,7 @@ def create_job():
 
 
 @scheduled_job_api.route('/api/scheduled_job/<int:job_id>', methods=('PUT',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def update_job(job_id):
     check_int(job_id)
@@ -86,7 +91,7 @@ def update_job(job_id):
 
 
 @scheduled_job_api.route('/api/scheduled_job/<int:job_id>')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def get_job(job_id):
     job = ScheduledJob.query.get(job_id)
@@ -97,7 +102,7 @@ def get_job(job_id):
 
 @scheduled_job_api.route(
     '/api/scheduled_job/<int:job_id>', methods=('DELETE',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def delete_job(job_id):
     job = ScheduledJob.query.get(job_id)
@@ -114,7 +119,7 @@ def delete_job(job_id):
 
 @scheduled_job_api.route(
     '/api/scheduled_job/<int:job_id>/trigger', methods=('POST',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def trigger_job(job_id):
     job = ScheduledJob.query.get(job_id)

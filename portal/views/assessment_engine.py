@@ -1,5 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
+
 from flask import (
     Blueprint,
     Response,
@@ -23,20 +24,24 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
-from ..models.assessment_status import invalidate_assessment_status_cache
-from ..models.assessment_status import overall_assessment_status
+from ..models.assessment_status import (
+    AssessmentStatus,
+    invalidate_assessment_status_cache,
+    overall_assessment_status,
+)
 from ..models.client import validate_origin
 from ..models.fhir import (
-    aggregate_responses,
     EC,
+    QuestionnaireResponse,
+    aggregate_responses,
     generate_qnr_csv,
-    QuestionnaireResponse)
+)
 from ..models.intervention import INTERVENTION
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import User, current_user, get_user_or_abort
+from ..trace import dump_trace, establish_trace
 from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
@@ -628,22 +633,23 @@ def assessment(patient_id, instrument_id):
         documents.append(qnr.document)
 
     bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(documents),
+        'resourceType': 'Bundle',
+        'updated': FHIR_datetime.now(),
+        'total': len(documents),
         'type': 'searchset',
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
-        'entry':documents,
+        'entry': documents,
     }
 
     return jsonify(bundle)
 
 
 @assessment_engine_api.route('/patient/assessment')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.RESEARCHER])
+@roles_required(
+    [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def get_assessments():
     """
@@ -745,8 +751,8 @@ def get_assessments():
     )
     bundle.update({
         'link': {
-            'rel':'self',
-            'href':request.url,
+            'rel': 'self',
+            'href': request.url,
         },
     })
 
@@ -1388,7 +1394,7 @@ def invalidate(user_id):
 
 
 @assessment_engine_api.route('/present-needed')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_needed():
     """Look up needed and in process q's for user and then present_assessment
@@ -1432,7 +1438,7 @@ def present_needed():
 
 
 @assessment_engine_api.route('/present-assessment')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine
@@ -1745,6 +1751,9 @@ def patient_assessment_status(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
 
     now = datetime.utcnow()
+    trace = request.args.get('trace', False)
+    if trace:
+        establish_trace("BEGIN trace for assessment-status on {}".format(patient_id))
     assessment_status = AssessmentStatus(user=patient, as_of_date=now)
     assessment_overall_status = assessment_status.overall_status if assessment_status else None
 
@@ -1765,4 +1774,8 @@ def patient_assessment_status(patient_id):
         'completed_ids': assessment_status.instruments_completed(classfication='all'),
         'qb_name': assessment_status.qb_name
     }
+
+    if trace:
+        response['trace'] = dump_trace()
+
     return jsonify(response)

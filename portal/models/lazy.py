@@ -1,7 +1,10 @@
-import thread
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
+import _thread
 from sqlalchemy.orm.util import class_mapper
 
 from ..database import db
+
 
 def _is_sql_wrapper(instance):
     """Determines if instance is a SQLAlchemy wrapper (ORM instance)"""
@@ -24,7 +27,7 @@ def lazyprop(fn):
     identifier in the key
 
     """
-    attr_name = '_lazy_{}.{}'.format(fn.__name__, thread.get_ident())
+    attr_name = '_lazy_{}.{}'.format(fn.__name__, _thread.get_ident())
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):
@@ -59,7 +62,7 @@ def query_by_name(cls, name):
 
     """
     attr_name = '_lazy_{}_{}.{}'.format(
-        cls.__name__, name, thread.get_ident())
+        cls.__name__, name, _thread.get_ident())
     def lookup(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, cls.query.filter_by(name=name).one())

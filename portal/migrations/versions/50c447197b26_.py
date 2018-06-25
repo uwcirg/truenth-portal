@@ -2,7 +2,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
-
 """add due field to questionnaire_banks
 
 Revision ID: 50c447197b26

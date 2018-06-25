@@ -1,7 +1,6 @@
 from alembic import op
 import sqlalchemy as sa
 
-
 """empty message
 
 Revision ID: d0b40bc8d7e6

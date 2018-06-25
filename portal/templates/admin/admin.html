@@ -59,7 +59,7 @@
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Delete</em></button>{% else %}-{% endif %}</td>
+                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN.value) and (not user.has_role(ROLE.STAFF.value))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Delete</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>

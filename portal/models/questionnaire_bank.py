@@ -1,12 +1,15 @@
 """Questionnaire Bank module"""
 from collections import namedtuple
-from datetime import datetime, MAXYEAR
+from datetime import MAXYEAR, datetime
+
 from flask import current_app, url_for
-from sqlalchemy import UniqueConstraint, CheckConstraint
+from flask_babel import gettext as _
+from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
+from ..trace import trace
 from .fhir import CC, QuestionnaireResponse
 from .intervention import Intervention
 from .intervention_strategies import observation_check
@@ -14,8 +17,6 @@ from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
-from ..trace import trace
-
 
 classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
@@ -78,6 +79,14 @@ class QuestionnaireBank(db.Model):
         return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
             self)
 
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
+
     @classmethod
     def from_json(cls, data):
         instance = cls()
@@ -118,10 +127,22 @@ class QuestionnaireBank(db.Model):
             self.recurs.remove(unwanted)
             db.session.delete(unwanted)
 
+        def purge_rank_conflicts(questionnaire):
+            # if a different q is assigned to the same rank, it'll lead to
+            # an integrity error - must remove the stale first
+            match = [
+                q for q in self.questionnaires if
+                q.rank == questionnaire.rank]
+            if (match and match[0].questionnaire_id !=
+                    questionnaire.questionnaire_id):
+                self.questionnaires.remove(match[0])
+                db.session.delete(match[0])
+
         qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_json(
                 q)
+            purge_rank_conflicts(questionnaire)
             questionnaire.questionnaire_bank_id = self.id
             questionnaire = questionnaire.add_if_not_found(True)
             if questionnaire not in self.questionnaires:
@@ -384,7 +405,9 @@ class QuestionnaireBank(db.Model):
                 last_found = qbd._replace(questionnaire_bank=qb)
 
                 if qbd.relative_start <= as_of_date and as_of_date < expiry:
+                    trace("most_recent found {}".format(last_found))
                     return last_found
+        trace("most_recent found {}".format(last_found))
         return last_found
 
     @staticmethod
@@ -627,5 +650,5 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
-        return "Month {}".format(total)
-    return qbd.questionnaire_bank.classification.title()
+        return _('Month %(month_total)d', month_total=total)
+    return _(qbd.questionnaire_bank.classification.title())

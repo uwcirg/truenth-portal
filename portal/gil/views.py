@@ -1,40 +1,35 @@
 from flask import (
+    Blueprint,
     abort,
     current_app,
-    Blueprint,
     jsonify,
     redirect,
     render_template,
     request,
     session,
-    url_for
+    url_for,
 )
 from jinja2 import TemplateNotFound
 
 from ..database import db
 from ..extensions import recaptcha
 from ..models.app_text import (
-    app_text,
     AboutATMA,
     PrivacyATMA,
     Terms_ATMA,
-    VersionedResource
+    VersionedResource,
+    app_text,
 )
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE
-from ..models.organization import (
-    OrgTree,
-    Organization,
-    OrganizationIdentifier
-)
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
-
 
 gil = Blueprint(
     'gil', __name__, template_folder='templates', static_folder='static',
@@ -107,11 +102,12 @@ def home():
             'Missing inital data still needed: {}'.format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
+    if (user.has_role(ROLE.STAFF.value) or
+            user.has_role(ROLE.INTERVENTION_STAFF.value)):
         return redirect(url_for('patients.patients_root'))
-    if user.has_role(ROLE.RESEARCHER):
+    if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
-    if user.has_role(ROLE.STAFF_ADMIN):
+    if user.has_role(ROLE.STAFF_ADMIN.value):
         return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
@@ -203,10 +199,11 @@ def terms_and_conditions():
     user = current_user()
     if user:
         role = None
-        if any(user.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)):
-            role = ROLE.STAFF
-        elif user.has_role(ROLE.PATIENT):
-            role = ROLE.PATIENT
+        if any(user.has_role(r) for r in (
+                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)):
+            role = ROLE.STAFF.value
+        elif user.has_role(ROLE.PATIENT.value):
+            role = ROLE.PATIENT.value
         terms = VersionedResource(
             app_text(Terms_ATMA.name_key(role=role)),
             locale_code=user.locale_code)

@@ -1,47 +1,57 @@
 """User model """
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
+
 from cgi import escape
 from datetime import datetime
+from io import StringIO
+import time
+
 from dateutil import parser
 from flask import abort, current_app
 from flask_babel import gettext as _
-from flask_user import UserMixin, _call_or_get
-from sqlalchemy import text
-from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
-from sqlalchemy import and_, or_, UniqueConstraint
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.dialects.postgresql import ENUM
-from StringIO import StringIO
 from flask_login import current_user as flask_login_current_user
+from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
+from past.builtins import basestring
 import regex
-import time
+from sqlalchemy import UniqueConstraint, and_, or_, text
+from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
-from .audit import Audit
-from .codeable_concept import CodeableConcept
-from .coding import Coding
-from ..dict_tools import dict_match, strip_empties
-from .encounter import Encounter
+from . import reference
 from ..database import db
-from ..date_tools import as_fhir, FHIR_datetime
-from .extension import CCExtension, TimezoneExtension
-from .fhir import Observation, UserObservation
-from .fhir import ValueQuantity, v_or_n, v_or_first
-from .identifier import Identifier
-from .intervention import UserIntervention
-from .organization import Organization, OrgTree
-from .performer import Performer
-from .practitioner import Practitioner
-import reference
-from .relationship import Relationship, RELATIONSHIP
-from .role import Role, ROLE
+from ..date_tools import FHIR_datetime, as_fhir
+from ..dict_tools import dict_match, strip_empties
 from ..system_uri import (
     IETF_LANGUAGE_TAG,
     TRUENTH_EXTENSTION_NHHD_291036,
     TRUENTH_EXTERNAL_STUDY_SYSTEM,
     TRUENTH_ID,
     TRUENTH_PROVIDER_SYSTEMS,
-    TRUENTH_USERNAME)
+    TRUENTH_USERNAME,
+)
+from .audit import Audit
+from .codeable_concept import CodeableConcept
+from .coding import Coding
+from .encounter import Encounter
+from .extension import CCExtension, TimezoneExtension
+from .fhir import (
+    Observation,
+    UserObservation,
+    ValueQuantity,
+    v_or_first,
+    v_or_n,
+)
+from .identifier import Identifier
+from .intervention import UserIntervention
+from .organization import Organization, OrgTree
+from .performer import Performer
+from .practitioner import Practitioner
+from .relationship import RELATIONSHIP, Relationship
+from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
@@ -772,14 +782,14 @@ class User(db.Model, UserMixin):
 
         """
         for rel in self.relationships:
-            if rel.relationship.name == RELATIONSHIP.SPONSOR:
+            if rel.relationship.name == RELATIONSHIP.SPONSOR.value:
                 return User.query.get(rel.other_user_id)
 
         service_user = User(username=(u'service account sponsored by {}'.
                                       format(self.username)))
         db.session.add(service_user)
-        add_role(service_user, ROLE.SERVICE)
-        self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
+        add_role(service_user, ROLE.SERVICE.value)
+        self.add_relationship(service_user, RELATIONSHIP.SPONSOR.value)
         return service_user
 
     def fetch_value_status_for_concept(self, codeable_concept):
@@ -1053,9 +1063,9 @@ class User(db.Model, UserMixin):
             change their own org affiliations.
 
             """
-            if (not acting_user.has_role(ROLE.ADMIN)
-                and (acting_user.has_role(ROLE.STAFF)
-                     or acting_user.has_role(ROLE.STAFF_ADMIN))
+            if (not acting_user.has_role(ROLE.ADMIN.value)
+                and (acting_user.has_role(ROLE.STAFF.value)
+                     or acting_user.has_role(ROLE.STAFF_ADMIN.value))
                     and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
@@ -1120,13 +1130,13 @@ class User(db.Model, UserMixin):
 
         """
         # Don't allow promotion of service accounts
-        if self.has_role(ROLE.SERVICE):
+        if self.has_role(ROLE.SERVICE.value):
             abort(400, "Promotion of service users not allowed")
 
         remove_if_not_requested = {role.id: role for role in self.roles}
         for role in role_list:
             # Don't allow others to add service to their accounts
-            if role.name == ROLE.SERVICE:
+            if role.name == ROLE.SERVICE.value:
                 abort(400, "Service role is restricted to service accounts")
             if role.id in remove_if_not_requested:
                 remove_if_not_requested.pop(role.id)
@@ -1429,9 +1439,9 @@ class User(db.Model, UserMixin):
         if not other:
             abort(404, "User not found {}".format(other_id))
 
-        if self.has_role(ROLE.ADMIN):
+        if self.has_role(ROLE.ADMIN.value):
             return True
-        if self.has_role(ROLE.SERVICE):
+        if self.has_role(ROLE.SERVICE.value):
             # Ideally, only users attached to the same intervention
             # as the service token would qualify.  Edge cases around
             # account creation and loose coupling between patients
@@ -1439,8 +1449,9 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if any(self.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)
-               ) and other.has_role(ROLE.PATIENT):
+        if (any(self.has_role(r) for r in (
+                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)) and
+                other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
@@ -1474,7 +1485,8 @@ class User(db.Model, UserMixin):
                         if orgtree.at_or_below_ids(org_id, others_orgs):
                             return True
 
-        if self.has_role(ROLE.STAFF_ADMIN) and other.has_role(ROLE.STAFF):
+        if (self.has_role(ROLE.STAFF_ADMIN.value) and
+                other.has_role(ROLE.STAFF.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -1482,8 +1494,8 @@ class User(db.Model, UserMixin):
                     return True
 
         if self.has_role(
-                ROLE.INTERVENTION_STAFF) and other.has_role(
-                ROLE.PATIENT):
+                ROLE.INTERVENTION_STAFF.value) and other.has_role(
+                ROLE.PATIENT.value):
             # Intervention staff can access patients within that intervention
             for intervention in self.interventions:
                 if intervention in other.interventions:
@@ -1598,7 +1610,7 @@ def add_role(user, role_name):
     role = Role.query.filter_by(name=role_name).first()
     assert(role)
     # don't allow promotion of service users
-    if user.has_role(ROLE.SERVICE):
+    if user.has_role(ROLE.SERVICE.value):
         raise RoleError("service accounts can't be promoted")
 
     new_role = UserRoles(user_id=user.id,
@@ -1696,11 +1708,11 @@ def flag_test():  # pragma: no test
     """Find all non-service users and flag as test"""
 
     users = User.query.filter(
-        ~User.roles.any(Role.name.in_([ROLE.TEST, ROLE.SERVICE]))
+        ~User.roles.any(Role.name.in_([ROLE.TEST.value, ROLE.SERVICE.value]))
     )
 
     for user in users:
-        add_role(user, ROLE.TEST)
+        add_role(user, ROLE.TEST.value)
     db.session.commit()
 
 

@@ -1,7 +1,7 @@
 """Configuration"""
 import os
-import redis
 
+import redis
 
 SITE_CFG = 'site.cfg'
 

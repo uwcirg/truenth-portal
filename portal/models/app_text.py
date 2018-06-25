@@ -7,15 +7,21 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from __future__ import unicode_literals  # isort:skip
+from future import standard_library  # isort:skip
+standard_library.install_aliases()  # noqa: E402
+
 from abc import ABCMeta, abstractmethod
+from builtins import str
+from string import Formatter
+import timeit
+from urllib.parse import parse_qsl, urlencode, urlparse
+
 from flask import current_app
 from flask_babel import gettext
+from future.utils import with_metaclass
 import requests
-from requests.exceptions import MissingSchema, ConnectionError
-import timeit
-from string import Formatter
-from urllib import urlencode
-from urlparse import parse_qsl, urlparse
+from requests.exceptions import ConnectionError, MissingSchema
 
 from ..database import db
 
@@ -83,7 +89,7 @@ class AppText(db.Model):
 
     def __repr__(self):
         return "{} ({}, {})".format(self.__class__.__name__,
-                                    self.name, str(self))
+                                    self.name, self)
 
     def __str__(self):
         if self.custom_text:
@@ -118,14 +124,13 @@ class AppText(db.Model):
         return d
 
 
-class AppTextModelAdapter(object):
+class AppTextModelAdapter(with_metaclass(ABCMeta, object)):
     """Several special purpose patterns used for lookups
 
     Make access consistent and easy for model classes where appropriate
 
     Abstract base class - defining methods each model adapter needs
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def name_key(**kwargs):
@@ -375,7 +380,7 @@ class UnversionedResource(object):
         self.url = url
         self.variables = variables or {}
         if asset:
-            self._asset = unicode(asset)
+            self._asset = str(asset)
         else:
             try:
                 response = time_request(url)
@@ -400,7 +405,7 @@ class UnversionedResource(object):
         if self._asset:
             try:
                 return self._asset.format(**self.variables)
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing asset variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -465,7 +470,7 @@ class VersionedResource(object):
         if self._asset:
             try:
                 return self._asset.format(**self.variables)
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing asset variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -567,12 +572,12 @@ class MailResource(object):
         if self._subject:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._subject).format(
+                    formatted = (self._subject).format(
                         **self.variables.minimal_subdict(self._subject))
                 else:
-                    formatted = unicode(self._subject).format(**self.variables)
+                    formatted = (self._subject).format(**self.variables)
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing subject variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -585,15 +590,15 @@ class MailResource(object):
         if self._body:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._body).format(
+                    formatted = (self._body).format(
                         **self.variables.minimal_subdict(self._body))
                 else:
-                    formatted = unicode(self._body).format(**self.variables)
+                    formatted = (str(self._body)).format(**self.variables)
                 if self._footer:
                     formatted += "\n"
                     formatted += self.footer
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))
@@ -606,12 +611,12 @@ class MailResource(object):
         if self._footer:
             try:
                 if hasattr(self.variables, 'minimal_subdict'):
-                    formatted = unicode(self._footer).format(
+                    formatted = (self._footer).format(
                         **self.variables.minimal_subdict(self._footer))
                 else:
-                    formatted = unicode(self._footer).format(**self.variables)
+                    formatted = (self._footer).format(**self.variables)
                 return formatted
-            except KeyError, e:
+            except KeyError as e:
                 self.error_msg = "Missing footer variable {}".format(e)
                 current_app.logger.error(self.error_msg +
                                          ": {}".format(self.url))

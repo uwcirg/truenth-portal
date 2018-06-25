@@ -1,19 +1,20 @@
 """Organization related views module"""
-from flask import abort, current_app, Blueprint, jsonify, request
-from flask_user import roles_required
 import json
-from sqlalchemy import exc, and_
+
+from flask import Blueprint, abort, current_app, jsonify, request
+from flask_user import roles_required
+from sqlalchemy import and_, exc
 
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
+from ..models.coding import Coding
 from ..models.identifier import Identifier
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
-from ..system_uri import PRACTICE_REGION
-
+from ..system_uri import IETF_LANGUAGE_TAG, PRACTICE_REGION
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
@@ -71,7 +72,7 @@ def organization_search():
     filter = None
     found_ids = []
     system, value = None, None
-    for k,v in request.args.items():
+    for k, v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
                 abort(400, "state search requires two letter state code")
@@ -194,7 +195,7 @@ def organization_get(id_or_code):
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def organization_delete(organization_id):
     """Delete the requested organization
@@ -229,7 +230,7 @@ def organization_delete(organization_id):
     try:
         db.session.delete(org)
         db.session.commit()
-    except exc.IntegrityError, e:
+    except exc.IntegrityError as e:
         message = "Cannot delete organization with related entities"
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
@@ -241,7 +242,7 @@ def organization_delete(organization_id):
 
 @org_api.route('/organization', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_post():
     """Add a new organization.  Updates should use PUT
 
@@ -300,7 +301,7 @@ def organization_post():
         abort(400, "Requires FHIR resourceType of 'Organization'")
     try:
         org = Organization.from_fhir(request.json)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.add(org)
     db.session.commit()
@@ -313,7 +314,7 @@ def organization_post():
 
 @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_put(organization_id):
     """Update organization via FHIR Resource Organization. New should POST
 
@@ -377,7 +378,7 @@ def organization_put(organization_id):
         complete = org.as_fhir(include_empties=True)
         complete.update(request.json)
         org.update_from_fhir(complete)
-    except MissingReference, e:
+    except MissingReference as e:
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated organization from input {}".format(
@@ -455,8 +456,19 @@ def add_user_organizations(user_id):
             {'reference': 'api/organization/123-45?system=http://pcctc.org/'}
         ]}
 
+    Additional attributes may be applied to the user, from the named
+    organization's matching defaults.  For example, both the default
+    timezone and the language may be assigned using the respective values:
+
+        {'organizations': [
+            {'reference': 'api/organizations/1001',
+             'language': 'apply_to_user',
+             'timezone': 'apply_to_user'}
+        ]}
+
     If user is already associated with one or more of the posted organizations,
     a 409 will be raised.
+
     ---
     tags:
       - User
@@ -496,8 +508,37 @@ def add_user_organizations(user_id):
     if not request.json or 'organizations' not in request.json:
         abort(400, "Requires `organizations` list")
 
+    # validate input - don't allow multiple orgs with `apply_to_user`
+    # attributes for any given field
+    applied_fields = []
+
+    def apply_defaults(item, org, applied):
+        for field in 'timezone', 'language':
+            if field in item:
+                if item[field] != 'apply_to_user':
+                    abort(400, "expected 'apply_to_user' on {}".format(field))
+                if field in applied:
+                    abort(400, "can't apply defaults from more than one org")
+                if field == 'language':
+                    # Org's default_locale respects the org tree inheritance,
+                    # but only returns the 'code' - need full Coding to set
+                    if not org.default_locale:
+                        abort(
+                            400, "can't apply language from org w/o a value")
+                    locale_code = Coding.query.filter(
+                        Coding.system == IETF_LANGUAGE_TAG).filter(
+                        Coding.code == org.default_locale).one()
+                    user.locale = (locale_code.code, locale_code.display)
+                else:
+                    setattr(user, field, getattr(org, field))
+                applied.append(field)
+
     for item in request.json.get('organizations'):
-        org = Reference.parse(item)
+        try:
+            org = Reference.parse(item)
+        except MissingReference as e:
+            abort(400, "Organization {}".format(e))
+        apply_defaults(item, org, applied_fields)
         if not isinstance(org, Organization):
             abort(400, "Expecting only `Organization` references")
         if org in user.organizations:

@@ -784,7 +784,7 @@
                     coreTypes.forEach(function(type) {
                         var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
                         if (notificationEntry.length > 0) {
-                            tnthAjax.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id"));
+                            Global.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id")); /*global Global */
                         }
                     });
                 }

@@ -3,9 +3,10 @@
 FHIR uses a telecom structure for email, fax, phone, etc.
 
 """
-from ..database import db
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM
+
+from ..database import db
 
 cp_sys_list = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other']
 cp_use_list = ['home', 'work', 'temp', 'old', 'mobile']
@@ -112,5 +113,5 @@ class Telecom(object):
         telecom = {}
         for cp in self.contact_points:
             if cp:
-                telecom[(cp.system,cp.use)] = cp.value
+                telecom[(cp.system, cp.use)] = cp.value
         return telecom

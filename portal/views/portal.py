@@ -1,42 +1,57 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from datetime import datetime
 import json
-import requests
+from pprint import pformat
+
 from celery.result import AsyncResult
-from flask import current_app, Blueprint, jsonify, render_template
-from flask import abort, make_response, redirect, request, session, url_for
-from flask import render_template_string
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    render_template_string,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import gettext as _
-from flask_user import roles_required
 from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
+from flask_user import roles_required
 from flask_wtf import FlaskForm
-from pprint import pformat
+import requests
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import validators, BooleanField, HiddenField, IntegerField, StringField
-from datetime import datetime
+from wtforms import (
+    BooleanField,
+    HiddenField,
+    IntegerField,
+    StringField,
+    validators,
+)
 
-from .auth import next_after_login, logout
 from ..audit import auditable_event
-from .crossdomain import crossdomain
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..factories.celery import create_celery
 from ..extensions import oauth, user_manager
+from ..factories.celery import create_celery
 from ..models.app_text import (
-    app_text,
     AppText,
-    get_terms,
     InitialConsent_ATMA,
     MailResource,
     UndefinedAppText,
     UserInviteEmail_ATMA,
     UserReminderEmail_ATMA,
-    VersionedResource
+    VersionedResource,
+    app_text,
+    get_terms,
 )
 from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.client import validate_origin
-from ..models.communication import load_template_args, Communication
+from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
 from ..models.fhir import QuestionnaireResponse
 from ..models.i18n import get_locale
@@ -44,14 +59,20 @@ from ..models.identifier import Identifier
 from ..models.login import login_user
 from ..models.message import EmailMessage
 from ..models.next_step import NextStep
-from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.organization import (
+    Organization,
+    OrganizationIdentifier,
+    OrgTree,
+    UserOrganization,
+)
 from ..models.reporting import get_reporting_stats
-from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
+from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user_or_abort, User
+from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
-from ..trace import establish_trace, dump_trace, trace
-
+from ..trace import dump_trace, establish_trace, trace
+from .auth import logout, next_after_login
+from .crossdomain import crossdomain
 
 portal = Blueprint('portal', __name__)
 
@@ -267,8 +288,11 @@ def access_via_token(token, next_step=None):
 
     # Valid token - confirm user id looks legit
     user = get_user_or_abort(user_id)
-    not_allowed = {ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE}
-    has = set([role.name for role in user.roles])
+    not_allowed = {
+        ROLE.ADMIN.value,
+        ROLE.APPLICATION_DEVELOPER.value,
+        ROLE.SERVICE.value}
+    has = {role.name for role in user.roles}
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
 
@@ -290,12 +314,12 @@ def access_via_token(token, next_step=None):
     # always available
     session['locale_code'] = user.locale_code
 
-    if {ROLE.WRITE_ONLY, ROLE.ACCESS_ON_VERIFY}.intersection(has):
+    if {ROLE.WRITE_ONLY.value, ROLE.ACCESS_ON_VERIFY.value}.intersection(has):
         # write only users with special role skip the challenge protocol
-        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
+        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE.value in has:
 
             # access_on_verify users are REQUIRED to verify
-            if ROLE.ACCESS_ON_VERIFY in has:
+            if ROLE.ACCESS_ON_VERIFY.value in has:
                 current_app.logger.error(
                     "ACCESS_ON_VERIFY {} has disallowed role "
                     "PROMOTE_WITHOUT_IDENTITY_CHALLENGE".format(user))
@@ -321,7 +345,7 @@ def access_via_token(token, next_step=None):
                 "verify".format(user))
             abort(400, "invalid state - can't continue")
 
-        if ROLE.ACCESS_ON_VERIFY in has:
+        if ROLE.ACCESS_ON_VERIFY.value in has:
             # Send user to verify, and then follow post login flow
             session['challenge.access_on_verify'] = True
             session['challenge.next_url'] = url_for('auth.next_after_login')
@@ -468,10 +492,10 @@ def initial_queries():
 
     org = user.first_top_organization()
     role = None
-    for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+    for r in (ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value):
         if user.has_role(r):
             # treat staff_admins as staff for this lookup
-            r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+            r = ROLE.STAFF.value if r == ROLE.STAFF_ADMIN.value else r
             role = r
     terms = get_terms(user.locale_code, org, role)
     # need this at all time now for ui
@@ -484,7 +508,7 @@ def initial_queries():
 
 
 @portal.route('/admin')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def admin():
     """user admin view function"""
@@ -590,7 +614,7 @@ def profile(user_id):
 
 
 @portal.route('/patient-invite-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_invite_email(user_id):
     """Patient Invite Email Content"""
@@ -616,7 +640,7 @@ def patient_invite_email(user_id):
 
 
 @portal.route('/patient-reminder-email/<int:user_id>')
-@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN, ROLE.STAFF])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
@@ -672,7 +696,7 @@ def contact_sent(message_id):
 
 
 @portal.route('/psa-tracker')
-@roles_required(ROLE.PATIENT)
+@roles_required(ROLE.PATIENT.value)
 @oauth.require_oauth()
 def psa_tracker():
     return render_template('psa_tracker.html', user=current_user())
@@ -687,7 +711,7 @@ class SettingsForm(FlaskForm):
 
 
 @portal.route('/settings', methods=['GET', 'POST'])
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def settings():
     """settings panel for admins"""
@@ -777,7 +801,8 @@ def config_settings(config_key):
         'PRE_REGISTERED_ROLES',
         'SYSTEM',
         'SHOW_PROFILE_MACROS',
-        'MEDIDATA_RAVE_FIELDS'
+        'MEDIDATA_RAVE_FIELDS',
+        'MEDIDATA_RAVE_ORG'
     )
     if config_key:
         key = config_key.upper()
@@ -794,7 +819,7 @@ def config_settings(config_key):
 
 
 @portal.route('/research')
-@roles_required([ROLE.RESEARCHER])
+@roles_required([ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def research_dashboard():
     """Research Dashboard
@@ -806,7 +831,7 @@ def research_dashboard():
 
 
 @portal.route('/reporting')
-@roles_required([ROLE.ADMIN, ROLE.ANALYST])
+@roles_required([ROLE.ADMIN.value, ROLE.ANALYST.value])
 @oauth.require_oauth()
 def reporting_dashboard():
     """Executive Reporting Dashboard
@@ -945,7 +970,7 @@ def celery_result(task_id):
 
 
 @portal.route('/communicate')
-@roles_required([ROLE.ADMIN])
+@roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
 def communications_dashboard():
     """Communications Dashboard
@@ -962,7 +987,7 @@ def communications_dashboard():
 
 
 @portal.route('/communicate/preview/<int:comm_id>')
-@roles_required([ROLE.ADMIN])
+@roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
 def preview_communication(comm_id):
     """Communication message preview"""
@@ -976,7 +1001,7 @@ def preview_communication(comm_id):
 
 
 @portal.route("/communicate/<email_or_id>")
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def communicate(email_or_id):
     """Direct call to trigger communications to given user.

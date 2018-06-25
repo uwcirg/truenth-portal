@@ -4,14 +4,15 @@ Role data lives in the `roles` table, populated via:
     `flask seed`
 
 To restrict access to a given role, use the ROLE object:
-    @roles_required(ROLE.ADMIN)
+    @roles_required(ROLE.ADMIN.value)
 
 To extend the list of roles, add name: description pairs to the
 STATIC_ROLES dict within.
 
 """
+from enum import Enum
+
 from ..database import db
-from UserDict import IterableUserDict
 
 
 class Role(db.Model):
@@ -24,8 +25,23 @@ class Role(db.Model):
     def __str__(self):
         return "Role {}".format(self.name)
 
+    def as_json(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'display_name': self.display_name}
+
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])
+
+
 #Source definition for roles, as dictionary {name: description,}
-STATIC_ROLES = IterableUserDict({
+STATIC_ROLES = {
     'access_on_verify':
         'Provides access prior to registration, on verification',
     'admin':
@@ -66,16 +82,11 @@ STATIC_ROLES = IterableUserDict({
     'write_only':
         'Limited access account, write only, cannot view data from '
         'previous sessions',
-})
+}
 
 
-def enum(**items):
-    """Convert dictionary to Enumeration for direct access"""
-    return type('Enum', (), items)
-
-ROLE = enum(**{unicode(r).upper():r for r in STATIC_ROLES})
-ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
-
+ROLE = Enum('ROLE', {r.upper(): r for r in STATIC_ROLES})
+ALL_BUT_WRITE_ONLY = [r.value for r in ROLE if r.value != 'write_only']
 
 def add_static_roles():
     """Seed database with default static roles

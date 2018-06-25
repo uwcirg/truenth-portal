@@ -14,26 +14,26 @@ the parameters given to the closures.
 
 """
 from datetime import datetime
-from flask import current_app, url_for
-from flask_babel import gettext as _
 import json
-from sqlalchemy import and_, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
-from .codeable_concept import CodeableConcept
-from .coding import Coding
+from flask import current_app, url_for
+from flask_babel import gettext as _
+from sqlalchemy import UniqueConstraint, and_
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+
 from ..database import db
 from ..date_tools import localize_datetime
+from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from .fhir import CC
 from .identifier import Identifier
-from .intervention import Intervention, INTERVENTION, UserIntervention
-from .organization import Organization, OrgTree, OrganizationIdentifier
+from .intervention import INTERVENTION, Intervention, UserIntervention
+from .organization import Organization, OrganizationIdentifier, OrgTree
 from .procedure_codes import known_treatment_started
 from .role import Role
-from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
-
 
 # ##
 # # functions implementing the 'access_strategy' API
@@ -85,7 +85,7 @@ def limit_by_clinic_w_id(
 
     if include_children:
         ot = OrgTree()
-        required = set([o for og in orgs for o in ot.here_and_below_id(og.id)])
+        required = {o for og in orgs for o in ot.here_and_below_id(og.id)}
     else:
         required = set((o.id for o in orgs))
     if combinator not in ('any', 'all'):
@@ -136,8 +136,7 @@ def not_in_clinic_w_id(
 
     if include_children:
         ot = OrgTree()
-        dont_want = set(
-            [o for og in orgs for o in ot.here_and_below_id(og.id)])
+        dont_want = {o for og in orgs for o in ot.here_and_below_id(og.id)}
     else:
         dont_want = set((o.id for o in orgs))
 
@@ -270,7 +269,7 @@ def update_card_html_on_completion():
                     'Due', 'Overdue', 'In Progress'):
                 greeting = _(u"Hi {}").format(user.display_name)
 
-                qb = assessment_status.qb_data.qb
+                qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
                 utc_start = qb.calculated_start(
                     trigger_date, as_of_date=now).relative_start
@@ -532,12 +531,18 @@ def tx_begun(boolean_value):
     return user_has_desired_tx
 
 
-def observation_check(display, boolean_value):
+def observation_check(display, boolean_value, invert_logic=False):
     """Returns strategy function for a particular observation and logic value
 
     :param display: observation coding.display from
       TRUENTH_CLINICAL_CODE_SYSTEM
     :param boolean_value: ValueQuantity boolean true or false expected
+    :param invert_logic: Effective binary ``not`` to apply to test.  If set,
+      will return True only if given observation with boolean_value is NOT
+      defined for user
+
+    NB a history of observations is maintained, with the most recent taking
+    precedence.
 
     """
     try:
@@ -546,8 +551,8 @@ def observation_check(display, boolean_value):
     except NoResultFound:
         raise ValueError("coding.display '{}' not found".format(display))
     try:
-        cc_id = CodeableConcept.query.filter(
-            CodeableConcept.codings.contains(coding)).one().id
+        cc = CodeableConcept.query.filter(
+            CodeableConcept.codings.contains(coding)).one()
     except NoResultFound:
         raise ValueError("codeable_concept'{}' not found".format(coding))
 
@@ -559,12 +564,14 @@ def observation_check(display, boolean_value):
         raise ValueError("boolean_value must be 'true' or 'false'")
 
     def user_has_matching_observation(intervention, user):
-        obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
-        if obs and obs[0].value_quantity == vq:
+        value, status = user.fetch_value_status_for_concept(
+            codeable_concept=cc)
+        if value == vq:
             _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
-            return True
+            return True if not invert_logic else False
+        return False if not invert_logic else True
 
     return user_has_matching_observation
 
@@ -696,7 +703,7 @@ class AccessStrategy(db.Model):
 
             # validate the given details by attempting to instantiate
             self.instantiate()
-        except Exception, e:
+        except Exception as e:
             raise ValueError("AccessStrategy instantiation error: {}".format(
                 e))
         return self

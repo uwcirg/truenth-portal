@@ -1,6 +1,5 @@
 """Group view methods"""
-from flask import abort, Blueprint, jsonify
-from flask import request
+from flask import Blueprint, abort, jsonify, request
 from flask_user import roles_required
 
 from ..audit import auditable_event
@@ -97,7 +96,7 @@ def group_by_name(group_name):
 
 @group_api.route('/', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def add_group():
     """Add new group
 
@@ -167,7 +166,7 @@ def add_group():
 
 @group_api.route('/<string:group_name>', methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def edit_group(group_name):
     """Edit an existing group
 

@@ -1,18 +1,21 @@
 """Unit test module for Assessment Engine API"""
 import json
+
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
 from portal.models.user import get_user
 from portal.models.user_consent import UserConsent
-from tests import TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase
 
 
 class TestAssessmentEngine(TestCase):
@@ -29,10 +32,10 @@ class TestAssessmentEngine(TestCase):
         )
         self.assert200(rv)
         response = rv.json
-        self.assertEquals(response['ok'], True)
-        self.assertEquals(response['valid'], True)
+        self.assertEqual(response['ok'], True)
+        self.assertEqual(response['valid'], True)
         self.assertTrue(self.test_user.questionnaire_responses.count(), 1)
-        self.assertEquals(
+        self.assertEqual(
             self.test_user.questionnaire_responses[0].encounter.auth_method,
             'password_authenticated')
 
@@ -101,8 +104,8 @@ class TestAssessmentEngine(TestCase):
         )
         self.assert200(rv)
         test_user = get_user(TEST_USER_ID)
-        self.assertEquals(test_user.questionnaire_responses.count(), 1)
-        self.assertEquals(
+        self.assertEqual(test_user.questionnaire_responses.count(), 1)
+        self.assertEqual(
             test_user.questionnaire_responses[0].questionnaire_bank_id,
             qb.id)
 
@@ -128,8 +131,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Upload incomplete QNR
         in_progress_response = self.client.post(
@@ -154,7 +157,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
         )
         self.assert200(updated_qnr_response)
-        self.assertEquals(updated_qnr_response.json['entry'][0]['group'],
+        self.assertEqual(updated_qnr_response.json['entry'][0]['group'],
                           completed_qnr['group'])
 
     def test_no_update_assessment(self):
@@ -188,8 +191,8 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.STAFF)
-        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.PATIENT.value)
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -204,7 +207,7 @@ class TestAssessmentEngine(TestCase):
         )
         response = rv.json
 
-        self.assertEquals(response['total'], len(response['entry']))
+        self.assertEqual(response['total'], len(response['entry']))
         self.assertTrue(response['entry'][0]['questionnaire']['reference'].endswith(instrument_id))
 
     def test_assessments_csv(self):

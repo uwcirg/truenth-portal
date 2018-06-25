@@ -1,8 +1,9 @@
 """Audit Module"""
 from datetime import datetime
+from enum import Enum
+
 from dateutil import parser
 from flask import current_app
-from enum import Enum
 
 from ..database import db
 from .reference import Reference

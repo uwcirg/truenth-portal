@@ -1,18 +1,18 @@
 """Auth related model classes """
-from flask import current_app, url_for
 from datetime import datetime, timedelta
 from smtplib import SMTPRecipientsRefused
+
+from flask import current_app, url_for
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from .message import EmailMessage
-from .role import Role, ROLE
-from .relationship import Relationship, RELATIONSHIP
-from .user import User, UserRoles, UserRelationship
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
-from .user import current_user
+from .message import EmailMessage
+from .relationship import RELATIONSHIP, Relationship
+from .role import ROLE, Role
+from .user import User, UserRelationship, UserRoles, current_user
 
 providers_list = ENUM(
     *SUPPORTED_OAUTH_PROVIDERS, name='providers', create_type=False)
@@ -249,7 +249,7 @@ def create_service_token(client, user):
 
     """
     if not current_app.config.get('TESTING') and (
-            len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE):
+            len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE.value):
         raise ValueError("only service users can create service tokens")
 
     # Hacking a backdoor into the OAuth protocol to generate a valid token
@@ -294,7 +294,7 @@ def token_janitor():
     results = Token.query.join(
         UserRoles, Token.user_id == UserRoles.user_id).join(
         Role, UserRoles.role_id == Role.id).filter(
-        Role.name == ROLE.SERVICE).filter(
+        Role.name == ROLE.SERVICE.value).filter(
         Token.expires < threshold).with_entities(
         UserRoles.user_id, Token.client_id, Token.expires).order_by(
         Token.expires).all()
@@ -303,7 +303,7 @@ def token_janitor():
         sponsor = UserRelationship.query.join(
             Relationship,
             Relationship.id == UserRelationship.relationship_id).filter(
-            Relationship.name == RELATIONSHIP.SPONSOR).filter(
+            Relationship.name == RELATIONSHIP.SPONSOR.value).filter(
             UserRelationship.other_user_id == user_id).with_entities(
             UserRelationship.user_id)
         if sponsor.count() != 1:

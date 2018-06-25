@@ -27,9 +27,17 @@ class ResearchProtocol(db.Model):
         return self
 
     def as_json(self):
-        d = {}
-        d['id'] = self.id
-        d['resourceType'] = 'ResearchProtocol'
-        d['name'] = self.name
-        d['created_at'] = FHIR_datetime.as_fhir(self.created_at)
-        return d
+        return {
+            'id': self.id,
+            'resourceType': 'ResearchProtocol',
+            'name': self.name,
+            'display_name': self.display_name,
+            'created_at': FHIR_datetime.as_fhir(self.created_at)}
+
+    @property
+    def display_name(self):
+        """Generate and return 'Title Case' version of name 'title_case' """
+        if not self.name:
+            return
+        word_list = self.name.split('_')
+        return ' '.join([n.title() for n in word_list])

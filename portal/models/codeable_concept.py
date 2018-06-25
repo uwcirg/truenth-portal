@@ -1,5 +1,5 @@
-from .coding import Coding
 from ..database import db
+from .coding import Coding
 
 
 class CodeableConceptCoding(db.Model):

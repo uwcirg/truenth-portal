@@ -1,8 +1,9 @@
 """Unit test module for stat reporting"""
 from datetime import datetime
+from re import search
+
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-from re import search
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
@@ -10,8 +11,10 @@ from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.questionnaire_bank import QuestionnaireBank
-from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
@@ -59,11 +62,11 @@ class TestReporting(TestCase):
                                        (user1, user2, user3, org))
         userid = user1.id
 
-        self.promote_user(user=user1, role_name=ROLE.PATIENT)
-        self.promote_user(user=user2, role_name=ROLE.PATIENT)
-        self.promote_user(user=user3, role_name=ROLE.PATIENT)
-        self.promote_user(user=user2, role_name=ROLE.PARTNER)
-        self.promote_user(user=user3, role_name=ROLE.STAFF)
+        self.promote_user(user=user1, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user2, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user3, role_name=ROLE.PATIENT.value)
+        self.promote_user(user=user2, role_name=ROLE.PARTNER.value)
+        self.promote_user(user=user3, role_name=ROLE.STAFF.value)
 
         with SessionScope(db):
             for i in range(5):
@@ -105,7 +108,7 @@ class TestReporting(TestCase):
         self.assertEqual(len(stats2['encounters']['all']), 5)
 
     def test_overdue_stats(self):
-        self.promote_user(user=self.test_user, role_name=ROLE.PATIENT)
+        self.promote_user(user=self.test_user, role_name=ROLE.PATIENT.value)
 
         rp = ResearchProtocol(name='proto')
         with SessionScope(db):

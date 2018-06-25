@@ -3,7 +3,7 @@
 
 pycodestyle:
   # Default is 79 in PEP8
-  max-line-length: 100
+  max-line-length: 79
 
 scanner:
   # Errors caused by only the patch are shown, not the whole file

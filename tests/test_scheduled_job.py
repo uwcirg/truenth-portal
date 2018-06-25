@@ -1,6 +1,7 @@
 """Unit test module for scheduled jobs logic"""
-from flask_webtest import SessionScope
 import json
+
+from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.role import ROLE
@@ -18,7 +19,7 @@ class TestScheduledJob(TestCase):
                           schedule=schedule, active=True)
         sjc = sj.crontab_schedule()
         self.assertTrue(45 in sjc.minute)
-        self.assertEquals(len(sjc.hour), 24)
+        self.assertEqual(len(sjc.hour), 24)
 
         invalid_schedule = "monday to friday"
         with self.assertRaises(Exception):
@@ -28,7 +29,7 @@ class TestScheduledJob(TestCase):
             sj.schedule = invalid_schedule
 
     def test_job_upsert(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test new job POST
@@ -41,7 +42,7 @@ class TestScheduledJob(TestCase):
             data=json.dumps(data))
         self.assert200(resp)
         job_id = resp.json['id']
-        self.assertEquals(resp.json['schedule'], '* * * * *')
+        self.assertEqual(resp.json['schedule'], '* * * * *')
 
         # POST of an existing should raise a 400
         resp = self.client.post(
@@ -57,11 +58,11 @@ class TestScheduledJob(TestCase):
             content_type='application/json',
             data=json.dumps(data2))
         self.assert200(resp)
-        self.assertEquals(resp.json['name'], data['name'])
-        self.assertEquals(resp.json['schedule'], '0 0 0 0 0')
+        self.assertEqual(resp.json['name'], data['name'])
+        self.assertEqual(resp.json['schedule'], '0 0 0 0 0')
 
     def test_job_get(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         job = ScheduledJob(name="test_get", task="test", schedule="0 0 * * *")
@@ -73,13 +74,13 @@ class TestScheduledJob(TestCase):
 
         resp = self.client.get('/api/scheduled_job/{}'.format(job_id))
         self.assert200(resp)
-        self.assertEquals(resp.json['task'], 'test')
+        self.assertEqual(resp.json['task'], 'test')
 
         resp = self.client.get('/api/scheduled_job/999')
         self.assert404(resp)
 
     def test_job_delete(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         job = ScheduledJob(name="test_del", task="test", schedule="0 0 * * *")
@@ -97,7 +98,7 @@ class TestScheduledJob(TestCase):
         self.assert404(resp)
 
     def test_active_check(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test standard scheduler job run of active job
@@ -110,8 +111,8 @@ class TestScheduledJob(TestCase):
 
         kdict = {"job_id": job.id}
         resp = test_task(**kdict)
-        self.assertEquals(len(resp.split()), 6)
-        self.assertEquals(resp.split()[-1], 'Test')
+        self.assertEqual(len(resp.split()), 6)
+        self.assertEqual(resp.split()[-1], 'Test')
 
         # test standard scheduler job run of inactive job
         job = ScheduledJob(id=999, name="test_inactive", active=False,
@@ -123,17 +124,17 @@ class TestScheduledJob(TestCase):
 
         kdict = {"job_id": job.id}
         resp = test_task(**kdict)
-        self.assertEquals(len(resp.split()), 4)
-        self.assertEquals(resp.split()[-1], 'inactive.')
+        self.assertEqual(len(resp.split()), 4)
+        self.assertEqual(resp.split()[-1], 'inactive.')
 
         # test manual override run of inactive job
         kdict['manual_run'] = True
         resp = test_task(**kdict)
-        self.assertEquals(len(resp.split()), 6)
-        self.assertEquals(resp.split()[-1], 'Test')
+        self.assertEqual(len(resp.split()), 6)
+        self.assertEqual(resp.split()[-1], 'Test')
 
     def test_job_trigger(self):
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
         # test standard task
@@ -147,7 +148,7 @@ class TestScheduledJob(TestCase):
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
 
         self.assert200(resp)
-        self.assertEquals(resp.json['message'].split()[-1], 'Test')
+        self.assertEqual(resp.json['message'].split()[-1], 'Test')
 
         # test task w/ args + kwargs
         alist = ["arg1", "arg2", "arg3"]
@@ -164,9 +165,9 @@ class TestScheduledJob(TestCase):
         self.assert200(resp)
 
         msg = resp.json['message'].split(". ")[1].split("|")
-        self.assertEquals(msg[0].split(","), alist)
+        self.assertEqual(msg[0].split(","), alist)
         kdict['manual_run'] = True
         kdict['job_id'] = job.id
-        self.assertEquals(json.loads(msg[1]), kdict)
+        self.assertEqual(json.loads(msg[1]), kdict)
 
         db.session.close_all()

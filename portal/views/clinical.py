@@ -1,12 +1,11 @@
 """Clinical API view functions"""
-from flask import abort, Blueprint, jsonify
-from flask import request
+from flask import Blueprint, abort, jsonify, request
 
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.fhir import CC, ValueQuantity, Observation
+from ..models.fhir import CC, Observation, ValueQuantity
 from ..models.user import current_user, get_user_or_abort
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')
@@ -349,7 +348,7 @@ def clinical_set(patient_id):
     patient.
 
     ---
-    operationId: setPatientObservation
+    operationId: addPatientObservation
     tags:
       - Clinical
     produces:

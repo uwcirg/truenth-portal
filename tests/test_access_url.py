@@ -10,9 +10,9 @@ class TestAccessUrl(TestCase):
 
     def test_create_access_url(self):
         onetime = self.add_user('one@time.com')
-        self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY)
+        self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY.value)
 
-        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         onetime = db.session.merge(onetime)
         rv = self.client.get('/api/user/{}/access_url'.format(onetime.id))
@@ -25,14 +25,14 @@ class TestAccessUrl(TestCase):
                 user_manager.token_manager.verify_token(token, 10)
         self.assertTrue(is_valid)
         self.assertFalse(has_expired)
-        self.assertEquals(id, onetime.id)
+        self.assertEqual(id, onetime.id)
 
     def test_use_access_url(self):
         """The current flow forces access to the challenge page"""
         onetime = self.add_user(
             'one@time.com', first_name='first', last_name='last')
         onetime.birthdate = '01-31-1969'  # verify requires DOB
-        self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY)
+        self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY.value)
         onetime = db.session.merge(onetime)
 
         token = user_manager.token_manager.generate_token(onetime.id)

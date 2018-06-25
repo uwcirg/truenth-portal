@@ -1,10 +1,10 @@
 """ Unit tests for package
 
 to run:
-    nosetests
+    py.test
 
 options:
-    nosetests --help
+    py.test --help
 
 """
 from datetime import datetime
@@ -97,12 +97,11 @@ class TestCase(Base):
         except IntegrityError:
             db.session.rollback()
             test_user = User.query.filter_by(username=TEST_USERNAME).one()
-            print "found existing test_user at {}".format(test_user.id)
+            print("found existing test_user at {}".format(test_user.id))
 
         if test_user.id != TEST_USER_ID:
-            print "apparent cruft from last run (test_user_id: %d)"\
-                    % test_user.id
-            print "try again..."
+            print("apparent cruft from last run (test_user_id: %d)" % test_user.id)
+            print("try again...")
             self.tearDown()
             self.setUp()
         else:
@@ -152,7 +151,7 @@ class TestCase(Base):
 
     def add_client(self):
         """Prep db with a test client for test user"""
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         client_id = 'test_client'
         client = Client(client_id=client_id,
                 _redirect_uris='http://localhost',

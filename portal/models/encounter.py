@@ -4,11 +4,12 @@ Designed around FHIR guidelines for representation of encounters.
 """
 from datetime import datetime
 
+from sqlalchemy.dialects.postgresql import ENUM
+
 from ..database import db
-from ..date_tools import as_fhir, FHIR_datetime
+from ..date_tools import FHIR_datetime, as_fhir
 from .reference import Reference
 from .role import ROLE
-from sqlalchemy.dialects.postgresql import ENUM
 
 
 class EncounterCodings(db.Model):
@@ -115,7 +116,7 @@ def initiate_encounter(user, auth_method):
 
     # Service users appear to have provided password, but get their
     # own special label
-    if user.has_role(ROLE.SERVICE):
+    if user.has_role(ROLE.SERVICE.value):
         auth_method = 'service_token_authenticated'
 
     # Initiate new as directed

@@ -7,8 +7,9 @@ To extend the list of roles, add name: description pairs to the
 STATIC_RELATIONSHIPS dict within, and rerun the seed command above.
 
 """
+from enum import Enum
+
 from ..database import db
-from UserDict import IterableUserDict
 
 
 class Relationship(db.Model):
@@ -22,22 +23,20 @@ class Relationship(db.Model):
         """Print friendly format for logging, etc."""
         return "Relationship {0.name}".format(self)
 
+
 #Source definition for relationships, as dictionary {name: description,}
-STATIC_RELATIONSHIPS = IterableUserDict({
+STATIC_RELATIONSHIPS = {
     'partner':
         'An intimate partner relationship',
     'sponsor':
         'The sponsor of a service account.  One way relationship from '
         'the user who created the account (the sponsor) to the service '
         'account used for automatic protected access to API endpoints.',
-        })
+}
 
 
-def enum(**items):
-    """Convert dictionary to Enumeration for direct access"""
-    return type('Enum', (), items)
-
-RELATIONSHIP = enum(**{unicode(r).upper():r for r in STATIC_RELATIONSHIPS})
+RELATIONSHIP = Enum(
+    'RELATIONSHIP', {r.upper(): r for r in STATIC_RELATIONSHIPS})
 
 
 def add_static_relationships():

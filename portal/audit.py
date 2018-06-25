@@ -8,9 +8,10 @@ auditable_event()
 Audit data is also persisted in the database *audit* table.
 
 """
+import logging
 import os
 import sys
-import logging
+
 from flask import current_app
 
 from .database import db
@@ -20,7 +21,7 @@ from .models.audit import Audit
 # initial goal was to isolate all auditable events to one log handler
 # revised to be a level less than ERROR, so auditable events aren't
 # considered errors for error mail handling (see SMTPHandler)
-AUDIT = (logging.WARN + logging.ERROR) / 2
+AUDIT = int((logging.WARN + logging.ERROR) / 2)
 
 
 def auditable_event(message, user_id, subject_id, context="other"):
@@ -51,7 +52,7 @@ def configure_audit_log(app):  # pragma: no cover
 
     """
     # Skip config when running tests or maintenance
-    if ('manage.py' in sys.argv and 'runserver' not in sys.argv) or\
+    if (sys.argv[0].endswith('/bin/flask') and 'run' not in sys.argv) or\
        app.testing:
         return
 

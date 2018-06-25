@@ -2,6 +2,9 @@ $(".button-container").each(function() {
     $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
 });
 $(".btn-tnth-primary").on("click", function() {
+    if ($(this).hasClass("disabled")) {
+        return false;
+    }
     var link = $(this).attr("href");
     if (link) {
         event.preventDefault();

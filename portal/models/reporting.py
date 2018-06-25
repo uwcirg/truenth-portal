@@ -1,24 +1,27 @@
 """Reporting statistics and data module"""
 from collections import defaultdict
 from datetime import datetime
-from flask import current_app
-from flask_babel import force_locale
 from smtplib import SMTPRecipientsRefused
 
-from .app_text import app_text, MailResource, SiteSummaryEmail_ATMA
-from .assessment_status import AssessmentStatus
+from flask import current_app
+from flask_babel import force_locale
+
 from ..audit import auditable_event
-from .communication import load_template_args
 from ..dogpile_cache import dogpile_cache
+from ..views.reporting import generate_overdue_table_html
+from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
+from .assessment_status import AssessmentStatus
+from .communication import load_template_args
 from .fhir import CC
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
-from .procedure_codes import known_treatment_started
-from .procedure_codes import known_treatment_not_started
+from .procedure_codes import (
+    known_treatment_not_started,
+    known_treatment_started,
+)
 from .role import ROLE
 from .user import User
-from ..views.reporting import generate_overdue_table_html
 
 
 @dogpile_cache.region('hourly')
@@ -42,7 +45,7 @@ def get_reporting_stats():
     interventions = Intervention.query.all()
 
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST):
+        if user.has_role(ROLE.TEST.value):
             continue
 
         for role in user.roles:
@@ -61,7 +64,8 @@ def get_reporting_stats():
                        for obs in user.observations):
                     stats['patients']['meta'] += 1
 
-        if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER):
+        if (user.has_role(ROLE.PATIENT.value) or
+                user.has_role(ROLE.PARTNER.value)):
             for interv in interventions:
                 desc = interv.description
                 if interv.name == 'decision_support_p3p':
@@ -102,7 +106,7 @@ def calculate_days_overdue(user):
     a_s = AssessmentStatus(user, as_of_date=now)
     if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
         return 0
-    qb = a_s.qb_data.qb
+    qb = a_s.qb_data.qbd.questionnaire_bank
     if not qb:
         return 0
     trigger_date = qb.trigger_date(user)
@@ -117,7 +121,8 @@ def overdue_stats_by_org():
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
-        if user.has_role(ROLE.TEST) or not user.has_role(ROLE.PATIENT):
+        if (user.has_role(ROLE.TEST.value) or not
+                user.has_role(ROLE.PATIENT.value)):
             continue
         overdue = calculate_days_overdue(user)
         if overdue > 0:
@@ -138,7 +143,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
     for user in User.query.filter_by(deleted_id=None).all():
-        if not (user.has_role(ROLE.STAFF) and user.email_ready()[0]
+        if not (user.has_role(ROLE.STAFF.value) and user.email_ready()[0]
                 and (top_org in ot.find_top_level_org(user.organizations))):
             continue
 

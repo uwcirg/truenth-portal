@@ -1,27 +1,31 @@
 """Model classes for retaining FHIR data"""
 from datetime import datetime
-from flask import current_app, abort, url_for
 from html.parser import HTMLParser
 import json
-from sqlalchemy import UniqueConstraint, or_
-from sqlalchemy.dialects.postgresql import JSONB, ENUM
-import requests
 
+from flask import abort, current_app, url_for
+from past.builtins import basestring
+import requests
+from sqlalchemy import UniqueConstraint, or_
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
+
+from ..database import db
+from ..date_tools import FHIR_datetime, as_fhir
+from ..system_uri import (
+    NHHD_291036,
+    TRUENTH_CLINICAL_CODE_SYSTEM,
+    TRUENTH_ENCOUNTER_CODE_SYSTEM,
+    TRUENTH_EXTERNAL_STUDY_SYSTEM,
+    TRUENTH_VALUESET,
+)
+from ..views.fhir import valueset_nhhd_291036
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from ..database import db
-from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .locale import LocaleConstants
 from .organization import OrgTree
 from .performer import Performer
 from .reference import Reference
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
-from ..system_uri import TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
-from ..system_uri import NHHD_291036
-from ..views.fhir import valueset_nhhd_291036
-
 
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
@@ -135,7 +139,7 @@ class ValueQuantity(db.Model):
             # based on classic truth value.
             try:
                 self.value = int(value) != 0
-            except (TypeError, ValueError), e:
+            except (TypeError, ValueError) as e:
                 if value is None or isinstance(value, basestring):
                     pass
                 else:
@@ -394,7 +398,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         questionnaire_response.document["encounter"] = encounter_fhir
 
         questionnaire_response.document["subject"] = {
-            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+            k: v for k, v in subject.as_fhir().items() if k in patient_fields
         }
 
         if subject.organizations:
@@ -419,11 +423,11 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
     bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(annotated_questionnaire_responses),
+        'resourceType': 'Bundle',
+        'updated': FHIR_datetime.now(),
+        'total': len(annotated_questionnaire_responses),
         'type': 'searchset',
-        'entry':annotated_questionnaire_responses,
+        'entry': annotated_questionnaire_responses,
     }
 
     return bundle
@@ -455,6 +459,8 @@ def qnr_document_id(
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
+    csv_null_value = r"\N"
+
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
         def __init__(self):
@@ -481,7 +487,7 @@ def generate_qnr_csv(qnr_bundle):
     def get_identifier(id_list, **kwargs):
         """Return first identifier object matching kwargs"""
         for identifier in id_list:
-            for k,v in kwargs.items():
+            for k, v in kwargs.items():
                 if identifier.get(k) != v:
                     break
             else:
@@ -619,7 +625,7 @@ def generate_qnr_csv(qnr_bundle):
                 row = []
                 for column_name in columns:
                     column = row_data.get(column_name)
-                    column = "\N" if column is None else column
+                    column = csv_null_value if column is None else column
 
                     # Handle JSON column escaping/enclosing
                     if not isinstance(column, basestring):
@@ -646,18 +652,14 @@ def fetch_HL7_V3_Namespace(valueSet):
         valueSet=valueSet)
     response = requests.get(src_url)
     load = response.text
-    data = json.loads(load)
-    return parse_concepts(
-        data['concept'],
-        system='http://hl7.org/fhir/v3/{}'.format(valueSet)
-    )
+    return parse_concepts(response.json()['concept'],
+                          system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
 def fetch_local_valueset(valueSet):
     """Pull and parse the named valueSet from our local definition"""
     response = valueset_nhhd_291036()
-    data = json.loads(response.data)
-    return parse_concepts(data['codeSystem']['concept'],
-                          system='{}/{}'.format(TRUENTH_VALUESET,valueSet))
+    return parse_concepts(response.json['codeSystem']['concept'],
+                          system='{}/{}'.format(TRUENTH_VALUESET, valueSet))
 
 
 def add_static_concepts(only_quick=False):

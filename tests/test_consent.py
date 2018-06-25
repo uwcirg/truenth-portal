@@ -1,15 +1,16 @@
 """Unit test module for user consent"""
 from datetime import datetime
+import json
+
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
-import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.user_consent import UserConsent
-from tests import TestCase, TEST_USER_ID
+from tests import TEST_USER_ID, TestCase
 
 
 class TestUserConsent(TestCase):
@@ -58,14 +59,14 @@ class TestUserConsent(TestCase):
         self.login()
         rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json['consent_agreements']), 2)
+        self.assertEqual(len(rv.json['consent_agreements']), 2)
         self.assertTrue('send_reminders' not in
                         rv.json['consent_agreements'][0])
         self.assertTrue('staff_editable' in
                         rv.json['consent_agreements'][0])
-        self.assertEquals(rv.json['consent_agreements'][0]['status'],
+        self.assertEqual(rv.json['consent_agreements'][0]['status'],
                           'consented')
-        self.assertEquals(rv.json['consent_agreements'][1]['status'],
+        self.assertEqual(rv.json['consent_agreements'][1]['status'],
                           'suspended')
 
     def test_post_user_consent(self):

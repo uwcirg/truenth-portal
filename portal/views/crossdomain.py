@@ -1,7 +1,8 @@
 """Cross Domain Decorators"""
 from datetime import timedelta
-from flask import make_response, request, current_app
 from functools import update_wrapper
+
+from flask import current_app, make_response, request
 
 from ..models.client import validate_origin
 

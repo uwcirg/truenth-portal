@@ -1,8 +1,8 @@
 """Intervention API view functions"""
-from flask import abort, Blueprint, jsonify
-from flask import current_app, request
-from flask_user import roles_required
 import json
+
+from flask import Blueprint, abort, current_app, jsonify, request
+from flask_user import roles_required
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Unauthorized
 
@@ -11,13 +11,12 @@ from ..database import db
 from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.group import Group, UserGroup
-from ..models.intervention import access_types, INTERVENTION, UserIntervention
+from ..models.intervention import INTERVENTION, UserIntervention, access_types
 from ..models.intervention_strategies import AccessStrategy
 from ..models.message import EmailMessage
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..models.user import current_user, User
-
+from ..models.user import User, current_user
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
@@ -136,7 +135,7 @@ def integration_delay_hack(intervention, key, value):
 @intervention_api.route('/intervention/<string:intervention_name>',
                         methods=('PUT',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required(ROLE.SERVICE)
+@roles_required(ROLE.SERVICE.value)
 def user_intervention_set(intervention_name):
     """Update user settings on the named intervention
 
@@ -235,8 +234,10 @@ def user_intervention_set(intervention_name):
         abort (404, 'no such intervention {}'.format(intervention_name))
 
     # service account being used must belong to the intervention owner
-    if not (intervention.client and intervention.client.user.has_relationship(
-        relationship_name=RELATIONSHIP.SPONSOR, other_user=current_user())):
+    if not (intervention.client and
+            intervention.client.user.has_relationship(
+                relationship_name=RELATIONSHIP.SPONSOR.value,
+                other_user=current_user())):
         abort(401, "Service account sponsored by intervention owner required")
 
     if not request.json or 'user_id' not in request.json:
@@ -286,7 +287,7 @@ def user_intervention_set(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule')
-@roles_required(ROLE.ADMIN)
+@roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def intervention_rule_list(intervention_name):
     """Return the list of intervention rules for named intervention
@@ -305,7 +306,7 @@ def intervention_rule_list(intervention_name):
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def intervention_rule_set(intervention_name):
     """POST an access rule to the named intervention
 

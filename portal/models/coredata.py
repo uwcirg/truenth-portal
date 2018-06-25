@@ -9,12 +9,14 @@ Interventions will sometimes require their own set of data, for which the
 
 """
 from abc import ABCMeta, abstractmethod
-from flask import current_app
 import sys
 
+from flask import current_app
+from future.utils import with_metaclass
+
 from .audit import Audit
-from .intervention import UserIntervention, INTERVENTION
 from .fhir import CC
+from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
 from .role import ROLE
 from .tou import ToU
@@ -107,9 +109,8 @@ class Coredata(object):
         return setattr(self.instance, name, value)
 
 
-class CoredataPoint(object):
+class CoredataPoint(with_metaclass(ABCMeta, object)):
     """Abstract base class - defining methods each datapoint needs"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def required(self, user, **kwargs):
@@ -220,7 +221,7 @@ class DobData(CoredataPoint):
 
     def required(self, user, **kwargs):
         # DOB is only required for patient
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -242,7 +243,7 @@ class RaceData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -260,7 +261,7 @@ class EthnicityData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -278,7 +279,7 @@ class IndigenousData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.has_role(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT.value):
             return True
         return False
 
@@ -304,8 +305,9 @@ class OrgData(CoredataPoint):
     def required(self, user, **kwargs):
         if SR_user(user) or CP_user(user):
             return False
-        if any(map(
-                user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
+        if any(map(user.has_role,
+                   (ROLE.PATIENT.value, ROLE.STAFF.value,
+                    ROLE.STAFF_ADMIN.value))):
             return True
         return False
 
@@ -321,7 +323,7 @@ class ClinicalData(CoredataPoint):
     def required(self, user, **kwargs):
         if SR_user(user):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
     def optional(self, user, **kwargs):
         return False
@@ -346,7 +348,7 @@ class LocalizedData(CoredataPoint):
             # on these systems, we don't ask about localized - let
             # the org check worry about that
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
     def optional(self, user, **kwargs):
         return False
@@ -416,7 +418,7 @@ class Subject_Website_ConsentData(TOU_core):
     def required(self, user, **kwargs):
         if not super(self.__class__, self).required(user, **kwargs):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
 
 class Stored_Website_Consent_FormData(TOU_core):
@@ -426,7 +428,7 @@ class Stored_Website_Consent_FormData(TOU_core):
         if (not super(self.__class__, self).required(user, **kwargs) or
                 not enter_manually_interview_assisted(user, **kwargs)):
             return False
-        return user.has_role(ROLE.PATIENT)
+        return user.has_role(ROLE.PATIENT.value)
 
 
 class Privacy_PolicyData(TOU_core):

@@ -1,19 +1,19 @@
 """Views for audit"""
-from flask import jsonify, Blueprint
+from flask import Blueprint, jsonify
 from flask_user import roles_required
 from sqlalchemy import or_
 
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.user import current_user, get_user_or_abort
 from ..models.role import ROLE
-
+from ..models.user import current_user, get_user_or_abort
 
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 
 
 @audit_api.route('/user/<int:user_id>/audit')
-@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def get_audit(user_id):
     """Access audit info for given user

@@ -1,4 +1,4 @@
-from tests import TestCase, LAST_NAME, FIRST_NAME
+from tests import FIRST_NAME, LAST_NAME, TestCase
 
 
 class TestTrueNTH(TestCase):
@@ -18,5 +18,5 @@ class TestTrueNTH(TestCase):
         self.login(user_id=user.id)
         rv = self.client.get('/api/portal-wrapper-html/')
 
-        self.assertEquals(rv.status_code, 200)
+        self.assertEqual(rv.status_code, 200)
         self.assertTrue(username in rv.data)

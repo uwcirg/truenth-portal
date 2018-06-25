@@ -4,29 +4,34 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from datetime import datetime
-from flask import current_app, url_for, abort
+
+from flask import abort, current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from werkzeug.exceptions import Unauthorized
 
-import address
-from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
-from .app_text import VersionedResource, UnversionedResource
-from .codeable_concept import CodeableConcept
-from .coding import Coding
+from . import address
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
+from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from .app_text import (
+    ConsentByOrg_ATMA,
+    UndefinedAppText,
+    UnversionedResource,
+    VersionedResource,
+    app_text,
+)
+from .codeable_concept import CodeableConcept
+from .coding import Coding
 from .extension import CCExtension, TimezoneExtension
 from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
-from .role import Role, ROLE
-from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
-
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
@@ -155,7 +160,7 @@ class Organization(db.Model):
         if self._phone:
             self._phone.value = val
         else:
-            self._phone = ContactPoint(system='phone',use='work',value=val)
+            self._phone = ContactPoint(system='phone', use='work', value=val)
 
     @property
     def default_locale(self):
@@ -278,8 +283,8 @@ class Organization(db.Model):
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone','work')) \
-                or telecom_cps.get(('phone',None))
+            self.phone = telecom_cps.get(('phone', 'work')) \
+                or telecom_cps.get(('phone', None))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
@@ -292,8 +297,12 @@ class Organization(db.Model):
         self.partOf_id = (
             Reference.parse(data['partOf']).id if data.get('partOf')
             else None)
-        for attr in ('use_specific_codings','race_codings',
-                    'ethnicity_codings','indigenous_codings'):
+        for attr in (
+            'use_specific_codings',
+            'race_codings',
+            'ethnicity_codings',
+            'indigenous_codings',
+        ):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
@@ -376,16 +385,16 @@ class Organization(db.Model):
         orgs = [o.as_fhir(include_empties=include_empties) for o in query]
 
         bundle = {
-            'resourceType':'Bundle',
-            'updated':FHIR_datetime.now(),
-            'total':len(orgs),
+            'resourceType': 'Bundle',
+            'updated': FHIR_datetime.now(),
+            'total': len(orgs),
             'type': 'searchset',
             'link': {
-                'rel':'self',
-                'href':url_for(
+                'rel': 'self',
+                'href': url_for(
                     'org_api.organization_search', _external=True),
             },
-            'entry':orgs,
+            'entry': orgs,
         }
         return bundle
 
@@ -875,8 +884,8 @@ class OrgTree(object):
         from .user_consent import UserConsent
 
         if not (
-            staff_user.has_role(ROLE.STAFF) or
-            staff_user.has_role(ROLE.STAFF_ADMIN)):
+                staff_user.has_role(ROLE.STAFF.value) or
+                staff_user.has_role(ROLE.STAFF_ADMIN.value)):
             raise Unauthorized("visible_patients() exclusive to staff use")
 
         staff_user_orgs = set()
@@ -886,7 +895,8 @@ class OrgTree(object):
         if not staff_user_orgs:
             return []
 
-        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT).one().id
+        patient_role_id = Role.query.filter_by(
+            name=ROLE.PATIENT.value).one().id
         now = datetime.utcnow()
         query = db.session.query(User.id).join(
             UserRoles).join(UserConsent).join(UserOrganization).filter(

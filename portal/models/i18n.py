@@ -1,23 +1,32 @@
 """Module for i18n methods and functionality"""
-import os
-import re
-import requests
-import sys
-import tempfile
+from future import standard_library # isort:skip
+standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
-from cStringIO import StringIO
-from flask import current_app, has_request_context, session
-from polib import pofile
+from io import BytesIO
+import os
+import re
 from subprocess import check_call
+import sys
+import tempfile
 from zipfile import ZipFile
 
-from .app_text import AppText
+from babel import negotiate_locale
+from flask import current_app, has_request_context, request, session
+from polib import pofile
+import requests
+
 from ..extensions import babel
+from ..system_uri import IETF_LANGUAGE_TAG
+from .app_text import AppText
+from .coding import Coding
 from .intervention import Intervention
 from .organization import Organization
+from .questionnaire_bank import QuestionnaireBank, classification_types_enum
 from .research_protocol import ResearchProtocol
+from .role import Role
 from .user import current_user
+
 
 def get_db_strings():
     msgid_map = defaultdict(set)
@@ -25,7 +34,9 @@ def get_db_strings():
         AppText: ('custom_text',),
         Intervention: ('description', 'card_html'),
         Organization: ('name',),
-        ResearchProtocol: ('name',),
+        QuestionnaireBank: ('display_name',),
+        ResearchProtocol: ('display_name',),
+        Role: ('display_name',)
     }
 
     for model, fields in i18n_fields.items():
@@ -41,34 +52,76 @@ def get_db_strings():
                 ))
     return msgid_map
 
+
+def get_static_strings():
+    """Manually add strings that are otherwise difficult to extract"""
+    msgid_map = {}
+    status_strings = (
+        'Completed',
+        'Due',
+        'In Progress',
+        'Overdue',
+        'Expired',
+    )
+    msgid_map.update({
+        '"{}"'.format(s):
+            {'assessment_status: %s' % s} for s in status_strings
+    })
+
+    enum_options = {
+        classification_types_enum: ('title',),
+    }
+    for enum, options in enum_options.items():
+        for value in enum.enums:
+            for function_name in options:
+                value = getattr(value, function_name)()
+            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(enum.name, value)}
+    return msgid_map
+
+
 def upsert_to_template_file():
-    db_translatables = get_db_strings()
-    if db_translatables:
-        try:
-            with open(os.path.join(current_app.root_path, "translations/messages.pot"),"r+") as potfile:
-                potlines = potfile.readlines()
-                for i, line in enumerate(potlines):
-                    if line.split() and (line.split()[0] == "msgid"):
-                        msgid = line.split(" ",1)[1].strip()
-                        if msgid in db_translatables:
-                            for location in db_translatables[msgid]:
-                                locstring = "# " + location + "\n"
-                                if not any(t == locstring for t in potlines[i-4:i]):
-                                    potlines.insert(i,locstring)
-                            del db_translatables[msgid]
-                for entry, locations in db_translatables.items():
-                    if entry:
-                        for loc in locations:
-                            potlines.append("# " + loc + "\n")
-                        potlines.append("msgid " + entry + "\n")
-                        potlines.append("msgstr \"\"\n")
-                        potlines.append("\n")
-                potfile.truncate(0)
-                potfile.seek(0)
-                potfile.writelines(potlines)
-        except:
-            exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-            sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
+    db_translatables = {}
+    db_translatables.update(get_db_strings())
+    if not db_translatables:
+        current_app.logger.warn("no DB strings extracted")
+        return
+
+    db_translatables.update(get_static_strings())
+
+    try:
+        with open(
+            os.path.join(
+                current_app.root_path,
+                "translations/messages.pot",
+            ),
+            "r+",
+        ) as potfile:
+            potlines = potfile.readlines()
+            for i, line in enumerate(potlines):
+                if not line.split() or (line.split()[0] != "msgid"):
+                    continue
+                msgid = line.split(" ", 1)[1].strip()
+                if msgid not in db_translatables:
+                    continue
+                for location in db_translatables[msgid]:
+                    locstring = "# " + location + "\n"
+                    if not any(t == locstring for t in potlines[i-4:i]):
+                        potlines.insert(i, locstring)
+                del db_translatables[msgid]
+            for entry, locations in db_translatables.items():
+                if not entry:
+                    continue
+                for loc in locations:
+                    potlines.append("# " + loc + "\n")
+                potlines.append("msgid " + entry + "\n")
+                potlines.append("msgstr \"\"\n")
+                potlines.append("\n")
+            potfile.truncate(0)
+            potfile.seek(0)
+            potfile.writelines(potlines)
+    except:
+        exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+        sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
 
 
 def fix_references(pot_fpath):
@@ -215,7 +268,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state):
             headers=headers,
         )
         for langfile in zfp.namelist():
-            langcode = re.sub('-','_',langfile.split('/')[0])
+            langcode = re.sub('-', '_', langfile.split('/')[0])
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
@@ -262,7 +315,7 @@ def download_zip_file(headers, project_id, uri, state):
     if not resp.content:
         sys.exit('no file returned')
     current_app.logger.debug("zip file downloaded from smartling")
-    fp = StringIO(resp.content)
+    fp = BytesIO(resp.content)
     return ZipFile(fp, "r")
 
 
@@ -318,7 +371,17 @@ def get_locale():
 
     # look for session variable in pre-logged-in state
     # confirm request context - not available from celery tasks
-    if has_request_context() and session.get('locale_code'):
-        return session['locale_code']
-
+    if has_request_context():
+        if session.get('locale_code'):
+            return session['locale_code']
+        browser_pref = negotiate_locale(
+            preferred=(
+                l.replace('-', '_') for l in request.accept_languages.values()
+            ),
+            available=(
+                c.code for c in Coding.query.filter_by(system=IETF_LANGUAGE_TAG)
+            ),
+        )
+        if browser_pref:
+            return browser_pref
     return current_app.config.get("DEFAULT_LOCALE")

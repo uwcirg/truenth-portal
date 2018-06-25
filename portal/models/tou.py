@@ -5,7 +5,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from .notification import Notification, UserNotification
 from .organization import Organization, OrgTree
-from .role import Role, ROLE
+from .role import ROLE, Role
 from .user import User
 
 tou_types = ENUM('website terms of use', 'subject website consent',
@@ -57,7 +57,7 @@ def update_tous(
     :param organization: Provide name of organization to restrict
      to respective set of users (all child orgs implicitly included)
     :param roles: Restrict to users with given roles; defaults to
-     (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN)
+     (ROLE.PATIENT.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
     :param notification: Name the notification to trigger, if applicable
     :param deactivate: set True to deactivate matching consents
     :param job_id: Used by scheduler - ignored in this context
@@ -78,8 +78,9 @@ def update_tous(
             raise ValueError("No such organization: {}".format(organization))
         require_orgs = set(OrgTree().here_and_below_id(org.id))
 
-    require_roles = set(roles) if roles else set(
-        (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))
+    require_roles = (
+        set(roles) if roles else
+        {ROLE.PATIENT.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value})
     for role in require_roles:
         if not Role.query.filter(Role.name == role).first():
             raise ValueError("No such role: {}".format(role))
