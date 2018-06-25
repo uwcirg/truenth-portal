@@ -12,34 +12,7 @@ import os
 
 from setuptools import find_packages, setup
 
-
-# maintain long_description as a single long line.
-# workaround for a bug in pkg_info._get_metadata("PKG-INFO")
-long_description =\
-"""TrueNTH Shared Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
-"""
-
-
 setup_kwargs = dict(
-    url="https://github.com/uwcirg/true_nth_usa_portal",
-    description="TrueNTH Shared Services",
-    long_description=long_description,
-    author="CIRG, University of Washington",
-    author_email="truenth-dev@uw.edu",
-    maintainer="CIRG, University of Washington",
-    maintainer_email="truenth-dev@uw.edu",
-    classifiers=(
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Healthcare Industry",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Topic :: Scientific/Engineering :: Bio-Informatics",
-        "Topic :: Scientific/Engineering :: Medical Science Apps",
-    ),
-    license="BSD",
-    platforms="any",
     include_package_data=True,
     zip_safe=False,
     packages=find_packages(),
