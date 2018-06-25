@@ -34,7 +34,7 @@ def recent_qnr_status(user, questionnaire_name, qbd):
         QuestionnaireResponse.authored.desc()).with_entities(
             QuestionnaireResponse.status, QuestionnaireResponse.authored)
 
-    if qbd.iteration:
+    if qbd.iteration is not None:
         query = query.filter(
             QuestionnaireResponse.qb_iteration == qbd.iteration)
     else:
