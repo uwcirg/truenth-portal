@@ -591,23 +591,6 @@
     {
       "extension": [
         {
-          "url": "http://hl7.org/fhir/valueset/languages",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "code": "en_US",
-                "display": "English",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "es_US",
-                "display": "Spanish",
-                "system": "urn:ietf:bcp:47"
-              }
-            ]
-          }
-        },
-        {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1095,23 +1078,6 @@
     },
     {
       "extension": [
-        {
-          "url": "http://hl7.org/fhir/valueset/languages",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "code": "en_US",
-                "display": "English",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "es_US",
-                "display": "Spanish",
-                "system": "urn:ietf:bcp:47"
-              }
-            ]
-          }
-        },
         {
           "timezone": "America/Los_Angeles",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
