@@ -12,7 +12,6 @@ import os
 
 from setuptools import find_packages, setup
 
-project = "portal"
 
 # maintain long_description as a single long line.
 # workaround for a bug in pkg_info._get_metadata("PKG-INFO")
@@ -22,7 +21,6 @@ long_description =\
 
 
 setup_kwargs = dict(
-    name=project,
     url="https://github.com/uwcirg/true_nth_usa_portal",
     description="TrueNTH Shared Services",
     long_description=long_description,
