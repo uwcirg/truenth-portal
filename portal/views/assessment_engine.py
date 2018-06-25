@@ -41,8 +41,8 @@ from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
-from .portal import check_int
 from ..trace import dump_trace, establish_trace
+from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
