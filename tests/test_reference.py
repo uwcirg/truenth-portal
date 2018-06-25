@@ -1,5 +1,8 @@
 """Unit test module for Reference class"""
+import sys
+
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.identifier import Identifier
@@ -11,7 +14,8 @@ from portal.models.reference import Reference
 from portal.system_uri import US_NPI
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestReference(TestCase):
 
     def test_patient(self):

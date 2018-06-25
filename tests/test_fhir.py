@@ -1,7 +1,9 @@
 """Unit test module for fhir model"""
 from datetime import datetime
+import sys
 
 from flask_webtest import SessionScope
+import pytest
 import pytz
 
 from portal.extensions import db
@@ -15,7 +17,8 @@ from portal.models.fhir import (
 from portal.system_uri import SNOMED
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestFHIR(TestCase):
     """FHIR model tests"""
 

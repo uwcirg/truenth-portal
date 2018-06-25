@@ -1,8 +1,10 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime, timedelta
+import sys
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
@@ -29,6 +31,8 @@ from tests.test_assessment_status import mock_qr
 now = datetime.utcnow()
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestQuestionnaireBank(TestCase):
 
     @staticmethod
