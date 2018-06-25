@@ -13,8 +13,6 @@ import os
 from setuptools import find_packages, setup
 
 setup_kwargs = dict(
-    include_package_data=True,
-    zip_safe=False,
     packages=find_packages(),
     scripts=[
         "manage.py",
