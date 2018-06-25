@@ -836,7 +836,7 @@ class TestQuestionnaireBank(TestCase):
             ['epic26_v3'], a_s.instruments_needing_full_assessment())
 
         # Complete the questionnaire from the 3mo v2 QB
-        mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb)
+        mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb, iteration=0)
 
         # Two weeks ago, should be completed
         user = db.session.merge(user)
