@@ -330,7 +330,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             doc_id='two11')
         qb = db.session.merge(qb)
         result = qnr_document_id(
-            TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+            subject_id=TEST_USER_ID,
+            questionnaire_bank_id=qb.id,
+            questionnaire_name='irondemog',
+            iteration=None,
+            status='in-progress')
         self.assertEqual(result, 'two11')
 
     def test_qnr_id_missing(self):
@@ -338,7 +342,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         qb = db.session.merge(qb)
         with self.assertRaises(NoResultFound):
             result = qnr_document_id(
-                TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+                subject_id=TEST_USER_ID,
+                questionnaire_bank_id=qb.id,
+                questionnaire_name='irondemog',
+                iteration=None,
+                status='in-progress')
 
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""

@@ -359,8 +359,12 @@ class AssessmentStatus(object):
                             user=self.user, as_of_date=self.as_of_date)
                         qb_id = indef_qb.questionnaire_bank.id
 
-                    results.append(
-                        qnr_document_id(self.user.id, qb_id, name, 'in-progress'))
+                    results.append(qnr_document_id(
+                        subject_id=self.user.id,
+                        questionnaire_bank_id=qb_id,
+                        questionnaire_name=name,
+                        iteration=self.qb_data.qbd.iteration,
+                        status='in-progress'))
         return results
 
     def next_available_due_date(self):
