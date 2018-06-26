@@ -354,7 +354,7 @@ class QuestionnaireBank(db.Model):
                     if start not in sort_results:
                         sort_results[start] = qb
                 results = [
-                    sort_results[k] for k in sorted(sort_results.iterkeys())]
+                    sort_results[k] for k in sorted(sort_results.keys())]
 
         validate_classification_count(results)
         return results
