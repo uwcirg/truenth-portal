@@ -19,17 +19,6 @@ setup_kwargs = dict(
         "wsgi.py",
         os.path.join('docker', 'remap_envvars.py'),
     ],
-    extras_require={
-        "dev": (
-            "coverage",
-            "nose",
-            "page_objects",
-            "selenium",
-            "swagger_spec_validator",
-            "tox",
-            "xvfbwrapper",
-        ),
-    },
     test_suite="tests",
 )
 
