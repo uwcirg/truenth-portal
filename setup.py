@@ -10,10 +10,9 @@ to install:
 import datetime
 import os
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 setup_kwargs = dict(
-    packages=find_packages(),
     scripts=[
         "manage.py",
         "wsgi.py",
