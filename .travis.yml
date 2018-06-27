@@ -73,6 +73,9 @@ before_install:
 
 install:
   - pip install tox
+  # Install dependencies first
+  - tox --notest
+
 
 script:
   - tox
