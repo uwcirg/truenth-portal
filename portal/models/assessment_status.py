@@ -351,6 +351,7 @@ class AssessmentStatus(object):
                     # Look out for indefinite work in-progress, as it
                     # belongs to a different questionnaire bank
                     qb_id = self.qb_data.qbd.questionnaire_bank.id
+                    iteration = self.qb_data.qbd.iteration
                     if name not in (
                         q.name
                         for q in self.qb_data.qbd.questionnaire_bank.questionnaires
@@ -358,12 +359,13 @@ class AssessmentStatus(object):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
                         qb_id = indef_qb.questionnaire_bank.id
+                        iteration = None  # indefinite doesn't recur
 
                     results.append(qnr_document_id(
                         subject_id=self.user.id,
                         questionnaire_bank_id=qb_id,
                         questionnaire_name=name,
-                        iteration=self.qb_data.qbd.iteration,
+                        iteration=iteration,
                         status='in-progress'))
         return results
 
