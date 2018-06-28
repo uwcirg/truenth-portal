@@ -870,14 +870,14 @@ def spec():
     swag = swagger(current_app)
     swag.update({
         "info": {
-            "version": current_app.config.metadata.version,
-            "title": current_app.config.metadata.summary,
-            "description": current_app.config.metadata.description,
-            "termsOfService": "http://cirg.washington.edu",
+            "version": current_app.config.metadata['version'],
+            "title": current_app.config.metadata['summary'],
+            "description": current_app.config.metadata['description'].strip(),
+            "termsOfService": current_app.config.metadata['home-page'],
             "contact": {
-                "name": "Clinical Informatics Research Group",
-                "email": "mcjustin@uw.edu",
-                "url": "http://cirg.washington.edu",
+                "name": current_app.config.metadata['author'],
+                "email": current_app.config.metadata['author-email'],
+                "url": current_app.config.metadata['home-page'],
             },
         },
         "schemes": ("http", "https"),

@@ -10,7 +10,7 @@ from .reference import Reference
 
 
 def lookup_version():
-    return current_app.config.metadata.version
+    return current_app.config.metadata['version']
 
 
 class Context(Enum):
