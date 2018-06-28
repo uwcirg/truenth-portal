@@ -23,22 +23,16 @@ setup_kwargs = dict(
 
 # Use setuptools-scm to determine version if available
 # Todo: refactor into function for setuptools_scm.parse_scm_fallback entrypoint
-if os.path.exists('.git'):
-    version_kwargs = dict(
-        use_scm_version=True,
-        setup_requires=('setuptools_scm'),
-    )
-else:
-    # Detect Heroku build environment
-    BUILD_DIR = os.environ.get("BUILD_DIR", None)
-    if BUILD_DIR:
-        # Override version generation (setuptools-scm)
-        build_version = BUILD_DIR.split("-")[-1]
-        version_kwargs = {"version": "0+ng"+build_version}
+version_kwargs = dict(
+    use_scm_version=True,
+    setup_requires=('setuptools_scm'),
+)
 
-    else:
-        version_kwargs = dict(
-            version='0+d'+datetime.date.today().strftime('%Y%m%d'))
+# Detect Heroku build environment and override version generation (setuptools-scm)
+BUILD_DIR = os.environ.get("BUILD_DIR")
+if BUILD_DIR:
+    build_version = BUILD_DIR.split("-")[-1]
+    version_kwargs = {"version": "0+ng"+build_version}
 
 setup_kwargs.update(version_kwargs)
 setup(**setup_kwargs)
