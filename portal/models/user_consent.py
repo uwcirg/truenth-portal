@@ -37,6 +37,8 @@ class UserConsent(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=False)
+    acceptance_date = db.Column(
+        db.DateTime, default=datetime.utcnow(), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     deleted_id = db.Column(db.ForeignKey('audit.id'), nullable=True)
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
@@ -96,9 +98,10 @@ class UserConsent(db.Model):
         d = {}
         d['user_id'] = self.user_id
         d['organization_id'] = self.organization_id
-        d['signed'] = FHIR_datetime.as_fhir(self.audit.timestamp)
+        d['acceptance_date'] = FHIR_datetime.as_fhir(self.acceptance_date)
         d['expires'] = FHIR_datetime.as_fhir(self.expires)
         d['agreement_url'] = self.agreement_url
+        d['recorded'] = self.audit.as_fhir()
         if self.deleted_id:
             d['deleted'] = self.deleted.as_fhir()
         if self.options:
@@ -133,12 +136,8 @@ class UserConsent(db.Model):
             obj.expires = FHIR_datetime.parse(
                 data.get('expires'), error_subject='expires')
         if data.get('acceptance_date'):
-            # The data model keeps acceptance_date in the audit, which
-            # isn't yet available - add directly to consent for client
-            # to migrate to audit row.
             obj.acceptance_date = FHIR_datetime.parse(
-                data.get('acceptance_date'),
-                error_subject='acceptance_date')
+                data.get('acceptance_date'), error_subject='acceptance_date')
         for attr in ('staff_editable', 'include_in_reports',
                      'send_reminders', 'status'):
             if attr in data:

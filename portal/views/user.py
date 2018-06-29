@@ -450,7 +450,7 @@ def user_consents(user_id):
                 required:
                   - user_id
                   - organization_id
-                  - signed
+                  - acceptance_date
                   - expires
                   - agreement_url
                 properties:
@@ -464,7 +464,7 @@ def user_consents(user_id):
                     description:
                       Organization identifier defining with whom the consent
                       agreement applies
-                  signed:
+                  acceptance_date:
                     type: string
                     format: date-time
                     description:

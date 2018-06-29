@@ -512,7 +512,7 @@ class QuestionnaireBank(db.Model):
                     return self.__trigger_date
             # otherwise, use the common top level consent date
             if user.valid_consents and user.valid_consents.count() > 0:
-                self.__trigger_date = user.valid_consents[0].audit.timestamp
+                self.__trigger_date = user.valid_consents[0].acceptance_date
                 trace(
                     'found valid_consent with trigger_date {}'.format(
                         self.__trigger_date))

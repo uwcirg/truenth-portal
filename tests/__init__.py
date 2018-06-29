@@ -79,6 +79,37 @@ def associative_backdate(now, backdate):
     return result, result + backdate
 
 
+def calc_date_params(backdate, setdate):
+    """
+    Returns the calculated date given user's request
+
+    Tests frequently need to mock times, this returns the calculated time,
+    either by adjusting from utcnow (via backdate), using the given value
+    (in setdate) or using the value of now if neither of those are available.
+
+    :param backdate: a relative timedelta to move from now
+    :param setdate: a specific datetime value
+    :return: best date given parameters
+
+    """
+    if setdate and backdate:
+        raise ValueError("set ONE, `backdate` OR `setdate`")
+
+    if setdate:
+        acceptance_date = setdate
+    elif backdate:
+        # Guard against associative problems with backdating by
+        # months.
+        if backdate.months:
+            raise ValueError(
+                "moving dates by month values is non-associative; use"
+                "`associative_backdate` and pass in `setdate` param")
+        acceptance_date = datetime.utcnow() - backdate
+    else:
+        acceptance_date = datetime.utcnow()
+    return acceptance_date
+
+
 class TestCase(Base):
     """Base TestClass for application."""
 
@@ -195,21 +226,21 @@ class TestCase(Base):
         if not User.query.filter_by(username=sysusername).first():
             return self.add_user(sysusername, 'System', 'Admin')
 
-    def add_required_clinical_data(self, backdate=None):
+    def add_required_clinical_data(self, backdate=None, setdate=None):
         """Add clinical data to get beyond the landing page
 
         :param backdate: timedelta value.  Define to mock Dx
           happening said period in the past
+        :param setdate: datetime value.  Define to mock Dx
+          happening at given time
 
         """
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        timestamp = None
-        if backdate:
-            timestamp = datetime.utcnow() - backdate
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             get_user(TEST_USER_ID).save_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=audit, status='preliminary', issued=timestamp)
+                audit=audit, status='preliminary', issued=calc_date_params(
+                    backdate=backdate, setdate=setdate))
 
     @staticmethod
     def add_practitioner(
@@ -258,13 +289,11 @@ class TestCase(Base):
 
         """
         audit = Audit(user_id=user_id, subject_id=user_id)
-        if setdate:
-            audit.timestamp = setdate
-        elif backdate:
-            audit.timestamp = datetime.utcnow() - backdate
         consent = UserConsent(
             user_id=user_id, organization_id=org_id,
-            audit=audit, agreement_url='http://fake.org')
+            audit=audit, agreement_url='http://fake.org',
+            acceptance_date=calc_date_params(
+                backdate=backdate, setdate=setdate))
         with SessionScope(db):
             db.session.add(consent)
             db.session.commit()
@@ -292,16 +321,6 @@ class TestCase(Base):
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        if setdate:
-            audit.timestamp = setdate
-        elif backdate:
-            # Guard against associative problems with backdating by
-            # months.
-            if backdate.months:
-                raise ValueError(
-                    "moving dates by month values is non-associative; use"
-                    "`associative_backdate` and pass in `setdate` param")
-            audit.timestamp = datetime.utcnow() - backdate
         tou = ToU(audit=audit, agreement_url='http://not.really.org',
                   type='website terms of use')
         privacy = ToU(audit=audit, agreement_url='http://not.really.org',
@@ -311,7 +330,9 @@ class TestCase(Base):
                    SEND_REMINDERS_MASK)
         consent = UserConsent(
             user_id=TEST_USER_ID, organization_id=parent_org,
-            options=options, audit=audit, agreement_url='http://fake.org')
+            options=options, audit=audit, agreement_url='http://fake.org',
+            acceptance_date = calc_date_params(
+                backdate=backdate, setdate=setdate))
         with SessionScope(db):
             db.session.add(tou)
             db.session.add(privacy)
