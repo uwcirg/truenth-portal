@@ -331,7 +331,7 @@ class TestCase(Base):
         consent = UserConsent(
             user_id=TEST_USER_ID, organization_id=parent_org,
             options=options, audit=audit, agreement_url='http://fake.org',
-            acceptance_date = calc_date_params(
+            acceptance_date=calc_date_params(
                 backdate=backdate, setdate=setdate))
         with SessionScope(db):
             db.session.add(tou)
