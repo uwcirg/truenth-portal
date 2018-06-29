@@ -67,7 +67,7 @@ class TestAppText(TestCase):
             'version': '1.3'}
         sample = (
             '{origin}/c/portal/truenth/asset/detailed?'
-            '&uuid={uuid}&version=latest'.format(**args))
+            'uuid={uuid}&version=latest'.format(**args))
         expected = (
             '{origin}/c/portal/truenth/asset?uuid={uuid}&'
             'version={version}'.format(**args))
