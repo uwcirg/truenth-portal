@@ -1,5 +1,6 @@
 """ setup script for "portal" package
 
+see setup.cfg for configuration parameters
 for development:
     python setup.py develop
 
