@@ -13,11 +13,6 @@ import os
 from setuptools import setup
 
 setup_kwargs = dict(
-    scripts=[
-        "manage.py",
-        "wsgi.py",
-        os.path.join('docker', 'remap_envvars.py'),
-    ],
     test_suite="tests",
 )
 
