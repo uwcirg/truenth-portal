@@ -41,8 +41,8 @@ env:
 
 matrix:
   include:
-    - env: TOXENV=py27
-    - env: TOXENV=py34
+    - env: TOXENV=py27 TEST_JOB_COUNT=2
+    - env: TOXENV=py34 TEST_JOB_COUNT=2
       python: "3.4"
     - env: TOXENV=translations PERSISTENCE_DIR="gil"
     - env: TOXENV=translations PERSISTENCE_DIR="eproms"
@@ -68,6 +68,13 @@ before_install:
       --owner "$PGUSER"
       --username "$PGUSER"
     "$PGDATABASE"
+
+  - for ((i=$TEST_JOB_COUNT-1; i>=0; i--)); do
+      createdb
+        --owner "$PGUSER"
+        --username "$PGUSER"
+      "${PGDATABASE}${i}" ;
+    done
 
   - pip install --upgrade pip setuptools
 

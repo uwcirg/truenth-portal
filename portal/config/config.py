@@ -7,7 +7,7 @@ SITE_CFG = 'site.cfg'
 
 
 def best_sql_url():
-    """Return compliant sql url from available enviornment variables"""
+    """Return compliant sql url from available environment variables"""
     env = os.environ
     if 'PGDATABASE' in env:
         return (
@@ -16,6 +16,20 @@ def best_sql_url():
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
 
+def testing_sql_url():
+    """Return compliant sql url from available environment variables"""
+
+    test_db_url = os.environ.get(
+        'SQLALCHEMY_DATABASE_TEST_URI',
+        "postgresql://test_user:4tests_only@localhost/portal_unit_tests"
+    )
+
+    worker_name = os.environ.get('PYTEST_XDIST_WORKER')
+    if not worker_name:
+        return test_db_url
+
+    worker_index = "".join(char for char in worker_name if char.isdigit())
+    return test_db_url + worker_index
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
@@ -156,9 +170,7 @@ class TestConfig(BaseConfig):
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'SQLALCHEMY_DATABASE_TEST_URI',
-        "postgresql://test_user:4tests_only@localhost/portal_unit_tests")
+    SQLALCHEMY_DATABASE_URI = testing_sql_url()
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
