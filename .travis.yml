@@ -64,17 +64,20 @@ before_install:
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-  - createdb
-      --owner "$PGUSER"
-      --username "$PGUSER"
-    "$PGDATABASE"
-
-  - for ((i=$TEST_JOB_COUNT-1; i>=0; i--)); do
+  # Create a database for each py.test worker if TEST_JOB_COUNT set
+  - if [ -n "$TEST_JOB_COUNT" ]; then
+      for ((i=$TEST_JOB_COUNT-1; i>=0; i--)); do
+        createdb
+          --owner "$PGUSER"
+          --username "$PGUSER"
+        "${PGDATABASE}${i}" ;
+      done ;
+    else
       createdb
         --owner "$PGUSER"
         --username "$PGUSER"
-      "${PGDATABASE}${i}" ;
-    done
+      "$PGDATABASE" ;
+    fi
 
   - pip install --upgrade pip setuptools
 
