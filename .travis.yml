@@ -66,7 +66,7 @@ before_install:
 
   # Create a database for each py.test worker if TEST_JOB_COUNT set
   - if [ -n "$TEST_JOB_COUNT" ]; then
-      for ((i=$TEST_JOB_COUNT-1; i>=0; i--)); do
+      for ((i=0; i<$TEST_JOB_COUNT; i++)); do
         createdb
           --owner "$PGUSER"
           --username "$PGUSER"
@@ -83,7 +83,7 @@ before_install:
 
 install:
   - pip install tox
-  # Install dependencies first
+  # Install test dependencies only
   - tox --notest
 
   # Start celery from tox virtual environment
@@ -112,7 +112,7 @@ after_success:
 before_deploy:
   - ./bin/docker-login.sh
 
-# Only deploy from default virtual env TravisCI job
+# Only deploy from "build-artifacts" tox environment and corresponding TravisCI job
 deploy:
   - provider: script
     skip_cleanup: true
