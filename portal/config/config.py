@@ -16,6 +16,7 @@ def best_sql_url():
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
 
+
 def testing_sql_url():
     """
     Return compliant sql url from available environment variables
