@@ -1,6 +1,7 @@
 """Identifier API"""
 from flask import Blueprint, abort, jsonify, request
 
+from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.identifier import Identifier
@@ -132,6 +133,9 @@ def add_identifier(user_id):
             abort(
                 409,
                 "POST restricted to identifiers not already assigned to user")
+        auditable_event(
+            message='Added {}'.format(ident),
+            user_id=current_user().id, subject_id=user.id, context='user')
         user._identifiers.append(ident)
     db.session.commit()
 
