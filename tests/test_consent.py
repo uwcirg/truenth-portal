@@ -98,14 +98,18 @@ class TestUserConsent(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['consent_agreements']), 3)
+        response = self.client.get(
+            '/api/user/{}/consent'.format(TEST_USER_ID))
+        self.assert200(response)
+        self.assertEqual(len(response.json['consent_agreements']), 3)
         # should be ordered by acceptance date, descending: (uc3, uc1, uc2)
         uc1, uc2, uc3 = map(db.session.merge, (uc1, uc2, uc3))
-        self.assertEqual(rv.json['consent_agreements'][0], uc3.as_json())
-        self.assertEqual(rv.json['consent_agreements'][1], uc1.as_json())
-        self.assertEqual(rv.json['consent_agreements'][2], uc2.as_json())
+        self.assertEqual(
+            response.json['consent_agreements'][0], uc3.as_json())
+        self.assertEqual(
+            response.json['consent_agreements'][1], uc1.as_json())
+        self.assertEqual(
+            response.json['consent_agreements'][2], uc2.as_json())
 
     def test_post_user_consent(self):
         self.shallow_org_tree()
