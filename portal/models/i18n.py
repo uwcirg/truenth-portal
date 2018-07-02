@@ -131,7 +131,7 @@ def fix_references(pot_fpath):
     path_regex = re.compile(r"^#: {}(?P<rel_path>.*):(?P<line>\d+)".format(
         os.path.dirname(current_app.root_path)
     ))
-    base_url = "%s/tree/develop" % current_app.config.metadata.home_page
+    base_url = "%s/tree/develop" % current_app.config.metadata['home-page']
 
     with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
         prefix='fix_references_',
@@ -174,8 +174,8 @@ def smartling_upload():
         'pybabel', 'extract',
         '--no-wrap',
         '--mapping-file', config_fpath,
-        '--project', current_app.config.metadata.name,
-        '--version', current_app.config.metadata.version,
+        '--project', current_app.config.metadata['name'],
+        '--version', current_app.config.metadata['version'],
         '--output-file', messages_pot_fpath,
         current_app.root_path,
     ))

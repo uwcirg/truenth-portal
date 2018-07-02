@@ -1,14 +1,17 @@
 """Unit test module for table preferences logic"""
 import json
+import sys
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.table_preference import TablePreference
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestTablePreference(TestCase):
     """Table Preference tests"""
 

@@ -59,7 +59,6 @@ matrix:
         sauce_connect: true
   allow_failures:
     - env: TOXENV=ui
-    - env: TOXENV=py34
 
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
@@ -74,12 +73,28 @@ before_install:
 
 install:
   - pip install tox
+  # Install dependencies first
+  - tox --notest
+
+  # Start celery from tox virtual environment
+  - if [ -f "${TRAVIS_BUILD_DIR}/.tox/${TOXENV}/bin/celery" ]; then
+      PATH="${TRAVIS_BUILD_DIR}/.tox/${TOXENV}/bin/"
+      celery worker
+        --detach
+        --app portal.celery_worker.celery
+        --loglevel info
+      ;
+    fi
 
 script:
   - tox
 
 after_success:
-  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ] && [ "$GIT_BRANCH" = "develop" ]; then
+  - if
+    [ -n "$CODACY_PROJECT_TOKEN" ] &&
+    [ -f "coverage.xml" ] &&
+    [ "$TOXENV" = "py27" ] &&
+    [ "$GIT_BRANCH" = "develop" ]; then
       pip install codacy-coverage ;
       python-codacy-coverage -r coverage.xml ;
     fi

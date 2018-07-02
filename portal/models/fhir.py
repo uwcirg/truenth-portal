@@ -434,7 +434,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
 
 
 def qnr_document_id(
-        subject_id, questionnaire_bank_id, questionnaire_name, status):
+        subject_id, questionnaire_bank_id, questionnaire_name, iteration,
+        status):
     """Return document['identifier'] for matching QuestionnaireResponse
 
     Using the given filter data to look for a matching QuestionnaireResponse.
@@ -452,8 +453,13 @@ def qnr_document_id(
         QuestionnaireResponse.questionnaire_bank_id ==
         questionnaire_bank_id).with_entities(
         QuestionnaireResponse.document[(
-            'identifier', 'value')]).one()
-    return qnr[0]
+            'identifier', 'value')])
+    if iteration is not None:
+        qnr = qnr.filter(QuestionnaireResponse.qb_iteration == iteration)
+    else:
+        qnr = qnr.filter(QuestionnaireResponse.qb_iteration.is_(None))
+
+    return qnr.one()[0]
 
 
 def generate_qnr_csv(qnr_bundle):

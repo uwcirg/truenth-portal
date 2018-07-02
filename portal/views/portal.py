@@ -868,23 +868,26 @@ def spec():
 
     """
     swag = swagger(current_app)
+    metadata = current_app.config.metadata
     swag.update({
         "info": {
-            "version": current_app.config.metadata.version,
-            "title": current_app.config.metadata.summary,
-            "description": current_app.config.metadata.description,
-            "termsOfService": "http://cirg.washington.edu",
+            "version": metadata['version'],
+            "title": metadata['summary'],
+            "termsOfService": metadata['home-page'],
             "contact": {
-                "name": "Clinical Informatics Research Group",
-                "email": "mcjustin@uw.edu",
-                "url": "http://cirg.washington.edu",
+                "name": metadata['author'],
+                "email": metadata['author-email'],
+                "url": metadata['home-page'],
             },
         },
         "schemes": ("http", "https"),
     })
 
-    # Fix swagger docs for paths with duplicate operationIds
+    # Todo: figure out why description isn't always set
+    if metadata.get('description'):
+        swag["info"]["description"] = metadata.get('description').strip()
 
+    # Fix swagger docs for paths with duplicate operationIds
     # Dict of offending routes (path and method), grouped by operationId
     operations = {}
 

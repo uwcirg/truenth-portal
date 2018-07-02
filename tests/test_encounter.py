@@ -1,10 +1,12 @@
 """Unit test module for Encounter API and model"""
 import json
 import os
+import sys
 import time
 
 import dateutil
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.encounter import Encounter
@@ -13,7 +15,8 @@ from portal.models.role import ROLE
 from portal.models.user import INVITE_PREFIX
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestEncounter(TestCase):
 
     def test_encounter_from_fhir(self):

@@ -34,7 +34,7 @@ now = datetime.utcnow()
 
 def mock_qr(
         instrument_id, status='completed', timestamp=None, qb=None,
-        doc_id=None):
+        doc_id=None, iteration=None):
     if not doc_id:
         doc_id = ''.join(choice(ascii_letters) for _ in range(10))
     timestamp = timestamp or datetime.utcnow()
@@ -65,7 +65,8 @@ def mock_qr(
         authored=timestamp,
         document=qr_document,
         encounter_id=enc.id,
-        questionnaire_bank=qb)
+        questionnaire_bank=qb,
+        qb_iteration=iteration)
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
@@ -329,7 +330,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             doc_id='two11')
         qb = db.session.merge(qb)
         result = qnr_document_id(
-            TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+            subject_id=TEST_USER_ID,
+            questionnaire_bank_id=qb.id,
+            questionnaire_name='irondemog',
+            iteration=None,
+            status='in-progress')
         self.assertEqual(result, 'two11')
 
     def test_qnr_id_missing(self):
@@ -337,7 +342,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         qb = db.session.merge(qb)
         with self.assertRaises(NoResultFound):
             result = qnr_document_id(
-                TEST_USER_ID, qb.id, 'irondemog', 'in-progress')
+                subject_id=TEST_USER_ID,
+                questionnaire_bank_id=qb.id,
+                questionnaire_name='irondemog',
+                iteration=None,
+                status='in-progress')
 
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""
@@ -669,6 +678,19 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.mark_localized()
         for instrument in localized_instruments:
             mock_qr(instrument_id=instrument, status='in-progress')
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
+        self.assertEqual(a_s.overall_status, 'In Progress')
+
+    def test_boundary_recurring_in_progress(self):
+        self.login()
+        backdate, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=6, hours=-1))
+        self.bless_with_basics(setdate=backdate)
+        self.mark_metastatic()
+        for instrument in metastatic_3:
+            mock_qr(
+                instrument_id=instrument, status='in-progress', iteration=0)
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         self.assertEqual(a_s.overall_status, 'In Progress')

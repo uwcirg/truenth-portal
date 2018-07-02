@@ -1,8 +1,10 @@
 """Unit test module for questionnaire_bank"""
 from datetime import datetime, timedelta
+import sys
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
@@ -29,6 +31,8 @@ from tests.test_assessment_status import mock_qr
 now = datetime.utcnow()
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestQuestionnaireBank(TestCase):
 
     @staticmethod
@@ -746,11 +750,11 @@ class TestQuestionnaireBank(TestCase):
         org, rp3, rp3_id = self.setup_org_n_rp(org=org, rp_name='v3')
         org_id = org.id
         self.test_user.organizations.append(org)
-        audit = Audit(
-            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, timestamp=weekago)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=weekago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)
@@ -806,11 +810,11 @@ class TestQuestionnaireBank(TestCase):
 
         self.test_user.organizations.append(org)
         audit = Audit(
-            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-            timestamp=fourmonthsago)
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=fourmonthsago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)
@@ -836,7 +840,7 @@ class TestQuestionnaireBank(TestCase):
             ['epic26_v3'], a_s.instruments_needing_full_assessment())
 
         # Complete the questionnaire from the 3mo v2 QB
-        mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb)
+        mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb, iteration=0)
 
         # Two weeks ago, should be completed
         user = db.session.merge(user)
