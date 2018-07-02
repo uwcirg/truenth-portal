@@ -1,5 +1,6 @@
 """Unit test module for user consent"""
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import json
 
 from dateutil import parser
@@ -63,6 +64,44 @@ class TestUserConsent(TestCase):
         assert 'staff_editable' in response.json['consent_agreements'][0]
         assert response.json['consent_agreements'][0]['status'] == 'consented'
         assert response.json['consent_agreements'][1]['status'] == 'suspended'
+
+    def test_consent_order(self):
+        self.shallow_org_tree()
+        org1, org2 = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
+        old = datetime.now() - relativedelta(years=10)
+        older = old - relativedelta(years=10)
+        oldest = older - relativedelta(years=50)
+
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc1 = UserConsent(
+            organization_id=org1.id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit, acceptance_date=older)
+        uc2 = UserConsent(
+            organization_id=org2.id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit, acceptance_date=oldest)
+        uc3 = UserConsent(
+            organization_id=0, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit, acceptance_date=old)
+        with SessionScope(db):
+            db.session.add(uc1)
+            db.session.add(uc2)
+            db.session.add(uc3)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        self.login()
+        response = self.client.get(
+            '/api/user/{}/consent'.format(TEST_USER_ID))
+        self.assert200(response)
+        self.assertEqual(len(response.json['consent_agreements']), 3)
+        # should be ordered by acceptance date, descending: (uc3, uc1, uc2)
+        uc1, uc2, uc3 = map(db.session.merge, (uc1, uc2, uc3))
+        self.assertEqual(
+            response.json['consent_agreements'][0], uc3.as_json())
+        self.assertEqual(
+            response.json['consent_agreements'][1], uc1.as_json())
+        self.assertEqual(
+            response.json['consent_agreements'][2], uc2.as_json())
 
     def test_post_user_consent(self):
         self.shallow_org_tree()
