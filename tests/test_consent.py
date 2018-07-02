@@ -223,5 +223,5 @@ class TestUserConsent(TestCase):
                                                   status='suspended').first()
         assert old_consent.agreement_url == new_consent.agreement_url
         assert new_consent.staff_editable == \
-               (not current_app.config.get('GIL'))
+            (not current_app.config.get('GIL'))
         assert not new_consent.send_reminders
