@@ -21,8 +21,6 @@ from portal.models.reference import Reference
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestClinical(TestCase):
 
     def prep_db_for_clinical(self):
@@ -52,17 +50,21 @@ class TestClinical(TestCase):
         self.prep_db_for_clinical()
         self.gleason_concept = db.session.merge(self.gleason_concept)
         self.test_user = db.session.merge(self.test_user)
-        assert pytest.approx(datetime.utcnow().toordinal()) ==\
-               self.test_user.fetch_datetime_for_concept(self.gleason_concept).toordinal()
+        assert pytest.approx(datetime.utcnow().toordinal()) == \
+            self.test_user.fetch_datetime_for_concept(
+                self.gleason_concept).toordinal()
 
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
         self.login()
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
-        clinical_data = json.loads(response.get_data(as_text=True))
-        assert 'Gleason score' == clinical_data['entry'][0]['content']['code']['coding'][0]['display']
-        assert '2' == clinical_data['entry'][0]['content']['valueQuantity']['value']
+        clinical_data = response.json
+        assert \
+            'Gleason score' == \
+            clinical_data['entry'][0]['content']['code']['coding'][0]['display']
+        assert '2' == \
+               clinical_data['entry'][0]['content']['valueQuantity']['value']
         assert json.dumps(Reference.patient(TEST_USER_ID).as_fhir())\
             == clinical_data['entry'][0]['content']['performer'][0]
         found = parser.parse(
@@ -97,7 +99,7 @@ class TestClinical(TestCase):
                               content_type='application/json',
                               data=json.dumps(data))
         assert response.status_code == 200
-        fhir = json.loads(response.get_data(as_text=True))
+        fhir = response.json
         assert '28540-3' in fhir['message']
         assert self.test_user.observations.count() == 1
         uo = UserObservation.query.filter_by(user_id=TEST_USER_ID).one()
@@ -114,7 +116,7 @@ class TestClinical(TestCase):
             TEST_USER_ID, obs.id), content_type='application/json',
             data=json.dumps(data))
         assert response.status_code == 200
-        clinical_data = json.loads(response.get_data(as_text=True))
+        clinical_data = response.json
         assert clinical_data['status'] == 'unknown'
         assert clinical_data['issued'] == new_issued+"+00:00"  # tz
         assert clinical_data['valueQuantity']['value'] == 'false'
@@ -130,7 +132,7 @@ class TestClinical(TestCase):
             TEST_USER_ID, obs.id), content_type='application/json',
             data=json.dumps(data))
         assert response.status_code == 200
-        clinical_data = json.loads(response.get_data(as_text=True))
+        clinical_data = response.json
         assert clinical_data['status'] == 'unknown'
         assert clinical_data['issued'] == new_issued+"+00:00"  # tz
         assert clinical_data['valueQuantity']['value'] == 'false'
@@ -163,24 +165,26 @@ class TestClinical(TestCase):
     def test_empty_biopsy_get(self):
         """Access biopsy on user w/o any clinical info"""
         self.login()
-        response = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        response = self.client.get('/api/patient/%s/clinical/biopsy'
+                                   % TEST_USER_ID)
         assert response.status_code == 200
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         assert data['value'] == 'unknown'
 
     def test_clinical_biopsy_put(self):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
-        response = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        response = self.client.post('/api/patient/%s/clinical/biopsy'
+                                    % TEST_USER_ID,
                               content_type='application/json',
                               data=json.dumps({'value': True}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
 
@@ -190,21 +194,24 @@ class TestClinical(TestCase):
         assert vq['value'] == 'true'
 
         # Access the direct biopsy value
-        response = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        response = self.client.get('/api/patient/%s/clinical/biopsy'
+                                   % TEST_USER_ID)
+        data = response.json
         assert data['value'] == 'true'
 
         # Can we alter the value?
-        response = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        response = self.client.post('/api/patient/%s/clinical/biopsy'
+                                    % TEST_USER_ID,
                               content_type='application/json',
                               data=json.dumps({'value': False}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Confirm it's altered
-        response = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        response = self.client.get('/api/patient/%s/clinical/biopsy'
+                                   % TEST_USER_ID)
+        data = response.json
         assert data['value'] == 'false'
 
         # Confirm history is retained
@@ -219,12 +226,12 @@ class TestClinical(TestCase):
             content_type='application/json',
             data=json.dumps({'value': True, 'status': 'unknown'}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
         status = data['entry'][0]['content']['status']
@@ -236,21 +243,24 @@ class TestClinical(TestCase):
         assert status == 'unknown'
 
         # Access the direct biopsy value
-        response = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        response = self.client.get('/api/patient/%s/clinical/biopsy'
+                                   % TEST_USER_ID)
+        data = response.json
         assert data['value'] == 'unknown'
 
         # Can we alter the value?
-        response = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        response = self.client.post('/api/patient/%s/clinical/biopsy'
+                                    % TEST_USER_ID,
                               content_type='application/json',
                               data=json.dumps({'value': False}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Confirm it's altered
-        response = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        response = self.client.get('/api/patient/%s/clinical/biopsy'
+                                   % TEST_USER_ID)
+        data = response.json
         assert data['value'] == 'false'
 
         # Confirm history is retained
@@ -265,12 +275,12 @@ class TestClinical(TestCase):
             content_type='application/json',
             data=json.dumps({'value': True}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
 
@@ -282,8 +292,8 @@ class TestClinical(TestCase):
         # Access the direct pca_diag value
         response = self.client.get(
             '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
-        assert data['value'] =='true'
+        data = response.json
+        assert data['value'] == 'true'
 
     def test_clinical_pca_diag_unknown(self):
         """Shortcut API - PCa diagnosis w/ status unknown"""
@@ -293,12 +303,12 @@ class TestClinical(TestCase):
             content_type='application/json',
             data=json.dumps({'value': True, 'status': 'unknown'}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
         status = data['entry'][0]['content']['status']
@@ -312,7 +322,7 @@ class TestClinical(TestCase):
         # Access the direct pca_diag value
         response = self.client.get(
             '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         assert data['value'] == 'unknown'
 
     def test_clinical_pca_localized(self):
@@ -322,12 +332,12 @@ class TestClinical(TestCase):
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID,
             content_type='application/json', data=json.dumps({'value': True}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
 
@@ -339,7 +349,7 @@ class TestClinical(TestCase):
         # Access the direct pca_localized value
         response = self.client.get(
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         assert data['value'] == 'true'
 
     def test_clinical_pca_localized_unknown(self):
@@ -350,12 +360,12 @@ class TestClinical(TestCase):
             content_type='application/json',
             data=json.dumps({'value': False, 'status': 'unknown'}))
         assert response.status_code == 200
-        result = json.loads(response.get_data(as_text=True))
+        result = response.json
         assert result['message'] == 'ok'
 
         # Can we get it back in FHIR?
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
         status = data['entry'][0]['content']['status']
@@ -369,7 +379,7 @@ class TestClinical(TestCase):
         # Access the direct pca_localized value
         response = self.client.get(
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
-        data = json.loads(response.get_data(as_text=True))
+        data = response.json
         assert data['value'] == 'unknown'
 
     def test_weight(self):
@@ -378,7 +388,8 @@ class TestClinical(TestCase):
             data = json.load(fhir_data)
 
         self.login()
-        response = self.client.put('/api/patient/{}/clinical'.format(TEST_USER_ID),
+        response = self.client.put('/api/patient/{}/clinical'
+                                   .format(TEST_USER_ID),
                              content_type='application/json',
                              data=json.dumps(data))
         assert response.status_code == 200
