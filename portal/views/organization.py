@@ -547,6 +547,9 @@ def add_user_organizations(user_id):
                 "POST restricted to organizations not already assigned to "
                 "user")
         user.organizations.append(org)
+        auditable_event(
+            message='Added {}'.format(org), user_id=current_user().id,
+            subject_id=user.id, context='organization')
     db.session.commit()
 
     # Return current organizations
