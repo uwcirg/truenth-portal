@@ -1,6 +1,11 @@
+import sys
+
+import pytest
+
 from tests import FIRST_NAME, LAST_NAME, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestTrueNTH(TestCase):
 
     def test_portal_wrapper_html(self):

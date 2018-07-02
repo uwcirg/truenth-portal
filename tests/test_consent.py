@@ -1,10 +1,12 @@
 """Unit test module for user consent"""
 from datetime import datetime
 import json
+import sys
 
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -12,7 +14,8 @@ from portal.models.organization import Organization
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
 
@@ -102,18 +105,14 @@ class TestUserConsent(TestCase):
         self.assert200(rv)
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
-        # check for consent signed audit (timestamp of acceptance_date)
-        signed = self.test_user.valid_consents[0]
-        self.assertEqual(signed.organization_id, org1.id)
-        self.assertEqual(signed.audit.timestamp,
+        consent = self.test_user.valid_consents[0]
+        self.assertEqual(consent.organization_id, org1.id)
+        self.assertEqual(consent.acceptance_date,
                          parser.parse(acceptance_date))
-        self.assertEqual(signed.audit.comment,
-                         "Consent agreement {} signed".format(signed.id))
-        # check for consent recorded audit (timestamp of a few seconds prior)
-        recorded = Audit.query.filter_by(
-            comment="Consent agreement {} recorded".format(signed.id)).first()
-        self.assertTrue(recorded)
-        self.assertTrue((datetime.utcnow() - recorded.timestamp).seconds < 30)
+        self.assertEqual(consent.audit.comment,
+                         "Consent agreement {} signed".format(consent.id))
+        self.assertTrue(
+            (datetime.utcnow() - consent.audit.timestamp).seconds < 30)
 
     def test_post_replace_user_consent(self):
         """second consent for same user,org should replace existing"""

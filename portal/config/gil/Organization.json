@@ -1406,6 +1406,110 @@
         "reference": "api/organization/40001"
       },
       "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40005,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Capital Urological Associates"
+        }
+      ],
+      "name": "Capital Urological Associates",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40006,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Michigan Urological Center"
+        }
+      ],
+      "name": "Michigan Urological Center",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40007,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Spectrum Health Medical Group-Urology"
+        }
+      ],
+      "name": "Spectrum Health Medical Group-Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40008,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Urologic Consultants, PC"
+        }
+      ],
+      "name": "Urologic Consultants, PC",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

@@ -62,8 +62,17 @@ repo_branch="$(git rev-parse --abbrev-ref HEAD)"
 BRANCH="${BRANCH:-${branch}}"
 update_repo
 
+virtualenv_path="${GIT_WORK_TREE}/env"
+if [ ! -d "${virtualenv_path}" ]; then
+    echo "Creating new virtual environment..."
+    virtualenv "${virtualenv_path}"
+    . "${virtualenv_path}/bin/activate"
+    pip install --upgrade pip setuptools
+    deactivate
+fi
+
 echo "Activating virtualenv"
-. "${GIT_WORK_TREE}/env/bin/activate"
+. "${virtualenv_path}/bin/activate"
 
 echo "Updating python dependancies"
 cd "${GIT_WORK_TREE}"

@@ -1,7 +1,9 @@
 """Unit test module for Demographics API"""
 import json
+import sys
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -21,7 +23,8 @@ from tests import (
     TestCase,
 )
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
