@@ -750,11 +750,11 @@ class TestQuestionnaireBank(TestCase):
         org, rp3, rp3_id = self.setup_org_n_rp(org=org, rp_name='v3')
         org_id = org.id
         self.test_user.organizations.append(org)
-        audit = Audit(
-            user_id=TEST_USER_ID, subject_id=TEST_USER_ID, timestamp=weekago)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=weekago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)
@@ -810,11 +810,11 @@ class TestQuestionnaireBank(TestCase):
 
         self.test_user.organizations.append(org)
         audit = Audit(
-            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-            timestamp=fourmonthsago)
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=fourmonthsago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)
