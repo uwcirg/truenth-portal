@@ -1,11 +1,16 @@
 """Unit test module for user document logic"""
-from StringIO import StringIO
+from future import standard_library  # isort:skip
+standard_library.install_aliases()  # noqa: E402
+from builtins import str
 from datetime import datetime
+from io import BytesIO
 import os
+import sys
 from tempfile import NamedTemporaryFile
 
 from flask import current_app
 from flask_webtest import SessionScope
+import pytest
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -15,7 +20,8 @@ from portal.models.user import get_user
 from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestUserDocument(TestCase):
     """User Document tests"""
 
@@ -64,7 +70,7 @@ class TestUserDocument(TestCase):
         ) as temp_pdf:
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
-            tempfileIO = StringIO(temp_pdf.read())
+            tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
@@ -92,7 +98,7 @@ class TestUserDocument(TestCase):
         ) as temp_pdf:
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
-            tempfileIO = StringIO(temp_pdf.read())
+            tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))

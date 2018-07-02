@@ -59,27 +59,52 @@ matrix:
         sauce_connect: true
   allow_failures:
     - env: TOXENV=ui
-    - env: TOXENV=py34
 
 before_install:
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-  - createdb
-      --owner "$PGUSER"
-      --username "$PGUSER"
-    "$PGDATABASE"
+  # Create a database for each py.test worker if TEST_JOB_COUNT set
+  - if [ -n "$TEST_JOB_COUNT" ]; then
+      for ((i=0; i<$TEST_JOB_COUNT; i++)); do
+        createdb
+          --owner "$PGUSER"
+          --username "$PGUSER"
+        "${PGDATABASE}${i}" ;
+      done ;
+    else
+      createdb
+        --owner "$PGUSER"
+        --username "$PGUSER"
+      "$PGDATABASE" ;
+    fi
 
   - pip install --upgrade pip setuptools
 
 install:
   - pip install tox
+  # Install test dependencies only
+  - tox --notest
+
+  # Start celery from tox virtual environment
+  - if [ -f "${TRAVIS_BUILD_DIR}/.tox/${TOXENV}/bin/celery" ]; then
+      PATH="${TRAVIS_BUILD_DIR}/.tox/${TOXENV}/bin/"
+      celery worker
+        --detach
+        --app portal.celery_worker.celery
+        --loglevel info
+      ;
+    fi
 
 script:
   - tox
 
 after_success:
-  - if [ -n "$CODACY_PROJECT_TOKEN" ] && [ -f "coverage.xml" ] && [ "$GIT_BRANCH" = "develop" ]; then
+  - if
+    [ -n "$CODACY_PROJECT_TOKEN" ] &&
+    [ -f "coverage.xml" ] &&
+    [ "$TOXENV" = "py27" ] &&
+    [ "$GIT_BRANCH" = "develop" ]; then
       pip install codacy-coverage ;
       python-codacy-coverage -r coverage.xml ;
     fi
@@ -87,7 +112,7 @@ after_success:
 before_deploy:
   - ./bin/docker-login.sh
 
-# Only deploy from default virtual env TravisCI job
+# Only deploy from "build-artifacts" tox environment and corresponding TravisCI job
 deploy:
   - provider: script
     skip_cleanup: true

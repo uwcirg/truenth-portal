@@ -109,6 +109,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 .save-loader-wrapper {
+  position: relative;
+  min-height: 12px;
   .load-icon {
     margin-left:4px;
     margin-top:5px;
@@ -118,6 +120,18 @@ body {
   }
   .error-icon {
     color: red;
+  }
+  .save-info {
+    opacity: 0;
+     -webkit-transition: opacity 0.8s ease-in;
+    transition: opacity 0.8s ease-in;
+    position: absolute;
+    font-size: @smallText;
+  }
+}
+@media (min-width: 768px) {
+  .save-loader-wrapper {
+    min-height: auto;
   }
 }
 .form-control,
@@ -1040,13 +1054,6 @@ div.pull-right {
   padding: 0.1em auto;
   color: #5a5a5a;
 
-}
-.save-info {
-  opacity: 0;
-   -webkit-transition: opacity 0.8s ease-in;
-  transition: opacity 0.8s ease-in;
-  position: absolute;
-  font-size: @smallText;
 }
 .access-button {
     opacity: 1;

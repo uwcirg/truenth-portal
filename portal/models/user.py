@@ -964,7 +964,8 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
-            # add audit for consent signed date
+            # add audit for this consent signing event, marking recording
+            # date, which is possibly different from `acceptance_date`
             audit = Audit(
                 user_id=acting_user.id,
                 subject_id=self.id,
@@ -979,26 +980,12 @@ class User(db.Model, UserMixin):
                                                  existing_consent, consent))
                     delete_consents.append(existing_consent)
 
-            if hasattr(consent, 'acceptance_date'):
-                # Move data to where it belongs, in the audit row
-                audit.timestamp = consent.acceptance_date
-                del consent.acceptance_date
-
             consent.audit = audit
             db.session.add(consent)
             db.session.commit()
             audit, consent = map(db.session.merge, (audit, consent))
             # update consent signed audit with consent ID ref
             audit.comment = "Consent agreement {} signed".format(consent.id)
-            # add audit for consent recorded date
-            recorded = Audit(
-                user_id=acting_user.id,
-                subject_id=self.id,
-                comment="Consent agreement {} recorded".format(consent.id),
-                context='consent',
-                timestamp=datetime.utcnow())
-            db.session.add(audit)
-            db.session.add(recorded)
             db.session.commit()
 
         for replaced in delete_consents:
