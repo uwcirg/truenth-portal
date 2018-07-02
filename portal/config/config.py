@@ -17,7 +17,13 @@ def best_sql_url():
                 PGDATABASE=env.get('PGDATABASE')))
 
 def testing_sql_url():
-    """Return compliant sql url from available environment variables"""
+    """
+    Return compliant sql url from available environment variables
+
+    If tests are being run with pytest-xdist workers,
+    a pre-existing database will be required for each worker,
+    suffixed with the worker index.
+    """
 
     test_db_url = os.environ.get(
         'SQLALCHEMY_DATABASE_TEST_URI',
