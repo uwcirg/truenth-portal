@@ -1,4 +1,5 @@
 from alembic import op
+import logging
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
@@ -17,6 +18,9 @@ Create Date: 2018-06-21 14:37:20.145030
 revision = 'c49b7f7944a7'
 down_revision = '0f1576a4e220'
 Session = sessionmaker()
+
+log = logging.getLogger("alembic")
+log.setLevel(logging.INFO)
 
 
 def upgrade():
@@ -54,11 +58,13 @@ def upgrade():
 
 
 def downgrade():
-    # Don't see much value in supporting downgrade, so raising for now,
-    # as we'll lose data.
+    # Don't see much value in supporting downgrade, simply log the fact
+    # that we'll lose data.
     #
     # Those consents w/ differing values in their audit rows from
     # `acceptance_date` would need recreation of "recorded" audits
     # in the downgrade.
-    raise RuntimeError(
+    log.error(
+        "DATA LOSS: "
         "Can't downgrade w/o coding up reanimation of `recorded` audits")
+    op.drop_column('user_consents', 'acceptance_date')
