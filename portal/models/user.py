@@ -274,8 +274,9 @@ class User(db.Model, UserMixin):
                                      foreign_keys=[Audit.subject_id])
     auth_providers = db.relationship('AuthProvider', lazy='dynamic',
                                      cascade='delete')
-    _consents = db.relationship('UserConsent', lazy='dynamic',
-                                cascade='delete')
+    _consents = db.relationship(
+        'UserConsent', lazy='dynamic', cascade='delete',
+        order_by="desc(UserConsent.acceptance_date)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
     encounters = db.relationship('Encounter', cascade='delete')

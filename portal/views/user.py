@@ -412,9 +412,10 @@ def user_consents(user_id):
     """Returns simple JSON listing user's valid consent agreements
 
     Returns the list of consent agreements between the requested user
-    and the respective organizations.
+    and the respective organizations.  Consents are ordered by
+    ``acceptance_date``, most recent first.
 
-    NB does include deleted and expired consents.  Deleted consents  will
+    NB does include deleted and expired consents.  Deleted consents will
     include audit details regarding the deletion.  The expires timestamp in UTC
     is also returned for all consents.
 
@@ -451,6 +452,7 @@ def user_consents(user_id):
                   - user_id
                   - organization_id
                   - acceptance_date
+                  - recorded
                   - expires
                   - agreement_url
                 properties:
@@ -470,6 +472,8 @@ def user_consents(user_id):
                     description:
                       Original UTC date-time from the moment the agreement was
                       signed or put in place by some other workflow
+                  recorded:
+                    $ref: "#/definitions/audits"
                   expires:
                     type: string
                     format: date-time
