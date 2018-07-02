@@ -1,12 +1,10 @@
 """Unit test module for user consent"""
 from datetime import datetime
 import json
-import sys
 
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -58,13 +56,13 @@ class TestUserConsent(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
-        assert rv.status_code == 200
-        assert len(rv.json['consent_agreements']) == 2
-        assert 'send_reminders' not in rv.json['consent_agreements'][0]
-        assert 'staff_editable' in rv.json['consent_agreements'][0]
-        assert rv.json['consent_agreements'][0]['status'] == 'consented'
-        assert rv.json['consent_agreements'][1]['status'] == 'suspended'
+        response = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert len(response.json['consent_agreements']) == 2
+        assert 'send_reminders' not in response.json['consent_agreements'][0]
+        assert 'staff_editable' in response.json['consent_agreements'][0]
+        assert response.json['consent_agreements'][0]['status'] == 'consented'
+        assert response.json['consent_agreements'][1]['status'] == 'suspended'
 
     def test_post_user_consent(self):
         self.shallow_org_tree()
@@ -73,10 +71,10 @@ class TestUserConsent(TestCase):
                 'staff_editable': True, 'send_reminders': False}
 
         self.login()
-        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
-        assert rv.status_code == 200
+        assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
@@ -93,10 +91,10 @@ class TestUserConsent(TestCase):
                 'acceptance_date': acceptance_date}
 
         self.login()
-        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
-        assert rv.status_code == 200
+        assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
@@ -114,10 +112,10 @@ class TestUserConsent(TestCase):
                 'staff_editable': True, 'send_reminders': True}
 
         self.login()
-        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
-        assert rv.status_code == 200
+        assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
@@ -130,10 +128,10 @@ class TestUserConsent(TestCase):
         data['staff_editable'] = False
         data['send_reminders'] = False
         data['status'] = 'suspended'
-        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
-        assert rv.status_code == 200
+        assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
@@ -168,17 +166,17 @@ class TestUserConsent(TestCase):
         assert self.test_user.valid_consents.count() == 2
         self.login()
 
-        rv = self.client.delete('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.delete('/api/user/{}/consent'.format(TEST_USER_ID),
                                 content_type='application/json',
                                 data=json.dumps(data))
-        assert rv.status_code == 200
+        assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
 
         # We no longer omit deleted consent rows, but rather, include
         # their audit data.
-        rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
-        assert 'deleted' in json.dumps(rv.json)
+        response = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
+        assert 'deleted' in json.dumps(response.json)
 
         # confirm deleted status
         dc = UserConsent.query.filter_by(user_id=TEST_USER_ID,
