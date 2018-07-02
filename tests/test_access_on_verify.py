@@ -1,3 +1,5 @@
+from __future__ import unicode_literals # isort:skip
+
 import json
 
 from flask import url_for
@@ -18,7 +20,7 @@ class TestAccessOnVerify(TestCase):
             '/api/account',
             data=json.dumps({}),
             content_type='application/json')
-        self.assert200(response)
+        assert response.status_code == 200
 
         # add role to account
         user_id = response.json['user_id']
@@ -27,20 +29,20 @@ class TestAccessOnVerify(TestCase):
             '/api/user/{user_id}/roles'.format(user_id=user_id),
             data=json.dumps(data),
             content_type='application/json')
-        self.assert200(response)
+        assert response.status_code == 200
 
     def test_access(self):
         # confirm exception on access w/o DOB
         weak_access_user = self.add_user(username='fake@org.com')
         self.promote_user(weak_access_user, role_name='access_on_verify')
         weak_access_user = db.session.merge(weak_access_user)
-        self.assertFalse(weak_access_user.birthdate)
+        assert not weak_access_user.birthdate
 
         token = user_manager.token_manager.generate_token(weak_access_user.id)
         access_url = url_for('portal.access_via_token', token=token)
 
         response = self.client.get(access_url)
-        self.assert400(response)
+        assert response.status_code == 400
 
         # add DOB & names and expect redirect to challenge
         weak_access_user.birthdate = '01-31-1999'
