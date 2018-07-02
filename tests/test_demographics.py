@@ -1,4 +1,6 @@
 """Unit test module for Demographics API"""
+from __future__ import unicode_literals
+
 import json
 import sys
 
@@ -23,8 +25,6 @@ from tests import (
     TestCase,
 )
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
