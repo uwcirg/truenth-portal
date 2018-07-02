@@ -71,7 +71,8 @@ class TestUserConsent(TestCase):
                 'staff_editable': True, 'send_reminders': False}
 
         self.login()
-        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post(
+                              '/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
         assert response.status_code == 200
@@ -91,7 +92,8 @@ class TestUserConsent(TestCase):
                 'acceptance_date': acceptance_date}
 
         self.login()
-        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post(
+                              '/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
         assert response.status_code == 200
@@ -101,7 +103,7 @@ class TestUserConsent(TestCase):
         assert consent.organization_id == org1.id
         assert consent.acceptance_date == parser.parse(acceptance_date)
         assert consent.audit.comment ==\
-               "Consent agreement {} signed".format(consent.id)
+            "Consent agreement {} signed".format(consent.id)
         assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
 
     def test_post_replace_user_consent(self):
@@ -112,7 +114,8 @@ class TestUserConsent(TestCase):
                 'staff_editable': True, 'send_reminders': True}
 
         self.login()
-        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post(
+                              '/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
         assert response.status_code == 200
@@ -128,7 +131,8 @@ class TestUserConsent(TestCase):
         data['staff_editable'] = False
         data['send_reminders'] = False
         data['status'] = 'suspended'
-        response = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.post(
+                              '/api/user/{}/consent'.format(TEST_USER_ID),
                               content_type='application/json',
                               data=json.dumps(data))
         assert response.status_code == 200
@@ -166,7 +170,8 @@ class TestUserConsent(TestCase):
         assert self.test_user.valid_consents.count() == 2
         self.login()
 
-        response = self.client.delete('/api/user/{}/consent'.format(TEST_USER_ID),
+        response = self.client.delete(
+                                '/api/user/{}/consent'.format(TEST_USER_ID),
                                 content_type='application/json',
                                 data=json.dumps(data))
         assert response.status_code == 200
@@ -217,5 +222,6 @@ class TestUserConsent(TestCase):
                                                   organization_id=org_id,
                                                   status='suspended').first()
         assert old_consent.agreement_url == new_consent.agreement_url
-        assert new_consent.staff_editable == (not current_app.config.get('GIL'))
+        assert new_consent.staff_editable == \
+               (not current_app.config.get('GIL'))
         assert not new_consent.send_reminders
