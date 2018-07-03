@@ -179,6 +179,12 @@
                 }
             });
         };
+        this.__getSettings = function(callback) {
+            callback = callback || function() {};
+            this.__request({"apiUrl": "/api/settings", "requestType": "GET", "callback": function(result) { //check config
+                callback(result);
+            }});
+        };
         this.__setPcaLocalized = function() {
             if (!this.userId || !this.__isPatient()) {
                 return false;
@@ -188,12 +194,12 @@
             if (!parentOrg) {
                 return false;
             }
-            this.__request({"apiUrl": "/api/settings", "requestType": "GET", "callback": function(result) { //check config
+            this.__getSettings(function(result) { //check config
                 if (!result || !result.data.LOCALIZED_AFFILIATE_ORG) {
                     return false;
                 }
                 tnthAjax.postClinical(userId,"pca_localized", OT.getOrgName(parentOrg) === result.data.LOCALIZED_AFFILIATE_ORG);
-            }});
+            });
         }
         this.__setProcedures = function() {
 
