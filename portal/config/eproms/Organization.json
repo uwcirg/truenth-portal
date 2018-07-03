@@ -1468,6 +1468,9 @@
         }
       ],
       "name": "TrueNTH Global",
+      "partOf": {
+        "reference": "api/organization/10000"
+      },
       "resourceType": "Organization"
     },
     {
