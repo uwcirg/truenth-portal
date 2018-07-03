@@ -1,12 +1,12 @@
 """Unit test module for Encounter API and model"""
+from __future__ import unicode_literals  # isort:skip
+
 import json
 import os
-import sys
 import time
 
 import dateutil
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.encounter import Encounter
@@ -15,8 +15,6 @@ from portal.models.role import ROLE
 from portal.models.user import INVITE_PREFIX
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestEncounter(TestCase):
 
     def test_encounter_from_fhir(self):
@@ -25,9 +23,9 @@ class TestEncounter(TestCase):
             data = json.load(fhir_data)
 
         enc = Encounter.from_fhir(data)
-        self.assertEqual(enc.status, 'finished')
-        self.assertEqual(enc.auth_method, 'password_authenticated')
-        self.assertEqual(enc.start_time, dateutil.parser.parse("2013-05-05"))
+        assert enc.status == 'finished'
+        assert enc.auth_method == 'password_authenticated'
+        assert enc.start_time == dateutil.parser.parse("2013-05-05")
 
     def test_encounter_as_fhir(self):
         enc = Encounter(status='planned', auth_method='url_authenticated',
@@ -39,32 +37,29 @@ class TestEncounter(TestCase):
             db.session.add(enc)
             db.session.commit()
         enc = db.session.merge(enc)
-        self.assertEqual(enc.status, data['status'])
-        self.assertEqual(enc.auth_method, data['auth_method'])
+        assert enc.status == data['status']
+        assert enc.auth_method == data['auth_method']
 
     def test_encounter_on_login(self):
         self.login()
-        self.assertEqual(len(self.test_user.encounters), 1)
-        self.assertEqual(
-            self.test_user.current_encounter.auth_method,
-            'password_authenticated')
+        assert len(self.test_user.encounters) == 1
+        assert self.test_user.current_encounter.auth_method == \
+               'password_authenticated'
 
     def test_encounter_after_logout(self):
         self.login()
         time.sleep(0.1)
         self.login()  # generate a second encounter - should logout the first
         self.client.get('/logout', follow_redirects=True)
-        self.assertTrue(len(self.test_user.encounters) > 1)
-        self.assertTrue(all(e.status == 'finished' for e in
-                            self.test_user.encounters))
-        self.assertFalse(self.test_user.current_encounter)
+        assert len(self.test_user.encounters) > 1
+        assert all(e.status == 'finished' for e in self.test_user.encounters)
+        assert not self.test_user.current_encounter
 
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        self.assertEqual(
-            service_user.current_encounter.auth_method,
-            'service_token_authenticated')
+        assert service_user.current_encounter.auth_method ==\
+               'service_token_authenticated'
 
     def test_login_as(self):
         self.bless_with_basics()
@@ -77,16 +72,15 @@ class TestEncounter(TestCase):
         self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
-        self.assertTrue(staff_user.current_encounter)
+        assert staff_user.current_encounter
 
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
-        rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
-        self.assertEqual(302, rv.status_code)  # sent to next_after_login
-        self.assertEqual(
-            self.test_user.current_encounter.auth_method,
-            'staff_authenticated')
-        self.assertTrue(self.test_user._email.startswith(INVITE_PREFIX))
+        response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
+        assert response.status_code == 302  # sent to next_after_login
+        assert self.test_user.current_encounter.auth_method == \
+            'staff_authenticated'
+        assert self.test_user._email.startswith(INVITE_PREFIX)
 
     def test_login_as(self):
         self.bless_with_basics()
@@ -99,12 +93,12 @@ class TestEncounter(TestCase):
         self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
-        self.assertTrue(staff_user.current_encounter)
+        assert staff_user.current_encounter
 
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
-        rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
+        response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         # should return 401 as test user isn't a patient or partner
-        self.assertEqual(401, rv.status_code)
-        self.assertFalse(self.test_user.current_encounter)
-        self.assertTrue(staff_user.current_encounter)
+        assert response.status_code == 401
+        assert not self.test_user.current_encounter
+        assert staff_user.current_encounter
