@@ -2,10 +2,8 @@
 from __future__ import unicode_literals
 
 import json
-import sys
 
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -29,30 +27,30 @@ class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
         self.login()
-        rv = self.client.get('/api/demographics')
+        response = self.client.get('/api/demographics')
 
-        fhir = json.loads(rv.data)
-        self.assertEqual(len(fhir['identifier']), 2)
-        self.assertEqual(fhir['resourceType'], 'Patient')
-        self.assertEqual(fhir['name']['family'], LAST_NAME)
-        self.assertEqual(fhir['name']['given'], FIRST_NAME)
-        self.assertEqual(fhir['photo'][0]['url'], IMAGE_URL)
+        fhir = response.json
+        assert len(fhir['identifier']) == 2
+        assert fhir['resourceType'] == 'Patient'
+        assert fhir['name']['family'] == LAST_NAME
+        assert fhir['name']['given'] == FIRST_NAME
+        assert fhir['photo'][0]['url'] == IMAGE_URL
         # confirm default timezone appears
         tz = [ext for ext in fhir['extension'] if
               ext['url'].endswith('timezone')]
-        self.assertEqual('UTC', tz[0]['timezone'])
-        self.assertEqual(False, fhir['deceasedBoolean'])
+        assert 'UTC' == tz[0]['timezone']
+        assert fhir['deceasedBoolean'] is False
 
         # confirm empties aren't present in extension; i.e. only 'url' key
-        self.assertFalse([e for e in fhir['extension'] if len(e.keys()) == 1])
-        self.assertEqual(len(fhir['telecom']), 1)
-        self.assertTrue(fhir['telecom'][0]['value'], TEST_USERNAME)
+        assert not [e for e in fhir['extension'] if len(e.keys()) == 1]
+        assert len(fhir['telecom']) == 1
+        assert fhir['telecom'][0]['value'] == TEST_USERNAME
 
     def test_demographics404(self):
         self.login()
         self.promote_user(role_name=ROLE.ADMIN.value)
-        rv = self.client.get('/api/demographics/666')
-        self.assert404(rv)
+        response = self.client.get('/api/demographics/666')
+        assert response.status_code == 404
 
     def test_demographicsPUT(self):
         # race / ethnicity require the SLOW addition of concepts to db
@@ -114,47 +112,47 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert200(rv)
-        fhir = json.loads(rv.data)
+        assert response.status_code == 200
+        fhir = response.json
         for item in fhir['telecom']:
             if item['system'] == 'phone':
                 if item['use'] == 'home':
-                    self.assertEqual(alt_phone, item['value'])
+                    assert alt_phone == item['value']
                 elif item['use'] == 'mobile':
-                    self.assertEqual(phone, item['value'])
+                    assert phone == item['value']
                 else:
                     self.fail(
                         'unexpected telecom use: {}'.format(item['use']))
             else:
                 self.fail(
                     'unexpected telecom system: {}'.format(item['system']))
-        self.assertEqual(fhir['birthDate'], dob)
-        self.assertEqual(fhir['deceasedDateTime'], dod)
-        self.assertEqual(fhir['gender'], gender.lower())
-        self.assertEqual(fhir['name']['family'], family)
-        self.assertEqual(fhir['name']['given'], given)
+        assert fhir['birthDate'] == dob
+        assert fhir['deceasedDateTime'] == dod
+        assert fhir['gender'] == gender.lower()
+        assert fhir['name']['family'] == family
+        assert fhir['name']['given'] == given
         # ignore added timezone and empty extensions
-        self.assertEqual(2, len(
-            [ext for ext in fhir['extension']
-             if 'valueCodeableConcept' in ext]))
-        self.assertEqual(3, len(fhir['careProvider']))
-        self.assertTrue(Reference.practitioner(pract_id).as_fhir() in fhir['careProvider'])
+        assert 2 == len([ext for ext in fhir['extension']
+                         if 'valueCodeableConcept' in ext])
+        assert 3 == len(fhir['careProvider'])
+        assert Reference.practitioner(pract_id).as_fhir()\
+               in fhir['careProvider']
 
         user = db.session.merge(self.test_user)
-        self.assertTrue(user._email.startswith('__no_email__'))
-        self.assertTrue(user.email is None)
-        self.assertEqual(user.first_name, given)
-        self.assertEqual(user.last_name, family)
-        self.assertEqual(['2162-6'], [c.code for c in user.ethnicities])
-        self.assertEqual(['1096-7'], [c.code for c in user.races])
-        self.assertEqual(user.organizations.count(), 2)
-        self.assertEqual(user.organizations[0].name, org_name)
-        self.assertEqual(user.organizations[1].name, org2_name)
-        self.assertEqual(user.practitioner_id, pract_id)
+        assert user._email.startswith('__no_email__')
+        assert user.email is None
+        assert user.first_name == given
+        assert user.last_name == family
+        assert ['2162-6'] == [c.code for c in user.ethnicities]
+        assert ['1096-7'] == [c.code for c in user.races]
+        assert user.organizations.count() == 2
+        assert user.organizations[0].name == org_name
+        assert user.organizations[1].name == org2_name
+        assert user.practitioner_id == pract_id
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
@@ -167,42 +165,42 @@ class TestDemographics(TestCase):
             db.session.add(ap_g)
             db.session.commit()
         self.login()
-        rv = self.client.get('/api/demographics')
+        response = self.client.get('/api/demographics')
 
-        fhir = json.loads(rv.data)
-        self.assertEqual(len(fhir['identifier']), 4)
+        fhir = response.json
+        assert len(fhir['identifier']) == 4
 
         # put a study identifier
         study_id = {
             "system":"http://us.truenth.org/identity-codes/external-study-id",
             "use":"secondary","value":"Test Study Id"}
         fhir['identifier'].append(study_id)
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(fhir))
         user = User.query.get(TEST_USER_ID)
-        self.assertEqual(len(user.identifiers), 5)
+        assert len(user.identifiers) == 5
 
     def test_bogus_identifiers(self):
         # empty string values causing problems - prevent insertion
         self.login()
-        rv = self.client.get('/api/demographics')
+        response = self.client.get('/api/demographics')
 
-        fhir = json.loads(rv.data)
-        self.assertEqual(len(fhir['identifier']), 2)
+        fhir = response.json
+        assert len(fhir['identifier']) == 2
 
         # put a study identifier
         study_id = {
             "system": "http://us.truenth.org/identity-codes/external-study-id",
             "use": "secondary", "value": ""}
         fhir['identifier'].append(study_id)
-        rv = self.client.put(
+        response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json',
             data=json.dumps(fhir))
-        self.assert400(rv)
+        assert response.status_code == 400
         user = User.query.get(TEST_USER_ID)
-        self.assertEqual(len(user.identifiers), 2)
+        assert len(user.identifiers) == 2
 
     def test_demographics_update_email(self):
         data = {"resourceType": "Patient",
@@ -214,12 +212,12 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put(
+        response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json', data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
         user = User.query.get(TEST_USER_ID)
-        self.assertEqual(user.email, 'updated@email.com')
+        assert user.email == 'updated@email.com'
 
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
@@ -227,10 +225,10 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_demographics_list_names(self):
         # confirm we can handle when given lists for names as spec'd
@@ -241,13 +239,13 @@ class TestDemographics(TestCase):
             ]}
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
         user = User.query.get(TEST_USER_ID)
-        self.assertEqual(user.last_name, 'family')
-        self.assertEqual(user.first_name, 'given')
+        assert user.last_name == 'family'
+        assert user.first_name == 'given'
 
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
@@ -256,13 +254,13 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert400(rv)
-        self.assertIn('Reference', rv.data)
-        self.assertIn('not found', rv.data)
+        assert response.status_code == 400
+        assert 'Reference' in response.get_data(as_text=True)
+        assert 'not found' in response.get_data(as_text=True)
 
     def test_demographics_duplicate_ref(self):
         # adding duplicate careProvider
@@ -283,14 +281,14 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert200(rv)
+        assert response.status_code == 200
         user = db.session.merge(self.test_user)
-        self.assertEqual(user.organizations.count(), 1)
-        self.assertEqual(user.organizations[0].name, org_name)
+        assert user.organizations.count() == 1
+        assert user.organizations[0].name == org_name
 
     def test_demographics_delete_ref(self):
         # existing careProvider should get removed
@@ -322,16 +320,16 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert200(rv)
+        assert response.status_code == 200
         user = db.session.merge(self.test_user)
 
         # confirm only the one sent via API is intact.
-        self.assertEqual(user.organizations.count(), 1)
-        self.assertEqual(user.organizations[0].name, 'test org')
+        assert user.organizations.count() == 1
+        assert user.organizations[0].name == 'test org'
 
     def test_demographics_identifier_ref(self):
         # referencing careProvider by (unique) external Identifier
@@ -362,15 +360,15 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert200(rv)
+        assert response.status_code == 200
         user, pract = map(db.session.merge, (self.test_user, pract))
-        self.assertEqual(user.organizations.count(), 1)
-        self.assertEqual(user.organizations[0].name, org_name)
-        self.assertEqual(user.practitioner_id, pract.id)
+        assert user.organizations.count() == 1
+        assert user.organizations[0].name == org_name
+        assert user.practitioner_id == pract.id
 
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
@@ -388,11 +386,11 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json',
             data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_alt_phone_removal(self):
         user = User.query.get(TEST_USER_ID)
@@ -414,18 +412,18 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
-        self.assert200(rv)
-        fhir = json.loads(rv.data)
+        assert response.status_code == 200
+        fhir = response.json
         for item in fhir['telecom']:
             if item['system'] == 'phone':
                 if item['use'] == 'mobile':
-                    self.assertEqual(item['value'], '867-5309')
+                    assert item['value'] == '867-5309'
                 elif item['use'] == 'home':
-                    self.assertEqual(item['value'], None)
+                    assert item['value'] is None
                 else:
                     self.fail(
                         'unexpected telecom use: {}'.format(item['use']))
@@ -447,10 +445,10 @@ class TestDemographics(TestCase):
         self.login()
         data = {"resourceType": "Patient",
                 'deceasedBoolean': False}
-        rv = self.client.put(
+        response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json',
             data=json.dumps(data))
-        self.assertTrue(rv.status_code, 200)
+        assert response.status_code == 200
         patient = User.query.get(TEST_USER_ID)
-        self.assertFalse(patient.deceased)
+        assert not patient.deceased
