@@ -1,5 +1,5 @@
 """Unit test module for Demographics API"""
-from __future__ import unicode_literals
+from __future__ import unicode_literals  # isort:skip
 
 import json
 
