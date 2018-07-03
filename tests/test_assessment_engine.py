@@ -1,4 +1,6 @@
 """Unit test module for Assessment Engine API"""
+from __future__ import unicode_literals  # isort:skip
+
 import json
 
 from flask_swagger import swagger
@@ -25,30 +27,30 @@ class TestAssessmentEngine(TestCase):
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data),
         )
-        self.assert200(rv)
-        response = rv.json
-        self.assertEqual(response['ok'], True)
-        self.assertEqual(response['valid'], True)
-        self.assertTrue(self.test_user.questionnaire_responses.count(), 1)
-        self.assertEqual(
-            self.test_user.questionnaire_responses[0].encounter.auth_method,
-            'password_authenticated')
+        assert response.status_code == 200
+        response = response.json
+        assert response['ok']
+        assert response['valid']
+        assert self.test_user.questionnaire_responses.count() == 1
+        assert\
+            self.test_user.questionnaire_responses[0].encounter.auth_method ==\
+            'password_authenticated'
 
     def test_submit_invalid_assessment(self):
         data = {'no_questionnaire_field': True}
 
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data),
         )
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
@@ -97,17 +99,16 @@ class TestAssessmentEngine(TestCase):
         qb = db.session.merge(qb)
 
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data),
         )
-        self.assert200(rv)
+        assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
-        self.assertEqual(test_user.questionnaire_responses.count(), 1)
-        self.assertEqual(
-            test_user.questionnaire_responses[0].questionnaire_bank_id,
-            qb.id)
+        assert test_user.questionnaire_responses.count() == 1
+        assert test_user.questionnaire_responses[0].questionnaire_bank_id ==\
+            qb.id
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)
@@ -140,7 +141,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(in_progress_qnr),
         )
-        self.assert200(in_progress_response)
+        assert in_progress_response.status_code == 200
 
         # Update incomplete QNR
         update_qnr_response = self.client.put(
@@ -148,17 +149,17 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(completed_qnr),
         )
-        self.assert200(update_qnr_response)
-        self.assertTrue(update_qnr_response.json['ok'])
-        self.assertTrue(update_qnr_response.json['valid'])
+        assert update_qnr_response.status_code == 200
+        assert update_qnr_response.json['ok']
+        assert update_qnr_response.json['valid']
 
         updated_qnr_response = self.client.get(
             '/api/patient/assessment?instrument_id={}'.format(instrument_id),
             content_type='application/json',
         )
-        self.assert200(updated_qnr_response)
-        self.assertEqual(updated_qnr_response.json['entry'][0]['group'],
-                          completed_qnr['group'])
+        assert update_qnr_response.status_code == 200
+        assert updated_qnr_response.json['entry'][0]['group'] ==\
+            completed_qnr['group']
 
     def test_no_update_assessment(self):
         swagger_spec = swagger(self.app)
@@ -172,7 +173,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(qnr),
         )
-        self.assert200(qnr_response)
+        assert qnr_response.status_code == 200
 
         qnr['identifier']['system'] = 'foo'
 
@@ -182,7 +183,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(qnr),
         )
-        self.assert404(update_qnr_response)
+        assert update_qnr_response.status_code == 404
 
     def test_assessments_bundle(self):
         swagger_spec = swagger(self.app)
@@ -199,16 +200,17 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(example_data),
         )
-        self.assert200(upload)
+        assert upload.status_code == 200
 
-        rv = self.client.get(
+        response = self.client.get(
             '/api/patient/assessment?instrument_id={}'.format(instrument_id),
             content_type='application/json',
         )
-        response = rv.json
+        response = response.json
 
-        self.assertEqual(response['total'], len(response['entry']))
-        self.assertTrue(response['entry'][0]['questionnaire']['reference'].endswith(instrument_id))
+        assert response['total'] == len(response['entry'])
+        assert response['entry'][0]['questionnaire']['reference']\
+            .endswith(instrument_id)
 
     def test_assessments_csv(self):
         swagger_spec = swagger(self.app)
@@ -221,7 +223,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(example_data),
         )
-        self.assert200(upload_response)
+        assert upload_response.status_code == 200
 
         download_response = self.client.get(
             '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),

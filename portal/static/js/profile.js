@@ -2148,13 +2148,13 @@
                             return false;
                         }
                         dataArray = data.consent_agreements.sort(function(a, b) {
-                            return new Date(b.signed) - new Date(a.signed);
+                            return new Date(b.acceptance_date) - new Date(a.acceptance_date);
                         });
                         var items = $.grep(dataArray, function(item) { //filtered out non-deleted items from all consents
                             return !item.deleted && String(item.status) === "consented";
                         });
                         if (items.length > 0) { //consent date in GMT
-                            self.manualEntry.consentDate = items[0].signed;
+                            self.manualEntry.consentDate = items[0].acceptance_date;
                         }
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
@@ -2360,7 +2360,7 @@
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.signed) + (self.isConsentEditable() && self.isTestEnvironment() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentEditable() && self.isTestEnvironment() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.acceptance_date, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2372,13 +2372,13 @@
                 }, {
                     content: sDisplay
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.signed)
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date)
 
                 },
                 {
-                    content: "<span class='text-danger'>" + (self.getDeletedDisplayDate(item)||"<span class='text-muted'>--</span>") + "</span>"
+                    content: "<span class='text-danger'>" + (self.getRecordedDisplayDate(item)||"<span class='text-muted'>--</span>") + "</span>"
                 }, {
-                    content: (item.deleted && item.deleted.by && item.deleted.by.display ? item.deleted.by.display : "<span class='text-muted'>--</span>")
+                    content: (item.recorded && item.recorded.by && item.recorded.by.display ? item.recorded.by.display : "<span class='text-muted'>--</span>")
                 }];
 
                 contentArray.forEach(function(cell) {
@@ -2406,10 +2406,10 @@
                 }
                 return "active";
             },
-            getDeletedDisplayDate: function(item) {
+            getRecordedDisplayDate: function(item) {
                 if (!item) {return "";}
-                var deleteDate = item.deleted ? item.deleted.lastUpdated : "";
-                return this.modules.tnthDates.formatDateString(deleteDate, "yyyy-mm-dd hh:mm:ss");
+                var recordedDate = item.recorded? item.recorded.lastUpdated : "";
+                return this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss");
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2687,9 +2687,7 @@
                 this.getTerms(); //get terms of use if any
                 var self = this, dataArray = []; 
                 if (data.consent_agreements && (data.consent_agreements).length > 0) {
-                    dataArray = (data.consent_agreements).sort(function(a, b) {
-                        return new Date(b.signed) - new Date(a.signed);
-                    });
+                    dataArray = data.consent_agreements;
                 }
                 this.consent.consentItems = dataArray;
                 this.consent.consentDisplayRows = [];
