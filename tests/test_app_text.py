@@ -59,7 +59,9 @@ class TestAppText(TestCase):
             db.session.add(title)
             db.session.commit()
         with pytest.raises(ValueError):
-            render_template_string('<html></head><body>{{ app_text("landing title") }}<body/><html/>')
+            render_template_string('<html></head><body>'
+                                   '{{ app_text("landing title") }}'
+                                   '<body/><html/>')
 
     def test_permanent_url(self):
         args = {

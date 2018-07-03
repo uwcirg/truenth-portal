@@ -34,8 +34,8 @@ class TestAssessmentEngine(TestCase):
         )
         assert response.status_code == 200
         response = response.json
-        assert response['ok'] == True
-        assert response['valid'] == True
+        assert response['ok']
+        assert response['valid']
         assert self.test_user.questionnaire_responses.count() == 1
         assert\
             self.test_user.questionnaire_responses[0].encounter.auth_method ==\
@@ -159,7 +159,7 @@ class TestAssessmentEngine(TestCase):
         )
         assert update_qnr_response.status_code == 200
         assert updated_qnr_response.json['entry'][0]['group'] ==\
-                          completed_qnr['group']
+            completed_qnr['group']
 
     def test_no_update_assessment(self):
         swagger_spec = swagger(self.app)
@@ -209,7 +209,8 @@ class TestAssessmentEngine(TestCase):
         response = response.json
 
         assert response['total'] == len(response['entry'])
-        assert response['entry'][0]['questionnaire']['reference'].endswith(instrument_id)
+        assert response['entry'][0]['questionnaire']['reference']\
+            .endswith(instrument_id)
 
     def test_assessments_csv(self):
         swagger_spec = swagger(self.app)

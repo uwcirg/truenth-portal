@@ -108,6 +108,6 @@ class TestAudit(TestCase):
         assert response.json['audits'][0]['by']['reference'] ==\
             Reference.patient(TEST_USER_ID).as_fhir()['reference']
         assert response.json['audits'][0]['on'] ==\
-                          Reference.patient(TEST_USER_ID).as_fhir()
+            Reference.patient(TEST_USER_ID).as_fhir()
         assert response.json['audits'][0]['context'] == 'other'
         assert response.json['audits'][0]['comment'] == 'just test data'

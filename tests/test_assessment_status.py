@@ -379,7 +379,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # confirm appropriate instruments
         a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
         assert set(a_s.instruments_needing_full_assessment()) ==\
-               localized_instruments
+            localized_instruments
 
     def test_localized_on_time(self):
         # User finished both on time
