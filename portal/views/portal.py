@@ -807,7 +807,8 @@ def config_settings(config_key):
         'SYSTEM',
         'SHOW_PROFILE_MACROS',
         'MEDIDATA_RAVE_FIELDS',
-        'MEDIDATA_RAVE_ORG'
+        'MEDIDATA_RAVE_ORG',
+        'LOCALIZED_AFFILIATE_ORG'
     )
     if config_key:
         key = config_key.upper()

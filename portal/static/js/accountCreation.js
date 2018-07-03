@@ -37,7 +37,9 @@
         var leafOrgs = this.__getDependency("leafOrgs");
         var orgList = this.__getDependency("orgList");
 
-
+        this.__isPatient = function() {
+            return $("#accountCreationContentContainer").attr("data-account") === "patient";
+        };
         this.__request = function(params) {
             params = params || {};
             params.callback = params.callback || function() {};
@@ -171,9 +173,32 @@
                         self.__handleError(data.error);
                         self.__handleButton();
                     } else {
+                        self.__setPcaLocalized();
                         self.__setProcedures();
                     }
                 }
+            });
+        };
+        this.__getSettings = function(callback) {
+            callback = callback || function() {};
+            this.__request({"apiUrl": "/api/settings", "requestType": "GET", "callback": function(result) { //check config
+                callback(result);
+            }});
+        };
+        this.__setPcaLocalized = function() {
+            if (!this.userId || !this.__isPatient()) {
+                return false;
+            }
+            var userId = this.userId;
+            var parentOrg = OT.getSelectedOrgTopLevelParentOrg();
+            if (!parentOrg) {
+                return false;
+            }
+            this.__getSettings(function(result) { //check config
+                if (!result || !result.data.LOCALIZED_AFFILIATE_ORG) {
+                    return false;
+                }
+                tnthAjax.postClinical(userId,"pca_localized", OT.getOrgName(parentOrg) === result.data.LOCALIZED_AFFILIATE_ORG);
             });
         };
         this.__setProcedures = function() {

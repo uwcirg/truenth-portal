@@ -1662,6 +1662,7 @@
                             }, 500);
                             self.reloadConsentList(userId);
                         }
+                        self.handlePcaLocalized();
                         if ($("#locale").length > 0) {
                             self.modules.tnthAjax.getLocale(userId);
                         }
@@ -1901,6 +1902,24 @@
                         });
                     });
                 });
+            },
+            handlePcaLocalized: function() {
+                if (!this.subjectId || !this.isPatient()) {
+                    return false;
+                }
+                var parentOrg = this.orgTool.getSelectedOrgTopLevelParentOrg();
+                if (!this.settings.LOCALIZED_AFFILIATE_ORG) {
+                    return false; //don't set at all if config is not present, i.e. Truenth does not have this config
+                }
+                this.modules.tnthAjax.postClinical(this.subjectId,"pca_localized", this.isLocalizedAffiliatedOrg());
+
+            },
+            isLocalizedAffiliatedOrg: function() {
+                var parentOrg = this.orgTool.getSelectedOrgTopLevelParentOrg();
+                if (!parentOrg) {
+                    return false;
+                }
+                return this.orgTool.getOrgName(parentOrg) === this.settings.LOCALIZED_AFFILIATE_ORG;
             },
             updateClinicalSection: function(data) {
                 if (!data) { return false; }

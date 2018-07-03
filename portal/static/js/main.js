@@ -366,6 +366,9 @@ OrgTool.prototype.populateUI = function() {
         container.html(i18next.t("No organizations available"));
     }
 };
+OrgTool.prototype.getSelectedOrgTopLevelParentOrg = function() {
+    return this.getTopLevelParentOrg(this.getSelectedOrg().val());
+};
 OrgTool.prototype.getSelectedOrg = function() {
     return $("#userOrgs input[name='organization']:checked");
 };
