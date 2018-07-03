@@ -1,4 +1,6 @@
 """Unit test module for access URLs"""
+from __future__ import unicode_literals  # isort:skip
+
 from flask import url_for
 
 from portal.extensions import db, user_manager
@@ -15,17 +17,18 @@ class TestAccessUrl(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         onetime = db.session.merge(onetime)
-        rv = self.client.get('/api/user/{}/access_url'.format(onetime.id))
-        self.assert200(rv)
+        response =\
+            self.client.get('/api/user/{}/access_url'.format(onetime.id))
+        assert response.status_code == 200
 
         # confirm we obtained a valid token
-        access_url = rv.json['access_url']
+        access_url = response.json['access_url']
         token = access_url.split('/')[-1]
         is_valid, has_expired, id =\
                 user_manager.token_manager.verify_token(token, 10)
-        self.assertTrue(is_valid)
-        self.assertFalse(has_expired)
-        self.assertEqual(id, onetime.id)
+        assert is_valid
+        assert not has_expired
+        assert id == onetime.id
 
     def test_use_access_url(self):
         """The current flow forces access to the challenge page"""
@@ -38,12 +41,12 @@ class TestAccessUrl(TestCase):
         token = user_manager.token_manager.generate_token(onetime.id)
         access_url = url_for('portal.access_via_token', token=token)
 
-        rv = self.client.get(access_url)
-        self.assert_redirects(rv, url_for('portal.challenge_identity'))
+        response = self.client.get(access_url)
+        self.assert_redirects(response, url_for('portal.challenge_identity'))
 
     def test_bad_token(self):
         token = 'TBKSYw7iHndUT3DfaED9tw.DHZMrQ.Wwr8SPM7ylABWf0mQHhGHHwttYk'
         access_url = url_for('portal.access_via_token', token=token)
 
-        rv = self.client.get(access_url)
-        self.assert404(rv)
+        response = self.client.get(access_url)
+        assert response.status_code == 404
