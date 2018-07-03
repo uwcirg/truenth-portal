@@ -200,7 +200,7 @@
                 }
                 tnthAjax.postClinical(userId,"pca_localized", OT.getOrgName(parentOrg) === result.data.LOCALIZED_AFFILIATE_ORG);
             });
-        }
+        };
         this.__setProcedures = function() {
 
             var self = this;
