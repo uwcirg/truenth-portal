@@ -256,68 +256,6 @@ class TestExclusionPersistence(TestCase):
         sp.export(staging_exclusion=True)
 
         assert Token.query.count() == 1
-        assert UserRelationship.query.count() == 1
-
-    def test_preflight_valid(self):
-        # setup pre-flight conditions expected to pass
-        ds_p3p = INTERVENTION.decision_support_p3p
-        ds_client = Client(
-            client_id='12345', client_secret='54321', user_id=TEST_USER_ID,
-            intervention=ds_p3p, _redirect_uris='http://testsite.org',
-            callback_url='http://callback.one')
-        service = self.add_service_user(sponsor=self.test_user)
-
-        with SessionScope(db):
-            db.session.add(ds_client)
-            db.session.commit()
-
-        ds_client = db.session.merge(ds_client)
-        service = db.session.merge(service)
-        create_service_token(client=ds_client, user=service)
-
-        # Export
-        sp = SitePersistence(target_dir=self.tmpdir)
-        sp.export(staging_exclusion=True)
-
-        assert Token.query.count() == 1
-
-        # Delete service account, expect it to return
-        with SessionScope(db):
-            db.session.delete(service)
-            db.session.commit()
-
-        assert User.query.count() == 1
-        assert Token.query.count() == 0
-
-        # Import
-        sp.import_(keep_unmentioned=True, staging_exclusion=True)
-
-        assert Token.query.count() == 1
-        assert User.query.count() == 2
-
-    def test_preflight_invalid_service_user(self):
-        # setup pre-flight conditions expected to fail
-        ds_p3p = INTERVENTION.decision_support_p3p
-        ds_client = Client(
-            client_id='12345', client_secret='54321', user_id=TEST_USER_ID,
-            intervention=ds_p3p, _redirect_uris='http://testsite.org',
-            callback_url='http://callback.one')
-        service = self.add_service_user(sponsor=self.test_user)
-
-        with SessionScope(db):
-            db.session.add(ds_client)
-            db.session.commit()
-
-        ds_client = db.session.merge(ds_client)
-        service = db.session.merge(service)
-        service_id = service.id
-        create_service_token(client=ds_client, user=service)
-
-        # Export
-        sp = SitePersistence(target_dir=self.tmpdir)
-        sp.export(staging_exclusion=True)
-
-        assert Token.query.count() == 1
 
         # Delete service account, and put fake patient in its place
         with SessionScope(db):
