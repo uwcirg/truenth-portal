@@ -455,7 +455,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status, "Due"
+        assert a_s.overall_status == "Due"
 
         # confirm list of expected intruments needing attention
         assert \
