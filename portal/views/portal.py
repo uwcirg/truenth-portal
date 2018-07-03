@@ -8,6 +8,7 @@ from flask import (
     Blueprint,
     abort,
     current_app,
+    g,
     jsonify,
     make_response,
     redirect,
@@ -93,7 +94,11 @@ def assert_locale_selector():
     # Confirm import & use of custom babel localeselector function.
     # Necessary to import get_locale to bring into the request scope to
     # prevent the default babel locale selector from being used.
-    assert get_locale()
+    locale_code = get_locale()
+
+    # assign locale code as global for easy access in template
+    if locale_code:
+        g.locale_code = locale_code
 
 
 @portal.before_app_request
