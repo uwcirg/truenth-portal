@@ -44,7 +44,7 @@ class TestEncounter(TestCase):
         self.login()
         assert len(self.test_user.encounters) == 1
         assert self.test_user.current_encounter.auth_method == \
-               'password_authenticated'
+            'password_authenticated'
 
     def test_encounter_after_logout(self):
         self.login()
@@ -59,7 +59,7 @@ class TestEncounter(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         assert service_user.current_encounter.auth_method ==\
-               'service_token_authenticated'
+            'service_token_authenticated'
 
     def test_login_as(self):
         self.bless_with_basics()
