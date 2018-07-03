@@ -140,7 +140,7 @@ class TestDemographics(TestCase):
                          if 'valueCodeableConcept' in ext])
         assert 3 == len(fhir['careProvider'])
         assert Reference.practitioner(pract_id).as_fhir()\
-               in fhir['careProvider']
+            in fhir['careProvider']
 
         user = db.session.merge(self.test_user)
         assert user._email.startswith('__no_email__')
