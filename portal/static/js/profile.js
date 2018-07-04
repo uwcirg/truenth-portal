@@ -72,8 +72,9 @@
                 var checkFinished = self.initChecks.length === 0;
                 if (checkFinished || (elapsedTime >= 5)) {
                     clearInterval(self.initIntervalId);
-                    self.onSectionsDidLoad();
-                    self.initSections(function() { self.handleOptionalCoreData();});
+                    self.initSections(function() { 
+                        self.onSectionsDidLoad();
+                        self.handleOptionalCoreData();});
                 }
             }, 30);
         },
