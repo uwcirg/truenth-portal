@@ -72,7 +72,7 @@
                 var checkFinished = self.initChecks.length === 0;
                 if (checkFinished || (elapsedTime >= 5)) {
                     clearInterval(self.initIntervalId);
-                    self.initSections(function() { 
+                    self.initSections(function() {
                         self.onSectionsDidLoad();
                         self.handleOptionalCoreData();});
                 }
@@ -562,7 +562,7 @@
                             triggerEvent = "blur";
                         }
                         if (_isTouchDevice()) { /*_isTouchDevice global */
-                            triggerEvent = "touchend"; //account for mobile devices touch events
+                            triggerEvent = "change"; //account for mobile devices touch events
                         }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
@@ -2705,7 +2705,7 @@
                     return false;
                 }
                 this.getTerms(); //get terms of use if any
-                var self = this, dataArray = []; 
+                var self = this, dataArray = [];
                 if (data.consent_agreements && (data.consent_agreements).length > 0) {
                     dataArray = data.consent_agreements;
                 }
@@ -2731,7 +2731,7 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-               
+
                 if (self.isConsentEditable()) {
                     self.initConsentItemEvent();
                 }
