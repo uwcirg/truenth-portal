@@ -184,6 +184,7 @@ body {
 }
 .save-loader-wrapper {
   position: relative;
+  margin-top: 4px;
   min-height: 12px;
   .success-icon {
     color: green;
@@ -194,6 +195,7 @@ body {
   .save-info {
     position: absolute;
     opacity: 0;
+    left: 0;
      -webkit-transition: opacity 0.8s ease-in;
     transition: opacity 0.8s ease-in;
     font-size: @smallText;
@@ -201,7 +203,7 @@ body {
 }
 @media (min-width: 768px) {
   .save-loader-wrapper {
-    min-height: auto;
+    min-height: 8px;
   }
 }
 .email-ready-message {
@@ -1694,7 +1696,7 @@ body.portal .copyright-container  {
 @media (min-width: 699px) {
   .portal-header,
   .portal-intro-text {
-    font-size: @subheadSize;
+    font-size: @subSmallHeadSize;
   }
 }
 .portal-header-logout-container {
@@ -1733,7 +1735,10 @@ body.portal .copyright-container  {
     opacity: @disabledOpacity;
   }
   & .title {
+    font-size: @subSmallHeadSize;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   & a {
     color: #FFF;
@@ -1810,7 +1815,7 @@ body.portal .copyright-container  {
 }
 @media (min-width: 699px) {
   .portal-description-title {
-    font-size: @lgsubheadSize;
+    font-size: @subSmallHeadSize;
   }
 }
 .portal-registration-container, .portal-full-width-container {
@@ -2385,7 +2390,6 @@ input.clinic {
 }
 
 #profileStudyIDContainer {
-  margin-bottom: 2em;
   input {
     width: 300px;
     max-width: 100%;
@@ -3363,7 +3367,7 @@ div.timezone-warning.text-warning {
 
 @media (min-width: 726px) {
   .portal-header {
-    font-size: @subheadSize;
+    font-size: @subSmallHeadSize;
   }
 }
 
