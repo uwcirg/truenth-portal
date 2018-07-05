@@ -148,6 +148,7 @@
                 consentDisplayRows: [],
                 consentListErrorMessage: "",
                 consentLoading: false,
+                saveLoading: false,
                 showInitialConsentTerms: false
             },
             assessment: {
@@ -1856,17 +1857,30 @@
                     e.stopPropagation();
                     closeButtons.attr("disabled", true);
                     var orgId = $(this).attr("data-org"), userId = __self.subjectId;
-                    $("#" + orgId + "_loader").show();
+                    var postUpdate = function(orgId, errorMessage) {
+                        if (errorMessage) {
+                            $("#"+orgId+"_consentAgreementMessage").html(errorMessage);
+                        } else {
+                            $("#"+orgId+"_consentAgreementMessage").html("");
+                            setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(); }, 250);
+                            setTimeout(function() { __self.reloadConsentList(userId);}, 500);
+                        }
+                        $("#" + orgId + "_loader.loading-message-indicator").hide();
+                        closeButtons.attr("disabled", false);
+                    };
+                    console.log("orgId? ", orgId)
+                    $("#" + orgId + "_loader.loading-message-indicator").show();
                     if ($(this).val() === "yes") {
                         var params = __self.CONSENT_ENUM.consented;
                         params.org = orgId;
                         params.agreementUrl = $("#" + orgId + "_agreement_url").val() || __self.getDefaultAgreementUrl(orgId);
-                        setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params);}, 10);
+                        setTimeout(function() {__self.modules.tnthAjax.setConsent(userId, params,"",false, function(data) {
+                            postUpdate(orgId, data.error);
+                        });}, 50);
                     } else {
                         __self.modules.tnthAjax.deleteConsent(userId, {"org": orgId});
+                        postUpdate(orgId);
                     }
-                    setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(); }, 250);
-                    setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                 });
 
                 closeButtons.off("click").on("click", function(e) {
@@ -2545,6 +2559,7 @@
                 $("#profileConsentListModal input[class='radio_consent_input']").each(function() {
                     $(this).off("click").on("click", function() { //remove pre-existing events as when consent list is re-drawn
                         var o = __self.CONSENT_ENUM[$(this).val()];
+                        __self.consent.saveLoading = true;
                         if (o) {
                             o.org = $(this).attr("data-orgId");
                             o.agreementUrl = $(this).attr("data-agreementUrl");
@@ -2553,21 +2568,23 @@
                             __self.modules.tnthAjax.deleteConsent($(this).attr("data-userId"), {
                                 org: $(this).attr("data-orgId")
                             });
+                            __self.consent.saveLoading = false;
                             __self.reloadConsentList($(this).attr("data-userId"));
                         } else if (String($(this).val()) === "suspended") {
                             var modalElement = $("#profileConsentListModal"), self = $(this);
                             __self.modules.tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"), null, function(data) {
                                 modalElement.removeClass("fade").modal("hide");
-                                if (data.error) {
-                                    $("#profileConsentListModalErrorMessage").text(data.error);
-                                } else {
-                                    __self.reloadConsentList(self.attr("data-userId"));
-                                }
+                                __self.consent.saveLoading = false;
+                                __self.reloadConsentList(self.attr("data-userId"));
                             });
                         } else {
-                            __self.modules.tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
-                            $("#profileConsentListModal").removeClass("fade").modal("hide");
-                            __self.reloadConsentList($(this).attr("data-userId"));
+                            var self = $(this);
+                            __self.modules.tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val(), false, function(data) {
+                                $("#profileConsentListModal").removeClass("fade").modal("hide");
+                                __self.consent.saveLoading = false;
+                                __self.reloadConsentList(self.attr("data-userId"));
+                            });
+    
                         }
                     });
                 });

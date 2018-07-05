@@ -562,7 +562,8 @@
                                 <label class="radio-inline"><input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>
                             </div>
                         </div>
-                        <div id="{orgId}_consentAgreementMessage" class="error-message"></div>
+                        <br/>
+                        <div id="{orgId}_consentAgreementMessage" class="set-consent-error error-message"></div>
                     </div>
                     <br/>
                     <div class="modal-footer" >
@@ -603,7 +604,8 @@
                               <label class="radio-inline"><input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>{{ _("No") }}</label>
                             </div>
                         </div>
-                        <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                        <br/>
+                        <div id="{{org}}_consentAgreementMessage" class="set-consent-error error-message"></div>
                      </div>
                      <br/>
                      <div class="modal-footer" >
@@ -721,7 +723,9 @@
                             </div>
                             <div id="#profileConsentListModalErrorMessage" class="text-danger"></div>
                         </div>
-                        <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+                        <div class="modal-footer">
+                            <div class="content-loading-message-indicator" v-show="consent.saveLoading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" v-show="!consent.saveLoading">{{_("Close")}}</button>
                         </div>
                 </div>
             </div>
