@@ -1,25 +1,24 @@
 """Test identifiers"""
+from __future__ import unicode_literals  # isort:skip
+
 import json
-import sys
 
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.identifier import Identifier
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestIdentifier(TestCase):
 
     def testGET(self):
         expected = len(self.test_user.identifiers)
         self.login()
-        rv = self.client.get('/api/user/{}/identifier'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['identifier']), expected)
+        response = self.client.get('/api/user/{}/identifier'
+                                   .format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert len(response.json['identifier']) == expected
 
     def testPOST(self):
         """Add an existing and fresh identifier - confirm it sticks"""
@@ -32,10 +31,10 @@ class TestIdentifier(TestCase):
         fresh = Identifier(system='http://another.com', value='unique')
         data = {'identifier': [i.as_fhir() for i in (existing, fresh)]}
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/identifier'.format(TEST_USER_ID),
             content_type='application/json', data=json.dumps(data))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['identifier']), expected)
+        assert response.status_code == 200
+        assert len(response.json['identifier']) == expected
         user = User.query.get(TEST_USER_ID)
-        self.assertEqual(len(user.identifiers), expected)
+        assert len(user.identifiers) == expected

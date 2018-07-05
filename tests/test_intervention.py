@@ -1,8 +1,9 @@
 """Unit test module for Intervention API"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime, timedelta
 import json
 import os
-import sys
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
@@ -32,8 +33,6 @@ from tests.test_assessment_status import (
     mock_questionnairebanks,
 )
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestIntervention(TestCase):
 
     def test_intervention_wrong_service_user(self):
@@ -41,11 +40,11 @@ class TestIntervention(TestCase):
         self.login(user_id=service_user.id)
 
         data = {'user_id': TEST_USER_ID, 'access': 'granted'}
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/sexual_recovery',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert401(rv)
+        assert response.status_code == 401
 
     def test_intervention(self):
         client = self.add_client()
@@ -64,20 +63,20 @@ class TestIntervention(TestCase):
             'staff_html': "unique HTML for /patients view"
         }
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/sexual_recovery',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         ui = UserIntervention.query.one()
-        self.assertEqual(ui.user_id, data['user_id'])
-        self.assertEqual(ui.access, data['access'])
-        self.assertEqual(ui.card_html, data['card_html'])
-        self.assertEqual(ui.link_label, data['link_label'])
-        self.assertEqual(ui.link_url, data['link_url'])
-        self.assertEqual(ui.status_text, data['status_text'])
-        self.assertEqual(ui.staff_html, data['staff_html'])
+        assert ui.user_id == data['user_id']
+        assert ui.access == data['access']
+        assert ui.card_html == data['card_html']
+        assert ui.link_label == data['link_label']
+        assert ui.link_url == data['link_url']
+        assert ui.status_text == data['status_text']
+        assert ui.staff_html == data['staff_html']
 
     def test_music_hack(self):
         client = self.add_client()
@@ -88,15 +87,15 @@ class TestIntervention(TestCase):
 
         data = {'user_id': TEST_USER_ID, 'access': "granted"}
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/music',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         ui = UserIntervention.query.one()
-        self.assertEqual(ui.user_id, data['user_id'])
-        self.assertEqual(ui.access, 'subscribed')
+        assert ui.user_id == data['user_id']
+        assert ui.access == 'subscribed'
 
     def test_intervention_partial_put(self):
         client = self.add_client()
@@ -135,20 +134,20 @@ class TestIntervention(TestCase):
             'card_html': "no access for YOU"
         }
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/sexual_recovery',
             content_type='application/json',
             data=json.dumps(update))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         ui = UserIntervention.query.one()
-        self.assertEqual(ui.user_id, data['user_id'])
-        self.assertEqual(ui.access, update['access'])
-        self.assertEqual(ui.card_html, update['card_html'])
-        self.assertEqual(ui.link_label, data['link_label'])
-        self.assertEqual(ui.link_url, data['link_url'])
-        self.assertEqual(ui.status_text, data['status_text'])
-        self.assertEqual(ui.staff_html, data['staff_html'])
+        assert ui.user_id == data['user_id']
+        assert ui.access == update['access']
+        assert ui.card_html == update['card_html']
+        assert ui.link_label == data['link_label']
+        assert ui.link_url == data['link_url']
+        assert ui.status_text == data['status_text']
+        assert ui.staff_html == data['staff_html']
 
     def test_intervention_bad_access(self):
         client = self.add_client()
@@ -161,11 +160,11 @@ class TestIntervention(TestCase):
             'access': 'enabled',
         }
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/sexual_recovery',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_intervention_validation(self):
         client = self.add_client()
@@ -179,11 +178,11 @@ class TestIntervention(TestCase):
             'link_url': 'http://un-safe.com',
         }
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/intervention/sexual_recovery',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_clinc_id(self):
         # Create several orgs with identifier
@@ -200,10 +199,14 @@ class TestIntervention(TestCase):
         cp_id = cp.id
 
         with SessionScope(db):
-            map(db.session.add, (org1, org2, org3))
+            db.session.add(org1)
+            db.session.add(org2)
+            db.session.add(org3)
             db.session.commit()
 
-        org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
+        org1 = db.session.merge(org1)
+        org2 = db.session.merge(org2)
+        org3 = db.session.merge(org3)
         d = {
             'function': 'limit_by_clinic_w_id',
             'kwargs': [{'name': 'identifier_value',
@@ -222,16 +225,16 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to associating user with any orgs, shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
-        self.assertFalse(cp.quick_access_check(user))
+        assert not cp.display_for_user(user).access
+        assert not cp.quick_access_check(user)
 
         # Add association and test again
         user.organizations.append(org3)
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
-        self.assertTrue(cp.display_for_user(user).access)
-        self.assertTrue(cp.quick_access_check(user))
+        assert cp.display_for_user(user).access
+        assert cp.quick_access_check(user)
 
     def test_diag_stategy(self):
         """Test strategy for diagnosis"""
@@ -255,8 +258,8 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to PCa dx, user shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
-        self.assertFalse(cp.quick_access_check(user))
+        assert not cp.display_for_user(user).access
+        assert not cp.quick_access_check(user)
 
         # Bless the test user with PCa diagnosis
         self.login()
@@ -268,8 +271,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertTrue(cp.display_for_user(user).access)
-        self.assertTrue(cp.quick_access_check(user))
+        assert cp.display_for_user(user).access
+        assert cp.quick_access_check(user)
 
     def test_diag_changed_stategy(self):
         """Test strategy for altered diagnosis"""
@@ -293,8 +296,8 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to PCa dx, user shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
-        self.assertFalse(cp.quick_access_check(user))
+        assert not cp.display_for_user(user).access
+        assert not cp.quick_access_check(user)
 
         # Bless the test user with PCa diagnosis
         self.login()
@@ -308,8 +311,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertTrue(cp.display_for_user(user).access)
-        self.assertTrue(cp.quick_access_check(user))
+        assert cp.display_for_user(user).access
+        assert cp.quick_access_check(user)
 
         # Now post a *NEW* value taking away PCa dx, should eclipse old value
         # and tak away access
@@ -321,8 +324,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertFalse(cp.display_for_user(user).access)
-        self.assertFalse(cp.quick_access_check(user))
+        assert not cp.display_for_user(user).access
+        assert not cp.quick_access_check(user)
 
 
     def test_no_tx(self):
@@ -345,8 +348,8 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to declaring TX, user should have access
-        self.assertTrue(cp.display_for_user(user).access)
-        self.assertTrue(cp.quick_access_check(user))
+        assert cp.display_for_user(user).access
+        assert cp.quick_access_check(user)
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -355,8 +358,8 @@ class TestIntervention(TestCase):
         user, cp = map(db.session.merge, (user, cp))
 
         # Declaring they started a non TX proc, should still have access
-        self.assertTrue(cp.display_for_user(user).access)
-        self.assertTrue(cp.quick_access_check(user))
+        assert cp.display_for_user(user).access
+        assert cp.quick_access_check(user)
 
         self.add_procedure(
             code='26294005',
@@ -367,8 +370,8 @@ class TestIntervention(TestCase):
         user, cp = map(db.session.merge, (user, cp))
 
         # Declaring they started a TX proc, should lose access
-        self.assertFalse(cp.display_for_user(user).access)
-        self.assertFalse(cp.quick_access_check(user))
+        assert not cp.display_for_user(user).access
+        assert not cp.quick_access_check(user)
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -393,10 +396,10 @@ class TestIntervention(TestCase):
 
         # Prior to associating user w/ decision support, the strategy
         # should give access to p3p
-        self.assertTrue(ds_p3p.display_for_user(user).access)
-        self.assertTrue(ds_p3p.quick_access_check(user))
-        self.assertFalse(ds_wc.display_for_user(user).access)
-        self.assertFalse(ds_wc.quick_access_check(user))
+        assert ds_p3p.display_for_user(user).access
+        assert ds_p3p.quick_access_check(user)
+        assert not ds_wc.display_for_user(user).access
+        assert not ds_wc.quick_access_check(user)
 
         # Add user to wisercare, confirm it's the only w/ access
 
@@ -407,10 +410,10 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ds_p3p, ds_wc = map(db.session.merge, (user, ds_p3p, ds_wc))
 
-        self.assertFalse(ds_p3p.display_for_user(user).access)
-        self.assertFalse(ds_p3p.quick_access_check(user))
-        self.assertTrue(ds_wc.display_for_user(user).access)
-        self.assertTrue(ds_wc.quick_access_check(user))
+        assert not ds_p3p.display_for_user(user).access
+        assert not ds_p3p.quick_access_check(user)
+        assert ds_wc.display_for_user(user).access
+        assert ds_wc.quick_access_check(user)
 
     def test_not_in_role_or_sr(self):
         user = self.test_user
@@ -440,31 +443,30 @@ class TestIntervention(TestCase):
                 name="SELF_MANAGEMENT if not SR and not in WRITE_ONLY",
                 intervention_id=sm.id,
                 function_details=json.dumps(d))
-            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
 
         # Prior to granting user WRITE_ONLY role, the strategy
         # should give access to p3p
-        self.assertTrue(sm.display_for_user(user).access)
-        self.assertTrue(sm.quick_access_check(user))
+        assert sm.display_for_user(user).access
+        assert sm.quick_access_check(user)
 
         # Add WRITE_ONLY to user's roles
         add_role(user, ROLE.WRITE_ONLY.value)
         with SessionScope(db):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
-        self.assertFalse(sm.display_for_user(user).access)
-        self.assertFalse(sm.quick_access_check(user))
+        assert not sm.display_for_user(user).access
+        assert not sm.quick_access_check(user)
 
         # Revert role change for next condition
         user.roles = []
         with SessionScope(db):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
-        self.assertTrue(sm.display_for_user(user).access)
-        self.assertTrue(sm.quick_access_check(user))
+        assert sm.display_for_user(user).access
+        assert sm.quick_access_check(user)
 
         # Grant user sr access, they should lose sm visibility
         ui = UserIntervention(
@@ -475,8 +477,8 @@ class TestIntervention(TestCase):
             db.session.add(ui)
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
-        self.assertFalse(sm.display_for_user(user).access)
-        self.assertFalse(sm.quick_access_check(user))
+        assert not sm.display_for_user(user).access
+        assert not sm.quick_access_check(user)
 
     def test_in_role(self):
         user = self.test_user
@@ -500,16 +502,16 @@ class TestIntervention(TestCase):
 
         # Prior to granting user PATIENT role, the strategy
         # should not give access to SM
-        self.assertFalse(sm.display_for_user(user).access)
-        self.assertFalse(sm.quick_access_check(user))
+        assert not sm.display_for_user(user).access
+        assert not sm.quick_access_check(user)
 
         # Add PATIENT to user's roles
         add_role(user, ROLE.PATIENT.value)
         with SessionScope(db):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
-        self.assertTrue(sm.display_for_user(user).access)
-        self.assertTrue(sm.quick_access_check(user))
+        assert sm.display_for_user(user).access
+        assert sm.quick_access_check(user)
 
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
@@ -540,8 +542,7 @@ class TestIntervention(TestCase):
         user, ae, metastatic_org = map(db.session.merge, (self.test_user, ae, metastatic_org))
 
         # without completing an assessment, card_html should include username
-        self.assertTrue(
-            user.display_name in ae.display_for_user(user).card_html)
+        assert user.display_name in ae.display_for_user(user).card_html
 
         # Add a fake assessments and see a change
         m_qb = QuestionnaireBank.query.filter(
@@ -556,12 +557,12 @@ class TestIntervention(TestCase):
         user, ae = map(db.session.merge, (self.test_user, ae))
 
         card_html = ae.display_for_user(user).card_html
-        self.assertTrue("Thank you" in card_html)
-        self.assertTrue(ae.quick_access_check(user))
+        assert "Thank you" in card_html
+        assert ae.quick_access_check(user)
 
         # test datetime display based on user timezone
         today = datetime.strftime(dt, '%e %b %Y')
-        self.assertTrue(today in card_html)
+        assert today in card_html
         user.timezone = "Asia/Tokyo"
         with SessionScope(db):
             db.session.add(user)
@@ -570,7 +571,7 @@ class TestIntervention(TestCase):
         card_html = ae.display_for_user(user).card_html
         tomorrow = datetime.strftime(
             dt + timedelta(days=1), '%e %b %Y')
-        self.assertTrue(tomorrow in card_html)
+        assert tomorrow in card_html
 
     def test_expired(self):
         """If baseline expired check message"""
@@ -598,9 +599,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
 
-        self.assertTrue(
-            "The assessment is no longer available" in
-            ae.display_for_user(user).card_html)
+        assert("The assessment is no longer available"
+               in ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
@@ -614,9 +614,8 @@ class TestIntervention(TestCase):
             }
         }
         acc_strat = AccessStrategy.from_json(d)
-        self.assertEqual(d['name'], acc_strat.name)
-        self.assertEqual(d['function_details'],
-                          json.loads(acc_strat.function_details))
+        assert d['name'] == acc_strat.name
+        assert d['function_details'] == json.loads(acc_strat.function_details)
 
     def test_strat_view(self):
         """Test strategy view functions"""
@@ -630,20 +629,20 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
             }
         }
-        rv = self.client.post(
+        response = self.client.post(
             '/api/intervention/sexual_recovery/access_rule',
             content_type='application/json',
             data=json.dumps(d))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # fetch it back and compare
-        rv = self.client.get('/api/intervention/sexual_recovery/access_rule')
-        self.assert200(rv)
-        data = json.loads(rv.data)
-        self.assertEqual(len(data['rules']), 1)
-        self.assertEqual(d['name'], data['rules'][0]['name'])
-        self.assertEqual(d['function_details'],
-                         data['rules'][0]['function_details'])
+        response = (self.client
+                    .get('/api/intervention/sexual_recovery/access_rule'))
+        assert response.status_code == 200
+        data = response.json
+        assert len(data['rules']) == 1
+        assert d['name'] == data['rules'][0]['name']
+        assert d['function_details'] == data['rules'][0]['function_details']
 
     def test_strat_dup_rank(self):
         """Rank must be unique"""
@@ -658,11 +657,11 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
             }
         }
-        rv = self.client.post(
+        response = self.client.post(
             '/api/intervention/sexual_recovery/access_rule',
             content_type='application/json',
             data=json.dumps(d))
-        self.assert200(rv)
+        assert response.status_code == 200
         d = {
             'name': 'unit test same rank example',
             'rank': 1,
@@ -673,11 +672,11 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
             }
         }
-        rv = self.client.post(
+        response = self.client.post(
             '/api/intervention/sexual_recovery/access_rule',
             content_type='application/json',
             data=json.dumps(d))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_and_strats(self):
         # Create a logical 'and' with multiple strategies
@@ -726,7 +725,7 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # first strat true, second false.  therfore, should be False
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        assert not ds_p3p.display_for_user(user).access
 
         # Add the child organization to the user, which should be included
         # due to default behavior of limit_by_clinic_w_id
@@ -735,7 +734,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
         # first strat true, second true.  therfore, should be True
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        assert ds_p3p.display_for_user(user).access
 
         ui = UserIntervention(
             user_id=user.id,
@@ -747,7 +746,7 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # first strat true, second false.  AND should be false
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        assert not ds_p3p.display_for_user(user).access
 
     def test_p3p_conditions(self):
         # Test the list of conditions expected for p3p
@@ -830,13 +829,12 @@ class TestIntervention(TestCase):
                 description=description,
                 intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # only first two strats true so far, therfore, should be False
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        assert not ds_p3p.display_for_user(user).access
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -851,15 +849,15 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # All conditions now met, should have access
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        assert ds_p3p.display_for_user(user).access
 
         # Remove all clinics, should still have access
         user.organizations = []
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        self.assertEqual(user.organizations.count(), 0)
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        assert user.organizations.count() == 0
+        assert ds_p3p.display_for_user(user).access
 
     def test_eproms_p3p_conditions(self):
         # Test the list of conditions expected for p3p on eproms
@@ -960,13 +958,12 @@ class TestIntervention(TestCase):
                 description=description,
                 intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # only first two strats true so far, therfore, should be False
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        assert not ds_p3p.display_for_user(user).access
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -981,22 +978,22 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # All conditions now met, should have access
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        assert ds_p3p.display_for_user(user).access
 
         # Remove all clinics, should still have access
         user.organizations = []
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        self.assertEqual(user.organizations.count(), 0)
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        assert user.organizations.count() == 0
+        assert ds_p3p.display_for_user(user).access
 
         # Finally, add the WRITE_ONLY group and it should disappear
         add_role(user, ROLE.WRITE_ONLY.value)
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        assert not ds_p3p.display_for_user(user).access
 
     def test_truenth_st_conditions(self):
         # Test the list of conditions expected for SymptomTracker in truenth
@@ -1055,13 +1052,12 @@ class TestIntervention(TestCase):
                 description=description,
                 intervention_id=INTERVENTION.SELF_MANAGEMENT.id,
                 function_details=json.dumps(d))
-            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
 
         # only first two strats true so far, therfore, should be False
-        self.assertFalse(sm.display_for_user(user).access)
+        assert not sm.display_for_user(user).access
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -1076,15 +1072,15 @@ class TestIntervention(TestCase):
         user, sm = map(db.session.merge, (user, sm))
 
         # All conditions now met, should have access
-        self.assertTrue(sm.display_for_user(user).access)
+        assert sm.display_for_user(user).access
 
         # Remove all clinics, should still have access
         user.organizations = []
         with SessionScope(db):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
-        self.assertEqual(user.organizations.count(), 0)
-        self.assertTrue(sm.display_for_user(user).access)
+        assert user.organizations.count() == 0
+        assert sm.display_for_user(user).access
 
         # Finally, remove the PATIENT role and it should disappear
         user.roles.pop()
@@ -1092,16 +1088,16 @@ class TestIntervention(TestCase):
             db.session.add(user)
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
-        self.assertFalse(sm.display_for_user(user).access)
+        assert not sm.display_for_user(user).access
 
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
         self.login()
-        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
+        response = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json.keys()), 1)
-        self.assertEqual(rv.json['user_id'], TEST_USER_ID)
+        assert response.status_code == 200
+        assert len(response.json.keys()) == 1
+        assert response.json['user_id'] == TEST_USER_ID
 
     def test_get_user_intervention(self):
         intervention_id = INTERVENTION.SEXUAL_RECOVERY.id
@@ -1118,17 +1114,17 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
+        response = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json.keys()), 7)
-        self.assertEqual(rv.json['user_id'], TEST_USER_ID)
-        self.assertEqual(rv.json['access'], 'granted')
-        self.assertEqual(rv.json['card_html'], "custom ch")
-        self.assertEqual(rv.json['link_label'], "link magic")
-        self.assertEqual(rv.json['link_url'], "http://example.com")
-        self.assertEqual(rv.json['status_text'], "status example")
-        self.assertEqual(rv.json['staff_html'], "custom ph")
+        assert response.status_code == 200
+        assert len(response.json.keys()) == 7
+        assert response.json['user_id'] == TEST_USER_ID
+        assert response.json['access'] == 'granted'
+        assert response.json['card_html'] == "custom ch"
+        assert response.json['link_label'] == "link magic"
+        assert response.json['link_url'] == "http://example.com"
+        assert response.json['status_text'] == "status example"
+        assert response.json['staff_html'] == "custom ph"
 
     def test_communicate(self):
         email_group = Group(name='test_email')
@@ -1145,17 +1141,17 @@ class TestIntervention(TestCase):
             'Review results at <a href="http://www.example.com">here</a>'
         }
         self.login()
-        rv = self.client.post('/api/intervention/{}/communicate'.format(
+        response = self.client.post('/api/intervention/{}/communicate'.format(
                 INTERVENTION.DECISION_SUPPORT_P3P.name),
                 content_type='application/json',
                 data=json.dumps(data))
-        self.assert200(rv)
-        self.assertEqual(rv.json['message'], 'sent')
+        assert response.status_code == 200
+        assert response.json['message'] == 'sent'
 
         message = EmailMessage.query.one()
         set1 = {foo.email, boo.email}
         set2 = set(message.recipients.split())
-        self.assertEqual(set1, set2)
+        assert set1 == set2
 
     def test_dynamic_intervention_access(self):
         # Confirm interventions dynamically added still accessible
@@ -1165,17 +1161,17 @@ class TestIntervention(TestCase):
             db.session.add(newbee)
             db.session.commit()
 
-        self.assertEqual(INTERVENTION.newbee, db.session.merge(newbee))
+        assert INTERVENTION.newbee == db.session.merge(newbee)
 
     def test_bogus_intervention_access(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             INTERVENTION.phoney
 
         self.login()
         self.promote_user(role_name=ROLE.SERVICE.value)
         data = {'user_id': TEST_USER_ID, 'access': "granted"}
-        rv = self.client.put('/api/intervention/phoney', data=data)
-        self.assert404(rv)
+        response = self.client.put('/api/intervention/phoney', data=data)
+        assert response.status_code == 404
 
 
 class TestEpromsStrategies(TestCase):
@@ -1215,18 +1211,18 @@ class TestEpromsStrategies(TestCase):
         southampton = Organization.query.filter_by(name='Southampton').one()
         self.test_user.organizations.append(southampton)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
-        self.assertTrue(self_mgmt.quick_access_check(self.test_user))
+        assert self_mgmt.quick_access_check(self.test_user)
 
     def test_self_mgmt_user_denied(self):
         """Non-patient w/ Southampton org should NOT get self_mgmt access"""
         southampton = Organization.query.filter_by(name='Southampton').one()
         self.test_user.organizations.append(southampton)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
-        self.assertFalse(self_mgmt.quick_access_check(self.test_user))
+        assert not self_mgmt.quick_access_check(self.test_user)
 
     def test_self_mgmt_org_denied(self):
         """Patient w/o Southampton org should NOT get self_mgmt access"""
         self.promote_user(role_name=ROLE.PATIENT.value)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
         user = db.session.merge(self.test_user)
-        self.assertFalse(self_mgmt.quick_access_check(user))
+        assert not self_mgmt.quick_access_check(user)

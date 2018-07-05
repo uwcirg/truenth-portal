@@ -1,6 +1,7 @@
 """Unit test module for group model"""
+from __future__ import unicode_literals  # isort:skip
+
 import json
-import sys
 
 from flask_webtest import SessionScope
 import pytest
@@ -11,8 +12,6 @@ from portal.models.group import Group
 from portal.models.role import ROLE
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestGroup(TestCase):
     """Group model tests"""
 
@@ -20,15 +19,14 @@ class TestGroup(TestCase):
         data = {'name': 'random_group_name',
                 'description': 'with a windy description'}
         grp = Group.from_json(data)
-        self.assertEqual(grp.name,
-                          data['name'])
-        self.assertEqual(grp.description,
-                          data['description'])
+        assert grp.name == data['name']
+        assert grp.description == data['description']
 
     def test_invalid_name(self):
         data = {'name': 'name with a space',
                 'description': 'with a windy description'}
-        self.assertRaises(BadRequest, Group.from_json, data)
+        with pytest.raises(BadRequest):
+            Group.from_json(data)
 
     def test_group_get(self):
         grp = Group(name='test')
@@ -39,9 +37,9 @@ class TestGroup(TestCase):
 
         # use api to obtain
         self.login()
-        rv = self.client.get('/api/group/{}'.format(grp.name))
-        self.assert200(rv)
-        self.assertEqual(rv.json['group']['name'], 'test')
+        response = self.client.get('/api/group/{}'.format(grp.name))
+        assert response.status_code == 200
+        assert response.json['group']['name'] == 'test'
 
     def test_group_list(self):
         grp1 = Group(name='test_1')
@@ -53,25 +51,25 @@ class TestGroup(TestCase):
 
         # use api to obtain list
         self.login()
-        rv = self.client.get('/api/group/')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertEqual(len(bundle['groups']), 2)
+        response = self.client.get('/api/group/')
+        assert response.status_code == 200
+        bundle = response.json
+        assert len(bundle['groups']) == 2
 
     def test_group_post(self):
         grp = Group(name='test', description='test group')
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        rv = self.client.post('/api/group/',
+        response = self.client.post('/api/group/',
                           content_type='application/json',
                           data=json.dumps(grp.as_json()))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # Pull the posted group
         grp2 = Group.query.filter_by(name='test').one()
-        self.assertEqual(grp2.name, grp.name)
-        self.assertEqual(grp2.description, grp.description)
+        assert grp2.name == grp.name
+        assert grp2.description == grp.description
 
     def test_group_edit(self):
         grp = Group(name='test_grp_name', description='test group')
@@ -83,21 +81,21 @@ class TestGroup(TestCase):
         self.login()
 
         improved_grp = Group(name='changed_name', description='Updated')
-        rv = self.client.put('/api/group/{}'.format('test_grp_name'),
+        response = self.client.put('/api/group/{}'.format('test_grp_name'),
                           content_type='application/json',
                           data=json.dumps(improved_grp.as_json()))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # Pull the posted group
         grp2 = Group.query.one()
-        self.assertEqual(grp2.name, improved_grp.name)
-        self.assertEqual(grp2.description, improved_grp.description)
+        assert grp2.name == improved_grp.name
+        assert grp2.description == improved_grp.description
 
     def test_user_no_groups(self):
         self.login()
-        rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['groups']), 0)
+        response = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert len(response.json['groups']) == 0
 
     def test_user_groups(self):
         grp1 = Group(name='test_1')
@@ -108,9 +106,9 @@ class TestGroup(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['groups']), 2)
+        response = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert len(response.json['groups']) == 2
 
     def test_put_user_groups(self):
         grp1 = Group(name='test1')
@@ -122,14 +120,14 @@ class TestGroup(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         # initially grp 1 is the only for the user
-        self.assertEqual(self.test_user.groups[0].name, 'test1')
+        assert self.test_user.groups[0].name == 'test1'
         grp2 = db.session.merge(grp2)
 
         # put only the 2nd group, should end up being the only one for the user
         self.login()
-        rv = self.client.put('/api/user/{}/groups'.format(TEST_USER_ID),
+        response = self.client.put('/api/user/{}/groups'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps({'groups': [grp2.as_json()]}))
-        self.assert200(rv)
-        self.assertEqual(len(self.test_user.groups), 1)
-        self.assertEqual(self.test_user.groups[0].name, 'test2')
+        assert response.status_code == 200
+        assert len(self.test_user.groups) == 1
+        assert self.test_user.groups[0].name == 'test2'
