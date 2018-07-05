@@ -43,8 +43,8 @@ class TestEncounter(TestCase):
     def test_encounter_on_login(self):
         self.login()
         assert len(self.test_user.encounters) == 1
-        assert self.test_user.current_encounter.auth_method == \
-            'password_authenticated'
+        assert (self.test_user.current_encounter.auth_method
+                == 'password_authenticated')
 
     def test_encounter_after_logout(self):
         self.login()
@@ -58,8 +58,8 @@ class TestEncounter(TestCase):
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        assert service_user.current_encounter.auth_method ==\
-            'service_token_authenticated'
+        assert (service_user.current_encounter.auth_method
+                == 'service_token_authenticated')
 
     def test_login_as(self):
         self.bless_with_basics()
@@ -78,8 +78,8 @@ class TestEncounter(TestCase):
         self.test_user = db.session.merge(self.test_user)
         response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         assert response.status_code == 302  # sent to next_after_login
-        assert self.test_user.current_encounter.auth_method == \
-            'staff_authenticated'
+        assert (self.test_user.current_encounter.auth_method
+                == 'staff_authenticated')
         assert self.test_user._email.startswith(INVITE_PREFIX)
 
     def test_login_as(self):
