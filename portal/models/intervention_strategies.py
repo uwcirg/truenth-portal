@@ -378,11 +378,15 @@ def update_card_html_on_completion():
 
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
+            message = _(u"Please complete your %(assigning_authority)s "
+                "questionnaire here.",
+                assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
                 <h4 class="portal-description-title">{header}</h4>
+                <div class="portal-description-body"><p>{message}</p></div>
                 <div class="button-container">
                   <a class="btn-lg btn-tnth-primary" href="{link_url}">
                      {link_label}
@@ -392,7 +396,7 @@ def update_card_html_on_completion():
               {completed_card}
             </div>""".format(
                 intro=intro_html(assessment_status), header=header,
-                link_url=link_url, link_label=link_label,
+                message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
         elif any(indefinite_questionnaires):
@@ -402,11 +406,15 @@ def update_card_html_on_completion():
                     _(u'Go to questionnaire'))
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
+            message = _(u"Please complete your %(assigning_authority)s "
+                "questionnaire here.",
+                assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
                 <h4 class="portal-description-title">{header}</h4>
+                <div class="portal-description-body"><p>{message}</p></div>
                 <div class="button-container">
                   <a class="btn-lg btn-tnth-primary" href="{link_url}">
                      {link_label}
@@ -417,7 +425,7 @@ def update_card_html_on_completion():
             </div>
             """.format(
                 intro=intro_html(assessment_status), header=header,
-                link_url=link_url, link_label=link_label,
+                message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
         elif assessment_status.overall_status == "Completed":
