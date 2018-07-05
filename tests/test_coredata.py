@@ -168,7 +168,7 @@ class TestCoredata(TestCase):
         user = db.session.merge(self.test_user)
         needed = Coredata().still_needed(user)
         assert ({'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"}
-               in needed)
+                in needed)
 
         self.login()
         resp = self.client.get('/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
