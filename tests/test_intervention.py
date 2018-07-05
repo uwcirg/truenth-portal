@@ -1,12 +1,12 @@
 """Unit test module for Intervention API"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime, timedelta
 import json
 import os
-import sys
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -32,8 +32,6 @@ from tests.test_assessment_status import (
     mock_questionnairebanks,
 )
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestIntervention(TestCase):
 
     def test_intervention_wrong_service_user(self):
@@ -200,10 +198,14 @@ class TestIntervention(TestCase):
         cp_id = cp.id
 
         with SessionScope(db):
-            map(db.session.add, (org1, org2, org3))
+            db.session.add(org1)
+            db.session.add(org2)
+            db.session.add(org3)
             db.session.commit()
 
-        org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
+        org1 = db.session.merge(org1)
+        org2 = db.session.merge(org2)
+        org3 = db.session.merge(org3)
         d = {
             'function': 'limit_by_clinic_w_id',
             'kwargs': [{'name': 'identifier_value',
@@ -639,7 +641,7 @@ class TestIntervention(TestCase):
         # fetch it back and compare
         rv = self.client.get('/api/intervention/sexual_recovery/access_rule')
         self.assert200(rv)
-        data = json.loads(rv.data)
+        data = rv.json
         self.assertEqual(len(data['rules']), 1)
         self.assertEqual(d['name'], data['rules'][0]['name'])
         self.assertEqual(d['function_details'],
