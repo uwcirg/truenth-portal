@@ -15,7 +15,8 @@ class TestIdentifier(TestCase):
     def testGET(self):
         expected = len(self.test_user.identifiers)
         self.login()
-        response = self.client.get('/api/user/{}/identifier'.format(TEST_USER_ID))
+        response = self.client.get('/api/user/{}/identifier'
+                                   .format(TEST_USER_ID))
         assert response.status_code == 200
         assert len(response.json['identifier']) == expected
 

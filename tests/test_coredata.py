@@ -104,8 +104,8 @@ class TestCoredata(TestCase):
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
         assert PRIVACY in needed
         assert WEB_TOU in needed
-        assert not SUBJ_CONSENT in needed
-        assert not STORED_FORM in needed
+        assert SUBJ_CONSENT not in needed
+        assert STORED_FORM not in needed
 
     def test_eproms_patient(self):
         """Eproms patient: all ToU but stored form"""
@@ -117,7 +117,7 @@ class TestCoredata(TestCase):
         assert PRIVACY in needed
         assert WEB_TOU in needed
         assert SUBJ_CONSENT in needed
-        assert not STORED_FORM in needed
+        assert STORED_FORM not in needed
 
     def test_enter_manually_interview_assisted(self):
         "interview: subject_website_consent and stored_web_consent_form"
@@ -130,8 +130,8 @@ class TestCoredata(TestCase):
 
         needed = [i['field'] for i in Coredata().still_needed(
             patient, entry_method='interview assisted')]
-        assert not PRIVACY in needed
-        assert not WEB_TOU in needed
+        assert PRIVACY not in needed
+        assert WEB_TOU not in needed
         assert SUBJ_CONSENT in needed
         assert STORED_FORM in needed
 
@@ -146,10 +146,10 @@ class TestCoredata(TestCase):
 
         needed = [i['field'] for i in Coredata().still_needed(
             patient, entry_method='paper')]
-        assert not PRIVACY in needed
-        assert not WEB_TOU in needed
+        assert PRIVACY not in needed
+        assert WEB_TOU not in needed
         assert SUBJ_CONSENT in needed
-        assert not STORED_FORM in needed
+        assert STORED_FORM not in needed
 
     def test_music_exception(self):
         "For patients with music org, the terms get special handling"
@@ -167,7 +167,8 @@ class TestCoredata(TestCase):
 
         user = db.session.merge(self.test_user)
         needed = Coredata().still_needed(user)
-        assert {'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"} in needed
+        assert ({'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"}
+               in needed)
 
         self.login()
         resp = self.client.get('/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
