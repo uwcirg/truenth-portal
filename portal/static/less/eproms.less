@@ -447,7 +447,7 @@ select:not([multiple]) {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 27em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -2945,6 +2945,14 @@ div.biopsy-option:last-of-type{
 #consentHistoryTable {
   tr.history td {
     background-color: #ececec;
+  }
+}
+
+@media (min-width: 1200px) {
+  #consentHistoryTable {
+    td {
+      min-width: 150px;
+    }
   }
 }
 
