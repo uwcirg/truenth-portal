@@ -1,8 +1,9 @@
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
 import os
 from shutil import rmtree
-import sys
 from tempfile import mkdtemp
 
 from flask_webtest import SessionScope
@@ -22,8 +23,6 @@ from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestModelPersistence(TestCase):
 
     def setUp(self):
@@ -53,8 +52,8 @@ class TestModelPersistence(TestCase):
         nextval = db.engine.execute(
             "SELECT NEXTVAL('{}')".format(
                 'organizations_id_seq')).fetchone()[0]
-        self.assertTrue(currval == id)
-        self.assertTrue(nextval > id)
+        assert currval == id
+        assert nextval > id
 
     def test_identifier_lookup(self):
         # setup a minimal communication request
@@ -69,7 +68,7 @@ class TestModelPersistence(TestCase):
             db.session.add(cr)
             db.session.commit()
         cr = db.session.merge(cr)
-        self.assertEqual(cr.identifiers.count(), 1)
+        assert cr.identifiers.count() == 1
 
         data = cr.as_fhir()
         mp = ModelPersistence(
@@ -79,7 +78,7 @@ class TestModelPersistence(TestCase):
         new_obj = CommunicationRequest.from_fhir(data)
         match, field_description = mp.lookup_existing(
             new_obj=new_obj, new_data=data)
-        self.assertEqual(match.name, cr.name)
+        assert match.name == cr.name
 
     def test_composite_key(self):
         known_coding =  Coding(
@@ -98,15 +97,15 @@ class TestModelPersistence(TestCase):
         modified = Coding.from_fhir(data)
         match, _ = mp.lookup_existing(
             new_obj=modified, new_data=modified_data)
-        self.assertEqual(data, match.as_fhir())
+        assert data == match.as_fhir()
 
         # Import and see the change
         updated = mp.update(modified_data)
-        self.assertEqual(modified, updated)
+        assert modified == updated
 
         # Export and verify
         serial = mp.serialize()
-        self.assertTrue(modified_data in serial)
+        assert modified_data in serial
 
     def test_delete_unnamed(self):
         keeper = AppText(name='keep me', custom_text='worthy')
@@ -126,12 +125,12 @@ class TestModelPersistence(TestCase):
 
         # Import w/ keep_unmentioned and expect both
         mp.import_(keep_unmentioned=True)
-        self.assertEqual(AppText.query.count(), 2)
+        assert AppText.query.count() == 2
 
         # Now import, and expect only keeper to remain
         mp.import_(keep_unmentioned=False)
-        self.assertEqual(AppText.query.count(), 1)
-        self.assertEqual(AppText.query.first().name, 'keep me')
+        assert AppText.query.count() == 1
+        assert AppText.query.first().name == 'keep me'
 
     def test_delete_extension(self):
         org = Organization(name='testy')
@@ -175,12 +174,12 @@ class TestModelPersistence(TestCase):
         with SessionScope(db):
             db.session.commit()
         org = db.session.merge(org)
-        self.assertTrue(len(org.as_fhir()['extension']) > 1)
+        assert len(org.as_fhir()['extension']) > 1
 
         mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
-        self.assertEqual(org.locales.count(), 0)
-        self.assertEqual(org.timezone, 'Asia/Tokyo')
+        assert org.locales.count() == 0
+        assert org.timezone == 'Asia/Tokyo'
 
     def test_delete_identifier(self):
         # orgs losing identifiers should delete the orphans
@@ -219,10 +218,10 @@ class TestModelPersistence(TestCase):
 
         mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
-        self.assertEqual(org.identifiers.count(), 1)
+        assert org.identifiers.count() == 1
 
         # Make sure we cleared out the orphan
-        with self.assertRaises(NoResultFound):
+        with pytest.raises(NoResultFound):
             Identifier.query.filter_by(
                 value='2 week ST', system=TRUENTH_CR_NAME).one()
 
@@ -237,7 +236,7 @@ class TestModelPersistence(TestCase):
             db.session.add(sj)
             db.session.add(sj2)
             db.session.commit()
-        self.assertEqual(ScheduledJob.query.count(), 2)
+        assert ScheduledJob.query.count() == 2
 
         mp = ModelPersistence(
             ScheduledJob, lookup_field='name',
@@ -258,7 +257,7 @@ class TestModelPersistence(TestCase):
             pfile.write(json.dumps(data))
 
         mp.import_(keep_unmentioned=False)
-        self.assertEqual(ScheduledJob.query.count(), 1)
+        assert ScheduledJob.query.count() == 1
 
     def test_rp_alteration(self):
         # orgs with old rp should migrate to multiple w/ updated retired
@@ -307,10 +306,10 @@ class TestModelPersistence(TestCase):
 
         mp.import_(keep_unmentioned=False)
         org = Organization.query.filter(Organization.name == 'testy').one()
-        self.assertEqual(len(org.research_protocols), 2)
+        assert len(org.research_protocols) == 2
 
         # Make sure retired_as_of was set properly on old
         rp1, rp2 = map(db.session.merge, (rp1, rp2))
         expected = [(rp2, None), (rp1, now)]
         results = [(rp, retired) for rp, retired in org.rps_w_retired()]
-        self.assertEqual(results, expected)
+        assert results == expected
