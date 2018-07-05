@@ -1,4 +1,6 @@
 """Coredata tests"""
+from __future__ import unicode_literals  # isort:skip
+
 from flask_webtest import SessionScope
 
 from portal.extensions import db
@@ -44,7 +46,7 @@ class TestCoredata(TestCase):
         configure_coredata(self.app)
 
     def test_registry(self):
-        self.assertTrue(len(Coredata()._registered) > 1)
+        assert len(Coredata()._registered) > 1
 
     def test_partner(self):
         """Partner doesn't need dx etc., set min and check pass"""
@@ -52,7 +54,7 @@ class TestCoredata(TestCase):
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.PARTNER.value)
         self.test_user = db.session.merge(self.test_user)
-        self.assertTrue(Coredata().initial_obtained(self.test_user))
+        assert Coredata().initial_obtained(self.test_user)
 
     def test_patient(self):
         """Patient has additional requirements"""
@@ -62,7 +64,7 @@ class TestCoredata(TestCase):
         self.test_user = db.session.merge(self.test_user)
         # Prior to adding clinical data, should return false
         Coredata()
-        self.assertFalse(Coredata().initial_obtained(self.test_user))
+        assert not Coredata().initial_obtained(self.test_user)
 
         self.login()
         self.add_required_clinical_data()
@@ -71,10 +73,10 @@ class TestCoredata(TestCase):
         self.test_user = db.session.merge(self.test_user)
         # should leave only indigenous, race and ethnicity as options
         # and nothing required
-        self.assertTrue(Coredata().initial_obtained(self.test_user))
+        assert Coredata().initial_obtained(self.test_user)
         expect = {'race', 'ethnicity', 'indigenous'}
         found = set(Coredata().optional(self.test_user))
-        self.assertEqual(found, expect)
+        assert found == expect
 
     def test_still_needed(self):
         """Query for list of missing datapoints in legible format"""
@@ -83,15 +85,15 @@ class TestCoredata(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
-        self.assertTrue(len(needed) > 1)
-        self.assertTrue('dob' in needed)
-        self.assertTrue('website_terms_of_use' in needed)
-        self.assertTrue('clinical' in needed)
-        self.assertTrue('org' in needed)
+        assert len(needed) > 1
+        assert 'dob' in needed
+        assert 'website_terms_of_use' in needed
+        assert 'clinical' in needed
+        assert 'org' in needed
 
         # needed should match required (minus 'name', 'role')
         required = Coredata().required(self.test_user)
-        self.assertEqual(set(required) - set(needed), {'name', 'role'})
+        assert set(required) - set(needed) == {'name', 'role'}
 
     def test_eproms_staff(self):
         """Eproms staff: privacy policy and website terms of use"""
@@ -100,10 +102,10 @@ class TestCoredata(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
-        self.assertTrue(PRIVACY in needed)
-        self.assertTrue(WEB_TOU in needed)
-        self.assertFalse(SUBJ_CONSENT in needed)
-        self.assertFalse(STORED_FORM in needed)
+        assert PRIVACY in needed
+        assert WEB_TOU in needed
+        assert not SUBJ_CONSENT in needed
+        assert not STORED_FORM in needed
 
     def test_eproms_patient(self):
         """Eproms patient: all ToU but stored form"""
@@ -112,10 +114,10 @@ class TestCoredata(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         needed = [i['field'] for i in Coredata().still_needed(self.test_user)]
-        self.assertTrue(PRIVACY in needed)
-        self.assertTrue(WEB_TOU in needed)
-        self.assertTrue(SUBJ_CONSENT in needed)
-        self.assertFalse(STORED_FORM in needed)
+        assert PRIVACY in needed
+        assert WEB_TOU in needed
+        assert SUBJ_CONSENT in needed
+        assert not STORED_FORM in needed
 
     def test_enter_manually_interview_assisted(self):
         "interview: subject_website_consent and stored_web_consent_form"
@@ -128,10 +130,10 @@ class TestCoredata(TestCase):
 
         needed = [i['field'] for i in Coredata().still_needed(
             patient, entry_method='interview assisted')]
-        self.assertFalse(PRIVACY in needed)
-        self.assertFalse(WEB_TOU in needed)
-        self.assertTrue(SUBJ_CONSENT in needed)
-        self.assertTrue(STORED_FORM in needed)
+        assert not PRIVACY in needed
+        assert not WEB_TOU in needed
+        assert SUBJ_CONSENT in needed
+        assert STORED_FORM in needed
 
     def test_enter_manually_paper(self):
         "paper: subject_website_consent"
@@ -144,10 +146,10 @@ class TestCoredata(TestCase):
 
         needed = [i['field'] for i in Coredata().still_needed(
             patient, entry_method='paper')]
-        self.assertFalse(PRIVACY in needed)
-        self.assertFalse(WEB_TOU in needed)
-        self.assertTrue(SUBJ_CONSENT in needed)
-        self.assertFalse(STORED_FORM in needed)
+        assert not PRIVACY in needed
+        assert not WEB_TOU in needed
+        assert SUBJ_CONSENT in needed
+        assert not STORED_FORM in needed
 
     def test_music_exception(self):
         "For patients with music org, the terms get special handling"
@@ -165,14 +167,14 @@ class TestCoredata(TestCase):
 
         user = db.session.merge(self.test_user)
         needed = Coredata().still_needed(user)
-        self.assertTrue({'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"} in needed)
+        assert {'field': WEB_TOU, 'collection_method': "ACCEPT_ON_NEXT"} in needed
 
         self.login()
         resp = self.client.get('/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
-        self.assert200(resp)
+        assert resp.status_code == 200
         passed = False
         for entry in resp.json['still_needed']:
             if entry['field'] == WEB_TOU:
-                self.assertEqual(entry['collection_method'], 'ACCEPT_ON_NEXT')
+                assert entry['collection_method'] == 'ACCEPT_ON_NEXT'
                 passed = True
-        self.assertTrue(passed)
+        assert passed
