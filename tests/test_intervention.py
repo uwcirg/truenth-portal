@@ -637,7 +637,7 @@ class TestIntervention(TestCase):
 
         # fetch it back and compare
         response = (self.client
-            .get('/api/intervention/sexual_recovery/access_rule'))
+                    .get('/api/intervention/sexual_recovery/access_rule'))
         assert response.status_code == 200
         data = response.json
         assert len(data['rules']) == 1
