@@ -1868,7 +1868,6 @@
                         $("#" + orgId + "_loader.loading-message-indicator").hide();
                         closeButtons.attr("disabled", false);
                     };
-                    console.log("orgId? ", orgId)
                     $("#" + orgId + "_loader.loading-message-indicator").show();
                     if ($(this).val() === "yes") {
                         var params = __self.CONSENT_ENUM.consented;
