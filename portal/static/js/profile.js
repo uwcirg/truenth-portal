@@ -65,18 +65,21 @@
         },
         mounted: function() {
             var self = this;
-            this.initIntervalId = setInterval(function() { //wait for ajax calls to finish
-                self.initEndTime = new Date();
-                var elapsedTime = self.initEndTime - self.initStartTime;
-                elapsedTime /= 1000;
-                var checkFinished = self.initChecks.length === 0;
-                if (checkFinished || (elapsedTime >= 5)) {
-                    clearInterval(self.initIntervalId);
-                    self.initSections(function() {
-                        self.onSectionsDidLoad();
-                        self.handleOptionalCoreData();});
-                }
-            }, 30);
+            Vue.nextTick(function () {
+                // DOM updated
+                self.initIntervalId = setInterval(function() { //wait for ajax calls to finish
+                    self.initEndTime = new Date();
+                    var elapsedTime = self.initEndTime - self.initStartTime;
+                    elapsedTime /= 1000;
+                    var checkFinished = self.initChecks.length === 0;
+                    if (checkFinished || (elapsedTime >= 5)) {
+                        clearInterval(self.initIntervalId);
+                        self.initSections(function() {
+                            self.onSectionsDidLoad();
+                            self.handleOptionalCoreData();});
+                    }
+                }, 30);
+            });
         },
         data: {
             subjectId: "",
@@ -752,29 +755,36 @@
             postDemoData: function(field, data) {
                 if (!this.subjectId) { return false; }
                 var self = this;
-                field = field || $(field);
-                data = data || {};
-                var valid = field.get(0).validity ? field.get(0).validity.valid : true;
-                if (!valid) {
-                    return false;
-                }
-                var o = field;
-                var parentContainer = field.closest(".profile-item-container");
-                var editButton = parentContainer.find(".profile-item-edit-btn");
-                var customErrorField = $("#" + o.attr("data-error-field"));
-                var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
-                if (hasError) {
-                    editButton.attr("disabled", false);
-                    return;
-                }
-                editButton.attr("disabled", true);
-                data.resourceType = data.resourceType || "Patient";
-                self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
-                    self.setDemoData();
-                    var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
-                    formGroup.removeClass("has-error");
-                    formGroup.find(".help-block.with-errors").html("");
-                    editButton.attr("disabled", false);
+                Vue.nextTick(function () {
+                    // DOM updated
+                    field = field || $(field);
+                    data = data || {};
+                    var valid = field.get(0).validity ? field.get(0).validity.valid : true;
+                    if (!valid) {
+                        return false;
+                    }
+                    var o = field;
+                    var parentContainer = field.closest(".profile-item-container");
+                    var editButton = parentContainer.find(".profile-item-edit-btn");
+                    var customErrorField = $("#" + o.attr("data-error-field"));
+                    var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
+                    if (hasError) {
+                        editButton.attr("disabled", false);
+                        return;
+                    }
+                    editButton.attr("disabled", true);
+                    data.resourceType = data.resourceType || "Patient";
+                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                        setTimeout(function() {
+                            self.setDemoData({cache: false}, function() {
+                                var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
+                                formGroup.removeClass("has-error");
+                                formGroup.find(".help-block.with-errors").html("");
+                                editButton.attr("disabled", false);
+                            });
+                        }, 350);
+
+                    });
                 });
             },
             getTelecomData: function() {
@@ -2583,7 +2593,7 @@
                                 __self.consent.saveLoading = false;
                                 __self.reloadConsentList(self.attr("data-userId"));
                             });
-    
+
                         }
                     });
                 });

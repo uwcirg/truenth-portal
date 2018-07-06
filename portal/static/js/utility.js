@@ -93,7 +93,7 @@ var request_attempts = 0;
  * note: this function supports older version of IE (version <= 9)
  * jquery ajax calls errored in older IE version
  */
-function newHttpRequest(url, params, callBack, noCache) {
+function newHttpRequest(url, params, callBack) {
     request_attempts++;
     var xmlhttp;
     if (window.XDomainRequest) {
@@ -115,7 +115,7 @@ function newHttpRequest(url, params, callBack, noCache) {
             } else {
                 if (request_attempts < 3) {
                     setTimeout(function() {
-                        newHttpRequest(url, callBack, noCache);
+                        newHttpRequest(url, callBack);
                     }, 3000);
                 } else {
                     loader();
@@ -123,15 +123,14 @@ function newHttpRequest(url, params, callBack, noCache) {
             }
         }
     };
-    if (noCache) {
+    params = params || {};
+    if (!params.cache) {
         url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     }
     xmlhttp.open("GET", url, true);
-    if (params) {
-        for (var param in params) {
-            if (params.hasOwnProperty(param)) {
-                xmlhttp.setRequestHeader(param, params[param]);
-            }
+    for (var param in params) {
+        if (params.hasOwnProperty(param)) {
+            xmlhttp.setRequestHeader(param, params[param]);
         }
     }
     xmlhttp.send();
@@ -178,13 +177,13 @@ function initWorker(url, params, callback) {
     }, false);
 }
 function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */
-    if (window.Worker && !_isTouchDevice()) {
-        initWorker(url, params, callback);
-    } else {
-        var isIE = getIEVersion();
-        var useFunc = isIE ? newHttpRequest: ajaxRequest;
-        useFunc(url, params, function(data) { callback(data);});
+    params = params || {};
+    if (params.useWorker && window.Worker && !_isTouchDevice()) {
+       initWorker(url, params, callback);
+       return true;
     }
+    var useFunc = getIEVersion() ? newHttpRequest: ajaxRequest; //NOTE JQuery ajax request does not work for IE <= 9
+    useFunc(url, params, function(data) { callback(data);});
 }
 function LRKeyEvent() {
     var LR_INVOKE_KEYCODE = 187;
