@@ -2039,7 +2039,6 @@ var Global = {
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
         sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
-        //url, method, userId, params, callback
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
                 restoreVis(); /*global restoreVis */
