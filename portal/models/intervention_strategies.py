@@ -379,8 +379,8 @@ def update_card_html_on_completion():
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
             message = _(u"Please complete your %(assigning_authority)s "
-                "questionnaire here.",
-                assigning_authority=assessment_status.assigning_authority)
+                        "questionnaire here.",
+                        assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
@@ -407,8 +407,8 @@ def update_card_html_on_completion():
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
             message = _(u"Please complete your %(assigning_authority)s "
-                "questionnaire here.",
-                assigning_authority=assessment_status.assigning_authority)
+                        "questionnaire here.",
+                        assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
