@@ -1,11 +1,11 @@
 """Unit test module for organization model"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 from builtins import map
 from datetime import datetime, timedelta
 import json
 import os
-import sys
 from urllib.parse import quote_plus
 
 from flask_webtest import SessionScope
@@ -35,8 +35,6 @@ from portal.system_uri import (
 )
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestOrganization(TestCase):
     """Organization model tests"""
 
@@ -50,18 +48,16 @@ class TestOrganization(TestCase):
         Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
                   'system': IETF_LANGUAGE_TAG})
         org = Organization.from_fhir(data)
-        self.assertEqual(org.addresses[0].line1,
-                          data['address'][0]['line'][0])
-        self.assertEqual(org.addresses[1].line1,
-                          data['address'][1]['line'][0])
-        self.assertEqual(org.name, data['name'])
-        self.assertEqual(org.phone, "022-655 2300")
-        self.assertTrue(org.use_specific_codings)
-        self.assertTrue(org.race_codings)
-        self.assertFalse(org.ethnicity_codings)
-        self.assertEqual(org.locales.count(), 1)
-        self.assertEqual(org.default_locale, "en_AU")
-        self.assertEqual(org._timezone, "US/Pacific")
+        assert org.addresses[0].line1 == data['address'][0]['line'][0]
+        assert org.addresses[1].line1 == data['address'][1]['line'][0]
+        assert org.name == data['name']
+        assert org.phone == "022-655 2300"
+        assert org.use_specific_codings
+        assert org.race_codings
+        assert not org.ethnicity_codings
+        assert org.locales.count() == 1
+        assert org.default_locale == "en_AU"
+        assert org._timezone == "US/Pacific"
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
@@ -81,19 +77,18 @@ class TestOrganization(TestCase):
         data.pop('id')
         org = Organization.from_fhir(data)
 
-        self.assertEqual(org.addresses[0].line1,
-                          data['address'][0]['line'][0])
-        self.assertEqual(org.name, data['name'])
-        self.assertEqual(org.phone, "022-655 2320")
-        self.assertEqual(org.partOf_id, parent_id)
+        assert org.addresses[0].line1 == data['address'][0]['line'][0]
+        assert org.name == data['name']
+        assert org.phone == "022-655 2320"
+        assert org.partOf_id == parent_id
 
         # confirm we can store
         with SessionScope(db):
             db.session.add(org)
             db.session.commit()
         org = db.session.merge(org)
-        self.assertTrue(org.id)
-        self.assertEqual(org.partOf_id, parent_id)
+        assert org.id
+        assert org.partOf_id == parent_id
 
     def test_timezone_inheritance(self):
         parent = Organization(id=101, name='parentOrg')
@@ -105,7 +100,7 @@ class TestOrganization(TestCase):
             db.session.add(org)
             db.session.commit()
         parent, org = map(db.session.merge, (parent, org))
-        self.assertEqual(org.timezone, 'UTC')
+        assert org.timezone == 'UTC'
 
         # test that timezone-less child org inherits from parent
         parent.timezone = 'Asia/Tokyo'
@@ -113,7 +108,7 @@ class TestOrganization(TestCase):
             db.session.add(parent)
             db.session.commit()
         parent, org = map(db.session.merge, (parent, org))
-        self.assertEqual(org.timezone, 'Asia/Tokyo')
+        assert org.timezone == 'Asia/Tokyo'
 
         # test that child org with timezone does NOT inherit from parent
         org.timezone = 'Europe/Rome'
@@ -121,16 +116,16 @@ class TestOrganization(TestCase):
             db.session.add(org)
             db.session.commit()
         org = db.session.merge(org)
-        self.assertEqual(org.timezone, 'Europe/Rome')
+        assert org.timezone == 'Europe/Rome'
 
     def test_as_fhir(self):
         org = Organization(name='Homer\'s Hospital')
         org.use_specific_codings = True
         org.race_codings = False
         data = org.as_fhir()
-        self.assertEqual(org.name, data['name'])
-        self.assertTrue(data['use_specific_codings'])
-        self.assertFalse(data['race_codings'])
+        assert org.name == data['name']
+        assert data['use_specific_codings']
+        assert not data['race_codings']
 
     def test_multiple_rps_in_fhir(self):
         yesterday = datetime.utcnow() - timedelta(days=1)
@@ -154,19 +149,17 @@ class TestOrganization(TestCase):
             db.session.commit()
         org, rp1, rp2, rp3 = map(db.session.merge, (org, rp1, rp2, rp3))
         data = org.as_fhir()
-        self.assertEqual(org.name, data['name'])
+        assert org.name == data['name']
         rps = [
             extension for extension in data['extension']
             if extension['url'] == ResearchProtocolExtension.extension_url]
 
-        self.assertEqual(len(rps), 1)
-        self.assertEqual(len(rps[0]['research_protocols']), 3)
+        assert len(rps) == 1
+        assert len(rps[0]['research_protocols']) == 3
 
         # confirm the order is descending in the custom accessor method
         results = [(rp, retired) for rp, retired in org.rps_w_retired()]
-        self.assertEqual(
-            [(rp1, None), (rp2, yesterday), (rp3, lastyear)],
-            results)
+        assert [(rp1, None), (rp2, yesterday), (rp3, lastyear)] == results
 
     def test_organization_get(self):
         self.login()
@@ -177,8 +170,8 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
 
         # use api to obtain FHIR
-        rv = self.client.get('/api/organization/{}'.format(org.id))
-        self.assert200(rv)
+        response = self.client.get('/api/organization/{}'.format(org.id))
+        assert response.status_code == 200
 
     def test_organization_get_by_identifier(self):
         org_id_system = "http://test/system"
@@ -196,45 +189,45 @@ class TestOrganization(TestCase):
             db.session.commit()
 
         # use api to obtain FHIR
-        rv = self.client.get(
+        response = self.client.get(
             '/api/organization?system={system}&value={value}'.format(
                 system=quote_plus(org_id_system), value=org_id_value))
-        self.assert200(rv)
-        self.assertEqual(rv.json['total'], 1)
-        self.assertEqual(rv.json['entry'][0]['id'], 999)
+        assert response.status_code == 200
+        assert response.json['total'] == 1
+        assert response.json['entry'][0]['id'] == 999
 
         # use alternative API to obtain organization
-        rv = self.client.get(
+        response = self.client.get(
             '/api/organization/{value}?system={system}'.format(
                 system=quote_plus(org_id_system), value=org_id_value))
-        self.assert200(rv)
-        fetched = Organization.from_fhir(rv.json)
+        assert response.status_code == 200
+        fetched = Organization.from_fhir(response.json)
         org = db.session.merge(org)
-        self.assertEqual(org.id, fetched.id)
-        self.assertEqual(org.name, fetched.name)
+        assert org.id == fetched.id
+        assert org.name == fetched.name
 
     def test_org_missing_identifier(self):
         # should get 404 w/o finding a match
-        rv = self.client.get(
+        response = self.client.get(
             '/api/organization/{value}?system={system}'.format(
                 system=quote_plus('http://nonsense.org'), value='123-45'))
-        self.assert404(rv)
+        assert response.status_code == 404
 
     def test_organization_list(self):
         count = Organization.query.count()
 
         # use api to obtain FHIR bundle
         self.login()
-        rv = self.client.get('/api/organization')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEqual(len(bundle['entry']), count)
+        response = self.client.get('/api/organization')
+        assert response.status_code == 200
+        bundle = response.json
+        assert bundle['resourceType'] == 'Bundle'
+        assert len(bundle['entry']) == count
 
     def test_organization_search(self):
         self.shallow_org_tree()
         count = Organization.query.count()
-        self.assertTrue(count > 1)
+        assert count > 1
 
         # add region to one org, we should get only that one back
         region = Identifier(value='state:NY', system=PRACTICE_REGION)
@@ -250,17 +243,17 @@ class TestOrganization(TestCase):
 
         # use api to obtain FHIR bundle
         self.login()
-        rv = self.client.get('/api/organization?state=NY')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEqual(len(bundle['entry']), 1)
+        response = self.client.get('/api/organization?state=NY')
+        assert response.status_code == 200
+        bundle = response.json
+        assert bundle['resourceType'] == 'Bundle'
+        assert len(bundle['entry']) == 1
 
     def test_organization_inheritence_search(self):
         # Region at top should apply to leaves
         self.deepen_org_tree()
         count = Organization.query.count()
-        self.assertTrue(count > 3)
+        assert count > 3
 
         # add region to one mid-level parent org with two children,
         # we should get only those three
@@ -277,31 +270,31 @@ class TestOrganization(TestCase):
 
         # use api to obtain FHIR bundle
         self.login()
-        rv = self.client.get('/api/organization?state=NY')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEqual(len(bundle['entry']), 3)
+        response = self.client.get('/api/organization?state=NY')
+        assert response.status_code == 200
+        bundle = response.json
+        assert bundle['resourceType'] == 'Bundle'
+        assert len(bundle['entry']) == 3
 
         # add filter to restrict to just the leaves
-        rv = self.client.get('/api/organization?state=NY&filter=leaves')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEqual(len(bundle['entry']), 2)
+        response = self.client.get('/api/organization?state=NY&filter=leaves')
+        assert response.status_code == 200
+        bundle = response.json
+        assert bundle['resourceType'] == 'Bundle'
+        assert len(bundle['entry']) == 2
 
     def test_organization_filter(self):
         # Filter w/o a search term
         self.deepen_org_tree()
         count = Organization.query.count()
-        self.assertTrue(count > 6)
+        assert count > 6
 
         # Filter w/o search should give a short list of orgs
-        rv = self.client.get('/api/organization?filter=leaves')
-        self.assert200(rv)
-        bundle = rv.json
-        self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEqual(len(bundle['entry']), 3)
+        response = self.client.get('/api/organization?filter=leaves')
+        assert response.status_code == 200
+        bundle = response.json
+        assert bundle['resourceType'] == 'Bundle'
+        assert len(bundle['entry']) == 3
 
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
@@ -326,19 +319,17 @@ class TestOrganization(TestCase):
         Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
                   'system': "urn:ietf:bcp:47"})
 
-        rv = self.client.put('/api/organization/{}'.format(org_id),
+        response = self.client.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',
                           data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # Pull the updated db entry
         org = Organization.query.get(org_id)
-        self.assertEqual(org.addresses[0].line1,
-                          data['address'][0]['line'][0])
-        self.assertEqual(org.addresses[1].line1,
-                          data['address'][1]['line'][0])
-        self.assertEqual(org.name, data['name'])
-        self.assertEqual(org.phone, "022-655 2300")
+        assert org.addresses[0].line1 == data['address'][0]['line'][0]
+        assert org.addresses[1].line1 == data['address'][1]['line'][0]
+        assert org.name == data['name']
+        assert org.phone == "022-655 2300"
 
     def test_organization_put_update(self):
         # confirm unmentioned fields persist
@@ -368,21 +359,21 @@ class TestOrganization(TestCase):
         del data['telecom']
         del data['language']
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/organization/{}'.format(org_id),
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # Pull the updated db entry
         org = Organization.query.get(org_id)
         en_AU = db.session.merge(en_AU)
 
         # Confirm all the unmentioned entries survived
-        self.assertEqual(org.phone, '800-800-5665')
-        self.assertEqual(org.default_locale, 'en_AU')
-        self.assertEqual(org.locales[0], en_AU)
-        self.assertEqual(org.timezone, 'US/Pacific')
+        assert org.phone == '800-800-5665'
+        assert org.default_locale == 'en_AU'
+        assert org.locales[0] == en_AU
+        assert org.timezone == 'US/Pacific'
 
     def test_organization_extension_update(self):
         # confirm clearing one of several extensions works
@@ -418,26 +409,25 @@ class TestOrganization(TestCase):
             if e['url'] != LocaleExtension.extension_url]
         input['extension'].append({'url': LocaleExtension.extension_url})
 
-        rv = self.client.put(
+        response = self.client.put(
             '/api/organization/{}'.format(org_id),
             content_type='application/json',
             data=json.dumps(input))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # Pull the updated db entry
         org = Organization.query.get(org_id)
         en_AU = db.session.merge(en_AU)
 
         # Confirm all the unmentioned entries survived
-        self.assertEqual(org.phone, '800-800-5665')
-        self.assertEqual(org.default_locale, 'en_AU')
-        self.assertEqual(org.locales.count(), 0)
-        self.assertEqual(org.timezone, 'US/Pacific')
-        self.assertEqual(
-            org.research_protocol(as_of_date=datetime.utcnow()).id, rp_id)
+        assert org.phone == '800-800-5665'
+        assert org.default_locale == 'en_AU'
+        assert org.locales.count() == 0
+        assert org.timezone == 'US/Pacific'
+        assert org.research_protocol(as_of_date=datetime.utcnow()).id == rp_id
 
         # Confirm empty extension isn't included in result
-        results = json.loads(rv.data)
+        results = response.json
         for e in results['extension']:
             assert 'url' in e
             assert len(e.keys()) > 1
@@ -452,10 +442,10 @@ class TestOrganization(TestCase):
         # prior to adding the parent (partOf) org
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        rv = self.client.post('/api/organization',
+        response = self.client.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_organization_delete(self):
         self.shallow_org_tree()
@@ -466,13 +456,13 @@ class TestOrganization(TestCase):
         # use api to delete one and confirm the other remains
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        rv = self.client.delete('/api/organization/{}'.format(org2_id))
-        self.assert200(rv)
-        self.assertEqual(Organization.query.get(org2_id), None)
+        response = self.client.delete('/api/organization/{}'.format(org2_id))
+        assert response.status_code == 200
+        assert Organization.query.get(org2_id) == None
         orgs = Organization.query.all()
         names =  [o.name for o in orgs]
-        self.assertTrue('none of the above' in names)
-        self.assertTrue(org1_name in names)
+        assert 'none of the above' in names
+        assert org1_name in names
 
     def test_organization_identifiers(self):
         alias = Identifier(
@@ -489,7 +479,7 @@ class TestOrganization(TestCase):
         with SessionScope(db):
             db.session.commit()
         org = db.session.merge(org)
-        self.assertEqual(org.identifiers.count(), before + 2)
+        assert org.identifiers.count() == before + 2
 
     def test_organization_identifiers_update(self):
         with open(os.path.join(
@@ -499,11 +489,11 @@ class TestOrganization(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         before = Organization.query.count()
-        rv = self.client.post('/api/organization',
+        response = self.client.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
-        self.assert200(rv)
-        self.assertEqual(Organization.query.count(), before + 1)
+        assert response.status_code == 200
+        assert Organization.query.count() == before + 1
 
         # the gastro file contains a single identifier - add
         # a second one and PUT, expecting we get two total
@@ -512,48 +502,48 @@ class TestOrganization(TestCase):
                            use='secondary')
         org = Organization.query.filter_by(name='Gastroenterology').one()
         data['identifier'].append(alias.as_fhir())
-        rv = self.client.put('/api/organization/{}'.format(org.id),
+        response = self.client.put('/api/organization/{}'.format(org.id),
                           content_type='application/json',
                           data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # obtain the org from the db, check the identifiers
         org = Organization.query.filter_by(name='Gastroenterology').one()
-        self.assertEqual(2, org.identifiers.count())
+        assert 2 == org.identifiers.count()
 
     def test_shortname(self):
         shorty = Identifier(system=SHORTNAME_ID, value='shorty')
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         # prior to adding shortname, should just get org name
-        self.assertEqual(org.name, org.shortname)
+        assert org.name == org.shortname
 
         org.identifiers.append(shorty)
         with SessionScope(db):
             db.session.commit()
         org = db.session.merge(org)
         # after, should get the shortname
-        self.assertEqual(org.shortname, 'shorty')
+        assert org.shortname == 'shorty'
 
     def test_org_tree_nodes(self):
         self.shallow_org_tree()
-        with self.assertRaises(ValueError) as context:
+        with pytest.raises(ValueError) as context:
             OrgTree().all_leaves_below_id(0)  # none of the above
-        self.assertTrue('not found' in context.exception.message)
+        assert 'not found' in str(context)
 
         nodes = OrgTree().all_leaves_below_id(101)
-        self.assertEqual(1, len(nodes))
+        assert 1 == len(nodes)
 
     def test_deeper_org_tree(self):
         self.deepen_org_tree()
         leaves = OrgTree().all_leaves_below_id(102)
-        self.assertTrue(len(leaves) == 2)
-        self.assertTrue(10032 in leaves)
-        self.assertTrue(10031 in leaves)
+        assert len(leaves) == 2
+        assert 10032 in leaves
+        assert 10031 in leaves
 
     def test_top_names(self):
         self.deepen_org_tree()
-        self.assertEqual({'101', '102'}, set(OrgTree().top_level_names()))
+        assert {'101', '102'} == set(OrgTree().top_level_names())
 
     def test_staff_leaves(self):
         # test staff with several org associations produces correct list
@@ -571,25 +561,25 @@ class TestOrganization(TestCase):
         # Should now find children of 101 (1001) and leaf children
         # of 102 (10031, 10032) for total of 3 leaf nodes
         leaves = self.test_user.leaf_organizations()
-        self.assertEqual(len(leaves), 3)
-        self.assertTrue(1001 in leaves)
-        self.assertTrue(10031 in leaves)
-        self.assertTrue(10032 in leaves)
+        assert len(leaves) == 3
+        assert 1001 in leaves
+        assert 10031 in leaves
+        assert 10032 in leaves
 
     def test_all_leaves(self):
         # can we get a list of just the leaf orgs
         self.deepen_org_tree()
         leaves = OrgTree().all_leaf_ids()
-        self.assertEqual(len(leaves), 3)
+        assert len(leaves) == 3
         for i in (1001, 10031, 10032):
-            self.assertTrue(i in leaves)
+            assert i in leaves
 
     def test_here_and_below_id(self):
         self.deepen_org_tree()
         nodes = OrgTree().here_and_below_id(102)
-        self.assertEqual(len(nodes), 4)
+        assert len(nodes) == 4
         for i in (102, 1002, 10031, 10032):
-            self.assertTrue(i in nodes)
+            assert i in nodes
 
     def test_visible_patients_on_none(self):
         # Add none of the above to users orgs
@@ -598,7 +588,7 @@ class TestOrganization(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         patients_list = OrgTree().visible_patients(self.test_user)
-        self.assertEqual(len(patients_list), 0)
+        assert len(patients_list) == 0
 
     def test_user_org_get(self):
         self.bless_with_basics()
@@ -607,9 +597,9 @@ class TestOrganization(TestCase):
             Reference.organization(o.id).as_fhir()
             for o in self.test_user.organizations]
         self.login()
-        rv = self.client.get('/api/user/{}/organization'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(rv.json['organizations'], expected)
+        response = self.client.get('/api/user/{}/organization'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert response.json['organizations'] == expected
 
     def test_user_org_post(self):
         self.shallow_org_tree()
@@ -619,13 +609,13 @@ class TestOrganization(TestCase):
             {'reference': 'api/organization/1001'}
         ]}
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/organization'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data))
 
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['organizations']), 2)
+        assert response.status_code == 200
+        assert len(response.json['organizations']) == 2
 
     def test_user_org_bogus_identifier(self):
         self.shallow_org_tree()
@@ -635,12 +625,12 @@ class TestOrganization(TestCase):
                  'api/organization/123-45?system={}'.format(US_NPI[:-1])}
         ]}
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/organization'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data))
 
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_user_org_invalid_timezone_post(self):
         # only one org in list can be marked with `apply_to_user`
@@ -650,12 +640,12 @@ class TestOrganization(TestCase):
             {'reference': 'api/organization/1001', 'timezone': "apply_to_user"}
         ]}
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/organization'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data))
 
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_user_org_apply_defaults(self):
         # apply org timezone and language defaults to user
@@ -672,12 +662,12 @@ class TestOrganization(TestCase):
             {'reference': 'api/organization/1001', 'language': "apply_to_user"}
         ]}
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/organization'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data))
 
-        self.assert200(rv)
+        assert response.status_code == 200
         user = db.session.merge(self.test_user)
-        self.assertEquals(user.timezone, 'Europe/Rome')
-        self.assertEquals(user.locale_code, 'en_AU')
+        assert user.timezone == 'Europe/Rome'
+        assert user.locale_code == 'en_AU'
