@@ -74,4 +74,5 @@ class TestResearchProtocol(TestCase):
         assert len(parent.research_protocols) == 1
         assert parent.research_protocols[0].id == rp.id
         assert len(child.research_protocols) == 0
-        assert child.research_protocol(as_of_date=datetime.utcnow()).id == rp.id
+        assert (child.research_protocol(as_of_date=datetime.utcnow()).id
+                == rp.id)

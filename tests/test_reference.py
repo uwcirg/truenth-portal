@@ -22,7 +22,7 @@ class TestReference(TestCase):
         o_ref = Reference.organization(o.id)
         assert o_ref.as_fhir()['display'] == 'test org'
         assert (o_ref.as_fhir()['reference']
-               == 'api/organization/{}'.format(o.id))
+                == 'api/organization/{}'.format(o.id))
 
     def test_org_w_identifier_parse(self):
         o = self.prep_org_w_identifier()

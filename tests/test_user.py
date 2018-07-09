@@ -72,7 +72,8 @@ class TestUser(TestCase):
         assert response.status_code == 400
 
         email = 'john+test@example.com'
-        request = '/api/unique_email?email={}'.format(urllib.parse.quote(email))
+        request = '/api/unique_email?email={}'.format(
+            urllib.parse.quote(email))
         response = self.client.get(request)
         assert response.status_code == 200
         results = response.json
@@ -605,7 +606,7 @@ class TestUser(TestCase):
         assert len(doc['roles']) == 1
         assert doc['roles'][0]['name'] == data['roles'][0]['name']
         user = User.query.get(TEST_USER_ID)
-        assert len(user.roles) ==  1
+        assert len(user.roles) == 1
 
     def test_roles_duplicate_post(self):
         """POST shouldn't allow duplicates"""
@@ -825,7 +826,7 @@ class TestUser(TestCase):
         for perm in ('view', 'edit'):
             for patient in (patient_w_id, patient_x_id):
                 with pytest.raises(Unauthorized):
-                    staff_leaf.check_role(perm,patient)
+                    staff_leaf.check_role(perm, patient)
         for perm in ('view', 'edit'):
             for patient in (patient_y_id, patient_z_id):
                 assert staff_leaf.check_role(perm, other_id=patient)
@@ -847,7 +848,7 @@ class TestUser(TestCase):
             patient_w_id, patient_x_id, patient_y_id, patient_z_id):
             assert staff_top.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
-                staff_top.check_role('edit',other_id=patient)
+                staff_top.check_role('edit', other_id=patient)
 
         # mid level staff can view all, edit none
         staff_mid = db.session.merge(staff_mid)
@@ -855,7 +856,7 @@ class TestUser(TestCase):
             patient_w_id, patient_x_id, patient_y_id, patient_z_id):
             assert staff_mid.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
-                staff_mid.check_role('edit',other_id=patient)
+                staff_mid.check_role('edit', other_id=patient)
 
         # low level staff can view only those w/ same org; edit none
         staff_leaf = db.session.merge(staff_leaf)
@@ -866,7 +867,7 @@ class TestUser(TestCase):
         for patient in (patient_y_id, patient_z_id):
             assert staff_leaf.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
-                staff_leaf.check_role('edit',patient)
+                staff_leaf.check_role('edit', patient)
 
     def test_deep_tree_staff_check_role(self):
         """Can staff-admin edit correct staff members"""
@@ -930,14 +931,14 @@ class TestUser(TestCase):
                 staff_x_id, staff_z_id):
                 assert staff_admin_mid.check_role(perm, other_id=staff)
             with pytest.raises(Unauthorized):
-                staff_admin_mid.check_role(perm,other_id=staff_y_id)
+                staff_admin_mid.check_role(perm, other_id=staff_y_id)
 
         # low level staff_admin can view/edit only those w/ same org
         staff_admin_leaf = db.session.merge(staff_admin_leaf)
         for perm in ('view', 'edit'):
             for staff in (staff_y_id, staff_x_id):
                 with pytest.raises(Unauthorized):
-                    staff_admin_leaf.check_role(perm,staff)
+                    staff_admin_leaf.check_role(perm, staff)
             assert staff_admin_leaf.check_role(perm, other_id=staff_z_id)
 
     def test_all_relationships(self):
@@ -965,7 +966,8 @@ class TestUser(TestCase):
         # make sure we get relationships for both subject and predicate
         self.create_fake_relationships()
         self.login()
-        response = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        response = self.client.get('/api/user/{}/relationships'.format(
+            TEST_USER_ID))
         assert response.status_code == 200
         assert len(response.json['relationships']) >= 2  # we'll add more
 
@@ -976,7 +978,8 @@ class TestUser(TestCase):
                                   'with': other_user.id},]
                }
         self.login()
-        response = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        response = self.client.put('/api/user/{}/relationships'.format(
+            TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         assert response.status_code == 200
@@ -995,7 +998,8 @@ class TestUser(TestCase):
         assert len(self.test_user.relationships) == 1
 
         self.login()
-        response = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        response = self.client.get('/api/user/{}/relationships'.format(
+            TEST_USER_ID))
         assert response.status_code == 200
         data = response.json
 
@@ -1006,7 +1010,8 @@ class TestUser(TestCase):
         data['relationships'] = [r for r in data['relationships'] if
                                  r['user'] == self.test_user.id]
         assert len(data['relationships']) == 1
-        response = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        response = self.client.put('/api/user/{}/relationships'.format(
+            TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         assert response.status_code == 200
@@ -1022,7 +1027,8 @@ class TestUser(TestCase):
                                   'with': TEST_USER_ID},]
                }
         self.login()
-        response = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        response = self.client.put('/api/user/{}/relationships'.format(
+            TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         assert response.status_code == 200
@@ -1126,7 +1132,8 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
 
-        response = self.client.post('/api/user/{}/password_reset'.format(TEST_USER_ID),
+        response = self.client.post('/api/user/{}/password_reset'.format(
+            TEST_USER_ID),
                 content_type='application/json')
 
         assert response.status_code == 200
@@ -1245,7 +1252,8 @@ class TestUser(TestCase):
         with SessionScope(db):
             db.session.commit()
         self.login()
-        response = self.client.get("/api/user/{}/email_ready".format(TEST_USER_ID))
+        response = self.client.get("/api/user/{}/email_ready".format(
+            TEST_USER_ID))
         assert response.status_code == 200
         assert response.json['ready']
 
@@ -1254,7 +1262,8 @@ class TestUser(TestCase):
         self.test_user.last_name = None
         with SessionScope(db):
             db.session.commit()
-        response = self.client.get("/api/user/{}/email_ready".format(TEST_USER_ID))
+        response = self.client.get("/api/user/{}/email_ready".format(
+            TEST_USER_ID))
         assert response.status_code == 200
         assert not response.json['ready']
         assert 'last_name' in response.json['reason']

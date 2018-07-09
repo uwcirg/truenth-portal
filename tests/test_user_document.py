@@ -67,7 +67,8 @@ class TestUserDocument(TestCase):
             temp_pdf.write(test_contents.encode('utf-8'))
             temp_pdf.seek(0)
             tempfileIO = BytesIO(temp_pdf.read())
-            response = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
+            response = self.client.post('/api/user/{}/patient_report'.format(
+                TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             assert response.status_code == 200
@@ -95,7 +96,8 @@ class TestUserDocument(TestCase):
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
             tempfileIO = BytesIO(temp_pdf.read())
-            response = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
+            response = self.client.post('/api/user/{}/patient_report'.format(
+                TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             assert response.status_code == 200

@@ -41,8 +41,8 @@ class TestProcedure(TestCase):
         data = response.json
         assert ('367336001'
                 == data['entry'][0]['resource']['code']['coding'][0]['code'])
-        assert ('Chemotherapy'
-                == data['entry'][0]['resource']['code']['coding'][0]['display'])
+        assert ('Chemotherapy' ==
+                data['entry'][0]['resource']['code']['coding'][0]['display'])
         assert (Reference.patient(TEST_USER_ID).as_fhir()['reference']
                 == data['entry'][0]['resource']['meta']['by']['reference'])
         last_updated = FHIR_datetime.parse(

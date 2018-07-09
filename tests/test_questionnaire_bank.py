@@ -824,7 +824,7 @@ class TestQuestionnaireBank(TestCase):
         a_s = AssessmentStatus(user=user, as_of_date=twoweeksago)
         v2qb = a_s.qb_data.qbd.questionnaire_bank
         assert (a_s.qb_data.qbd.questionnaire_bank.name
-               == 'CRV_recurring_3mo_period v2')
+                == 'CRV_recurring_3mo_period v2')
         assert a_s.qb_name == 'CRV_recurring_3mo_period v2'
         assert a_s.instruments_needing_full_assessment() == ['epic26_v2']
 

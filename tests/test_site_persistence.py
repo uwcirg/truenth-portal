@@ -103,7 +103,7 @@ class TestSitePersistence(TestCase):
         # to what's expected in the persistence file
         assert (INTERVENTION.CARE_PLAN.card_html == ('<p>Organization and '
                 'support for the many details of life as a prostate cancer '
-                'survivor</p>'))
+                                                     'survivor</p>'))
         assert INTERVENTION.SELF_MANAGEMENT.description == 'Symptom Tracker'
         assert (INTERVENTION.SELF_MANAGEMENT.link_label
                 == 'Go to Symptom Tracker')
