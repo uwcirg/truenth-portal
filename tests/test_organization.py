@@ -458,7 +458,7 @@ class TestOrganization(TestCase):
         self.login()
         response = self.client.delete('/api/organization/{}'.format(org2_id))
         assert response.status_code == 200
-        assert Organization.query.get(org2_id) == None
+        assert Organization.query.get(org2_id) is None
         orgs = Organization.query.all()
         names =  [o.name for o in orgs]
         assert 'none of the above' in names
@@ -597,7 +597,8 @@ class TestOrganization(TestCase):
             Reference.organization(o.id).as_fhir()
             for o in self.test_user.organizations]
         self.login()
-        response = self.client.get('/api/user/{}/organization'.format(TEST_USER_ID))
+        response = self.client.get('/api/user/{}/organization'.format(
+            TEST_USER_ID))
         assert response.status_code == 200
         assert response.json['organizations'] == expected
 
