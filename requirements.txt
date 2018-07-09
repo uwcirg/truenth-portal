@@ -12,7 +12,7 @@ Babel==2.6.0
 backports.shutil-get-terminal-size==1.0.0
 bcrypt==3.1.4
 beautifulsoup4==4.6.0
-billiard==3.5.0.3
+billiard==3.5.0.4
 blinker==1.4
 celery==4.2.0
 cffi==1.11.5
