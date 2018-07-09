@@ -1,8 +1,11 @@
 """Unit test module for communication"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import pytest
 import regex
 
 from portal.database import db
@@ -66,15 +69,15 @@ class TestCommunication(TestQuestionnaireSetup):
         dd = DynamicDictLookup()
         dd['a'] = f
         dd['b'] = 'bbb'
-        self.assertEqual(dd['a'], 'zzz')
-        self.assertEqual(dd['b'], 'bbb')
+        assert dd['a'] == 'zzz'
+        assert dd['b'] == 'bbb'
         target = 'a {a} and b {b}'.format(**dd)
-        self.assertTrue(dd['a'] in target)
-        self.assertTrue(dd['b'] in target)
+        assert dd['a'] in target
+        assert dd['b'] in target
 
     def test_dd_no_key(self):
         dd = DynamicDictLookup()
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             dd['a']
 
     def test_unicode(self):
@@ -82,7 +85,7 @@ class TestCommunication(TestQuestionnaireSetup):
         dd['u'] = u'\u2713'
         target = u'works {u}'
         result = target.format(**dd)
-        self.assertTrue(u'\u2713' in result)
+        assert u'\u2713' in result
 
     def test_dd_no_extra_calls(self):
         def bad():
@@ -97,26 +100,26 @@ class TestCommunication(TestQuestionnaireSetup):
 
         ok = "string with just the {good} reference"
         # format forces __get_item__ on all key/values by default
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             ok.format(**dd)
 
         # using minimal_subdict, should fly
-        self.assertTrue('good results' in ok.format(**dd.minimal_subdict(ok)))
+        assert 'good results' in ok.format(**dd.minimal_subdict(ok))
 
     def test_template_org(self):
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
         dd = load_template_args(user=user, questionnaire_bank_id=None)
-        self.assertEqual(dd['parent_org'], '101')
-        self.assertEqual(dd['clinic_name'], '1001')
+        assert dd['parent_org'] == '101'
+        assert dd['clinic_name'] == '1001'
 
     def test_pw_button(self):
         dd = load_template_args(user=None, questionnaire_bank_id=None)
-        self.assertTrue('forgot-password' in dd['password_reset_button'])
+        assert 'forgot-password' in dd['password_reset_button']
 
     def test_st_button(self):
         dd = load_template_args(user=None, questionnaire_bank_id=None)
-        self.assertTrue('Symptom Tracker' in dd['st_button'])
+        assert 'Symptom Tracker' in dd['st_button']
 
     def test_due_date(self):
         qb = QuestionnaireBank.query.filter_by(name='localized').one()
@@ -129,7 +132,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(self.test_user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEqual(dd['questionnaire_due_date'], '10 Jun 2017')
+        assert dd['questionnaire_due_date'] == '10 Jun 2017'
 
         # with timezone where (day = UTCday + 1)
         user.timezone = "Asia/Tokyo"
@@ -139,7 +142,7 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEqual(dd['questionnaire_due_date'], '11 Jun 2017')
+        assert dd['questionnaire_due_date'] == '11 Jun 2017'
 
         # with calculated_due
         qb.due = "{\"days\": 7}"
@@ -149,16 +152,16 @@ class TestCommunication(TestQuestionnaireSetup):
         user = db.session.merge(user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
-        self.assertEqual(dd['questionnaire_due_date'], '18 Jun 2017')
+        assert dd['questionnaire_due_date'] == '18 Jun 2017'
 
     def test_empty(self):
         # Base test system shouldn't generate any messages
         count_b4 = Communication.query.count()
-        self.assertFalse(count_b4)
+        assert not count_b4
 
         update_patient_loop(update_cache=False, queue_messages=True)
         count_after = Communication.query.count()
-        self.assertEqual(count_b4, count_after)
+        assert count_b4 == count_after
 
     def test_nearready_message(self):
         # At 13 days with all work in-progress, shouldn't generate message
@@ -176,7 +179,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_ready_message(self):
         # At 14 days with all work in-progress, should generate message
@@ -196,7 +199,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertEqual(expected.user_id, TEST_USER_ID)
+        assert expected.user_id == TEST_USER_ID
 
     def test_noworkdone_message(self):
         # At 14 days with no work started, should generate message
@@ -211,7 +214,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertEqual(expected.user_id, TEST_USER_ID)
+        assert expected.user_id == TEST_USER_ID
 
     def test_single_message(self):
         # With multiple time spaced CRs, only latest should send
@@ -228,11 +231,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
-        self.assertEqual(expected.count(), 3)
-        self.assertEqual(
-            len([e for e in expected if e.status == 'preparation']), 1)
-        self.assertEqual(
-            len([e for e in expected if e.status == 'suspended']), 2)
+        assert expected.count() == 3
+        assert len([e for e in expected if e.status == 'preparation']) == 1
+        assert len([e for e in expected if e.status == 'suspended']) == 2
 
     def test_no_email(self):
         # User w/o email shouldn't trigger communication
@@ -250,7 +251,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
-        self.assertEqual(expected.count(), 0)
+        assert expected.count() == 0
 
     def test_done_message(self):
         # At 14 days with all work done, should not generate message
@@ -268,7 +269,7 @@ class TestCommunication(TestQuestionnaireSetup):
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_create_message(self):
         self.add_user('__system__')
@@ -290,9 +291,9 @@ class TestCommunication(TestQuestionnaireSetup):
         # is set false.  Confirm persisted data from the fake send
         # looks good.
 
-        self.assertTrue(comm.message)
-        self.assertEqual(comm.message.recipients, TEST_USERNAME)
-        self.assertEqual(comm.status, 'completed')
+        assert comm.message
+        assert comm.message.recipients == TEST_USERNAME
+        assert comm.status == 'completed'
 
     def test_preview(self):
         self.bless_with_basics()
@@ -309,9 +310,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         preview = comm.preview()
 
-        self.assertTrue('<style>' in preview.body)
-        self.assertTrue(preview.subject)
-        self.assertEqual(preview.recipients, TEST_USERNAME)
+        assert '<style>' in preview.body
+        assert preview.subject
+        assert preview.recipients == TEST_USERNAME
 
     def test_practitioner(self):
         self.bless_with_basics()
@@ -323,13 +324,13 @@ class TestCommunication(TestQuestionnaireSetup):
         user.practitioner_id = dr.id
 
         dd = load_template_args(user=user)
-        self.assertEqual(dd['practitioner_name'], 'Bob Jones')
+        assert dd['practitioner_name'] == 'Bob Jones'
 
     def test_missing_practitioner(self):
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
         dd = load_template_args(user=user)
-        self.assertEqual(dd['practitioner_name'], '')
+        assert dd['practitioner_name'] == ''
 
     def test_decision_support(self):
         self.bless_with_basics()
@@ -341,7 +342,7 @@ class TestCommunication(TestQuestionnaireSetup):
         match = regex.match(
             r'<a href=(.*)/access/(.*)/decision_support(.*)',
             dd['decision_support_via_access_link'])
-        self.assertTrue(match)
+        assert match
 
 
 class TestCommunicationTnth(TestQuestionnaireSetup):
@@ -361,13 +362,13 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(QuestionnaireBank.qbs_for_user(
-                self.test_user, 'baseline', as_of_date=datetime.utcnow()))
+        assert QuestionnaireBank.qbs_for_user(
+                self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         # Being a day short, shouldn't fire
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_st_done(self):
         # Symptom Tracker QB with completed shouldn't fire
@@ -379,8 +380,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
+        assert QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         for instrument in symptom_tracker_instruments:
             mock_qr(instrument_id=instrument)
@@ -388,7 +389,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # With all q's done, shouldn't generate a message
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_st_undone(self):
         # Symptom Tracker QB with incompleted should generate communication
@@ -402,16 +403,16 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user.birthdate = '1969-07-16'
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
+        assert QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
         a_s, _ = overall_assessment_status(TEST_USER_ID)
-        self.assertEqual('In Progress', a_s)
+        assert 'In Progress' == a_s
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertTrue(expected)
+        assert expected
 
     def test_st_metastatic(self):
         # Symptom Tracker QB on metastatic patient shouldn't qualify
@@ -427,14 +428,14 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             status='final', issued=None)
 
         # Confirm test user doesn't qualify for ST QB
-        self.assertFalse(QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
+        assert not QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         # shouldn't generate a message either
         mock_qr(instrument_id='epic26')
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_procedure_update(self):
         # Newer procedure should alter trigger date and suspend message
@@ -446,8 +447,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        self.assertTrue(QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow()))
+        assert QuestionnaireBank.qbs_for_user(
+            self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         # Add fresh procedure
         self.add_procedure('4', 'External beam radiation therapy', ICHOM)
@@ -455,7 +456,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         # New procedure date should suspend message
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
-        self.assertFalse(expected)
+        assert not expected
 
     def test_persist(self):
         cr = mock_communication_request(
@@ -464,7 +465,6 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             communication_request_name='test-communication-request')
 
         serial = cr.as_fhir()
-        self.assertEqual(serial['resourceType'], 'CommunicationRequest')
+        assert serial['resourceType'] == 'CommunicationRequest'
         copy = CommunicationRequest.from_fhir(serial)
-        self.assertEqual(cr.questionnaire_bank.name,
-                          copy.questionnaire_bank.name)
+        assert cr.questionnaire_bank.name == copy.questionnaire_bank.name

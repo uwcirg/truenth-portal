@@ -447,7 +447,7 @@ select:not([multiple]) {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 27em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -600,6 +600,7 @@ select:not([multiple]) {
   text-align: left;
   &.footer-separate {
     padding-top: 0;
+    margin-top: 1em;
     .footer-container {
       margin-top: 30px;
       border-top: 1px solid #ccc;
@@ -1696,7 +1697,7 @@ body.portal .copyright-container  {
 @media (min-width: 699px) {
   .portal-header,
   .portal-intro-text {
-    font-size: @subSmallHeadSize;
+    font-size: @subSmallHeadSize*0.96;
   }
 }
 .portal-header-logout-container {
@@ -1720,7 +1721,7 @@ body.portal .copyright-container  {
 .portal-description {
   background: #3d4750;
   color: #FFF;
-  padding: 0.5em 2em 4em 2em;
+  padding: 0.5em 1.5em 4em;
   position: relative;
   width: 430px;
   max-width: 100%;
@@ -1789,7 +1790,7 @@ body.portal .copyright-container  {
 .portal-description .button-container {
   position: absolute;
   bottom: 0;
-  margin-bottom: 1em;
+  margin-bottom: 2.5em;
   left: 0;
   right: 0;
   margin-left: auto;
@@ -1800,13 +1801,10 @@ body.portal .copyright-container  {
 
 .portal-flex-container {
   .portal-description {
-    padding-top: 2.5em;
+    padding-top: 1.5em;
   }
 }
 
-.portal-description-incomplete .button-container {
-  top: 50%;
-}
 .portal-description-title {
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -2950,6 +2948,14 @@ div.biopsy-option:last-of-type{
   }
 }
 
+@media (min-width: 1200px) {
+  #consentHistoryTable {
+    td {
+      min-width: 150px;
+    }
+  }
+}
+
 .button--LR,
 .button--LR.data-show,
 #profileConsentList .button--LR{
@@ -3362,12 +3368,6 @@ div.timezone-warning.text-warning {
     & .pull-right {
       top: 4px
     }
-  }
-}
-
-@media (min-width: 726px) {
-  .portal-header {
-    font-size: @subSmallHeadSize;
   }
 }
 

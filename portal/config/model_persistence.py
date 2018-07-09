@@ -1,4 +1,5 @@
 """Persistence details for Model Classes"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -74,8 +75,9 @@ class ModelPersistence(object):
 
     @staticmethod
     def _log(msg):
-        current_app.logger.info(msg)
-        trace(msg)
+        msg = msg.encode('utf-8')
+        current_app.logger.info(str(msg))
+        trace(str(msg))
 
     def __header__(self, data):
         data['resourceType'] = 'Bundle'
@@ -204,7 +206,7 @@ class ModelPersistence(object):
     def lookup_existing(self, new_obj, new_data):
         match, field_description = None, None
         if self.lookup_field == 'id':
-            field_description = unicode(new_obj.id)
+            field_description = str(new_obj.id)
             match = (
                 self.model.query.get(new_obj.id)
                 if new_obj.id is not None else None)
@@ -212,7 +214,7 @@ class ModelPersistence(object):
             ids = new_data.get('identifier')
             if len(ids) == 1:
                 id = Identifier.from_fhir(ids[0]).add_if_not_found()
-                field_description = unicode(id)
+                field_description = str(id)
                 match = self.model.find_by_identifier(id) if id else None
             elif len(ids) > 1:
                 raise ValueError(
@@ -221,7 +223,7 @@ class ModelPersistence(object):
         elif isinstance(self.lookup_field, tuple):
             # Composite key case
             args = {k: new_data.get(k) for k in self.lookup_field}
-            field_description = unicode(args)
+            field_description = str(args)
             match = self.model.query.filter_by(**args).first()
         else:
             args = {self.lookup_field: new_data[self.lookup_field]}

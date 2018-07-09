@@ -60,7 +60,7 @@
     },
     {
       "name": "PSA Tracker strategy",
-      "description": "Allow (TNG Patients AND localized PCa AND Tx Started) OR (TNG Patients AND w/o positive PCa dx)",
+      "description": "Allow (TNG Patients AND localized PCa) OR (TNG Patients AND w/o positive PCa dx)",
       "resourceType": "AccessStrategy",
       "intervention_name": "psa_tracker",
       "id": 3001,
@@ -110,19 +110,6 @@
                     "name": "display",
                     "value": "PCa localized diagnosis"
                   },
-                  {
-                    "name": "boolean_value",
-                    "value": "true"
-                  }
-                ]
-              },
-              {
-                "name": "strategy_3",
-                "value": "tx_begun"
-              },
-              {
-                "name": "strategy_3_kwargs",
-                "value": [
                   {
                     "name": "boolean_value",
                     "value": "true"

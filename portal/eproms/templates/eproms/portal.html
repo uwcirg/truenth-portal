@@ -52,21 +52,15 @@
     <div class="portal-description {{class}}">
         {%- if intervention.description -%}<h2 class="tnth-subhead title">{{ intervention.description }}</h2>{% endif %}
         {{ caller() }}
-        <div class="button-container">
-            {%- if not display.link_url -%}
-               <div class="button-container {{class}}">
-                    <a class="btn-lg btn-tnth-primary disabled" href="#">
-                        {{display.link_label or _("Not Available")}}
-                    </a>
-                </div>
-            {%- else -%}
-                <div class="button-container">
-                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
-                    	{{display.link_label or _("Go to link")}}
-                	</a>
-                </div>
-            {%- endif -%}
-        </div>
+        {%- if not display.link_url -%}
+            <div class="button-container {{class}}">
+                <a class="btn-lg btn-tnth-primary disabled" href="#">{{display.link_label or _("Not Available")}}</a>
+            </div>
+        {%- else -%}
+            <div class="button-container">
+                <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">{{display.link_label or _("Go to link")}}</a>
+            </div>
+        {%- endif -%}
     </div>
 {%- endmacro %}
 

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
 
@@ -37,6 +39,6 @@ class TestDateTools(TestCase):
     def test_int_date(self):
         # integer value shouldn't generate parser error
         acceptance_date = 1394413200000
-        with self.assertRaises(BadRequest) as e:
+        with pytest.raises(BadRequest) as e:
             dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
-        self.assertTrue('acceptance date' in str(e.exception))
+        assert 'acceptance date' in str(e)
