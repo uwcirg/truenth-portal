@@ -40,8 +40,9 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             }
         } // end for
     }
-    params = params || {};
-    if (!params.cache) { //NOTE, the no-cache headers are ignored for XMLHttpRequest calls in older IEs see  https://stackoverflow.com/questions/244918/internet-explorer-7-ajax-links-only-load-once
+    params = params || {}; 
+    //a workaround for browsers that ignore cache-control headers, IE Edge https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/107207/ and older browsers https://stackoverflow.com/questions/244918/internet-explorer-7-ajax-links-only-load-once
+    if (!params.cache) { 
         url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     }
     xhr.open("GET", url, true);
