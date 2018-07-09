@@ -27,7 +27,8 @@
                 if ($("#adminTable").length > 0) {
                     self.rowLinkEvent();
                     self.setColumnSelections();
-                    self.getTablePreference(self.userId, self.tableIdentifier);
+                    self.setTableFilters(self.userId); //set user's preference for filter(s)
+                    self.initTableEvents();
                     self.initOrgsList(org_list); /*global org_list*/
                     self.handleDisableFields();
                     self.setRowItemEvent();
@@ -152,7 +153,6 @@
                         self.setSortFilterProp();
                         self.configTable();
                         self.addFilterPlaceHolders();
-                        self.initTableEvents();
                         self.configured = true;
                         setTimeout(function() {callback();}, 50);
                     } else {
@@ -186,7 +186,7 @@
             configTable: function() {
                 var options = {};
                 if(this.tableIdentifier === "patientList") {
-                    var sortObj = this.getTablePreference(this.userId);
+                    var sortObj = this.getTablePreference(this.userId, this.tableIdentifier);
                     sortObj = sortObj || this.getDefaultTablePreference();
                     options.sortName = sortObj.sort_field;
                     options.sortOrder = sortObj.sort_order;
@@ -368,7 +368,6 @@
                     self.orgTool.populateUI(); //populate orgs dropdown UI
                     var hbOrgs = self.orgTool.getHereBelowOrgs(self.getUserOrgs()); //filter orgs UI based on user's orgs
                     self.orgTool.filterOrgs(hbOrgs);
-                    self.setTableFilters(self.userId); //set user's preference for filter(s)
                     self.initOrgsEvent(requestOrgList);
                     self.fadeLoader();
                 });
@@ -581,13 +580,15 @@
                     });
                 }
                 if(prefData && prefData.filters) { //set filter values
+                    var fname="";
                     for(var item in prefData.filters) {
-                        if(prefData.filters.hasOwnProperty(item)) {
-                            var fname = "#adminTable .bootstrap-table-filter-control-" + item;
-                            if($(fname).length > 0) { //note this is based on the trigger event for filtering specify in the plugin
-                                $(fname).val(prefData.filters[item]).trigger($(fname).attr("type") === "text" ? "keyup" : "change");
-                            }
+                        fname = "#adminTable .bootstrap-table-filter-control-" + item;
+                        if($(fname).length === 0) {
+                            continue;
                         }
+                        //note this is based on the trigger event for filtering specify in the plugin
+                        $(fname).val(prefData.filters[item]);
+                        $(fname).trigger($(fname).get(0).tagName === "INPUT" ? "keyup" : "change");
                     }
                 }
             },
