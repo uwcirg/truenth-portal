@@ -457,7 +457,7 @@ class TestUser(TestCase):
         new_user = User.query.get(user_id)
         assert new_user.first_name == given
         assert new_user.last_name == family
-        assert new_user.username == None
+        assert new_user.username is None
         assert len(new_user.roles) == 1
         roles = {"roles": [{"name": ROLE.PATIENT.value}]}
         response = self.client.put('/api/user/{}/roles'.format(user_id),
