@@ -40,14 +40,18 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             }
         } // end for
     }
-    xhr.onreadystatechange = ensureReadiness;
+    params = params || {}; 
+    //a workaround for browsers that ignore cache-control headers, IE Edge https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/107207/ and older browsers https://stackoverflow.com/questions/244918/internet-explorer-7-ajax-links-only-load-once
+    if (!params.cache) { 
+        url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+    }
     xhr.open("GET", url, true);
-    params = params || {};
     for (var param in params) {
         if (params.hasOwnProperty(param)) {
             xhr.setRequestHeader(param, params[param]);
         }
     }
+    xhr.onreadystatechange = ensureReadiness;
     xhr.send("");
 }
 addEventListener("message", function(e) {

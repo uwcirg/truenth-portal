@@ -467,7 +467,7 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: "false", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: false, sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         var self = this;
@@ -2038,7 +2038,7 @@ var Global = {
     },
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
-        sendRequest(PORTAL_NAV_PAGE, false, function(data) { /*global sendRequest */
+        sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
                 restoreVis(); /*global restoreVis */
