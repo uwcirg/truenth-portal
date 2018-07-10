@@ -72,8 +72,8 @@ class TestUser(TestCase):
         assert response.status_code == 400
 
         email = 'john+test@example.com'
-        request = '/api/unique_email?email={}'.format(
-            urllib.parse.quote(email))
+        request = '/api/unique_email?email={}'.format(urllib.parse.quote(
+            email))
         response = self.client.get(request)
         assert response.status_code == 200
         results = response.json
