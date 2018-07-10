@@ -498,8 +498,6 @@ var tnthAjax = {
             });
             return true;
         }
-        console.log("params? ", params)
-        console.log("url? ", url)
         $.ajax({
             type: method ? method : "GET",
             url: url,
