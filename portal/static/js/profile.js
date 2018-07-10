@@ -1117,10 +1117,10 @@
                     btnSelf.addClass("disabled").attr("disabled", true);
 
                     $.ajax({ //get email content via API
-                            type: "GET",
-                            url: emailUrl,
-                            cache: false,
-                            async: true
+                        type: "GET",
+                        url: emailUrl,
+                        cache: false,
+                        async: true
                     }).done(function(data) {
                         if (!data || !data.subject || !data.body) {
                             self.messages.userInviteEmailErrorMessage = "<div>" + i18next.t("Unable to send email. Missing content.") + "</div>";;
