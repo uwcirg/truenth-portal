@@ -73,7 +73,8 @@ def organization_search():
         description:
             If given a `True` value, alters the return type to HTML and
             generates a `tree` view of the organization hierarchy for easier
-            human comprehension of the structure.
+            human comprehension of the structure.  Can NOT be combined with
+            other filters or search parameters.
         required: false
         type: string
     produces:
@@ -151,6 +152,8 @@ def organization_search():
 
     bundle = Organization.generate_bundle(matching_orgs, include_empties=False)
     if tree_view:
+        if matching_orgs:
+            abort(400, "Can't combine search filters with `tree_view`")
         return render_template('org_tree.html', bundle=bundle)
     return jsonify(bundle)
 
