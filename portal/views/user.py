@@ -1642,7 +1642,7 @@ def upload_user_document(user_id):
             abort(
                 400, "no file found - please POST a single file using "
                      "standard multipart/form-data parameters")
-        key = list(req.files.keys())[0]  # either 'file' or actual filename
+        key = next(req.files.keys())  # either 'file' or actual filename
         return req.files[key]
 
     filedata = posted_filename(request)
