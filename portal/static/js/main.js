@@ -18,6 +18,20 @@ var SYSTEM_IDENTIFIER_ENUM = {
     CANCER_TREATMENT_CODE: "118877007",
     NONE_TREATMENT_CODE: "999"
 };
+var CLINICAL_CODE_ENUM = {
+    "biopsy": {
+        code: 111,
+        display: "biopsy"
+    },
+    "pca_diag": {
+        code: 121,
+        display: "PCa diagnosis"
+    },
+    "pca_localized": {
+        code: 141,
+        display: "PCa localized diagnosis"
+    }
+};
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
@@ -1144,17 +1158,6 @@ var tnthAjax = {
             }
         });
     },
-    "putClinical": function(userId, toCall, toSend, targetField) {
-        this.sendRequest("/api/patient/" + userId + "/clinical/" + toCall, "POST", userId, {data: JSON.stringify({value: toSend}),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".put-clinical-error").html("");
-                } else {
-                    $(".put-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
-                }
-            }
-        });
-    },
     "getObservationId": function(userId, code) {
         if (!userId) { return false; }
         var obId = "",_code = "";
@@ -1176,22 +1179,14 @@ var tnthAjax = {
         });
         return obId;
     },
-    "postClinical": function(userId, toCall, toSend, status, targetField, params) {
+    "postClinical": function(userId, toCall, toSend, status, targetField, params, callback) {
         if (!userId) { return false; }
         params = params || {};
         var code = "", display = "";
-        switch (toCall) {
-        case "biopsy":
-            code = "111";
-            display = "biopsy";
-            break;
-        case "pca_diag":
-            code = "121";
-            display = "PCa diagnosis";
-            break;
-        case "pca_localized":
-            code = "141";
-            display = "PCa localized diagnosis";
+        if (CLINICAL_CODE_ENUM.hasOwnProperty(String(toCall).toLowerCase())) {
+            var match = CLINICAL_CODE_ENUM[toCall];
+            code = match.code;
+            display = match.display;
         }
         if (!code) {
             return false;
@@ -1214,6 +1209,7 @@ var tnthAjax = {
             method = "PUT";
             url = url + "/" + obsId;
         }
+        callback = callback || function() {};
         this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray),targetField: targetField}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1222,6 +1218,7 @@ var tnthAjax = {
                     $(".post-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
                 }
             }
+            callback(data);
         });
     },
     "getTermsUrl": function(sync, callback) { /*global i18next */
