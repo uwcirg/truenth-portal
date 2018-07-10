@@ -124,14 +124,16 @@ function newHttpRequest(url, params, callBack) {
         }
     };
     params = params || {};
-    if (!params.cache) {
-        url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-    }
     xmlhttp.open("GET", url, true);
     for (var param in params) {
         if (params.hasOwnProperty(param)) {
             xmlhttp.setRequestHeader(param, params[param]);
         }
+    }
+    if (!params.cache) {
+        xmlhttp.setRequestHeader("cache-control", "no-cache");
+        xmlhttp.setRequestHeader("expires", "-1");
+        xmlhttp.setRequestHeader("pragma", "no-cache"); //legacy HTTP 1.0 servers and IE support
     }
     xmlhttp.send();
 }
@@ -165,15 +167,16 @@ function ajaxRequest(url, params, callback) {
         request_attempts = 0;
     });
 }
-function initWorker(url, params, callback) {
+function initWorker(url, params, callbackFunc) {
     var worker = new Worker('/static/js/ajaxWorker.js');
     worker.postMessage({url: url, params: params});
     worker.addEventListener("message", function(e) {
-        callback(e.data);
+        callbackFunc(e.data);
         worker.terminate();
     }, false);
     worker.addEventListener("error", function(e) {
         console.log("Worker runtime error: Line ", e.lineno, " in ", e.filename, ": ", e.message);
+        worker.terminate();
     }, false);
 }
 function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */

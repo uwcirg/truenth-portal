@@ -467,7 +467,7 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: false, sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         var self = this;
@@ -497,6 +497,13 @@ var tnthAjax = {
                 }
             });
             return true;
+        }
+        if (!params.cache) {
+            params.headers = {
+                "cache-control": "no-cache",
+                "expires": "-1",
+                "pragma": "no-cache"
+            }
         }
         $.ajax({
             type: method ? method : "GET",
@@ -609,7 +616,9 @@ var tnthAjax = {
             callback(JSON.parse(sessionStorage.currentUser));
         } else {
             this.sendRequest("/api/me", "GET", "", params, function(data) {
-                sessionStorage.setItem("currentUser", JSON.stringify(data));
+                if (data && data.id) { //make sure the necessary data is there before setting session
+                    sessionStorage.setItem("currentUser", JSON.stringify(data));
+                }
                 callback(data);
             });
         }
