@@ -485,10 +485,10 @@ var tnthAjax = {
                     return false;
                 }
                 if (!data) {
-                    callback({"error": true});
+                    callback({"error": true, "data": "no data returned"});
                     fieldHelper.showError(targetField);
                 } else if (data.error) {
-                    callback({"error": true});
+                    callback({"error": true, "data": data});
                     self.sendError(data, url, userId);
                     fieldHelper.showError(targetField);
                 } else {
@@ -520,7 +520,7 @@ var tnthAjax = {
                 callback(data);
                 fieldHelper.showUpdate(targetField);
             } else {
-                callback({"error": true});
+                callback({"error": true, "data": "no data returned"});
                 fieldHelper.showError(targetField);
             }
         }).fail(function(xhr) {
@@ -532,7 +532,7 @@ var tnthAjax = {
                 })(self, url, method, userId, params, callback);
             } else {
                 params.attempts = 0;
-                callback({"error": true});
+                callback({"error": true, "data": xhr});
                 fieldHelper.showError(targetField);
                 self.sendError(xhr, url, userId);
             }

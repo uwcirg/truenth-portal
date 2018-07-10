@@ -63,7 +63,7 @@
                 self.modules.tnthAjax.setConfigurationUI(CONSENT_WITH_TOP_LEVEL_ORG, data.CONSENT_WITH_TOP_LEVEL_ORG + ""); //for use by UI later, e.g. handle consent submission
             });
         },
-        mounted: function() {
+       mounted: function() {
             var self = this;
             Vue.nextTick(function () {
                 // DOM updated
@@ -344,7 +344,9 @@
                 this.modules.tnthAjax.getDemo(this.subjectId, params, function(data) { //get demo returned cached data if there, but we need fresh data
                     if (data) {
                         self.demo.data = data;
-                        self.setUserEmailReady();
+                        setTimeout(function() {
+                            self.setUserEmailReady();
+                        }, 50);
                         if (data.telecom) {
                             data.telecom.forEach(function(item) {
                                 if (item.system === "email") {
@@ -1104,60 +1106,66 @@
                         return false;
                     }
                     var emailUrl = selectedOption.attr("data-url"), email = $("#email").val(), subject = "", body = "", returnUrl = "";
+                    var accessUrlError = "";
                     if (!emailUrl) {
                         self.messages.userInviteEmailErrorMessage = i18next.t("Url for email content is unavailable.");
                         return false;
                     }
+                    var resetBtn = function() {
+                        btnSelf.removeClass("disabled").attr("disabled", false);
+                    };
+                    btnSelf.addClass("disabled").attr("disabled", true);
+
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,
                         cache: false,
-                        async: false
+                        async: true
                     }).done(function(data) {
-                        if (data) {
-                            subject = data.subject;
-                            body = data.body;
-                            self.messages.userInviteEmailErrorMessage = "";
-                        }
-                    }).fail(function(xhr) { //report error
-                        self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
-                    });
-
-                    if (!body || !subject || !email) {
-                        var message = "<div>" + i18next.t("Unable to send email.") + "</div>";
-                        self.messages.userInviteEmailErrorMessage = message;
-                        return false;
-                    }
-                    var inviteError = "";
-                    if (selectedOption.val() === "invite" && emailType === "registration") {
-                        returnUrl = self.getAccessUrl();
-                        if (returnUrl) {
-                            body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
-                        } else {
-                            inviteError = i18next.t("failed request to get email invite url");
-                        }
-                    }
-                    if (inviteError) {
-                        self.messages.userInviteEmailErrorMessage = inviteError;
-                        return false;
-                    }
-                    self.modules.tnthAjax.invite(self.subjectId, {
-                        "subject": subject,
-                        "recipients": email,
-                        "body": body
-                    }, function(data) {
-                        if (data.error) {
-                            self.messages.userInviteEmailErrorMessage = i18next.t("Unable to send email");
+                        if (!data || !data.subject || !data.body) {
+                            self.messages.userInviteEmailErrorMessage = "<div>" + i18next.t("Unable to send email. Missing content.") + "</div>";;
+                            btnSelf.removeClass("disabled").attr("disabled", false);
                             return false;
                         }
-                        self.messages.userInviteEmailInfoMessage = "<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>";
-                        emailTypeElem.val("");
-                        btnSelf.addClass("disabled");
-                        self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
-                            setTimeout(function() {
-                                self.getEmailLog(self.subjectId, data);
-                            }, 100);
+                        subject = data.subject;
+                        body = data.body;
+                        if (selectedOption.val() === "invite" && emailType === "registration") {
+                            returnUrl = self.getAccessUrl();
+                            if (returnUrl) {
+                                body = body.replace(/url_placeholder/g, decodeURIComponent(returnUrl));
+                            } else {
+                                accessUrlError = i18next.t("failed request to get email invite url");
+                            }
+                        }
+
+                        self.messages.userInviteEmailErrorMessage = "";
+                        if (accessUrlError) {
+                            self.messages.userInviteEmailErrorMessage = accessUrlError;
+                            resetBtn();
+                            return false;
+                        }
+                        self.modules.tnthAjax.invite(self.subjectId, {
+                            "subject": subject,
+                            "recipients": email,
+                            "body": body
+                        }, function(data) {
+                            if (data.error) {
+                                self.messages.userInviteEmailErrorMessage = i18next.t("Error occurred while sending invite email.");
+                                resetBtn();
+                                return false;
+                            }
+                            self.messages.userInviteEmailInfoMessage = "<strong class='text-success'>" + i18next.t("{emailType} email sent to {emailAddress}").replace("{emailType}", selectedOption.text()).replace("{emailAddress}", email) + "</strong>";
+                            emailTypeElem.val("");
+                            self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
+                                setTimeout(function() {
+                                    self.getEmailLog(self.subjectId, data);
+                                }, 100);
+                            });
                         });
+                    }).fail(function(xhr) { //report error
+                        self.messages.userInviteEmailErrorMessage = i18next.t("Error occurred retreving email content via API.");
+                        resetBtn();
+                        self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
                     });
                 });
             },
@@ -1207,7 +1215,7 @@
                             $("#btnProfileSendEmail").attr("disabled", true);
                         } else {
                             if (data.error) {
-                                $("#profileEmailErrorMessage").text(i18next.t("Unable to send email."));
+                                $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
                             }
                         }
                     });
@@ -2593,7 +2601,7 @@
                                 __self.consent.saveLoading = false;
                                 __self.reloadConsentList(self.attr("data-userId"));
                             });
-
+    
                         }
                     });
                 });
