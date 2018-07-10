@@ -1,7 +1,14 @@
 """Organization related views module"""
 import json
 
-from flask import Blueprint, abort, current_app, jsonify, request
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 from sqlalchemy import and_, exc
 
@@ -37,6 +44,11 @@ def organization_search():
     If search terms are provided but no matching organizations are found,
     a 404 is returned.
 
+    NB - for humans to view the organization hierarchy, add `?tree_view=True`
+    to the request.  This will result in altering the return type to HTML
+    with the JSON bits for each respective organization showing in a tree
+    like structure.
+
     ---
     operationId: organization_search
     tags:
@@ -56,6 +68,14 @@ def organization_search():
             to just the leaf nodes of the organization tree.
         required: false
         type: string
+      - name: tree_view
+        in: query
+        description:
+            If given a `True` value, alters the return type to HTML and
+            generates a `tree` view of the organization hierarchy for easier
+            human comprehension of the structure.
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -71,7 +91,7 @@ def organization_search():
     """
     filter = None
     found_ids = []
-    system, value = None, None
+    system, value, tree_view = None, None, None
     for k, v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
@@ -96,6 +116,8 @@ def organization_search():
             system = v
         elif k == 'value':
             value = v
+        elif k == 'tree_view':
+            tree_view = v and v.lower() == 'true'
         else:
             abort(400, "only search on `state`, `filter` or `system` AND `value` "
                   "are available at this time")
@@ -128,6 +150,8 @@ def organization_search():
             matching_orgs |= set(ot.here_and_below_id(org))
 
     bundle = Organization.generate_bundle(matching_orgs, include_empties=False)
+    if tree_view:
+        return render_template('org_tree.html', bundle=bundle)
     return jsonify(bundle)
 
 
