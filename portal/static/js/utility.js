@@ -124,14 +124,16 @@ function newHttpRequest(url, params, callBack) {
         }
     };
     params = params || {};
-    if (!params.cache) {
-        url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-    }
     xmlhttp.open("GET", url, true);
     for (var param in params) {
         if (params.hasOwnProperty(param)) {
             xmlhttp.setRequestHeader(param, params[param]);
         }
+    }
+    if (!params.cache) {
+        xmlhttp.setRequestHeader("cache-control", "no-cache");
+        xmlhttp.setRequestHeader("expires", "-1");
+        xmlhttp.setRequestHeader("pragma", "no-cache"); //legacy HTTP 1.0 servers and IE support
     }
     xmlhttp.send();
 }

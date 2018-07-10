@@ -616,7 +616,7 @@
                 if (targetSection.length > 0) {
                     var loadingElement = targetSection.find(".profile-item-loader");
                     loadingElement.show();
-                    this.modules.tnthAjax.getOptionalCoreData(self.subjectId, {useWorker: true}, function(data) {
+                    this.modules.tnthAjax.getOptionalCoreData(self.subjectId, {useWorker: true, cache: true}, function(data) { //cache this request as change is rare if ever for optional data
                         if (data.optional) {
                             var sections = $("#profileForm .optional");
                             sections.each(function() {

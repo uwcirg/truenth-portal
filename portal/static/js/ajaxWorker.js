@@ -40,12 +40,13 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             }
         } // end for
     }
-    params = params || {}; 
-    //a workaround for browsers that ignore cache-control headers, IE Edge https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/107207/ and older browsers https://stackoverflow.com/questions/244918/internet-explorer-7-ajax-links-only-load-once
-    if (!params.cache) { 
-        url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-    }
+    params = params || {};
     xhr.open("GET", url, true);
+    if (!params.cache) {
+        xhr.setRequestHeader("cache-control", "no-cache");
+        xhr.setRequestHeader("expires", "-1");
+        xhr.setRequestHeader("pragma", "no-cache"); //legacy HTTP 1.0 servers and IE support
+    }
     for (var param in params) {
         if (params.hasOwnProperty(param)) {
             xhr.setRequestHeader(param, params[param]);
