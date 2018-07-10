@@ -503,7 +503,7 @@ var tnthAjax = {
                 "cache-control": "no-cache",
                 "expires": "-1",
                 "pragma": "no-cache"
-            }
+            };
         }
         $.ajax({
             type: method ? method : "GET",
