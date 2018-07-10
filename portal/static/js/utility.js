@@ -165,15 +165,16 @@ function ajaxRequest(url, params, callback) {
         request_attempts = 0;
     });
 }
-function initWorker(url, params, callback) {
+function initWorker(url, params, callbackFunc) {
     var worker = new Worker('/static/js/ajaxWorker.js');
     worker.postMessage({url: url, params: params});
     worker.addEventListener("message", function(e) {
-        callback(e.data);
+        callbackFunc(e.data);
         worker.terminate();
     }, false);
     worker.addEventListener("error", function(e) {
         console.log("Worker runtime error: Line ", e.lineno, " in ", e.filename, ": ", e.message);
+        worker.terminate();
     }, false);
 }
 function sendRequest(url, params, callback) { /*generic function for sending GET ajax request, make use of worker if possible */
