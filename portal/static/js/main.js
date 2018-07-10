@@ -31,7 +31,7 @@ var CLINICAL_CODE_ENUM = {
         code: 141,
         display: "PCa localized diagnosis"
     }
-}
+};
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
