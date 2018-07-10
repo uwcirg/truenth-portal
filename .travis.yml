@@ -43,7 +43,7 @@ matrix:
   include:
     - env: TOXENV=py27
     - env: TOXENV=py3
-      python: "3.4"
+      python: "3.6"
     - env: TOXENV=translations PERSISTENCE_DIR="gil"
     - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=docs
