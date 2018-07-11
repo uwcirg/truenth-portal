@@ -358,6 +358,10 @@ OrgTool.prototype.populateUI = function() {
                     } else {
                         attrObj.textClass = "text-muter";
                     }
+                } else {
+                    if (_isTopLevel) {
+                        attrObj.textClass = "text-muted singleton";
+                    }
                 }
                 childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
                     .replace(/\{\{itemName\}\}/g, item.name)
