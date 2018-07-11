@@ -3,9 +3,14 @@ from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
-from io import BytesIO
 import os
-from tempfile import NamedTemporaryFile
+
+try:
+    # Python 2
+    from cStringIO import StringIO
+except ImportError:
+    # Python 3
+    from io import StringIO
 
 from flask import current_app
 from flask_webtest import SessionScope
@@ -62,7 +67,9 @@ class TestUserDocument(TestCase):
         response = self.client.post(
             '/api/user/{}/patient_report'.format(TEST_USER_ID),
             content_type='multipart/form-data',
-            data=dict({'file': (StringIO(test_contents), 'udoc_test.pdf')}),
+            data=dict({'file':
+                           (StringIO(test_contents),
+                            'udoc_test.pdf')})
         )
         assert response.status_code == 200
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
@@ -81,21 +88,12 @@ class TestUserDocument(TestCase):
     def test_download_user_document(self):
         self.login()
         test_contents = "This is a test."
-        with NamedTemporaryFile(
-            prefix='udoc_test_',
-            suffix='.pdf',
-            delete=True,
-        ) as temp_pdf:
-            temp_pdf.write(test_contents.encode('utf-8'))
-            temp_pdf.seek(0)
-            tempfileIO = BytesIO(temp_pdf.read())
-            response = self.client.post('/api/user/{}/patient_report'.format(
-                TEST_USER_ID),
-                                content_type='multipart/form-data',
-                                data=dict({'file': (tempfileIO, temp_pdf.name)}))
-            assert response.status_code == 200
-        udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
-        response = self.client.get('/api/user/{}/user_documents/{}'.format(
-                            TEST_USER_ID, udoc.id))
+        response = self.client.post(
+            '/api/user/{}/patient_report'.format(TEST_USER_ID),
+            content_type='multipart/form-data',
+            data=dict({'file':
+                           (StringIO(test_contents),
+                            'udoc_test.pdf')})
+        )
         assert response.status_code == 200
         assert response.get_data(as_text=True) == test_contents
