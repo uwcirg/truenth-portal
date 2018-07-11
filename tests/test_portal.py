@@ -1,9 +1,14 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
+from future.standard_library import install_aliases
+from past.builtins import basestring
+install_aliases()
 
 from datetime import datetime
 import tempfile
+import sys
 import urllib
+from urllib.parse import urlencode
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
@@ -92,7 +97,7 @@ class TestPortal(TestCase):
         response = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
-        results = unicode(response.data, 'utf-8')
+        results = response.get_data(as_text=True)
         self.assertIn(ui.staff_html, results)
 
     def test_public_access(self):
@@ -166,7 +171,10 @@ class TestPortal(TestCase):
         body = message.style_message(message.body)
         self.assertTrue(u'DOCTYPE' in body)
         self.assertTrue(u'style' in body)
-        self.assertTrue(isinstance(body, str))
+        if sys.version_info[0] < 3:
+            self.assertTrue(isinstance(body, unicode))
+        else:
+            self.assertTrue(isinstance(body, str))
 
         self.login()
         response = self.client.get('/invite/{0}'.format(message.id))
@@ -205,7 +213,7 @@ class TestPortal(TestCase):
             temp_spec.write(self.client.get('/spec').data)
             temp_spec.seek(0)
 
-            #validate_spec_url("file:%s" % temp_spec.name)
+            validate_spec_url("file:%s" % temp_spec.name)
 
     def test_report_error(self):
         self.login()
@@ -215,7 +223,7 @@ class TestPortal(TestCase):
             'message': 'creative test string'
         }
         response = self.client.get('/report-error?{}'.format(
-            urllib.urlencode(params)))
+            urllib.parse.urlencode(params)))
         self.assert200(response)
 
     def test_configuration_settings(self):
