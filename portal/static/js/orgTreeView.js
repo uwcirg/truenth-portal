@@ -1,5 +1,5 @@
 $(function() {
-	var OT = new OrgTool(); /*global*/
+	var OT = new OrgTool(); /*global OrgTool*/
 	OT.init(function(data) {
 		OT.populateUI();
 	});

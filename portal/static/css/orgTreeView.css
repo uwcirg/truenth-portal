@@ -1,0 +1,66 @@
+/* overriding main css with inline style */
+input.clinic {
+	display: none;
+}
+#fillOrgs .indent {
+	padding: 0 2.5em;
+}
+#fillOrgs {
+	margin: 2em 1em;
+	font-size: 10pt;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	flex-direction: column;
+}
+@media (min-width: 1200px) {
+	#fillOrgs {
+		justify-content: space-between;
+	}
+}
+#fillOrgs * {
+	font-size: 12px;
+}
+#fillOrgs .text-muted,
+#fillOrgs .singleton {
+	color: #68727e;
+    display: inline-block;
+    border: 1px solid #ececec !important;
+    padding: 0.5em !important;
+}
+#fillOrgs .parent-org-container {
+	margin: 1em 0;
+	width: 550px;
+	max-width: 100%;
+}
+#fillOrgs .text-muter {
+	color: #71464f;
+	display: inline-block;
+	padding: 0.5em;
+	border: 1px solid #ececec !important;
+}
+#fillOrgs legend,
+#fillOrgs .parent-singleton {
+    background: #7C959E;
+    color: #FFF;
+    margin: 4px 0;
+    font-size: 14px !important;
+    letter-spacing: 0.05rem;
+    font-weight: 500;
+    border: 1px solid #ececec;
+    padding: 0.5em;
+    display: inline-block;
+}
+#fillOrgs .parent-singleton {
+	padding: 4px;
+}
+#fillOrgs .parent-singleton * {
+	font-size: 14px;
+	font-weight: 500;
+	background: #7C959E;
+    color: #FFF;
+}
+#fillOrgs .parent-singleton label {
+	top: 2px;
+	padding: 4px;
+}
