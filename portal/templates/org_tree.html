@@ -70,9 +70,8 @@ input.clinic {
 </style>
 <div id="fillOrgs" class="org-tree"></div>
 {% endblock %}
-{% block document_ready %}
-	var OT = new OrgTool();
-	OT.init(function(data) {
-		OT.populateUI();
-	});
-{% endblock 
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/orgTreeView.js') }}"></script>
+{% endblock %}
+
+
