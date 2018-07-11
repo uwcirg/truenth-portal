@@ -13,25 +13,33 @@ input.clinic {
 	font-size: 10pt;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: center;
 	flex-direction: column;
+}
+@media (min-width: 1200px) {
+	#fillOrgs {
+		justify-content: space-between;
+	}
 }
 #fillOrgs * {
 	font-size: 12px;
 }
-#fillOrgs .text-muted {
+#fillOrgs .text-muted,
+#fillOrgs .singleton {
 	color: #68727e;
     display: inline-block;
     border: 1px solid #ececec !important;
-    padding: 4px;
+    padding: 0.5em !important;
 }
 #fillOrgs .parent-org-container {
 	margin: 1em 0;
+	width: 550px;
+	max-width: 100%;
 }
 #fillOrgs .text-muter {
 	color: #71464f;
 	display: inline-block;
-	padding: 0 4px;
+	padding: 0.5em;
 	border: 1px solid #ececec !important;
 }
 #fillOrgs legend,
@@ -65,7 +73,6 @@ input.clinic {
 {% block document_ready %}
 	var OT = new OrgTool();
 	OT.init(function(data) {
-		console.log(data)
 		OT.populateUI();
 	});
 {% endblock %}
