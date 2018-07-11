@@ -6,4 +6,3 @@ $(function() {
 	//add other JS if needed
 });
 
-
