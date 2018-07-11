@@ -1,3 +1,5 @@
+from __future__ import unicode_literals  # isort:skip
+
 from flask_webtest import SessionScope
 import pytest
 from werkzeug.exceptions import BadRequest
@@ -31,5 +33,4 @@ class TestNextStep(TestCase):
         with SessionScope(db):
             db.session.commit()
 
-        self.assertEqual(test_link, NextStep.decision_support(
-            self.test_user))
+        assert test_link == NextStep.decision_support(self.test_user)

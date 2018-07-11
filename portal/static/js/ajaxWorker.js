@@ -40,14 +40,19 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             }
         } // end for
     }
-    xhr.onreadystatechange = ensureReadiness;
-    xhr.open("GET", url, true);
     params = params || {};
+    xhr.open("GET", url, true);
+    if (!params.cache) {
+        xhr.setRequestHeader("cache-control", "no-cache");
+        xhr.setRequestHeader("expires", "-1");
+        xhr.setRequestHeader("pragma", "no-cache"); //legacy HTTP 1.0 servers and IE support
+    }
     for (var param in params) {
         if (params.hasOwnProperty(param)) {
             xhr.setRequestHeader(param, params[param]);
         }
     }
+    xhr.onreadystatechange = ensureReadiness;
     xhr.send("");
 }
 addEventListener("message", function(e) {

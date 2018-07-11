@@ -72,7 +72,7 @@ class TestUserDocument(TestCase):
             temp_pdf.seek(0)
             tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
-                                content_type='multipart/form-data', 
+                                content_type='multipart/form-data',
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
@@ -100,7 +100,7 @@ class TestUserDocument(TestCase):
             temp_pdf.seek(0)
             tempfileIO = BytesIO(temp_pdf.read())
             rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
-                                content_type='multipart/form-data', 
+                                content_type='multipart/form-data',
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
