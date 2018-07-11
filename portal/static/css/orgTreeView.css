@@ -28,6 +28,15 @@ input.clinic {
     border: 1px solid #ececec !important;
     padding: 0.5em !important;
 }
+#fillOrgs .text-muted:after {
+	content: "\2193";
+	display: block;
+	width: 20px;
+	margin: auto;
+}
+#fillOrgs .text-muted.singleton:after {
+	content: "";
+}
 #fillOrgs .parent-org-container {
 	margin: 1em 0;
 	width: 550px;
@@ -38,6 +47,15 @@ input.clinic {
 	display: inline-block;
 	padding: 0.5em;
 	border: 1px solid #ececec !important;
+}
+#fillOrgs .text-muter:after {
+	content: "\2193";
+	display: block;
+	width: 20px;
+	margin: auto;
+}
+#fillOrgs .text-muter.singleton:after {
+	content: "";
 }
 #fillOrgs legend,
 #fillOrgs .parent-singleton {
