@@ -44,11 +44,6 @@ def organization_search():
     If search terms are provided but no matching organizations are found,
     a 404 is returned.
 
-    NB - for humans to view the organization hierarchy, add `?tree_view=True`
-    to the request.  This will result in altering the return type to HTML
-    with the JSON bits for each respective organization showing in a tree
-    like structure.
-
     ---
     operationId: organization_search
     tags:
