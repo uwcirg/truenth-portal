@@ -8,7 +8,7 @@
               <input id="tab-one" type="checkbox" name="tabs" class="tab-input">
               <label for="tab-one" class="tab-label">{{_("Videos")}}</label>
               <div class="tab-content">
-                <ul>
+                <ul class="work-instruction-list">
                     {% for video in video_content %}
                         <li class="work-instruction-item">{{video | safe}}</li>
                     {% endfor %}
@@ -20,7 +20,7 @@
             <input id="tab-two" type="checkbox" name="tabs" class="tab-input">
             <label for="tab-two" class="tab-label">{{_("Work Instructions")}}</label>
             <div class="tab-content">
-                <ul>
+                <ul class="work-instruction-list">
                     {% for asset in results %}
                         {% if 'video' not in asset['tags'] %}
                             <li class="work-instruction-item">
