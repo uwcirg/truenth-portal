@@ -5,6 +5,9 @@ var ResourcesTool = function() {
         });
         $(".tab-label").trigger("click");
         this.handlePrint();
+        $("#resourcesContentContainer .tab-content").each(function() {
+            $(this).css("max-height", $(this).children(".work-instruction-list").outerHeight()+25);
+        });
     };
     this.handlePrint = function() {
         var self = this;
