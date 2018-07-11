@@ -71,6 +71,7 @@ class TestPractitioner(TestCase):
         pract = db.session.merge(pract)
 
         # test get by ID
+        self.login()
         resp = self.client.get('/api/practitioner/{}'.format(pract.id))
         assert resp.status_code == 200
 
