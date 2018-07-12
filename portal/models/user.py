@@ -984,6 +984,9 @@ class User(db.Model, UserMixin):
         If the user had pre-existing consent agreements between the
         same organization_id, the new will replace the old
 
+        NB this will only modify/update consents between the user
+        and the organizations named in the given consent_list.
+
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
