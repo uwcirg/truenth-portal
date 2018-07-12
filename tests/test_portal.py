@@ -1,11 +1,11 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
-from future.standard_library import install_aliases
+from future import standard_library  # isort:skip
+standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import tempfile
 import sys
 import urllib
-install_aliases()
 from urllib.parse import urlencode
 
 from flask_swagger import swagger
