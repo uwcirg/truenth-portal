@@ -167,7 +167,7 @@ class TestPortal(TestCase):
                                sender="testuser@email.com",
                                body='Welcome to testing \u2713',
                                sent_at=sent_at,
-                               recipients = "one@ex1.com two@two.org")
+                               recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
 
