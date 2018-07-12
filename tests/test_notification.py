@@ -1,15 +1,12 @@
 """Unit test module for Notification and UserNotification logic"""
-import sys
+from __future__ import unicode_literals  # isort:skip
 
 from flask_webtest import SessionScope
-import pytest
 
 from portal.extensions import db
 from portal.models.notification import Notification, UserNotification
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestNotification(TestCase):
     """Notification and UserNotification tests"""
 
@@ -21,8 +18,8 @@ class TestNotification(TestCase):
             db.session.commit()
         notif = db.session.merge(notif)
 
-        self.assertTrue(notif.id)
-        self.assertTrue(notif.created_at)
+        assert notif.id
+        assert notif.created_at
 
     def test_notification_get(self):
         notif = Notification(name="test", content="Test Alert!")
@@ -39,11 +36,11 @@ class TestNotification(TestCase):
         self.login()
         resp = self.client.get(
             '/api/user/{}/notification'.format(TEST_USER_ID))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(len(resp.json['notifications']), 1)
-        self.assertEqual(resp.json['notifications'][0]['name'], 'test')
-        self.assertTrue(resp.json['notifications'][0]['created_at'])
+        assert len(resp.json['notifications']) == 1
+        assert resp.json['notifications'][0]['name'] == 'test'
+        assert resp.json['notifications'][0]['created_at']
 
     def test_usernotification_delete(self):
         notif = Notification(name="test", content="Test Alert!")
@@ -60,17 +57,17 @@ class TestNotification(TestCase):
         notif, un, self.test_user = map(
             db.session.merge, (notif, un, self.test_user))
 
-        self.assertTrue(notif in self.test_user.notifications)
+        assert notif in self.test_user.notifications
 
         self.login()
         resp = self.client.delete(
             '/api/user/{}/notification/{}'.format(TEST_USER_ID, notif_id))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
         # confirm the UserNotification was deleted
-        self.assertFalse(notif in self.test_user.notifications)
-        self.assertFalse(UserNotification.query.filter_by(
-            user_id=TEST_USER_ID, notification_id=notif_id).first())
+        assert notif not in self.test_user.notifications
+        assert not UserNotification.query.filter_by(
+            user_id=TEST_USER_ID, notification_id=notif_id).first()
 
         # confirm the Notification was NOT deleted
-        self.assertTrue(Notification.query.filter_by(name="test").first())
+        assert Notification.query.filter_by(name="test").first()

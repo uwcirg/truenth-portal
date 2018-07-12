@@ -793,11 +793,33 @@ class User(db.Model, UserMixin):
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR.value)
         return service_user
 
+    def concept_value(self, codeable_concept):
+        """Look up logical value for given concept
+
+        Returns the most current setting for a given concept, by
+        interpreting the results of a matching
+        ``fetch_value_status_for_concept()`` call.
+
+        NB - as there are states beyond true/false, such as "unknown"
+        for a given concept, this does NOT return a boolean but a string.
+
+        :returns: a string, typically "true", "false" or "unknown"
+
+        """
+        value_quantity, status = self.fetch_value_status_for_concept(
+            codeable_concept)
+        if value_quantity and status != 'unknown':
+            return value_quantity.value
+
+        return 'unknown'
+
     def fetch_value_status_for_concept(self, codeable_concept):
         """Return matching ValueQuantity & status for this user
 
         Given the possibility of multiple matching observations, returns
         the most current info available.
+
+        See also ``concept_value()``
 
         :returns: (value_quantity, status) tuple for the observation
          if found on the user, else (None, None)

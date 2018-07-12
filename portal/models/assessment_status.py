@@ -6,7 +6,11 @@ from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
 from ..trace import trace
-from .fhir import QuestionnaireResponse, qnr_document_id
+from .fhir import (
+    CC,
+    QuestionnaireResponse,
+    qnr_document_id,
+)
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
@@ -221,12 +225,8 @@ class AssessmentStatus(object):
 
     @property
     def localized(self):
-        """Returns true if the user is associated with the localized org"""
-        local_org = current_app.config.get('LOCALIZED_AFFILIATE_ORG', None)
-        if local_org in self.user.organizations:
-            return True
-        else:
-            return False
+        """Returns true if the user is known to have PCa_localized dx"""
+        return self.user.concept_value(CC.PCaLocalized) == 'true'
 
     @property
     def __organization(self):

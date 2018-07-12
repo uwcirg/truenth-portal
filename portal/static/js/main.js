@@ -18,6 +18,20 @@ var SYSTEM_IDENTIFIER_ENUM = {
     CANCER_TREATMENT_CODE: "118877007",
     NONE_TREATMENT_CODE: "999"
 };
+var CLINICAL_CODE_ENUM = {
+    "biopsy": {
+        code: 111,
+        display: "biopsy"
+    },
+    "pca_diag": {
+        code: 121,
+        display: "PCa diagnosis"
+    },
+    "pca_localized": {
+        code: 141,
+        display: "PCa localized diagnosis"
+    }
+};
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
@@ -344,6 +358,10 @@ OrgTool.prototype.populateUI = function() {
                     } else {
                         attrObj.textClass = "text-muter";
                     }
+                } else {
+                    if (_isTopLevel) {
+                        attrObj.textClass = "text-muted singleton";
+                    }
                 }
                 childClinic = childClinic.replace(/\{\{itemId\}\}/g, item.id)
                     .replace(/\{\{itemName\}\}/g, item.name)
@@ -467,7 +485,7 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", cache: "false", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         var self = this;
@@ -485,10 +503,10 @@ var tnthAjax = {
                     return false;
                 }
                 if (!data) {
-                    callback({"error": true});
+                    callback({"error": true, "data": "no data returned"});
                     fieldHelper.showError(targetField);
                 } else if (data.error) {
-                    callback({"error": true});
+                    callback({"error": true, "data": data});
                     self.sendError(data, url, userId);
                     fieldHelper.showError(targetField);
                 } else {
@@ -497,6 +515,13 @@ var tnthAjax = {
                 }
             });
             return true;
+        }
+        if (!params.cache) {
+            params.headers = {
+                "cache-control": "no-cache",
+                "expires": "-1",
+                "pragma": "no-cache"
+            };
         }
         $.ajax({
             type: method ? method : "GET",
@@ -513,7 +538,7 @@ var tnthAjax = {
                 callback(data);
                 fieldHelper.showUpdate(targetField);
             } else {
-                callback({"error": true});
+                callback({"error": true, "data": "no data returned"});
                 fieldHelper.showError(targetField);
             }
         }).fail(function(xhr) {
@@ -525,7 +550,7 @@ var tnthAjax = {
                 })(self, url, method, userId, params, callback);
             } else {
                 params.attempts = 0;
-                callback({"error": true});
+                callback({"error": true, "data": xhr});
                 fieldHelper.showError(targetField);
                 self.sendError(xhr, url, userId);
             }
@@ -609,7 +634,9 @@ var tnthAjax = {
             callback(JSON.parse(sessionStorage.currentUser));
         } else {
             this.sendRequest("/api/me", "GET", "", params, function(data) {
-                sessionStorage.setItem("currentUser", JSON.stringify(data));
+                if (data && data.id) { //make sure the necessary data is there before setting session
+                    sessionStorage.setItem("currentUser", JSON.stringify(data));
+                }
                 callback(data);
             });
         }
@@ -1135,17 +1162,6 @@ var tnthAjax = {
             }
         });
     },
-    "putClinical": function(userId, toCall, toSend, targetField) {
-        this.sendRequest("/api/patient/" + userId + "/clinical/" + toCall, "POST", userId, {data: JSON.stringify({value: toSend}),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".put-clinical-error").html("");
-                } else {
-                    $(".put-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
-                }
-            }
-        });
-    },
     "getObservationId": function(userId, code) {
         if (!userId) { return false; }
         var obId = "",_code = "";
@@ -1167,22 +1183,14 @@ var tnthAjax = {
         });
         return obId;
     },
-    "postClinical": function(userId, toCall, toSend, status, targetField, params) {
+    "postClinical": function(userId, toCall, toSend, status, targetField, params, callback) {
         if (!userId) { return false; }
         params = params || {};
         var code = "", display = "";
-        switch (toCall) {
-        case "biopsy":
-            code = "111";
-            display = "biopsy";
-            break;
-        case "pca_diag":
-            code = "121";
-            display = "PCa diagnosis";
-            break;
-        case "pca_localized":
-            code = "141";
-            display = "PCa localized diagnosis";
+        if (CLINICAL_CODE_ENUM.hasOwnProperty(String(toCall).toLowerCase())) {
+            var match = CLINICAL_CODE_ENUM[toCall];
+            code = match.code;
+            display = match.display;
         }
         if (!code) {
             return false;
@@ -1205,6 +1213,7 @@ var tnthAjax = {
             method = "PUT";
             url = url + "/" + obsId;
         }
+        callback = callback || function() {};
         this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray),targetField: targetField}, function(data) {
             if (data) {
                 if (!data.error) {
@@ -1213,6 +1222,7 @@ var tnthAjax = {
                     $(".post-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
                 }
             }
+            callback(data);
         });
     },
     "getTermsUrl": function(sync, callback) { /*global i18next */
@@ -2038,7 +2048,7 @@ var Global = {
     },
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
-        sendRequest(PORTAL_NAV_PAGE, false, function(data) { /*global sendRequest */
+        sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
                 restoreVis(); /*global restoreVis */

@@ -25,11 +25,12 @@ def upgrade():
     bad_ids = [i[0] for i in conn.execute(
             identifiers,
             internal_systems=tuple(internal_identifier_systems))]
-    remove_uis = text(
-        "DELETE FROM user_identifiers WHERE identifier_id IN :bad_ids")
-    conn.execute(remove_uis, bad_ids=tuple(bad_ids))
-    remove_ids = text("DELETE FROM identifiers WHERE id IN :bad_ids")
-    conn.execute(remove_ids, bad_ids=tuple(bad_ids))
+    if bad_ids:
+        remove_uis = text(
+            "DELETE FROM user_identifiers WHERE identifier_id IN :bad_ids")
+        conn.execute(remove_uis, bad_ids=tuple(bad_ids))
+        remove_ids = text("DELETE FROM identifiers WHERE id IN :bad_ids")
+        conn.execute(remove_ids, bad_ids=tuple(bad_ids))
 
 
 def downgrade():

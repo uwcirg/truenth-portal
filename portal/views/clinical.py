@@ -507,9 +507,4 @@ def clinical_api_shortcut_get(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    value_quantity, status = patient.fetch_value_status_for_concept(
-        codeable_concept)
-    if value_quantity and status != 'unknown':
-        return jsonify(value=value_quantity.value)
-
-    return jsonify(value='unknown')
+    return jsonify(value=patient.concept_value(codeable_concept))

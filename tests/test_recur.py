@@ -1,6 +1,7 @@
 """Module to test Recur model"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime, timedelta
-import sys
 
 import pytest
 
@@ -10,8 +11,6 @@ from tests import TestCase
 now = datetime.utcnow()
 
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestRecur(TestCase):
 
     def test_expired(self):
@@ -21,7 +20,7 @@ class TestRecur(TestCase):
         result, _ = recur.active_interval_start(
             trigger_date=back_36, as_of_date=now)
         # None implies expired or not started
-        self.assertIsNone(result)
+        assert result is None
 
     def test_not_started(self):
         yesterday = datetime.utcnow() - timedelta(days=1)
@@ -30,7 +29,7 @@ class TestRecur(TestCase):
         result, _ = recur.active_interval_start(
             trigger_date=yesterday, as_of_date=now)
         # None implies expired or not started
-        self.assertIsNone(result)
+        assert result is None
 
     def test_first_interval(self):
         three_back = datetime.utcnow() - timedelta(days=3)
@@ -39,8 +38,8 @@ class TestRecur(TestCase):
         result, ic = recur.active_interval_start(
             trigger_date=three_back, as_of_date=now)
         # should get three back plus start
-        self.assertAlmostEqual(result, three_back + timedelta(days=2))
-        self.assertEqual(ic, 0)
+        assert pytest.approx(result) == three_back + timedelta(days=2)
+        assert ic == 0
 
     def test_third_interval(self):
         thirty_back = datetime.utcnow() - timedelta(days=30)
@@ -49,5 +48,5 @@ class TestRecur(TestCase):
         result, ic = recur.active_interval_start(
             trigger_date=thirty_back, as_of_date=now)
         # should get back 30 back, plus 2 to start, plus 10*2
-        self.assertAlmostEqual(result, thirty_back + timedelta(days=22))
-        self.assertEqual(ic, 2)
+        assert pytest.approx(result) == thirty_back + timedelta(days=22)
+        assert ic == 2

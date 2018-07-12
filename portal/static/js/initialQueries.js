@@ -43,8 +43,15 @@
     FieldsChecker.prototype.setUserId = function(callback) {
         var self = this, tnthAjax = this.__getDependency("tnthAjax");
         callback = callback || function() {};
+        self.userId = $("#iq_userId").val(); //set in template, check this first as API can return error
+        if (self.userId) {
+            callback();
+            return;
+        }
         tnthAjax.getCurrentUser(function(data) {
-            self.userId = data.id;
+            if (data && data.id) {
+                self.userId = data.id;
+            }
             callback();
         });
     };
