@@ -163,11 +163,12 @@ class TestPortal(TestCase):
         """Email invites - test view for sent messages"""
         sent_at = datetime.strptime("2000/01/01 12:31:00",
                 "%Y/%m/%d %H:%M:%S")
-        message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
-                               sender="testuser@email.com",
-                               body='Welcome to testing \u2713',
-                               sent_at=sent_at,
-                               recipients="one@ex1.com two@two.org")
+        message = EmailMessage(
+            subject='a subject', user_id=TEST_USER_ID,
+            sender="testuser@email.com",
+            body='Welcome to testing \u2713',
+            sent_at=sent_at,
+            recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
 
