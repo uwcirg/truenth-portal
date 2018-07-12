@@ -347,7 +347,7 @@
                         var tempResults = results;
                         results = results.slice(0, 10);
                         self.history.items = tempResults.slice(10, 20);
-                        self.history.sidenote = String(self.i18next.t("* Ten results since {year}")).replace("{year}", self.getHistoryMinYear());
+                        self.history.sidenote = String(self.i18next.t("* Maximum of {resultNumber} results since {year}")).replace("{resultNumber}", 10).replace("{year}", self.getHistoryMinYear());
                     }
                     if (results.length === 0) {
                         self.noResultMessage = self.i18next.t("No PSA results to display");
