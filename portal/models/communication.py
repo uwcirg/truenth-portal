@@ -283,9 +283,8 @@ class Communication(db.Model):
 
         return msg
 
-
     def generate_and_send(self):
-        "Collate message details and send"
+        """Collate message details and send"""
 
         if current_app.config.get('DEBUG_EMAIL', False):
             # hack to restart trace when in loop from celery task
