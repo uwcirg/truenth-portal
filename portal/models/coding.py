@@ -20,7 +20,7 @@ class Coding(db.Model):
     def update_from_fhir(self, data):
         for i in ("system", "code", "display"):
             if i in data:
-                self.__setattr__(i, data[i])
+                self.__setattr__(i, str(data[i]))
         return self.add_if_not_found(True)
 
     @classmethod
