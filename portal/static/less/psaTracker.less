@@ -212,7 +212,7 @@ option.select-option {
     #psaTrackerTreatmentContainer {
         max-width: 85%;
         position: relative;
-        left: 1em;
+        left: 1.1em;
     }
 }
 #psaTrackerResultsTable,
@@ -464,38 +464,9 @@ option.select-option {
     font-weight: 200;
     text-decoration: none;
 }
-
-.selectdiv {
-  position: relative;
-  /*Don't really need this just for demo styling*/
-
-  /*float: left;*/
-  min-width: 150px;
-  /*margin: 50px 33%;*/
-}
-
-/*To remove button from IE11, thank you Matt */
+/*To remove button from IE11 */
 select::-ms-expand {
      display: none;
-}
-
-.selectdiv:after {
-  content: '\25B8';
-  font: 17px "Consolas", monospace;
-  color: #FFF;
-  -webkit-transform: rotate(90deg);
-  -moz-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  transform: rotate(90deg);
-  right: 4px;
-  /*Adjust for position however you want*/
-
-  top: 8px;
-  padding: 0 2px 2px;
-  /*border-bottom: 1px solid #999;*/
-  /*left line */
-  position: absolute;
-  pointer-events: none;
 }
 .filter-cell {
     position: relative;
@@ -508,12 +479,8 @@ select::-ms-expand {
       -ms-transform: rotate(90deg);
       transform: rotate(90deg);
       right: 12px;
-      /*Adjust for position however you want*/
-
       top: 10px;
       padding: 0 2px 2px;
-      /*border-bottom: 1px solid #999;*/
-      /*left line */
       position: absolute;
       pointer-events: none;
     }
