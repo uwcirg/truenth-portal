@@ -1,7 +1,6 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
 from future.standard_library import install_aliases
-from past.builtins import basestring
 install_aliases()
 
 from datetime import datetime
@@ -37,11 +36,11 @@ class TestPortal(TestCase):
         self.add_required_clinical_data()
         self.bless_with_basics()
         response = self.client.get('/home')
-        self.assert200(response)
+        assert response.status_code == 200
 
-        self.assertIn('Custom Label', response.get_data(as_text=True))
+        assert 'Custom Label' in response.get_data(as_text=True)
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.card_html, response.data.decode('utf-8'))
+        assert intervention.card_html in response.get_data(as_text=True)
 
     def test_user_card_html(self):
         """Interventions can further customize per user"""
@@ -64,14 +63,14 @@ class TestPortal(TestCase):
         user = db.session.merge(self.test_user)
 
         response = self.client.get('/home')
-        self.assert200(response)
+        assert response.status_code == 200
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.card_html, response.data.decode('utf-8'))
-        self.assertIn(ui.link_label, response.data.decode('utf-8'))
-        self.assertIn(ui.link_url, response.data.decode('utf-8'))
+        assert ui.card_html in response.get_data(as_text=True)
+        assert ui.link_label in response.get_data(as_text=True)
+        assert ui.link_url in response.get_data(as_text=True)
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.display_for_user(user).link_label, response.data.decode('utf-8'))
+        assert intervention.display_for_user(user).link_label in response.get_data(as_text=True)
 
     def test_staff_html(self):
         """Interventions can customize the staff text """
@@ -98,7 +97,7 @@ class TestPortal(TestCase):
 
         ui = db.session.merge(ui)
         results = response.get_data(as_text=True)
-        self.assertIn(ui.staff_html, results)
+        assert ui.staff_html in results
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
@@ -112,7 +111,7 @@ class TestPortal(TestCase):
         self.bless_with_basics()
         response = self.client.get('/home')
 
-        self.assertNotIn('Sexual Recovery', response.get_data(as_text=True))
+        assert 'Sexual Recovery' not in response.get_data(as_text=True)
 
         # now give just the test user access
         intervention = db.session.merge(intervention)
@@ -124,7 +123,7 @@ class TestPortal(TestCase):
             db.session.commit()
         response = self.client.get('/home')
 
-        self.assertIn('Sexual Recovery', response.get_data(as_text=True))
+        assert 'Sexual Recovery' in response.get_data(as_text=True)
 
     def test_admin_list(self):
         """Test admin view lists all users"""
@@ -140,7 +139,7 @@ class TestPortal(TestCase):
         response = self.client.get('/admin')
 
         # Should at least see an entry per user in system
-        self.assertTrue(response.get_data(as_text=True).count('/profile') >= User.query.count())
+        assert response.get_data(as_text=True).count('/profile') >= User.query.count()
 
     def test_invite(self):
         """Test email invite form"""
@@ -154,7 +153,7 @@ class TestPortal(TestCase):
                 'recipients': 'test_user@yahoo.com test_user@uw.edu',
                 'body': "Ode to joy" }
         response = self.client.post('/invite', data=postdata, follow_redirects=True)
-        self.assertTrue("Email Invite Sent" in response.get_data(as_text=True))
+        assert "Email Invite Sent" in response.get_data(as_text=True)
 
     def test_message_sent(self):
         """Email invites - test view for sent messages"""
@@ -169,24 +168,24 @@ class TestPortal(TestCase):
 
         # confirm styling unicode functions
         body = message.style_message(message.body)
-        self.assertTrue(u'DOCTYPE' in body)
-        self.assertTrue(u'style' in body)
+        assert u'DOCTYPE' in body
+        assert u'style' in body
         if sys.version_info[0] < 3:
-            self.assertTrue(isinstance(body, unicode))
+            assert isinstance(body, unicode)
         else:
-            self.assertTrue(isinstance(body, str))
+            assert isinstance(body, str)
 
         self.login()
         response = self.client.get('/invite/{0}'.format(message.id))
-        self.assertTrue(response.get_data(as_text=True).find(sent_at.strftime('%m/%d/%Y %H:%M:%S'))
-            > 0)
-        self.assertTrue(response.get_data(as_text=True).find('one@ex1.com two@two.org') > 0)
+        assert (response.get_data(as_text=True).find(
+            sent_at.strftime('%m/%d/%Y %H:%M:%S')) > 0)
+        assert response.get_data(as_text=True).find('one@ex1.com two@two.org') > 0
 
     def test_missing_message(self):
         """Request to view non existant message should 404"""
         self.login()
         response = self.client.get('/invite/404')
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
@@ -200,7 +199,7 @@ class TestPortal(TestCase):
         swag = swagger(self.client.application)
 
         for key in expected_keys:
-            self.assertIn(key, swag)
+            assert key in swag
 
     def test_swagger_validation(self):
         """Ensure our swagger spec matches swagger schema"""
@@ -224,16 +223,16 @@ class TestPortal(TestCase):
         }
         response = self.client.get('/report-error?{}'.format(
             urllib.parse.urlencode(params)))
-        self.assert200(response)
+        assert response.status_code == 200
 
     def test_configuration_settings(self):
         self.login()
         lr_group = self.app.config['LR_GROUP']
         response = self.client.get('/api/settings/lr_group')
-        self.assert200(response)
-        self.assertEqual(response.json.get('LR_GROUP'), lr_group)
+        assert response.status_code == 200
+        assert response.json.get('LR_GROUP') == lr_group
         response2 = self.client.get('/api/settings/bad_value')
-        self.assertEqual(response2.status_code, 400)
+        assert response2.status_code == 400
 
 
 class TestPortalEproms(TestCase):
@@ -267,28 +266,28 @@ class TestPortalEproms(TestCase):
         # validate redirect of /website-consent-script GET
         response = self.client.get('/website-consent-script/{}?redirect_url='
                              '{}'.format(TEST_USER_ID, local_url))
-        self.assert200(response)
+        assert response.status_code == 200
 
         response2 = self.client.get('/website-consent-script/{}?redirect_url='
                               '{}'.format(TEST_USER_ID, invalid_url))
-        self.assert401(response2)
+        assert response2.status_code == 401
 
         # validate redirect of /login/<provider> GET
         response3 = self.client.get('/login/TESTING?user_id={}&next='
                               '{}'.format(TEST_USER_ID, client_url),
                               follow_redirects=True)
-        self.assert200(response3)
+        assert response3.status_code == 200
 
         response4 = self.client.get('/login/TESTING?user_id={}&next='
                               '{}'.format(TEST_USER_ID, invalid_url),
                               follow_redirects=True)
-        self.assert401(response4)
+        assert response4.status_code == 401
 
         # validate redirect of /challenge POST
         formdata = {'user_id': TEST_USER_ID, 'next_url': local_url}
         response5 = self.client.post('/challenge', data=formdata)
-        self.assert200(response5)
+        assert response5.status_code == 200
 
         formdata['next_url'] = invalid_url
         response6 = self.client.post('/challenge', data=formdata)
-        self.assert401(response6)
+        assert response6.status_code == 401
