@@ -20,15 +20,15 @@ var SYSTEM_IDENTIFIER_ENUM = {
 };
 var CLINICAL_CODE_ENUM = {
     "biopsy": {
-        code: 111,
+        code: "111",
         display: "biopsy"
     },
     "pca_diag": {
-        code: 121,
+        code: "121",
         display: "PCa diagnosis"
     },
     "pca_localized": {
-        code: 141,
+        code: "141",
         display: "PCa localized diagnosis"
     }
 };
