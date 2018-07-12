@@ -713,6 +713,8 @@ def withdraw_user_consent(user_id):
         abort(404, "no UserConsent found for user ID {} and org ID "
               "{}".format(user.id, org_id))
     try:
+        # Make a copy of the found UserConsent via `make_transient`
+        # and setting the id to None, so update_consents can store as new
         make_transient(uc)
         uc.id = None
         uc.status = 'suspended'
