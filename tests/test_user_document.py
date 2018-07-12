@@ -68,7 +68,7 @@ class TestUserDocument(TestCase):
         fpath = os.path.join(
             current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"),
             str(udoc.uuid))
-        with open(fpath, 'r') as udoc_file:
+        with open(fpath, 'rb') as udoc_file:
             assert udoc_file.read() == test_contents
         os.remove(fpath)
 
