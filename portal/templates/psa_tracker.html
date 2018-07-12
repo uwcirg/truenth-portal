@@ -51,7 +51,7 @@
                             </tr>
                         </TFOOT>
                     </table>
-                    <div id="psaTrackerDataSidebar">
+                    <div id="psaTrackerDataSidebar" v-show="history.items.length">
                         <button class="btn btn-tnth-primary" v-show="history.items.length" v-on:click="showHistory" v-html="history.buttonLabel"></button>
                     </div>
                 </div>
