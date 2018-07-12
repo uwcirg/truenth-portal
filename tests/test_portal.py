@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
+from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
 from portal.extensions import db
