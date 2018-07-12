@@ -5,16 +5,9 @@ standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import os
 
-try:
-    # Python 2
-    from cStringIO import StringIO
-except ImportError:
-    # Python 3
-    from io import StringIO
-
 from flask import current_app
 from flask_webtest import SessionScope
-from io import StringIO
+from io import BytesIO
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -23,6 +16,7 @@ from portal.models.intervention import INTERVENTION
 from portal.models.user import get_user
 from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
+
 
 class TestUserDocument(TestCase):
     """User Document tests"""
@@ -63,19 +57,17 @@ class TestUserDocument(TestCase):
         create_service_token(client=client, user=get_user(TEST_USER_ID))
         self.login()
 
-        test_contents = "This is a test."
+        test_contents = b"This is a test."
         response = self.client.post(
             '/api/user/{}/patient_report'.format(TEST_USER_ID),
             content_type='multipart/form-data',
-            data=dict({'file':
-                           (StringIO(test_contents),
-                            'udoc_test.pdf')})
-        )
+            data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
+
         assert response.status_code == 200
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
-        fpath = os.path.join(current_app.root_path,
-                            current_app.config.get("FILE_UPLOAD_DIR"),
-                            str(udoc.uuid))
+        fpath = os.path.join(
+            current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"),
+            str(udoc.uuid))
         with open(fpath, 'r') as udoc_file:
             assert udoc_file.read() == test_contents
         os.remove(fpath)
@@ -84,16 +76,17 @@ class TestUserDocument(TestCase):
         assert (udoc.intervention.description
                 == INTERVENTION.SEXUAL_RECOVERY.description)
 
-
     def test_download_user_document(self):
         self.login()
-        test_contents = "This is a test."
+        test_contents = b"This is a test."
         response = self.client.post(
             '/api/user/{}/patient_report'.format(TEST_USER_ID),
             content_type='multipart/form-data',
-            data=dict({'file':
-                           (StringIO(test_contents),
-                            'udoc_test.pdf')})
-        )
+            data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
         assert response.status_code == 200
-        assert response.get_data(as_text=True) == test_contents
+
+        udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
+        response = self.client.get('/api/user/{}/user_documents/{}'.format(
+            TEST_USER_ID, udoc.id))
+        assert response.status_code == 200
+        assert response.data == test_contents
