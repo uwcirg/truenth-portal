@@ -10,6 +10,7 @@ from urllib.parse import urlencode
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
+from past.builtins import basestring
 from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
@@ -164,19 +165,16 @@ class TestPortal(TestCase):
                 "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
-                body=u'Welcome to testing \u2713', sent_at=sent_at,
+                body='Welcome to testing \u2713', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")
         db.session.add(message)
         db.session.commit()
 
         # confirm styling unicode functions
         body = message.style_message(message.body)
-        assert u'DOCTYPE' in body
-        assert u'style' in body
-        if sys.version_info[0] < 3:
-            assert isinstance(body, unicode)
-        else:
-            assert isinstance(body, str)
+        assert 'DOCTYPE' in body
+        assert 'style' in body
+        assert isinstance(body,basestring)
 
         self.login()
         response = self.client.get('/invite/{0}'.format(message.id))
