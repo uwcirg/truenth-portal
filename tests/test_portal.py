@@ -1,12 +1,11 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
 from future.standard_library import install_aliases
-install_aliases()
-
 from datetime import datetime
 import tempfile
 import sys
 import urllib
+install_aliases()
 from urllib.parse import urlencode
 
 from flask_swagger import swagger
@@ -71,7 +70,8 @@ class TestPortal(TestCase):
         assert ui.link_label in response.get_data(as_text=True)
         assert ui.link_url in response.get_data(as_text=True)
         intervention = db.session.merge(intervention)
-        assert intervention.display_for_user(user).link_label in response.get_data(as_text=True)
+        assert (intervention.display_for_user(user).link_label
+                in response.get_data(as_text=True))
 
     def test_staff_html(self):
         """Interventions can customize the staff text """
@@ -140,7 +140,8 @@ class TestPortal(TestCase):
         response = self.client.get('/admin')
 
         # Should at least see an entry per user in system
-        assert response.get_data(as_text=True).count('/profile') >= User.query.count()
+        assert (response.get_data(as_text=True).count('/profile')
+                >= User.query.count())
 
     def test_invite(self):
         """Test email invite form"""
@@ -153,7 +154,8 @@ class TestPortal(TestCase):
         postdata = { 'subject': 'unittest subject',
                 'recipients': 'test_user@yahoo.com test_user@uw.edu',
                 'body': "Ode to joy" }
-        response = self.client.post('/invite', data=postdata, follow_redirects=True)
+        response = self.client.post('/invite', data=postdata,
+                                    follow_redirects=True)
         assert "Email Invite Sent" in response.get_data(as_text=True)
 
     def test_message_sent(self):
@@ -180,7 +182,8 @@ class TestPortal(TestCase):
         response = self.client.get('/invite/{0}'.format(message.id))
         assert (response.get_data(as_text=True).find(
             sent_at.strftime('%m/%d/%Y %H:%M:%S')) > 0)
-        assert response.get_data(as_text=True).find('one@ex1.com two@two.org') > 0
+        assert (response.get_data(as_text=True).find('one@ex1.com two@two.org')
+                > 0)
 
     def test_missing_message(self):
         """Request to view non existant message should 404"""
