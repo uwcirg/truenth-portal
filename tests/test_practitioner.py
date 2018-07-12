@@ -1,9 +1,7 @@
 """Unit test module for Practitioner module"""
-import json
-import sys
+from __future__ import unicode_literals  # isort:skip
 
-from flask_webtest import SessionScope
-import pytest
+import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -12,8 +10,6 @@ from portal.models.role import ROLE
 from portal.system_uri import US_NPI
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestPractitioner(TestCase):
     """Practitioner model and view tests"""
 
@@ -29,43 +25,42 @@ class TestPractitioner(TestCase):
 
         # test base query
         resp = self.client.get('/api/practitioner')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['total'], 3)
-        self.assertEqual(resp.json['entry'][0]['name'][0]['given'], 'Indiana')
+        assert resp.json['total'] == 3
+        assert resp.json['entry'][0]['name'][0]['given'] == 'Indiana'
 
         # test query with multiple results
         resp = self.client.get('/api/practitioner?first_name=John')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['total'], 2)
-        self.assertEqual(resp.json['entry'][0]['name'][0]['family'], 'Watson')
+        assert resp.json['total'] == 2
+        assert resp.json['entry'][0]['name'][0]['family'] == 'Watson'
 
         # test query with multiple search parameters
         resp = self.client.get(
             '/api/practitioner?first_name=John&last_name=Zoidberg')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['total'], 1)
-        self.assertEqual(
-            resp.json['entry'][0]['name'][0]['family'], 'Zoidberg')
+        assert resp.json['total'] == 1
+        assert resp.json['entry'][0]['name'][0]['family'] == 'Zoidberg'
 
         # test query using identifier system/value
         resp = self.client.get(
             '/api/practitioner?system={}&value=ijones'.format(US_NPI))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['total'], 1)
-        self.assertEqual(resp.json['entry'][0]['name'][0]['family'], 'Jones')
+        assert resp.json['total'] == 1
+        assert resp.json['entry'][0]['name'][0]['family'] == 'Jones'
 
         # test invalid system/value combos
         resp = self.client.get(
             '/api/practitioner?system=testsys')
-        self.assert400(resp)
+        assert resp.status_code == 400
 
         resp = self.client.get(
             '/api/practitioner?system=testsys&value=notvalid')
-        self.assert404(resp)
+        assert resp.status_code == 404
 
     def test_practitioner_get(self):
         pract = self.add_practitioner(first_name="Indiana", last_name="Jones")
@@ -76,28 +71,29 @@ class TestPractitioner(TestCase):
         pract = db.session.merge(pract)
 
         # test get by ID
+        self.login()
         resp = self.client.get('/api/practitioner/{}'.format(pract.id))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['resourceType'], 'Practitioner')
-        self.assertEqual(resp.json['name'][0]['given'], 'Indiana')
+        assert resp.json['resourceType'] == 'Practitioner'
+        assert resp.json['name'][0]['given'] == 'Indiana'
         phone_json = {'system': 'phone', 'use': 'work', 'value': '555-1234'}
-        self.assertTrue(phone_json in resp.json['telecom'])
+        assert phone_json in resp.json['telecom']
         email_json = {'system': 'email', 'value': 'test@notarealsite.com'}
-        self.assertTrue(email_json in resp.json['telecom'])
+        assert email_json in resp.json['telecom']
 
         # test get by external identifier
         resp = self.client.get(
             '/api/practitioner/{}?system={}'.format('jwatson', US_NPI))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(resp.json['resourceType'], 'Practitioner')
-        self.assertEqual(resp.json['name'][0]['family'], 'Watson')
+        assert resp.json['resourceType'] == 'Practitioner'
+        assert resp.json['name'][0]['family'] == 'Watson'
 
         # test with invalid external identifier
         resp = self.client.get(
             '/api/practitioner/{}?system={}'.format('invalid', 'testsys'))
-        self.assert404(resp)
+        assert resp.status_code == 404
 
     def test_practitioner_post(self):
         data = {
@@ -132,20 +128,20 @@ class TestPractitioner(TestCase):
 
         resp = self.client.post('/api/practitioner', data=json.dumps(data),
                                 content_type='application/json')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
-        self.assertEqual(Practitioner.query.count(), 1)
+        assert Practitioner.query.count() == 1
         pract = Practitioner.query.all()[0]
-        self.assertEqual(pract.last_name, 'Zoidberg')
-        self.assertEqual(pract.email, 'test@notarealsite.com')
-        self.assertEqual(pract.phone, '555-1234')
-        self.assertEqual(len(pract.identifiers.all()), 1)
-        self.assertEqual(pract.identifiers[0].system, 'testsys')
+        assert pract.last_name == 'Zoidberg'
+        assert pract.email == 'test@notarealsite.com'
+        assert pract.phone == '555-1234'
+        assert len(pract.identifiers.all()) == 1
+        assert pract.identifiers[0].system == 'testsys'
 
         # confirm audit entry for practitioner creation
         audit = Audit.query.first()
         audit_words = audit.comment.split()
-        self.assertEqual(audit_words[0], 'created')
+        assert audit_words[0] == 'created'
 
         # test with existing external identifier
         data = {
@@ -166,7 +162,7 @@ class TestPractitioner(TestCase):
 
         resp = self.client.post('/api/practitioner', data=json.dumps(data),
                                 content_type='application/json')
-        self.assertEqual(resp.status_code, 409)
+        assert resp.status_code == 409
 
     def test_practitioner_put(self):
         pract = self.add_practitioner(first_name="John", last_name="Watson")
@@ -205,17 +201,17 @@ class TestPractitioner(TestCase):
         resp = self.client.put('/api/practitioner/{}'.format(pract_id),
                                data=json.dumps(data),
                                content_type='application/json')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
         updated = Practitioner.query.get(pract_id)
-        self.assertEqual(updated.last_name, 'Zoidberg')
-        self.assertEqual(updated.phone, '555-9876')
-        self.assertEqual(updated.email, 'test2@notarealsite.com')
+        assert updated.last_name == 'Zoidberg'
+        assert updated.phone == '555-9876'
+        assert updated.email == 'test2@notarealsite.com'
 
         # confirm audit entry for practitioner update
         audit = Audit.query.first()
         audit_words = audit.comment.split()
-        self.assertEqual(audit_words[0], 'updated')
+        assert audit_words[0] == 'updated'
 
         # test update by external identifier
         data = {
@@ -233,18 +229,18 @@ class TestPractitioner(TestCase):
             '/api/practitioner/{}?system={}'.format('testval', US_NPI),
             data=json.dumps(data),
             content_type='application/json')
-        self.assert200(resp)
+        assert resp.status_code == 200
 
         updated = Practitioner.query.get(pract2_id)
-        self.assertEqual(updated.last_name, 'Jones')
-        self.assertEqual(updated.phone, '999-9999')
+        assert updated.last_name == 'Jones'
+        assert updated.phone == '999-9999'
 
         # test with invalid external identifier
         resp = self.client.put(
             '/api/practitioner/{}?system={}'.format('invalid', 'testsys'),
             data=json.dumps(data),
             content_type='application/json')
-        self.assert404(resp)
+        assert resp.status_code == 404
 
         # test with existing external identifier
         data = {
@@ -260,11 +256,11 @@ class TestPractitioner(TestCase):
         resp = self.client.put('/api/practitioner/{}'.format(pract_id),
                                data=json.dumps(data),
                                content_type='application/json')
-        self.assertEqual(resp.status_code, 409)
+        assert resp.status_code == 409
 
         # test updating with same external identifier
         resp = self.client.put(
             '/api/practitioner/{}?system={}'.format('testval', US_NPI),
             data=json.dumps(data),
             content_type='application/json')
-        self.assert200(resp)
+        assert resp.status_code == 200
