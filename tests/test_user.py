@@ -2,6 +2,7 @@
 from datetime import datetime
 import json
 import re
+import sys
 import urllib
 
 from flask_webtest import SessionScope
@@ -56,6 +57,8 @@ def test_empty_id():
         get_user_or_abort('')
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestUser(TestCase):
     """User model and view tests"""
 

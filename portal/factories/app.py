@@ -1,13 +1,14 @@
 """Portal module"""
 from __future__ import print_function
 
+import email.parser
 import logging
 from logging import handlers
 import os
 import sys
 
 from flask import Flask
-import pkginfo
+from pkg_resources import get_distribution
 import redis
 import requests_cache
 from werkzeug.contrib.profiler import ProfilerMiddleware
@@ -314,14 +315,16 @@ def configure_logging(app):  # pragma: no cover
 
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
-    metadata = pkginfo.Installed('portal')
-    metadata.version = sys.modules['portal'].__version__
+    distribution = get_distribution('portal')
+    metadata_str = distribution.get_metadata(distribution.PKG_INFO)
+    metadata = email.parser.Parser().parsestr(metadata_str)
 
     # Get git hash from version if present
     # https://github.com/pypa/setuptools_scm#default-versioning-scheme
     # Todo: extend Distribution base class instead of monkey patching
-    if metadata.version and '+' in metadata.version:
-        metadata.git_hash = metadata.version.split('+')[-1].split('.')[0][1:]
+    version = metadata.get('version')
+    if version and '+' in version:
+        metadata['git_hash'] = version.split('+')[-1].split('.')[0][1:]
 
     app.config.metadata = metadata
 

@@ -1,4 +1,6 @@
 """Unit test module for address model"""
+from __future__ import unicode_literals  # isort:skip
+
 from portal.models.address import Address
 from tests import TestCase
 
@@ -15,15 +17,15 @@ class TestAddress(TestCase):
             "country": "USA"
         }
         addr = Address.from_fhir(data)
-        self.assertEqual(addr.line1, data['line'][0])
-        self.assertEqual(addr.city, data['city'])
-        self.assertEqual(addr.state, data['state'])
-        self.assertEqual(addr.postalCode, data['postalCode'])
-        self.assertIn('Suite 227', str(addr))
+        assert addr.line1 == data['line'][0]
+        assert addr.city == data['city']
+        assert addr.state == data['state']
+        assert addr.postalCode == data['postalCode']
+        assert 'Suite 227' in str(addr)
 
     def test_as_fhir(self):
         addr = Address(city='Seattle', state='WA', postalCode='98101')
         data = addr.as_fhir()
-        self.assertEqual(addr.city, data['city'])
-        self.assertEqual(addr.state, data['state'])
-        self.assertEqual(addr.postalCode, data['postalCode'])
+        assert addr.city == data['city']
+        assert addr.state == data['state']
+        assert addr.postalCode == data['postalCode']

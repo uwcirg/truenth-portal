@@ -274,8 +274,9 @@ class User(db.Model, UserMixin):
                                      foreign_keys=[Audit.subject_id])
     auth_providers = db.relationship('AuthProvider', lazy='dynamic',
                                      cascade='delete')
-    _consents = db.relationship('UserConsent', lazy='dynamic',
-                                cascade='delete')
+    _consents = db.relationship(
+        'UserConsent', lazy='dynamic', cascade='delete',
+        order_by="desc(UserConsent.acceptance_date)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
     encounters = db.relationship('Encounter', cascade='delete')
@@ -792,11 +793,33 @@ class User(db.Model, UserMixin):
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR.value)
         return service_user
 
+    def concept_value(self, codeable_concept):
+        """Look up logical value for given concept
+
+        Returns the most current setting for a given concept, by
+        interpreting the results of a matching
+        ``fetch_value_status_for_concept()`` call.
+
+        NB - as there are states beyond true/false, such as "unknown"
+        for a given concept, this does NOT return a boolean but a string.
+
+        :returns: a string, typically "true", "false" or "unknown"
+
+        """
+        value_quantity, status = self.fetch_value_status_for_concept(
+            codeable_concept)
+        if value_quantity and status != 'unknown':
+            return value_quantity.value
+
+        return 'unknown'
+
     def fetch_value_status_for_concept(self, codeable_concept):
         """Return matching ValueQuantity & status for this user
 
         Given the possibility of multiple matching observations, returns
         the most current info available.
+
+        See also ``concept_value()``
 
         :returns: (value_quantity, status) tuple for the observation
          if found on the user, else (None, None)
@@ -964,7 +987,8 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
-            # add audit for consent signed date
+            # add audit for this consent signing event, marking recording
+            # date, which is possibly different from `acceptance_date`
             audit = Audit(
                 user_id=acting_user.id,
                 subject_id=self.id,
@@ -979,26 +1003,12 @@ class User(db.Model, UserMixin):
                                                  existing_consent, consent))
                     delete_consents.append(existing_consent)
 
-            if hasattr(consent, 'acceptance_date'):
-                # Move data to where it belongs, in the audit row
-                audit.timestamp = consent.acceptance_date
-                del consent.acceptance_date
-
             consent.audit = audit
             db.session.add(consent)
             db.session.commit()
             audit, consent = map(db.session.merge, (audit, consent))
             # update consent signed audit with consent ID ref
             audit.comment = "Consent agreement {} signed".format(consent.id)
-            # add audit for consent recorded date
-            recorded = Audit(
-                user_id=acting_user.id,
-                subject_id=self.id,
-                comment="Consent agreement {} recorded".format(consent.id),
-                context='consent',
-                timestamp=datetime.utcnow())
-            db.session.add(audit)
-            db.session.add(recorded)
             db.session.commit()
 
         for replaced in delete_consents:

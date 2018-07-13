@@ -109,6 +109,9 @@ body {
   text-rendering: optimizeLegibility;
 }
 .save-loader-wrapper {
+  position: relative;
+  margin-top: 4px;
+  min-height: 12px;
   .load-icon {
     margin-left:4px;
     margin-top:5px;
@@ -118,6 +121,18 @@ body {
   }
   .error-icon {
     color: red;
+  }
+  .save-info {
+    opacity: 0;
+     -webkit-transition: opacity 0.8s ease-in;
+    transition: opacity 0.8s ease-in;
+    position: absolute;
+    font-size: @smallText;
+  }
+}
+@media (min-width: 768px) {
+  .save-loader-wrapper {
+    min-height: 8px;
   }
 }
 .form-control,
@@ -1041,13 +1056,6 @@ div.pull-right {
   color: #5a5a5a;
 
 }
-.save-info {
-  opacity: 0;
-   -webkit-transition: opacity 0.8s ease-in;
-  transition: opacity 0.8s ease-in;
-  position: absolute;
-  font-size: @smallText;
-}
 .access-button {
     opacity: 1;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
@@ -1216,6 +1224,10 @@ div.pull-right {
   }
 }
 #patientList {
+  #patientListOptions {
+    border-bottom: 1px solid #ececec;
+    margin-bottom: 2em;
+  }
   div.or {
     display: block;
     background-color: @orBackgroundColor;

@@ -695,7 +695,7 @@
         {
           "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "146-07"
+          "value": "146-17"
         }
       ],
       "language": "en_US",
@@ -1321,6 +1321,34 @@
     {
       "extension": [
         {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14652,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "146-52"
+        }
+      ],
+      "language": "en_US",
+      "name": "Juravinski Cancer Centre",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
@@ -1468,6 +1496,9 @@
         }
       ],
       "name": "TrueNTH Global",
+      "partOf": {
+        "reference": "api/organization/10000"
+      },
       "resourceType": "Organization"
     },
     {

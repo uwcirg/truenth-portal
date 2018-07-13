@@ -1,4 +1,6 @@
 """Unit test module for internationalization logic"""
+from __future__ import unicode_literals  # isort:skip
+
 from flask import current_app
 from flask_login import login_user
 
@@ -6,13 +8,11 @@ from portal.models.i18n import get_locale
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
-
 class TestI18n(TestCase):
     """I18n tests"""
 
     def test_get_locale(self):
-        self.assertEqual(
-            get_locale(), current_app.config.get("DEFAULT_LOCALE"))
+        assert get_locale() == current_app.config.get("DEFAULT_LOCALE")
 
         language = 'en_AU'
         language_name = "Australian English"
@@ -21,4 +21,4 @@ class TestI18n(TestCase):
         test_user.locale = (language, language_name)
 
         login_user(test_user)
-        self.assertEqual(get_locale(), language)
+        assert get_locale() == language

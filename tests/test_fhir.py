@@ -1,4 +1,6 @@
 """Unit test module for fhir model"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 
 from flask_webtest import SessionScope
@@ -43,9 +45,9 @@ class TestFHIR(TestCase):
                }
         cc_parsed = CodeableConcept.from_fhir(data['test_concept1'])
 
-        self.assertEqual(cc_parsed.codings, cc.codings)
-        self.assertEqual(2, len(cc.codings))
-        self.assertEqual(cc_parsed.text, cc.text)
+        assert cc_parsed.codings == cc.codings
+        assert 2 == len(cc.codings)
+        assert cc_parsed.text == cc.text
 
         # and again, but now containing a new coding
         data = {"test_concept2":
@@ -61,16 +63,16 @@ class TestFHIR(TestCase):
         cc_parsed = CodeableConcept.from_fhir(data['test_concept2'])
 
         persisted = CodeableConcept.query.get(cc_parsed.id)
-        self.assertEqual(cc_parsed.codings, persisted.codings)
-        self.assertEqual(len(persisted.codings), 3)
-        self.assertEqual(persisted.text, 'given two codings')
+        assert cc_parsed.codings == persisted.codings
+        assert len(persisted.codings) == 3
+        assert persisted.text == 'given two codings'
 
     def test_display_lookup(self):
         # example used: Coding(system=SNOMED, code='707266006',
         #  display='Androgen deprivation therapy').add_if_not_found(True)
 
         display = Coding.display_lookup(system=SNOMED, code='707266006')
-        self.assertEqual('Androgen deprivation therapy', display)
+        assert 'Androgen deprivation therapy' == display
 
     def test_codeable_concept_parse(self):
         system = "urn:ietf:bcp:47"
@@ -84,30 +86,30 @@ class TestFHIR(TestCase):
                 },
                }
         cc = CodeableConcept.from_fhir(data['language'])
-        self.assertEqual(cc.text, 'Nederlands')
-        self.assertEqual(1, len(cc.codings))
+        assert cc.text == 'Nederlands'
+        assert 1 == len(cc.codings)
         coding = cc.codings[0]
-        self.assertEqual(coding.system, system)
-        self.assertEqual(coding.code, code)
-        self.assertEqual(coding.display, display)
+        assert coding.system == system
+        assert coding.code == code
+        assert coding.display == display
 
     def test_vq_format(self):
         vq = ValueQuantity(units='widgets',
                            system='unknown', code='10.0')
         vq_str = "test format: {}".format(vq)
-        self.assertIn('unknown', vq_str)
-        self.assertIn('widgets', vq_str)
-        self.assertIn('10.0', vq_str)
+        assert 'unknown' in vq_str
+        assert 'widgets' in vq_str
+        assert '10.0' in vq_str
 
     def test_vq_true_boolean(self):
         # units of `boolean` should convert ints to true/false
         vq = ValueQuantity(units='boolean', system='unknown', value='-10')
-        self.assertEqual(True, vq.value)
+        assert vq.value
 
     def test_vq_false_boolean(self):
         # units of `boolean` should convert ints to true/false
         vq = ValueQuantity(units='boolean', system='unknown', value='0')
-        self.assertEqual(False, vq.value)
+        assert not vq.value
 
     def test_cc_format(self):
         c1 = Coding(system='http://test.org', code='66.5',
@@ -116,13 +118,13 @@ class TestFHIR(TestCase):
                              display='grade')
         cc = CodeableConcept(text='test text', codings=[c1, c2])
         cc_str = "test format: {}".format(cc)
-        self.assertIn(cc.text, cc_str)
-        self.assertIn(c1.system, cc_str)
-        self.assertIn(c1.code, cc_str)
-        self.assertIn(c1.display, cc_str)
-        self.assertIn(c2.system, cc_str)
-        self.assertIn(c2.code, cc_str)
-        self.assertIn(c2.display, cc_str)
+        assert cc.text in cc_str
+        assert c1.system in cc_str
+        assert c1.code in cc_str
+        assert c1.display in cc_str
+        assert c2.system in cc_str
+        assert c2.code in cc_str
+        assert c2.display in cc_str
 
     def test_qr_format(self):
         self.login()
@@ -135,8 +137,8 @@ class TestFHIR(TestCase):
         db.session.add(qr)
         db.session.commit()
         qr_str = "test format: {}".format(qr)
-        self.assertIn(str(qr.subject_id), qr_str)
-        self.assertIn(str(qr.status), qr_str)
+        assert str(qr.subject_id) in qr_str
+        assert str(qr.status) in qr_str
 
 
 def test_tz_aware_conversion():

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals  # isort:skip
+
 import json
 
 from flask import url_for
@@ -14,33 +16,33 @@ class TestAccessOnVerify(TestCase):
         # use APIs to create account w/ special role
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        rv = self.client.post(
+        response = self.client.post(
             '/api/account',
             data=json.dumps({}),
             content_type='application/json')
-        self.assert200(rv)
+        assert response.status_code == 200
 
         # add role to account
-        user_id = rv.json['user_id']
+        user_id = response.json['user_id']
         data = {'roles': [{'name': 'access_on_verify'}]}
-        rv = self.client.put(
+        response = self.client.put(
             '/api/user/{user_id}/roles'.format(user_id=user_id),
             data=json.dumps(data),
             content_type='application/json')
-        self.assert200(rv)
+        assert response.status_code == 200
 
     def test_access(self):
         # confirm exception on access w/o DOB
         weak_access_user = self.add_user(username='fake@org.com')
         self.promote_user(weak_access_user, role_name='access_on_verify')
         weak_access_user = db.session.merge(weak_access_user)
-        self.assertFalse(weak_access_user.birthdate)
+        assert not weak_access_user.birthdate
 
         token = user_manager.token_manager.generate_token(weak_access_user.id)
         access_url = url_for('portal.access_via_token', token=token)
 
-        rv = self.client.get(access_url)
-        self.assert400(rv)
+        response = self.client.get(access_url)
+        assert response.status_code == 400
 
         # add DOB & names and expect redirect to challenge
         weak_access_user.birthdate = '01-31-1999'
@@ -49,5 +51,5 @@ class TestAccessOnVerify(TestCase):
         with SessionScope(db):
             db.session.commit()
 
-        rv = self.client.get(access_url)
-        self.assert_redirects(rv, url_for('portal.challenge_identity'))
+            response = self.client.get(access_url)
+        self.assert_redirects(response, url_for('portal.challenge_identity'))

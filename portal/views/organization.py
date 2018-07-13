@@ -1,7 +1,14 @@
 """Organization related views module"""
 import json
 
-from flask import Blueprint, abort, current_app, jsonify, request
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 from sqlalchemy import and_, exc
 
@@ -56,6 +63,15 @@ def organization_search():
             to just the leaf nodes of the organization tree.
         required: false
         type: string
+      - name: tree_view
+        in: query
+        description:
+            If given a `True` value, alters the return type to HTML and
+            generates a `tree` view of the organization hierarchy for easier
+            human comprehension of the structure.  Can NOT be combined with
+            other filters or search parameters.
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -71,7 +87,7 @@ def organization_search():
     """
     filter = None
     found_ids = []
-    system, value = None, None
+    system, value, tree_view = None, None, None
     for k, v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
@@ -96,6 +112,8 @@ def organization_search():
             system = v
         elif k == 'value':
             value = v
+        elif k == 'tree_view':
+            tree_view = v and v.lower() == 'true'
         else:
             abort(400, "only search on `state`, `filter` or `system` AND `value` "
                   "are available at this time")
@@ -128,6 +146,10 @@ def organization_search():
             matching_orgs |= set(ot.here_and_below_id(org))
 
     bundle = Organization.generate_bundle(matching_orgs, include_empties=False)
+    if tree_view:
+        if matching_orgs:
+            abort(400, "Can't combine search filters with `tree_view`")
+        return render_template('org_tree.html', bundle=bundle)
     return jsonify(bundle)
 
 
@@ -547,6 +569,9 @@ def add_user_organizations(user_id):
                 "POST restricted to organizations not already assigned to "
                 "user")
         user.organizations.append(org)
+        auditable_event(
+            message='Added {}'.format(org), user_id=current_user().id,
+            subject_id=user.id, context='organization')
     db.session.commit()
 
     # Return current organizations

@@ -2,9 +2,11 @@
 from datetime import datetime, timedelta
 import json
 import os
+import sys
 
 import dateutil
 from flask import current_app
+import pytest
 import pytz
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -22,7 +24,8 @@ from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase
 
-
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestProcedure(TestCase):
 
     def test_procedureGET_404(self):
@@ -55,7 +58,7 @@ class TestProcedure(TestCase):
         self.assertAlmostEqual(
             datetime.utcnow(), start_time, delta=timedelta(seconds=5))
         self.assertEqual(
-            current_app.config.metadata.version,
+            current_app.config.metadata['version'],
             data['entry'][0]['resource']['meta']['version'])
 
     def test_procedure_from_fhir(self):

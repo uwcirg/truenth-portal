@@ -1,4 +1,5 @@
 """Unit test module for app_text"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -7,6 +8,7 @@ from urllib.parse import parse_qsl, unquote_plus, urlparse
 
 from flask import render_template_string
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.app_text import (
@@ -48,7 +50,7 @@ class TestAppText(TestCase):
             db.session.commit()
         result = render_template_string(
             '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
-        self.assertTrue('_expanded_' in result)
+        assert '_expanded_' in result
 
     def test_missing_arg(self):
         with SessionScope(db):
@@ -56,9 +58,10 @@ class TestAppText(TestCase):
             title.custom_text = '_expanded_ {0}'
             db.session.add(title)
             db.session.commit()
-        self.assertRaises(
-            ValueError, render_template_string,
-            '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
+        with pytest.raises(ValueError):
+            render_template_string('<html></head><body>'
+                                   '{{ app_text("landing title") }}'
+                                   '<body/><html/>')
 
     def test_permanent_url(self):
         args = {
@@ -67,14 +70,14 @@ class TestAppText(TestCase):
             'version': '1.3'}
         sample = (
             '{origin}/c/portal/truenth/asset/detailed?'
-            '&uuid={uuid}&version=latest'.format(**args))
+            'uuid={uuid}&version=latest'.format(**args))
         expected = (
             '{origin}/c/portal/truenth/asset?uuid={uuid}&'
             'version={version}'.format(**args))
 
         result = VersionedResource(sample, locale_code='en_AU')._permanent_url(
             generic_url=sample, version=args['version'])
-        self.assertTrue(Url(result) == Url(expected))
+        assert Url(result) == Url(expected)
 
     def test_config_value_in_custom_text(self):
         self.app.config['CT_TEST'] = 'found!'
@@ -86,17 +89,16 @@ class TestAppText(TestCase):
             db.session.commit()
 
         result = app_text('embed config value')
-        self.assertTrue('found!' in result)
+        assert 'found!' in result
 
     def test_fetch_elements_invalid_url(self):
         sample_url = "https://notarealwebsitebeepboop.com"
         sample_error = (
             "Could not retrieve remove content - Server could not be reached")
         result = VersionedResource(sample_url, locale_code=None)
-        self.assertEqual(result.error_msg, sample_error)
-        self.assertEqual(result.url, sample_url)
-        # self.asset should still work (and equal the error text)
-        self.assertEqual(result.asset, sample_error)
+        assert result.error_msg == sample_error
+        assert result.url == sample_url
+        assert result.asset == sample_error
 
     def test_asset_variable_replacement(self):
         test_user = User.query.get(TEST_USER_ID)
@@ -110,7 +112,7 @@ class TestAppText(TestCase):
                                        asset=test_asset,
                                        variables=test_vars)
         rf_id = int(resource.asset.split()[-1])
-        self.assertEqual(rf_id, TEST_USER_ID)
+        assert rf_id == TEST_USER_ID
 
         invalid_asset = "Not a real {variable}!"
         resource = UnversionedResource(test_url,
@@ -118,9 +120,9 @@ class TestAppText(TestCase):
                                        variables=test_vars)
         error_key = resource.asset.split()[-1]
         if sys.version_info[0] < 3:
-            self.assertEqual(error_key, "u'variable'")
+            assert error_key == "u'variable'"
         else:
-            self.assertEqual(error_key, "'variable'")
+            assert error_key == "'variable'"
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",
@@ -129,20 +131,20 @@ class TestAppText(TestCase):
                     "footerkey": "foot"}
         tmr = MailResource(None, locale_code='en_AU', variables=testvars)
 
-        self.assertEqual(tmr.subject, "TESTING SUBJECT")
-        self.assertEqual(tmr.body.splitlines()[0], "TESTING BODY")
-        self.assertEqual(tmr.body.splitlines()[1], "TESTING FOOTER")
+        assert tmr.subject == "TESTING SUBJECT"
+        assert tmr.body.splitlines()[0] == "TESTING BODY"
+        assert tmr.body.splitlines()[1] == "TESTING FOOTER"
 
         tmr._subject = "Replace this: {subjkey}"
         tmr._body = "Replace these: {bodykey1} and {bodykey2}"
         tmr._footer = "Replace this: {footerkey}"
 
-        self.assertEqual(tmr.subject.split()[-1], "test")
-        self.assertEqual(tmr.body.splitlines()[0].split()[-1], "456")
-        self.assertEqual(tmr.body.splitlines()[1].split()[-1], "foot")
-        self.assertEqual(set(tmr.variable_list), set(testvars.keys()))
-        self.assertTrue(testvars['bodykey1'] in tmr.body)
+        assert tmr.subject.split()[-1] == "test"
+        assert tmr.body.splitlines()[0].split()[-1] == "456"
+        assert tmr.body.splitlines()[1].split()[-1] == "foot"
+        assert set(tmr.variable_list) == set(testvars.keys())
+        assert testvars['bodykey1'] in tmr.body
 
         # test footer optionality
         tmr._footer = None
-        self.assertEqual(len(tmr.body.splitlines()), 1)
+        assert len(tmr.body.splitlines()) == 1

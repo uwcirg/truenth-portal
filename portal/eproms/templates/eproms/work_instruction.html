@@ -11,5 +11,7 @@
 	<h3 class="work-instruction-content-heading first-letter">{{title | replace('-', ' ')}}</h3>
 	<div>{{content|safe}}</div>
 </div>
+{% endblock %}
+{% block additional_scripts %}
 <script src="{{url_for('.static', filename='js/resources.js')}}"></script>
 {% endblock %}

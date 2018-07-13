@@ -56,7 +56,7 @@
     },
     {
       "card_html": "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>",
-      "description": "Symptom Tracker tool",
+      "description": "Symptom Tracker",
       "display_rank": 2,
       "link_label": "Go to Symptom Tracker",
       "name": "self_management",
@@ -91,7 +91,7 @@
       "resourceType": "Intervention"
     },
     {
-      "card_html": "<p>Remember to update your PSA score.</p>",
+      "card_html": "<p>Remember to update your PSA level.</p>",
       "description": "PSA Tracker",
       "link_label": "Track your PSA",
       "name": "psa_tracker",

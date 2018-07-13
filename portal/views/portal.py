@@ -8,6 +8,7 @@ from flask import (
     Blueprint,
     abort,
     current_app,
+    g,
     jsonify,
     make_response,
     redirect,
@@ -93,7 +94,11 @@ def assert_locale_selector():
     # Confirm import & use of custom babel localeselector function.
     # Necessary to import get_locale to bring into the request scope to
     # prevent the default babel locale selector from being used.
-    assert get_locale()
+    locale_code = get_locale()
+
+    # assign locale code as global for easy access in template
+    if locale_code:
+        g.locale_code = locale_code
 
 
 @portal.before_app_request
@@ -802,7 +807,8 @@ def config_settings(config_key):
         'SYSTEM',
         'SHOW_PROFILE_MACROS',
         'MEDIDATA_RAVE_FIELDS',
-        'MEDIDATA_RAVE_ORG'
+        'MEDIDATA_RAVE_ORG',
+        'LOCALIZED_AFFILIATE_ORG'
     )
     if config_key:
         key = config_key.upper()
@@ -868,23 +874,26 @@ def spec():
 
     """
     swag = swagger(current_app)
+    metadata = current_app.config.metadata
     swag.update({
         "info": {
-            "version": current_app.config.metadata.version,
-            "title": current_app.config.metadata.summary,
-            "description": current_app.config.metadata.description,
-            "termsOfService": "http://cirg.washington.edu",
+            "version": metadata['version'],
+            "title": metadata['summary'],
+            "termsOfService": metadata['home-page'],
             "contact": {
-                "name": "Clinical Informatics Research Group",
-                "email": "mcjustin@uw.edu",
-                "url": "http://cirg.washington.edu",
+                "name": metadata['author'],
+                "email": metadata['author-email'],
+                "url": metadata['home-page'],
             },
         },
         "schemes": ("http", "https"),
     })
 
-    # Fix swagger docs for paths with duplicate operationIds
+    # Todo: figure out why description isn't always set
+    if metadata.get('description'):
+        swag["info"]["description"] = metadata.get('description').strip()
 
+    # Fix swagger docs for paths with duplicate operationIds
     # Dict of offending routes (path and method), grouped by operationId
     operations = {}
 

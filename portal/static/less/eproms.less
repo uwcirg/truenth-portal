@@ -183,16 +183,31 @@ body {
   }
 }
 .save-loader-wrapper {
-  .load-icon {
-    margin-left:4px;
-    margin-top:5px;
-  }
+  position: relative;
+  margin-top: 4px;
+  min-height: 12px;
   .success-icon {
     color: green;
   }
   .error-icon {
     color: red;
   }
+  .save-info {
+    position: absolute;
+    opacity: 0;
+    left: 0;
+     -webkit-transition: opacity 0.8s ease-in;
+    transition: opacity 0.8s ease-in;
+    font-size: @smallText;
+  }
+}
+@media (min-width: 768px) {
+  .save-loader-wrapper {
+    min-height: 8px;
+  }
+}
+#fillOrgs.org-tree {
+  flex-direction: row;
 }
 .email-ready-message {
   padding: 8px 5px;
@@ -435,7 +450,7 @@ select:not([multiple]) {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 25em;
+    max-height: 27em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -588,6 +603,7 @@ select:not([multiple]) {
   text-align: left;
   &.footer-separate {
     padding-top: 0;
+    margin-top: 1em;
     .footer-container {
       margin-top: 30px;
       border-top: 1px solid #ccc;
@@ -668,8 +684,8 @@ select:not([multiple]) {
 }
 
 #mainDiv.profile .copyright-container,
-#mainDiv.portal .copyright-container,
-#mainDiv.portal .copyright-container * {
+body.portal .copyright-container,
+body.portal .copyright-container * {
   color: @footerWhiteThemeColor;
 }
 
@@ -1300,14 +1316,6 @@ div.footer-wrapper.right-panel {
     max-width: 100%;
   }
 }
-
-.save-info {
-  opacity: 0;
-   -webkit-transition: opacity 0.8s ease-in;
-  transition: opacity 0.8s ease-in;
-  position: absolute;
-  font-size: @smallText;
-}
 #patientList {
   div.or {
     display: inline-block;
@@ -1614,25 +1622,16 @@ div.footer-wrapper.right-panel {
     border-radius: 45px;
   }
 }
-#mainDiv.portal {
-  background: rgba(95, 103, 110, 1);
+body.portal {
+  background: #5F676E;
   overflow-x: hidden;
   overflow-y: auto;
-  height: 93.5vh;
 }
-@media (min-width: 992px) {
-  #mainDiv.portal {
-    height: 88vh;
-  }
-}
-#mainDiv.portal::-webkit-scrollbar {
-  display: none;
-}
-#mainDiv.portal .container {
+body.portal .container {
   max-width: 1100px;
 }
-#mainDiv.profile .copyright-container,
-#mainDiv.portal .copyright-container  {
+body.profile .copyright-container,
+body.portal .copyright-container  {
   color: #F5F5F5;
   margin-bottom: 1em;
 }
@@ -1647,18 +1646,10 @@ div.footer-wrapper.right-panel {
 .portal-item {
   max-width: 100%;
 }
-.portal-no-description-container {
-  min-height: 400px;
-  position: relative;
-  margin-top: 10%;
-  font-size: @subheadSize;
-  max-width: 100%;
-  border: 2px solid rgba(121, 121, 121, 1);
-}
 .portal-header-container {
   color: #FFF;
   width: 85%;
-  margin: 1em auto 6em auto;
+  margin: 1em auto 2em auto;
   font-size: @subheadSize;
   max-width: 100%;
   text-align: center;
@@ -1688,14 +1679,19 @@ div.footer-wrapper.right-panel {
 }
 .portal-header-container * {
   line-height: 27px;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 400;
 }
-.portal-header {
-  font-size: @subheadSize;
+.portal-header,
+.portal-intro-text {
+  font-size: @baseFontSize;
   letter-spacing: 1px;
 }
-.portal-intro-text {
-  font-size: @subheadSize;
+@media (min-width: 699px) {
+  .portal-header,
+  .portal-intro-text {
+    font-size: @subSmallHeadSize*0.96;
+  }
 }
 .portal-header-logout-container {
   width: 100%;
@@ -1703,7 +1699,6 @@ div.footer-wrapper.right-panel {
   margin: 2em auto;
   text-align: center;
   & a {
-  width: 150px;
   max-width: 100%;
   margin: 1em auto;
   text-transform: uppercase;
@@ -1711,19 +1706,15 @@ div.footer-wrapper.right-panel {
 }
 .portal-flex-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   flex-wrap: wrap;
   position: relative;
   padding-bottom: 1em;
 }
-.portal-completed-container {
-  margin-top: -4em;
-}
 .portal-description {
-  background: #43484d;
-  border: 1px solid rgba(121, 121, 121, 1);
+  background: #3d4750;
   color: #FFF;
-  padding: 1em 2em 4em 2em;
+  padding: 0.5em 1.5em 4em;
   position: relative;
   width: 430px;
   max-width: 100%;
@@ -1738,7 +1729,10 @@ div.footer-wrapper.right-panel {
     opacity: @disabledOpacity;
   }
   & .title {
+    font-size: @subSmallHeadSize;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   & a {
     color: #FFF;
@@ -1753,18 +1747,43 @@ div.footer-wrapper.right-panel {
 @media (min-width: 992px) {
   .portal-description {
     margin: 1em;
+    &.full-width {
+      width: 96%;
+      min-height: 200px;
+    }
   }
 }
+.portal-no-description-container {
+  position: relative;
+  font-size: @subheadSize;
+  max-width: 100%;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  padding: 1.25em 2em;
+  & .portal-description-title {
+    font-size: @baseFontSize;
+    font-weight: bold;
+  }
+}
+@media (min-width: 992px) {
+  .portal-no-description-container {
+    & .portal-description-title {
+      font-size: 1em;
+    }
+  }
+}
+
 .portal-description-body {
   margin-top: 1em;
   text-align: center;
-  font-size: @baseFontSize*0.95;
+  font-size: @baseFontSize;
+  -webkit-font-smoothing: antialiased;
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {
   position: absolute;
   bottom: 0;
-  margin-bottom: 1em;
+  margin-bottom: 2.5em;
   left: 0;
   right: 0;
   margin-left: auto;
@@ -1775,17 +1794,20 @@ div.footer-wrapper.right-panel {
 
 .portal-flex-container {
   .portal-description {
-    padding-top: 2.5em;
+    padding-top: 1.5em;
   }
 }
 
-.portal-description-incomplete .button-container {
-  top: 50%;
-}
 .portal-description-title {
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
+  font-size: @baseFontSize;
+}
+@media (min-width: 699px) {
+  .portal-description-title {
+    font-size: @subSmallHeadSize;
+  }
 }
 .portal-registration-container, .portal-full-width-container {
   width: 93.5%;
@@ -2353,13 +2375,13 @@ input.clinic {
   margin-left:0.5em;
   width: 250px;
   max-width: 100%;
+  word-wrap: break-word;
 }
 #sendRegistrationEmailForm label {
   font-weight: normal;
 }
 
 #profileStudyIDContainer {
-  margin-bottom: 2em;
   input {
     width: 300px;
     max-width: 100%;
@@ -2920,6 +2942,14 @@ div.biopsy-option:last-of-type{
   }
 }
 
+@media (min-width: 1200px) {
+  #consentHistoryTable {
+    td {
+      min-width: 150px;
+    }
+  }
+}
+
 .button--LR,
 .button--LR.data-show,
 #profileConsentList .button--LR{
@@ -3077,7 +3107,7 @@ div.timezone-warning.text-warning {
 /** Responsive sizes **/
 @media (min-width: 423px) {
   .portal-header {
-    line-height: 50px;
+    line-height: 42px;
   }
   #termsText {
     padding: 0 1em;
@@ -3277,6 +3307,7 @@ div.timezone-warning.text-warning {
   }
   .portal-description .button-container a {
     width: 300px;
+    padding: 0.8em;
   }
    .profile-item-container {
     padding: 2em 3em 2.5em 3em;
@@ -3331,12 +3362,6 @@ div.timezone-warning.text-warning {
     & .pull-right {
       top: 4px
     }
-  }
-}
-
-@media (min-width: 726px) {
-  .portal-header {
-    font-size: @subheadSize;
   }
 }
 

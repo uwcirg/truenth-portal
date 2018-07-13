@@ -1,5 +1,8 @@
 """Module to test Recur model"""
 from datetime import datetime, timedelta
+import sys
+
+import pytest
 
 from portal.models.recur import Recur
 from tests import TestCase
@@ -7,6 +10,8 @@ from tests import TestCase
 now = datetime.utcnow()
 
 
+if sys.version_info.major > 2:
+    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestRecur(TestCase):
 
     def test_expired(self):

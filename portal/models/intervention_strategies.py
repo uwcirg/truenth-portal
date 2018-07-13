@@ -244,15 +244,11 @@ def update_card_html_on_completion():
                   <h2 class="portal-header">{greeting}</h2>
                   <p>{confirm}</p>
                   <p>{reminder}</p>
-                  <div class="button-callout">
-                    <figure id="portalScrollArrow"></figure>
-                  </div>
-                  <br/><br/>
-                  <div class="button-container portal-header-logout-container">
+                </div>
+                <div class="button-container portal-header-logout-container">
                     <a class="btn-lg btn-tnth-primary" href="/logout">
                       {logout}
                     </a>
-                  </div>
                 </div>""".format(greeting=greeting, confirm=confirm,
                                  reminder=reminder, logout=logout)
 
@@ -302,9 +298,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
@@ -319,9 +312,6 @@ def update_card_html_on_completion():
                       <h4 class="portal-intro-text">
                         {reminder}
                       </h4>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if assessment_status.overall_status == "Completed":
@@ -388,11 +378,16 @@ def update_card_html_on_completion():
 
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
+            message = _(
+                u"Please complete your %(assigning_authority)s "
+                "questionnaire here.",
+                assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
                 <h4 class="portal-description-title">{header}</h4>
+                <div class="portal-description-body"><p>{message}</p></div>
                 <div class="button-container">
                   <a class="btn-lg btn-tnth-primary" href="{link_url}">
                      {link_label}
@@ -402,7 +397,7 @@ def update_card_html_on_completion():
               {completed_card}
             </div>""".format(
                 intro=intro_html(assessment_status), header=header,
-                link_url=link_url, link_label=link_label,
+                message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
         elif any(indefinite_questionnaires):
@@ -412,11 +407,16 @@ def update_card_html_on_completion():
                     _(u'Go to questionnaire'))
             link_url = url_for('assessment_engine_api.present_needed')
             header = _(u"Open Questionnaire")
+            message = _(
+                u"Please complete your %(assigning_authority)s "
+                "questionnaire here.",
+                assigning_authority=assessment_status.assigning_authority)
             card_html = u"""
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
                 <h4 class="portal-description-title">{header}</h4>
+                <div class="portal-description-body"><p>{message}</p></div>
                 <div class="button-container">
                   <a class="btn-lg btn-tnth-primary" href="{link_url}">
                      {link_label}
@@ -427,7 +427,7 @@ def update_card_html_on_completion():
             </div>
             """.format(
                 intro=intro_html(assessment_status), header=header,
-                link_url=link_url, link_label=link_label,
+                message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
         elif assessment_status.overall_status == "Completed":
@@ -473,14 +473,20 @@ def update_card_html_on_completion():
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
             else:
+                greeting = _(u"Hi, %(full_name)s", full_name=user.display_name)
+                header = _(u"Questionnaire Expired")
                 message = _(
                     u"The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
                 card_html = u"""
+                    <div class="portal-header-container">
+                        <h2 class="portal-header">{greeting}</h2>
+                    </div>
                     <div class='portal-description
-                        portal-no-description-container'>
-                      {message}
-                    </div>""".format(message=message)
+                        portal-no-description-container full-width'>
+                        <h4 class="portal-description-title">{header}</h4>
+                        {message}
+                    </div>""".format(greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
