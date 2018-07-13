@@ -611,6 +611,11 @@ def set_user_consents(user_id):
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
+    if ('acceptance_date' in request.json
+            and FHIR_datetime.parse(request.json['acceptance_date'])
+            > datetime.utcnow()):
+        abort(400, "Future `acceptance_date` not permitted")
+
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
