@@ -106,6 +106,28 @@ class TestClinical(TestCase):
         uo = UserObservation.query.filter_by(user_id=TEST_USER_ID).one()
         assert uo.encounter.auth_method == 'password_authenticated'
 
+    def test_int_code_POST(self):
+        data = {
+            "resourceType":"Observation",
+            "code": {
+                "coding": [{
+                    "code": 111,
+                    "display": "biopsy",
+                    "system": "http://us.truenth.org/clinical-codes"}]},
+            "issued": "2018-01-1",
+            "status": "",
+            "valueQuantity": {
+                "units": "boolean",
+                "value": "true"}}
+
+        self.login()
+        response = self.client.post(
+            '/api/patient/%s/clinical' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
+        assert response.status_code == 200
+        assert '111' in response.json['message']
+        assert self.test_user.observations.count() == 1
+
     def test_clinicalPUT(self):
         self.prep_db_for_clinical()
         self.login()
