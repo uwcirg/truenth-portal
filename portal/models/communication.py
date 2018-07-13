@@ -83,7 +83,7 @@ def load_template_args(user, questionnaire_bank_id=None):
             return text.replace('<a href', '<a class="btn" href')
 
     def _lookup_assessment_button():
-        return make_button(_lookup_assessment_link(), True)
+        return make_button(_lookup_assessment_link(), inline=True)
 
     def _lookup_assessment_link():
         label = _(u'Complete Questionnaire')
@@ -187,7 +187,7 @@ def load_template_args(user, questionnaire_bank_id=None):
             INTERVENTION.SELF_MANAGEMENT, label=label)
 
     def _lookup_verify_account_button():
-        return make_button(_lookup_verify_account_link(), True)
+        return make_button(_lookup_verify_account_link(), inline=True)
 
     def _lookup_verify_account_link():
         token = user_manager.token_manager.generate_token(user.id)
