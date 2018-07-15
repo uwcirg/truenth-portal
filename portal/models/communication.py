@@ -67,7 +67,7 @@ def load_template_args(user, questionnaire_bank_id=None):
                 raise ValueError("Can't make button w/o matching href pattern")
 
             return (
-                '<a href={link} '
+                u'<a href={link} '
                 'style="font-size: 0.9em; '
                 'font-family: Helvetica, Arial, sans-serif; '
                 'display: inline-block; color: #FFF; '
