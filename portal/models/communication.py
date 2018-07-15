@@ -67,17 +67,17 @@ def load_template_args(user, questionnaire_bank_id=None):
                 raise ValueError("Can't make button w/o matching href pattern")
 
             return (
-                u'<a href={link} '
-                'style="font-size: 0.9em; '
-                'font-family: Helvetica, Arial, sans-serif; '
-                'display: inline-block; color: #FFF; '
-                'background-color: #7C959E; border-color: #7C959E; '
-                'border-radius: 0;'
-                'letter-spacing: 2px; cursor: pointer; '
-                'text-transform: uppercase; text-align: center; '
-                'line-height: 1.42857143;'
-                'font-weight: 400; padding: 0.6em; text-decoration: none;">'
-                '{label}</a>'.format(
+                u"""<a href={link}
+                style="font-size: 0.9em;
+                font-family: Helvetica, Arial, sans-serif;
+                display: inline-block; color: #FFF;
+                background-color: #7C959E; border-color: #7C959E;
+                border-radius: 0;
+                letter-spacing: 2px; cursor: pointer;
+                text-transform: uppercase; text-align: center;
+                line-height: 1.42857143;
+                font-weight: 400; padding: 0.6em; text-decoration: none;">
+                {label}</a>""".format(
                     link=match.groups()[0], label=match.groups()[1]))
         else:
             return text.replace('<a href', '<a class="btn" href')
