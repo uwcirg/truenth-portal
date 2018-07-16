@@ -12,6 +12,6 @@ class TestCelery(TestCase):
         y = 99
         response = (self.client.get(
             '/celery-test?x={x}&y={y}&redirect-to-result=True'.
-                format(x=x, y=y), follow_redirects=True))
+            format(x=x, y=y), follow_redirects=True))
         assert response.status_code == 200
         assert response.get_data(as_text=True) == str(x + y)
