@@ -2,7 +2,7 @@ from collections import OrderedDict
 import json
 
 from flask import Blueprint, redirect, render_template, url_for
-
+from ..extensions import oauth
 from ..models.user import current_user
 from ..views.portal import get_any_tag_data, get_asset
 
@@ -73,6 +73,7 @@ def index():
 
 
 @exercise_diet.route('/introduction')
+@oauth.require_oauth()
 def introduction():
     assets = []
     data = get_any_tag_data("introduction")
@@ -84,6 +85,7 @@ def introduction():
 
 
 @exercise_diet.route('/diet')
+@oauth.require_oauth()
 def diet():
     data = get_any_tag_data("diet")
     assets = []
@@ -108,6 +110,7 @@ def portal():
 
 
 @exercise_diet.route('/exercise')
+@oauth.require_oauth()
 def exercise():
     data = get_any_tag_data("exercise")
     assets = []
@@ -127,6 +130,7 @@ def exercise():
 
 
 @exercise_diet.route('/recipes')
+@oauth.require_oauth()
 def recipes():
     data = get_any_tag_data("recipe-intro")
     recipe_intro = get_asset(
@@ -139,6 +143,7 @@ def recipes():
 
 
 @exercise_diet.route('/recipe/<heading>/<int:item>')
+@oauth.require_oauth()
 def recipe(heading, item):
     assets = get_all_recipes()
     asset = get_asset(assets[heading][item][1])
