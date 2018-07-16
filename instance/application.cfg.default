@@ -1,6 +1,6 @@
 # Example configuration values for application.  Don't commit private copy!
 DEBUG = True
-SECRET_KEY = 'generate some random secret string'
+SECRET_KEY = 'sdfasdf981fn88nfa89893948'
 SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost/dbname'
 SERVER_NAME = '<the name and port number of the server (e.g.: 'myapp.dev:5000')>'
 
