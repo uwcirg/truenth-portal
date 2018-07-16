@@ -393,7 +393,7 @@
                     this.items = this.RANGE_ENUM[this.filters.selectedFilterResultRange](this.items);
                 }
                 if (this.items.length === 0 && this.isActedOn()) {
-                    this.noResultMessage = this.i18next.t("No PSA result matching the filtering criteria.  Please try again.");
+                    this.noResultMessage = this.i18next.t("No PSA result matching the filtering criteria. Please try again.");
                 }
                 if (!redraw) {
                     return false;
@@ -740,7 +740,7 @@
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
                         tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
-                        tooltipContainer.html("<b>PSA</b> " + d.result + "<br/><span class='small-text'>" + d.date + "</span>")
+                        tooltipContainer.html("<b>" + self.i18next.t("PSA") + "</b> " + d.result + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
                             .style("left", (d3.event.pageX - TOOLTIP_WIDTH/2) + "px")
