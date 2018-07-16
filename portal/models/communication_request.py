@@ -204,6 +204,11 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     'preparation' status.
 
     """
+    if not user.email_ready()[0]:
+        # don't queue/send message if user isn't ready to receive them
+        trace("user isn't 'email_ready, abort")
+        return
+
     trace("process {}; iteration {}".format(
         questionnaire_bank, iteration_count))
 
