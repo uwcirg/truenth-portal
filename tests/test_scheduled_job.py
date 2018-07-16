@@ -61,7 +61,7 @@ class TestScheduledJob(TestCase):
             data=json.dumps(data2))
         assert resp.status_code == 200
         assert resp.json['name'] == data['name']
-        assert resp.json['schedule'] ==  '0 0 0 0 0'
+        assert resp.json['schedule'] == '0 0 0 0 0'
 
     def test_job_get(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
