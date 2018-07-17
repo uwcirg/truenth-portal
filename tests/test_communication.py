@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Unit test module for communication"""
 from __future__ import unicode_literals  # isort:skip
 
@@ -82,10 +83,10 @@ class TestCommunication(TestQuestionnaireSetup):
 
     def test_unicode(self):
         dd = DynamicDictLookup()
-        dd['u'] = '\u2713'
+        dd['u'] = '✓'
         target = 'works {u}'
         result = target.format(**dd)
-        assert '\u2713' in result
+        assert '✓' in result
 
     def test_dd_no_extra_calls(self):
         def bad():
