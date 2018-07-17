@@ -11,15 +11,11 @@ additional configuration of most objects defined herein.
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
 
-# Flask-Authomatic provides OAuth between the Portal and upstream
-# identity providers such as Facebook
 # Babel is used for i18n
 # Flask-Mail is used for email communication
 # ReCaptcha is used for form verification
 # Flask-Session provides server side sessions
 # Flask-User
-from authomatic import Authomatic
-from authomatic.providers import oauth2
 from flask import abort, request
 from flask_babel import Babel
 from flask_mail import Mail
@@ -107,45 +103,6 @@ class OAuthOrAlternateAuth(OAuth2Provider):
         return wrapper
 
 oauth = OAuthOrAlternateAuth()
-
-
-
-class _delay_init(object):
-    """We can't initialize authomatic till the app config is ready"""
-
-    def __init__(self):
-        self._authomatic = None
-
-    @property
-    def authomatic(self):
-        return self._authomatic
-
-    def init_app(self, app):
-        if self._authomatic:
-            return
-        self._authomatic = Authomatic(
-            config={
-                'facebook': {
-                    'class_': oauth2.Facebook,
-                    'consumer_key': app.config['FB_CONSUMER_KEY'],
-                    'consumer_secret': app.config['FB_CONSUMER_SECRET'],
-                    'scope': ['public_profile', 'email'],
-                },
-                'google': {
-                    'class_': oauth2.Google,
-                    'consumer_key': app.config['GOOGLE_CONSUMER_KEY'],
-                    'consumer_secret': app.config['GOOGLE_CONSUMER_SECRET'],
-                    'scope': ['profile', 'email'],
-                },
-            },
-            secret=app.config['SECRET_KEY'],
-            debug=True,
-            logger=app.logger
-        )
-
-
-authomatic = _delay_init()
-
 
 mail = Mail()
 

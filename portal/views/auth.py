@@ -1,12 +1,11 @@
 """Auth related view functions"""
+from abc import ABCMeta, abstractmethod
 import base64
 from datetime import datetime
 import hashlib
 import hmac
 import json
 
-from authomatic.adapters import WerkzeugAdapter
-from authomatic.exceptions import CancellationError, ConfigError
 from flask import (
     Blueprint,
     abort,
@@ -19,6 +18,10 @@ from flask import (
     session,
     url_for,
 )
+from flask_dance.contrib.facebook import make_facebook_blueprint
+from flask_dance.contrib.google import make_google_blueprint
+from flask_dance.consumer import oauth_authorized, oauth_error
+from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import (
@@ -28,11 +31,11 @@ from flask_user.signals import (
     user_reset_password,
 )
 import requests
-
+from sqlalchemy.orm.exc import NoResultFound
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
-from ..extensions import authomatic, oauth
+from ..extensions import oauth
 from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
@@ -48,6 +51,260 @@ from ..models.user import (
 
 auth = Blueprint('auth', __name__)
 
+google_blueprint = make_google_blueprint(
+    scope=['profile', 'email'],
+    login_url='/login/google/',
+)
+
+facebook_blueprint = make_facebook_blueprint(
+    scope=['email', 'user_birthday', 'user_gender'],
+    login_url='/login/facebook/',
+)
+
+class FlaskDanceProvider:
+    __metaclass__ = ABCMeta
+
+    def __init__(self, blueprint, token):
+        self.blueprint = blueprint
+        self.token = token
+
+    @property
+    def name(self):
+        return self.blueprint.name
+
+    @abstractmethod
+    def get_user_info (self):
+        pass
+
+class GoogleFlaskDanceProvider(FlaskDanceProvider):
+    def get_user_info (self):
+        resp = self.blueprint.session.get('/oauth2/v2/userinfo')
+        if not resp.ok:
+            current_app.logger.debug('Failed to fetch user info from Google')
+            return False
+
+        google_info = resp.json()
+        
+        user_info = FlaskProviderUserInfo()
+        user_info.id = google_info['id']
+        user_info.first_name = google_info['given_name']
+        user_info.last_name = google_info['family_name']
+        user_info.email = google_info['email']
+        user_info.image_url = google_info['picture']
+
+        # Gender may not be available
+        if 'gender' in google_info:
+            user_info.gender = google_info['gender']
+
+        # Birthday may not be available
+        if 'birthday' in google_info:
+            user_info.birthdate = google_info['birthday']
+        
+        return user_info
+
+class FacebookFlaskDanceProvider(FlaskDanceProvider):
+    def get_user_info (self):
+        resp = self.blueprint.session.get('/me', params={ 'fields': 'id,email,birthday,first_name,last_name,gender,picture' })
+        if not resp.ok:
+            current_app.logger.debug('Failed to fetch user info from Facebook')
+            return False
+
+        facebook_info = resp.json()
+        
+        user_info = FlaskProviderUserInfo()
+        user_info.id = facebook_info['id']
+        user_info.first_name = facebook_info['first_name']
+        user_info.last_name = facebook_info['last_name']
+        user_info.email = facebook_info['email']
+        user_info.gender = facebook_info['gender']
+        user_info.image_url = facebook_info['picture']['data']['url']
+        user_info.birthdate = facebook_info['birthday']
+        
+        return user_info
+
+class FlaskProviderUserInfo(object):
+    def __init__(self):
+        self.id = None
+        self.first_name = None
+        self.last_name = None
+        self.email = None
+        self.birthdate = None
+        self.gender = None
+        self.image_url = None
+
+@oauth_authorized.connect_via(facebook_blueprint)
+def facebook_logged_in(facebook_blueprint, token):
+    """successful facebook login callback
+
+    After successful Facebook authorization control
+    returns here. The facebook blueprint and the oauth bearer
+    token are returned and used to log the user into the portal
+    """
+    facebook_provider = FacebookFlaskDanceProvider(facebook_blueprint, token)
+    return login_user_with_provider(request, facebook_provider)
+
+@oauth_authorized.connect_via(google_blueprint)
+def google_logged_in(google_blueprint, token):
+    """successful google login callback
+
+    After successful Google authorization control
+    returns here. The google blueprint and the oauth bearer
+    token are returned and used to log the user into the portal
+    """
+    google_provider = GoogleFlaskDanceProvider(google_blueprint, token)
+    return login_user_with_provider(request, google_provider)
+
+def login_user_with_provider(request, provider):
+    """provider login
+
+    A common login function for all providers. Once the provider
+    calls our server with the user's bearer token, the token in wrapped in an instance
+    of FlaskDanceProvider and passed here. This function uses it to get more information
+    about the user to successfully log them in.
+    """
+    import pdb
+    pdb.set_trace()
+    
+    store_next_in_session(request, provider)
+    
+    if current_user():
+        if current_user().deleted:
+            abort(400, "deleted user - operation not permitted")
+        return next_after_login()
+
+    if not provider.token:
+        current_app.logger.info("User canceled IdP auth - send home")
+        return redirect('/')
+
+    user_info = provider.get_user_info()
+
+    current_app.logger.debug(
+        "Successful authentication at %s", provider.name)
+
+    try:
+        # Check to see if the user has already logged in
+        # with this auth provider
+        auth_provider_query = AuthProvider.query.filter_by(
+           provider=provider.name,
+           provider_id=user_info.id,
+        )
+
+        auth_provider = auth_provider_query.one()
+    except NoResultFound:
+        auth_provider = AuthProvider(
+            provider=provider.name,
+            provider_id=user_info.id,
+            token=provider.token,
+        )
+ 
+    if auth_provider.user:        
+        auditable_event(
+            "login via {0}".format(provider.name),
+            user_id=auth_provider.user_id,
+            subject_id=auth_provider.user.id,
+            context='login'
+        ) 
+    else:
+        # Check to see if a user already exists
+        user_query = User.query.filter_by(email=user_info.email)
+        user = user_query.first()
+
+        if user:
+            auditable_event(
+                "login user via NEW IdP {0}".format(provider.name),
+                user_id=user.id,
+                subject_id=user.id,
+                context='login'
+            )
+        else:
+            # Create a new user
+            user = User(
+                first_name=user_info.first_name,
+                last_name=user_info.last_name,
+                email=user_info.email,
+                birthdate=user_info.birthdate,
+                gender=user_info.gender,
+                image_url=user_info.image_url,
+            )
+            
+            # Make sure the user is committed
+            db.session.add(user)
+            
+            auditable_event(
+                "register new user via {0}".format(provider.name),
+                user_id=user.id,
+                subject_id=user.id,
+                context='account'
+            )
+
+        # Associate this user with the auth provider 
+        # and make sure we commit the new wuth provider
+        auth_provider.user = user
+        db.session.add(auth_provider)
+
+    # Update the user's image in case they're logging in from
+    # a different IDP or their image url changed
+    auth_provider.user.image_url = user_info.image_url
+
+    # Finally, commit all of our changes
+    db.session.commit()
+
+    # Update our session
+    session['id'] = auth_provider.user.id
+    session['remote_token'] = provider.token
+     
+    # Log the user in
+    login_user(auth_provider.user, 'password_authenticated')
+
+    next_after_login()
+
+    # Disable Flask-Dance's default behavior that saves the oauth token
+    return False
+
+def store_next_in_session(request, provider):
+    """store the 'next' request arg in session
+
+    If the 'next' arg is set on the request store its value in the user's session
+    so we can use it to navigate to the next page after we're done authenticating
+    
+    """
+    if request.args.get('next'):
+        session['next'] = request.args.get('next')
+        validate_origin(session['next'])
+        current_app.logger.debug(
+            "store-session['next'] <{}> from login/{}".format(
+                session['next'], provider.name))
+ 
+@oauth_error.connect_via(google_blueprint)
+def google_error(google_blueprint, error, error_description=None, error_uri=None):
+    if not resp.ok:
+        reload_count = session.get('force_reload_count', 0)
+        if reload_count > 2:
+            current_app.logger.warn("Failed 3 attempts: {}".format(
+                result.error.message))
+            abort(500, "unable to authorize with provider {}".format(
+                    provider_name))
+            
+        session['force_reload_count'] = reload_count + 1
+        current_app.logger.info(str(result.error))
+        # Work around for w/ Safari and cookies set to current site only
+        # forcing a reload brings the local cookies back into view
+        # (they're missing with such a setting on returning from
+        # the 3rd party IdP redirect)
+        current_app.logger.info("attempting reload on oauth error")
+        return render_template('force_reload.html',
+            message=result.error.message)
+
+    msg = (
+        "OAuth error from {name}! "
+        "error={error} description={description} uri={uri}"
+    ).format(
+        name=blueprint.name,
+        error=error,
+        description=error_description,
+        uri=error_uri,
+    )
+    print msg
 
 @auth.route('/deauthorized', methods=('POST',))
 @csrf.exempt
@@ -277,7 +534,7 @@ def next_after_login():
     return resp
 
 
-@auth.route('/login/<provider_name>/')
+#@auth.route('/login/<provider_name>/')
 def login(provider_name):
     """login view function
 
@@ -296,134 +553,13 @@ def login(provider_name):
         login_user(user, 'password_authenticated')
         return next_after_login()
 
-    def picture_url(result):
-        """Using OAuth result, fetch the user's picture URL"""
-        image_url = result.user.picture
-        if provider_name == 'facebook':
-            # Additional request needed for FB profile image
-            url = '?'.join(
-                ("https://graph.facebook.com/{0}/picture",
-                 "redirect=false&width=160")).format(result.user.id)
-            response = result.provider.access(url)
-            if response.status == 200:
-                image_url = response.data['data']['url']
-        return image_url
-
     if provider_name == 'TESTING' and current_app.config['TESTING']:
         return testing_backdoor(request.args.get('user_id'))
 
-    if request.args.get('next'):
-        session['next'] = request.args.get('next')
-        validate_origin(session['next'])
-        current_app.logger.debug(
-            "store-session['next'] <{}> from login/{}".format(
-                session['next'], provider_name))
-        # The existance of any args (including 'next') breaks the authomatic
-        # login flow.  Clear out before passing on
-        from werkzeug.datastructures import ImmutableMultiDict
-        request.args = ImmutableMultiDict()
-
-    prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
-
-    if (not current_app.config.get('{}_CONSUMER_KEY'.format(prv)) or
-            not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
-        current_app.logger.info(
-            "Generating 404 on request for OAuth provider `{}` missing "
-            "configuration".format(provider_name))
-        abort(404)
+    print "Old auth method called"
 
     response = make_response()
-    adapter = WerkzeugAdapter(request, response)
-    try:
-        result = authomatic.authomatic.login(adapter, provider_name)
-    except ConfigError:
-        # Raised for random requests for non-configured hosts.  Treat as 404
-        current_app.logger.info(
-            "Generating 404 on request for OAuth provider `{}` missing "
-            "configuration".format(provider_name))
-        abort(404)
-
-    if current_user():
-        if current_user().deleted:
-            abort(400, "deleted user - operation not permitted")
-        return next_after_login()
-    if result:
-        if result.error:
-            if isinstance(result.error, CancellationError):
-                current_app.logger.info("User canceled IdP auth - send home")
-                return redirect('/')
-
-            reload_count = session.get('force_reload_count', 0)
-            if reload_count > 2:
-                current_app.logger.warn("Failed 3 attempts: {}".format(
-                    result.error.message))
-                abort(500, "unable to authorize with provider {}".format(
-                    provider_name))
-            session['force_reload_count'] = reload_count + 1
-            current_app.logger.info(str(result.error))
-            # Work around for w/ Safari and cookies set to current site only
-            # forcing a reload brings the local cookies back into view
-            # (they're missing with such a setting on returning from
-            # the 3rd party IdP redirect)
-            current_app.logger.info("attempting reload on oauth error")
-            return render_template('force_reload.html',
-                                   message=result.error.message)
-        elif result.user:
-            current_app.logger.debug(
-                "Successful authentication at %s", provider_name)
-            if not (result.user.name and result.user.id):
-                result.user.update()
-                image_url = picture_url(result)
-
-            # Success - add or pull this user to/from database
-            ap = AuthProvider.query.filter_by(
-                provider=provider_name, provider_id=result.user.id).first()
-            if ap:
-                auditable_event("login via {0}".format(provider_name),
-                                user_id=ap.user_id, subject_id=ap.user.id,
-                                context='login')
-                user = User.query.filter_by(id=ap.user_id).first()
-                user.image_url = image_url
-                db.session.commit()
-            else:
-                # Experiencing problems pulling email from IdPs.
-                if not result.user.email:
-                    abort(500, "No email for user {} from {}".format(
-                        result.user.id, provider_name))
-
-                # Confirm we haven't seen user from a different IdP
-                user = (User.query.filter_by(
-                    email=result.user.email).first()
-                    if result.user.email else None)
-
-                if not user:
-                    user = add_authomatic_user(result.user, image_url)
-                    db.session.commit()
-                    auditable_event(
-                        "register new user via {0}".format(provider_name),
-                        user_id=user.id,
-                        subject_id=user.id,
-                        context='account')
-                else:
-                    auditable_event(
-                        "login user via NEW IdP {0}".format(provider_name),
-                        user_id=user.id,
-                        subject_id=user.id,
-                        context='login')
-                    user.image_url = image_url
-
-                ap = AuthProvider(
-                    provider=provider_name,
-                    provider_id=result.user.id,
-                    user_id=user.id)
-                db.session.add(ap)
-                db.session.commit()
-            session['id'] = user.id
-            session['remote_token'] = result.provider.credentials.token
-            login_user(user, 'password_authenticated')
-            return next_after_login()
-    else:
-        return response
+    return response
 
 
 @auth.route('/login-as/<user_id>')
