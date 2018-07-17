@@ -91,6 +91,10 @@ option.select-option {
     margin: 1em 0;
     padding: 1em;
     letter-spacing: 1px;
+    .body {
+        font-weight: 200;
+        letter-spacing: 1px;
+    }
     .heading {
         margin: 0.5em 0 1em;
         border-bottom: 1px solid darken(@psaTrackerBorderColor, 50%);
@@ -293,7 +297,6 @@ option.select-option {
            font-family: "sans-serif";
            position: relative;
            display: inline-block;
-           padding: 0.1em;
            font-weight: 500;
         }
     }
@@ -387,6 +390,12 @@ option.select-option {
 #psaTrackerButtonsContainer {
     padding: 1em 0;
     margin-top: 1em;
+    position: relative;
+    min-height: 5em;
+    button {
+        position: absolute;
+        left: 1em;
+    }
 }
 #psaTrackerGraphContainer {
     padding: 1em 0.5em 0.5em;
@@ -461,7 +470,7 @@ option.select-option {
         color: @contentColor;
         text-decoration: none;
     }
-    font-weight: 200;
+    font-weight: 300;
     text-decoration: none;
 }
 /*To remove button from IE11 */
@@ -493,6 +502,7 @@ select::-ms-expand {
         box-shadow: none;
         overflow: -moz-scrollbars-none;
         overflow: hidden;
+        letter-spacing: 1px;
         &:focus {
             -webkit-appearance: none;
             -moz-appearance: none;
