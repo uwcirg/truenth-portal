@@ -123,9 +123,9 @@ class TestAuth(TestCase):
         authomatic_user = AuthomaticMock()
         authomatic_user.name = 'Test User'
         authomatic_user.first_name = 'Test'
-        authomatic_user.last_name = u'Bugn\xed'
+        authomatic_user.last_name = 'Bugn\xed'
         authomatic_user.birth_date = None
-        authomatic_user.gender = u'male'
+        authomatic_user.gender = 'male'
         authomatic_user.email = 'test@test.org'
 
         new_user = add_authomatic_user(authomatic_user, None)
