@@ -156,8 +156,12 @@ class TestProcedure(TestCase):
             ('888', 'Other (free text)', ICHOM),
             ('118877007', 'Procedure on prostate', SNOMED),
             ('999999999', 'Other primary treatment', SNOMED),
-            ('androgen deprivation therapy - surgical orchiectomy', 'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
-            ('androgen deprivation therapy - chemical', 'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('androgen deprivation therapy - surgical orchiectomy',
+             'Androgen deprivation therapy (ADT) - Surgical orchiectomy',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('androgen deprivation therapy - chemical',
+             'Androgen deprivation therapy (ADT) - Chemical',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
             ('176307007', 'Whole-gland ablation', SNOMED),
             ('438778003', 'Focal-gland ablation', SNOMED)
 
