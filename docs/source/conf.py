@@ -16,7 +16,6 @@ from __future__ import unicode_literals  # isort:skip
 import datetime
 import email.parser
 import os
-import sys
 
 from pkg_resources import get_distribution
 
