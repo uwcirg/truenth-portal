@@ -208,17 +208,24 @@ class QuestionnaireBankDetails(object):
                 "Indeterminate org lookup - only expecting one root org "
                 "for patient {}".format(self.user))
 
+        valid_consent_found = False
         for candidate in self.user.organizations:
-            valid_consents = self.user.valid_consents.filter(
-                UserConsent.organization_id == candidate.id).with_entities(
-                UserConsent.options, UserConsent.status).first()
-            if not valid_consents:
-                raise ValueError(
-                    "can't locate valid consent for user:org {}:{}".format(
-                        self.user, candidate))
-            if valid_consents[1] == 'suspended':
-                return True
+            if not candidate.id:  # `none of the above` doesn't count
+                continue
 
+            # Need to process in order, finding the consent closest to the
+            # user's leaf org and then moving up.
+            for org_id in OrgTree().at_and_above_ids(candidate.id):
+                valid_consent = self.user.valid_consents.filter(
+                    UserConsent.organization_id == org_id).with_entities(
+                    UserConsent.options, UserConsent.status).first()
+                if valid_consent:
+                    valid_consent_found = True
+                if valid_consent and valid_consent[1] == 'suspended':
+                    return True
+
+        if not valid_consent_found:
+            raise ValueError("No consent found for {}".format(self.user))
         return False
 
 
