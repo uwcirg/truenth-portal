@@ -1415,6 +1415,9 @@ def present_needed():
     if not as_of_date:
         as_of_date = datetime.utcnow()
     assessment_status = AssessmentStatus(subject, as_of_date=as_of_date)
+    if assessment_status.overall_status == 'Withdrawn':
+        abort (400, 'Withdrawn; no pending work found')
+
     args = dict(request.args.items())
     args['instrument_id'] = (
         assessment_status.instruments_needing_full_assessment(
