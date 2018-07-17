@@ -40,10 +40,10 @@ def dict_match(newd, oldd, diff_stream):
     else:
         if added:
             diff_stream.write(
-                "added {}\n".format({k:newd.get(k) for k in added}))
+                "added {}\n".format({k: newd.get(k) for k in added}))
         if removed:
             diff_stream.write(
-                "removed {}\n".format({k:oldd.get(k) for k in removed}))
+                "removed {}\n".format({k: oldd.get(k) for k in removed}))
         if modified:
             for k in modified.keys():
                 diff_stream.write(
