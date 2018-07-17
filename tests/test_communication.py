@@ -170,9 +170,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=13))
+        self.bless_with_basics(
+            backdate=relativedelta(days=13), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -190,9 +190,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=14))
+        self.bless_with_basics(
+            backdate=relativedelta(days=14), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -208,9 +208,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=14))
+        self.bless_with_basics(
+            backdate=relativedelta(days=14), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -225,9 +225,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=22))
+        self.bless_with_basics(
+            backdate=relativedelta(days=22), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
@@ -242,9 +242,10 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=22))
+        self.bless_with_basics(
+            backdate=relativedelta(days=22), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.email = NO_EMAIL_PREFIX
         with SessionScope(db):
             db.session.commit()
@@ -260,9 +261,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # Fake a user associated with localized org
         # and mark all baseline questionnaires as in-progress
-        self.bless_with_basics(backdate=relativedelta(days=14))
+        self.bless_with_basics(
+            backdate=relativedelta(days=14), local_metastatic='localized')
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.mark_localized()
         mock_qr(instrument_id='eproms_add')
         mock_qr(instrument_id='epic26')
         mock_qr(instrument_id='comorb')

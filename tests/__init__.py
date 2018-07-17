@@ -298,7 +298,8 @@ class TestCase(Base):
             db.session.add(consent)
             db.session.commit()
 
-    def bless_with_basics(self, backdate=None, setdate=None):
+    def bless_with_basics(
+            self, backdate=None, setdate=None, local_metastatic=None):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
@@ -308,14 +309,22 @@ class TestCase(Base):
         :param setdate: datetime value.  Define to mock consents
           happening at exact time in the past
 
+        :param local_metastatic: set to 'localized' or 'metastatic' for
+          tests needing those respective orgs assigned to the test user
+
         """
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
 
         # Register with a clinic
         self.shallow_org_tree()
-        org = Organization.query.filter(
-            Organization.partOf_id != None).first()
+
+        if local_metastatic:
+            org = Organization.query.filter(
+                Organization.name == local_metastatic).one()
+        else:
+            org = Organization.query.filter(
+                Organization.partOf_id.isnot(None)).first()
         assert org
         self.test_user.organizations.append(org)
 
