@@ -314,7 +314,7 @@ def update_card_html_on_completion():
                       </h4>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
-            if assessment_status.overall_status == "Completed":
+            if assessment_status.overall_status in ("Completed", "Withdrawn"):
                 return thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
@@ -400,7 +400,8 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif any(indefinite_questionnaires):
+        elif (any(indefinite_questionnaires)
+              and assessment_status.overall_status != 'Withdrawn'):
             # User completed baseline, but has outstanding indefinite work
             link_label = _(u'Continue questionnaire') if (
                 indefinite_questionnaires[1]) else (
@@ -430,7 +431,7 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif assessment_status.overall_status == "Completed":
+        elif assessment_status.overall_status in ("Completed", "Withdrawn"):
             # User completed both baseline and indefinite
             link_label = _(u'View previous questionnaire')
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
