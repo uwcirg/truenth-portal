@@ -7,6 +7,8 @@ options:
     py.test --help
 
 """
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
@@ -41,7 +43,7 @@ from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
-FIRST_NAME = u'\u2713'
+FIRST_NAME = '\u2713'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
