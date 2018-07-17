@@ -541,6 +541,11 @@ class TestOrganization(TestCase):
         assert 10032 in leaves
         assert 10031 in leaves
 
+    def test_at_and_above(self):
+        self.deepen_org_tree()
+        results = OrgTree().at_and_above_ids(10032)
+        assert len(results) == 3
+
     def test_top_names(self):
         self.deepen_org_tree()
         assert {'101', '102'} == set(OrgTree().top_level_names())
