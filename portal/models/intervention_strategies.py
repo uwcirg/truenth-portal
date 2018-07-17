@@ -233,7 +233,7 @@ def update_card_html_on_completion():
                 classification='indefinite'))
 
         def thank_you_block(name, registry):
-            greeting = _("Thank you, {}.").format(name)
+            greeting = _("Thank you, %(full_name)s.", full_name=name)
             confirm = _(
                 "You've completed the %(registry)s questionnaire.",
                 registry=_(registry))
@@ -265,7 +265,7 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                greeting = _("Hi {}").format(user.display_name)
+                greeting = _("Hi, %(full_name)s.", full_name=user.display_name)
 
                 qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
