@@ -303,7 +303,7 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
-                greeting = _("Hi {}").format(user.display_name)
+                greeting = _("Hi, %(full_name)s.", full_name=user.display_name)
                 reminder = _(
                     "Please complete your %(assigning_authority)s "
                     "questionnaire at your convenience.",
