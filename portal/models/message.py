@@ -1,4 +1,6 @@
 """Model classes for message data"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 from textwrap import fill
 
@@ -12,7 +14,7 @@ from .user import User
 
 def log_message(message, app):
     """Configured to handle signals on email_dispatched - log the event"""
-    app.logger.info(u"Message sent; To: {0} Subj: {1}".format(
+    app.logger.info("Message sent; To: {0} Subj: {1}".format(
         message.recipients, message.subject))
 
 
@@ -20,7 +22,7 @@ email_dispatched.connect(log_message)
 
 
 EMAIL_HEADER = (
-    u"<!DOCTYPE html><html>"
+    "<!DOCTYPE html><html>"
     "<head><title>TrueNTH email</title><style>"
     "body {"
     " font-size: 16px;"
@@ -74,7 +76,7 @@ EMAIL_HEADER = (
     " text-decoration: none;"
     "}"
     "</style></head><body>")
-EMAIL_FOOTER = u"</body></html>"
+EMAIL_FOOTER = "</body></html>"
 
 
 class EmailMessage(db.Model):
@@ -93,14 +95,14 @@ class EmailMessage(db.Model):
     def style_message(body):
         """Implicitly called on send, to wrap body with style tags"""
         # Catch duplicate styling attempts
-        restricted = (u'<!doctype', u'<html', u'<head', u'<body')
+        restricted = ('<!doctype', '<html', '<head', '<body')
         lower_body = body.lower()
         for element in restricted:
             if element in lower_body:
                 raise ValueError(
-                    u"Unexpected element '{}' found in email body".format(
+                    "Unexpected element '{}' found in email body".format(
                         element))
-        return u'{header}{body}{footer}'.format(
+        return '{header}{body}{footer}'.format(
             header=EMAIL_HEADER, body=body, footer=EMAIL_FOOTER)
 
     def send_message(self, cc_address=None):
@@ -127,7 +129,7 @@ class EmailMessage(db.Model):
         subject_id = subject.id if subject else self.user_id
 
         if user_id and subject_id:
-            audit_msg = (u"EmailMessage '{0.subject}' sent to "
+            audit_msg = ("EmailMessage '{0.subject}' sent to "
                          "{0.recipients} from {0.sender}".format(self))
             auditable_event(message=audit_msg, user_id=user_id,
                             subject_id=subject_id, context="user")
