@@ -3112,6 +3112,21 @@ h6.lose span {
 /* ======================================================================================== */
 /* ======================================================================================== */
 
+@media (max-width: 767px) {
+    body.modal-open .modal.is-modal-active .modal-dialog,
+    div#exercise-works.modal.fade.in,
+    div#exercise-benefits.modal.fade.in {
+        max-width: 100%;
+    }
+}
+div#exercise-works.modal.fade.in table,
+div#exercise-benefits.modal.fade.in table {
+    word-wrap: break-word;
+}
+
+div#exercise-benefits.modal.fade.in table {
+    table-layout: fixed;
+}
 
 div#exercise-benefits.modal.fade.in h2 {
     position: relative;
@@ -3163,11 +3178,11 @@ div#exercise-benefits.modal.fade.in h3 {
     margin: 10px auto;
 }
 div#exercise-benefits.modal.fade.in ul {
-	padding: 3px 3px 10px;
-	padding: 3px 0px 10px;
-
-	margin-bottom: 10px;
-	margin-bottom: 0px;
+    padding: 3px 3px 10px;
+    padding: 3px 0px 10px;
+    margin-bottom: 10px;
+    margin-bottom: 0px;
+    word-wrap: break-word;
 }
 div#exercise-benefits.modal.fade.in ul li:first-child {
     font-weight: 500;
