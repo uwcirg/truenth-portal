@@ -82,10 +82,10 @@ class TestCommunication(TestQuestionnaireSetup):
 
     def test_unicode(self):
         dd = DynamicDictLookup()
-        dd['u'] = u'\u2713'
-        target = u'works {u}'
+        dd['u'] = '\u2713'
+        target = 'works {u}'
         result = target.format(**dd)
-        assert u'\u2713' in result
+        assert '\u2713' in result
 
     def test_dd_no_extra_calls(self):
         def bad():
