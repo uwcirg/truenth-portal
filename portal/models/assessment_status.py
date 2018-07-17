@@ -14,6 +14,7 @@ from .fhir import (
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
+from .user_consent import UserConsent
 
 
 def recent_qnr_status(user, questionnaire_name, qbd):
@@ -158,6 +159,9 @@ class QuestionnaireBankDetails(object):
 
     def overall_status(self):
         """Returns the `overall_status` for the given QB"""
+        if self.withdrawn():
+            return 'Withdrawn'
+
         if not (
             self.qbd.questionnaire_bank and
             self.qbd.questionnaire_bank.trigger_date
@@ -185,6 +189,37 @@ class QuestionnaireBankDetails(object):
             else:
                 result = 'In Progress'
         return result
+
+    def withdrawn(self):
+        """Determine if user has `withdrawn` from study """
+        # No easy tie between QB and organization.  Make assumption
+        # that if the QBD isn't intervention tied, the user is associated
+        # with the intervention by org.
+        intervention_qbs = QuestionnaireBank.query.filter(
+            QuestionnaireBank.intervention_id.isnot(None))
+        if self.qbd.questionnaire_bank in intervention_qbs:
+            return False
+
+        # With multiple root organizations, the consent lookup would
+        # be indeterminate - don't allow
+        root_orgs = OrgTree().find_top_level_org(self.user.organizations)
+        if len(root_orgs) > 1:
+            current_app.logger.error(
+                "Indeterminate org lookup - only expecting one root org "
+                "for patient {}".format(self.user))
+
+        for candidate in self.user.organizations:
+            valid_consents = self.user.valid_consents.filter(
+                UserConsent.organization_id == candidate.id).with_entities(
+                UserConsent.options, UserConsent.status).first()
+            if not valid_consents:
+                raise ValueError(
+                    "can't locate valid consent for user:org {}:{}".format(
+                        self.user, candidate))
+            if valid_consents[1] == 'suspended':
+                return True
+
+        return False
 
 
 class AssessmentStatus(object):
@@ -403,6 +438,8 @@ class AssessmentStatus(object):
             'In Progress': if one or more questionnaires were at least
                 started and the remaining unfinished questionnaires are not
                 expired.
+            'Withdrawn': if the user's consent agreement with QB organization
+                includes "send_reminders: False".
 
         """
         return self.qb_data.overall_status()
