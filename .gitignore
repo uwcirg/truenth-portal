@@ -6,7 +6,6 @@
 *.pyc
 *~
 *.swp
-.coverage
 application.cfg
 site.cfg
 celerybeat-schedule
@@ -20,11 +19,13 @@ log
 portal/test_uploads
 docker/portal.env
 
+.coverage
 .idea
-.tox/
-.settings/
-.pydevproject
 .project
+.pydevproject
+.pytest_cache
+.settings
+.tox
 
 # translation files
 portal/translations/
