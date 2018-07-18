@@ -281,6 +281,9 @@ class TestCase(Base):
                          backdate=None, setdate=None):
         """Bless given user with a valid consent with org
 
+        NB - if existing consent for user/org is present, simply update
+        with new date values
+
         :param backdate: timedelta value.  Define to mock consents
           happening said period in the past
 
@@ -288,14 +291,22 @@ class TestCase(Base):
           happening at exact time in the past
 
         """
-        audit = Audit(user_id=user_id, subject_id=user_id)
-        consent = UserConsent(
-            user_id=user_id, organization_id=org_id,
-            audit=audit, agreement_url='http://fake.org',
-            acceptance_date=calc_date_params(
-                backdate=backdate, setdate=setdate))
+        acceptance_date = calc_date_params(
+            backdate=backdate, setdate=setdate)
+        consent = UserConsent.query.filter(
+            UserConsent.user_id == user_id).filter(
+            UserConsent.organization_id == org_id).first()
+        if consent:
+            consent.acceptance_date = acceptance_date
+        else:
+            audit = Audit(user_id=user_id, subject_id=user_id)
+            consent = UserConsent(
+                user_id=user_id, organization_id=org_id,
+                audit=audit, agreement_url='http://fake.org',
+                acceptance_date=acceptance_date)
         with SessionScope(db):
-            db.session.add(consent)
+            if consent not in db.session:
+                db.session.add(consent)
             db.session.commit()
 
     def bless_with_basics(
