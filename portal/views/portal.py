@@ -552,8 +552,6 @@ def admin():
         org_list = Organization.query.all()
         users = User.query.filter_by(deleted=None).all()
 
-    for u in users:
-        u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template(
         'admin/admin.html', users=users, wide_container="true",
         org_list=list(org_list), user=user)
