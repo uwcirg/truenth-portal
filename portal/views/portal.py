@@ -74,6 +74,7 @@ from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
+from ..type_tools import check_int
 from .auth import logout, next_after_login
 from .crossdomain import crossdomain
 
@@ -1091,13 +1092,6 @@ def stock_consent(org_name):
             </body>
         </html>""",
         body=body)
-
-
-def check_int(i):
-    try:
-        return int(i)
-    except ValueError:
-        abort(400, "invalid input '{}' - must be an integer".format(i))
 
 
 def get_asset(uuid):
