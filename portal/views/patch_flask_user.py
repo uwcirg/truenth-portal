@@ -1,4 +1,5 @@
 """workarounds to flask_user problems"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -20,7 +21,7 @@ def patch_make_safe_url(url):
 
     """
     parts = urlsplit(url)
-    no_scheme, no_hostname = u'', u''
+    no_scheme, no_hostname = '', ''
     safe_url = urlunsplit(
         (no_scheme, no_hostname, parts.path, parts.query, parts.fragment))
     return safe_url
