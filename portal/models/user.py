@@ -1,4 +1,6 @@
 """User model """
+from __future__ import unicode_literals  # isort:skip
+
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -786,7 +788,7 @@ class User(db.Model, UserMixin):
             if rel.relationship.name == RELATIONSHIP.SPONSOR.value:
                 return User.query.get(rel.other_user_id)
 
-        service_user = User(username=(u'service account sponsored by {}'.
+        service_user = User(username=('service account sponsored by {}'.
                                       format(self.username)))
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE.value)
