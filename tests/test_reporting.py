@@ -22,6 +22,7 @@ from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
 from tests import TestCase
 
+
 class TestReporting(TestCase):
     """Reporting tests"""
 
@@ -125,6 +126,7 @@ class TestReporting(TestCase):
             db.session.add(crv)
             db.session.commit()
         crv, epic26 = map(db.session.merge, (crv, epic26))
+        crv_id = crv.id
 
         bank = QuestionnaireBank(
             name='CRV', research_protocol_id=rp_id,
@@ -136,6 +138,8 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        self.test_user.organizations.append(crv)
+        self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
@@ -146,8 +150,7 @@ class TestReporting(TestCase):
         assert len(ostats) == 0
 
         # test user with status = 'Overdue' (should show up)
-        self.test_user.organizations.append(crv)
-        self.consent_with_org(org_id=crv.id, backdate=relativedelta(days=18))
+        self.consent_with_org(org_id=crv_id, backdate=relativedelta(days=18))
         with SessionScope(db):
             db.session.add(bank)
             db.session.commit()
