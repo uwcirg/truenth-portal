@@ -1,4 +1,6 @@
 """Module for additional dictionary tools/utilities"""
+from __future__ import unicode_literals  # isort:skip
+
 import numbers
 
 
@@ -38,14 +40,14 @@ def dict_match(newd, oldd, diff_stream):
     else:
         if added:
             diff_stream.write(
-                u"added {}\n".format({k:newd.get(k) for k in added}))
+                "added {}\n".format({k: newd.get(k) for k in added}))
         if removed:
             diff_stream.write(
-                u"removed {}\n".format({k:oldd.get(k) for k in removed}))
+                "removed {}\n".format({k: oldd.get(k) for k in removed}))
         if modified:
             for k in modified.keys():
                 diff_stream.write(
-                    u"replace {} with {}\n".format(
+                    "replace {} with {}\n".format(
                         {k: oldd.get(k)}, {k: newd.get(k)}))
         return False
 
