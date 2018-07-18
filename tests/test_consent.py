@@ -5,16 +5,17 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json
 
-from date_tools import FHIR_datetime
 from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
+
 
 class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
