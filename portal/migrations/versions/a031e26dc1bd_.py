@@ -2,18 +2,17 @@ from alembic import op
 import sqlalchemy as sa
 import sqlalchemy_utils
 
-
 """empty message
 
-Revision ID: 4d5b44069fc5
-Revises: 0f1576a4e220
-Create Date: 2018-07-10 16:00:55.574363
+Revision ID: a031e26dc1bd
+Revises: b4dcf331317e
+Create Date: 2018-07-18 15:49:38.121020
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4d5b44069fc5'
-down_revision = '0f1576a4e220'
+revision = 'a031e26dc1bd'
+down_revision = 'b4dcf331317e'
 
 
 def upgrade():
