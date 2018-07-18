@@ -11,11 +11,11 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+from __future__ import unicode_literals  # isort:skip
 
 import datetime
 import email.parser
 import os
-import sys
 
 from pkg_resources import get_distribution
 
@@ -60,7 +60,7 @@ project_slug = project.replace(" ", "")
 
 now = datetime.datetime.now()
 author = metadata['author']
-copyright = u'{}, {}'.format(now.year, author)
+copyright = '{}, {}'.format(now.year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -145,7 +145,7 @@ if not os.environ.get('READTHEDOCS') == 'True':
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
-#html_title = u'TrueNTH Shared Services v16.4.27'
+# html_title = 'TrueNTH Shared Services v16.4.27'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -251,7 +251,7 @@ latex_elements = {
 latex_documents = [(
     master_doc,
     '%s.tex' % project_slug,
-    u'%s Documentation' % project,
+    '%s Documentation' % project,
     author,
     'manual'
 )]
@@ -282,7 +282,7 @@ latex_documents = [(
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, project_slug.lower(), u'%s Documentation' % project,
+    (master_doc, project_slug.lower(), '%s Documentation' % project,
      [author], 1)
 ]
 
@@ -298,7 +298,7 @@ man_pages = [
 texinfo_documents = [(
     master_doc,
     project_slug,
-    u'%s Documentation' % project,
+    '%s Documentation' % project,
     author,
     project_slug,
     'One line description of project.',
