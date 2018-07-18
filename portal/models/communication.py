@@ -17,6 +17,7 @@ from ..database import db
 from ..date_tools import localize_datetime
 from ..extensions import user_manager
 from ..trace import dump_trace, establish_trace, trace
+from .assessment_status import overall_assessment_status
 from .app_text import MailResource
 from .intervention import INTERVENTION
 from .message import EmailMessage
@@ -283,9 +284,8 @@ class Communication(db.Model):
 
         return msg
 
-
     def generate_and_send(self):
-        "Collate message details and send"
+        """Collate message details and send"""
 
         if current_app.config.get('DEBUG_EMAIL', False):
             # hack to restart trace when in loop from celery task
@@ -301,6 +301,12 @@ class Communication(db.Model):
             raise ValueError(
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
+
+        if overall_assessment_status(self.user_id) == 'Withdrawn':
+            current_app.logger.info(
+                "Skipping message send for withdrawn {}".format(user))
+            self.status = 'suspended'
+            return
 
         trace("load variables for {user} & UUID {uuid} on {request}".format(
             user=user,

@@ -296,9 +296,7 @@ class QuestionnaireBank(db.Model):
             results = []
 
             # At this time, doesn't apply to metastatic patients.
-            if not any((obs.codeable_concept == CC.PCaLocalized
-                    and obs.value_quantity == CC.FALSE_VALUE)
-                   for obs in user.observations):
+            if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
 
                 # Complicated rules (including strategies and UserIntervention rows)
                 # define a user's access to an intervention.  Rely on the
