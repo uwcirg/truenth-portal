@@ -265,7 +265,7 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                greeting = _("Hi, %(full_name)s.", full_name=user.display_name)
+                greeting = _("Hi, %(full_name)s", full_name=user.display_name)
 
                 qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
@@ -303,7 +303,7 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
-                greeting = _("Hi, %(full_name)s.", full_name=user.display_name)
+                greeting = _("Hi, %(full_name)s", full_name=user.display_name)
                 reminder = _(
                     "Please complete your %(assigning_authority)s "
                     "questionnaire at your convenience.",
