@@ -1,4 +1,6 @@
 """Communication model"""
+from __future__ import unicode_literals  # isort:skip
+
 from collections import MutableMapping
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
@@ -67,7 +69,7 @@ def load_template_args(user, questionnaire_bank_id=None):
                 raise ValueError("Can't make button w/o matching href pattern")
 
             return (
-                u"""<a href={link}
+                """<a href={link}
                 style="font-size: 0.9em;
                 font-family: Helvetica, Arial, sans-serif;
                 display: inline-block; color: #FFF;
@@ -86,9 +88,9 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_assessment_link(), inline=True)
 
     def _lookup_assessment_link():
-        label = _(u'Complete Questionnaire')
+        label = _('Complete Questionnaire')
         return (
-            u'<a href="{ae_link}">{label}</a>'.format(
+            '<a href="{ae_link}">{label}</a>'.format(
                 ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
@@ -111,8 +113,8 @@ def load_template_args(user, questionnaire_bank_id=None):
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
-        label = _(u'TrueNTH P3P')
-        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
+        label = _('TrueNTH P3P')
+        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     def _lookup_debug_slot():
         """Special slot added when configuration DEBUG_EMAIL is set"""
@@ -149,9 +151,9 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_password_reset_link())
 
     def _lookup_password_reset_link():
-        label = _(u'Password Reset')
+        label = _('Password Reset')
         return (
-            u'<a href="{url}">{label}</a>'.format(
+            '<a href="{url}">{label}</a>'.format(
                 url=url_for('user.forgot_password', _external=True),
                 label=label))
 
@@ -182,8 +184,8 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_st_link())
 
     def _lookup_st_link():
-        label = _(u"Symptom Tracker")
-        return u'<a href="{0.link_url}">{label}</a>'.format(
+        label = _("Symptom Tracker")
+        return '<a href="{0.link_url}">{label}</a>'.format(
             INTERVENTION.SELF_MANAGEMENT, label=label)
 
     def _lookup_verify_account_button():
@@ -199,8 +201,8 @@ def load_template_args(user, questionnaire_bank_id=None):
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
-        label = _(u'Verify Account')
-        return u'<a href="{url}">{label}</a>'.format(url=url, label=label)
+        label = _('Verify Account')
+        return '<a href="{url}">{label}</a>'.format(url=url, label=label)
 
     # Load all functions from the local space with the `_lookup_` prefix
     # into the args instance
