@@ -9,11 +9,13 @@ from dateutil import parser
 from flask import current_app
 from flask_webtest import SessionScope
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
+
 
 class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
@@ -143,6 +145,22 @@ class TestUserConsent(TestCase):
         assert consent.audit.comment ==\
             "Consent agreement {} signed".format(consent.id)
         assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
+
+    def test_post_user_future_consent_date(self):
+        """Shouldn't allow future consent date"""
+        self.shallow_org_tree()
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        acceptance_date = datetime.utcnow() + relativedelta(days=1)
+        data = {'organization_id': org1.id,
+                'agreement_url': self.url,
+                'acceptance_date': FHIR_datetime.as_fhir(acceptance_date)}
+
+        self.login()
+        response = self.client.post(
+                              '/api/user/{}/consent'.format(TEST_USER_ID),
+                              content_type='application/json',
+                              data=json.dumps(data))
+        assert response.status_code == 400
 
     def test_post_replace_user_consent(self):
         """second consent for same user,org should replace existing"""
