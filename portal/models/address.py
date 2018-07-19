@@ -35,8 +35,8 @@ class Address(db.Model):
                           el])
 
     def __str__(self):
-        return "Address: {0.use} {0.type} {0.lines} {0.city} {0.district}"\
-                " {0.state} {0.postalCode} {0.country}".format(self)
+        return "Address: {0.use} {0.type} {0.lines} {0.city} {0.district}" \
+               " {0.state} {0.postalCode} {0.country}".format(self)
 
     @classmethod
     def from_fhir(cls, data):
