@@ -19,6 +19,7 @@ input.clinic {
 @media (min-width: 1200px) {
 	#fillOrgs {
 		justify-content: space-between;
+		flex-wrap: nowrap;
 	}
 }
 #fillOrgs * {
@@ -46,7 +47,6 @@ input.clinic {
 }
 #fillOrgs .parent-org-container {
 	margin: 1em 0;
-	width: 600px;
 	max-width: 100%;
 }
 #fillOrgs .text-muter {
@@ -94,6 +94,9 @@ input.clinic {
 	top: 2px;
 	padding: 4px;
 }
+div.org-container label.org-label {
+	padding: 0.35em 0.25em;
+}
 .info {
 	margin: 1em 1em 0;
     border: 1px solid;
@@ -113,6 +116,7 @@ input.clinic {
 	display: inline-block;
 	font-size: 10px;
 	letter-spacing: 0.1rem;
+	text-decoration: underline;
 }
 legend .json-link {
 	color: #FFF;
