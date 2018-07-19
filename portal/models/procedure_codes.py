@@ -152,10 +152,11 @@ class TxStartedConstants(object):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM,
             code='androgen deprivation therapy - surgical orchiectomy',
-            display='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(
-            True)
+            display='Androgen deprivation therapy (ADT) -'
+                    'Surgical orchiectomy').add_if_not_found(True)
         return CodeableConcept(codings=[tnth],
-                               text='Androgen deprivation therapy (ADT) - Surgical orchiectomy').add_if_not_found(
+                               text='Androgen deprivation therapy (ADT) -'
+                                    'Surgical orchiectomy').add_if_not_found(
             True)
 
     @lazyprop
@@ -163,10 +164,11 @@ class TxStartedConstants(object):
         tnth = Coding(
             system=TRUENTH_CLINICAL_CODE_SYSTEM,
             code='androgen deprivation therapy - chemical',
-            display='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(
-            True)
+            display=('Androgen deprivation therapy (ADT) - Chemical').
+                add_if_not_found(True))
         return CodeableConcept(codings=[tnth],
-                               text='Androgen deprivation therapy (ADT) - Chemical').add_if_not_found(
+                               text='Androgen deprivation therapy (ADT) -'
+                                    'Chemical').add_if_not_found(
             True)
 
     @lazyprop

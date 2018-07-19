@@ -348,7 +348,8 @@ class QuestionnaireBank(db.Model):
                     start = (
                             qb.calculated_start(
                                 trigger_date=trigger_date,
-                                as_of_date=as_of_date).relative_start or someday)
+                                as_of_date=as_of_date).relative_start
+                            or someday)
 
                     if start not in sort_results:
                         sort_results[start] = qb
