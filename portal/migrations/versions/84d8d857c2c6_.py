@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from StringIO import StringIO
+from io import BytesIO
 import sys
 
 from alembic import op
@@ -87,7 +87,7 @@ def upgrade():
                 continue
             # Confirm results are the same
             if keeper.document != i.document:
-                report = StringIO()
+                report = BytesIO()
                 dict_match(keeper.document, i.document, report)
                 print(report.getvalue())
                 print("ERROR different docs; skipping QNRs {} and {}".format(

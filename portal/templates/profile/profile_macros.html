@@ -159,7 +159,7 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale" v-model="demo.data.languageCode" v-on:change="updateLocaleData">
-            {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
+            {%- for locale_code, locale_name in person.locale_display_options.items() -%}
                 <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
             {%- endfor -%}
         </select>

@@ -9,6 +9,7 @@ import os
 import alembic.config
 import click
 from flask_migrate import Migrate
+from past.builtins import basestring
 import redis
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -280,7 +281,6 @@ def config(config_key):
         # Remap None values to an empty string
         print(app.config.get(config_key, '') or '')
         return
-
     print(json.dumps(
         # Skip un-serializable values
         {k: v for k, v in app.config.items() if isinstance(v, basestring)},
