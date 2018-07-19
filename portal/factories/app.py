@@ -233,9 +233,8 @@ def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):
         sql_log_file = '/tmp/sql_log'
-        sql_file_handler = handlers.RotatingFileHandler(sql_log_file,
-                                                        maxBytes=1000000,
-                                                        backupCount=20)
+        sql_file_handler = handlers.RotatingFileHandler(
+            sql_log_file, maxBytes=1000000, backupCount=20)
         sql_file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(thread)d: %(message)s'
         ))
@@ -292,9 +291,8 @@ def configure_logging(app):  # pragma: no cover
         )
         return
 
-    info_file_handler = handlers.RotatingFileHandler(info_log,
-                                                     maxBytes=1000000,
-                                                     backupCount=20)
+    info_file_handler = handlers.RotatingFileHandler(
+        info_log, maxBytes=1000000, backupCount=20)
     info_file_handler.setLevel(level)
     info_file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '
