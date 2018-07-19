@@ -8,6 +8,7 @@ from ..models.role import ROLE, Role
 from ..models.user import User, UserRelationship, UserRoles
 from .model_persistence import ModelPersistence, require
 
+
 # StagingExclusions capture details exclusive of a full db overwrite
 # that are to be restored *after* db migration.  For example, when
 # bringing the production db to staging, retain the staging
@@ -68,6 +69,7 @@ def preflight(target_dir):
     :returns: True if all clear
 
     """
+
     def persistence_by_type(cls):
         """Helper to pull details by type and return persistence instance"""
         ex_by_cls = [ex for ex in staging_exclusions if ex.cls == cls]
@@ -144,9 +146,10 @@ class ExclusionPersistence(ModelPersistence):
     values or re-enter staging configuration values to test every time.
 
     """
+
     def __init__(
             self, model_class, limit_to_attributes, filter_query,
-            target_dir=None, lookup_field='id',):
+            target_dir=None, lookup_field='id', ):
         super(ExclusionPersistence, self).__init__(
             model_class=model_class,
             lookup_field=lookup_field,

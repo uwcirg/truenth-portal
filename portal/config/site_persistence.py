@@ -110,6 +110,7 @@ class SitePersistence(object):
           on staging when pulling over production data
 
         """
+
         def default_import():
             for model in models:
                 model_persistence = ModelPersistence(
