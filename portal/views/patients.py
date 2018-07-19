@@ -16,7 +16,7 @@ from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.user import User, UserRoles, current_user, get_user_or_abort
 from ..models.user_consent import UserConsent
-from .portal import check_int
+from ..type_tools import check_int
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 

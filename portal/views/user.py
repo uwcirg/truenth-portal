@@ -46,8 +46,8 @@ from ..models.user import (
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from ..type_tools import check_int
 from .auth import logout
-from .portal import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
