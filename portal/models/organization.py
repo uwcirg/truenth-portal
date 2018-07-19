@@ -284,8 +284,8 @@ class Organization(db.Model):
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone', 'work')) \
-                         or telecom_cps.get(('phone', None))
+            self.phone = (telecom_cps.get(('phone', 'work'))
+                          or telecom_cps.get(('phone', None)))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
