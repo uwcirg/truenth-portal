@@ -464,8 +464,8 @@ def configure_coredata(app):
             # limit class loading to this module - die if not found
             cls = getattr(sys.modules[__name__], cls_name)
         except AttributeError as e:
-            app.logger.error("Configuration for REQUIRED_CORE_DATA includes "
-                             "unknown element '{}' - can't continue".format(
-                name))
+            app.logger.error(
+                "Configuration for REQUIRED_CORE_DATA includes "
+                "unknown element '{}' - can't continue".format(name))
             raise e
         coredata.register_class(cls)
