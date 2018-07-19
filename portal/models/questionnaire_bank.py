@@ -273,9 +273,9 @@ class QuestionnaireBank(db.Model):
             """return list QBs for which the user already submitted work"""
             submitted = QuestionnaireBank.query.join(
                 QuestionnaireResponse).filter(
-                    QuestionnaireResponse.subject_id == user.id,
-                    QuestionnaireResponse.questionnaire_bank_id ==
-                    QuestionnaireBank.id).order_by(
+                QuestionnaireResponse.subject_id == user.id,
+                QuestionnaireResponse.questionnaire_bank_id ==
+                QuestionnaireBank.id).order_by(
                 QuestionnaireResponse.authored.desc())
             if classification:
                 submitted = submitted.filter(
@@ -322,7 +322,8 @@ class QuestionnaireBank(db.Model):
         # collate submitted QBs, QBs by org and QBs by intervention
         in_progress = submitted_qbs(user=user, classification=classification)
         by_org = qbs_by_org(user=user, classification=classification)
-        by_intervention = qbs_by_intervention(user=user, classification=classification)
+        by_intervention = qbs_by_intervention(user=user,
+                                              classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
             # Need one QB for baseline, indef - prefer in_progress
@@ -345,9 +346,9 @@ class QuestionnaireBank(db.Model):
                 for qb in results:
                     trigger_date = qb.trigger_date(user=user)
                     start = (
-                        qb.calculated_start(
-                            trigger_date=trigger_date,
-                            as_of_date=as_of_date).relative_start or someday)
+                            qb.calculated_start(
+                                trigger_date=trigger_date,
+                                as_of_date=as_of_date).relative_start or someday)
 
                     if start not in sort_results:
                         sort_results[start] = qb
@@ -375,7 +376,7 @@ class QuestionnaireBank(db.Model):
         and should be treated independently - see `indefinite_qb`
 
         """
-        assert(as_of_date)
+        assert (as_of_date)
         baseline = QuestionnaireBank.qbs_for_user(
             user, 'baseline', as_of_date=as_of_date)
         if not baseline:
@@ -619,8 +620,8 @@ class QuestionnaireBankQuestionnaire(db.Model):
         @return: the new or matched QuestionnaireBankQuestionnaire
 
         """
-        assert(self.questionnaire_id)
-        assert(self.questionnaire_bank_id)
+        assert (self.questionnaire_id)
+        assert (self.questionnaire_bank_id)
         if self in db.session:
             assert self.id
             return self

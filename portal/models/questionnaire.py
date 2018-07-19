@@ -38,7 +38,8 @@ class Questionnaire(db.Model):
     def find_by_name(cls, name):
         """Shortcut to fetch by named identifier with common system"""
         identifier = Identifier(
-            _value=name, system=TRUENTH_QUESTIONNAIRE_CODE_SYSTEM).add_if_not_found()
+            _value=name,
+            system=TRUENTH_QUESTIONNAIRE_CODE_SYSTEM).add_if_not_found()
         return cls.find_by_identifier(identifier)
 
     @classmethod

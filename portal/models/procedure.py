@@ -36,10 +36,11 @@ class Procedure(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     encounter_id = db.Column(db.ForeignKey('encounters.id',
-                                name='procedures_encounter_fk'),
-                                nullable=False)
+                                           name='procedures_encounter_fk'),
+                             nullable=False)
 
-    audit = db.relationship('Audit', cascade="save-update, delete", lazy='joined')
+    audit = db.relationship('Audit', cascade="save-update, delete",
+                            lazy='joined')
     """tracks when and by whom the `procedure` was retained, included
     as *meta* data in the FHIR output
     """
@@ -92,6 +93,7 @@ class Procedure(db.Model):
 
     def __str__(self):
         """Log friendly string format"""
+
         def performed():
             if self.end_time:
                 return "{} to {}".format(
