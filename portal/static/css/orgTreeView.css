@@ -85,9 +85,10 @@ input.clinic {
 	background: #7C959E;
     color: #FFF;
 }
-#fillOrgs .parent-singleton .sub-text {
+#fillOrgs .parent-singleton .sub-text,
+#fillOrgs .parent-singleton .json-link  {
 	font-weight: 200;
-	font-size: 11px;
+	font-size: 10px;
 }
 #fillOrgs .parent-singleton label {
 	top: 2px;
