@@ -76,8 +76,8 @@ def get_static_strings():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
-            msgid_map['"{}"'.format(value)] = {
-            '{}: {}'.format(enum.name, value)}
+            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(
+                enum.name, value)}
     return msgid_map
 
 
@@ -143,7 +143,8 @@ def fix_references(pot_fpath):
     ) as tmpfile:
         for line in infile:
             tmpfile.write(
-                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line))
+                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url,
+                               line))
 
     os.rename(tmpfile.name, pot_fpath)
     current_app.logger.debug("messages.pot file references fixed")
