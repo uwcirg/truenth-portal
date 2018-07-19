@@ -563,8 +563,8 @@ def generate_qnr_csv(qnr_bundle):
     def author_role(row_data, qnr_data):
         if (row_data.get('truenth_subject_id') == row_data.get('author_id') or
                 ('type' in qnr_data['encounter'] and
-                        'paper' in (c.get('code') for c in
-                                    qnr_data['encounter']['type']))):
+                 'paper' in (c.get('code') for c in
+                             qnr_data['encounter']['type']))):
             return 'Subject'
         else:
             return 'Site Resource'
