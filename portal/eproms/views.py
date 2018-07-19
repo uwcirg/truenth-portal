@@ -43,16 +43,16 @@ eproms = Blueprint(
 
 @eproms.errorhandler(404)
 def page_not_found(e):
-    return render_template('eproms/404.html', no_nav="true",
-                           user=current_user()), 404
+    return render_template(
+        'eproms/404.html', no_nav="true", user=current_user()), 404
 
 
 @eproms.errorhandler(500)
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
-    return render_template('eproms/500.html', no_nav="true",
-                           user=current_user()), 500
+    return render_template(
+        'eproms/500.html', no_nav="true", user=current_user()), 500
 
 
 @eproms.route('/')
@@ -66,9 +66,10 @@ def landing():
     init_login_modal = False
     if 'pending_authorize_args' in session:
         init_login_modal = True
-    return render_template('eproms/landing.html', user=None, no_nav="true",
-                           timed_out=timed_out,
-                           init_login_modal=init_login_modal)
+    return render_template(
+        'eproms/landing.html', user=None, no_nav="true",
+        timed_out=timed_out,
+        init_login_modal=init_login_modal)
 
 
 @eproms.route('/home')
