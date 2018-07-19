@@ -1104,7 +1104,7 @@ def get_asset(uuid):
     url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
         LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
     data = requests.get(url).content
-    return json.JSONDecoder().decode(data)['asset']
+    return json.loads(data.decode('utf-8'))['asset']
 
 
 def get_any_tag_data(*anyTags):
