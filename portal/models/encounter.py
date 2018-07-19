@@ -61,6 +61,7 @@ class Encounter(db.Model):
 
     def __str__(self):
         """Log friendly string format"""
+
         def period():
             if self.end_time:
                 return "{} to {}".format(
@@ -129,7 +130,7 @@ def initiate_encounter(user, auth_method):
 
 def finish_encounter(user):
     """On logout, terminate user's active encounter, if found """
-    assert(user)
+    assert (user)
     now = datetime.utcnow()
     # Look for any stale encounters needing to be closed out.
     query = Encounter.query.filter(Encounter.user_id == user.id).filter(

@@ -31,6 +31,7 @@ class Coredata(object):
         Outer class accessors wrap, so any calls hit the single
         instance and appear at outer class scope.
         """
+
         def __init__(self):
             self._registered = []
 
@@ -465,6 +466,6 @@ def configure_coredata(app):
         except AttributeError as e:
             app.logger.error("Configuration for REQUIRED_CORE_DATA includes "
                              "unknown element '{}' - can't continue".format(
-                                 name))
+                name))
             raise e
         coredata.register_class(cls)
