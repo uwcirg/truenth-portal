@@ -1,4 +1,5 @@
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 import _thread
 from sqlalchemy.orm.util import class_mapper
@@ -28,6 +29,7 @@ def lazyprop(fn):
 
     """
     attr_name = '_lazy_{}.{}'.format(fn.__name__, _thread.get_ident())
+
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):
@@ -41,6 +43,7 @@ def lazyprop(fn):
                 attr = fn(self)  # reload - merge fails on collected objs
                 setattr(self, attr_name, attr)
         return attr
+
     return _lazyprop
 
 
@@ -63,6 +66,7 @@ def query_by_name(cls, name):
     """
     attr_name = '_lazy_{}_{}.{}'.format(
         cls.__name__, name, _thread.get_ident())
+
     def lookup(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, cls.query.filter_by(name=name).one())
@@ -74,4 +78,5 @@ def query_by_name(cls, name):
             attr = cls.query.filter_by(name=name).one()
             setattr(self, attr_name, attr)
         return attr
+
     return lookup

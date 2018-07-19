@@ -10,6 +10,7 @@ class LocaleConstants(object):
     within for easy access and testing
 
     """
+
     def __iter__(self):
         for attr in dir(self):
             if attr.startswith('_'):
