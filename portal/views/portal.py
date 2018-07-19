@@ -1102,10 +1102,7 @@ def check_int(i):
 
 def get_asset(uuid):
     url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
-    return requests.get(
-        url,
-        params={'uuid': uuid},
-    ).json()['asset']
+    return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 
 def get_any_tag_data(*anyTags):
@@ -1123,10 +1120,8 @@ def get_any_tag_data(*anyTags):
     }
 
     url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
-    return requests.get(
-        url,
-        params=liferay_qs_params,
-    ).json()
+    return requests.get(url, params=liferay_qs_params).json()
+
 
 def get_all_tag_data(*allTags):
     """
@@ -1143,7 +1138,4 @@ def get_all_tag_data(*allTags):
     }
 
     url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
-    return requests.get(
-        url,
-        params=liferay_qs_params,
-    ).json()
+    return requests.get(url, params=liferay_qs_params).json()
