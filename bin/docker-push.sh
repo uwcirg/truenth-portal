@@ -57,7 +57,7 @@ get_configured_registries | while read config ; do
     echo "$DOCKER_TAGS" | while read tag ; do
         # docker.io is the default repo that `docker push` pushes to
         # if 'docker.io' is included in the command, the push will fail
-        if [ "$repo" = "docker.io" ]; then
+        if echo "$repo" | grep --quiet 'docker\.io'; then
             docker push "${DOCKER_IMAGE_NAME}:${tag}"
         else
             docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
