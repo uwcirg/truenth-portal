@@ -2,6 +2,9 @@
 input.clinic {
 	display: none;
 }
+#fillOrgs {
+	margin: 1em !important;
+}
 #fillOrgs .indent {
 	padding: 0 2.5em;
 }
@@ -21,6 +24,10 @@ input.clinic {
 #fillOrgs * {
 	font-size: 12px;
 }
+#fillOrgs .sub-text,
+#fillOrgs .json-link {
+	font-size: 10px;
+}
 #fillOrgs .text-muted,
 #fillOrgs .singleton {
 	color: #68727e;
@@ -39,7 +46,7 @@ input.clinic {
 }
 #fillOrgs .parent-org-container {
 	margin: 1em 0;
-	width: 550px;
+	width: 600px;
 	max-width: 100%;
 }
 #fillOrgs .text-muter {
@@ -78,7 +85,40 @@ input.clinic {
 	background: #7C959E;
     color: #FFF;
 }
+#fillOrgs .parent-singleton .sub-text {
+	font-weight: 200;
+	font-size: 11px;
+}
 #fillOrgs .parent-singleton label {
 	top: 2px;
 	padding: 4px;
 }
+.info {
+	margin: 1em 1em 0;
+    border: 1px solid;
+    padding: 0.5em;
+    display: inline-block;
+    color: #9a9894;
+    font-size: 0.9em;
+}
+.sub-text {
+	font-weight: 300;
+	font-size: 11px;
+	letter-spacing: 1px;
+}
+.json-link {
+	font-weight: 300;
+	margin-left: 1em;
+	display: inline-block;
+	font-size: 10px;
+	letter-spacing: 0.1rem;
+}
+legend .json-link {
+	color: #FFF;
+}
+legend .json-link:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color: #3B4551;
+}
+
