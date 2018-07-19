@@ -94,7 +94,7 @@ def home():
 
     # Enforce flow - don't expect 'next' params here
     if 'next' in session and session['next']:
-        abort(500, "session['next'] found in /home for user {}". \
+        abort(500, "session['next'] found in /home for user {}".
               format(user))
 
     # Enforce flow - confirm we have acquired initial data
