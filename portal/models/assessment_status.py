@@ -225,7 +225,7 @@ class QuestionnaireBankDetails(object):
                     return True
 
         if not valid_consent_found:
-            raise ValueError("No consent found for {}".format(self.user))
+            current_app.logger.warn("No consent found for {}".format(self.user))
         return False
 
 
