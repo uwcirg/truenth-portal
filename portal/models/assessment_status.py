@@ -398,7 +398,7 @@ class AssessmentStatus(object):
                     if name not in (
                             q.name
                             for q in
-                    self.qb_data.qbd.questionnaire_bank.questionnaires
+                            self.qb_data.qbd.questionnaire_bank.questionnaires
                     ):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
