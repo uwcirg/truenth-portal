@@ -47,17 +47,23 @@ get_configured_registries | while read config ; do
 
     # Apply all tags in DOCKER_TAGS to image
     echo "$DOCKER_TAGS" | while read tag ; do
-        docker tag \
-            "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" \
-            "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
+        # docker.io is the default repo that `docker push` pushes to
+        # if 'docker.io' is included in the command, the push will fail
+        if [ "$repo" = "docker.io" ]; then
+            docker tag \
+                "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" \
+                "${DOCKER_IMAGE_NAME}:${tag}"
+        else
+            docker tag \
+                "${DOCKER_REPOSITORY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" \
+                "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
+        fi
     done
 
     # Push each tag, in background
     echo "Pushing images to $repo..."
     echo "$DOCKER_TAGS" | while read tag ; do
-        # docker.io is the default repo that `docker push` pushes to
-        # if 'docker.io' is included in the command, the push will fail
-        if echo "$repo" | grep --quiet 'docker\.io'; then
+        if [ "$repo" = "docker.io" ]; then
             docker push "${DOCKER_IMAGE_NAME}:${tag}"
         else
             docker push "${repo}/${DOCKER_IMAGE_NAME}:${tag}"
