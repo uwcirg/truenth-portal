@@ -1104,7 +1104,7 @@ def get_asset(uuid):
     url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
     return requests.get(
         url,
-        params={'uuid':uuid},
+        params={'uuid': uuid},
     ).json()['asset']
 
 
