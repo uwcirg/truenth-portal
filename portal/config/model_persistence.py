@@ -260,8 +260,8 @@ class ModelPersistence(object):
 
         if existing:
             details = StringIO()
-            if not dict_match(complete_form, getattr(existing, serialize)(),
-                              details):
+            if not dict_match(
+                    complete_form, getattr(existing, serialize)(), details):
                 self._log(
                     "{type} {id} collision on import.  {details}".format(
                         type=self.model.__name__,
