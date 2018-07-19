@@ -18,7 +18,7 @@ class Identifier(db.Model):
     assigner = db.Column(db.String(255))
 
     __table_args__ = (UniqueConstraint('system', 'value',
-        name='_identifier_system_value'),)
+                                       name='_identifier_system_value'),)
 
     @property
     def value(self):
@@ -41,7 +41,7 @@ class Identifier(db.Model):
         instance.value = data['value']
         # FHIR changed - assigner needs to reference object in system
         # not storing at this time
-        #if 'assigner' in data:
+        # if 'assigner' in data:
         #    instance.assigner = data['assigner']
         return instance
 
