@@ -40,16 +40,16 @@ gil = Blueprint(
 
 @gil.errorhandler(404)
 def page_not_found(e):
-    return render_template('gil/404.html', no_nav="true",
-                           user=current_user()), 404
+    return render_template(
+        'gil/404.html', no_nav="true", user=current_user()), 404
 
 
 @gil.errorhandler(500)
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
-    return render_template('gil/500.html', no_nav="true",
-                           user=current_user()), 500
+    return render_template(
+        'gil/500.html', no_nav="true", user=current_user()), 500
 
 
 @gil.route('/')
@@ -296,8 +296,8 @@ def decision_support():
 
 @gil.route('/what-is-prostate-cancer')
 def prostate_cancer_facts():
-    return render_template('gil/what-is-prostate-cancer.html',
-                           user=current_user())
+    return render_template(
+        'gil/what-is-prostate-cancer.html', user=current_user())
 
 
 @gil.route('/exercise-and-diet')
