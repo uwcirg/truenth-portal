@@ -69,8 +69,8 @@ class Coding(db.Model):
     def display_lookup(code, system):
         """Return display value for (code, system), if found"""
         item = Coding.query.filter(
-            Coding.code==code,
-            Coding.system==system).first()
+            Coding.code == code,
+            Coding.system == system).first()
         if not item:
             raise ValueError(
                 "No coding found for ({system}, {code})".format(
