@@ -108,8 +108,8 @@ class ModelPersistence(object):
         for o in data['entry']:
             if not o.get('resourceType') == self.model.__name__:
                 # Hard code exception for resourceType: Patient being a User
-                if o.get(
-                        'resourceType') == 'Patient' and self.model.__name__ == 'User':
+                if (o.get('resourceType') == 'Patient'
+                        and self.model.__name__ == 'User'):
                     pass
                 else:
                     raise ValueError(
