@@ -66,7 +66,7 @@ DELETED_REGEX = r"__deleted_\d+__(.*)"
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
-internal_identifier_systems =(
+internal_identifier_systems = (
     (TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS)
 
 
@@ -742,7 +742,7 @@ class User(db.Model, UserMixin):
                            code=v.get('code')).add_if_not_found(True)
 
         issued = (fhir.get('issued') and
-                 parser.parse(fhir.get('issued')) or None)
+                  parser.parse(fhir.get('issued')) or None)
         status = fhir.get('status')
         observation = self.save_observation(cc, vq, audit, status, issued)
         if 'performer' in fhir:
@@ -951,7 +951,7 @@ class User(db.Model, UserMixin):
             audit = self.deceased
             if "time of death" in audit.comment:
                 return {"deceasedDateTime":
-                            FHIR_datetime.as_fhir(audit.timestamp)}
+                        FHIR_datetime.as_fhir(audit.timestamp)}
             return {"deceasedBoolean": True}
 
         d = {}
@@ -1016,7 +1016,7 @@ class User(db.Model, UserMixin):
                         consent.organization_id):
                     current_app.logger.debug(
                         "deleting matching consent {} replacing with {} ".
-                            format(existing_consent, consent))
+                        format(existing_consent, consent))
                     delete_consents.append(existing_consent)
 
             consent.audit = audit
@@ -1332,7 +1332,7 @@ class User(db.Model, UserMixin):
             if telecom.email:
                 if self.email and ((telecom.email != self.email)
                                    and (User.query.filter_by(
-                            email=telecom.email).count() > 0)):
+                        email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
@@ -1354,7 +1354,7 @@ class User(db.Model, UserMixin):
             if self.id and self.id != fhir['id']:
                 raise ValueError(
                     "unexpected, non-matching 'id' found in FHIR for {}"
-                        .format(self))
+                    .format(self))
             self.id = fhir['id']
 
         return self
@@ -1401,7 +1401,7 @@ class User(db.Model, UserMixin):
                 append_list = [
                     item for item in other_entity
                     if item not in self_entity and item.name not in
-                       current_app.config['PRE_REGISTERED_ROLES']]
+                    current_app.config['PRE_REGISTERED_ROLES']]
             elif relationship == '_identifiers':
                 # Don't copy internal identifiers
                 append_list = [item for item in other_entity if item not in
