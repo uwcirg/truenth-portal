@@ -77,6 +77,7 @@ def scheduled_task(func):
             update_job_status(job_id, status=message)
 
         return message
+
     return call_and_update
 
 
@@ -178,11 +179,10 @@ def update_patient_loop(update_cache=True, queue_messages=True):
     """
     patient_role_id = Role.query.filter(
         Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()[0]
-    valid_patients = User.query.join(
-        UserRoles).filter(
-            and_(User.id == UserRoles.user_id,
-                 User.deleted_id.is_(None),
-                 UserRoles.role_id == patient_role_id))
+    valid_patients = User.query.join(UserRoles).filter(and_(
+        User.id == UserRoles.user_id,
+        User.deleted_id.is_(None),
+        UserRoles.role_id == patient_role_id))
 
     now = datetime.utcnow()
     for user in valid_patients:

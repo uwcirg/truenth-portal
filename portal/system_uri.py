@@ -30,7 +30,7 @@ TRUENTH_USERNAME = '{system}/{provider}'.format(
 SUPPORTED_OAUTH_PROVIDERS = ('facebook', 'google')
 TRUENTH_PROVIDER_SYSTEMS = tuple('{system}/{provider}'.format(
     system=TRUENTH_IDENTITY_SYSTEM, provider=provider) for
-    provider in SUPPORTED_OAUTH_PROVIDERS)
+                                 provider in SUPPORTED_OAUTH_PROVIDERS)
 
 DECISION_SUPPORT_GROUP = '{}/decision-support-group'.format(
     TRUENTH_IDENTITY_SYSTEM)
