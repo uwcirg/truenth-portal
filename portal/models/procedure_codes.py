@@ -154,9 +154,9 @@ class TxStartedConstants(object):
             code='androgen deprivation therapy - surgical orchiectomy',
             display='Androgen deprivation therapy (ADT) -'
                     'Surgical orchiectomy').add_if_not_found(True)
-        return CodeableConcept(codings=[tnth],
-                               text='Androgen deprivation therapy (ADT) -'
-                                    'Surgical orchiectomy').add_if_not_found(
+        return CodeableConcept(
+            codings=[tnth], text='Androgen deprivation therapy (ADT) -'
+                                 'Surgical orchiectomy').add_if_not_found(
             True)
 
     @lazyprop
@@ -166,10 +166,9 @@ class TxStartedConstants(object):
             code='androgen deprivation therapy - chemical',
             display='Androgen deprivation therapy (ADT) - Chemical').\
             add_if_not_found(True)
-        return CodeableConcept(codings=[tnth],
-                               text='Androgen deprivation therapy (ADT) -'
-                                    'Chemical').add_if_not_found(
-            True)
+        return CodeableConcept(
+            codings=[tnth], text='Androgen deprivation therapy (ADT) -'
+                                 'Chemical').add_if_not_found(True)
 
     @lazyprop
     def WholeGlandAblation(self):

@@ -322,8 +322,8 @@ class QuestionnaireBank(db.Model):
         # collate submitted QBs, QBs by org and QBs by intervention
         in_progress = submitted_qbs(user=user, classification=classification)
         by_org = qbs_by_org(user=user, classification=classification)
-        by_intervention = qbs_by_intervention(user=user,
-                                              classification=classification)
+        by_intervention = qbs_by_intervention(
+            user=user, classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
             # Need one QB for baseline, indef - prefer in_progress
