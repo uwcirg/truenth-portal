@@ -37,12 +37,10 @@ class TestFHIR(TestCase):
         cc = db.session.merge(cc)
 
         # now parse a fhir snippet containing first just a partial set
-        data = {"test_concept1":
-                    {"coding": [{"system": initial_coding1.system,
-                                 "code": initial_coding1.code,
-                                 "display": initial_coding1.display}, ],
-                     },
-                }
+        data = {"test_concept1": {"coding": [{
+            "system": initial_coding1.system,
+            "code": initial_coding1.code,
+            "display": initial_coding1.display}, ], }, }
         cc_parsed = CodeableConcept.from_fhir(data['test_concept1'])
 
         assert cc_parsed.codings == cc.codings
@@ -50,16 +48,12 @@ class TestFHIR(TestCase):
         assert cc_parsed.text == cc.text
 
         # and again, but now containing a new coding
-        data = {"test_concept2":
-                    {"coding": [{"system": initial_coding1.system,
-                                 "code": initial_coding1.code,
-                                 "display": initial_coding1.display},
-                                {"system": 'local',
-                                 "code": 'local-1',
-                                 "display": 'si-loco'}, ],
-                     "text": "given two codings"
-                     },
-                }
+        data = {"test_concept2": {"coding": [{
+            "system": initial_coding1.system,
+            "code": initial_coding1.code,
+            "display": initial_coding1.display},
+            {"system": 'local', "code": 'local-1', "display": 'si-loco'}, ],
+            "text": "given two codings"}, }
         cc_parsed = CodeableConcept.from_fhir(data['test_concept2'])
 
         persisted = CodeableConcept.query.get(cc_parsed.id)
@@ -78,13 +72,9 @@ class TestFHIR(TestCase):
         system = "urn:ietf:bcp:47"
         code = "nl"
         display = "Dutch"
-        data = {"language":
-                    {"coding": [{"system": system,
-                                 "code": code,
-                                 "display": display}, ],
-                     "text": "Nederlands"
-                     },
-                }
+        data = {"language": {"coding": [{
+            "system": system, "code": code, "display": display}, ],
+            "text": "Nederlands"}, }
         cc = CodeableConcept.from_fhir(data['language'])
         assert cc.text == 'Nederlands'
         assert 1 == len(cc.codings)
