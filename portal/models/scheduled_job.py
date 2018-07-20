@@ -74,8 +74,7 @@ class ScheduledJob(db.Model):
             hour=svals[1],
             day_of_month=svals[2],
             month_of_year=svals[3],
-            day_of_week=svals[4]
-        )
+            day_of_week=svals[4])
 
     def trigger(self):
         from .. import tasks
