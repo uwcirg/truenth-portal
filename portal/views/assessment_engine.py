@@ -618,7 +618,7 @@ def assessment(patient_id, instrument_id):
                 # todo: migrate towards FHIR spec in persisted data
                 if ('extension' in answer.get('valueCoding', {})
                         and not isinstance(answer['valueCoding']['extension'],
-                                       (tuple, list))):
+                                           (tuple, list))):
                     answer['valueCoding']['extension'] = [
                         answer['valueCoding']['extension']]
 
