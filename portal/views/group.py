@@ -11,6 +11,7 @@ from ..models.user import current_user
 
 group_api = Blueprint('group_api', __name__, url_prefix='/api/group')
 
+
 @group_api.route('/')
 @oauth.require_oauth()
 def current_groups():
@@ -154,12 +155,12 @@ def add_group():
         abort(400,
               "{name} already exists, can't redefine".format(name=name))
 
-
     name = Group.validate_name(name)
     g = Group(name=name, description=request.json['description'])
     db.session.add(g)
     db.session.commit()
-    auditable_event("{g} added".format(g=g), user_id=current_user().id,
+    auditable_event(
+        "{g} added".format(g=g), user_id=current_user().id,
         subject_id=current_user().id, context='group')
     return jsonify(message="ok")
 
@@ -233,6 +234,7 @@ def edit_group(group_name):
     g.name = Group.validate_name(request.json['name'])
     g.description = request.json['description']
     db.session.commit()
-    auditable_event("{g} updated".format(g=g), user_id=current_user().id,
+    auditable_event(
+        "{g} updated".format(g=g), user_id=current_user().id,
         subject_id=current_user().id, context='group')
     return jsonify(message="ok")
