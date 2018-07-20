@@ -31,6 +31,7 @@ from portal.models.role import ROLE
 from portal.models.user import get_user
 from tests import TEST_USER_ID, TestCase
 
+
 class TestSitePersistence(TestCase):
 
     def setUp(self):
@@ -101,9 +102,9 @@ class TestSitePersistence(TestCase):
         # confirm we see a sample of changes from the
         # defauls in add_static_interventions call
         # to what's expected in the persistence file
-        assert (INTERVENTION.CARE_PLAN.card_html == ('<p>Organization and '
-                'support for the many details of life as a prostate cancer '
-                                                     'survivor</p>'))
+        assert (INTERVENTION.CARE_PLAN.card_html == (
+            '<p>Organization and support for the many details of life as a '
+            'prostate cancer survivor</p>'))
         assert INTERVENTION.SELF_MANAGEMENT.description == 'Symptom Tracker'
         assert (INTERVENTION.SELF_MANAGEMENT.link_label
                 == 'Go to Symptom Tracker')
@@ -194,5 +195,5 @@ class TestEpromsSitePersistence(TestCase):
         """Confirm persisted organizations came into being"""
         assert Organization.query.count() > 5
         tngr = Organization.query.filter(
-            Organization.name=='TrueNTH Global Registry').one()
+            Organization.name == 'TrueNTH Global Registry').one()
         assert tngr.id == 10000
