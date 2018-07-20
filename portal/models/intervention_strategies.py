@@ -489,8 +489,8 @@ def update_card_html_on_completion():
                         portal-no-description-container full-width'>
                         <h4 class="portal-description-title">{header}</h4>
                         {message}
-                    </div>""".format(greeting=greeting, header=header,
-                                     message=message)
+                    </div>""".format(
+                    greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
@@ -608,8 +608,8 @@ def combine_strategies(**kwargs):
     strats = []
     arbitrary_limit = 7
     if 'strategy_{}'.format(arbitrary_limit) in kwargs:
-        raise ValueError("only supporting %d combined strategies",
-                         arbitrary_limit - 1)
+        raise ValueError(
+            "only supporting %d combined strategies", arbitrary_limit - 1)
     for i in range(1, arbitrary_limit):
         if 'strategy_{}'.format(i) not in kwargs:
             break

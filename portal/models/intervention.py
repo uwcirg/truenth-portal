@@ -256,8 +256,8 @@ class UserIntervention(db.Model):
     link_url = db.Column(db.Text)
     status_text = db.Column(db.Text)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    intervention_id = db.Column(db.ForeignKey('interventions.id'),
-                                nullable=False)
+    intervention_id = db.Column(
+        db.ForeignKey('interventions.id'), nullable=False)
 
     def as_json(self, include_empties=True):
         d = {'user_id': self.user_id}
