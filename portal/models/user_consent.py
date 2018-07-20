@@ -14,7 +14,7 @@ from .user import User
 
 def default_expires():
     """5 year from now, in UTC"""
-    return datetime.utcnow() + timedelta(days=365*5)
+    return datetime.utcnow() + timedelta(days=365 * 5)
 
 
 STAFF_EDITABLE_MASK = 0b001

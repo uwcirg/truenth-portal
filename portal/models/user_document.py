@@ -27,7 +27,8 @@ class UserDocument(db.Model):
     filetype = db.Column(db.Text, nullable=False)
     uuid = db.Column(db.Text, nullable=False)
     uploaded_at = db.Column(db.DateTime, nullable=False)
-    intervention_id = db.Column(db.ForeignKey('interventions.id'), nullable=True)
+    intervention_id = db.Column(
+        db.ForeignKey('interventions.id'), nullable=True)
 
     intervention = db.relationship('Intervention')
 
@@ -59,7 +60,8 @@ class UserDocument(db.Model):
         filename = secure_filename(upload_file.filename)
         filetype = filename.rsplit('.', 1)[1]
         if filetype.lower() not in data['allowed_extensions']:
-            raise ValueError("filetype must be one of: " + ", ".join(data['allowed_extensions']))
+            raise ValueError("filetype must be one of: " + ", ".join(
+                data['allowed_extensions']))
         file_uuid = uuid4()
         try:
             upload_dir = os.path.join(
@@ -72,7 +74,8 @@ class UserDocument(db.Model):
         except:
             raise OSError("could not save file")
         if 'contributor' in data:
-            interv = Intervention.query.filter_by(description=data['contributor']).first()
+            interv = Intervention.query.filter_by(
+                description=data['contributor']).first()
 
         return cls(user_id=data['user_id'],
                    document_type=data['document_type'],
@@ -82,7 +85,6 @@ class UserDocument(db.Model):
                    uploaded_at=datetime.utcnow(),
                    intervention=interv
                    )
-
 
     def get_file_contents(self):
         filepath = os.path.join(
