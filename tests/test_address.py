@@ -9,8 +9,8 @@ class TestAddress(TestCase):
     """Address model tests"""
 
     def test_from_fhir(self):
-        data =  {
-            "line": [ "3300 Washtenaw Avenue", "Suite 227"],
+        data = {
+            "line": ["3300 Washtenaw Avenue", "Suite 227"],
             "city": "Ann Arbor",
             "state": "MI",
             "postalCode": "48104",
