@@ -173,8 +173,8 @@ def smartling_upload():
     config_fname = current_app.config['BABEL_CONFIG_FILENAME']
     translation_fpath = os.path.join(current_app.root_path, "translations")
     messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
-    config_fpath = os.path.join(current_app.root_path, "../instance/",
-                                config_fname)
+    config_fpath = os.path.join(
+        current_app.root_path, "../instance/", config_fname)
 
     # create new .pot file from code
     check_call((

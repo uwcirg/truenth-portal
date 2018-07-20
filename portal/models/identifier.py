@@ -17,8 +17,8 @@ class Identifier(db.Model):
     _value = db.Column('value', db.Text, nullable=False)
     assigner = db.Column(db.String(255))
 
-    __table_args__ = (UniqueConstraint('system', 'value',
-                                       name='_identifier_system_value'),)
+    __table_args__ = (UniqueConstraint(
+        'system', 'value', name='_identifier_system_value'),)
 
     @property
     def value(self):

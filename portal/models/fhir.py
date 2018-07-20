@@ -176,9 +176,8 @@ class ValueQuantity(db.Model):
             return self
 
         lookup_value = self.value and str(self.value) or None
-        match = self.query.filter_by(value=lookup_value,
-                                     units=self.units,
-                                     system=self.system).first()
+        match = self.query.filter_by(
+            value=lookup_value, units=self.units, system=self.system).first()
         if not match:
             db.session.add(self)
             if commit_immediately:
@@ -193,16 +192,15 @@ class Observation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     issued = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(80))
-    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'),
-                                    nullable=False)
-    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
-                                  nullable=False)
+    codeable_concept_id = db.Column(
+        db.ForeignKey('codeable_concepts.id'), nullable=False)
+    value_quantity_id = db.Column(
+        db.ForeignKey('value_quantities.id'), nullable=False)
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
-    performers = db.relationship('Performer', lazy='dynamic',
-                                 cascade="save-update",
-                                 secondary="observation_performers",
-                                 backref=db.backref('observations'))
+    performers = db.relationship(
+        'Performer', lazy='dynamic', cascade="save-update",
+        secondary="observation_performers", backref=db.backref('observations'))
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -278,10 +276,10 @@ class Observation(db.Model):
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
-    observation_id = db.Column(db.ForeignKey('observations.id'),
-                               nullable=False)
+    user_id = db.Column(db.ForeignKey(
+        'users.id', ondelete='CASCADE'), nullable=False)
+    observation_id = db.Column(
+        db.ForeignKey('observations.id'), nullable=False)
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
@@ -297,34 +295,34 @@ class UserObservation(db.Model):
 class UserIndigenous(db.Model):
     __tablename__ = 'user_indigenous'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-                                       name='_indigenous_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_indigenous_user_coding'),)
 
 
 class UserEthnicity(db.Model):
     __tablename__ = 'user_ethnicities'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-                                       name='_ethnicity_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_ethnicity_user_coding'),)
 
 
 class UserRace(db.Model):
     __tablename__ = 'user_races'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-                                       name='_race_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_race_user_coding'),)
 
 
 class QuestionnaireResponse(db.Model):
