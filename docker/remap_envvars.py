@@ -22,7 +22,6 @@ def get_db_url():
 
 
 def main():
-
     db_uri = get_db_url()
     if not db_uri:
         return
