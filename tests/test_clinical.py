@@ -51,9 +51,9 @@ class TestClinical(TestCase):
         self.prep_db_for_clinical()
         self.gleason_concept = db.session.merge(self.gleason_concept)
         self.test_user = db.session.merge(self.test_user)
-        assert pytest.approx(datetime.utcnow().toordinal()) == \
-               self.test_user.fetch_datetime_for_concept(
-                   self.gleason_concept).toordinal()
+        assert (pytest.approx(datetime.utcnow().toordinal()) ==
+                self.test_user.fetch_datetime_for_concept(
+                    self.gleason_concept).toordinal())
 
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
@@ -61,16 +61,14 @@ class TestClinical(TestCase):
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
         clinical_data = response.json
-        assert \
-            'Gleason score' == \
-            clinical_data \
-                ['entry'][0]['content']['code']['coding'][0]['display']
-        assert '2' == \
-               clinical_data['entry'][0]['content']['valueQuantity']['value']
-        assert json.dumps(Reference.patient(TEST_USER_ID).as_fhir()) \
-               == clinical_data['entry'][0]['content']['performer'][0]
-        found = parser.parse(
-            clinical_data['entry'][0]['updated'])
+        assert ('Gleason score' ==
+               clinical_data['entry'][0]['content']['code']['coding'][0][
+                   'display'])
+        assert ('2' ==
+                clinical_data['entry'][0]['content']['valueQuantity']['value'])
+        assert (json.dumps(Reference.patient(TEST_USER_ID).as_fhir())
+                == clinical_data['entry'][0]['content']['performer'][0])
+        found = parser.parse(clinical_data['entry'][0]['updated'])
         found = found.replace(tzinfo=None)
         self.assertAlmostEqual(datetime.utcnow(), found,
                                delta=timedelta(seconds=5))

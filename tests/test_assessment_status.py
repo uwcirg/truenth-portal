@@ -408,7 +408,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         # confirm appropriate instruments
         assert (localized_instruments -
                 set(a_s.instruments_needing_full_assessment('all')) ==
-            {'eproms_add'})
+                {'eproms_add'})
         assert not a_s.instruments_in_progress()
 
     def test_metastatic_on_time(self):
@@ -442,7 +442,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # metastatic indefinite should also be 'due'
         assert (metastatic_indefinite_instruments ==
-               set(a_s.instruments_needing_full_assessment('indefinite')))
+                set(a_s.instruments_needing_full_assessment('indefinite')))
         assert not a_s.instruments_in_progress('indefinite')
 
     def test_localized_overdue(self):

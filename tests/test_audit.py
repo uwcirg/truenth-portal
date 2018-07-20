@@ -13,21 +13,22 @@ from portal.models.user_consent import UserConsent
 from tests import FIRST_NAME, LAST_NAME, TEST_USER_ID, TestCase
 
 log_login_idp = (
-    "2016-02-23 09:49:25,733: " 
-    "performed by {} on {}: " 
-    "login: login user via NEW IdP facebook".format(TEST_USER_ID, TEST_USER_ID))
+    "2016-02-23 09:49:25,733: "
+    "performed by {} on {}: "
+    "login: login user via NEW IdP facebook".format(
+        TEST_USER_ID, TEST_USER_ID))
 
 log_login_google = (
-    "2016-02-23 09:52:57,806: " 
-    "performed by {} on {}: " 
+    "2016-02-23 09:52:57,806: "
+    "performed by {} on {}: "
     "login: login via google".format(TEST_USER_ID, TEST_USER_ID))
 
 log_callbacks = (
-    "2016-02-23 10:52:24,856: " 
-    "performed by {} on {}: " 
-    "other: after: " 
-    "Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, " 
-    "redirects: https://stg-sr.us.truenth.org/, " 
+    "2016-02-23 10:52:24,856: "
+    "performed by {} on {}: "
+    "other: after: "
+    "Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, "
+    "redirects: https://stg-sr.us.truenth.org/, "
     "callback: https://stg-sr.us.truenth.org/_/callback".format(TEST_USER_ID,
                                                                 TEST_USER_ID))
 
@@ -79,11 +80,11 @@ class TestAudit(TestCase):
         assert response.status_code == 200
         assert 1 == len(response.json['audits'])
         assert (response.json['audits'][0]['by']['reference'] ==
-               Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+                Reference.patient(TEST_USER_ID).as_fhir()['reference'])
         assert (response.json['audits'][0]['by']['display'] ==
-               ' '.join((FIRST_NAME, LAST_NAME)))
+                ' '.join((FIRST_NAME, LAST_NAME)))
         assert (response.json['audits'][0]['on'] ==
-               Reference.patient(TEST_USER_ID).as_fhir())
+                Reference.patient(TEST_USER_ID).as_fhir())
         assert response.json['audits'][0]['context'] == 'other'
         assert response.json['audits'][0]['comment'] == 'just test data'
 
@@ -110,8 +111,8 @@ class TestAudit(TestCase):
         assert response.status_code == 200
         assert 1 == len(response.json['audits'])
         assert (response.json['audits'][0]['by']['reference'] ==
-               Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+                Reference.patient(TEST_USER_ID).as_fhir()['reference'])
         assert (response.json['audits'][0]['on'] ==
-               Reference.patient(TEST_USER_ID).as_fhir())
+                Reference.patient(TEST_USER_ID).as_fhir())
         assert response.json['audits'][0]['context'] == 'other'
         assert response.json['audits'][0]['comment'] == 'just test data'
