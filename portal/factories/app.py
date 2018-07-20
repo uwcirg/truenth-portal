@@ -249,10 +249,7 @@ def configure_logging(app):  # pragma: no cover
 
     # Configure Error Emails for high level log messages, only in prod mode
     if not any((
-            app.debug,
-            app.testing,
-            not app.config.get('ERROR_SENDTO_EMAIL'),
-    )):
+            app.debug, app.testing, not app.config.get('ERROR_SENDTO_EMAIL'))):
         mail_handler = SSLSMTPHandler(
             mailhost=app.config['MAIL_SERVER'],
             mailport=app.config['MAIL_PORT'],
