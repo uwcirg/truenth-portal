@@ -40,7 +40,8 @@ def jobs_list():
         path = task.split('.')
         if path[0] == 'portal':
             tasks.append(path[-1])
-    return render_template('admin/scheduled_jobs_list.html', jobs=jobs, tasks=tasks)
+    return render_template(
+        'admin/scheduled_jobs_list.html', jobs=jobs, tasks=tasks)
 
 
 @scheduled_job_api.route('/api/scheduled_job', methods=('POST',))

@@ -131,11 +131,10 @@ def staff_index():
     # Gather up all staff admin and admin that belongs to user's org(s)
     admin_staff = User.query.join(UserRoles).filter(
         and_(User.id == UserRoles.user_id,
-             UserRoles.role_id.in_([admin_role_id, staff_admin_role_id])
-             )
-        ).join(UserOrganization).filter(
-            and_(UserOrganization.user_id == User.id,
-                 UserOrganization.organization_id.in_(user_orgs)))
+             UserRoles.role_id.in_([admin_role_id, staff_admin_role_id]))
+    ).join(UserOrganization).filter(
+        and_(UserOrganization.user_id == User.id,
+             UserOrganization.organization_id.in_(user_orgs)))
     admin_list = [u.id for u in admin_staff]
 
     # Gather up all staff belonging to any of the orgs (and their children)
@@ -144,11 +143,10 @@ def staff_index():
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id == UserRoles.user_id,
              ~User.id.in_(admin_list),
-             UserRoles.role_id == staff_role_id
-             )
-        ).join(UserOrganization).filter(
-            and_(UserOrganization.user_id == User.id,
-                 UserOrganization.organization_id.in_(org_list)))
+             UserRoles.role_id == staff_role_id)
+    ).join(UserOrganization).filter(
+        and_(UserOrganization.user_id == User.id,
+             UserOrganization.organization_id.in_(org_list)))
     staff_list = staff_list.union(org_staff).all()
 
     # only show test users to admins
