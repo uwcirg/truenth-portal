@@ -38,6 +38,7 @@ def crossdomain(
         request.headers['Origin'] doesn't validate as one we know.
 
     """
+
     def get_headers():
         if headers is not None and not isinstance(headers, basestring):
             return ', '.join(x.upper() for x in headers)
@@ -89,4 +90,5 @@ def crossdomain(
 
         f.provide_automatic_options = False
         return update_wrapper(wrapped_function, f)
+
     return decorator
