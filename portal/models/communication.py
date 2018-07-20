@@ -60,6 +60,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         `_lookup_first_name` -> `first_name`
 
     """
+
     def ae_link():
         return url_for('assessment_engine_api.present_needed', _external=True)
 
