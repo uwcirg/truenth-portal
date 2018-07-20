@@ -80,20 +80,19 @@ def practitioner_search():
                 query = query.filter_by(**d)
         else:
             abort(400, "only `first_name`, `last_name`, and `system`/`value` "
-                  "search filters are available at this time")
+                       "search filters are available at this time")
 
     if system or value:
         if not (system and value):
             abort(400, 'for identifier search, must provide both '
-                  '`system` and `value` params')
+                       '`system` and `value` params')
         ident = Identifier.query.filter_by(system=system, _value=value).first()
         if not ident:
             abort(404, 'no identifiers found for system `{}`, '
-                  'value `{}`'.format(system, value))
-        query = query.join(
-            PractitionerIdentifier).filter(and_(
-                PractitionerIdentifier.identifier_id == ident.id,
-                PractitionerIdentifier.practitioner_id == Practitioner.id))
+                       'value `{}`'.format(system, value))
+        query = query.join(PractitionerIdentifier).filter(and_(
+            PractitionerIdentifier.identifier_id == ident.id,
+            PractitionerIdentifier.practitioner_id == Practitioner.id))
 
     practs = [p.as_fhir() for p in query]
 
@@ -155,7 +154,7 @@ def practitioner_get(id_or_code):
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
             abort(404, 'no practitioner found with identifier: system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
+                       'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -293,7 +292,7 @@ def practitioner_put(id_or_code):
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
             abort(404, 'no practitioner found with identifier: system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
+                       'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -324,9 +323,9 @@ def check_for_existing_external_id(json, current_id=None):
         value = ident.get('value')
         if not (system and value):
             abort(400, 'Both system and value must be provided '
-                  'for identifier {}'.format(ident))
+                       'for identifier {}'.format(ident))
         practitioner = lookup_practitioner_by_external_id(system, value)
         if (practitioner and
                 (not current_id or (practitioner.id != current_id))):
             abort(409, 'Practitioner with identifier {} already '
-                  'exists'.format(ident))
+                       'exists'.format(ident))
