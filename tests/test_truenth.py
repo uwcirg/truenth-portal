@@ -2,6 +2,7 @@ from __future__ import unicode_literals  # isort:skip
 
 from tests import FIRST_NAME, LAST_NAME, TestCase
 
+
 class TestTrueNTH(TestCase):
 
     def test_portal_wrapper_html(self):

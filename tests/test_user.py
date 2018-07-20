@@ -1,6 +1,7 @@
 """Unit test module for user model and views"""
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from datetime import datetime
@@ -127,8 +128,8 @@ class TestUser(TestCase):
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.ethnicities.count() == 2
 
-        extension = {"url":
-            "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"}
+        extension = {
+            "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"}
         kls = user_extension_map(user=self.test_user, extension=extension)
         assert isinstance(kls, UserEthnicityExtension)
 
@@ -141,20 +142,15 @@ class TestUser(TestCase):
         assert '2142-8' in codes
 
         # now create a new extension (FHIR like) and apply to the user
-        extension = {"url":
-            "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
-            "valueCodeableConcept": {
-                "coding": [
-                    {"system":
-                     "http://hl7.org/fhir/v3/Ethnicity",
-                     "code": "2162-6"
-                    },
-                    {"system":
-                     "http://hl7.org/fhir/v3/Ethnicity",
-                     "code": "2142-8"
-                    },
-                ]
-            }}
+        extension = {
+            "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+             "valueCodeableConcept": {
+                 "coding": [
+                     {"system":"http://hl7.org/fhir/v3/Ethnicity",
+                      "code": "2162-6"
+                      },
+                     {"system":"http://hl7.org/fhir/v3/Ethnicity",
+                      "code": "2142-8"}, ]}}
 
         ue = UserEthnicityExtension(self.test_user, extension)
         ue.apply_fhir()
@@ -171,10 +167,10 @@ class TestUser(TestCase):
             and_(Coding.code.in_(('1', '4')),
                  Coding.system == TRUENTH_VALUESET_NHHD_291036)).all()
         with SessionScope(db):
-            db.session.add(UserIndigenous(user_id=TEST_USER_ID,
-                                         coding_id=concepts[0].id))
-            db.session.add(UserIndigenous(user_id=TEST_USER_ID,
-                                         coding_id=concepts[1].id))
+            db.session.add(UserIndigenous(
+                user_id=TEST_USER_ID, coding_id=concepts[0].id))
+            db.session.add(UserIndigenous(
+                user_id=TEST_USER_ID, coding_id=concepts[1].id))
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.indigenous.count() == 2
@@ -193,16 +189,16 @@ class TestUser(TestCase):
 
         # now create a new extension (FHIR like) and apply to the user
         extension = {"url": TRUENTH_EXTENSTION_NHHD_291036,
-            "valueCodeableConcept": {
-                "coding": [
-                    {"system": TRUENTH_VALUESET_NHHD_291036,
-                     "code": "1"
-                    },
-                    {"system": TRUENTH_VALUESET_NHHD_291036,
-                     "code": "9"
-                    },
-                ]
-            }}
+                     "valueCodeableConcept": {
+                         "coding": [
+                             {"system": TRUENTH_VALUESET_NHHD_291036,
+                              "code": "1"
+                              },
+                             {"system": TRUENTH_VALUESET_NHHD_291036,
+                              "code": "9"
+                              },
+                         ]
+                     }}
 
         ue = UserIndigenousStatusExtension(self.test_user, extension)
         ue.apply_fhir()
@@ -294,11 +290,11 @@ class TestUser(TestCase):
             db.session.add(consent_audit)
             db.session.commit()
             db.session.add(UserConsent(
-                                user_id=deleted_id,
-                                organization_id=consent_org.id,
-                                audit=consent_audit,
-                                agreement_url='http://example.org',
-                                options=STAFF_EDITABLE_MASK))
+                user_id=deleted_id,
+                organization_id=consent_org.id,
+                audit=consent_audit,
+                agreement_url='http://example.org',
+                options=STAFF_EDITABLE_MASK))
             db.session.commit()
         consent_org, consent_audit = map(db.session.merge,
                                          (consent_org, consent_audit))
@@ -321,16 +317,16 @@ class TestUser(TestCase):
         data = {"resourceType": "Patient",
                 "extension": [{"url": TimezoneExtension.extension_url,
                                "timezone": "bogus"}]}
-        response = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/{}'.format(TEST_USER_ID),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 400
 
         # Valid setting should work
         data['extension'][0]['timezone'] = 'US/Eastern'
-        response = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/{}'.format(TEST_USER_ID),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
         user = User.query.get(TEST_USER_ID)
         assert user.timezone == 'US/Eastern'
@@ -346,9 +342,10 @@ class TestUser(TestCase):
     def test_account_creation_with_null_org(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        data = {'organizations': [{'organization_id':None}]}
-        response = self.client.post('/api/account', data=json.dumps(data),
-                           content_type='application/json')
+        data = {'organizations': [{'organization_id': None}]}
+        response = self.client.post(
+            '/api/account', data=json.dumps(data),
+            content_type='application/json')
         assert response.status_code == 400
 
     def test_account_creation(self):
@@ -370,18 +367,18 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        response = self.client.put('/api/demographics/{}'.format(user_id),
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/{}'.format(user_id),
+            content_type='application/json', data=json.dumps(data))
         new_user = User.query.get(user_id)
         assert new_user.first_name == given
         assert new_user.last_name == family
         assert new_user.username is None
         assert len(new_user.roles) == 0
         roles = {"roles": [{"name": ROLE.PATIENT.value}]}
-        response = self.client.put('/api/user/{}/roles'.format(user_id),
-                          content_type='application/json',
-                          data=json.dumps(roles))
+        response = self.client.put(
+            '/api/user/{}/roles'.format(user_id),
+            content_type='application/json', data=json.dumps(roles))
         assert len(new_user.roles) == 1
         assert new_user.locale_code == language
         assert new_user.locale_name == language_name
@@ -403,9 +400,9 @@ class TestUser(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
-        response = self.client.post('/api/account',
-                              content_type='application/json',
-                              data=json.dumps(data))
+        response = self.client.post(
+            '/api/account', content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
 
         user_id = response.json['user_id']
@@ -427,15 +424,15 @@ class TestUser(TestCase):
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
             'consents': [{'organization_id': org_id,
-                        'agreement_url': 'http://fake.org',
-                        'staff_editable': True,
-                        'send_reminders': False}],
+                          'agreement_url': 'http://fake.org',
+                          'staff_editable': True,
+                          'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT.value}],
-            }
+        }
         self.login(user_id=staff_id)
-        response = self.client.post('/api/account',
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.post(
+            '/api/account', content_type='application/json',
+            data=json.dumps(data))
 
         assert response.status_code == 200
         assert response.json['user_id'] > 0
@@ -451,9 +448,9 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        response = self.client.put('/api/demographics/{}'.format(user_id),
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/{}'.format(user_id),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
         new_user = User.query.get(user_id)
         assert new_user.first_name == given
@@ -461,9 +458,9 @@ class TestUser(TestCase):
         assert new_user.username is None
         assert len(new_user.roles) == 1
         roles = {"roles": [{"name": ROLE.PATIENT.value}]}
-        response = self.client.put('/api/user/{}/roles'.format(user_id),
-                          content_type='application/json',
-                          data=json.dumps(roles))
+        response = self.client.put(
+            '/api/user/{}/roles'.format(user_id),
+            content_type='application/json', data=json.dumps(roles))
         assert len(new_user.roles) == 1
         assert new_user.locale_code == language
         assert new_user.locale_name == language_name
@@ -484,15 +481,15 @@ class TestUser(TestCase):
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
             'consents': [{'organization_id': org_id,
-                        'agreement_url': 'http://fake.org',
-                        'staff_editable': True,
-                        'send_reminders': False}],
+                          'agreement_url': 'http://fake.org',
+                          'staff_editable': True,
+                          'send_reminders': False}],
             'roles': [{'name': ROLE.PARTNER.value}],
-            }
+        }
         self.login(user_id=staff_id)
-        response = self.client.post('/api/account',
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.post(
+            '/api/account', content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 400
 
     def test_user_by_organization(self):
@@ -550,16 +547,16 @@ class TestUser(TestCase):
 
     def test_roles_add(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER.value},
-                {"name": ROLE.PATIENT.value},
-                {"name": ROLE.ADMIN.value}
-                ]}
+            {"name": ROLE.APPLICATION_DEVELOPER.value},
+            {"name": ROLE.PATIENT.value},
+            {"name": ROLE.ADMIN.value}
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         doc = response.json
@@ -573,15 +570,15 @@ class TestUser(TestCase):
 
     def test_roles_post(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER.value},
-                {"name": ROLE.PATIENT.value}
-                ]}
+            {"name": ROLE.APPLICATION_DEVELOPER.value},
+            {"name": ROLE.PATIENT.value}
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.post(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         doc = response.json
@@ -591,15 +588,15 @@ class TestUser(TestCase):
 
     def test_roles_duplicate_add(self):
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER.value},
-                ]}
+            {"name": ROLE.APPLICATION_DEVELOPER.value},
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
-        response = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         doc = response.json
@@ -611,15 +608,15 @@ class TestUser(TestCase):
     def test_roles_duplicate_post(self):
         """POST shouldn't allow duplicates"""
         data = {"roles": [
-                {"name": ROLE.APPLICATION_DEVELOPER.value},
-                ]}
+            {"name": ROLE.APPLICATION_DEVELOPER.value},
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
         response = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+                                    content_type='application/json',
+                                    data=json.dumps(data))
 
         assert response.status_code == 409
         user = User.query.get(TEST_USER_ID)
@@ -631,14 +628,14 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         data = {"roles": [
-                {"name": ROLE.ADMIN.value},
-                {"name": ROLE.APPLICATION_DEVELOPER.value},
-                ]}
+            {"name": ROLE.ADMIN.value},
+            {"name": ROLE.APPLICATION_DEVELOPER.value},
+        ]}
 
         self.login()
-        response = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         doc = response.json
@@ -665,15 +662,15 @@ class TestUser(TestCase):
 
     def test_roles_nochange(self):
         data = {"roles": [
-                {"name": ROLE.PATIENT.value},
-                {"name": ROLE.ADMIN.value}
-                ]}
+            {"name": ROLE.PATIENT.value},
+            {"name": ROLE.ADMIN.value}
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         doc = response.json
@@ -684,17 +681,18 @@ class TestUser(TestCase):
     def test_prevent_service_role(self):
         "Don't allow promotion of accounts to service"
         data = {"roles": [
-                {"name": ROLE.SERVICE.value},
-                {"name": ROLE.ADMIN.value}
-                ]}
+            {"name": ROLE.SERVICE.value},
+            {"name": ROLE.ADMIN.value}
+        ]}
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 400
+
     def test_user_check_roles(self):
         org = Organization(name='members only')
         user = self.test_user
@@ -702,8 +700,8 @@ class TestUser(TestCase):
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
-        audit = Audit(comment='test data', user_id=TEST_USER_ID,
-            subject_id=TEST_USER_ID)
+        audit = Audit(
+            comment='test data', user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         self.promote_user(user, ROLE.STAFF.value)
         self.promote_user(u2, ROLE.PATIENT.value)
         self.promote_user(member_of, ROLE.PATIENT.value)
@@ -811,14 +809,14 @@ class TestUser(TestCase):
         staff_top = db.session.merge(staff_top)
         for perm in ('view', 'edit'):
             for patient in (
-                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                    patient_w_id, patient_x_id, patient_y_id, patient_z_id):
                 assert staff_top.check_role(perm, other_id=patient)
 
         # mid level staff can view/edit all
         staff_mid = db.session.merge(staff_mid)
         for perm in ('view', 'edit'):
             for patient in (
-                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                    patient_w_id, patient_x_id, patient_y_id, patient_z_id):
                 assert staff_mid.check_role(perm, other_id=patient)
 
         # low level staff can view/edit only those w/ same org
@@ -845,7 +843,7 @@ class TestUser(TestCase):
         # top level staff can view all, edit none
         staff_top = db.session.merge(staff_top)
         for patient in (
-            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
             assert staff_top.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
                 staff_top.check_role('edit', other_id=patient)
@@ -853,7 +851,7 @@ class TestUser(TestCase):
         # mid level staff can view all, edit none
         staff_mid = db.session.merge(staff_mid)
         for patient in (
-            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
             assert staff_mid.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
                 staff_mid.check_role('edit', other_id=patient)
@@ -921,14 +919,14 @@ class TestUser(TestCase):
         staff_admin_top = db.session.merge(staff_admin_top)
         for perm in ('view', 'edit'):
             for staff in (
-                staff_x_id, staff_y_id, staff_z_id):
+                    staff_x_id, staff_y_id, staff_z_id):
                 assert staff_admin_top.check_role(perm, other_id=staff)
 
         # mid level staff_admin can view/edit all but top
         staff_admin_mid = db.session.merge(staff_admin_mid)
         for perm in ('view', 'edit'):
             for staff in (
-                staff_x_id, staff_z_id):
+                    staff_x_id, staff_z_id):
                 assert staff_admin_mid.check_role(perm, other_id=staff)
             with pytest.raises(Unauthorized):
                 staff_admin_mid.check_role(perm, other_id=staff_y_id)
@@ -954,9 +952,9 @@ class TestUser(TestCase):
                                relationship_id=partner.id,
                                other_user_id=other_user.id)
         sponsor = Relationship.query.filter_by(name='sponsor').first()
-        rel2 = UserRelationship(user_id=other_user.id,
-                               relationship_id=sponsor.id,
-                               other_user_id=TEST_USER_ID)
+        rel2 = UserRelationship(
+            user_id=other_user.id, relationship_id=sponsor.id,
+            other_user_id=TEST_USER_ID)
         with SessionScope(db):
             db.session.add(rel)
             db.session.add(rel2)
@@ -973,15 +971,15 @@ class TestUser(TestCase):
 
     def test_set_relationships(self):
         other_user = self.add_user(username='other@foo.com')
-        data = {'relationships':[{'user': TEST_USER_ID,
-                                  'has the relationship': 'partner',
-                                  'with': other_user.id},]
-               }
+        data = {'relationships': [{'user': TEST_USER_ID,
+                                   'has the relationship': 'partner',
+                                   'with': other_user.id}, ]
+                }
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
             TEST_USER_ID),
-                         content_type='application/json',
-                         data=json.dumps(data))
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
 
         ur = UserRelationship.query.filter_by(
@@ -1012,8 +1010,8 @@ class TestUser(TestCase):
         assert len(data['relationships']) == 1
         response = self.client.put('/api/user/{}/relationships'.format(
             TEST_USER_ID),
-                         content_type='application/json',
-                         data=json.dumps(data))
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         assert len(response.json['relationships']) == 1
         assert len(self.test_user.relationships) == 1
@@ -1022,15 +1020,15 @@ class TestUser(TestCase):
         "delete now done by PUTting less than all relationships"
         self.create_fake_relationships()
         other_user = User.query.filter_by(username='other@foo.com').first()
-        data = {'relationships':[{'user': other_user.id,
-                                  'has the relationship': 'sponsor',
-                                  'with': TEST_USER_ID},]
-               }
+        data = {'relationships': [{'user': other_user.id,
+                                   'has the relationship': 'sponsor',
+                                   'with': TEST_USER_ID}, ]
+                }
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
             TEST_USER_ID),
-                         content_type='application/json',
-                         data=json.dumps(data))
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
 
         # shouldn't find the deleted (the one not PUT above)
@@ -1081,8 +1079,8 @@ class TestUser(TestCase):
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
-            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a',
-                subject_id=TEST_USER_ID)
+            deceased_audit = Audit(
+                user_id=TEST_USER_ID, comment='n/a', subject_id=TEST_USER_ID)
             other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
@@ -1134,7 +1132,7 @@ class TestUser(TestCase):
 
         response = self.client.post('/api/user/{}/password_reset'.format(
             TEST_USER_ID),
-                content_type='application/json')
+            content_type='application/json')
 
         assert response.status_code == 200
 
@@ -1142,9 +1140,9 @@ class TestUser(TestCase):
         # example bogus data from msk testing
         data = {
             'agreement_url':
-            'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorUrl='
-            'true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-'
-            '5339-e677353e694f',
+                'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorUrl='
+                'true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-'
+                '5339-e677353e694f',
             'user_id': '{}'.format(TEST_USER_ID),
             'include_in_reports': True,
             'send_reminders': False,
@@ -1160,7 +1158,7 @@ class TestUser(TestCase):
     def test_locale_inheritance(self):
         # prepopuate database with matching locale
         cd = Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                  'system': "urn:ietf:bcp:47"})
+                               'system': "urn:ietf:bcp:47"})
         # create parent with locale
         parent_id = 101
         parent = Organization(id=parent_id, name='test parent')
