@@ -55,10 +55,8 @@ def valueset_nhhd_291036():
             ('Both Aboriginal and Torres Strait Islander origin', '3'),
             ('Neither Aboriginal nor Torres Strait Islander origin', '4'),
             ('Not stated/inadequately described', '9')):
-        concepts.append({"code": value,
-                         "abstract": "false",
-                         "display": name,
-                         "definition": name
-                         })
+        concepts.append(
+            {"code": value, "abstract": "false", "display": name,
+             "definition": name})
 
     return jsonify(**valueset)
