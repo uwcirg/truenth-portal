@@ -89,7 +89,7 @@ class Recur(db.Model):
             has yet to begin (prior to start).
 
         """
-        assert(as_of_date)
+        assert as_of_date
         start_date = trigger_date + RelativeDelta(self.start)
         termination = (
             trigger_date + RelativeDelta(self.termination) if

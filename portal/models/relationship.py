@@ -24,7 +24,7 @@ class Relationship(db.Model):
         return "Relationship {0.name}".format(self)
 
 
-#Source definition for relationships, as dictionary {name: description,}
+# Source definition for relationships, as dictionary {name: description,}
 STATIC_RELATIONSHIPS = {
     'partner':
         'An intimate partner relationship',
@@ -33,7 +33,6 @@ STATIC_RELATIONSHIPS = {
         'the user who created the account (the sponsor) to the service '
         'account used for automatic protected access to API endpoints.',
 }
-
 
 RELATIONSHIP = Enum(
     'RELATIONSHIP', {r.upper(): r for r in STATIC_RELATIONSHIPS})
