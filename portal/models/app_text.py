@@ -9,6 +9,7 @@ SitePersistence mechanism, and looked up in a template using the
 """
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from abc import ABCMeta, abstractmethod
@@ -70,7 +71,7 @@ def localize_url(url, locale_code):
     if url and 'languageId' not in url:
         delimiter = '&' if '?' in url else '?'
         return "{url}{delimiter}languageId={locale_code}".format(
-                url=url, delimiter=delimiter, locale_code=locale_code)
+            url=url, delimiter=delimiter, locale_code=locale_code)
     return url
 
 
@@ -206,7 +207,7 @@ class Terms_ATMA(AppTextModelAdapter):
 
         """
         if kwargs.get('organization') and kwargs.get('role'):
-            return "{} {} terms and conditions URL".\
+            return "{} {} terms and conditions URL". \
                 format(kwargs.get('organization').name, kwargs.get('role'))
         elif kwargs.get('role'):
             return "{} terms and conditions URL".format(kwargs.get('role'))
@@ -227,8 +228,8 @@ class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
         if not kwargs.get('organization'):
             raise ValueError("required 'organization' parameter not defined")
         else:
-            return "{} website declaration form URL".\
-                    format(kwargs.get('organization').name)
+            return "{} website declaration form URL". \
+                format(kwargs.get('organization').name)
 
 
 class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
@@ -245,8 +246,8 @@ class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
         if not kwargs.get('organization'):
             raise ValueError("required 'organization' parameter not defined")
         else:
-            return "{} staff registraion email URL".\
-                    format(kwargs.get('organization').name)
+            return "{} staff registraion email URL". \
+                format(kwargs.get('organization').name)
 
 
 class UserInviteEmail_ATMA(AppTextModelAdapter):
@@ -362,6 +363,7 @@ class PrivacyATMA(AppTextModelAdapter):
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
+
     def __init__(self, url, asset=None, variables=None):
         """Initialize based on requested URL
 

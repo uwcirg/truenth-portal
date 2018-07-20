@@ -37,7 +37,7 @@ def recent_qnr_status(user, questionnaire_name, qbd):
     ).order_by(
         QuestionnaireResponse.status,
         QuestionnaireResponse.authored.desc()).with_entities(
-            QuestionnaireResponse.status, QuestionnaireResponse.authored)
+        QuestionnaireResponse.status, QuestionnaireResponse.authored)
 
     if qbd.iteration is not None:
         query = query.filter(
@@ -133,6 +133,7 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
+
     def __init__(self, user, as_of_date):
         """ Initialize and lookup status for respective questionnaires
 
@@ -163,8 +164,8 @@ class QuestionnaireBankDetails(object):
             return 'Withdrawn'
 
         if not (
-            self.qbd.questionnaire_bank and
-            self.qbd.questionnaire_bank.trigger_date
+                self.qbd.questionnaire_bank and
+                self.qbd.questionnaire_bank.trigger_date
         ):
             return 'Expired'
         status_strings = [v['status'] for v in self.status_by_q.values()]
@@ -395,8 +396,9 @@ class AssessmentStatus(object):
                     qb_id = self.qb_data.qbd.questionnaire_bank.id
                     iteration = self.qb_data.qbd.iteration
                     if name not in (
-                        q.name
-                        for q in self.qb_data.qbd.questionnaire_bank.questionnaires
+                            q.name
+                            for q in
+                            self.qb_data.qbd.questionnaire_bank.questionnaires
                     ):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
