@@ -7,6 +7,7 @@ from portal.extensions import db
 from portal.models.notification import Notification, UserNotification
 from tests import TEST_USER_ID, TestCase
 
+
 class TestNotification(TestCase):
     """Notification and UserNotification tests"""
 

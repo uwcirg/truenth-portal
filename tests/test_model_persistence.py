@@ -23,6 +23,7 @@ from portal.models.scheduled_job import ScheduledJob
 from portal.system_uri import SNOMED
 from tests import TestCase
 
+
 class TestModelPersistence(TestCase):
 
     def setUp(self):
@@ -62,8 +63,10 @@ class TestModelPersistence(TestCase):
         from portal.system_uri import TRUENTH_CR_NAME
         from portal.models.identifier import Identifier
         mock_tnth_questionnairebanks()
-        cr = mock_communication_request('symptom_tracker_recurring', '{"days": 14}')
-        cr.identifiers.append(Identifier(value='2 week ST', system=TRUENTH_CR_NAME))
+        cr = mock_communication_request(
+            'symptom_tracker_recurring', '{"days": 14}')
+        cr.identifiers.append(
+            Identifier(value='2 week ST', system=TRUENTH_CR_NAME))
         with SessionScope(db):
             db.session.add(cr)
             db.session.commit()
@@ -81,7 +84,7 @@ class TestModelPersistence(TestCase):
         assert match.name == cr.name
 
     def test_composite_key(self):
-        known_coding =  Coding(
+        known_coding = Coding(
             system=SNOMED, code='26294005',
             display='Radical prostatectomy (nerve-sparing)').add_if_not_found(
             True)
