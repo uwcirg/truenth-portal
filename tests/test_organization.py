@@ -1,6 +1,7 @@
 """Unit test module for organization model"""
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 from builtins import map
 from datetime import datetime, timedelta
@@ -35,18 +36,20 @@ from portal.system_uri import (
 )
 from tests import TEST_USER_ID, TestCase
 
+
 class TestOrganization(TestCase):
     """Organization model tests"""
 
     def test_from_fhir(self):
         with open(os.path.join(
-            os.path.dirname(__file__),
-            'organization-example-f001-burgers.json'), 'r') as fhir_data:
+                os.path.dirname(__file__),
+                'organization-example-f001-burgers.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
-        #prepopuate database with matching locale
-        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                  'system': IETF_LANGUAGE_TAG})
+        # prepopuate database with matching locale
+        Coding.from_fhir(
+            {'code': 'en_AU', 'display': 'Australian English',
+             'system': IETF_LANGUAGE_TAG})
         org = Organization.from_fhir(data)
         assert org.addresses[0].line1 == data['address'][0]['line'][0]
         assert org.addresses[1].line1 == data['address'][1]['line'][0]
@@ -69,8 +72,9 @@ class TestOrganization(TestCase):
         parent_id = parent.id
 
         with open(os.path.join(
-            os.path.dirname(__file__),
-            'organization-example-f002-burgers-card.json'), 'r') as fhir_data:
+                os.path.dirname(__file__),
+                'organization-example-f002-burgers-card.json'),
+                'r') as fhir_data:
             data = json.load(fhir_data)
 
         # remove the id from the file - doesn't play well with ours
@@ -179,8 +183,8 @@ class TestOrganization(TestCase):
         self.login()
         org = Organization(name='test', id=999)
         ident = Identifier(id=99, system=org_id_system, value=org_id_value)
-        org_ident = OrganizationIdentifier(organization_id=999,
-                                            identifier_id=99)
+        org_ident = OrganizationIdentifier(
+            organization_id=999, identifier_id=99)
         with SessionScope(db):
             db.session.add(org)
             db.session.add(ident)
@@ -300,8 +304,8 @@ class TestOrganization(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         with open(os.path.join(
-            os.path.dirname(__file__),
-            'organization-example-f001-burgers.json'), 'r') as fhir_data:
+                os.path.dirname(__file__),
+                'organization-example-f001-burgers.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
         # remove the id from the file - doesn't play well with ours
@@ -315,13 +319,13 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         org_id = org.id
 
-        #prepopuate database with matching locale
+        # prepopuate database with matching locale
         Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                  'system': "urn:ietf:bcp:47"})
+                          'system': "urn:ietf:bcp:47"})
 
-        response = self.client.put('/api/organization/{}'.format(org_id),
-                          content_type='application/json',
-                          data=json.dumps(data))
+        response = self.client.put(
+            '/api/organization/{}'.format(org_id),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
 
         # Pull the updated db entry
@@ -434,17 +438,18 @@ class TestOrganization(TestCase):
 
     def test_organization_post(self):
         with open(os.path.join(
-            os.path.dirname(__file__),
-            'organization-example-f002-burgers-card.json'), 'r') as fhir_data:
+                os.path.dirname(__file__),
+                'organization-example-f002-burgers-card.json'),
+                'r') as fhir_data:
             data = json.load(fhir_data)
 
         # the 002-burgers-card org refers to another - should fail
         # prior to adding the parent (partOf) org
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.post('/api/organization',
-                           content_type='application/json',
-                           data=json.dumps(data))
+        response = self.client.post(
+            '/api/organization', content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 400
 
     def test_organization_delete(self):
@@ -460,7 +465,7 @@ class TestOrganization(TestCase):
         assert response.status_code == 200
         assert Organization.query.get(org2_id) is None
         orgs = Organization.query.all()
-        names =  [o.name for o in orgs]
+        names = [o.name for o in orgs]
         assert 'none of the above' in names
         assert org1_name in names
 
@@ -483,15 +488,15 @@ class TestOrganization(TestCase):
 
     def test_organization_identifiers_update(self):
         with open(os.path.join(
-            os.path.dirname(__file__),
-            'organization-example-gastro.json'), 'r') as fhir_data:
+                os.path.dirname(__file__),
+                'organization-example-gastro.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         before = Organization.query.count()
-        response = self.client.post('/api/organization',
-                           content_type='application/json',
-                           data=json.dumps(data))
+        response = self.client.post(
+            '/api/organization', content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         assert Organization.query.count() == before + 1
 
@@ -502,9 +507,9 @@ class TestOrganization(TestCase):
                            use='secondary')
         org = Organization.query.filter_by(name='Gastroenterology').one()
         data['identifier'].append(alias.as_fhir())
-        response = self.client.put('/api/organization/{}'.format(org.id),
-                          content_type='application/json',
-                          data=json.dumps(data))
+        response = self.client.put(
+            '/api/organization/{}'.format(org.id),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
 
         # obtain the org from the db, check the identifiers

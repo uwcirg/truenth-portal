@@ -1,6 +1,7 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import tempfile
@@ -23,8 +24,10 @@ from portal.models.role import ROLE
 from portal.models.user import User, get_user
 from tests import TEST_USER_ID, TestCase
 
+
 class TestPortal(TestCase):
     """Portal view tests"""
+
     def test_card_html(self):
         """Interventions can customize the button text """
         client = self.add_client()
@@ -152,17 +155,18 @@ class TestPortal(TestCase):
         db.session.commit()
 
         self.login()
-        postdata = { 'subject': 'unittest subject',
-                'recipients': 'test_user@yahoo.com test_user@uw.edu',
-                'body': "Ode to joy" }
+        postdata = {
+            'subject': 'unittest subject',
+            'recipients': 'test_user@yahoo.com test_user@uw.edu',
+            'body': "Ode to joy"}
         response = self.client.post('/invite', data=postdata,
                                     follow_redirects=True)
         assert "Email Invite Sent" in response.get_data(as_text=True)
 
     def test_message_sent(self):
         """Email invites - test view for sent messages"""
-        sent_at = datetime.strptime("2000/01/01 12:31:00",
-                "%Y/%m/%d %H:%M:%S")
+        sent_at = datetime.strptime(
+            "2000/01/01 12:31:00", "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(
             subject='a subject', user_id=TEST_USER_ID,
             sender="testuser@email.com",
@@ -209,9 +213,9 @@ class TestPortal(TestCase):
         """Ensure our swagger spec matches swagger schema"""
 
         with tempfile.NamedTemporaryFile(
-            prefix='swagger_test_',
-            suffix='.json',
-            delete=True,
+                prefix='swagger_test_',
+                suffix='.json',
+                delete=True,
         ) as temp_spec:
             temp_spec.write(self.client.get('/spec').data)
             temp_spec.seek(0)
@@ -264,27 +268,30 @@ class TestPortalEproms(TestCase):
 
         client = self.add_client()
         client_url = client._redirect_uris
-        local_url = "http://{}/home?test".format(self.app.config.get('SERVER_NAME'))
+        local_url = "http://{}/home?test".format(
+            self.app.config.get('SERVER_NAME'))
         invalid_url = 'http://invalid.org'
 
         # validate redirect of /website-consent-script GET
         response = self.client.get('/website-consent-script/{}?redirect_url='
-                             '{}'.format(TEST_USER_ID, local_url))
+                                   '{}'.format(TEST_USER_ID, local_url))
         assert response.status_code == 200
 
         response2 = self.client.get('/website-consent-script/{}?redirect_url='
-                              '{}'.format(TEST_USER_ID, invalid_url))
+                                    '{}'.format(TEST_USER_ID, invalid_url))
         assert response2.status_code == 401
 
         # validate redirect of /login/<provider> GET
-        response3 = self.client.get('/login/TESTING?user_id={}&next='
-                              '{}'.format(TEST_USER_ID, client_url),
-                              follow_redirects=True)
+        response3 = self.client.get(
+            '/login/TESTING?user_id={}&next={}'.format(
+                TEST_USER_ID, client_url),
+            follow_redirects=True)
         assert response3.status_code == 200
 
-        response4 = self.client.get('/login/TESTING?user_id={}&next='
-                              '{}'.format(TEST_USER_ID, invalid_url),
-                              follow_redirects=True)
+        response4 = self.client.get(
+            '/login/TESTING?user_id={}&next={}'.format(
+                TEST_USER_ID, invalid_url),
+            follow_redirects=True)
         assert response4.status_code == 401
 
         # validate redirect of /challenge POST
