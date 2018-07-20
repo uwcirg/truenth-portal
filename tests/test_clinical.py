@@ -62,7 +62,7 @@ class TestClinical(TestCase):
 
         clinical_data = response.json
         assert ('Gleason score' ==
-               clinical_data['entry'][0]['content']['code']['coding'][0][
+                clinical_data['entry'][0]['content']['code']['coding'][0][
                    'display'])
         assert ('2' ==
                 clinical_data['entry'][0]['content']['valueQuantity']['value'])
