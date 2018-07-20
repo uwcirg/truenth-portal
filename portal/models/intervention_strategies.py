@@ -107,8 +107,8 @@ def limit_by_clinic_w_id(
                  intervention=intervention.name)
             return True
 
-    return user_registered_with_all_clinics if combinator == 'all' else \
-        user_registered_with_any_clinics
+    return (user_registered_with_all_clinics if combinator == 'all'
+            else user_registered_with_any_clinics)
 
 
 def not_in_clinic_w_id(
@@ -506,8 +506,8 @@ def update_card_html_on_completion():
                 ))
             db.session.commit()
         else:
-            if ui.card_html != card_html or ui.link_label != link_label or \
-                    ui.link_url != link_url:
+            if (ui.card_html != card_html or ui.link_label != link_label or
+                    ui.link_url != link_url):
                 ui.card_html = card_html
                 ui.link_label = link_label,
                 ui.link_url = link_url
