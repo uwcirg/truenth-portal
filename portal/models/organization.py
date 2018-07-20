@@ -440,8 +440,7 @@ class Organization(db.Model):
 class OrganizationLocale(db.Model):
     __tablename__ = 'organization_locales'
     id = db.Column(db.Integer, primary_key=True)
-    organization_id = db.Column(
-        db.ForeignKey(
+    organization_id = db.Column(db.ForeignKey(
             'organizations.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
