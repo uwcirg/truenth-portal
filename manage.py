@@ -87,7 +87,9 @@ def sync():
     seed()
 
 
-@click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
+@click.option(
+    '--keep_unmentioned', '-k', default=False,
+    help='Keep orgs and interventions not mentioned in persistence file')
 @app.cli.command(name="seed")
 def seed_command(keep_unmentioned):
     """Seed database with required data"""
@@ -215,11 +217,12 @@ def password_reset(email, password, actor):
 @click.option(
     '--actor', '-a',
     help='Email of user to act as.',
-    prompt= \
+    prompt=(
         "\n\nWARNING!!!\n\n"
-        " This will permanently delete the target user and all their related data.\n"
+        " This will permanently delete the target user and all their related"
+        " data.\n"
         " If you want to contiue,"
-        " enter a valid user email as the acting party for our records"
+        " enter a valid user email as the acting party for our records")
 )
 @app.cli.command()
 def purge_user(email, actor):
@@ -264,7 +267,8 @@ def translation_download(language, state):
     if app.config['SYSTEM_TYPE'].lower() == 'production':
         default_state = 'published'
     state = state or default_state
-    click.echo('Downloading {state} translations from Smartling'.format(state=state))
+    click.echo(
+        'Downloading {state} translations from Smartling'.format(state=state))
     smartling_download(state=state, language=language)
 
 
