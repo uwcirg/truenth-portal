@@ -135,8 +135,8 @@ class TestCase(Base):
             print("found existing test_user at {}".format(test_user.id))
 
         if test_user.id != TEST_USER_ID:
-            print(
-                "apparent cruft from last run (test_user_id: %d)" % test_user.id)
+            print("apparent cruft from last run (test_user_id: %d)"
+                  % test_user.id)
             print("try again...")
             self.tearDown()
             self.setUp()
@@ -183,7 +183,8 @@ class TestCase(Base):
 
         """
         return self.client.get(
-            '/login/TESTING?user_id={0}'.format(user_id), follow_redirects=True)
+            '/login/TESTING?user_id={0}'.format(user_id),
+            follow_redirects=True)
 
     def add_client(self):
         """Prep db with a test client for test user"""

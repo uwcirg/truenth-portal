@@ -17,7 +17,8 @@ class TestAccessUrl(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         onetime = db.session.merge(onetime)
-        response = self.client.get('/api/user/{}/access_url'.format(onetime.id))
+        response = self.client.get('/api/user/{}/access_url'.format(
+            onetime.id))
         assert response.status_code == 200
 
         # confirm we obtained a valid token
