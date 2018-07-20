@@ -122,7 +122,7 @@ def overdue_stats_by_org():
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
         if (user.has_role(ROLE.TEST.value) or not
-        user.has_role(ROLE.PATIENT.value)):
+            user.has_role(ROLE.PATIENT.value)):
             continue
         overdue = calculate_days_overdue(user)
         if overdue > 0:
