@@ -1,6 +1,7 @@
 """Persistence details for Model Classes"""
 from __future__ import unicode_literals  # isort:skip
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from io import StringIO
@@ -107,7 +108,8 @@ class ModelPersistence(object):
         for o in data['entry']:
             if not o.get('resourceType') == self.model.__name__:
                 # Hard code exception for resourceType: Patient being a User
-                if o.get('resourceType') == 'Patient' and self.model.__name__ == 'User':
+                if (o.get('resourceType') == 'Patient'
+                        and self.model.__name__ == 'User'):
                     pass
                 else:
                     raise ValueError(
@@ -119,7 +121,8 @@ class ModelPersistence(object):
         self.filename = self.persistence_filename()
         if data:
             with open(self.filename, 'w') as f:
-                f.write(json.dumps(data, indent=2, sort_keys=True, separators=(',', ': ')))
+                f.write(json.dumps(data, indent=2, sort_keys=True,
+                                   separators=(',', ': ')))
             self._log("Wrote site persistence to `{}`".format(self.filename))
 
     def __verify_header__(self, data):
@@ -257,7 +260,8 @@ class ModelPersistence(object):
 
         if existing:
             details = StringIO()
-            if not dict_match(complete_form, getattr(existing, serialize)(), details):
+            if not dict_match(
+                    complete_form, getattr(existing, serialize)(), details):
                 self._log(
                     "{type} {id} collision on import.  {details}".format(
                         type=self.model.__name__,
