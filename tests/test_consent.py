@@ -112,9 +112,9 @@ class TestUserConsent(TestCase):
 
         self.login()
         response = self.client.post(
-                              '/api/user/{}/consent'.format(TEST_USER_ID),
-                              content_type='application/json',
-                              data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -133,17 +133,17 @@ class TestUserConsent(TestCase):
 
         self.login()
         response = self.client.post(
-                              '/api/user/{}/consent'.format(TEST_USER_ID),
-                              content_type='application/json',
-                              data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert consent.acceptance_date == parser.parse(acceptance_date)
-        assert consent.audit.comment ==\
-            "Consent agreement {} signed".format(consent.id)
+        assert (consent.audit.comment ==
+                "Consent agreement {} signed".format(consent.id))
         assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
 
     def test_post_user_future_consent_date(self):
@@ -157,9 +157,9 @@ class TestUserConsent(TestCase):
 
         self.login()
         response = self.client.post(
-                              '/api/user/{}/consent'.format(TEST_USER_ID),
-                              content_type='application/json',
-                              data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 400
 
     def test_post_replace_user_consent(self):
@@ -171,9 +171,9 @@ class TestUserConsent(TestCase):
 
         self.login()
         response = self.client.post(
-                              '/api/user/{}/consent'.format(TEST_USER_ID),
-                              content_type='application/json',
-                              data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -188,9 +188,9 @@ class TestUserConsent(TestCase):
         data['send_reminders'] = False
         data['status'] = 'suspended'
         response = self.client.post(
-                              '/api/user/{}/consent'.format(TEST_USER_ID),
-                              content_type='application/json',
-                              data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
@@ -227,9 +227,9 @@ class TestUserConsent(TestCase):
         self.login()
 
         response = self.client.delete(
-                                '/api/user/{}/consent'.format(TEST_USER_ID),
-                                content_type='application/json',
-                                data=json.dumps(data))
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
@@ -278,6 +278,6 @@ class TestUserConsent(TestCase):
                                                   organization_id=org_id,
                                                   status='suspended').first()
         assert old_consent.agreement_url == new_consent.agreement_url
-        assert new_consent.staff_editable == \
-            (not current_app.config.get('GIL'))
+        assert (new_consent.staff_editable ==
+                (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
