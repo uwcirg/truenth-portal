@@ -180,8 +180,8 @@ class Organization(db.Model):
         if not value:
             self.default_locale_id = None
         else:
-            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG,
-                                            code=value).first()
+            coding = Coding.query.filter_by(
+                system=IETF_LANGUAGE_TAG, code=value).first()
             if not coding:
                 raise ValueError(
                     "Can't find locale code {value} - constrained to "
@@ -284,8 +284,9 @@ class Organization(db.Model):
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = (telecom_cps.get(('phone', 'work'))
-                          or telecom_cps.get(('phone', None)))
+            self.phone = (
+                    telecom_cps.get(('phone', 'work'))
+                    or telecom_cps.get(('phone', None)))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
@@ -310,8 +311,8 @@ class Organization(db.Model):
         by_extension_url = {ext['url']: ext for ext in
                             data.get('extension', [])}
         for kls in org_extension_classes:
-            args = by_extension_url.get(kls.extension_url,
-                                        {'url': kls.extension_url})
+            args = by_extension_url.get(
+                kls.extension_url, {'url': kls.extension_url})
             instance = org_extension_map(self, args)
             instance.apply_fhir()
 
@@ -440,12 +441,12 @@ class OrganizationLocale(db.Model):
     __tablename__ = 'organization_locales'
     id = db.Column(db.Integer, primary_key=True)
     organization_id = db.Column(
-        db.ForeignKey('organizations.id', ondelete='CASCADE'),
-        nullable=False)
+        db.ForeignKey(
+            'organizations.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'coding_id',
-                                       name='_organization_locale_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'coding_id', name='_organization_locale_coding'),)
 
 
 class LocaleExtension(CCExtension):
@@ -481,8 +482,9 @@ class OrganizationResearchProtocol(db.Model):
         'organization_id', 'research_protocol_id',
         name='_organization_research_protocol'),)
 
-    def __init__(self, research_protocol=None, organization=None,
-                 retired_as_of=None):
+    def __init__(
+            self, research_protocol=None, organization=None,
+            retired_as_of=None):
         if research_protocol:
             assert isinstance(research_protocol, ResearchProtocol)
         if organization:
@@ -595,8 +597,8 @@ class UserOrganization(db.Model):
     user_id = db.Column(db.ForeignKey(
         'users.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'organization_id',
-                                       name='_user_organization'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'organization_id', name='_user_organization'),)
 
     organization = db.relationship('Organization')
 
@@ -610,8 +612,8 @@ class OrganizationAddress(db.Model):
     address_id = db.Column(db.ForeignKey(
         'addresses.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'address_id',
-                                       name='_organization_address'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'address_id', name='_organization_address'),)
 
 
 class OrganizationIdentifier(db.Model):
@@ -623,8 +625,8 @@ class OrganizationIdentifier(db.Model):
     identifier_id = db.Column(db.ForeignKey(
         'identifiers.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'identifier_id',
-                                       name='_organization_identifier'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'identifier_id', name='_organization_identifier'),)
 
 
 class OrgNode(object):
