@@ -212,7 +212,7 @@ def acquire():
         qs = parse_qsl(parsed.query)
         if qs:
             url = ("{0.scheme}://{0.netloc}{0.path}?".format(parsed) +
-                    urlencode(qs))
+                   urlencode(qs))
         return url
 
     return render_template(
