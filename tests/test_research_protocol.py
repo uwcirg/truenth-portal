@@ -11,6 +11,7 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.system_uri import TRUENTH_RP_EXTENSION
 from tests import TestCase
 
+
 class TestResearchProtocol(TestCase):
     """Research Protocol tests"""
 
@@ -47,8 +48,8 @@ class TestResearchProtocol(TestCase):
 
         org_data = {"name": "test_org",
                     "extension": [
-                    {"url": TRUENTH_RP_EXTENSION,
-                     "research_protocols": [{'name': "test_rp"}]}
+                        {"url": TRUENTH_RP_EXTENSION,
+                         "research_protocols": [{'name': "test_rp"}]}
                     ]}
 
         org = Organization.from_fhir(org_data)

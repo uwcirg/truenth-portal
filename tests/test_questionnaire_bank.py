@@ -88,8 +88,8 @@ class TestQuestionnaireBank(TestCase):
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
         exists = Recur.query.filter_by(
-                start=recur3.start, cycle_length=recur3.cycle_length,
-                termination=recur3.termination).first()
+            start=recur3.start, cycle_length=recur3.cycle_length,
+            termination=recur3.termination).first()
         if exists:
             recur3 = exists
 
@@ -97,8 +97,8 @@ class TestQuestionnaireBank(TestCase):
             start='{"months": 6}', cycle_length='{"years": 1}',
             termination='{"years": 3, "months": 3}')
         exists = Recur.query.filter_by(
-                start=recur6.start, cycle_length=recur6.cycle_length,
-                termination=recur6.termination).first()
+            start=recur6.start, cycle_length=recur6.cycle_length,
+            termination=recur6.termination).first()
         if exists:
             recur6 = exists
 
