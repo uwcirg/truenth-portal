@@ -99,7 +99,8 @@ class TestDemographics(TestCase):
                             "system": "http://hl7.org/fhir/v3/Race",
                             "code": "1096-7"}]}},
                     {"url":
-                         "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                        "http://hl7.org/fhir/StructureDefinition/us-core-"
+                        "ethnicity",
                      "valueCodeableConcept": {
                          "coding": [{
                              "system": "http://hl7.org/fhir/v3/Ethnicity",
@@ -141,8 +142,8 @@ class TestDemographics(TestCase):
         assert 2 == len([ext for ext in fhir['extension']
                          if 'valueCodeableConcept' in ext])
         assert 3 == len(fhir['careProvider'])
-        assert Reference.practitioner(pract_id).as_fhir() \
-               in fhir['careProvider']
+        assert (Reference.practitioner(pract_id).as_fhir()
+                in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         assert user._email.startswith('__no_email__')
