@@ -51,7 +51,8 @@ class TestUserDocument(TestCase):
                 == FHIR_datetime.as_fhir(now))
 
     def test_post_patient_report(self):
-        # tests whether we can successfully post a patient report -type user doc file
+        # tests whether we can successfully post a patient report -type
+        # user doc file
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY
         create_service_token(client=client, user=get_user(TEST_USER_ID))
