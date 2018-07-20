@@ -96,9 +96,9 @@ def organization_search():
 
             query = OrganizationIdentifier.query.join(
                 Identifier).filter(and_(
-                OrganizationIdentifier.identifier_id == Identifier.id,
-                Identifier.system == PRACTICE_REGION,
-                Identifier._value == region))
+                    OrganizationIdentifier.identifier_id == Identifier.id,
+                    Identifier.system == PRACTICE_REGION,
+                    Identifier._value == region))
             found_ids = [oi.organization_id for oi in query]
             if not found_ids:
                 abort(404, "no organzations found for state {}".format(v))
@@ -122,9 +122,9 @@ def organization_search():
     if system and value:
         query = OrganizationIdentifier.query.join(
             Identifier).filter(and_(
-            OrganizationIdentifier.identifier_id == Identifier.id,
-            Identifier.system == system,
-            Identifier._value == value))
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == value))
         found_ids = [oi.organization_id for oi in query]
         if not found_ids:
             abort(
@@ -196,10 +196,10 @@ def organization_get(id_or_code):
         query = Organization.query.join(
             OrganizationIdentifier).join(
             Identifier).filter(and_(
-            Organization.id == OrganizationIdentifier.organization_id,
-            OrganizationIdentifier.identifier_id == Identifier.id,
-            Identifier.system == system,
-            Identifier._value == id_or_code))
+                Organization.id == OrganizationIdentifier.organization_id,
+                OrganizationIdentifier.identifier_id == Identifier.id,
+                Identifier.system == system,
+                Identifier._value == id_or_code))
         if query.count() == 1:
             org = query.first()
         else:
