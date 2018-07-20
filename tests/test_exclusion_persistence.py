@@ -21,6 +21,7 @@ from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRelationship, UserRoles
 from tests import TEST_USER_ID, TestCase
 
+
 class TestExclusionPersistence(TestCase):
 
     def setUp(self):

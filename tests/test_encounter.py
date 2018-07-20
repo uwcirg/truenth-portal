@@ -15,6 +15,7 @@ from portal.models.role import ROLE
 from portal.models.user import INVITE_PREFIX
 from tests import TEST_USER_ID, TestCase
 
+
 class TestEncounter(TestCase):
 
     def test_encounter_from_fhir(self):
