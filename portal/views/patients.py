@@ -40,8 +40,8 @@ def patients_root():
     org_list = set()
     now = datetime.utcnow()
     consent_query = UserConsent.query.filter(and_(
-                         UserConsent.deleted_id.is_(None),
-                         UserConsent.expires > now))
+        UserConsent.deleted_id.is_(None),
+        UserConsent.expires > now))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
 
     if user.has_role(ROLE.STAFF.value):
@@ -75,16 +75,15 @@ def patients_root():
 
         # Gather up all patients belonging to any of the orgs (and their
         # children) this (staff) user belongs to.
-        org_patients = User.query.join(UserRoles).filter(
-            and_(User.id == UserRoles.user_id,
-                 UserRoles.role_id == patient_role_id,
-                 User.deleted_id.is_(None),
-                 User.id.in_(consented_users)
-                 )
-            ).join(UserOrganization).filter(
-                and_(UserOrganization.user_id == User.id,
-                     UserOrganization.organization_id != 0,
-                     UserOrganization.organization_id.in_(org_list)))
+        org_patients = User.query.join(UserRoles).filter(and_(
+            User.id == UserRoles.user_id,
+            UserRoles.role_id == patient_role_id,
+            User.deleted_id.is_(None),
+            User.id.in_(consented_users))
+        ).join(UserOrganization).filter(and_(
+            UserOrganization.user_id == User.id,
+            UserOrganization.organization_id != 0,
+            UserOrganization.organization_id.in_(org_list)))
         patients = patients.union(org_patients)
 
     if user.has_role(ROLE.INTERVENTION_STAFF.value):
@@ -98,10 +97,9 @@ def patients_root():
                  UserRoles.role_id == patient_role_id,
                  User.deleted_id.is_(None),
                  User.id.in_(consented_users))
-                 ).join(UserIntervention).filter(
-                 and_(
-                     UserIntervention.user_id == User.id,
-                     UserIntervention.intervention_id.in_(ui_list)))
+        ).join(UserIntervention).filter(and_(
+            UserIntervention.user_id == User.id,
+            UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
     # only show test users to admins

@@ -82,9 +82,9 @@ def patient_search():
                           "need 'system' and 'value' to look up identifier")
                 ui = UserIdentifier.query.join(
                     Identifier).filter(and_(
-                        UserIdentifier.identifier_id==Identifier.id,
-                        Identifier.system==ident_dict['system'],
-                        Identifier._value==ident_dict['value'])).first()
+                        UserIdentifier.identifier_id == Identifier.id,
+                        Identifier.system == ident_dict['system'],
+                        Identifier._value == ident_dict['value'])).first()
                 if ui:
                     search_params['id'] = ui.user_id
             except ValueError:
