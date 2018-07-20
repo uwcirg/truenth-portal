@@ -43,14 +43,16 @@ eproms = Blueprint(
 
 @eproms.errorhandler(404)
 def page_not_found(e):
-    return render_template('eproms/404.html', no_nav="true", user=current_user()), 404
+    return render_template(
+        'eproms/404.html', no_nav="true", user=current_user()), 404
 
 
 @eproms.errorhandler(500)
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
-    return render_template('eproms/500.html', no_nav="true", user=current_user()), 500
+    return render_template(
+        'eproms/500.html', no_nav="true", user=current_user()), 500
 
 
 @eproms.route('/')
@@ -64,7 +66,10 @@ def landing():
     init_login_modal = False
     if 'pending_authorize_args' in session:
         init_login_modal = True
-    return render_template('eproms/landing.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
+    return render_template(
+        'eproms/landing.html', user=None, no_nav="true",
+        timed_out=timed_out,
+        init_login_modal=init_login_modal)
 
 
 @eproms.route('/home')
@@ -90,7 +95,7 @@ def home():
 
     # Enforce flow - don't expect 'next' params here
     if 'next' in session and session['next']:
-        abort(500, "session['next'] found in /home for user {}".\
+        abort(500, "session['next'] found in /home for user {}".
               format(user))
 
     # Enforce flow - confirm we have acquired initial data
@@ -171,7 +176,8 @@ def terms_and_conditions():
         terms = VersionedResource(
             app_text(Terms_ATMA.name_key()), locale_code=None)
     return render_template(
-        'eproms/terms.html', content=terms.asset, editorUrl=terms.editor_url, user=user)
+        'eproms/terms.html', content=terms.asset, editorUrl=terms.editor_url,
+        user=user)
 
 
 @eproms.route('/about')
@@ -201,7 +207,8 @@ def contact():
             if '@' in org.email:
                 recipient_types.append((org.name, org.email))
         return render_template(
-            'eproms/contact.html', sendername=sendername, email=email, user=user,
+            'eproms/contact.html', sendername=sendername, email=email,
+            user=user,
             types=recipient_types)
 
     if (not user and
@@ -278,7 +285,8 @@ def resources():
     org = user.first_top_organization()
     if not org:
         abort(400, 'user must belong to an organization')
-    resources_data = get_any_tag_data('{} work instruction'.format(org.name.lower()))
+    resources_data = get_any_tag_data(
+        '{} work instruction'.format(org.name.lower()))
     results = json.JSONDecoder().decode(resources_data)['results']
     if (len(results) > 0):
         video_content = []
