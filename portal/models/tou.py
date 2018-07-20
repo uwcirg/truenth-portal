@@ -73,7 +73,8 @@ def update_tous(
 
     require_orgs = None
     if organization:
-        org = Organization.query.filter(Organization.name == organization).first()
+        org = Organization.query.filter(
+            Organization.name == organization).first()
         if not org:
             raise ValueError("No such organization: {}".format(organization))
         require_orgs = set(OrgTree().here_and_below_id(org.id))

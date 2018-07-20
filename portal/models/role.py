@@ -40,7 +40,7 @@ class Role(db.Model):
         return ' '.join([n.title() for n in word_list])
 
 
-#Source definition for roles, as dictionary {name: description,}
+# Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = {
     'access_on_verify':
         'Provides access prior to registration, on verification',
@@ -84,9 +84,9 @@ STATIC_ROLES = {
         'previous sessions',
 }
 
-
 ROLE = Enum('ROLE', {r.upper(): r for r in STATIC_ROLES})
 ALL_BUT_WRITE_ONLY = [r.value for r in ROLE if r.value != 'write_only']
+
 
 def add_static_roles():
     """Seed database with default static roles
