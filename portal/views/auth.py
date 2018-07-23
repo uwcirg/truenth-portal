@@ -52,7 +52,7 @@ from ..models.user import (
 auth = Blueprint('auth', __name__)
 
 google_blueprint = make_google_blueprint(
-    scope=['profile', 'email'],
+    scope=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
     login_url='/login/google/',
 )
 
@@ -162,9 +162,6 @@ def login_user_with_provider(request, provider):
     of FlaskDanceProvider and passed here. This function uses it to get more information
     about the user to successfully log them in.
     """
-    import pdb
-    pdb.set_trace()
-    
     store_next_in_session(request, provider)
     
     if current_user():
@@ -534,7 +531,7 @@ def next_after_login():
     return resp
 
 
-#@auth.route('/login/<provider_name>/')
+@auth.route('/login/<provider_name>/')
 def login(provider_name):
     """login view function
 
@@ -556,7 +553,10 @@ def login(provider_name):
     if provider_name == 'TESTING' and current_app.config['TESTING']:
         return testing_backdoor(request.args.get('user_id'))
 
-    print "Old auth method called"
+    if current_user():
+        if current_user().deleted:
+            abort(400, "deleted user - operation not permitted")
+        return next_after_login()
 
     response = make_response()
     return response
