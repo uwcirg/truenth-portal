@@ -271,6 +271,7 @@ def login_user_with_provider(request, provider):
             
             # Make sure the user is committed
             db.session.add(user)
+            db.session.commit();
             
             auditable_event(
                 "register new user via {0}".format(provider.name),
