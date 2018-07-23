@@ -96,9 +96,9 @@ def organization_search():
 
             query = OrganizationIdentifier.query.join(
                 Identifier).filter(and_(
-                    OrganizationIdentifier.identifier_id==Identifier.id,
-                    Identifier.system==PRACTICE_REGION,
-                    Identifier._value==region))
+                    OrganizationIdentifier.identifier_id == Identifier.id,
+                    Identifier.system == PRACTICE_REGION,
+                    Identifier._value == region))
             found_ids = [oi.organization_id for oi in query]
             if not found_ids:
                 abort(404, "no organzations found for state {}".format(v))
@@ -107,7 +107,7 @@ def organization_search():
             if not filter == 'leaves':
                 abort(
                     400, "unknown filter request '{}' - expecting "
-                    "'leaves'".format(filter))
+                         "'leaves'".format(filter))
         elif k == 'system':
             system = v
         elif k == 'value':
@@ -115,8 +115,9 @@ def organization_search():
         elif k == 'tree_view':
             tree_view = v and v.lower() == 'true'
         else:
-            abort(400, "only search on `state`, `filter` or `system` AND `value` "
-                  "are available at this time")
+            abort(
+                400, "only search on `state`, `filter` or `system` AND `value`"
+                     " are available at this time")
 
     if system and value:
         query = OrganizationIdentifier.query.join(
@@ -202,8 +203,9 @@ def organization_get(id_or_code):
         if query.count() == 1:
             org = query.first()
         else:
-            abort(404, 'no organization found with identifier: '
-                  'system `{}`, value `{}`'.format(system, id_or_code))
+            abort(
+                404, 'no organization found with identifier: '
+                     'system `{}`, value `{}`'.format(system, id_or_code))
     else:
         try:
             organization_id = int(id_or_code)
@@ -211,7 +213,7 @@ def organization_get(id_or_code):
         except ValueError:
             abort(
                 400, "invalid input '{}' - expected integer without system "
-                "parameter".format(id_or_code))
+                     "parameter".format(id_or_code))
 
     return jsonify(org.as_fhir(include_empties=False))
 
@@ -256,7 +258,8 @@ def organization_delete(organization_id):
         message = "Cannot delete organization with related entities"
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
-    auditable_event("deleted {}".format(org), user_id=current_user().id,
+    auditable_event(
+        "deleted {}".format(org), user_id=current_user().id,
         subject_id=current_user().id, context='organization')
     OrgTree.invalidate_cache()
     return jsonify(message='deleted organization {}'.format(org))
@@ -318,8 +321,8 @@ def organization_post():
           to view requested patient
 
     """
-    if not request.json or 'resourceType' not in request.json or\
-            request.json['resourceType'] != 'Organization':
+    if (not request.json or 'resourceType' not in request.json or
+            request.json['resourceType'] != 'Organization'):
         abort(400, "Requires FHIR resourceType of 'Organization'")
     try:
         org = Organization.from_fhir(request.json)
@@ -390,8 +393,8 @@ def organization_put(organization_id):
           to view requested patient
 
     """
-    if not request.json or 'resourceType' not in request.json or\
-            request.json['resourceType'] != 'Organization':
+    if (not request.json or 'resourceType' not in request.json or
+            request.json['resourceType'] != 'Organization'):
         abort(400, "Requires FHIR resourceType of 'Organization'")
     org = Organization.query.get_or_404(organization_id)
     try:
