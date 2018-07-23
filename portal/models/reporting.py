@@ -144,7 +144,7 @@ def generate_and_send_summaries(cutoff_days, org_id):
 
     for user in User.query.filter_by(deleted_id=None).all():
         if not (user.has_role(ROLE.STAFF.value) and user.email_ready()[0]
-                and (top_org in ot.find_top_level_org(user.organizations))):
+                and (top_org in ot.find_top_level_orgs(user.organizations))):
             continue
 
         args = load_template_args(user=user)
