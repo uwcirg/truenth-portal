@@ -1093,10 +1093,8 @@ def stock_consent(org_name):
 
 
 def get_asset(uuid):
-    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
-    data = requests.get(url).content
-    return json.loads(data.decode('utf-8'))['asset']
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 
 def get_any_tag_data(*anyTags):
@@ -1112,12 +1110,9 @@ def get_any_tag_data(*anyTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()
 
 
 def get_all_tag_data(*allTags):
@@ -1133,9 +1128,6 @@ def get_all_tag_data(*allTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()
