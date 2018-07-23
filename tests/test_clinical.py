@@ -21,6 +21,7 @@ from portal.models.reference import Reference
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
+
 class TestClinical(TestCase):
 
     def prep_db_for_clinical(self):
@@ -50,9 +51,9 @@ class TestClinical(TestCase):
         self.prep_db_for_clinical()
         self.gleason_concept = db.session.merge(self.gleason_concept)
         self.test_user = db.session.merge(self.test_user)
-        assert pytest.approx(datetime.utcnow().toordinal()) == \
-            self.test_user.fetch_datetime_for_concept(
-                self.gleason_concept).toordinal()
+        assert (pytest.approx(datetime.utcnow().toordinal()) ==
+                self.test_user.fetch_datetime_for_concept(
+                    self.gleason_concept).toordinal())
 
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
@@ -60,19 +61,17 @@ class TestClinical(TestCase):
         response = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
         clinical_data = response.json
-        assert \
-            'Gleason score' == \
-            clinical_data\
-                ['entry'][0]['content']['code']['coding'][0]['display']
-        assert '2' == \
-               clinical_data['entry'][0]['content']['valueQuantity']['value']
-        assert json.dumps(Reference.patient(TEST_USER_ID).as_fhir())\
-            == clinical_data['entry'][0]['content']['performer'][0]
-        found = parser.parse(
-            clinical_data['entry'][0]['updated'])
+        assert ('Gleason score' ==
+                clinical_data['entry'][0]['content']['code']['coding'][0][
+                   'display'])
+        assert ('2' ==
+                clinical_data['entry'][0]['content']['valueQuantity']['value'])
+        assert (json.dumps(Reference.patient(TEST_USER_ID).as_fhir())
+                == clinical_data['entry'][0]['content']['performer'][0])
+        found = parser.parse(clinical_data['entry'][0]['updated'])
         found = found.replace(tzinfo=None)
         self.assertAlmostEqual(datetime.utcnow(), found,
-                                delta=timedelta(seconds=5))
+                               delta=timedelta(seconds=5))
 
     def test_clinicalPOST(self):
         data = {
@@ -96,9 +95,9 @@ class TestClinical(TestCase):
         }
 
         self.login()
-        response = self.client.post('/api/patient/%s/clinical' % TEST_USER_ID,
-                              content_type='application/json',
-                              data=json.dumps(data))
+        response = self.client.post(
+            '/api/patient/%s/clinical' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
         fhir = response.json
         assert '28540-3' in fhir['message']
@@ -108,7 +107,7 @@ class TestClinical(TestCase):
 
     def test_int_code_POST(self):
         data = {
-            "resourceType":"Observation",
+            "resourceType": "Observation",
             "code": {
                 "coding": [{
                     "code": 111,
@@ -141,7 +140,7 @@ class TestClinical(TestCase):
         assert response.status_code == 200
         clinical_data = response.json
         assert clinical_data['status'] == 'unknown'
-        assert clinical_data['issued'] == new_issued+"+00:00"  # tz
+        assert clinical_data['issued'] == new_issued + "+00:00"  # tz
         assert clinical_data['valueQuantity']['value'] == 'false'
 
     def test_clinical0forFalse(self):
@@ -157,7 +156,7 @@ class TestClinical(TestCase):
         assert response.status_code == 200
         clinical_data = response.json
         assert clinical_data['status'] == 'unknown'
-        assert clinical_data['issued'] == new_issued+"+00:00"  # tz
+        assert clinical_data['issued'] == new_issued + "+00:00"  # tz
         assert clinical_data['valueQuantity']['value'] == 'false'
 
     def test_empty_clinical_get(self):
@@ -170,12 +169,12 @@ class TestClinical(TestCase):
         self.login()
         data = {
             "resourceType": "Observation",
-            "code":{"coding":[{
-                "code":"121",
-                "display":"PCa diagnosis",
-                "system":"http://us.truenth.org/clinical-codes"}]},
-                "status":"unknown",
-                "valueQuantity":{"units": "boolean", "value": None}}
+            "code": {"coding": [{
+                "code": "121",
+                "display": "PCa diagnosis",
+                "system": "http://us.truenth.org/clinical-codes"}]},
+            "status": "unknown",
+            "valueQuantity": {"units": "boolean", "value": None}}
         response = self.client.post('/api/patient/{}/clinical'.format(
             TEST_USER_ID), content_type='application/json',
             data=json.dumps(data))
@@ -197,10 +196,9 @@ class TestClinical(TestCase):
     def test_clinical_biopsy_put(self):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
-        response = self.client.post('/api/patient/%s/clinical/biopsy'
-                                    % TEST_USER_ID,
-                              content_type='application/json',
-                              data=json.dumps({'value': True}))
+        response = self.client.post(
+            '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps({'value': True}))
         assert response.status_code == 200
         result = response.json
         assert result['message'] == 'ok'
@@ -223,10 +221,9 @@ class TestClinical(TestCase):
         assert data['value'] == 'true'
 
         # Can we alter the value?
-        response = self.client.post('/api/patient/%s/clinical/biopsy'
-                                    % TEST_USER_ID,
-                              content_type='application/json',
-                              data=json.dumps({'value': False}))
+        response = self.client.post(
+            '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps({'value': False}))
         assert response.status_code == 200
         result = response.json
         assert result['message'] == 'ok'
@@ -272,10 +269,9 @@ class TestClinical(TestCase):
         assert data['value'] == 'unknown'
 
         # Can we alter the value?
-        response = self.client.post('/api/patient/%s/clinical/biopsy'
-                                    % TEST_USER_ID,
-                              content_type='application/json',
-                              data=json.dumps({'value': False}))
+        response = self.client.post(
+            '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps({'value': False}))
         assert response.status_code == 200
         result = response.json
         assert result['message'] == 'ok'
@@ -411,10 +407,9 @@ class TestClinical(TestCase):
             data = json.load(fhir_data)
 
         self.login()
-        response = self.client.put('/api/patient/{}/clinical'
-                                   .format(TEST_USER_ID),
-                             content_type='application/json',
-                             data=json.dumps(data))
+        response = self.client.put(
+            '/api/patient/{}/clinical'.format(TEST_USER_ID),
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
 
         obs = self.test_user.observations.one()  # only expect the one

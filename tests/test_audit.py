@@ -12,23 +12,26 @@ from portal.models.role import ROLE
 from portal.models.user_consent import UserConsent
 from tests import FIRST_NAME, LAST_NAME, TEST_USER_ID, TestCase
 
-log_login_idp = \
-    "2016-02-23 09:49:25,733: "\
-    "performed by {} on {}: "\
-    "login: login user via NEW IdP facebook".format(TEST_USER_ID, TEST_USER_ID)
+log_login_idp = (
+    "2016-02-23 09:49:25,733: "
+    "performed by {} on {}: "
+    "login: login user via NEW IdP facebook".format(
+        TEST_USER_ID, TEST_USER_ID))
 
-log_login_google = \
-    "2016-02-23 09:52:57,806: "\
-    "performed by {} on {}: "\
-    "login: login via google".format(TEST_USER_ID, TEST_USER_ID)
+log_login_google = (
+    "2016-02-23 09:52:57,806: "
+    "performed by {} on {}: "
+    "login: login via google".format(TEST_USER_ID, TEST_USER_ID))
 
-log_callbacks = \
-    "2016-02-23 10:52:24,856: "\
-    "performed by {} on {}: "\
-    "other: after: "\
-    "Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, "\
-    "redirects: https://stg-sr.us.truenth.org/, "\
-    "callback: https://stg-sr.us.truenth.org/_/callback".format(TEST_USER_ID, TEST_USER_ID)
+log_callbacks = (
+    "2016-02-23 10:52:24,856: "
+    "performed by {} on {}: "
+    "other: after: "
+    "Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, "
+    "redirects: https://stg-sr.us.truenth.org/, "
+    "callback: https://stg-sr.us.truenth.org/_/callback".format(TEST_USER_ID,
+                                                                TEST_USER_ID))
+
 
 class TestAudit(TestCase):
     """Audit model tests"""
@@ -64,8 +67,9 @@ class TestAudit(TestCase):
         assert 0 == len(response.json['audits'])
 
     def test_get(self):
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-                        comment='just test data')
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+            comment='just test data')
         with SessionScope(db):
             db.session.add(audit)
             db.session.commit()
@@ -75,12 +79,12 @@ class TestAudit(TestCase):
         response = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         assert response.status_code == 200
         assert 1 == len(response.json['audits'])
-        assert response.json['audits'][0]['by']['reference'] ==\
-            Reference.patient(TEST_USER_ID).as_fhir()['reference']
-        assert response.json['audits'][0]['by']['display'] ==\
-            ' '.join((FIRST_NAME, LAST_NAME))
-        assert response.json['audits'][0]['on'] ==\
-            Reference.patient(TEST_USER_ID).as_fhir()
+        assert (response.json['audits'][0]['by']['reference'] ==
+                Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+        assert (response.json['audits'][0]['by']['display'] ==
+                ' '.join((FIRST_NAME, LAST_NAME)))
+        assert (response.json['audits'][0]['on'] ==
+                Reference.patient(TEST_USER_ID).as_fhir())
         assert response.json['audits'][0]['context'] == 'other'
         assert response.json['audits'][0]['comment'] == 'just test data'
 
@@ -92,8 +96,9 @@ class TestAudit(TestCase):
         org = Organization.query.filter(Organization.id > 0).first()
         staff.organizations.append(org)
         self.test_user.organizations.append(org)
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-                    comment='just test data')
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+            comment='just test data')
         consent = UserConsent(user_id=TEST_USER_ID, organization_id=org.id,
                               audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
@@ -105,9 +110,9 @@ class TestAudit(TestCase):
         response = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         assert response.status_code == 200
         assert 1 == len(response.json['audits'])
-        assert response.json['audits'][0]['by']['reference'] ==\
-            Reference.patient(TEST_USER_ID).as_fhir()['reference']
-        assert response.json['audits'][0]['on'] ==\
-            Reference.patient(TEST_USER_ID).as_fhir()
+        assert (response.json['audits'][0]['by']['reference'] ==
+                Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+        assert (response.json['audits'][0]['on'] ==
+                Reference.patient(TEST_USER_ID).as_fhir())
         assert response.json['audits'][0]['context'] == 'other'
         assert response.json['audits'][0]['comment'] == 'just test data'

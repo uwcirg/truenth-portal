@@ -45,8 +45,8 @@ def mock_qr(
         "questionnaire": {
             "display": "Additional questions",
             "reference":
-            "https://{}/api/questionnaires/{}".format(
-                'SERVER_NAME', instrument_id)},
+                "https://{}/api/questionnaires/{}".format(
+                    'SERVER_NAME', instrument_id)},
         "identifier": {
             "use": "official",
             "label": "cPRO survey session ID",
@@ -362,8 +362,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # confirm appropriate instruments
         a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert set(a_s.instruments_needing_full_assessment()) ==\
-            localized_instruments
+        assert (set(a_s.instruments_needing_full_assessment()) ==
+                localized_instruments)
 
     def test_localized_on_time(self):
         # User finished both on time
@@ -406,10 +406,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         assert a_s.overall_status == "In Progress"
 
         # confirm appropriate instruments
-        assert\
-            localized_instruments -\
-            set(a_s.instruments_needing_full_assessment('all')) ==\
-            {'eproms_add'}
+        assert (localized_instruments -
+                set(a_s.instruments_needing_full_assessment('all')) ==
+                {'eproms_add'})
         assert not a_s.instruments_in_progress()
 
     def test_metastatic_on_time(self):
@@ -437,14 +436,13 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         assert a_s.overall_status == "Due"
 
         # confirm list of expected intruments needing attention
-        assert \
-            metastatic_baseline_instruments ==\
-            set(a_s.instruments_needing_full_assessment())
+        assert (metastatic_baseline_instruments ==
+                set(a_s.instruments_needing_full_assessment()))
         assert not a_s.instruments_in_progress()
 
         # metastatic indefinite should also be 'due'
-        assert metastatic_indefinite_instruments ==\
-            set(a_s.instruments_needing_full_assessment('indefinite'))
+        assert (metastatic_indefinite_instruments ==
+                set(a_s.instruments_needing_full_assessment('indefinite')))
         assert not a_s.instruments_in_progress('indefinite')
 
     def test_localized_overdue(self):
@@ -489,9 +487,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # with only epic26 started, should see results for both
         # instruments_needing_full_assessment and insturments_in_progress
-        assert \
-            {'eproms_add', 'comorb'} ==\
-            set(a_s.instruments_needing_full_assessment())
+        assert ({'eproms_add', 'comorb'} ==
+                set(a_s.instruments_needing_full_assessment()))
         assert ['doc-26'] == a_s.instruments_in_progress()
 
     def test_metastatic_as_of_date(self):
@@ -530,9 +527,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         # in the initial window w/ no questionnaires submitted
         # should include all from initial recur
-        assert \
-            set(a_s.instruments_needing_full_assessment()) ==\
-            metastatic_3
+        assert (set(a_s.instruments_needing_full_assessment()) ==
+                metastatic_3)
 
         # confirm iteration 0
         assert a_s.qb_data.qbd.iteration == 0
@@ -611,8 +607,9 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         assert response.status_code == 200
         assert len(response.json['status']) == 1
         assert (
-            response.json['status'][0]['consents'][0]['assessment_status'] ==
-            'Expired')
+                response.json['status'][0]['consents'][0][
+                    'assessment_status'] ==
+                'Expired')
 
     def test_none_org(self):
         # check users w/ none of the above org
@@ -697,7 +694,6 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         assert a_s.overall_status == 'Expired'
-
 
 
 class TestTnthAssessmentStatus(TestQuestionnaireSetup):
