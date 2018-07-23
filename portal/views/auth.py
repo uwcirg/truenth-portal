@@ -347,7 +347,7 @@ def google_error(blueprint, error, error_description=None, error_uri=None):
     # the 3rd party IdP redirect)
     current_app.logger.info("attempting reload on oauth error")
     return render_template('force_reload.html',
-        message=result.error.message)
+        message=error_description)
 
 @auth.route('/deauthorized', methods=('POST',))
 @csrf.exempt
