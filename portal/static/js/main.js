@@ -828,37 +828,32 @@ var tnthAjax = {
         }
     },
     deleteConsent: function(userId, params) {
-        if (userId && params) {
-            var consented = this.getAllValidConsent(userId, params.org);
-            if (consented) {
-                var self = this, __url = "/api/user/" + userId + "/consent";
-                consented.forEach(function(orgId) { //delete all consents for the org
-                    var found = false;
-                    if (params.exclude) {
-                        var arr = params.exclude.split(",");
-                        arr.forEach(function(o) {
-                            if (!found) {
-                                found = (String(o) === String(orgId));
-                            }
-                        });
-                        if (found) {
-                            return true;
-                        }
-                    }
-                    if (!found) {
-                        self.sendRequest(__url, "DELETE", userId, {sync: true,data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
-                            if (data) {
-                                if (!data.error) {
-                                    $(".delete-consent-error").html("");
-                                } else {
-                                    $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
-                                }
-                            }
-                        });
-                    }
-                });
-            }
+        if (!userId || !params) {
+            return false;
         }
+        var consented = this.getAllValidConsent(userId, params.org);
+        if (!consented) {
+            return false;
+        }
+        var arrExcludedOrgIds = params.exclude ? params.exclude.split(","): [];
+        var arrConsents = $.grep(consented, function(orgId) {
+            var inArray = $.grep(arrExcludedOrgIds, function(eOrg) {
+                return String(eOrg) === String(orgId);
+            });
+           return !(inArray.length); //filter out org Id(s) that are in the array of org Ids to be excluded;
+        });
+        var self = this;
+        arrConsents.forEach(function(orgId) { //delete all consents for the org
+            self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
+                if (data) {
+                    if (!data.error) {
+                        $(".delete-consent-error").html("");
+                    } else {
+                        $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
+                    }
+                }
+            });
+        });
     },
     withdrawConsent: function(userId, orgId, params, callback) {
         callback = callback || function() {};
@@ -897,12 +892,12 @@ var tnthAjax = {
             if (!data || data.error || !data.consent_agreements || data.consent_agreements.length === 0) {
                 return consentedOrgIds;
             }
-            (data.consent_agreements).forEach(function(item) {
+            consentedOrgIds = $.grep(data.consent_agreements, function(item) {
                 var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
-                if (!item.deleted && !(expired > 0)) {
-                    if (String(orgId).toLowerCase() === "all") { consentedOrgIds.push(item.organization_id); }
-                    else if (String(orgId) === String(item.organization_id)) { consentedOrgIds.push(orgId); }
-                }
+                return !item.deleted && !(expired > 0) && (String(orgId).toLowerCase() === "all" || String(orgId) === String(item.organization_id));
+            });
+            consentedOrgIds = (consentedOrgIds).map(function(item) {
+                return item.organization_id;
             });
             return consentedOrgIds;
         });
