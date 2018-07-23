@@ -170,6 +170,9 @@
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
                 errorMessage: ""
             },
+            patientEmailForm: {
+                loading: false
+            },
             disableFields: [],
             topLevelOrgs: [],
             fillViews: {},
@@ -1111,11 +1114,17 @@
                         self.messages.userInviteEmailErrorMessage = i18next.t("Url for email content is unavailable.");
                         return false;
                     }
-                    var resetBtn = function() {
-                        btnSelf.removeClass("disabled").attr("disabled", false);
+                    var resetBtn = function(disabled, showLoading) {
+                        disabled = disabled || false;
+                        btnSelf.attr("disabled", disabled);
+                        self.patientEmailForm.loading = showLoading;
+                        if (!disabled) {
+                            btnSelf.removeClass("disabled");
+                        } else {
+                            btnSelf.addClass("disabled");
+                        }
                     };
-                    btnSelf.addClass("disabled").attr("disabled", true);
-
+                    resetBtn(true, true);
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,
@@ -1124,7 +1133,7 @@
                     }).done(function(data) {
                         if (!data || !data.subject || !data.body) {
                             self.messages.userInviteEmailErrorMessage = "<div>" + i18next.t("Unable to send email. Missing content.") + "</div>";;
-                            btnSelf.removeClass("disabled").attr("disabled", false);
+                            resetBtn();
                             return false;
                         }
                         subject = data.subject;
@@ -1161,6 +1170,7 @@
                                     self.getEmailLog(self.subjectId, data);
                                 }, 100);
                             });
+                            resetBtn(true);
                         });
                     }).fail(function(xhr) { //report error
                         self.messages.userInviteEmailErrorMessage = i18next.t("Error occurred retreving email content via API.");
