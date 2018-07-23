@@ -13,6 +13,8 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
 import sys
@@ -231,15 +233,15 @@ def update_card_html_on_completion():
                 classification='indefinite'))
 
         def thank_you_block(name, registry):
-            greeting = _(u"Thank you, {}.").format(name)
+            greeting = _("Thank you, %(full_name)s.", full_name=name)
             confirm = _(
-                u"You've completed the %(registry)s questionnaire.",
+                "You've completed the %(registry)s questionnaire.",
                 registry=_(registry))
             reminder = _(
-                u"You will be notified when the next "
+                "You will be notified when the next "
                 "questionnaire is ready to complete.")
-            logout = _(u"Log out")
-            return u"""
+            logout = _("Log out")
+            return """
                 <div class="portal-header-container">
                   <h2 class="portal-header">{greeting}</h2>
                   <p>{confirm}</p>
@@ -263,7 +265,7 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status in (
                     'Due', 'Overdue', 'In Progress'):
-                greeting = _(u"Hi {}").format(user.display_name)
+                greeting = _("Hi, %(full_name)s", full_name=user.display_name)
 
                 qb = assessment_status.qb_data.qbd.questionnaire_bank
                 trigger_date = qb.trigger_date(user)
@@ -278,7 +280,7 @@ def update_card_html_on_completion():
                         trigger_date, as_of_date=now) or utc_start
                     expired_date = localize_datetime(utc_expired, user)
                     reminder = _(
-                        u"Please complete your %(assigning_authority)s "
+                        "Please complete your %(assigning_authority)s "
                         "questionnaire as soon as possible. It will expire "
                         "on %(expired_date)s.",
                         assigning_authority=_(
@@ -287,12 +289,12 @@ def update_card_html_on_completion():
                 else:
                     due_date = localize_datetime(utc_due, user)
                     reminder = _(
-                        u"Please complete your %(assigning_authority)s "
+                        "Please complete your %(assigning_authority)s "
                         "questionnaire by %(due_date)s.",
                         assigning_authority=assessment_status.assigning_authority,
                         due_date=due_date)
 
-                return u"""
+                return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
                       <h4 class="portal-intro-text">
@@ -301,12 +303,12 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
 
             if any(indefinite_questionnaires):
-                greeting = _(u"Hi {}").format(user.display_name)
+                greeting = _("Hi, %(full_name)s", full_name=user.display_name)
                 reminder = _(
-                    u"Please complete your %(assigning_authority)s "
+                    "Please complete your %(assigning_authority)s "
                     "questionnaire at your convenience.",
                     assigning_authority=assessment_status.assigning_authority)
-                return u"""
+                return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
                       <h4 class="portal-intro-text">
@@ -314,7 +316,7 @@ def update_card_html_on_completion():
                       </h4>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
-            if assessment_status.overall_status == "Completed":
+            if assessment_status.overall_status in ("Completed", "Withdrawn"):
                 return thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
@@ -322,11 +324,11 @@ def update_card_html_on_completion():
 
         def completed_card_html(assessment_status):
             """Generates the appropriate HTML for the 'completed card'"""
-            header = _(u"Completed Questionnaires")
+            header = _("Completed Questionnaires")
             message = _(
-                u"When you are done, completed questionnaires will be "
+                "When you are done, completed questionnaires will be "
                 "shown here.")
-            completed_placeholder = u"""
+            completed_placeholder = """
                 <div class="portal-description disabled">
                   <h4 class="portal-description-title">
                     {header}
@@ -336,7 +338,7 @@ def update_card_html_on_completion():
                   </div>
                 </div>""".format(header=header, message=message)
 
-            completed_html = u"""
+            completed_html = """
                 <div class="portal-description">
                   <h4 class="portal-description-title">
                     {header}
@@ -351,11 +353,11 @@ def update_card_html_on_completion():
                  </div>"""
 
             if assessment_status.overall_status == "Completed":
-                header = _(u"Completed Questionnaires")
+                header = _("Completed Questionnaires")
                 utc_comp_date = assessment_status.completed_date
                 comp_date = localize_datetime(utc_comp_date, user)
                 message = _(
-                    u"View questionnaire completed on %(comp_date)s",
+                    "View questionnaire completed on %(comp_date)s",
                     comp_date=comp_date)
                 return completed_html.format(
                     header=header, message=message,
@@ -371,18 +373,18 @@ def update_card_html_on_completion():
         if assessment_status.overall_status in (
                 'Due', 'Overdue', 'In Progress'):
 
-            link_label = _(u'Go to questionnaire')
+            link_label = _('Go to questionnaire')
             # User has unfinished baseline assessment work
             if assessment_status.overall_status == 'In Progress':
-                link_label = _(u'Continue questionnaire')
+                link_label = _('Continue questionnaire')
 
             link_url = url_for('assessment_engine_api.present_needed')
-            header = _(u"Open Questionnaire")
+            header = _("Open Questionnaire")
             message = _(
-                u"Please complete your %(assigning_authority)s "
+                "Please complete your %(assigning_authority)s "
                 "questionnaire here.",
                 assigning_authority=assessment_status.assigning_authority)
-            card_html = u"""
+            card_html = """
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
@@ -400,18 +402,19 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif any(indefinite_questionnaires):
+        elif (any(indefinite_questionnaires)
+              and assessment_status.overall_status != 'Withdrawn'):
             # User completed baseline, but has outstanding indefinite work
-            link_label = _(u'Continue questionnaire') if (
+            link_label = _('Continue questionnaire') if (
                 indefinite_questionnaires[1]) else (
-                    _(u'Go to questionnaire'))
+                    _('Go to questionnaire'))
             link_url = url_for('assessment_engine_api.present_needed')
-            header = _(u"Open Questionnaire")
+            header = _("Open Questionnaire")
             message = _(
-                u"Please complete your %(assigning_authority)s "
+                "Please complete your %(assigning_authority)s "
                 "questionnaire here.",
                 assigning_authority=assessment_status.assigning_authority)
-            card_html = u"""
+            card_html = """
             {intro}
             <div class="portal-main portal-flex-container">
               <div class="portal-description portal-description-incomplete">
@@ -430,13 +433,13 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif assessment_status.overall_status == "Completed":
+        elif assessment_status.overall_status in ("Completed", "Withdrawn"):
             # User completed both baseline and indefinite
-            link_label = _(u'View previous questionnaire')
+            link_label = _('View previous questionnaire')
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
-            header = _(u"Open Questionnaire")
-            message = _(u"No questionnaire is due.")
-            card_html = u"""
+            header = _("Open Questionnaire")
+            message = _("No questionnaire is due.")
+            card_html = """
             <div class="container">
               {intro}
               <div class=
@@ -463,7 +466,7 @@ def update_card_html_on_completion():
                     "Unexpected state {} for {}".format(
                         assessment_status.overall_status, user))
 
-            link_label = u"N/A"
+            link_label = "N/A"
             link_url = None
 
             # If the user was enrolled in indefinite work and lands
@@ -473,12 +476,12 @@ def update_card_html_on_completion():
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
             else:
-                greeting = _(u"Hi, %(full_name)s", full_name=user.display_name)
-                header = _(u"Questionnaire Expired")
+                greeting = _("Hi, %(full_name)s", full_name=user.display_name)
+                header = _("Questionnaire Expired")
                 message = _(
-                    u"The assessment is no longer available.\n"
+                    "The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
-                card_html = u"""
+                card_html = """
                     <div class="portal-header-container">
                         <h2 class="portal-header">{greeting}</h2>
                     </div>

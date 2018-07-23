@@ -1,4 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
 from pprint import pformat
@@ -72,6 +74,7 @@ from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
+from ..type_tools import check_int
 from .auth import logout, next_after_login
 from .crossdomain import crossdomain
 
@@ -85,8 +88,8 @@ def favicon():
 
 @portal.route('/no-script')
 def no_script():
-    return make_response(_(u"This application requires Javascript enabled.\
-                            Please check your browser settings."))
+    return make_response(_("This application requires Javascript enabled."
+                           " Please check your browser settings."))
 
 
 @portal.before_app_request
@@ -549,8 +552,6 @@ def admin():
         org_list = Organization.query.all()
         users = User.query.filter_by(deleted=None).all()
 
-    for u in users:
-        u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template(
         'admin/admin.html', users=users, wide_container="true",
         org_list=list(org_list), user=user)
@@ -1077,7 +1078,7 @@ def stock_consent(org_name):
     :param org_name: the org_name to include in the agreement text
 
     """
-    body = _(u"I consent to sharing information with %(org_name)s",
+    body = _("I consent to sharing information with %(org_name)s",
              org_name=_(org_name))
     return render_template_string(
         """<!doctype html>
@@ -1091,18 +1092,9 @@ def stock_consent(org_name):
         body=body)
 
 
-def check_int(i):
-    try:
-        return int(i)
-    except ValueError:
-        abort(400, "invalid input '{}' - must be an integer".format(i))
-
-
 def get_asset(uuid):
-    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
-    data = requests.get(url).content
-    return json.JSONDecoder().decode(data)['asset']
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 
 def get_any_tag_data(*anyTags):
@@ -1118,12 +1110,9 @@ def get_any_tag_data(*anyTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()
 
 
 def get_all_tag_data(*allTags):
@@ -1139,9 +1128,6 @@ def get_all_tag_data(*allTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()

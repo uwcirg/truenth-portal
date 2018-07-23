@@ -36,6 +36,7 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 .main.exercise-diet {
     top: 0em;
     padding-top: 4em;
+    padding-bottom: 3em;
 }
 .main.portal .Hero-title h2 {
     margin-top: -1em;
@@ -973,32 +974,32 @@ table#diet-table tr td ul li {
 table#avoid-foods-table tr td img.processed-meats {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.poultry {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.whole-milk {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.supplements {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
@@ -1410,9 +1411,9 @@ h3 a {
     text-decoration: underline;
 }
 h3 a:hover {
-	font-size: 22px;
-	font-weight: 600;
-	letter-spacing: .01em;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .01em;
     color: #435928;
     text-align: center;
     padding: 5px 0;
@@ -1420,13 +1421,14 @@ h3 a:hover {
     text-decoration: underline;
 }
 #Resources p {
-	margin: 0px;
-	font-size: 1em;
-	line-height: 1.4em;
-	letter-spacing: .02em;
-	font-weight: 500;
-	font-style: normal;
-	color: #333;
+    margin: 0px;
+    font-size: 1em;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    font-weight: 500;
+    font-style: normal;
+    color: #333;
+    padding: 0 1em;
 }
 #Resources p a {
 	margin: 0px;
@@ -1442,18 +1444,17 @@ h3 a:hover {
     color: #fff;
     background: #5e7c38;
     border: none;
-
-    margin: 10px auto 20px;
-	height: 2.2em;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	font-size: 12px;
-	font-weight: 400;
-	line-height: 90%;
-	text-shadow: none;
-	border-radius: 0;
-	vertical-align: middle;
-	display: inline-block;
+    margin: 10px 1em 20px;
+    height: 2.2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 90%;
+    text-shadow: none;
+    border-radius: 0;
+    vertical-align: middle;
+    display: inline-block;
 }
 #Resources .btn-primary:hover {
     color: #fff;
@@ -3111,6 +3112,21 @@ h6.lose span {
 /* ======================================================================================== */
 /* ======================================================================================== */
 
+@media (max-width: 767px) {
+    body.modal-open .modal.is-modal-active .modal-dialog,
+    div#exercise-works.modal.fade.in,
+    div#exercise-benefits.modal.fade.in {
+        max-width: 100%;
+    }
+}
+div#exercise-works.modal.fade.in table,
+div#exercise-benefits.modal.fade.in table {
+    word-wrap: break-word;
+}
+
+div#exercise-benefits.modal.fade.in table {
+    table-layout: fixed;
+}
 
 div#exercise-benefits.modal.fade.in h2 {
     position: relative;
@@ -3162,11 +3178,11 @@ div#exercise-benefits.modal.fade.in h3 {
     margin: 10px auto;
 }
 div#exercise-benefits.modal.fade.in ul {
-	padding: 3px 3px 10px;
-	padding: 3px 0px 10px;
-
-	margin-bottom: 10px;
-	margin-bottom: 0px;
+    padding: 3px 3px 10px;
+    padding: 3px 0px 10px;
+    margin-bottom: 10px;
+    margin-bottom: 0px;
+    word-wrap: break-word;
 }
 div#exercise-benefits.modal.fade.in ul li:first-child {
     font-weight: 500;

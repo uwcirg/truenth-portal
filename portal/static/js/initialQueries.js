@@ -1022,13 +1022,13 @@
                         setTimeout(function() {
                             fc.initIncompleteFields();
                             fc.onIncompleteFieldsDidInit();
+                            DELAY_LOADING = false;
+                            showMain(); /* global showMain */
+                            hideLoader(true); /* global hideLoader */
                         }, 300);
                         fc.startTime = 0;
                         fc.endTime = 0;
                         clearInterval(fc.intervalId);
-                        DELAY_LOADING = false;
-                        showMain(); /* global showMain */
-                        hideLoader(true); /* global hideLoader */
                     }
                 }, 100);
             });

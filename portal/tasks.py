@@ -190,9 +190,6 @@ def update_patient_loop(update_cache=True, queue_messages=True):
             dogpile_cache.invalidate(overall_assessment_status, user.id)
             dogpile_cache.refresh(overall_assessment_status, user.id)
         if queue_messages:
-            if not user.email_ready()[0]:
-                # don't queue/send message if user isn't ready to receive them
-                continue
             qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(

@@ -1,4 +1,6 @@
 """Auth related view functions"""
+from __future__ import unicode_literals  # isort:skip
+
 from abc import ABCMeta, abstractmethod
 import base64
 from datetime import datetime
@@ -364,7 +366,7 @@ def deauthorized():
         padding_factor = (4 - len(s) % 4)
         s += "="*padding_factor
         return base64.b64decode(unicode(s).translate(
-            dict(zip(map(ord, u'-_'), u'+/'))))
+            dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
     sig = base64_url_decode(encoded_sig)

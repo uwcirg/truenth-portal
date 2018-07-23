@@ -46,8 +46,8 @@ from ..models.user import (
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from ..type_tools import check_int
 from .auth import logout
-from .portal import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -611,6 +611,11 @@ def set_user_consents(user_id):
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
+    if ('acceptance_date' in request.json
+            and FHIR_datetime.parse(request.json['acceptance_date'])
+            > datetime.utcnow()):
+        abort(400, "Future `acceptance_date` not permitted")
+
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
@@ -713,6 +718,8 @@ def withdraw_user_consent(user_id):
         abort(404, "no UserConsent found for user ID {} and org ID "
               "{}".format(user.id, org_id))
     try:
+        # Make a copy of the found UserConsent via `make_transient`
+        # and setting the id to None, so update_consents can store as new
         make_transient(uc)
         uc.id = None
         uc.status = 'suspended'

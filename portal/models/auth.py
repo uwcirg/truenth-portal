@@ -51,6 +51,7 @@ class AuthProviderPersistable(AuthProvider):
     that work with persistence.
 
     """
+
     def as_fhir(self):
         """serialize the AuthProvider"""
         d = {'resourceType': 'AuthProviderPersistable'}

@@ -840,6 +840,21 @@ class OrgTree(object):
             if other_organization_id in children:
                 return True
 
+    def at_and_above_ids(self, organization_id):
+        """Returns list of ids from any point in tree and up the parent stack
+
+        :param organization_id: node in tree, will be included in return list
+        :return: list of organization ids from the one given on up including
+            every parent found in chain
+
+        """
+        ids = []
+        node = self.find(organization_id)
+        while node is not self.root:
+            ids.append(node.id)
+            node = node.parent
+        return ids
+
     def find_top_level_org(self, organizations):
         """Returns top level organization(s) based on the organizations provided
 

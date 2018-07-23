@@ -1,4 +1,6 @@
 """SSL extension module"""
+from __future__ import unicode_literals  # isort:skip
+
 from logging.handlers import SMTPHandler
 
 
@@ -35,13 +37,13 @@ class SSLSMTPHandler(SMTPHandler):
             else:
                 smtp = smtplib.SMTP(**smtp_config)
 
-            message = u'\r\n'.join((
-                u'From: {from_addr}',
-                u'To: {to_addr}',
-                u'Subject: {subject}',
-                u'Date: {date}',
-                u'',
-                u'{body}',
+            message = '\r\n'.join((
+                'From: {from_addr}',
+                'To: {to_addr}',
+                'Subject: {subject}',
+                'Date: {date}',
+                '',
+                '{body}',
             )).format(
                 from_addr=self.fromaddr,
                 to_addr=','.join(self.toaddrs),

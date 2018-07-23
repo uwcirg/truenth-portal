@@ -161,11 +161,14 @@ class CommunicationRequest(db.Model):
         """
         existing = CommunicationRequest.query.filter(
             CommunicationRequest.questionnaire_bank_id ==
-            self.questionnaire_bank_id).filter(
-                CommunicationRequest.notify_post_qb_start ==
-                self.notify_post_qb_start).filter(
-                    CommunicationRequest.qb_iteration ==
-                    self.qb_iteration).first()
+            self.questionnaire_bank_id
+        ).filter(
+            CommunicationRequest.notify_post_qb_start ==
+            self.notify_post_qb_start
+        ).filter(
+            CommunicationRequest.qb_iteration ==
+            self.qb_iteration
+        ).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:
@@ -204,6 +207,11 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
     'preparation' status.
 
     """
+    if not user.email_ready()[0]:
+        # don't queue/send message if user isn't ready to receive them
+        trace("user isn't 'email_ready, abort")
+        return
+
     trace("process {}; iteration {}".format(
         questionnaire_bank, iteration_count))
 

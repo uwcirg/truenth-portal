@@ -217,6 +217,10 @@
                     self.clearNew();
                 });
                 /*
+                 * use numeric keypad for PSA result on mobile devices
+                 */
+                 this.convertToNumericField($("#psaResult"));
+                /*
                  * modal event
                  */
                 $("#addPSAModal").on("show.bs.modal", function() {
@@ -234,6 +238,11 @@
                 }).on("mouseout", function() {
                     $(this).removeClass("edit");
                 });
+            },
+            convertToNumericField: function(field) {
+                if (field && ("ontouchstart" in window || (typeof(window.DocumentTouch) !== "undefined" && document instanceof window.DocumentTouch))) {
+                    field.each(function() {$(this).prop("type", "tel");});
+                }
             },
             getCurrentUserId: function() {
                 var self = this;
@@ -700,14 +709,14 @@
                         .attr("height", RECT_HEIGHT)
                         .style("stroke", TREATMENT_TEXT_COLOR)
                         .style("stroke-width", "0.5")
-                        .style("fill", "#FFF");
+                        .style("fill", TREATMENT_TEXT_COLOR);
                     graphArea.append("text")
                         .attr("x", x(treatmentDate))
                         .attr("y", 41)
                         .attr("text-anchor", "middle")
                         .attr("font-size", "11px")
                         .style("stroke-width", "4px")
-                        .style("fill", TREATMENT_TEXT_COLOR)
+                        .style("fill", "#FFF")
                         .style("letter-spacing", "2px")
                         .text(self.i18next.t("treatment"));
                 }
@@ -771,10 +780,10 @@
                         return y(d.result);
                     })
                     .attr("text-anchor", "middle")
-                    .attr("dy", "-1.25em")
+                    .attr("dy", "-1.35em")
                     .attr("font-size", "11px")
                     .style("stroke-width", "2")
-                    .attr("font-weight", "400")
+                    .attr("font-weight", "500")
                     .attr("letter-spacing", "2px")
                     .attr("fill", "#656F76")
                     .text(function(d) {

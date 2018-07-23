@@ -1,3 +1,5 @@
+from __future__ import unicode_literals  # isort:skip
+
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -87,7 +89,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         org_row.append(row_total)
         rows.append(org_row)
 
-    totalrow = [_(u"TOTAL")]
+    totalrow = [_("TOTAL")]
     row_total = 0
     for cd in cutoff_days:
         totalrow.append(totals[cd])

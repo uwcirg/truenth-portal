@@ -16,6 +16,7 @@
 @gridLineColor: #d8dade;
 @noResultColor: #B1B1B1;
 @cellBorderColor: #E5E5E5;
+@borderColor: #ececec;
 
 .filter-control {
     -webkit-appearance: none;
@@ -25,8 +26,8 @@
 .tooltip {
     position: absolute;
     text-align: center;
-    width: 60px;
-    height: 28px;
+    width: 54px;
+    height: 38px;
     padding: 4px;
     font: 12px sans-serif;
     background: @tooltipColor;
@@ -44,7 +45,7 @@
       left: 45%;
       position: absolute;
       width: 0;
-      transform: translateY(-50%);
+      transform: translateY(-30%);
     }
 }
 .marker {
@@ -89,8 +90,12 @@ option.select-option {
 	background-color: #374550;
     color: #FFF;
     margin: 1em 0;
-    padding: 1em;
+    padding: 0.75em 1em 0.5em;
     letter-spacing: 1px;
+    .body {
+        font-weight: 200;
+        letter-spacing: 1px;
+    }
     .heading {
         margin: 0.5em 0 1em;
         border-bottom: 1px solid darken(@psaTrackerBorderColor, 50%);
@@ -281,6 +286,7 @@ option.select-option {
         .edit-icon {
             width: 22px;
             text-align: center;
+            margin-left: 0.2em;
             background-color: @linkBgColor;
             color: #FFF;
             &:hover {
@@ -293,7 +299,6 @@ option.select-option {
            font-family: "sans-serif";
            position: relative;
            display: inline-block;
-           padding: 0.1em;
            font-weight: 500;
         }
     }
@@ -374,7 +379,7 @@ option.select-option {
     margin-top: 1em;
     margin-bottom: 1em;
     color: @noResultColor;
-    border: 1px solid @noResultColor;
+    border: 1px solid @borderColor;
     min-height: 10em;
     padding: 4.25em 1em;
     font-size: 1.3em;
@@ -383,10 +388,93 @@ option.select-option {
     text-align: center;
     -webkit-font-smoothing: antialiased;
     position: relative;
+    -webkit-box-shadow: 10px 9px 5px -8px @borderColor;
+    -moz-box-shadow: 10px 9px 5px -8px @borderColor;
+    box-shadow: 10px 9px 5px -8px @borderColor;
 }
 #psaTrackerButtonsContainer {
     padding: 1em 0;
-    margin-top: 1em;
+    margin-top: 0.5em;
+    position: relative;
+    min-height: 5em;
+    display: inline-block;
+    button {
+        margin-left: 0.25em;
+        -webkit-animation: scaler 1200ms linear;
+        -moz-animation: scaler 700ms linear;
+        -ms-animation: scaler 700ms linear;
+        -o-animation: scaler 700ms linear;
+        animation: scaler 700ms linear;
+    }
+}
+@-webkit-keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@-o-keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
 }
 #psaTrackerGraphContainer {
     padding: 1em 0.5em 0.5em;
@@ -461,7 +549,7 @@ option.select-option {
         color: @contentColor;
         text-decoration: none;
     }
-    font-weight: 200;
+    font-weight: 300;
     text-decoration: none;
 }
 /*To remove button from IE11 */
@@ -493,6 +581,7 @@ select::-ms-expand {
         box-shadow: none;
         overflow: -moz-scrollbars-none;
         overflow: hidden;
+        letter-spacing: 1px;
         &:focus {
             -webkit-appearance: none;
             -moz-appearance: none;

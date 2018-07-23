@@ -16,6 +16,7 @@ def parse_connection_uri():
     conn_uri = conn_strings[0].split('=')[1]
     return conn_uri.strip()[1:-1]  # strip quotes, newlines
 
+
 connection_uri = parse_connection_uri()
 print("Connecting to database\n ->{}".format(connection_uri))
 

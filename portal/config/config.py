@@ -38,6 +38,7 @@ def testing_sql_url():
     worker_index = "".join(char for char in worker_name if char.isdigit())
     return test_db_url + worker_index
 
+
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
     TESTING = False
@@ -74,11 +75,13 @@ class BaseConfig(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL')
-    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
+    MAIL_SUPPRESS_SEND = os.environ.get(
+        'MAIL_SUPPRESS_SEND',
+        str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
 
-    CELERY_IMPORTS = ('portal.tasks', )
+    CELERY_IMPORTS = ('portal.tasks',)
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
@@ -93,7 +96,8 @@ class BaseConfig(object):
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
-    PRE_REGISTERED_ROLES = ['access_on_verify', 'write_only', 'promote_without_identity_challenge']
+    PRE_REGISTERED_ROLES = [
+        'access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
@@ -154,14 +158,14 @@ class BaseConfig(object):
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     TREATMENT_OPTIONS = [
-    ('373818007', 'http://snomed.info/sct'),
-    ('424313000', 'http://snomed.info/sct'),
-    ('26294005', 'http://snomed.info/sct'),
-    ('26294005-nns', 'http://snomed.info/sct'),
-    ('33195004', 'http://snomed.info/sct'),
-    ('228748004', 'http://snomed.info/sct'),
-    ('707266006', 'http://snomed.info/sct'),
-    ('999999999', 'http://snomed.info/sct')]
+        ('373818007', 'http://snomed.info/sct'),
+        ('424313000', 'http://snomed.info/sct'),
+        ('26294005', 'http://snomed.info/sct'),
+        ('26294005-nns', 'http://snomed.info/sct'),
+        ('33195004', 'http://snomed.info/sct'),
+        ('228748004', 'http://snomed.info/sct'),
+        ('707266006', 'http://snomed.info/sct'),
+        ('999999999', 'http://snomed.info/sct')]
 
 
 class DefaultConfig(BaseConfig):
@@ -173,7 +177,8 @@ class DefaultConfig(BaseConfig):
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
-    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
+    MAIL_SUPPRESS_SEND = os.environ.get(
+        'MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False

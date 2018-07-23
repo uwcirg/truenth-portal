@@ -153,13 +153,17 @@ class TestProcedure(TestCase):
             ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
-            ('888', u'Other (free text)', ICHOM),
+            ('888', 'Other (free text)', ICHOM),
             ('118877007', 'Procedure on prostate', SNOMED),
-            ('999999999', u'Other primary treatment', SNOMED),
-            (u'androgen deprivation therapy - surgical orchiectomy', u'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
-            (u'androgen deprivation therapy - chemical', u'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
-            ('176307007', u'Whole-gland ablation', SNOMED),
-            ('438778003', u'Focal-gland ablation', SNOMED)
+            ('999999999', 'Other primary treatment', SNOMED),
+            ('androgen deprivation therapy - surgical orchiectomy',
+             'Androgen deprivation therapy (ADT) - Surgical orchiectomy',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('androgen deprivation therapy - chemical',
+             'Androgen deprivation therapy (ADT) - Chemical',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('176307007', 'Whole-gland ablation', SNOMED),
+            ('438778003', 'Focal-gland ablation', SNOMED)
 
         }
         # confirm we have the whole list:
@@ -175,9 +179,8 @@ class TestProcedure(TestCase):
         for code, display, system in started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            assert (known_treatment_started(self.test_user),
-                    "treatment {} didn't show as started".format(
-                        (system, code)))
+            assert known_treatment_started(self.test_user),\
+                "treatment {} didn't show as started".format((system, code))
 
             # The "others" count as treatement started, but should NOT
             # return a date from latest_treatment - only specific treatments
@@ -204,7 +207,7 @@ class TestProcedure(TestCase):
         for code, display, system in not_started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            assert (known_treatment_not_started(self.test_user),
-                    "treatment '{}' didn't show as not started".format(
-                        (system, code)))
+            assert known_treatment_not_started(self.test_user),\
+                "treatment '{}' didn't show as not started".format(
+                    (system, code))
             self.test_user.procedures.delete()  # reset for next iteration
