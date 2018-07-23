@@ -845,12 +845,13 @@ var tnthAjax = {
         var self = this;
         arrConsents.forEach(function(orgId) { //delete all consents for the org
             self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
-                if (data) {
-                    if (!data.error) {
-                        $(".delete-consent-error").html("");
-                    } else {
-                        $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
-                    }
+                if (!data) {
+                    return false;
+                }
+                if (!data.error) {
+                    $(".delete-consent-error").html("");
+                } else {
+                    $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
                 }
             });
         });
