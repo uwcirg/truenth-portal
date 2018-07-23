@@ -136,7 +136,7 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
         After the user successfully authenticates with Facebook enters this function, which
         gets the user's info from Facebook and returns an instance of FlaskDanceProviderUserInfo
         """
-         resp = self.blueprint.session.get('/me', params={ 'fields': 'id,email,birthday,first_name,last_name,gender,picture' })
+        resp = self.blueprint.session.get('/me', params={ 'fields': 'id,email,birthday,first_name,last_name,gender,picture' })
         if not resp.ok:
             current_app.logger.debug('Failed to fetch user info from Facebook')
             return False
