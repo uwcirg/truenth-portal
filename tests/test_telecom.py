@@ -4,6 +4,7 @@ from __future__ import unicode_literals  # isort:skip
 from portal.models.telecom import ContactPoint, Telecom
 from tests import TestCase
 
+
 class TestTelecom(TestCase):
     """Telecom model tests"""
 
