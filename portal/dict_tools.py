@@ -14,7 +14,7 @@ def dict_compare(d1, d2):
     intersect_keys = d1_keys.intersection(d2_keys)
     added = d1_keys - d2_keys
     removed = d2_keys - d1_keys
-    modified = {o : (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
+    modified = {o: (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
     same = set(o for o in intersect_keys if d1[o] == d2[o])
     return added, removed, modified, same
 
@@ -63,6 +63,7 @@ def strip_empties(d):
     to the default python `if value` check - both are retained.
 
     """
+
     def has_value(value):
         """Need to retain 'False' booleans and numeric 0 values"""
         if isinstance(value, (bool, numbers.Number)):
