@@ -54,7 +54,7 @@ from ..models.user import (
 auth = Blueprint('auth', __name__)
 
 google_blueprint = make_google_blueprint(
-    scope=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+    scope=['profile', 'email'],
     login_url='/login/google/',
 )
 
