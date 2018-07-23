@@ -340,5 +340,4 @@ def token_janitor():
             for email in exc[0]:
                 error_emails.add(email)
 
-
     return list(error_emails)

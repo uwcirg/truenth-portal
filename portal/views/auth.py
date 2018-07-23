@@ -18,10 +18,10 @@ from flask import (
     session,
     url_for,
 )
-from flask_dance.contrib.facebook import make_facebook_blueprint
-from flask_dance.contrib.google import make_google_blueprint
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
+from flask_dance.contrib.facebook import make_facebook_blueprint
+from flask_dance.contrib.google import make_google_blueprint
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import (
@@ -62,6 +62,11 @@ facebook_blueprint = make_facebook_blueprint(
 )
 
 class FlaskDanceProvider:
+    """base class for flask dance providers that gets user info after success auth
+
+    When a new provider is added to the protal's consumer oauth flow, a descendent
+    of this class needs to be created to get the user's information from the provider after a successful auth 
+    """
     __metaclass__ = ABCMeta
 
     def __init__(self, blueprint, token):
@@ -74,10 +79,25 @@ class FlaskDanceProvider:
 
     @abstractmethod
     def get_user_info (self):
+        """gets user info from the provider
+
+        This function must be overriden in descendant classes to return an instance of FlaskProviderUserInfo
+        that is filled with user information fetched from the provider
+        """
         pass
 
 class GoogleFlaskDanceProvider(FlaskDanceProvider):
+    """fetches user info from Google after successfull auth
+
+    After the user successfully authenticates with Google, this class fetches
+    the user's info from Google and packages it in FlaskDanceProviderUserInfo
+    """
     def get_user_info (self):
+        """gets user info from Google
+
+        After the user successfully authenticates with Google enters this function, which
+        gets the user's info from Google and returns an instance of FlaskDanceProviderUserInfo
+        """
         resp = self.blueprint.session.get('/oauth2/v2/userinfo')
         if not resp.ok:
             current_app.logger.debug('Failed to fetch user info from Google')
@@ -103,8 +123,18 @@ class GoogleFlaskDanceProvider(FlaskDanceProvider):
         return user_info
 
 class FacebookFlaskDanceProvider(FlaskDanceProvider):
+    """fetches user info from Facebook after successfull auth
+
+    After the user successfully authenticates with Facebook, this class fetches
+    the user's info from Facebook and packages it in FlaskDanceProviderUserInfo
+    """
     def get_user_info (self):
-        resp = self.blueprint.session.get('/me', params={ 'fields': 'id,email,birthday,first_name,last_name,gender,picture' })
+        """gets user info from Facebook 
+
+        After the user successfully authenticates with Facebook enters this function, which
+        gets the user's info from Facebook and returns an instance of FlaskDanceProviderUserInfo
+        """
+         resp = self.blueprint.session.get('/me', params={ 'fields': 'id,email,birthday,first_name,last_name,gender,picture' })
         if not resp.ok:
             current_app.logger.debug('Failed to fetch user info from Facebook')
             return False
@@ -123,6 +153,13 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
         return user_info
 
 class FlaskProviderUserInfo(object):
+    """a common format for user info fetched from providers
+
+    Each provider packages user info a litle differently. Google, for example,
+    uses "given_name" and the key for the first name value, which Facebook uses "first_name".
+    To make it easier for our code to parse responses in a common function, this class provides a
+    common format to store the results from each provider
+    """
     def __init__(self):
         self.id = None
         self.first_name = None
@@ -134,10 +171,10 @@ class FlaskProviderUserInfo(object):
 
 @oauth_authorized.connect_via(facebook_blueprint)
 def facebook_logged_in(facebook_blueprint, token):
-    """successful facebook login callback
+    """successful Facebook login callback
 
     After successful Facebook authorization control
-    returns here. The facebook blueprint and the oauth bearer
+    returns here. The Facebook blueprint and the oauth bearer
     token are returned and used to log the user into the portal
     """
     facebook_provider = FacebookFlaskDanceProvider(facebook_blueprint, token)
@@ -145,10 +182,10 @@ def facebook_logged_in(facebook_blueprint, token):
 
 @oauth_authorized.connect_via(google_blueprint)
 def google_logged_in(google_blueprint, token):
-    """successful google login callback
+    """successful Google login callback
 
     After successful Google authorization control
-    returns here. The google blueprint and the oauth bearer
+    returns here. The Google blueprint and the oauth bearer
     token are returned and used to log the user into the portal
     """
     google_provider = GoogleFlaskDanceProvider(google_blueprint, token)
@@ -160,7 +197,7 @@ def login_user_with_provider(request, provider):
     A common login function for all providers. Once the provider
     calls our server with the user's bearer token, the token in wrapped in an instance
     of FlaskDanceProvider and passed here. This function uses it to get more information
-    about the user to successfully log them in.
+    about the user and, if all goes well, log them in.
     """
     store_next_in_session(request, provider)
     
@@ -173,14 +210,15 @@ def login_user_with_provider(request, provider):
         current_app.logger.info("User canceled IdP auth - send home")
         return redirect('/')
 
+    # Use the auth token to get user info from the provider
     user_info = provider.get_user_info()
 
     current_app.logger.debug(
         "Successful authentication at %s", provider.name)
 
     try:
-        # Check to see if the user has already logged in
-        # with this auth provider
+        # Check to see if the user has logged in
+        # with this auth provider at any point in the past
         auth_provider_query = AuthProvider.query.filter_by(
            provider=provider.name,
            provider_id=user_info.id,
@@ -188,6 +226,9 @@ def login_user_with_provider(request, provider):
 
         auth_provider = auth_provider_query.one()
     except NoResultFound:
+        # If this is the first time the user is logging with this provider
+        # create an entry in the provider table. This will be updated with
+        # more info below
         auth_provider = AuthProvider(
             provider=provider.name,
             provider_id=user_info.id,
@@ -202,7 +243,8 @@ def login_user_with_provider(request, provider):
             context='login'
         ) 
     else:
-        # Check to see if a user already exists
+        # This is the user's first time logging in with this provider
+        # Check to see if a db entry already exists for the user's email address.
         user_query = User.query.filter_by(email=user_info.email)
         user = user_query.first()
 
@@ -214,7 +256,8 @@ def login_user_with_provider(request, provider):
                 context='login'
             )
         else:
-            # Create a new user
+            # This user has never logged in before.
+            # Create a new entry in the user table.
             user = User(
                 first_name=user_info.first_name,
                 last_name=user_info.last_name,
@@ -234,8 +277,8 @@ def login_user_with_provider(request, provider):
                 context='account'
             )
 
-        # Associate this user with the auth provider 
-        # and make sure we commit the new wuth provider
+        # Associate this user with the new auth provider 
+        # and prepare to save the changes
         auth_provider.user = user
         db.session.add(auth_provider)
 
@@ -263,7 +306,6 @@ def store_next_in_session(request, provider):
 
     If the 'next' arg is set on the request store its value in the user's session
     so we can use it to navigate to the next page after we're done authenticating
-    
     """
     if request.args.get('next'):
         session['next'] = request.args.get('next')
@@ -273,35 +315,36 @@ def store_next_in_session(request, provider):
                 session['next'], provider.name))
  
 @oauth_error.connect_via(google_blueprint)
-def google_error(google_blueprint, error, error_description=None, error_uri=None):
-    if not resp.ok:
-        reload_count = session.get('force_reload_count', 0)
-        if reload_count > 2:
-            current_app.logger.warn("Failed 3 attempts: {}".format(
-                result.error.message))
-            abort(500, "unable to authorize with provider {}".format(
-                    provider_name))
+@oauth_error.connect_via(facebook_blueprint)
+def google_error(blueprint, error, error_description=None, error_uri=None):
+    """handles outh errors
+    
+    If there's an error during provider authentiation control returns here.
+    This function 
+    """
+    reload_count = session.get('force_reload_count', 0)
+    if reload_count > 2:
+        current_app.logger.warn(
+            "Failed 3 attempts: OAuth error from {name}! "
+            "error={error} description={description} uri={uri}"
+        ).format(
+            name=blueprint.name,
+            error=error,
+            description=error_description,
+            uri=error_uri,
+        )
+        abort(500, "unable to authorize with provider {}".format(
+            blueprint.name))
             
-        session['force_reload_count'] = reload_count + 1
-        current_app.logger.info(str(result.error))
-        # Work around for w/ Safari and cookies set to current site only
-        # forcing a reload brings the local cookies back into view
-        # (they're missing with such a setting on returning from
-        # the 3rd party IdP redirect)
-        current_app.logger.info("attempting reload on oauth error")
-        return render_template('force_reload.html',
-            message=result.error.message)
-
-    msg = (
-        "OAuth error from {name}! "
-        "error={error} description={description} uri={uri}"
-    ).format(
-        name=blueprint.name,
-        error=error,
-        description=error_description,
-        uri=error_uri,
-    )
-    print msg
+    session['force_reload_count'] = reload_count + 1
+    current_app.logger.info(str(error))
+    # Work around for w/ Safari and cookies set to current site only
+    # forcing a reload brings the local cookies back into view
+    # (they're missing with such a setting on returning from
+    # the 3rd party IdP redirect)
+    current_app.logger.info("attempting reload on oauth error")
+    return render_template('force_reload.html',
+        message=result.error.message)
 
 @auth.route('/deauthorized', methods=('POST',))
 @csrf.exempt
