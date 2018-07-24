@@ -80,6 +80,7 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
+    FLUSH_CACHE_ON_SYNC = False
 
     CELERY_IMPORTS = ('portal.tasks',)
     DEBUG = False
