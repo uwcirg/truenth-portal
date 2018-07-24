@@ -62,7 +62,7 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        return url_for('assessment_engine_api.present_needed', _external=True)
+        return "url_placeholder/present_needed"
 
     def make_button(text, inline=False):
         if inline:
