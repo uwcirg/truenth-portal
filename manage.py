@@ -65,7 +65,7 @@ def upgrade_db():
 
 def flush_cache():
     """Flush redis of all values. Cached values may not longer correspond with new DB entries"""
-    if app.config.get('FLUSH_CACHE_ON_SYNC', True):
+    if app.config.get('FLUSH_CACHE_ON_SYNC'):
         r = redis.from_url(app.config['REDIS_URL'])
         r.flushdb()
 
