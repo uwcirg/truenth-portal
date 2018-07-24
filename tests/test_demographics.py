@@ -223,13 +223,9 @@ class TestDemographics(TestCase):
         dup = 'bogus@match.com'
         self.test_user._email = NO_EMAIL_PREFIX
         self.add_user(username=dup)
-        data = {"resourceType": "Patient",
-                "telecom": [
-                    {
-                        "system": 'email',
-                        'value': dup
-                    }],
-               }
+        data = {
+            "resourceType": "Patient",
+            "telecom": [{"system": 'email', 'value': dup}]}
 
         self.login()
         response = self.client.put(
