@@ -236,7 +236,8 @@ class TestDemographics(TestCase):
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json', data=json.dumps(data))
         assert response.status_code == 400
-        assert 'email address already in use' in response.get_data()
+        assert 'email address already in use' in response.get_data(
+            as_text=True)
         user = User.query.get(TEST_USER_ID)
         assert user._email == NO_EMAIL_PREFIX
 
