@@ -21,7 +21,6 @@ from flask import (
     url_for,
 )
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.google import make_google_blueprint
 from flask_login import logout_user
