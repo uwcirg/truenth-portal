@@ -87,6 +87,7 @@ class BaseConfig(object):
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
+    LOG_CACHE_MISS = False
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
     LOG_LEVEL = 'DEBUG'
 
