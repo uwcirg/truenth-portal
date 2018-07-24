@@ -34,7 +34,12 @@ from ..models.coredata import configure_coredata
 from ..models.role import ROLE
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
-from ..views.auth import auth, capture_next_view_function, facebook_blueprint, google_blueprint 
+from ..views.auth import (
+    auth,
+    capture_next_view_function,
+    facebook_blueprint,
+    google_blueprint,
+)
 from ..views.client import client_api
 from ..views.clinical import clinical_api
 from ..views.coredata import coredata_api

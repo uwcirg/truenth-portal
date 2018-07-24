@@ -4,6 +4,7 @@ from smtplib import SMTPRecipientsRefused
 
 from flask import current_app, url_for
 from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
@@ -28,7 +29,8 @@ class AuthProvider(OAuthConsumerMixin, db.Model):
                         nullable=False)
     user = db.relationship('User')
 
-    db.UniqueConstraint('provider', 'provider_id', name='uix_1')
+    __table_args__ = (UniqueConstraint('provider', 'provider_id',
+                                       name='auth_providers_by_provider'),)
 
     def as_fhir(self):
         # produce a FHIR identifier entry for the provider
