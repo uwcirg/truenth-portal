@@ -1320,7 +1320,7 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if self.email and ((telecom.email != self.email) and
+                if self._email and ((telecom.email != self._email) and
                         (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
