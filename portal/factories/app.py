@@ -11,6 +11,7 @@ from flask import Flask
 from pkg_resources import get_distribution
 import redis
 import requests_cache
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 # Hack - workaround to cyclic imports/missing SQLA models for docker
@@ -108,6 +109,11 @@ def create_app(config=None, app_name=None, blueprints=None):
 
     app = Flask(app_name, template_folder='templates',
                 instance_relative_config=True)
+
+    # Force sending https redirect uris to auth providers
+    # http://flask-dance.readthedocs.io/en/latest/proxies.html
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
     configure_app(app, config)
     configure_profiler(app)
     configure_csrf(app)
