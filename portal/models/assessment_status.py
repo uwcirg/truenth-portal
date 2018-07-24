@@ -471,7 +471,7 @@ def overall_assessment_status(user_id):
 
     """
     user = User.query.get(user_id)
-    if current_app.config.get("LOG_CACHE_MISS", False):
+    if current_app.config.get("LOG_CACHE_MISS"):
         current_app.logger.debug("CACHE MISS: {} {}".format(
             __name__, user_id))
     now = datetime.utcnow()
