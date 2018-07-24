@@ -203,7 +203,7 @@ class QuestionnaireBankDetails(object):
 
         root_orgs = OrgTree().find_top_level_orgs(self.user.organizations)
         if len(root_orgs) > 1:
-            current_app.logger.error(
+            current_app.logger.warning(
                 "Indeterminate org lookup - only expecting one root org "
                 "for patient {}".format(self.user))
 
@@ -471,8 +471,9 @@ def overall_assessment_status(user_id):
 
     """
     user = User.query.get(user_id)
-    current_app.logger.debug("CACHE MISS: {} {}".format(
-        __name__, user_id))
+    if current_app.config.get("LOG_CACHE_MISS", False):
+        current_app.logger.debug("CACHE MISS: {} {}".format(
+            __name__, user_id))
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
     qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)
