@@ -449,7 +449,7 @@ Install requirements by running:
 
 .. code:: bash
 
-    $ pip install --requirements requirements.txt
+    $ pip install --requirement requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
