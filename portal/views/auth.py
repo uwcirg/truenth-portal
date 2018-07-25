@@ -286,7 +286,7 @@ def oauth_test_backdoor():
 
 @oauth_authorized.connect_via(facebook_blueprint)
 @oauth_authorized.connect_via(google_blueprint)
-def provider_logged_in(blueprint, token):
+def login(blueprint, token):
     """successful provider login callback
 
     After successful authorization at the provider, control
