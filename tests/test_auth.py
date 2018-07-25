@@ -219,7 +219,7 @@ class TestAuth(TestCase):
         assert validate_origin(local_url)
         assert pytest.raises(Unauthorized, validate_origin, invalid_url)
 
-    def test_oauth_new_auth_provider_new_user(self):
+    def test_oauth_with_new_auth_provider_and_new_user(self):
         # Login using the test backdoor
         response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
 
@@ -236,7 +236,7 @@ class TestAuth(TestCase):
             user_id=user.id,
         ).first()
 
-    def test_oauth_new_auth_provider_new_user_unicode_name(self):
+    def test_oauth_with_new_auth_provider_and_new_user_unicode_name(self):
         # Set a unicode name
         oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
         oauth_info['last_name'] = 'Bugn\xed'
@@ -259,7 +259,7 @@ class TestAuth(TestCase):
 
         pass
 
-    def test_oauth_new_auth_provider_existing_user(self):
+    def test_oauth_with_new_auth_provider_and_existing_user(self):
         # Create the user
         user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
 
@@ -276,7 +276,7 @@ class TestAuth(TestCase):
             user_id=user.id,
         ).first()
 
-    def test_oauth_existing_auth_provider_existing_user(self):
+    def test_oauth_with_existing_auth_provider_and_existing_user(self):
         # Create the user
         user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
 
@@ -289,7 +289,7 @@ class TestAuth(TestCase):
         # Verify the response returned successfully
         assert response.status_code == 200
 
-    def test_oauth_failed_to_get_user_info(self):
+    def test_oauth_when_mock_provider_fails_to_get_user_info(self):
         # Make the mock provider fail to get user info
         oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
         oauth_info['fail_to_get_user_info'] = True
@@ -300,7 +300,7 @@ class TestAuth(TestCase):
         # Verify 500
         assert response.status_code == 500
 
-    def test_oauth_invalid_token(self):
+    def test_oauth_with_invalid_token(self):
         # Set an invalid token
         oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
         oauth_info.pop('token', None)

@@ -91,40 +91,42 @@ class FlaskDanceProvider:
         pass
 
 
-class MockFlaskDanceProvider(FlaskDanceProvider):
-    """creates user info from test data to validate auth logic
+class FacebookFlaskDanceProvider(FlaskDanceProvider):
+    """fetches user info from Facebook after successfull auth
 
-    This class should only be used during testing.
-    It simply returns the data passed into its constructor in
-    get_user_info. This effectively mocks out the get_user_info
-    request that's normally sent to a provider after successful oauth
-    in non-test environments.
+    After the user successfully authenticates with Facebook
+    this class fetches the user's info from Facebook and packages
+    it in FlaskDanceProviderUserInfo
     """
 
-    def __init__(self, provider_name, token, user_info, fail_to_get_user_info):
-        blueprint = type(str('MockBlueprint'), (object,), {})
-        blueprint.name = provider_name
-        super(MockFlaskDanceProvider, self).__init__(
-                blueprint,
-                token)
-
-        self.user_info = user_info
-        self.fail_to_get_user_info = fail_to_get_user_info
-
     def get_user_info(self):
-        """return the user info passed into the constructor
+        """gets user info from Facebook
 
-        This effectively mocks out the get_user_info
-        request that's normally sent to a provider after successful oauth
-        in non-test environments.
+        After the user successfully authenticates with Facebook
+        control enters this function which gets the user's info from
+        Facebook and returns an instance of FlaskDanceProviderUserInfo
         """
-        if self.fail_to_get_user_info:
-            current_app.logger.debug(
-                'MockFlaskDanceProvider failed to get user info'
-            )
+        resp = self.blueprint.session.get(
+            '/me',
+            params={
+                'fields':
+                    'id,email,birthday,first_name,last_name,gender,picture'})
+        if not resp.ok:
+            current_app.logger.debug('Failed to fetch user info from Facebook')
             return False
 
-        return self.user_info
+        facebook_info = resp.json()
+
+        user_info = FlaskProviderUserInfo()
+        user_info.id = facebook_info['id']
+        user_info.first_name = facebook_info['first_name']
+        user_info.last_name = facebook_info['last_name']
+        user_info.email = facebook_info['email']
+        user_info.gender = facebook_info['gender']
+        user_info.image_url = facebook_info['picture']['data']['url']
+        user_info.birthdate = facebook_info['birthday']
+
+        return user_info
 
 
 class GoogleFlaskDanceProvider(FlaskDanceProvider):
@@ -167,42 +169,40 @@ class GoogleFlaskDanceProvider(FlaskDanceProvider):
         return user_info
 
 
-class FacebookFlaskDanceProvider(FlaskDanceProvider):
-    """fetches user info from Facebook after successfull auth
+class MockFlaskDanceProvider(FlaskDanceProvider):
+    """creates user info from test data to validate auth logic
 
-    After the user successfully authenticates with Facebook
-    this class fetches the user's info from Facebook and packages
-    it in FlaskDanceProviderUserInfo
+    This class should only be used during testing.
+    It simply returns the data passed into its constructor in
+    get_user_info. This effectively mocks out the get_user_info
+    request that's normally sent to a provider after successful oauth
+    in non-test environments.
     """
 
-    def get_user_info(self):
-        """gets user info from Facebook
+    def __init__(self, provider_name, token, user_info, fail_to_get_user_info):
+        blueprint = type(str('MockBlueprint'), (object,), {})
+        blueprint.name = provider_name
+        super(MockFlaskDanceProvider, self).__init__(
+                blueprint,
+                token)
 
-        After the user successfully authenticates with Facebook
-        control enters this function which gets the user's info from
-        Facebook and returns an instance of FlaskDanceProviderUserInfo
+        self.user_info = user_info
+        self.fail_to_get_user_info = fail_to_get_user_info
+
+    def get_user_info(self):
+        """return the user info passed into the constructor
+
+        This effectively mocks out the get_user_info
+        request that's normally sent to a provider after successful oauth
+        in non-test environments.
         """
-        resp = self.blueprint.session.get(
-            '/me',
-            params={
-                'fields':
-                    'id,email,birthday,first_name,last_name,gender,picture'})
-        if not resp.ok:
-            current_app.logger.debug('Failed to fetch user info from Facebook')
+        if self.fail_to_get_user_info:
+            current_app.logger.debug(
+                'MockFlaskDanceProvider failed to get user info'
+            )
             return False
 
-        facebook_info = resp.json()
-
-        user_info = FlaskProviderUserInfo()
-        user_info.id = facebook_info['id']
-        user_info.first_name = facebook_info['first_name']
-        user_info.last_name = facebook_info['last_name']
-        user_info.email = facebook_info['email']
-        user_info.gender = facebook_info['gender']
-        user_info.image_url = facebook_info['picture']['data']['url']
-        user_info.birthdate = facebook_info['birthday']
-
-        return user_info
+        return self.user_info
 
 
 class FlaskProviderUserInfo(object):
@@ -285,30 +285,25 @@ def oauth_test_backdoor():
 
 
 @oauth_authorized.connect_via(facebook_blueprint)
-def facebook_logged_in(facebook_blueprint, token):
-    """successful Facebook login callback
-
-    After successful Facebook authorization control
-    returns here. The Facebook blueprint and the oauth bearer
-    token are returned and used to log the user into the portal
-    """
-    facebook_provider = FacebookFlaskDanceProvider(facebook_blueprint, token)
-    login_user_with_provider(request, facebook_provider)
-
-    # Disable Flask-Dance's default behavior that saves the oauth token
-    return False
-
-
 @oauth_authorized.connect_via(google_blueprint)
-def google_logged_in(google_blueprint, token):
-    """successful Google login callback
+def provider_logged_in(blueprint, token):
+    """successful provider login callback
 
-    After successful Google authorization control
-    returns here. The Google blueprint and the oauth bearer
-    token are returned and used to log the user into the portal
+    After successful authorization at the provider, control
+    returns here. The blueprint and the oauth bearer
+    token are used to log the user into the portal
     """
-    google_provider = GoogleFlaskDanceProvider(google_blueprint, token)
-    login_user_with_provider(request, google_provider)
+    provider = None
+    if blueprint.name == 'google':
+        provider = GoogleFlaskDanceProvider(blueprint, token)
+    elif blueprint.name == 'facebook':
+        provider = FacebookFlaskDanceProvider(blueprint, token)
+    else:
+        error_message = 'Unexpected provider {}'.format(blueprint.name)
+        current_app.logger.error(error_message)
+        return abort(500, error_message)
+
+    login_user_with_provider(request, provider)
 
     # Disable Flask-Dance's default behavior that saves the oauth token
     return False
