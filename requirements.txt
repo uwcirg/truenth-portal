@@ -3,9 +3,8 @@
 --no-binary billiard,cffi,psycopg2
 
 alabaster==0.7.11         # via sphinx
-alembic==1.0.0           # via flask-migrate
+alembic==1.0.0            # via flask-migrate
 amqp==2.3.2               # via kombu
-authomatic==0.1.0.post1
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.4             # via flask-user
 beautifulsoup4==4.6.0     # via webtest
@@ -22,6 +21,7 @@ docutils==0.14            # via sphinx
 dogpile.cache==0.6.6      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.11.2
+flask-dance[sqla]==1.0.0
 git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache
 flask-login==0.4.1        # via flask-user
 flask-mail==0.9.1         # via flask-user

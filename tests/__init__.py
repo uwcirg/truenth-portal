@@ -14,6 +14,7 @@ from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
+from urllib import urlencode
 
 from portal.factories.app import create_app
 from portal.config.config import TestConfig
@@ -47,6 +48,19 @@ TEST_USERNAME = 'testy@example.com'
 FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
+
+OAUTH_INFO_PROVIDER_LOGIN = {
+    'birthdate': '10/04/1988',
+    'email': 'test@test.com',
+    'first_name': 'Firstname',
+    'gender': 'male',
+    'last_name': 'Lastname',
+    'image_url': 'pictureurl@example.com',
+    'next': '/',
+    'provider_id': '12345678910',
+    'provider_name': 'google',
+    'token': '{ "property": "value" }',
+}
 
 # import hidden relation classes needed to create database
 from portal.models.communication_request import CommunicationRequest
@@ -171,17 +185,33 @@ class TestCase(Base):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
-    def login(self, user_id=TEST_USER_ID):
-        """Bless the self.client session with a logged in user
+    def login(
+        self,
+        user_id=TEST_USER_ID,
+        oauth_info=None,
+        follow_redirects=True
+    ):
+        """login using the oauth backdoor
 
         A standard prerequisite in any test needed an authorized
-        user.  Call before subsequent calls to self.client.{get,post,put}
+        user. Call before subsequent calls to self.client.{get,post,put}
+        or call to test oauth logic.
 
-        Taking advantage of testing backdoor in views.auth.login()
+        Taking advantage of testing backdoor in
+        views.auth.oauth_test_backdoor()
 
         """
-        return self.client.get('/login/TESTING?user_id={0}'.format(user_id),
-                follow_redirects=True)
+        # By default log the user in through the session
+        # with the given id
+        if not oauth_info:
+            oauth_info = {'user_id': user_id}
+
+        # Use the key value pairs in oauth_info dict
+        # as query params
+        oauth_url = 'test/oauth?' + urlencode(oauth_info)
+
+        # Finally, attempt to login using the test backdoor
+        return self.client.get(oauth_url, follow_redirects=follow_redirects)
 
     def add_client(self):
         """Prep db with a test client for test user"""

@@ -124,7 +124,7 @@ correct libraries are installed:
 
 .. code:: bash
 
-    pip install --requirements requirements.txt
+    pip install --requirement requirements.txt
 
 COMMAND LINE INTERFACE
 ----------------------
@@ -311,7 +311,7 @@ Testing
 To run the tests, repeat the
 ``postgres createuser && postgres createdb`` commands as above with the
 values for the {user, password, database} as defined in the
-``TestConfig`` class within ``portal.config.py``
+``TestConfig`` class within ``portal\config\config.py``
 
 All test modules under the ``tests`` directory can be executed via
 ``py.test`` (again from project root with the virtual environment
@@ -449,7 +449,7 @@ Install requirements by running:
 
 .. code:: bash
 
-    $ pip install --requirements requirements.txt
+    $ pip install --requirement requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^
