@@ -3,7 +3,7 @@ version: "3.2"
 services:
   # Base service; for extension only, not for direct use
   base: &service_base
-    image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-portal_web}:${DOCKER_IMAGE_TAG:-latest}"
+    image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
     build:
       context: ..
       dockerfile: docker/Dockerfile
