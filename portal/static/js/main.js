@@ -2206,24 +2206,22 @@ var Global = {
         self.setNotificationsDisplay();
     },
     "setNotificationsDisplay": function() {
-        var allVisited = true;
-        var actionRequired = $("#notificationBanner [data-action-required]").length > 0;
-        if (actionRequired) {
+        if ($("#notificationBanner [data-action-required]").length > 0) { //requiring user action
             $("#notificationBanner .close").removeClass("active");
-        } else {
-            var allVisited = true;
-            $("#notificationBanner [data-id]").each(function() {
-                if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
-                    allVisited = false;
-                    return false;
-                }
-            });
-            if (allVisited) {
-                $("#notificationBanner").hide();
-            } else {
-                $("#notificationBanner .close").addClass("active");
+            return false;
+        }
+        var allVisited = true;
+        $("#notificationBanner [data-id]").each(function() {
+            if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
+                allVisited = false;
+                return false;
             }
-        }    
+        });
+        if (allVisited) {
+            $("#notificationBanner").hide();
+        } else {
+            $("#notificationBanner .close").addClass("active");
+        } 
     },
     initValidator: function() {
         if (typeof $.fn.validator === "undefined") { return false; }

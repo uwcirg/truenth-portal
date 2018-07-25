@@ -719,6 +719,9 @@
                             (self.find(".edit-view")).each(function() {
                                 $(this).hide();
                             });
+                        } else {
+                            self.hide();
+                            return true;
                         }
                     }
                     self.show().removeClass("tnth-hide");
