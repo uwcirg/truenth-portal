@@ -224,11 +224,6 @@ def login_user_with_provider(request, provider):
     """
     store_next_in_session(request, provider)
 
-    if current_user():
-        if current_user().deleted:
-            abort(400, "deleted user - operation not permitted")
-        return next_after_login()
-
     if not provider.token:
         current_app.logger.info("User canceled IdP auth - send home")
         return redirect('/')
