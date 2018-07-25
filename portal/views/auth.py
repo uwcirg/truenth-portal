@@ -45,7 +45,7 @@ from ..models.login import login_user
 from ..models.role import ROLE
 from ..models.user import (
     User,
-    add_authomatic_user,
+    add_user,
     current_user,
     get_user_or_abort,
 )
@@ -89,6 +89,42 @@ class FlaskDanceProvider:
         filled with user information fetched from the provider
         """
         pass
+
+
+class MockFlaskDanceProvider(FlaskDanceProvider):
+    """creates user info from test data to validate auth logic
+
+    This class should only be used during testing.
+    It simply returns the data passed into its constructor in
+    get_user_info. This effectively mocks out the get_user_info
+    request that's normally sent to a provider after successful oauth
+    in non-test environments.
+    """
+
+    def __init__(self, provider_name, token, user_info, fail_to_get_user_info):
+        blueprint = type(str('MockBlueprint'), (object,), {})
+        blueprint.name = provider_name
+        super(MockFlaskDanceProvider, self).__init__(
+                blueprint,
+                token)
+
+        self.user_info = user_info
+        self.fail_to_get_user_info = fail_to_get_user_info
+
+    def get_user_info(self):
+        """return the user info passed into the constructor
+
+        This effectively mocks out the get_user_info
+        request that's normally sent to a provider after successful oauth
+        in non-test environments.
+        """
+        if self.fail_to_get_user_info:
+            current_app.logger.debug(
+                'MockFlaskDanceProvider failed to get user info'
+            )
+            return False
+
+        return self.user_info
 
 
 class GoogleFlaskDanceProvider(FlaskDanceProvider):
@@ -189,6 +225,65 @@ class FlaskProviderUserInfo(object):
         self.image_url = None
 
 
+@auth.route('/test/oauth')
+def oauth_test_backdoor():
+    """unit test backdoor
+
+    API that handles oauth related tasks for unit tests.
+    When a test needs to login or test oauth related logic
+    this API will likely be used.
+    """
+    def login_test_user_using_session(user_id):
+        assert int(user_id) < 10  # allowed for test users only!
+        session['id'] = user_id
+        user = current_user()
+        login_user(user, 'password_authenticated')
+        return next_after_login()
+
+    def login_test_user_with_mock_provider():
+        mock_provider = create_mock_provider()
+        return login_user_with_provider(request, mock_provider)
+
+    def create_mock_provider():
+        user_info = FlaskProviderUserInfo()
+        user_info.id = request.args.get('provider_id')
+        user_info.first_name = request.args.get('first_name')
+        user_info.last_name = request.args.get('last_name')
+        user_info.email = request.args.get('email')
+        user_info.image_url = request.args.get('image_url')
+        user_info.gender = request.args.get('gender')
+        user_info.birthday = request.args.get('birthday')
+
+        # If a token is set turn it into a json object
+        token = request.args.get('token')
+        if token:
+            token = json.loads(token)
+
+        mock_provider = MockFlaskDanceProvider(
+            request.args.get('provider_name'),
+            token,
+            user_info,
+            request.args.get('fail_to_get_user_info')
+        )
+
+        return mock_provider
+
+    if not current_app.config['TESTING']:
+        return abort(404)
+
+    # Validate the next arg
+    if request.args.get('next'):
+        validate_origin(request.args.get('next'))
+
+    # If user_id is set log the user in by updating the session
+    user_id = request.args.get('user_id')
+    if user_id:
+        return login_test_user_using_session(user_id)
+
+    # Otherwise log the user in using the consumer flow
+    return login_test_user_with_mock_provider()
+
+
 @oauth_authorized.connect_via(facebook_blueprint)
 def facebook_logged_in(facebook_blueprint, token):
     """successful Facebook login callback
@@ -198,7 +293,10 @@ def facebook_logged_in(facebook_blueprint, token):
     token are returned and used to log the user into the portal
     """
     facebook_provider = FacebookFlaskDanceProvider(facebook_blueprint, token)
-    return login_user_with_provider(request, facebook_provider)
+    login_user_with_provider(request, facebook_provider)
+
+    # Disable Flask-Dance's default behavior that saves the oauth token
+    return False
 
 
 @oauth_authorized.connect_via(google_blueprint)
@@ -210,7 +308,10 @@ def google_logged_in(google_blueprint, token):
     token are returned and used to log the user into the portal
     """
     google_provider = GoogleFlaskDanceProvider(google_blueprint, token)
-    return login_user_with_provider(request, google_provider)
+    login_user_with_provider(request, google_provider)
+
+    # Disable Flask-Dance's default behavior that saves the oauth token
+    return False
 
 
 def login_user_with_provider(request, provider):
@@ -230,6 +331,15 @@ def login_user_with_provider(request, provider):
 
     # Use the auth token to get user info from the provider
     user_info = provider.get_user_info()
+    if not user_info:
+        current_app.logger.debug(
+            'Failed to get user info at %s',
+            provider.name
+        )
+        return abort(
+            500,
+            "unable to authorize with provider {}".format(provider.name)
+        )
 
     current_app.logger.debug(
         "Successful authentication at %s", provider.name)
@@ -277,17 +387,9 @@ def login_user_with_provider(request, provider):
         else:
             # This user has never logged in before.
             # Create a new entry in the user table.
-            user = User(
-                first_name=user_info.first_name,
-                last_name=user_info.last_name,
-                email=user_info.email,
-                birthdate=user_info.birthdate,
-                gender=user_info.gender,
-                image_url=user_info.image_url,
-            )
+            user = add_user(user_info)
 
             # Make sure the user is committed
-            db.session.add(user)
             db.session.commit()
 
             auditable_event(
@@ -316,10 +418,7 @@ def login_user_with_provider(request, provider):
     # Log the user in
     login_user(auth_provider.user, 'password_authenticated')
 
-    next_after_login()
-
-    # Disable Flask-Dance's default behavior that saves the oauth token
-    return False
+    return next_after_login()
 
 
 def store_next_in_session(request, provider):
@@ -339,7 +438,12 @@ def store_next_in_session(request, provider):
 
 @oauth_error.connect_via(google_blueprint)
 @oauth_error.connect_via(facebook_blueprint)
-def google_error(blueprint, error, error_description=None, error_uri=None):
+def provider_oauth_error(
+    blueprint,
+    error,
+    error_description=None,
+    error_uri=None
+):
     """handles outh errors
 
     If there's an error during provider authentiation
@@ -597,37 +701,6 @@ def next_after_login():
         update_timeout()
 
     return resp
-
-
-@auth.route('/login/<provider_name>/')
-def login(provider_name):
-    """login view function
-
-    After successful authorization at OAuth server, control
-    returns here.  The user's ID and the remote oauth bearer
-    token are retained in the session for subsequent use.
-
-    """
-    def testing_backdoor(user_id):
-        "Unittesting backdoor - see tests.login() for use"
-        assert int(user_id) < 10  # allowed for test users only!
-        session['id'] = user_id
-        if request.args.get('next'):
-            validate_origin(request.args.get('next'))
-        user = current_user()
-        login_user(user, 'password_authenticated')
-        return next_after_login()
-
-    if provider_name == 'TESTING' and current_app.config['TESTING']:
-        return testing_backdoor(request.args.get('user_id'))
-
-    if current_user():
-        if current_user().deleted:
-            abort(400, "deleted user - operation not permitted")
-        return next_after_login()
-
-    response = make_response()
-    return response
 
 
 @auth.route('/login-as/<user_id>')
