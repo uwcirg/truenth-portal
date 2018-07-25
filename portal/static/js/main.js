@@ -2044,6 +2044,7 @@ var Global = {
     },
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
+        var self = this;
         sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
@@ -2058,8 +2059,8 @@ var Global = {
                     sessionStorage.clear();
                 });
             }, 150);
-            Global.getNotification(function(data) { //ajax to get notifications information
-                Global.notifications(data);
+            self.getNotification(function(data) { //ajax to get notifications information
+                self.notifications(data);
             });
             callback();
         });
@@ -2130,29 +2131,24 @@ var Global = {
             callback({"error": i18next.t("User id is required")});
             return false;
         }
-        var notificationSessionKey = "notification_" + userId;
-        if (sessionStorage.getItem(notificationSessionKey)) {
-            callback(JSON.parse(sessionStorage.getItem(notificationSessionKey)));
-        } else {
-            $.ajax({
-                type:"GET",
-                url: "/api/user/"+userId+"/notification"
-            }).done(function(data) {
-                if (data) {
-                    callback(data);
-                    sessionStorage.setItem(notificationSessionKey, JSON.stringify(data));
-                } else {
-                    callback({"error": i18next.t("no data returned")});
-                }
-            }).fail(function(){
-                callback({"error": i18next.t("Error occurred retrieving notification.")});
-            });
-        }
+        $.ajax({
+            type:"GET",
+            url: "/api/user/"+userId+"/notification"
+        }).done(function(data) {
+            if (data) {
+                callback(data);
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        }).fail(function(){
+            callback({"error": i18next.t("Error occurred retrieving notification.")});
+        });
     },
     "deleteNotification": function(userId, notificationId) {
         if (!userId || parseInt(notificationId) < 0 || !notificationId) {
             return false;
         }
+        var self = this;
         this.getNotification(function(data) {
             if (data.notifications && data.notifications.length > 0) {
                 var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
@@ -2164,80 +2160,68 @@ var Global = {
                         type: "DELETE",
                         url: "/api/user/" + userId + "/notification/" + notificationId
                     }).done(function() {
-                        sessionStorage.removeItem("notification_"+userId);
+                        $("#notification_" + notificationId).attr("data-visited", true);
+                        $("#notification_" + notificationId).find("[data-action-required]").removeAttr("data-action-required");
+                        self.setNotificationsDisplay();
                     });
                 }
             }
         });
     },
     "notifications": function(data) {
-        if (data && data.notifications && data.notifications.length > 0) {
-            var notificationText = "";
-            (data.notifications).forEach(function(notice) {
-                notificationText += "<div class='notification' data-id='" + notice.id + "' data-name='" + notice.name + "'>" + i18next.t(notice.content) + "</div>";
-            });
-            var setVis = function() {
-                var allVisited = true;
-                var doHideCloseButton = true;
-                $("#notificationBanner [data-id]").each(function() {
-                    var actionRequired = $(this).find("[data-action-required]").length > 0;
-                    if (!actionRequired) { //close button should not be hidden if there is any link that does not require user action
-                        if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
-                            allVisited = false;
-                        }
-                        if (!$(this).attr("data-visited")) { //don't hide the close button if there one link that hasn't been visited
-                            doHideCloseButton = false;
-                        }
-                    } else {
-                        allVisited = false;
-                    }
-                });
-                if (allVisited) {
-                    $("#notificationBanner").hide();
-                } else {
-                    if (doHideCloseButton) {
-                        $("#notificationBanner .close").removeClass("active");
-                    }
-                }
-            };
-            if (notificationText) {
-                $("#notificationBanner .content").html(notificationText);
-                $("#notificationBanner .notification").addClass("active");
-                $("#notificationBanner").show();
-                $("#notificationBanner [data-id] a").each(function() {
-                    $(this).on("click", function() {
-                        var parentElement = $(this).closest(".notification");
-                        parentElement.attr("data-visited", "true"); //adding the attribute data-visited will hide the notification entry
-                        Global.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id")); //delete relevant notification
-                    });
-                });
-                $("#notificationBanner [data-id]").each(function() {
-                    var actionRequired = $(this).find("[data-action-required]").length > 0;
-                    if (!actionRequired) {
-                        $("#notificationBanner .close").addClass("active"); //adding the class of active will allow close button to display
-                    }
-                    $(this).on("click", function(e) {
-                        e.stopPropagation();
-                        setVis();
-                    });
-                });
-                $("#notificationBanner .close").on("click", function(e) { //closing the banner
-                    e.stopPropagation();
-                    $("#notificationBanner [data-id]").each(function() {
-                        var actionRequired = $(this).find("[data-action-required]").length > 0;
-                        if (!actionRequired) {
-                            Global.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
-                            $(this).attr("data-visited", "true");
-                        }
-                    });
-                    setVis();
-                });
-            } else {
-                $("#notificationBanner").hide();
-            }
-        } else {
+        if (!data || !data.notifications || data.notifications.length === 0) {
             $("#notificationBanner").hide();
+            return false;
         }
+        var arrNotificationText = (data.notifications).map(function(notice) {
+            return "<div class='notification' id='notification_{notificationId}' data-id='{notificationId}' data-name='{notificationName}'>{notificationContent}</div>"
+                .replace(/\{notificationId\}/g, notice.id)
+                .replace(/\{notificationName\}/g, notice.name)
+                .replace(/\{notificationContent\}/g, notice.content);
+        });
+        var self = this;
+        $("#notificationBanner .content").html(arrNotificationText.join(""));
+        $("#notificationBanner .notification").addClass("active");
+        $("#notificationBanner").show();
+        $("#notificationBanner [data-id] a").each(function() {
+            $(this).on("click", function(e) {
+                e.stopPropagation();
+                var parentElement = $(this).closest(".notification");
+                parentElement.attr("data-visited", "true"); //adding the attribute data-visited will hide the notification entry
+                self.deleteNotification($("#notificationUserId").val(), parentElement.attr("data-id")); //delete relevant notification
+                self.setNotificationsDisplay();
+            });
+        });
+        $("#notificationBanner .close").on("click", function(e) { //closing the banner
+            e.stopPropagation();
+            $("#notificationBanner [data-id]").each(function() {
+                var actionRequired = $(this).find("[data-action-required]").length > 0;
+                if (!actionRequired) {
+                    $(this).attr("data-visited", true);
+                    self.deleteNotification($("#notificationUserId").val(), $(this).attr("data-id"));
+                }
+            });
+            self.setNotificationsDisplay();
+        });
+        self.setNotificationsDisplay();
+    },
+    "setNotificationsDisplay": function() {
+        if ($("#notificationBanner [data-action-required]").length > 0) { //requiring user action
+            $("#notificationBanner .close").removeClass("active");
+            return false;
+        }
+        var allVisited = true;
+        $("#notificationBanner [data-id]").each(function() {
+            if (allVisited && !$(this).attr("data-visited")) { //check if all links have been visited
+                allVisited = false;
+                return false;
+            }
+        });
+        if (allVisited) {
+            $("#notificationBanner").hide();
+        } else {
+            $("#notificationBanner .close").addClass("active");
+        } 
     },
     initValidator: function() {
         if (typeof $.fn.validator === "undefined") { return false; }
