@@ -1093,7 +1093,7 @@ def stock_consent(org_name):
 
 
 def get_asset(uuid):
-    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    url = "{}/c/portal/truenth/asset/detailed".format(current_app.config["LR_ORIGIN"])
     return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 

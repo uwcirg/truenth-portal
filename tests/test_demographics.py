@@ -12,7 +12,7 @@ from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.reference import Reference
 from portal.models.role import ROLE
-from portal.models.user import User
+from portal.models.user import User, NO_EMAIL_PREFIX
 from portal.system_uri import US_NPI
 from tests import (
     FIRST_NAME,
@@ -218,6 +218,24 @@ class TestDemographics(TestCase):
         assert response.status_code == 200
         user = User.query.get(TEST_USER_ID)
         assert user.email == 'updated@email.com'
+
+    def test_demographics_duplicate_email(self):
+        dup = 'bogus@match.com'
+        self.test_user._email = NO_EMAIL_PREFIX
+        self.add_user(username=dup)
+        data = {
+            "resourceType": "Patient",
+            "telecom": [{"system": 'email', 'value': dup}]}
+
+        self.login()
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
+        assert response.status_code == 400
+        assert 'email address already in use' in response.get_data(
+            as_text=True)
+        user = User.query.get(TEST_USER_ID)
+        assert user._email == NO_EMAIL_PREFIX
 
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",

@@ -1,4 +1,5 @@
 """Module for next_step logic"""
+from flask import url_for
 from werkzeug.exceptions import BadRequest
 
 from .intervention import Intervention
@@ -16,6 +17,11 @@ class NextStep(object):
         if hasattr(NextStep, step):
             return True
         raise BadRequest("{} not a valid next step".format(step))
+
+    @staticmethod
+    def present_needed(user):
+        return url_for(
+            'assessment_engine_api.present_needed', subject_id=user.id)
 
     @staticmethod
     def decision_support(user):
