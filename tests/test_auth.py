@@ -221,7 +221,7 @@ class TestAuth(TestCase):
 
     def test_oauth_new_auth_provider_new_user(self):
         # Login using the test backdoor
-        response = self.login(OAUTH_INFO_PROVIDER_LOGIN)
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
 
         # Verify a new user was created
         user = User.query.filter_by(
@@ -242,7 +242,7 @@ class TestAuth(TestCase):
         oauth_info['last_name'] = 'Bugn\xed'
 
         # Login using the test backdoor
-        response = self.login(OAUTH_INFO_PROVIDER_LOGIN)
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
 
         # Verify a new user was created
         user = User.query.filter_by(
@@ -264,7 +264,7 @@ class TestAuth(TestCase):
         user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
 
         # Login through the test backdoor
-        response = self.login(OAUTH_INFO_PROVIDER_LOGIN)
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
 
         # Verify the response returned successfully
         assert response.status_code == 200
@@ -284,7 +284,7 @@ class TestAuth(TestCase):
         add_auth_provider(OAUTH_INFO_PROVIDER_LOGIN, user)
 
         # Login through the test backdoor
-        response = self.login(OAUTH_INFO_PROVIDER_LOGIN)
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
 
         # Verify the response returned successfully
         assert response.status_code == 200
@@ -295,7 +295,7 @@ class TestAuth(TestCase):
         oauth_info['fail_to_get_user_info'] = True
 
         # Attempt to login through the test backdoor
-        response = self.login(oauth_info)
+        response = self.login(oauth_info=oauth_info)
 
         # Verify 500
         assert response.status_code == 500
@@ -306,7 +306,7 @@ class TestAuth(TestCase):
         oauth_info.pop('token', None)
 
         # Attempt to login through the test backdoor
-        response = self.login(oauth_info, follow_redirects=False)
+        response = self.login(oauth_info=oauth_info, follow_redirects=False)
 
         # Verify force reload
         self.assertRedirects(response, oauth_info['next'])

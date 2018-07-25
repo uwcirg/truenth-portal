@@ -49,9 +49,6 @@ FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
-OAUTH_INFO_SESSION_LOGIN = {
-    'user_id': TEST_USER_ID,
-}
 OAUTH_INFO_PROVIDER_LOGIN = {
     'birthdate': '10/04/1988',
     'email': 'test@test.com',
@@ -188,8 +185,10 @@ class TestCase(Base):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
-    def login(self,
-        oauth_info=OAUTH_INFO_SESSION_LOGIN,
+    def login(
+        self,
+        user_id=TEST_USER_ID,
+        oauth_info=None,
         follow_redirects=True
     ):
         """login using the oauth backdoor
@@ -202,8 +201,16 @@ class TestCase(Base):
         views.auth.oauth_test_backdoor()
 
         """
+        # By default log the user in through the session
+        # with the given id
+        if not oauth_info:
+            oauth_info = {'user_id': user_id}
 
+        # Use the key value pairs in oauth_info dict
+        # as query params
         oauth_url = 'test/oauth?' + urlencode(oauth_info)
+
+        # Finally, attempt to login using the test backdoor
         return self.client.get(oauth_url, follow_redirects=follow_redirects)
 
     def add_client(self):
