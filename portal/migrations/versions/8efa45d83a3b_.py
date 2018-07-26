@@ -18,6 +18,7 @@ down_revision = 'b4dcf331317e'
 
 Session = sessionmaker()
 
+
 def increment_linkId(linkId):
     instrument_id, question_index = linkId.split('.')
 
@@ -25,6 +26,7 @@ def increment_linkId(linkId):
         instrument_id=instrument_id,
         question_index=int(question_index)+1,
     )
+
 
 def increment_code(code):
     instrument_id, question_index, option_index = code.split('.')
@@ -34,6 +36,7 @@ def increment_code(code):
         question_index=int(question_index)+1,
         option_index=option_index,
     )
+
 
 def reindex_questions(questionnaire_response_json):
     """Modify QuestionnaireResponse codes in-place"""
@@ -61,6 +64,8 @@ def upgrade():
 
     for qnr in questionnaire_responses:
         reindex_questions(qnr.document)
+        session.add(qnr)
+    session.commit()
 
 
 def downgrade():
