@@ -39,8 +39,10 @@ def increment_code(code):
 
 
 def reindex_questions(questionnaire_response_json):
-    """Modify QuestionnaireResponse codes in-place"""
-    for question in questionnaire_response_json['group']['question']:
+    """Copy and modify QuestionnaireResponse codes"""
+    qnr_json_copy = dict(questionnaire_response_json)
+
+    for question in qnr_json_copy['group']['question']:
         question['linkId'] = increment_linkId(question['linkId'])
 
         for answer in question['answer']:
@@ -49,6 +51,7 @@ def reindex_questions(questionnaire_response_json):
                 continue
 
             coding_answer_data['code'] = increment_code(coding_answer_data['code'])
+    return qnr_json_copy
 
 
 def upgrade():
@@ -64,7 +67,10 @@ def upgrade():
     ).order_by(QuestionnaireResponse.id)
 
     for qnr in questionnaire_responses:
-        reindex_questions(qnr.document)
+
+        # create new dict to ensure saved
+        qnr_json = reindex_questions(qnr.document)
+        qnr.document = qnr_json
         session.add(qnr)
     session.commit()
 
