@@ -66,6 +66,7 @@ def upgrade():
     ).order_by(QuestionnaireResponse.id)
 
     for qnr in questionnaire_responses:
+        print("Processing QNR:%d" % qnr.id)
 
         # create new dict to ensure saved
         qnr_json = reindex_questions(qnr.document)
