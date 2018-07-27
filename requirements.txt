@@ -19,7 +19,7 @@ click==6.7                # via flask
 coverage==4.5.1
 decorator==4.2.1          # via validators
 docutils==0.14            # via sphinx
-dogpile.cache==0.6.6      # via flask-dogpile-cache
+dogpile.cache==0.6.7      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.11.2
 git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache
