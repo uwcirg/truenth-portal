@@ -66,12 +66,20 @@ def upgrade():
     ).order_by(QuestionnaireResponse.id)
 
     for qnr in questionnaire_responses:
-        # create new dict to ensure saved
         qnr_json = reindex_questions(qnr.document)
+
+        # "Reset" QNR to save updated data
+        # Todo: fix JSONB mutation detection
+        # See https://bugs.launchpad.net/fuel/+bug/1482658
+        qnr.document = {}
+        session.add(qnr)
+        session.commit()
+
         qnr.document = qnr_json
         session.add(qnr)
+        session.commit()
+        assert qnr.document
         print("Processed QNR: %d" % qnr.id)
-    session.commit()
     # ### end Alembic commands ###
 
 def downgrade():
