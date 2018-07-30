@@ -57,7 +57,6 @@ def reindex_questions(questionnaire_response_json):
 age_question_stub = {
     'text': 'What is your current age?',
     'answer': [],
-    'linkId': 'irondemog.1',
 }
 
 
@@ -74,9 +73,13 @@ def upgrade():
 
     for qnr in questionnaire_responses:
         qnr_json = reindex_questions(qnr.document)
+        instrument_id = qnr.document["questionnaire"]["reference"].split("/")[-1]
+
+        age_question = dict(age_question_stub)
+        age_question['linkId'] = "{instrument_id}.1".format(instrument_id=instrument_id)
 
         # add age question stub
-        qnr_json['group']['question'].insert(0, age_question_stub)
+        qnr_json['group']['question'].insert(0, age_question)
 
         # "Reset" QNR to save updated data
         # Todo: fix JSONB mutation detection
