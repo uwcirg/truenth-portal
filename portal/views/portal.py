@@ -52,7 +52,10 @@ from ..models.app_text import (
     app_text,
     get_terms,
 )
-from ..models.assessment_status import invalidate_assessment_status_cache, overall_assessment_status
+from ..models.assessment_status import (
+    invalidate_assessment_status_cache,
+    overall_assessment_status
+)
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
@@ -669,7 +672,8 @@ def patient_reminder_email(user_id):
         if qbd and qbd.questionnaire_bank:
             questionnaire_bank_id = qbd.questionnaire_bank.id
         # pass in questionnaire bank id to get at the questionnaire due date
-        args = load_template_args(user=user, questionnaire_bank_id=questionnaire_bank_id)
+        args = load_template_args(user=user, questionnaire_bank_id=\
+                                  questionnaire_bank_id)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
