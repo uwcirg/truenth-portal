@@ -188,17 +188,18 @@ class TestUser(TestCase):
         assert '4' in codes
 
         # now create a new extension (FHIR like) and apply to the user
-        extension = {"url": TRUENTH_EXTENSTION_NHHD_291036,
-                     "valueCodeableConcept": {
-                         "coding": [
-                             {"system": TRUENTH_VALUESET_NHHD_291036,
-                              "code": "1"
-                              },
-                             {"system": TRUENTH_VALUESET_NHHD_291036,
-                              "code": "9"
-                              },
-                         ]
-                     }}
+        extension = {
+            "url": TRUENTH_EXTENSTION_NHHD_291036,
+            "valueCodeableConcept": {
+                "coding": [
+                    {"system": TRUENTH_VALUESET_NHHD_291036,
+                     "code": "1"
+                     },
+                    {"system": TRUENTH_VALUESET_NHHD_291036,
+                     "code": "9"
+                     },
+                ]
+            }}
 
         ue = UserIndigenousStatusExtension(self.test_user, extension)
         ue.apply_fhir()
@@ -421,12 +422,14 @@ class TestUser(TestCase):
         staff_id = staff.id
         self.promote_user(user=staff, role_name=ROLE.STAFF.value)
         data = {
-            'organizations': [{'organization_id': org_id},
-                              {'organization_id': org2_id}],
-            'consents': [{'organization_id': org_id,
-                          'agreement_url': 'http://fake.org',
-                          'staff_editable': True,
-                          'send_reminders': False}],
+            'organizations': [
+                {'organization_id': org_id},
+                {'organization_id': org2_id}],
+            'consents': [{
+                'organization_id': org_id,
+                'agreement_url': 'http://fake.org',
+                'staff_editable': True,
+                'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT.value}],
         }
         self.login(user_id=staff_id)
