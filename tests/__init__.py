@@ -183,7 +183,8 @@ class TestCase(Base):
 
         """
         return self.client.get(
-            '/login/TESTING?user_id={0}'.format(user_id),
+            '/login/TESTING',
+            query_string={'user_id': user_id},
             follow_redirects=True)
 
     def add_client(self):
