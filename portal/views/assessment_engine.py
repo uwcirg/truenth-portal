@@ -616,9 +616,11 @@ def assessment(patient_id, instrument_id):
             for answer in question['answer']:
                 # Hack: Extensions should be a list, correct in-place if need be
                 # todo: migrate towards FHIR spec in persisted data
-                if ('extension' in answer.get('valueCoding', {})
-                        and not isinstance(answer['valueCoding']['extension'],
-                                           (tuple, list))):
+                if (
+                    'extension' in answer.get('valueCoding', {}) and
+                    not isinstance(answer['valueCoding']['extension'],
+                                   (tuple, list))
+                ):
                     answer['valueCoding']['extension'] = [
                         answer['valueCoding']['extension']]
 
@@ -850,8 +852,8 @@ def assessment_update(patient_id):
     # Todo: enforce identifier uniqueness at initial submission
     try:
         existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["identifier"] == updated_qnr[
-                "identifier"]
+            QuestionnaireResponse.document["identifier"]
+            == updated_qnr["identifier"]
         ).one()
     # except NoResultException:
     except NoResultFound:
@@ -1354,15 +1356,19 @@ def assessment_add(patient_id):
     qbd = QuestionnaireBank.most_current_qb(
         patient, as_of_date=authored)
     qb = qbd.questionnaire_bank
-    if (qb and qn and (qn.id in [qbq.questionnaire.id
-                                 for qbq in qb.questionnaires])):
+    if (
+        qb and qn and
+        (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+    ):
         qnr_qb = qb
     # if a valid qb wasn't found, try the indefinite option
     if not qnr_qb:
         qbd = QuestionnaireBank.indefinite_qb(patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
-        if (qb and qn and (qn.id in [qbq.questionnaire.id
-                                     for qbq in qb.questionnaires])):
+        if (
+            qb and qn and
+            (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+        ):
             qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
