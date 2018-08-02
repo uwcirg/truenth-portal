@@ -39,7 +39,7 @@ Download and run the ``latest`` images::
     docker-compose pull web
     docker-compose up web
 
-By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use an image with another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
+By default, the ``truenth_portal`` image with the ``latest`` tag is downloaded and used. To use an image with another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
 
     export DOCKER_IMAGE_TAG='stable'
     docker-compose pull web

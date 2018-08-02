@@ -107,8 +107,9 @@ def limit_by_clinic_w_id(
                  intervention=intervention.name)
             return True
 
-    return user_registered_with_all_clinics if combinator == 'all' else\
-        user_registered_with_any_clinics
+    return (
+        user_registered_with_all_clinics if combinator == 'all'
+        else user_registered_with_any_clinics)
 
 
 def not_in_clinic_w_id(
@@ -407,7 +408,7 @@ def update_card_html_on_completion():
             # User completed baseline, but has outstanding indefinite work
             link_label = _('Continue questionnaire') if (
                 indefinite_questionnaires[1]) else (
-                    _('Go to questionnaire'))
+                _('Go to questionnaire'))
             link_url = url_for('assessment_engine_api.present_needed')
             header = _("Open Questionnaire")
             message = _(
@@ -489,7 +490,8 @@ def update_card_html_on_completion():
                         portal-no-description-container full-width'>
                         <h4 class="portal-description-title">{header}</h4>
                         {message}
-                    </div>""".format(greeting=greeting, header=header, message=message)
+                    </div>""".format(
+                    greeting=greeting, header=header, message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
@@ -505,8 +507,10 @@ def update_card_html_on_completion():
                 ))
             db.session.commit()
         else:
-            if ui.card_html != card_html or ui.link_label != link_label or\
-               ui.link_url != link_url:
+            if (
+                ui.card_html != card_html or ui.link_label != link_label or
+                ui.link_url != link_url
+            ):
                 ui.card_html = card_html
                 ui.link_label = link_label,
                 ui.link_url = link_url
@@ -537,6 +541,7 @@ def tx_begun(boolean_value):
 
     def user_has_desired_tx(intervention, user):
         return check_func(user)
+
     return user_has_desired_tx
 
 
@@ -606,8 +611,8 @@ def combine_strategies(**kwargs):
     strats = []
     arbitrary_limit = 7
     if 'strategy_{}'.format(arbitrary_limit) in kwargs:
-        raise ValueError("only supporting %d combined strategies",
-                         arbitrary_limit-1)
+        raise ValueError(
+            "only supporting %d combined strategies", arbitrary_limit - 1)
     for i in range(1, arbitrary_limit):
         if 'strategy_{}'.format(i) not in kwargs:
             break
@@ -682,8 +687,9 @@ class AccessStrategy(db.Model):
 
     def __str__(self):
         """Log friendly string format"""
-        return "AccessStrategy: {0.name} {0.description} {0.rank}"\
-            "{0.function_details}".format(self)
+        return (
+            "AccessStrategy: {0.name} {0.description} {0.rank}"
+            "{0.function_details}").format(self)
 
     @classmethod
     def from_json(cls, data):
