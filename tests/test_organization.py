@@ -555,6 +555,16 @@ class TestOrganization(TestCase):
         self.deepen_org_tree()
         assert {'101', '102'} == set(OrgTree().top_level_names())
 
+    def test_roots(self):
+        self.deepen_org_tree()
+        # Given two orgs on the same branch of tree and one from another
+        # branch should result in just two root nodes
+        orgs_on_branch = (
+            Organization.query.get(102), Organization.query.get(10031),
+            Organization.query.get(1001))
+        assert ({Organization.query.get(101), Organization.query.get(102)}
+                == OrgTree().find_top_level_orgs(orgs_on_branch))
+
     def test_staff_leaves(self):
         # test staff with several org associations produces correct list
         self.deepen_org_tree()
