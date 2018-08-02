@@ -101,7 +101,7 @@ class TestTou(TestCase):
 
         self.login()
         response = self.client.get('/api/user/{}/tou/privacy-policy'.format(
-                             TEST_USER_ID))
+            TEST_USER_ID))
         assert response.status_code == 200
         # result must be timezone aware isoformat, without microseconds
         tzaware = timestamp.replace(tzinfo=pytz.utc)

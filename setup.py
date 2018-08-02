@@ -17,7 +17,7 @@ from setuptools import setup
 BUILD_DIR = os.environ.get("BUILD_DIR")
 if BUILD_DIR:
     build_version = BUILD_DIR.split("-")[-1]
-    setup(version="0+ng"+build_version)
+    setup(version="0+ng" + build_version)
 else:
     # default git-based version generation (setuptools-scm), see setup.cfg
     setup()
