@@ -20,6 +20,7 @@ def create_celery(app):
     celery.conf.update(app.config)
 
     TaskBase = celery.Task
+
     class ContextTask(TaskBase):
         abstract = True
 
@@ -31,6 +32,7 @@ def create_celery(app):
                 finally:
                     db.session.remove()
                 return response
+
     celery.Task = ContextTask
 
     __celery = celery

@@ -3,6 +3,7 @@ from __future__ import unicode_literals  # isort:skip
 
 from tests import TestCase
 
+
 class TestCelery(TestCase):
     """Portal view tests"""
 

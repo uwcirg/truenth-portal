@@ -9,6 +9,7 @@ from portal.extensions import db
 from portal.models.table_preference import TablePreference
 from tests import TEST_USER_ID, TestCase
 
+
 class TestTablePreference(TestCase):
     """Table Preference tests"""
 
