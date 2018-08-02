@@ -201,11 +201,9 @@ class QuestionnaireBankDetails(object):
         if self.qbd.questionnaire_bank in intervention_qbs:
             return False
 
-        # With multiple root organizations, the consent lookup would
-        # be indeterminate - don't allow
-        root_orgs = OrgTree().find_top_level_org(self.user.organizations)
+        root_orgs = OrgTree().find_top_level_orgs(self.user.organizations)
         if len(root_orgs) > 1:
-            current_app.logger.error(
+            current_app.logger.warning(
                 "Indeterminate org lookup - only expecting one root org "
                 "for patient {}".format(self.user))
 
@@ -278,7 +276,7 @@ class AssessmentStatus(object):
         for org in self.user.organizations:
             org_rp = org.research_protocol(self.as_of_date)
             if org_rp and org_rp.id == rp_id:
-                return OrgTree().find_top_level_org([org])[0]
+                return OrgTree().find_top_level_orgs([org], first=True)
         return None
 
     @property
@@ -473,8 +471,9 @@ def overall_assessment_status(user_id):
 
     """
     user = User.query.get(user_id)
-    current_app.logger.debug("CACHE MISS: {} {}".format(
-        __name__, user_id))
+    if current_app.config.get("LOG_CACHE_MISS"):
+        current_app.logger.debug("CACHE MISS: {} {}".format(
+            __name__, user_id))
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
     qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)

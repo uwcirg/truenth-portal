@@ -80,6 +80,7 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
+    FLUSH_CACHE_ON_SYNC = True
 
     CELERY_IMPORTS = ('portal.tasks',)
     DEBUG = False
@@ -87,6 +88,7 @@ class BaseConfig(object):
     DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
+    LOG_CACHE_MISS = False
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
     LOG_LEVEL = 'DEBUG'
 
