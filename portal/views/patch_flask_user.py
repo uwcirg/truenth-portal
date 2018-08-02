@@ -5,9 +5,13 @@ standard_library.install_aliases()  # noqa: E402
 
 from urllib.parse import urlsplit, urlunsplit
 
-from flask import current_app, flash, redirect, request, url_for
+from flask import current_app, flash, redirect, request
 from flask_babel import force_locale, gettext as _
 from flask_user.views import _endpoint_url
+
+from ..database import db
+from ..models.message import EmailMessage
+from ..models.user import current_user
 
 
 def patch_make_safe_url(url):
@@ -62,3 +66,26 @@ def patch_forgot_password():
     # Process GET or invalid POST
     return user_manager.render_function(
         user_manager.forgot_password_template, form=form)
+
+
+def patch_send_email(recipient, subject, html_message, text_message):
+    """ Replace flask_user's `send_email` for tracking purposes
+
+    In order to capture emails sent by flask-user, replicate and customize
+    the built in flask_user function.
+
+    """
+
+    # Disable email sending when testing
+    if current_app.testing:
+        return
+
+    user = current_user()
+    user_id = user.id if user else None
+    email = EmailMessage(
+        subject=subject, body=html_message, recipients=recipient,
+        sender=current_app.config['MAIL_DEFAULT_SENDER'], user_id=user_id)
+
+    email.send_message()
+    db.session.add(email)
+    db.session.commit()

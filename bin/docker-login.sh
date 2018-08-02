@@ -34,6 +34,11 @@ get_configured_registries | while read config ; do
     username="$(echo "$config" | cut --delimiter ' ' --fields 2)"
     api_key="$(echo "$config" | cut --delimiter ' ' --fields 3)"
 
+    # remove username from repo when logging into docker.io
+    if echo "$repo" | grep --quiet 'docker\.io'; then
+        repo='docker.io'
+    fi
+
     echo "Logging into $repo..."
     docker login \
         --username "$username" \
