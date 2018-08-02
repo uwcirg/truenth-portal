@@ -1450,10 +1450,10 @@
         {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "Michigan Urological Center"
+          "value": "Michigan Urological Clinic"
         }
       ],
-      "name": "Michigan Urological Center",
+      "name": "Michigan Urological Clinic",
       "partOf": {
         "reference": "api/organization/40001"
       },
