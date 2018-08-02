@@ -143,8 +143,9 @@ def demographics_set(patient_id):
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
     if not request.json:
-        abort(400, "Requires JSON with submission including "
-                   "HEADER 'Content-Type: application/json'")
+        abort(400,
+              "Requires JSON with submission including "
+              "HEADER 'Content-Type: application/json'")
     if request.json.get('resourceType') != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
     if request.json.get('organizations'):
