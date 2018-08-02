@@ -279,8 +279,8 @@ def access_via_token(token, next_step=None):
         assert (not current_user())
 
     def verify_token(valid_seconds):
-        is_valid, has_expired, user_id = (user_manager.token_manager.
-                                          verify_token(token, valid_seconds))
+        is_valid, has_expired, user_id = (
+            user_manager.token_manager.verify_token(token, valid_seconds))
         if has_expired:
             current_app.logger.info("token access failed: "
                                     "expired token {}".format(token))
@@ -310,8 +310,8 @@ def access_via_token(token, next_step=None):
         target_url = getattr(NextStep, next_step)(user)
         if not target_url:
             # Due to access strategies, the next step may not (yet) apply
-            abort(
-                400, "Patient doesn't qualify for '{}', can't continue".format(
+            abort(400,
+                  "Patient doesn't qualify for '{}', can't continue".format(
                       next_step))
         session['next'] = target_url
         current_app.logger.debug(
@@ -823,7 +823,8 @@ def config_settings(config_key):
     if config_key:
         key = config_key.upper()
         if not any(
-                key.startswith(prefix) for prefix in config_prefix_whitelist):
+            key.startswith(prefix) for prefix in config_prefix_whitelist
+        ):
             abort(400, "Configuration key '{}' not available".format(key))
         return jsonify({key: current_app.config.get(key)})
     else:
