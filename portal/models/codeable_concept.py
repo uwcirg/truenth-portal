@@ -9,7 +9,7 @@ class CodeableConceptCoding(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     codeable_concept_id = db.Column(db.ForeignKey(
         'codeable_concepts.id'), nullable=False)
-    coding_id =  db.Column(db.ForeignKey('codings.id'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
     # Maintain a unique relationship between each codeable concept
     # and it list of codings.  Therefore, a CodeableConcept always
@@ -65,7 +65,7 @@ class CodeableConcept(db.Model):
             raise ValueError("Can't add CodeableConcept without any codings")
         query = CodeableConceptCoding.query.filter(
             CodeableConceptCoding.coding_id.in_(coding_ids)).distinct(
-                CodeableConceptCoding.codeable_concept_id)
+            CodeableConceptCoding.codeable_concept_id)
         if query.count() > 1:
             raise ValueError(
                 "DB problem - multiple CodeableConcepts {} found for "

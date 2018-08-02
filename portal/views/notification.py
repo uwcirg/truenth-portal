@@ -5,7 +5,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.notification import UserNotification
 from ..models.user import current_user, get_user, get_user_or_abort
-from .portal import check_int
+from ..type_tools import check_int
 
 notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 

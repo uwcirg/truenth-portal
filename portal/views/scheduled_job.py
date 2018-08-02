@@ -16,7 +16,7 @@ from ..factories.celery import create_celery
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 from ..models.user import current_user
-from .portal import check_int
+from ..type_tools import check_int
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 
