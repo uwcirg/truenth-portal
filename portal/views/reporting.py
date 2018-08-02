@@ -20,7 +20,7 @@ from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE
 from ..models.user import User, current_user
 
-reporting_api = Blueprint('reporting', __name__, )
+reporting_api = Blueprint('reporting', __name__)
 
 
 @reporting_api.route('/admin/overdue-table')

@@ -153,8 +153,9 @@ def practitioner_get(id_or_code):
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
-            abort(404, 'no practitioner found with identifier: system `{}`, '
-                       'value `{}`'.format(system, id_or_code))
+            abort(404,
+                  'no practitioner found with identifier: system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -291,8 +292,9 @@ def practitioner_put(id_or_code):
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
-            abort(404, 'no practitioner found with identifier: system `{}`, '
-                       'value `{}`'.format(system, id_or_code))
+            abort(404,
+                  'no practitioner found with identifier: system `{}`, '
+                  'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
