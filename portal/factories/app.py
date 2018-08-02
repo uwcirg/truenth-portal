@@ -133,6 +133,7 @@ def configure_app(app, config):
             app.config['SERVER_NAME'].split(':')[0]
         )
 
+
 def configure_profiler(app):
     if app.config.get('PROFILE'):
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
@@ -182,11 +183,12 @@ def configure_extensions(app):
 
     from flask_user.views import login, register
     from ..views.patch_flask_user import (
-        patch_make_safe_url, patch_forgot_password)
+        patch_make_safe_url, patch_forgot_password, patch_send_email)
 
     user_manager.init_app(
         app,
         forgot_password_view_function=patch_forgot_password,
+        send_email_function=patch_send_email,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
         register_view_function=capture_next_view_function(register),
@@ -232,8 +234,8 @@ def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):
         sql_log_file = '/tmp/sql_log'
-        sql_file_handler = handlers.RotatingFileHandler(sql_log_file,
-                maxBytes=1000000, backupCount=20)
+        sql_file_handler = handlers.RotatingFileHandler(
+            sql_log_file, maxBytes=1000000, backupCount=20)
         sql_file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(thread)d: %(message)s'
         ))
@@ -248,10 +250,7 @@ def configure_logging(app):  # pragma: no cover
 
     # Configure Error Emails for high level log messages, only in prod mode
     if not any((
-        app.debug,
-        app.testing,
-        not app.config.get('ERROR_SENDTO_EMAIL'),
-    )):
+            app.debug, app.testing, not app.config.get('ERROR_SENDTO_EMAIL'))):
         mail_handler = SSLSMTPHandler(
             mailhost=app.config['MAIL_SERVER'],
             mailport=app.config['MAIL_PORT'],
@@ -274,7 +273,6 @@ def configure_logging(app):  # pragma: no cover
     if not os.path.exists(app.config['LOG_FOLDER']):
         os.mkdir(app.config['LOG_FOLDER'])
 
-
     info_log = os.path.join(app.config['LOG_FOLDER'], 'info.log')
     # For WSGI servers, the log file is only writable by www-data
     # This prevents users from being able to run other management
@@ -291,8 +289,8 @@ def configure_logging(app):  # pragma: no cover
         )
         return
 
-    info_file_handler = handlers.RotatingFileHandler(info_log,
-            maxBytes=1000000, backupCount=20)
+    info_file_handler = handlers.RotatingFileHandler(
+        info_log, maxBytes=1000000, backupCount=20)
     info_file_handler.setLevel(level)
     info_file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '
@@ -309,7 +307,7 @@ def configure_logging(app):  # pragma: no cover
         log.setLevel(level)
         log.addHandler(info_file_handler)
 
-    #app.logger.debug("initiate logging done at level %s, %d",
+    # app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)
 
 

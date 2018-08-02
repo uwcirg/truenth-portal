@@ -1,8 +1,7 @@
 """User model """
 from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library  # isort:skip
-
+from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
@@ -67,7 +66,7 @@ gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
 internal_identifier_systems = (
-    (TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS)
+    TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS
 
 
 class UserIndigenousStatusExtension(CCExtension):
@@ -698,15 +697,12 @@ class User(db.Model, UserMixin):
 
         A user may have any number of organizations, but most business
         decisions, assume there is only one.  Arbitrarily returning the
-        first from the matchin query in case of multiple.
+        first from the matching query in case of multiple.
 
         :returns: a single top level organization, or None
 
         """
-        top_orgs = OrgTree().find_top_level_org(self.organizations)
-        if top_orgs:
-            return top_orgs[0]
-        return None
+        return OrgTree().find_top_level_orgs(self.organizations, first=True)
 
     def leaf_organizations(self):
         """Return list of 'leaf' organization ids for user's orgs
@@ -1332,10 +1328,8 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if self.email and (
-                        (telecom.email != self.email) and
-                        (User.query.filter_by(
-                        email=telecom.email).count() > 0)):
+                if self._email and ((telecom.email != self._email) and
+                        (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()

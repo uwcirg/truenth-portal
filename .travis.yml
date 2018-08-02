@@ -35,7 +35,7 @@ env:
     - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - DOCKER_REPO="${DOCKER_REPO:-portal-docker}"
     - DOCKER_REPOSITORY=""
-    - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
+    - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-truenth_portal}"
     - DOCKER_IMAGE_TAG=travis
     - DOCKER_EXTRA_TAGS="$TRAVIS_BUILD_NUMBER"
 
