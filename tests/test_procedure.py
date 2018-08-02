@@ -180,9 +180,8 @@ class TestProcedure(TestCase):
         for code, display, system in started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            assert (
-                known_treatment_started(self.test_user),
-                "treatment {} didn't show as started".format((system, code)))
+            assert known_treatment_started(self.test_user),\
+                "treatment {} didn't show as started".format((system, code))
 
             # The "others" count as treatement started, but should NOT
             # return a date from latest_treatment - only specific treatments
