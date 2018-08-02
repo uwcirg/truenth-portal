@@ -684,8 +684,8 @@ class AccessStrategy(db.Model):
 
     def __str__(self):
         """Log friendly string format"""
-        return "AccessStrategy: {0.name} {0.description} {0.rank}" \
-               "{0.function_details}".format(self)
+        return ("AccessStrategy: {0.name} {0.description} {0.rank}"
+                "{0.function_details}").format(self)
 
     @classmethod
     def from_json(cls, data):
