@@ -92,11 +92,11 @@ def upsert_to_template_file():
 
     try:
         with open(
-                os.path.join(
-                    current_app.root_path,
-                    "translations/messages.pot",
-                ),
-                "r+",
+            os.path.join(
+                current_app.root_path,
+                "translations/messages.pot",
+            ),
+            "r+",
         ) as potfile:
             potlines = potfile.readlines()
             for i, line in enumerate(potlines):
@@ -137,9 +137,9 @@ def fix_references(pot_fpath):
     base_url = "%s/tree/develop" % current_app.config.metadata['home-page']
 
     with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
-            prefix='fix_references_',
-            suffix='.pot',
-            delete=False,
+        prefix='fix_references_',
+        suffix='.pot',
+        delete=False,
     ) as tmpfile:
         for line in infile:
             tmpfile.write(
