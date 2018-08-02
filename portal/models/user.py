@@ -662,8 +662,8 @@ class User(db.Model, UserMixin):
         to establish which should be visible to the user"""
 
         def locale_name_from_code(locale_code):
-            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG,
-                                            code=locale_code).first()
+            coding = Coding.query.filter_by(
+                system=IETF_LANGUAGE_TAG, code=locale_code).first()
             return coding.display
 
         locale_options = {}
@@ -1330,8 +1330,9 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if self.email and ((telecom.email != self.email)
-                                   and (User.query.filter_by(
+                if self.email and (
+                        (telecom.email != self.email) and
+                        (User.query.filter_by(
                         email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email
