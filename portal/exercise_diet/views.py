@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import json
 
 from flask import Blueprint, redirect, render_template, url_for
 
@@ -19,7 +18,7 @@ def get_all_recipes():
                      'tomatoes': [],
                      'fish': [],
                      'alternatives_to_processed_meats': []}
-    for asset in json.loads(recipe_data.decode('utf-8'))['results']:
+    for asset in recipe_data['results']:
         if 'vegetables' in asset['tags']:
             recipe_assets['vegetables'].append(
                 (asset['title'], asset['uuid'],
@@ -42,7 +41,7 @@ def get_all_recipes():
                  asset['small_image'], 'recipe'))
 
     shopping_data = get_any_tag_data("shopping_tips")
-    for asset in json.loads(shopping_data.decode('utf-8'))['results']:
+    for asset in shopping_data['results']:
         if 'vegetables' in asset['tags']:
             recipe_assets['vegetables'].append(
                 (asset['title'], asset['uuid'],
@@ -76,7 +75,7 @@ def index():
 def introduction():
     assets = []
     data = get_any_tag_data("introduction")
-    for asset in json.loads(data.decode('utf-8'))['results']:
+    for asset in data['results']:
         assets.append(get_asset(asset['uuid']))
 
     return render_template('exercise_diet/index.html', assets=assets,
@@ -87,12 +86,12 @@ def introduction():
 def diet():
     data = get_any_tag_data("diet")
     assets = []
-    for asset in json.loads(data.decode('utf-8'))['results']:
+    for asset in data['results']:
         assets.append(get_asset(asset['uuid']))
 
     modal_data = get_any_tag_data("diet-modal")
     modals = OrderedDict()
-    for modal in json.loads(modal_data.decode('utf-8'))['results']:
+    for modal in modal_data['results']:
         tag = modal['tags']
         tag.remove('diet-modal')
         modals[tag[0]] = (modal['title'], modal['priority'],
@@ -104,19 +103,20 @@ def diet():
 
 @exercise_diet.route('/portal')
 def portal():
-    return render_template('exercise_diet/exercise-diet_portal.html', user=current_user())
+    return render_template(
+        'exercise_diet/exercise-diet_portal.html', user=current_user())
 
 
 @exercise_diet.route('/exercise')
 def exercise():
     data = get_any_tag_data("exercise")
     assets = []
-    for asset in json.loads(data.decode('utf-8'))['results']:
+    for asset in data['results']:
         assets.append(get_asset(asset['uuid']))
 
     modal_data = get_any_tag_data("exercise-modal")
     modals = OrderedDict()
-    for modal in json.loads(modal_data.decode('utf-8'))['results']:
+    for modal in modal_data['results']:
         tag = modal['tags']
         tag.remove('exercise-modal')
         modals[tag[0]] = (modal['title'], modal['priority'],
@@ -129,8 +129,7 @@ def exercise():
 @exercise_diet.route('/recipes')
 def recipes():
     data = get_any_tag_data("recipe-intro")
-    recipe_intro = get_asset(
-        json.loads(data.decode('utf-8'))['results'][0]['uuid'])
+    recipe_intro = get_asset(data['results'][0]['uuid'])
     recipe_assets = get_all_recipes()
     return render_template('exercise_diet/recipes.html',
                            recipe_intro=recipe_intro,

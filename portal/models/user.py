@@ -694,15 +694,12 @@ class User(db.Model, UserMixin):
 
         A user may have any number of organizations, but most business
         decisions, assume there is only one.  Arbitrarily returning the
-        first from the matchin query in case of multiple.
+        first from the matching query in case of multiple.
 
         :returns: a single top level organization, or None
 
         """
-        top_orgs = OrgTree().find_top_level_org(self.organizations)
-        if top_orgs:
-            return top_orgs[0]
-        return None
+        return OrgTree().find_top_level_orgs(self.organizations, first=True)
 
     def leaf_organizations(self):
         """Return list of 'leaf' organization ids for user's orgs
@@ -913,6 +910,11 @@ class User(db.Model, UserMixin):
         for proc in self.procedures:
             fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
+
+    @property
+    def rolelist(self):
+        """Generate UI friendly string of user's roles by name"""
+        return ', '.join([r.name for r in self.roles])
 
     def as_fhir(self, include_empties=True):
         """Return JSON representation of user
@@ -1318,7 +1320,7 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if self.email and ((telecom.email != self.email) and
+                if self._email and ((telecom.email != self._email) and
                         (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email

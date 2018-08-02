@@ -46,8 +46,8 @@ from ..models.user import (
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from ..type_tools import check_int
 from .auth import logout
-from .portal import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -400,7 +400,7 @@ def access_url(user_id):
     token = user_manager.token_manager.generate_token(user_id)
     url = url_for(
         'portal.access_via_token', token=token, _external=True)
-    auditable_event("generated access token for user {}".format(user_id),
+    auditable_event("generated access token {}".format(token),
                     user_id=current_user().id, subject_id=user.id,
                     context='authentication')
     return jsonify(access_url=url)
