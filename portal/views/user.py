@@ -226,7 +226,7 @@ def account():
         try:
             org_list = [Organization.query.filter_by(
                 id=org['organization_id']).one()
-                        for org in request.json['organizations']]
+                for org in request.json['organizations']]
             user.update_orgs(org_list, acting_user=acting_user,
                              excuse_top_check=True)
             if org_list:
