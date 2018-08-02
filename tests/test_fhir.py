@@ -37,10 +37,13 @@ class TestFHIR(TestCase):
         cc = db.session.merge(cc)
 
         # now parse a fhir snippet containing first just a partial set
-        data = {"test_concept1": {"coding": [{
-            "system": initial_coding1.system,
-            "code": initial_coding1.code,
-            "display": initial_coding1.display}, ], }, }
+        data = {"test_concept1":
+            {"coding": [{
+                "system": initial_coding1.system,
+                "code": initial_coding1.code,
+                "display": initial_coding1.display},
+            ]},
+        }
         cc_parsed = CodeableConcept.from_fhir(data['test_concept1'])
 
         assert cc_parsed.codings == cc.codings
