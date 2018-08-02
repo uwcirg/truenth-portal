@@ -235,7 +235,7 @@ def portal_footer_html():
     return make_response(html)
 
 
-### Deprecated rewrites follow
+# Deprecated rewrites follow
 @truenth_api.route('/portal-wrapper-html/<username>',
                    methods=('GET', 'OPTIONS'))
 @crossdomain()
