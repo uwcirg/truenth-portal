@@ -23,8 +23,8 @@ if not pytest.config.getoption("--include-ui-testing"):
 
 @unittest.skipUnless(
     (
-            "SAUCE_USERNAME" in os.environ or
-            xvfbwrapper.Xvfb().xvfb_exists()
+        "SAUCE_USERNAME" in os.environ or
+        xvfbwrapper.Xvfb().xvfb_exists()
     ),
     "Xvfb not installed"
 )
