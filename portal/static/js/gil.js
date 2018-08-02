@@ -1197,6 +1197,7 @@ module.exports = accessCodeObj = (function() {
         $("#access_code_info").show();
         $("#accessCodeLink").addClass("icon-box__button--disabled");
         $("#btnCreateAccount").removeAttr("href").addClass("icon-box__button--disabled");
+        $("#shortcut_alias").attr("disabled", true);
         window.app.interventionSessionObj.setInterventionSession();
         setTimeout(function() { location.replace("/go/" + ($("#shortcut_alias").val()).toLowerCase());}, 4000);
       } else {

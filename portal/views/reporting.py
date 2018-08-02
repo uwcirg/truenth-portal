@@ -139,9 +139,9 @@ def generate_numbers():
             od = overdue(user)
             qb = a_s.qb_name
             for org in user.organizations:
-                top = ot.find_top_level_org([org])
+                top = ot.find_top_level_orgs([org], first=True)
                 org_name = "{}: {}".format(
-                    top[0].name, org.name) if top else org.name
+                    top.name, org.name) if top else org.name
                 cw.writerow((
                     user.id, email, qb, a_s.overall_status, od, org_name))
 
