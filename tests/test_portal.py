@@ -213,9 +213,9 @@ class TestPortal(TestCase):
         """Ensure our swagger spec matches swagger schema"""
 
         with tempfile.NamedTemporaryFile(
-                prefix='swagger_test_',
-                suffix='.json',
-                delete=True,
+            prefix='swagger_test_',
+            suffix='.json',
+            delete=True,
         ) as temp_spec:
             temp_spec.write(self.client.get('/spec').data)
             temp_spec.seek(0)
@@ -273,8 +273,10 @@ class TestPortalEproms(TestCase):
         invalid_url = 'http://invalid.org'
 
         # validate redirect of /website-consent-script GET
-        response = self.client.get('/website-consent-script/{}?redirect_url='
-                                   '{}'.format(TEST_USER_ID, local_url))
+        response = self.client.get(
+            '/website-consent-script/{}?redirect_url={}'.format(
+                TEST_USER_ID, local_url)
+        )
         assert response.status_code == 200
 
         response2 = self.client.get('/website-consent-script/{}?redirect_url='
@@ -283,8 +285,8 @@ class TestPortalEproms(TestCase):
 
         # validate redirect of /login/<provider> GET
         response3 = self.client.get(
-            '/login/TESTING?user_id={}&next={}'.format(
-                TEST_USER_ID, client_url),
+            '/login/TESTING',
+            query_string={'user_id': TEST_USER_ID, 'next': client_url},
             follow_redirects=True)
         assert response3.status_code == 200
 

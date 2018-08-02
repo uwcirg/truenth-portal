@@ -319,7 +319,7 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         org_id = org.id
 
-        # prepopuate database with matching locale
+        # prepopulate database with matching locale
         Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
                           'system': "urn:ietf:bcp:47"})
 
