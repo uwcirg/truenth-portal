@@ -205,10 +205,13 @@ def next_after_login():
         invited_id = session.get('invited_verified_user_id') or session.get(
             'login_as_id')
         invited_user = User.query.get(invited_id)
+        preserve_next_across_sessions = session.get('next')
         logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
+        if preserve_next_across_sessions:
+            session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
         assert (not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
         user = current_user()
