@@ -142,8 +142,9 @@ class TestUserConsent(TestCase):
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert consent.acceptance_date == parser.parse(acceptance_date)
-        assert (consent.audit.comment ==
-                "Consent agreement {} signed".format(consent.id))
+        assert (
+            consent.audit.comment ==
+            "Consent agreement {} signed".format(consent.id))
         assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
 
     def test_post_user_future_consent_date(self):
@@ -240,8 +241,8 @@ class TestUserConsent(TestCase):
         assert 'deleted' in json.dumps(response.json)
 
         # confirm deleted status
-        dc = UserConsent.query.filter_by(user_id=TEST_USER_ID,
-                                         organization_id=org1_id).first()
+        dc = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org1_id).first()
         assert dc.status == 'deleted'
 
     def test_withdraw_user_consent(self):
@@ -261,23 +262,23 @@ class TestUserConsent(TestCase):
 
         data = {'organization_id': org_id}
         self.login()
-        resp = self.client.post('/api/user/{}/consent/'
-                                'withdraw'.format(TEST_USER_ID),
-                                content_type='application/json',
-                                data=json.dumps(data))
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            content_type='application/json', data=json.dumps(data))
         assert resp.status_code == 200
 
         # check that old consent is marked as deleted
-        old_consent = UserConsent.query.filter_by(user_id=TEST_USER_ID,
-                                                  organization_id=org_id,
-                                                  status='deleted').first()
+        old_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='deleted').first()
         assert old_consent.deleted_id
 
         # check new withdrawn consent
-        new_consent = UserConsent.query.filter_by(user_id=TEST_USER_ID,
-                                                  organization_id=org_id,
-                                                  status='suspended').first()
+        new_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='suspended').first()
         assert old_consent.agreement_url == new_consent.agreement_url
-        assert (new_consent.staff_editable ==
-                (not current_app.config.get('GIL')))
+        assert (
+            new_consent.staff_editable ==
+            (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
