@@ -719,6 +719,9 @@
                             (self.find(".edit-view")).each(function() {
                                 $(this).hide();
                             });
+                        } else {
+                            self.hide();
+                            return true;
                         }
                     }
                     self.show().removeClass("tnth-hide");
@@ -785,7 +788,10 @@
                     coreTypes.push(parentCoreType);
                 }
                 $(this).closest("label").find("[data-core-data-type]").each(function() {
-                    coreTypes.push($(this).attr("data-core-data-type"));
+                    var coreDataType = $(this).attr("data-core-data-type");
+                    if($.inArray(coreDataType, coreTypes) === -1) {
+                        coreTypes.push(coreDataType);
+                    }
                 });
                 if (coreTypes.length > 0) { //need to delete notification for each corresponding coredata terms type once user has agreed
                     coreTypes.forEach(function(type) {
