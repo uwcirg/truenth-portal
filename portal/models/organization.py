@@ -285,8 +285,8 @@ class Organization(db.Model):
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = (
-                    telecom_cps.get(('phone', 'work'))
-                    or telecom_cps.get(('phone', None)))
+                telecom_cps.get(('phone', 'work'))
+                or telecom_cps.get(('phone', None)))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
@@ -308,8 +308,8 @@ class Organization(db.Model):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
-        by_extension_url = {ext['url']: ext for ext in
-                            data.get('extension', [])}
+        by_extension_url = {ext['url']: ext
+                            for ext in data.get('extension', [])}
         for kls in org_extension_classes:
             args = by_extension_url.get(
                 kls.extension_url, {'url': kls.extension_url})
