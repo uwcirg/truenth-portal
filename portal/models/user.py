@@ -1088,7 +1088,7 @@ class User(db.Model, UserMixin):
             if (
                 not acting_user.has_role(ROLE.ADMIN.value)
                 and (acting_user.has_role(ROLE.STAFF.value)
-                    or acting_user.has_role(ROLE.STAFF_ADMIN.value))
+                     or acting_user.has_role(ROLE.STAFF_ADMIN.value))
                 and user.id == acting_user.id
             ):
                 raise ValueError(
