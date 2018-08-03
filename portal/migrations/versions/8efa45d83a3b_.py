@@ -50,8 +50,7 @@ def reindex_questions(questionnaire_response_json):
             if not coding_answer_data:
                 continue
 
-            coding_answer_data['code'] = increment_code(
-                coding_answer_data['code'])
+            coding_answer_data['code'] = increment_code(coding_answer_data['code'])
     return qnr_json_copy
 
 
@@ -66,20 +65,18 @@ def upgrade():
     session = Session(bind=op.get_bind())
 
     instrument_ids = ('irondemog', 'irondemog_v3')
-    questionnaire_responses = session.query(QuestionnaireResponse).filter(
-        sa.or_(QuestionnaireResponse.document[
+    questionnaire_responses = session.query(QuestionnaireResponse).filter(sa.or_(
+        QuestionnaireResponse.document[
             ("questionnaire", "reference")
         ].astext.endswith(instrument_id) for instrument_id in instrument_ids
     )).order_by(QuestionnaireResponse.id)
 
     for qnr in questionnaire_responses:
         qnr_json = reindex_questions(qnr.document)
-        instrument_id = qnr.document["questionnaire"]["reference"].split("/")[
-            -1]
+        instrument_id = qnr.document["questionnaire"]["reference"].split("/")[-1]
 
         age_question = dict(age_question_stub)
-        age_question['linkId'] = "{instrument_id}.1".format(
-            instrument_id=instrument_id)
+        age_question['linkId'] = "{instrument_id}.1".format(instrument_id=instrument_id)
 
         # add age question stub
         qnr_json['group']['question'].insert(0, age_question)
