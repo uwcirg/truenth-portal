@@ -7,32 +7,32 @@ from tests import TestCase
 class TestPathFlaskUser(TestCase):
 
     def test_no_path(self):
-        url = u'http://google.com'
+        url = 'http://google.com'
         safe_url = patch_make_safe_url(url)
         assert '' == safe_url
 
     def test_no_qs(self):
-        url = u'https://google.com/'
+        url = 'https://google.com/'
         safe_url = patch_make_safe_url(url)
         assert '/' == safe_url
 
     def test_w_qs(self):
-        url = u'https://google.com/search?q=testing'
+        url = 'https://google.com/search?q=testing'
         safe_url = patch_make_safe_url(url)
         assert '/search?q=testing' == safe_url
 
     def test_wo_host_scheme(self):
-        url = u'/search?q=testing&safe=on'
+        url = '/search?q=testing&safe=on'
         safe_url = patch_make_safe_url(url)
         assert '/search?q=testing&safe=on' == safe_url
 
     def test_fragment_wo_host(self):
-        url = u'/search?q=testing&safe=on#row=4'
+        url = '/search?q=testing&safe=on#row=4'
         safe_url = patch_make_safe_url(url)
         assert url == safe_url
 
     def test_qs_and_fragment(self):
-        url = u'https://google.com:443/search?q=testing&safe=on#row=4'
+        url = 'https://google.com:443/search?q=testing&safe=on#row=4'
         safe_url = patch_make_safe_url(url)
         index = url.find('/search')
         assert url[index:] == safe_url

@@ -9,7 +9,7 @@
     <section class="psa-tracker-title">
         {% raw -%}
             <h2 class="tnth-header heading">{{intro.header}}</h2>
-            {{intro.body}}
+            <div class="body">{{intro.body}}</div>
             <div id="psaTrackerButtonsContainer"><button id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</button></div>
         {%- endraw %}
     </section>
@@ -28,36 +28,51 @@
                         <THEAD class="psa-tracker-table-header">
                             <th v-for="item in headers">{{item}}</th>
                         </THEAD>
-                        <tr v-if="showFilters()">
-                            <td>
-                                <filter-control v-bind:id="'psaTrackerYearFilter'" v-bind:prompt="filters.filterYearPrompt" v-bind:items="yearList" v-bind:selectedvalue="filters.selectedFilterYearValue" v-on:changeevent="filterDataByYearEvent"></filter-control>
-                            </td>
-                            <td>
-                                <filter-control v-bind:id="'psaTrackerResultFilter'" v-bind:prompt="filters.filterResultPrompt" v-bind:items="resultRange" v-bind:selectedvalue="filters.selectedFilterResultRange" v-on:changeevent="filterDataByResultEvent"></filter-control>
-                            </td>
-                        </tr>
-                        <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row">
-                            <td class="result-cell"><span v-on:click="onEdit(item)">{{item.date}}</span></td>
-                            <td class="result-cell"><span v-on:click="onEdit(item)">{{item.result}}</span></td>
-                        </tr>
+                        <TBODY>
+                            <tr v-if="showFilters()" class="filter-row">
+                                <td class="filter-cell">
+                                    <filter-control v-bind:id="'psaTrackerYearFilter'" v-bind:prompt="filters.filterYearPrompt" v-bind:items="yearList" v-bind:selectedvalue="filters.selectedFilterYearValue" v-on:changeevent="filterDataByYearEvent"></filter-control>
+                                </td>
+                                <td class="filter-cell">
+                                    <filter-control v-bind:id="'psaTrackerResultFilter'" v-bind:prompt="filters.filterResultPrompt" v-bind:items="resultRange" v-bind:selectedvalue="filters.selectedFilterResultRange" v-on:changeevent="filterDataByResultEvent"></filter-control>
+                                </td>
+                            </tr>
+                            <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row" v-on:click="onEdit(item)">
+                                <td class="result-cell"><div class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></div><span>{{item.date}}</span></td>
+                                <td class="result-cell"><span>{{item.result}}</span></td>
+                            </tr>
+                        </TBODY>
+                        <TFOOT>
+                            <tr>
+                                <td colspan="2">
+                                    <span class="glyphicon glyphicon-remove edit-icon" aria-hidden="true" v-on:click="refresh" v-bind:disabled="!isActedOn()" v-if="showFilters()" v-bind:title="filterText"></span>
+                                    <a class="info-link" v-on:click="refresh" v-bind:disabled="!isActedOn()" v-if="showFilters()" v-html="filters.clearLabel" v-bind:title="filterText"></a>
+                                </td>
+                            </tr>
+                        </TFOOT>
                     </table>
-                    <div id="psaTrackerDataSidebar">
+                    <div id="psaTrackerDataSidebar" v-show="history.items.length">
                         <button class="btn btn-tnth-primary" v-show="history.items.length" v-on:click="showHistory" v-html="history.buttonLabel"></button>
-                        <button class="btn btn-tnth-primary" v-on:click="refresh" v-bind:disabled="!isActedOn()" v-if="showFilters()" v-html="filters.clearLabel"></button>
                     </div>
                 </div>
                 <div id="psaTrackerGraphContainer" v-bind:class="{ 'tnth-hide': loading }">
                     <div id="psaTrackerGraph"></div>
                     <div id="psaTrackerTreatmentContainer">
-                        <div v-if="showTreatment()" v-for="item in treatment.data">
-                            <span>{{treatment.treatmentTextPrompt}}</span> <span class="text-warning display-text">{{item.display}}</span>
-                            <br/>
-                            <span>{{treatment.treatmentDatePrompt}}</span> <span class="text-warning display-text">{{item.date}}</span>
+                        <div class="group" v-if="showTreatment()" v-for="item in treatment.data">
+                            <div>
+                                <div class="title">{{treatment.treatmentTextPrompt}}</div><div class="content display-text">{{item.display}}</div>
+                            </div>
+                            <div>
+                                <div class="title">{{treatment.treatmentDatePrompt}}</div> <div class="content display-text">{{item.date}}</div>
+                            </div>
                         </div>
                         <div v-if="!showTreatment()">
                             <span class="text-warning" v-html="treatment.noTreatmentText"></span>
                         </div>
-                        <a href="profile#profileProceduresWrapper" class="info-link" v-html="editLink"></a>
+                        <div class="shift-right">
+                            <a v-bind:href="treatmentEditUrl" class="info-link" v-html="editLink" v-bind:title="editText"></a>
+                            <a v-bind:href="treatmentEditUrl" v-bind:title="editText"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>
+                        </div>
                     </div>
                 </div>
             </div>

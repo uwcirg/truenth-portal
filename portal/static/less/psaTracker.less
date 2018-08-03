@@ -1,13 +1,22 @@
 
 @psaTrackerBorderColor: #eff0f1;
 @psaTrackerTableHeaderBgColor: #496470;
-@psaTrackerStrokeColor: #777;
-@psaTrackerHoverBgColor: #b0bdc3;
+@psaTrackerStrokeColor: #656F76;
+@psaTrackerHoverBgColor: #D7DBE0;
 @legendTextColor: #333;
 @selectedColor: #777;
 @hoverColor: #FFF;
 @tooltipColor: #374550;
-@markerColor: #8a6d3b;
+@markerColor: #EF425C;
+@contentColor: #656F76;
+@linkBgColor: #5F7782;
+@editLinkColor: #646667;
+@editLinkFontSize: 12px;
+@filterColor: #819EAD;
+@gridLineColor: #d8dade;
+@noResultColor: #B1B1B1;
+@cellBorderColor: #E5E5E5;
+@borderColor: #ececec;
 
 .filter-control {
     -webkit-appearance: none;
@@ -15,17 +24,17 @@
     outline: none;
 }
 .tooltip {
-    position: absolute;         
-    text-align: center;         
-    width: 60px;                    
-    height: 28px;                   
-    padding: 2px;               
-    font: 12px sans-serif;      
+    position: absolute;
+    text-align: center;
+    width: 54px;
+    height: 38px;
+    padding: 4px;
+    font: 12px sans-serif;
     background: @tooltipColor;
     color: #FFF;
-    border: 0px;        
-    border-radius: 4px;         
-    pointer-events: none; 
+    border: 0px;
+    border-radius: 0;
+    pointer-events: none;
     &:after {
       border-top: 10px solid @tooltipColor;
       border-left: 10px solid transparent;
@@ -36,8 +45,8 @@
       left: 45%;
       position: absolute;
       width: 0;
-      transform: translateY(-50%);
-    }  
+      transform: translateY(-30%);
+    }
 }
 .marker {
     stroke: @markerColor;
@@ -74,12 +83,19 @@ option.select-option {
         color: @psaTrackerHoverBgColor;
     }
 }
+.small-text {
+    font-size: 10px;
+}
 .psa-tracker-title {
 	background-color: #374550;
     color: #FFF;
     margin: 1em 0;
-    padding: 1em;
+    padding: 0.75em 1em 0.5em;
     letter-spacing: 1px;
+    .body {
+        font-weight: 200;
+        letter-spacing: 1px;
+    }
     .heading {
         margin: 0.5em 0 1em;
         border-bottom: 1px solid darken(@psaTrackerBorderColor, 50%);
@@ -90,6 +106,10 @@ option.select-option {
 .psa-tracker-table-header {
 	background: @psaTrackerTableHeaderBgColor;
 	color: #FFF;
+    & TH {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
 }
 #psaTrackerResultsContainer {
 	margin-top: 2em;
@@ -112,7 +132,7 @@ option.select-option {
 }
 #psaTrackerDataSidebar {
     .btn {
-        font-size: 12px;
+        font-size: @editLinkFontSize;
         margin: 1em 0;
     }
 }
@@ -123,11 +143,62 @@ option.select-option {
     -webkit-transform: translateX(0);
     -ms-transform: translateX(0);
     transform: translateX(0);
-    border: 2px solid #bf9d9d;
-    padding: 1em 0.5em;
+    background-color: #EBEDEE;
+    border: 1px solid #B1B1B1;
+    padding: 1em;
     margin: 1em auto;
     max-width: 100%;
     font-size: 14px;
+    min-height: 6.5em;
+    .title {
+        color: #3F4B54;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+    .content {
+        color: @contentColor;
+        letter-spacing: 1px;
+    }
+    .group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        div {
+            margin: 0 0.5em;
+        }
+    }
+    .shift-right {
+        text-align: center;
+        color: #FFF;
+        & a {
+            color: @editLinkColor;
+            text-decoration: none;
+            font-weight: 200;
+            letter-spacing: 1px;
+            font-size: 12px;
+            margin-right: 4px;
+            display: inline-block;
+        }
+        .edit-icon {
+            display: inline-block;
+            background: @linkBgColor;
+            padding: 4px;
+            color: #FFF;
+        }
+        a:hover {
+            cursor: pointer;
+            color: @contentColor;
+        }
+        .edit-icon:hover {
+            background-color:@contentColor;
+            cursor: pointer;
+        }
+        width: 70px;
+        padding: 4px;
+        position: absolute;
+        right: 1%;
+        bottom: 8%;
+    }
     &.inactive {
         -webkit-transform: translateX(-150%);
         -ms-transform: translateX(-150%);
@@ -144,29 +215,56 @@ option.select-option {
         overflow-y: hidden;
     }
     #psaTrackerTreatmentContainer {
-        max-width: 93%;
+        max-width: 85%;
+        position: relative;
+        left: 1.1em;
     }
 }
 #psaTrackerResultsTable,
 #psaTrackerHistoryTable {
     TH, TD {
-        padding: 0.5em 1em;
-        border: 1px solid @psaTrackerStrokeColor;
+        padding: 0.5em 2em;
+        border: 1px solid @cellBorderColor;
+        text-align: center;
     }
     TH {
         letter-spacing: 1px;
         padding: 0.8em;
     }
     TR.result-row {
-        border: 1px solid;
+        border: 1px solid @cellBorderColor;
+        &:hover {
+            cursor: pointer;
+        }
+        .edit-icon {
+            display: none;
+            position: absolute;
+            top: 35%;
+            left: 6%;
+            color: @selectedColor;
+        }
+        &.edit {
+            .edit-icon {
+                display: block;
+            }
+        }
     }
     TR.result-row.selected,
     TR.result-row:hover {
-        /*border: solid 2px @selectedColor; */
         background: @psaTrackerHoverBgColor;
         color: @hoverColor;
     }
     .result-cell{
+        color: @contentColor;
+        padding: 1em 2em;
+        &:first-of-type {
+            border-right: 0;
+        }
+        &:nth-of-type(2) {
+            border-left: 0;
+        }
+        text-align: center;
+        position: relative;
         input {
             height: 2.2em;
         }
@@ -175,10 +273,40 @@ option.select-option {
             width: 100px;
             &:hover {
                 cursor:pointer;
-                text-decoration: underline;
-                color: @hoverColor;
-                cursor: pointer;
             }
+        }
+    }
+    TFOOT {
+        TD {
+            text-align: left;
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 0;
+            padding: 12px 0;
+        }
+        .edit-icon {
+            width: 22px;
+            text-align: center;
+            margin-left: 0.2em;
+            background-color: @linkBgColor;
+            color: #FFF;
+            &:hover {
+                cursor:pointer;
+                background-color: @contentColor;
+            }
+        }
+        .glyphicon-remove:before {
+           content: "X";
+           font-family: "sans-serif";
+           position: relative;
+           display: inline-block;
+           font-weight: 500;
+        }
+    }
+    .filter-row {
+        TD {
+            background-color: @filterColor;
+            padding: 0 0.5em;
         }
     }
 }
@@ -251,18 +379,103 @@ option.select-option {
 #psaTrackerNoResultContainer {
     margin-top: 1em;
     margin-bottom: 1em;
-    background: hsla(15, 0%, 68%, 0.7);
+    color: @noResultColor;
+    border: 1px solid @borderColor;
     min-height: 10em;
     padding: 4.25em 1em;
-    color: #FFF;
     font-size: 1.3em;
     font-style: italic;
     letter-spacing: 0.5px;
+    text-align: center;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+    -webkit-box-shadow: 10px 9px 5px -8px @borderColor;
+    -moz-box-shadow: 10px 9px 5px -8px @borderColor;
+    box-shadow: 10px 9px 5px -8px @borderColor;
 }
 #psaTrackerButtonsContainer {
     padding: 1em 0;
-    margin-top: 1em;
+    margin-top: 0.5em;
+    position: relative;
+    min-height: 5em;
+    display: inline-block;
+    button {
+        margin-left: 0.25em;
+        -webkit-animation: scaler 1200ms linear;
+        -moz-animation: scaler 700ms linear;
+        -ms-animation: scaler 700ms linear;
+        -o-animation: scaler 700ms linear;
+        animation: scaler 700ms linear;
+    }
+}
+@-webkit-keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@-o-keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@keyframes scaler {
+  0% {
+    -webkit-transform: scale(0.25);
+    -moz-transform: scale(0.25);
+    -ms-transform: scale(0.25);
+    -o-transform: scale(0.25);
+    transform: scale(0.25);
+  }
+  50% {
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
 }
 #psaTrackerGraphContainer {
     padding: 1em 0.5em 0.5em;
@@ -277,20 +490,22 @@ option.select-option {
     }
     .x-axis path,
     .y-axis path {
-        stroke-width: 0
+        stroke-width: 0;
     }
     .axis-stroke,
     .grid-y text {
         font-size: 12px;
         stroke: @psaTrackerStrokeColor;
-        stroke-width: 0.5;
+        stroke-width: 0.1;
         shape-rendering: crispEdges;
+        -webkit-font-smoothing: antialiased;
     }
     .grid {
         line {
-            stroke: #d2cdcd;
+            stroke: @gridLineColor;
             stroke-opacity: 0.7;
             shape-rendering: crispEdges;
+            stroke-width: 1;
         }
         path {
             stroke-width: 0;
@@ -300,11 +515,13 @@ option.select-option {
         stroke-opacity: 0;
     }
     .legend-text {
-        font-size: 10px;
+        font-size: 12px;
         stroke: @legendTextColor;
-        letter-spacing: 2px;
+        stroke-width: 0.5;
         opacity: 0.6;
-        font-weight: 300;
+        font-weight: 200;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
     .circle {
         fill: #FFF;
@@ -325,17 +542,92 @@ option.select-option {
     }
 }
 .info-link {
-    text-decoration: underline;
-    font-weight: bold;
+    font-size: @editLinkFontSize;
+    color: @editLinkColor;
+    letter-spacing: 1px;
+    &:hover {
+        cursor:pointer;
+        color: @contentColor;
+        text-decoration: none;
+    }
+    font-weight: 300;
+    text-decoration: none;
+}
+/*To remove button from IE11 */
+select::-ms-expand {
+     display: none;
+}
+.filter-cell {
+    position: relative;
+    &:after {
+      content: '\25B8';
+      font: 17px "Consolas", monospace;
+      color: #FFF;
+      -webkit-transform: rotate(90deg);
+      -moz-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+      transform: rotate(90deg);
+      right: 12px;
+      top: 10px;
+      padding: 0 2px 2px;
+      position: absolute;
+      pointer-events: none;
+    }
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        overflow: -moz-scrollbars-none;
+        overflow: hidden;
+        letter-spacing: 1px;
+        &:focus {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+        }
+        height: 40px;
+        display: block;
+        color: #FFF;
+        background-color: #819EAD;
+        background-image: none;
+        border: 0;
+        option {
+            color: #FFF;
+            &:hover {
+                color: #FFF;
+                background-color: @psaTrackerTableHeaderBgColor;
+                cursor: pointer;
+            }
+        }
+    }
+}
+@supports (-moz-appearance:none) {
+    .filter-cell {
+        select {
+            background-color: transparent !important;
+            background-image: linear-gradient(to bottom, #819EAD, #819EAD);
+            option {
+                background-color: transparent !important;
+            }
+        }
+    }
 }
 @media (min-width: 992px) {
     #psaTrackerGraphContainer {
         margin-top: 1.5em;
     }
     #psaTrackerDataSidebar {
+        padding: 1em 0;
+        border-top: 1px solid @cellBorderColor;
         .btn {
             font-size: 0.85em;
-            margin: 0; 
+            margin: 0;
         }
     }
 }

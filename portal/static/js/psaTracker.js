@@ -39,9 +39,14 @@
             savingInProgress: false,
             addErrorMessage: "",
             noResultMessage: this.i18next.t("No PSA results to display"),
+            editText: this.i18next.t("Edit"),
             saveText: this.i18next.t("Save"),
             closeText: this.i18next.t("Close"),
+            filterText: this.i18next.t("Filter"),
+            yLegendText: this.i18next.t("Result (ng/ml)"),
+            xLegendText: this.i18next.t("PSA Test Date"),
             MAX_RESULT: 10000,
+            treatmentEditUrl: "profile#profileProceduresWrapper",
             newItem: {
                 id: "",
                 result: "",
@@ -152,7 +157,7 @@
                 return this.addTitle;
             },
             getRefreshMessage: function() {
-                return i18next.t("Click to reload the page and try again.");
+                return this.i18next.t("Click to reload the page and try again.");
             },
             validateResult: function(val) {
                 var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > this.MAX_RESULT);
@@ -212,6 +217,10 @@
                     self.clearNew();
                 });
                 /*
+                 * use numeric keypad for PSA result on mobile devices
+                 */
+                 this.convertToNumericField($("#psaResult"));
+                /*
                  * modal event
                  */
                 $("#addPSAModal").on("show.bs.modal", function() {
@@ -224,6 +233,16 @@
                         self.modalLoading = false; //allow time for setting value with it being visible to user
                     }, 50);
                 });
+                $("#psaTrackerResultsTable .result-row").on("mouseover", function() {
+                    $(this).addClass("edit");
+                }).on("mouseout", function() {
+                    $(this).removeClass("edit");
+                });
+            },
+            convertToNumericField: function(field) {
+                if (field && ("ontouchstart" in window || (typeof(window.DocumentTouch) !== "undefined" && document instanceof window.DocumentTouch))) {
+                    field.each(function() {$(this).prop("type", "tel");});
+                }
             },
             getCurrentUserId: function() {
                 var self = this;
@@ -317,7 +336,7 @@
                         dataObj.code = contentCoding.code;
                         dataObj.display = contentCoding.display;
                         dataObj.updated = self.formatDateString(item.updated.substring(0, 19), "yyyy-mm-dd hh:mm:ss");
-                        dataObj.date = self.formatDateString(content.issued.substring(0, 19), "d M y");
+                        dataObj.date = content.issued ? self.formatDateString(content.issued.substring(0, 19), "d M y"): "";
                         dataObj.result = content.valueQuantity.value;
                         dataObj.edit = true;
                         dataObj.titleYear = new Date(content.issued).getFullYear();
@@ -337,7 +356,10 @@
                         var tempResults = results;
                         results = results.slice(0, 10);
                         self.history.items = tempResults.slice(10, 20);
-                        self.history.sidenote = String(i18next.t("* Ten results since {year}")).replace("{year}", self.getHistoryMinYear());
+                        self.history.sidenote = String(self.i18next.t("* Maximum of {resultNumber} results since {year}")).replace("{resultNumber}", 10).replace("{year}", self.getHistoryMinYear());
+                    }
+                    if (results.length === 0) {
+                        self.noResultMessage = self.i18next.t("No PSA results to display");
                     }
                     self.items = self.originals = results;
                     self.filterData();
@@ -378,6 +400,9 @@
                 }
                 if (this.filters.selectedFilterResultRange) {
                     this.items = this.RANGE_ENUM[this.filters.selectedFilterResultRange](this.items);
+                }
+                if (this.items.length === 0 && this.isActedOn()) {
+                    this.noResultMessage = this.i18next.t("No PSA result matching the filtering criteria. Please try again.");
                 }
                 if (!redraw) {
                     return false;
@@ -428,6 +453,7 @@
                         self.addErrorMessage = self.i18next.t("Server error occurred adding PSA result.");
                     } else {
                         $("#addPSAModal").modal("hide");
+                        self.clearFilter(); //clear filter after every new data update?
                         self.getData();
                         self.addErrorMessage = "";
                     }
@@ -482,7 +508,7 @@
                 return 1000 * 60 * 60 * 24;
             },
             getInterval: function(minDate, maxDate, step) {
-                step = step || 10;
+                step = step || 8;
                 if (!maxDate || !minDate) {
                     return step;
                 }
@@ -492,7 +518,7 @@
             },
             dateTicks: function(t0, t1) {
                 var startTime = new Date(t0), endTime = new Date(t1), times = [], dateTime;
-                var INTERVAL = this.getInterval(t0, t1, 10) || 30;
+                var INTERVAL = this.getInterval(t0, t1, 7) || 7;
                 startTime.setUTCDate(startTime.getUTCDate());
                 endTime.setUTCDate(endTime.getUTCDate());
                 while(startTime <= endTime) {
@@ -505,12 +531,23 @@
                 }
                 return times;
             },
+            setLetterSpacing: function(string) {
+                string = string || "";
+                var dxString = "0 ";
+                for (var index = 1; index < string.length; index++) {
+                    if (/\s/.test(string.charAt(index))) {
+                        dxString += "3 ";
+                        continue;
+                    }
+                    dxString += "2 ";
+                }
+                return dxString;
+            },
             drawGraph: function() { //using d3 library to draw graph
                 $("#psaTrackerGraph").html("");
                 var self = this;
                 var d3 = self.d3;
-                var i18next = self.i18next;
-                var WIDTH = 600, HEIGHT = 430, TOP = 50, RIGHT = 40, BOTTOM = 110, LEFT = 60, TIME_FORMAT = "%d %b %Y";
+                var WIDTH = 640, HEIGHT = 430, TOP = 50, RIGHT = 40, BOTTOM = 70, LEFT = 70, TIME_FORMAT = "%d %b %Y";
 
                 // Set the dimensions of the canvas / graph
                 var margin = { top: TOP, right: RIGHT, bottom: BOTTOM, left: LEFT },
@@ -537,7 +574,7 @@
                 });
 
                 var xDomain = d3.extent(data, function(d) { return d.graph_date; });
-                var bound = (width - margin.left - margin.right) / 10;
+                var bound = (width - margin.left - margin.right) / 7;
                 var x = d3.time.scale().range([bound, width - bound]);
                 var y = d3.scale.log().range([height, 0]); //log scale
 
@@ -575,29 +612,30 @@
                     .append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom);
-                //background
-                svg.append("rect")
-                    .attr("x", margin.left)
-                    .attr("y", margin.top)
-                    .attr("width", width)
-                    .attr("height", height)
-                    .style("stroke", "#777")
-                    .style("stroke-width", "1")
-                    .style("fill", "hsla(0, 0%, 93%, 0.7)");
 
                 var graphArea = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 // Add the X Axis
                 graphArea.append("g")
                     .attr("class", "x axis x-axis")
-                    .attr("transform", "translate(0," + height + ")")
+                    .attr("transform", "translate(0," + (height +  5) + ")")
                     .call(xAxis)
                     .selectAll("text")
+                    .call(function(text) {
+                        text.each(function() {
+                            var textNode = d3.select(this);
+                            var dateString = textNode.text();
+                            var arrDate = dateString.split(/\s+/);
+                            var dx = "-1.25em";
+                            textNode.text(null).append("tspan").attr("x", 0).attr("y", textNode.attr("y")).attr("dx", dx).attr("dy", textNode.attr("dy")).text(arrDate[0] + " " + arrDate[1]);
+                            textNode.append("tspan").attr("x", 0).attr("y", textNode.attr("y")).attr("dx", "-1em").attr("dy", "2em").text(arrDate[2]);
+                        });
+                    })
                     .attr("y", 0)
                     .attr("x", 7)
                     .attr("dy", ".35em")
-                    .attr("transform", "rotate(90)")
                     .attr("class", "axis-stroke")
+                    .style("letter-spacing", "1px")
                     .style("text-anchor", "start");
 
                 // add the X gridlines
@@ -631,15 +669,25 @@
                     .attr("class", "axis-stroke")
                     .style("text-anchor", "end");
 
+                //borders around graph area
+                var BORDER_STROKE_COLOR = "#3F4B54";
+                svg.append("path").attr("d", "M " + margin.left + " " + margin.top + " V " + (HEIGHT-margin.bottom) + " H" + (WIDTH-margin.right))
+                    .style("stroke", BORDER_STROKE_COLOR)
+                    .style("stroke-width", "1");
+                svg.append("path").attr("d", "M " + margin.left + " " + margin.top + " H " + (WIDTH-margin.right) + " V " + (HEIGHT-margin.bottom))
+                    .style("stroke", BORDER_STROKE_COLOR)
+                    .style("stroke-width", "0.5");
+
                 //add div for tooltip
                 var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
                 //treatment line
-                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 10));
+                var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 7));
+                var TREATMENT_TEXT_COLOR = "#EF425C";
                 if (treatmentDate) {
                     var treatmentPath = graphArea.append("path");
                     treatmentPath.attr("d", "M"+x(treatmentDate) + " 0" + " V " + height + " Z")
-                        .style("stroke", "#8b6e3c80")
+                        .style("stroke", TREATMENT_TEXT_COLOR)
                         .style("stroke-dasharray", "1, 5")
                         .style("stroke-width", "2");
 
@@ -653,39 +701,42 @@
                         .attr("y", height - 6)
                         .attr("xlink:href", "#arrow");
 
-                    var RECT_HEIGHT = 25, RECT_WIDTH = 70;
+                    var RECT_HEIGHT = 25, RECT_WIDTH = 76;
                     graphArea.append("rect")
                         .attr("x", x(treatmentDate) - RECT_WIDTH/2)
                         .attr("y", 25)
                         .attr("width", RECT_WIDTH)
                         .attr("height", RECT_HEIGHT)
-                        .style("stroke", "#777")
+                        .style("stroke", TREATMENT_TEXT_COLOR)
                         .style("stroke-width", "0.5")
-                        .style("fill", "#FFF");
+                        .style("fill", TREATMENT_TEXT_COLOR);
                     graphArea.append("text")
                         .attr("x", x(treatmentDate))
-                        .attr("y", 40)
+                        .attr("y", 41)
                         .attr("text-anchor", "middle")
-                        .attr("font-size", "10px")
-                        .style("stroke-width", "4")
-                        .style("fill", "#8a6d3b")
+                        .attr("font-size", "11px")
+                        .style("stroke-width", "4px")
+                        .style("fill", "#FFF")
                         .style("letter-spacing", "2px")
-                        .text(i18next.t("treatment"));
+                        .text(self.i18next.t("treatment"));
                 }
 
                 // Add the valueline path.
                 graphArea.append("path")
                     .attr("class", "line")
-                    .style("stroke", "#8b8ea2")
+                    .style("stroke", "#bec0c1")
+                    .style("stroke-width", 2)
                     .attr("d", valueline(data));
 
                 // Add the scatterplot
-                var circleRadius = 3.7;
+                var circleRadius = 7.7, CIRCLE_STROKE_COLOR = "#809EAE";
                 graphArea.selectAll("circle").data(data)
                     .enter().append("circle")
                     .transition()
                     .duration(850)
                     .delay(function(d, i) { return i * 7; })
+                    .style("stroke", CIRCLE_STROKE_COLOR)
+                    .style("stroke-width", 2)
                     .attr("r", circleRadius)
                     .attr("class", "circle")
                     .attr("cx", function(d) { return x(d.graph_date); })
@@ -693,14 +744,12 @@
                 graphArea.selectAll("circle")
                     .on("mouseover", function(d) {
                         var element = d3.select(this);
-                        element.transition().duration(100).attr("r", circleRadius * 2.3);
-                        element.style("stroke", "#FFF")
-                            .style("stroke-width", "2")
-                            .style("fill", "#777")
+                        element.transition().duration(100).attr("r", circleRadius * 1.2);
+                        element.style("fill", CIRCLE_STROKE_COLOR)
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
                         tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
-                        tooltipContainer.html(d.result + "<br/>" + d.date)
+                        tooltipContainer.html("<b>" + self.i18next.t("PSA") + "</b> " + d.result + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
                             .style("left", (d3.event.pageX - TOOLTIP_WIDTH/2) + "px")
@@ -711,13 +760,11 @@
                         element.transition()
                             .duration(100)
                             .attr("r", circleRadius);
-                        element.style("stroke", "#777")
-                            .style("stroke-width", "1")
+                        element.style("stroke", CIRCLE_STROKE_COLOR)
                             .style("fill", "#FFF")
                             .classed("focused", false);
                         tooltipContainer.transition().duration(500).style("opacity", 0);
-                    })
-                    .on("click", self.onEdit);
+                    });
 
                 // Add text labels
                 graphArea.selectAll("text.text-label")
@@ -732,12 +779,12 @@
                         return y(d.result);
                     })
                     .attr("text-anchor", "middle")
-                    .attr("dy", "-0.6em")
+                    .attr("dy", "-1.35em")
                     .attr("font-size", "11px")
                     .style("stroke-width", "2")
-                    .attr("font-weight", "900")
-                    .attr("letter-spacing", "1px")
-                    .attr("fill", "darkgreen")
+                    .attr("font-weight", "500")
+                    .attr("letter-spacing", "2px")
+                    .attr("fill", "#656F76")
                     .text(function(d) {
                         return d.result;
                     });
@@ -752,19 +799,21 @@
 
                 //add axis legends
                 var xlegend = graphArea.append("g")
-                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 8 + 5) + ")");
+                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 5) + ")");
 
                 xlegend.append("text")
-                    .text(i18next.t("PSA Test Date"))
+                    .text(self.xLegendText)
+                    .attr("dx", self.setLetterSpacing(self.xLegendText))
                     .attr("class", "legend-text");
 
                 var ylegend = graphArea.append("g")
-                    .attr("transform", "translate(" + (-margin.left + margin.left / 2.5) + "," + (height / 2 + height / 6) + ")");
+                    .attr("transform", "translate(" + (-margin.left + margin.left / 2 - 5) + "," + (height / 2 + height / 6) + ")");
 
                 ylegend.append("text")
                     .attr("transform", "rotate(270)")
                     .attr("class", "legend-text")
-                    .text(i18next.t("Result (ng/ml)"));
+                    .attr("dx", self.setLetterSpacing(self.yLegendText)) //using dx attribute for letter spacing due to FF not supporting SVG element's letter spacing styling
+                    .text(self.yLegendText);
 
             }
         }

@@ -1,4 +1,6 @@
 """Cross Domain Decorators"""
+from past.builtins import basestring
+
 from datetime import timedelta
 from functools import update_wrapper
 

@@ -1,4 +1,6 @@
 """User model """
+from __future__ import unicode_literals  # isort:skip
+
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -692,15 +694,12 @@ class User(db.Model, UserMixin):
 
         A user may have any number of organizations, but most business
         decisions, assume there is only one.  Arbitrarily returning the
-        first from the matchin query in case of multiple.
+        first from the matching query in case of multiple.
 
         :returns: a single top level organization, or None
 
         """
-        top_orgs = OrgTree().find_top_level_org(self.organizations)
-        if top_orgs:
-            return top_orgs[0]
-        return None
+        return OrgTree().find_top_level_orgs(self.organizations, first=True)
 
     def leaf_organizations(self):
         """Return list of 'leaf' organization ids for user's orgs
@@ -786,7 +785,7 @@ class User(db.Model, UserMixin):
             if rel.relationship.name == RELATIONSHIP.SPONSOR.value:
                 return User.query.get(rel.other_user_id)
 
-        service_user = User(username=(u'service account sponsored by {}'.
+        service_user = User(username=('service account sponsored by {}'.
                                       format(self.username)))
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE.value)
@@ -912,6 +911,11 @@ class User(db.Model, UserMixin):
             fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
+    @property
+    def rolelist(self):
+        """Generate UI friendly string of user's roles by name"""
+        return ', '.join([r.name for r in self.roles])
+
     def as_fhir(self, include_empties=True):
         """Return JSON representation of user
 
@@ -983,6 +987,9 @@ class User(db.Model, UserMixin):
         Adds the provided list of consent agreements to the user.
         If the user had pre-existing consent agreements between the
         same organization_id, the new will replace the old
+
+        NB this will only modify/update consents between the user
+        and the organizations named in the given consent_list.
 
         """
         delete_consents = []  # capture consents being replaced
@@ -1313,7 +1320,7 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
-                if self.email and ((telecom.email != self.email) and
+                if self._email and ((telecom.email != self._email) and
                         (User.query.filter_by(email=telecom.email).count() > 0)):
                     abort(400, "email address already in use")
                 self.email = telecom.email

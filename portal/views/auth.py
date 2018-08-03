@@ -1,4 +1,6 @@
 """Auth related view functions"""
+from __future__ import unicode_literals  # isort:skip
+
 import base64
 from datetime import datetime
 import hashlib
@@ -67,7 +69,7 @@ def deauthorized():
         padding_factor = (4 - len(s) % 4)
         s += "="*padding_factor
         return base64.b64decode(unicode(s).translate(
-            dict(zip(map(ord, u'-_'), u'+/'))))
+            dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
     sig = base64_url_decode(encoded_sig)
@@ -201,10 +203,13 @@ def next_after_login():
         invited_id = session.get('invited_verified_user_id') or session.get(
             'login_as_id')
         invited_user = User.query.get(invited_id)
+        preserve_next_across_sessions = session.get('next')
         logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
+        if preserve_next_across_sessions:
+            session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
         assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
         user = current_user()

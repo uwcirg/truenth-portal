@@ -1,13 +1,10 @@
 """Unit test module for telecom model"""
-import sys
-
-import pytest
+from __future__ import unicode_literals  # isort:skip
 
 from portal.models.telecom import ContactPoint, Telecom
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
+
 class TestTelecom(TestCase):
     """Telecom model tests"""
 
@@ -31,21 +28,21 @@ class TestTelecom(TestCase):
             }
         ]
         tc = Telecom.from_fhir(data)
-        self.assertEqual(len(tc.contact_points), 3)
-        self.assertEqual(tc.email, "hq@HL7.org")
+        assert len(tc.contact_points) == 3
+        assert tc.email == "hq@HL7.org"
 
     def test_telecom_as_fhir(self):
         cp = ContactPoint(system='phone', use='work', value='123-4567')
         tc = Telecom(email='hq@HL7.org', contact_points=[cp])
         data = tc.as_fhir()
-        self.assertEqual(len(data), 2)
+        assert len(data) == 2
 
     def test_telecom_cp_dict(self):
         cp = ContactPoint(system='phone', use='work', value='123-4567')
         tc = Telecom(email='hq@HL7.org', contact_points=[cp])
         data = tc.cp_dict()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data.get(('phone', 'work')), '123-4567')
+        assert len(data) == 1
+        assert data.get(('phone', 'work')) == '123-4567'
 
     def test_contactpoint_from_fhir(self):
         data = {
@@ -55,11 +52,11 @@ class TestTelecom(TestCase):
             "value": "867-5309"
         }
         cp = ContactPoint.from_fhir(data)
-        self.assertEqual(cp.system, "phone")
-        self.assertEqual(cp.value, "867-5309")
+        assert cp.system == "phone"
+        assert cp.value == "867-5309"
 
     def test_contactpoint_as_fhir(self):
         cp = ContactPoint(system='phone', use='work', value='867-5309')
         data = cp.as_fhir()
-        self.assertEqual(len(data), 3)
-        self.assertEqual(data['value'], '867-5309')
+        assert len(data) == 3
+        assert data['value'] == '867-5309'

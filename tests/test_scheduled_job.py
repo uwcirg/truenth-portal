@@ -1,6 +1,7 @@
 """Unit test module for scheduled jobs logic"""
+from __future__ import unicode_literals  # isort:skip
+
 import json
-import sys
 
 from flask_webtest import SessionScope
 import pytest
@@ -11,8 +12,6 @@ from portal.models.scheduled_job import ScheduledJob
 from portal.tasks import test as test_task
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestScheduledJob(TestCase):
     """Scheduled Job tests"""
 
@@ -21,14 +20,14 @@ class TestScheduledJob(TestCase):
         sj = ScheduledJob(name="test_sched", task="test",
                           schedule=schedule, active=True)
         sjc = sj.crontab_schedule()
-        self.assertTrue(45 in sjc.minute)
-        self.assertEqual(len(sjc.hour), 24)
+        assert 45 in sjc.minute
+        assert len(sjc.hour) == 24
 
         invalid_schedule = "monday to friday"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             sj.schedule = invalid_schedule
         invalid_schedule = "* * * * * *"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             sj.schedule = invalid_schedule
 
     def test_job_upsert(self):
@@ -43,16 +42,16 @@ class TestScheduledJob(TestCase):
             '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(resp)
+        assert resp.status_code == 200
         job_id = resp.json['id']
-        self.assertEqual(resp.json['schedule'], '* * * * *')
+        assert resp.json['schedule'] == '* * * * *'
 
         # POST of an existing should raise a 400
         resp = self.client.post(
             '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert400(resp)
+        assert resp.status_code == 400
 
         # test existing job PUT
         data2 = {'schedule': "0 0 0 0 0"}
@@ -60,9 +59,9 @@ class TestScheduledJob(TestCase):
             '/api/scheduled_job/{}'.format(job_id),
             content_type='application/json',
             data=json.dumps(data2))
-        self.assert200(resp)
-        self.assertEqual(resp.json['name'], data['name'])
-        self.assertEqual(resp.json['schedule'], '0 0 0 0 0')
+        assert resp.status_code == 200
+        assert resp.json['name'] == data['name']
+        assert resp.json['schedule'] == '0 0 0 0 0'
 
     def test_job_get(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
@@ -76,11 +75,11 @@ class TestScheduledJob(TestCase):
             job_id = job.id
 
         resp = self.client.get('/api/scheduled_job/{}'.format(job_id))
-        self.assert200(resp)
-        self.assertEqual(resp.json['task'], 'test')
+        assert resp.status_code == 200
+        assert resp.json['task'] == 'test'
 
         resp = self.client.get('/api/scheduled_job/999')
-        self.assert404(resp)
+        assert resp.status_code == 404
 
     def test_job_delete(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
@@ -94,11 +93,11 @@ class TestScheduledJob(TestCase):
             job_id = job.id
 
         resp = self.client.delete('/api/scheduled_job/{}'.format(job_id))
-        self.assert200(resp)
-        self.assertFalse(ScheduledJob.query.all())
+        assert resp.status_code == 200
+        assert not ScheduledJob.query.all()
 
         resp = self.client.delete('/api/scheduled_job/999')
-        self.assert404(resp)
+        assert resp.status_code == 404
 
     def test_active_check(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
@@ -114,8 +113,8 @@ class TestScheduledJob(TestCase):
 
         kdict = {"job_id": job.id}
         resp = test_task(**kdict)
-        self.assertEqual(len(resp.split()), 6)
-        self.assertEqual(resp.split()[-1], 'Test')
+        assert len(resp.split()) == 6
+        assert resp.split()[-1] == 'Test'
 
         # test standard scheduler job run of inactive job
         job = ScheduledJob(id=999, name="test_inactive", active=False,
@@ -127,14 +126,14 @@ class TestScheduledJob(TestCase):
 
         kdict = {"job_id": job.id}
         resp = test_task(**kdict)
-        self.assertEqual(len(resp.split()), 4)
-        self.assertEqual(resp.split()[-1], 'inactive.')
+        assert len(resp.split()) == 4
+        assert resp.split()[-1] == 'inactive.'
 
         # test manual override run of inactive job
         kdict['manual_run'] = True
         resp = test_task(**kdict)
-        self.assertEqual(len(resp.split()), 6)
-        self.assertEqual(resp.split()[-1], 'Test')
+        assert len(resp.split()) == 6
+        assert resp.split()[-1] == 'Test'
 
     def test_job_trigger(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
@@ -150,8 +149,8 @@ class TestScheduledJob(TestCase):
 
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
 
-        self.assert200(resp)
-        self.assertEqual(resp.json['message'].split()[-1], 'Test')
+        assert resp.status_code == 200
+        assert resp.json['message'].split()[-1] == 'Test'
 
         # test task w/ args + kwargs
         alist = ["arg1", "arg2", "arg3"]
@@ -165,12 +164,12 @@ class TestScheduledJob(TestCase):
         job = db.session.merge(job)
 
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
-        self.assert200(resp)
+        assert resp.status_code == 200
 
         msg = resp.json['message'].split(". ")[1].split("|")
-        self.assertEqual(msg[0].split(","), alist)
+        assert msg[0].split(",") == alist
         kdict['manual_run'] = True
         kdict['job_id'] = job.id
-        self.assertEqual(json.loads(msg[1]), kdict)
+        assert json.loads(msg[1]) == kdict
 
         db.session.close_all()

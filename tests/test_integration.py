@@ -1,4 +1,6 @@
 """Unit test module for Selenium testing"""
+from __future__ import unicode_literals  # isort:skip
+
 import os
 import sys
 import unittest
@@ -100,7 +102,7 @@ class TestUI(TestCase, LiveServerTestCase):
         page = LoginPage(self.driver)
         page.get("/user/sign-in")
 
-        self.assertNotIn("Uh-oh", page.w.find_element_by_tag_name("body").text)
+        assert "Uh-oh" not in page.w.find_element_by_tag_name("body").text
 
     def test_login_form_fb_exists(self):
         """Ensure Facebook button present on login form"""
@@ -108,4 +110,4 @@ class TestUI(TestCase, LiveServerTestCase):
         page = LoginPage(self.driver)
         page.get("/user/sign-in")
 
-        self.assertIsNotNone(page.facebook_button)
+        assert page.facebook_button is not None

@@ -1,12 +1,9 @@
 """Unit test module for portal views"""
-import sys
-
-import pytest
+from __future__ import unicode_literals  # isort:skip
 
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
+
 class TestCelery(TestCase):
     """Portal view tests"""
 
@@ -14,7 +11,8 @@ class TestCelery(TestCase):
         """Try simply add task handed off to celery"""
         x = 151
         y = 99
-        rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'. \
-                             format(x=x, y=y), follow_redirects=True)
-        self.assert200(rv)
-        self.assertEqual(rv.data, str(x + y))
+        response = (self.client.get(
+            '/celery-test?x={x}&y={y}&redirect-to-result=True'.
+            format(x=x, y=y), follow_redirects=True))
+        assert response.status_code == 200
+        assert response.get_data(as_text=True) == str(x + y)

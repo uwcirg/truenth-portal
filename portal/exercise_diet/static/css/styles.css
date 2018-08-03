@@ -33,6 +33,14 @@ body.page-exercise-diet-portal footer {
 body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
     margin-top: 2em;
 }
+.main.exercise-diet {
+    top: 0em;
+    padding-top: 4em;
+    padding-bottom: 3em;
+}
+.main.portal .Hero-title h2 {
+    margin-top: -1em;
+}
 
 #Exercise-Diet-Portal {
 	position: relative;
@@ -410,7 +418,7 @@ img.objective-background  {
 	position: relative;
 	width: 715px;
     max-width: 100%;
-	height: 12em;
+	height: 13em;
     background: rgba(57, 56, 51, 0.8);
 	padding: 10px;
 	margin: 10px auto;
@@ -480,7 +488,7 @@ img.objective-background  {
     display: inline-block;
     text-transform: uppercase;
     text-align: center;
-    padding: 6px;
+    padding: 1em 6px;
     width: 210px;
     margin: 20px 10px 20px;
     height: 70px;
@@ -506,15 +514,6 @@ img.objective-background  {
 .middle-content {
 	margin-right: 50px;
 }
-
-
-
-
-
-
-
-
-
 
 
 /*                					Intro page ul li										*/
@@ -870,6 +869,10 @@ h6 span {
     width: auto;
     margin: 0px 2px 3px;
 }
+table#diet-table,
+table#avoid-foods-table {
+    table-layout: fixed;
+}
 table#diet-table tr td img.oils {
 	margin: 2px;
 	padding: 0;
@@ -971,32 +974,32 @@ table#diet-table tr td ul li {
 table#avoid-foods-table tr td img.processed-meats {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.poultry {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.whole-milk {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
 table#avoid-foods-table tr td img.supplements {
 	margin: 2px;
 	padding: 0;
-	width: 100%;
-	max-width:90px;
+	max-width: 100%;
+	width:90px;
 	height: auto;
 	border: none;
 }
@@ -1224,7 +1227,7 @@ b, strong {
 	max-width: 768px;
 }
 #Intro-Hero {
-	position: absolute;
+	position: relative;
 	width: 100%;
 	padding: 0 10px;
 }
@@ -1241,8 +1244,21 @@ b, strong {
     position: absolute;
 	width: 100%;
     text-align: center;
-    top: 38%;
+    height: 2em;
+    top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+main.exercise-diet .Hero-title {
+    top: 2.5%;
+    bottom: auto;
+}
+@media (min-width: 699px) {
+    main.exercise-diet .Hero-title {
+        top: 10.5%;
+    }
 }
 
 .Hero-title h2 {
@@ -1255,6 +1271,7 @@ b, strong {
     color: #fff;
     letter-spacing: .03em;
     text-shadow: 1px 1px #000;
+    margin: 0;
 }
 
 .clearfix {
@@ -1265,8 +1282,11 @@ b, strong {
 
 #ED-Intro #Intro-content, #ED-Exercise #Intro-content {
 	position: absolute;
-	padding: 0px;
+	padding: 0px 1em;
     margin: 0px auto;
+}
+#ED-Exercise #Intro-content {
+    position: relative;
 }
 
 #ED-Recipes #Intro-Hero {
@@ -1285,7 +1305,7 @@ b, strong {
 #Intro-content p {
 	position: relative;
 	padding: 0px 5px;
-    margin: 0px auto 10px;
+    margin: 0px 5px 10px;
 }
 .start-button {
     font-size: 13px;
@@ -1391,9 +1411,9 @@ h3 a {
     text-decoration: underline;
 }
 h3 a:hover {
-	font-size: 22px;
-	font-weight: 600;
-	letter-spacing: .01em;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .01em;
     color: #435928;
     text-align: center;
     padding: 5px 0;
@@ -1401,13 +1421,14 @@ h3 a:hover {
     text-decoration: underline;
 }
 #Resources p {
-	margin: 0px;
-	font-size: 1em;
-	line-height: 1.4em;
-	letter-spacing: .02em;
-	font-weight: 500;
-	font-style: normal;
-	color: #333;
+    margin: 0px;
+    font-size: 1em;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    font-weight: 500;
+    font-style: normal;
+    color: #333;
+    padding: 0 1em;
 }
 #Resources p a {
 	margin: 0px;
@@ -1423,18 +1444,17 @@ h3 a:hover {
     color: #fff;
     background: #5e7c38;
     border: none;
-
-    margin: 10px auto 20px;
-	height: 2.2em;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	font-size: 12px;
-	font-weight: 400;
-	line-height: 90%;
-	text-shadow: none;
-	border-radius: 0;
-	vertical-align: middle;
-	display: inline-block;
+    margin: 10px 1em 20px;
+    height: 2.2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 90%;
+    text-shadow: none;
+    border-radius: 0;
+    vertical-align: middle;
+    display: inline-block;
 }
 #Resources .btn-primary:hover {
     color: #fff;
@@ -3092,6 +3112,21 @@ h6.lose span {
 /* ======================================================================================== */
 /* ======================================================================================== */
 
+@media (max-width: 767px) {
+    body.modal-open .modal.is-modal-active .modal-dialog,
+    div#exercise-works.modal.fade.in,
+    div#exercise-benefits.modal.fade.in {
+        max-width: 100%;
+    }
+}
+div#exercise-works.modal.fade.in table,
+div#exercise-benefits.modal.fade.in table {
+    word-wrap: break-word;
+}
+
+div#exercise-benefits.modal.fade.in table {
+    table-layout: fixed;
+}
 
 div#exercise-benefits.modal.fade.in h2 {
     position: relative;
@@ -3143,11 +3178,11 @@ div#exercise-benefits.modal.fade.in h3 {
     margin: 10px auto;
 }
 div#exercise-benefits.modal.fade.in ul {
-	padding: 3px 3px 10px;
-	padding: 3px 0px 10px;
-
-	margin-bottom: 10px;
-	margin-bottom: 0px;
+    padding: 3px 3px 10px;
+    padding: 3px 0px 10px;
+    margin-bottom: 10px;
+    margin-bottom: 0px;
+    word-wrap: break-word;
 }
 div#exercise-benefits.modal.fade.in ul li:first-child {
     font-weight: 500;
@@ -5244,6 +5279,15 @@ div#recipe-modal .modal-body button.btn.btn-secondary-top span:hover {
 main .module-assets {
     overflow: auto;
 }
+main.exercise-diet .module-assets p {
+    margin: 0 1.5em;
+}
+@media (min-width: 912px) {
+    main.exercise-diet .module-assets {
+        max-width: 780px;
+        margin: -2em auto auto;
+    }
+}
 
 h3.module__head {
     color: #FFF;
@@ -5266,15 +5310,6 @@ main [data-target] {
 #ED-Intro {
     height: 90em;
 }
-
-#ED-Exercise {
-    height: 140em;
-}
-
-#ED-Diet {
-    height: 135em;
-}
-
 
 /* Bootstrap breakpoints
 /* ======================================================================================== */
@@ -5344,18 +5379,13 @@ main [data-target] {
 /* 	max-width: 768px; */
 }
 
+#ED-Recipes {
+    margin-top: -2em;
+}
+
 #ED-Intro {
     height: 90em;
 }
-
-#ED-Exercise {
-    height: 115em;
-}
-
-#ED-Diet {
-    height: 135em;
-}
-
 .navbar-toggle {
     display: none;
 }
@@ -6179,14 +6209,6 @@ table {
     display: none;
 }
 
-.Hero-title  {
-    position: absolute;
-	width: 100%;
-    text-align: center;
-    top: 31%;
-    left: 0;
-}
-
 .Hero-title h2 {
     border: none;
     font-size: 1.5em;
@@ -6203,14 +6225,6 @@ table {
 	margin: 0 auto;
 	padding: 0 0.1em;
 	max-width: 768px;
-}
-
-#ED-Exercise {
-    height: 150em;
-}
-
-#ED-Diet {
-    height: 175em;
 }
 
 #mainNavbar > ul > li > a {
@@ -6304,15 +6318,6 @@ table {
 .navbar-toggle {
     display: none;
 }
-
-.Hero-title  {
-    position: absolute;
-	width: 100%;
-    text-align: center;
-    top: 26%;
-    left: 0;
-}
-
 .Hero-title h2 {
     border: none;
     font-size: 1.5em;
@@ -6322,6 +6327,7 @@ table {
     color: #fff;
     letter-spacing: .05em;
     text-shadow: 1px 1px #000;
+    margin: 0;
 }
 
 #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
@@ -6410,15 +6416,6 @@ table {
 .navbar-toggle {
     display: none;
 }
-
-.Hero-title  {
-    position: absolute;
-	width: 100%;
-    text-align: center;
-    top: 22%;
-    left: 0;
-}
-
 .Hero-title h2 {
     border: none;
     font-size: 1.5em;
@@ -6428,6 +6425,7 @@ table {
     color: #fff;
     letter-spacing: .05em;
     text-shadow: 1px 1px #000;
+    margin: 0;
 }
 
 #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {

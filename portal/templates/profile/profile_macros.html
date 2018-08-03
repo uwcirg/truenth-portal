@@ -159,7 +159,7 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale" v-model="demo.data.languageCode" v-on:change="updateLocaleData">
-            {%- for locale_code, locale_name in person.locale_display_options.iteritems() -%}
+            {%- for locale_code, locale_name in person.locale_display_options.items() -%}
                 <option value="{{ locale_code }}" {{ "selected" if ((person and person.locale_code == locale_code) or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == locale_code)) }}>{{ _(locale_name) }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == locale_code }}</option>
             {%- endfor -%}
         </select>
@@ -304,7 +304,8 @@
                 </select>
             </div>
         </div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" disabled>{{ _("Send email") }}</button>
+        <div v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" v-show="!patientEmailForm.loading" disabled>{{ _("Send email") }}</button>
         <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
         <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
         {{emailReadyMessage()}}

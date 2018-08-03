@@ -294,8 +294,12 @@ a:focus {
   min-width: 100px;
   display: inline-block;
   text-transform: uppercase;
+  &:focus {
+    background-color: @btnColor;
+    border-color: @btnColor;
+    color: #fff;
+  }
   &:hover,
-  &:focus,
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
@@ -2786,6 +2790,15 @@ input.clinic {
 #emailBodyModal .body-content {
   overflow: hidden;
   font-size: @mediumText;
+}
+#profileEmailLogTable {
+  .message-subject {
+    position: relative;
+  }
+  .message-loader {
+    position: absolute;
+    z-index: 1;
+  }
 }
 .hide {
   display: none;

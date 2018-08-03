@@ -1,3 +1,5 @@
+from __future__ import unicode_literals  # isort:skip
+
 from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
@@ -87,7 +89,7 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         org_row.append(row_total)
         rows.append(org_row)
 
-    totalrow = [_(u"TOTAL")]
+    totalrow = [_("TOTAL")]
     row_total = 0
     for cd in cutoff_days:
         totalrow.append(totals[cd])
@@ -136,9 +138,9 @@ def generate_numbers():
             od = overdue(user)
             qb = a_s.qb_name
             for org in user.organizations:
-                top = ot.find_top_level_org([org])
+                top = ot.find_top_level_orgs([org], first=True)
                 org_name = "{}: {}".format(
-                    top[0].name, org.name) if top else org.name
+                    top.name, org.name) if top else org.name
                 cw.writerow((
                     user.id, email, qb, a_s.overall_status, od, org_name))
 

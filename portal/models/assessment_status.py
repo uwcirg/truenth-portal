@@ -14,6 +14,7 @@ from .fhir import (
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
+from .user_consent import UserConsent
 
 
 def recent_qnr_status(user, questionnaire_name, qbd):
@@ -36,7 +37,7 @@ def recent_qnr_status(user, questionnaire_name, qbd):
     ).order_by(
         QuestionnaireResponse.status,
         QuestionnaireResponse.authored.desc()).with_entities(
-            QuestionnaireResponse.status, QuestionnaireResponse.authored)
+        QuestionnaireResponse.status, QuestionnaireResponse.authored)
 
     if qbd.iteration is not None:
         query = query.filter(
@@ -132,6 +133,7 @@ class QuestionnaireBankDetails(object):
     reports and details needed by clients like AssessmentStatus.
 
     """
+
     def __init__(self, user, as_of_date):
         """ Initialize and lookup status for respective questionnaires
 
@@ -158,9 +160,12 @@ class QuestionnaireBankDetails(object):
 
     def overall_status(self):
         """Returns the `overall_status` for the given QB"""
+        if self.withdrawn():
+            return 'Withdrawn'
+
         if not (
-            self.qbd.questionnaire_bank and
-            self.qbd.questionnaire_bank.trigger_date
+                self.qbd.questionnaire_bank and
+                self.qbd.questionnaire_bank.trigger_date
         ):
             return 'Expired'
         status_strings = [v['status'] for v in self.status_by_q.values()]
@@ -185,6 +190,42 @@ class QuestionnaireBankDetails(object):
             else:
                 result = 'In Progress'
         return result
+
+    def withdrawn(self):
+        """Determine if user has `withdrawn` from study """
+        # No easy tie between QB and organization.  Make assumption
+        # that if the QBD isn't intervention tied, the user is associated
+        # with the intervention by org.
+        intervention_qbs = QuestionnaireBank.query.filter(
+            QuestionnaireBank.intervention_id.isnot(None))
+        if self.qbd.questionnaire_bank in intervention_qbs:
+            return False
+
+        root_orgs = OrgTree().find_top_level_orgs(self.user.organizations)
+        if len(root_orgs) > 1:
+            current_app.logger.warning(
+                "Indeterminate org lookup - only expecting one root org "
+                "for patient {}".format(self.user))
+
+        valid_consent_found = False
+        for candidate in self.user.organizations:
+            if not candidate.id:  # `none of the above` doesn't count
+                continue
+
+            # Need to process in order, finding the consent closest to the
+            # user's leaf org and then moving up.
+            for org_id in OrgTree().at_and_above_ids(candidate.id):
+                valid_consent = self.user.valid_consents.filter(
+                    UserConsent.organization_id == org_id).with_entities(
+                    UserConsent.options, UserConsent.status).first()
+                if valid_consent:
+                    valid_consent_found = True
+                if valid_consent and valid_consent[1] == 'suspended':
+                    return True
+
+        if not valid_consent_found:
+            current_app.logger.warn("No consent found for {}".format(self.user))
+        return False
 
 
 class AssessmentStatus(object):
@@ -235,7 +276,7 @@ class AssessmentStatus(object):
         for org in self.user.organizations:
             org_rp = org.research_protocol(self.as_of_date)
             if org_rp and org_rp.id == rp_id:
-                return OrgTree().find_top_level_org([org])[0]
+                return OrgTree().find_top_level_orgs([org], first=True)
         return None
 
     @property
@@ -353,8 +394,9 @@ class AssessmentStatus(object):
                     qb_id = self.qb_data.qbd.questionnaire_bank.id
                     iteration = self.qb_data.qbd.iteration
                     if name not in (
-                        q.name
-                        for q in self.qb_data.qbd.questionnaire_bank.questionnaires
+                            q.name
+                            for q in
+                            self.qb_data.qbd.questionnaire_bank.questionnaires
                     ):
                         indef_qb = QuestionnaireBank.indefinite_qb(
                             user=self.user, as_of_date=self.as_of_date)
@@ -403,6 +445,8 @@ class AssessmentStatus(object):
             'In Progress': if one or more questionnaires were at least
                 started and the remaining unfinished questionnaires are not
                 expired.
+            'Withdrawn': if the user's consent agreement with QB organization
+                includes "send_reminders: False".
 
         """
         return self.qb_data.overall_status()
@@ -427,8 +471,9 @@ def overall_assessment_status(user_id):
 
     """
     user = User.query.get(user_id)
-    current_app.logger.debug("CACHE MISS: {} {}".format(
-        __name__, user_id))
+    if current_app.config.get("LOG_CACHE_MISS"):
+        current_app.logger.debug("CACHE MISS: {} {}".format(
+            __name__, user_id))
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
     qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)

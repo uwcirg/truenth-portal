@@ -102,7 +102,7 @@ def user_intervention_get(intervention_name, user_id):
     """
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
-        abort (404, 'no such intervention {}'.format(intervention_name))
+        abort(404, 'no such intervention {}'.format(intervention_name))
     current_user().check_role(permission='edit', other_id=user_id)
 
     ui = UserIntervention.query.filter_by(
@@ -231,7 +231,7 @@ def user_intervention_set(intervention_name):
     try:
         intervention = getattr(INTERVENTION, intervention_name)
     except ValueError:
-        abort (404, 'no such intervention {}'.format(intervention_name))
+        abort(404, 'no such intervention {}'.format(intervention_name))
 
     # service account being used must belong to the intervention owner
     if not (intervention.client and
@@ -274,7 +274,8 @@ def user_intervention_set(intervention_name):
             'staff_html'):
         if attr in request.json:
             value = integration_delay_hack(
-                intervention=intervention, key=attr, value=request.json.get(attr))
+                intervention=intervention, key=attr,
+                value=request.json.get(attr))
             complete[attr] = value
     ui.update_from_json(complete)
     db.session.commit()
@@ -298,7 +299,7 @@ def intervention_rule_list(intervention_name):
     """
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
-        abort (404, 'no such intervention {}'.format(intervention_name))
+        abort(404, 'no such intervention {}'.format(intervention_name))
     rules = [x.as_json() for x in intervention.access_strategies]
     return jsonify(rules=rules)
 
@@ -325,7 +326,7 @@ def intervention_rule_set(intervention_name):
     """
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
-        abort (404, 'no such intervention {}'.format(intervention_name))
+        abort(404, 'no such intervention {}'.format(intervention_name))
 
     if not request.json or 'function_details' not in request.json:
         abort(400, "Requires JSON with well defined access strategy")
@@ -411,7 +412,7 @@ def intervention_communicate(intervention_name):
     """
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
-        abort (404, 'no such intervention {}'.format(intervention_name))
+        abort(404, 'no such intervention {}'.format(intervention_name))
 
     if not request.json:
         abort(400, "Requires JSON detailing communication")
@@ -424,20 +425,21 @@ def intervention_communicate(intervention_name):
         abort(400, "Only protocol of email is supported at this time")
 
     subject = request.json.get('subject')
-    if not subject or  len(subject) > 78:
+    if not subject or len(subject) > 78:
         abort(400,
               "`subject` is required and limited to 78 characters in length")
 
     recipients = [
         u.email for u in User.query.join(UserGroup).filter(
-            UserGroup.group_id==group.id)]
+            UserGroup.group_id == group.id)]
     if not recipients:
         abort(400, "no recipients found")
 
     sender = current_app.config['MAIL_DEFAULT_SENDER']
-    email = EmailMessage(subject=subject, body=request.json.get('message'),
-            recipients=' '.join(recipients), sender=sender,
-            user_id=current_user().id)
+    email = EmailMessage(
+        subject=subject, body=request.json.get('message'),
+        recipients=' '.join(recipients), sender=sender,
+        user_id=current_user().id)
     email.send_message()
 
     db.session.add(email)

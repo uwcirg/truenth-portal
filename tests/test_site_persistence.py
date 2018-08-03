@@ -6,12 +6,12 @@ integration tests.  For example, does a complicated strategy come
 to life and properly control the visibility of a intervention card?
 
 """
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import os
-import sys
 
 from flask_webtest import SessionScope
-import pytest
 
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db
@@ -31,8 +31,7 @@ from portal.models.role import ROLE
 from portal.models.user import get_user
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
+
 class TestSitePersistence(TestCase):
 
     def setUp(self):
@@ -51,14 +50,14 @@ class TestSitePersistence(TestCase):
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
-        self.assertTrue(Organization.query.count() > 5)
+        assert Organization.query.count() > 5
         npis = []
         for org in Organization.query:
             npis += [
                 id.value for id in org.identifiers if id.system ==
                 'http://hl7.org/fhir/sid/us-npi']
-        self.assertTrue('1447420906' in npis)  # UWMC
-        self.assertTrue('1164512851' in npis)  # UCSF
+        assert '1447420906' in npis  # UWMC
+        assert '1164512851' in npis  # UCSF
 
     def testMidLevelOrgDeletion(self):
         """Test for problem scenario where mid level org should be removed"""
@@ -75,8 +74,8 @@ class TestSitePersistence(TestCase):
         INTERVENTION.DECISION_SUPPORT_P3P.public_access = False
         INTERVENTION.SEXUAL_RECOVERY.public_access = False  # part of strat.
         user = self.test_user
-        self.assertFalse(
-            INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
+        assert not INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(
+            user).access
 
         # Fulfill conditions
         enc = Encounter(status='in-progress', auth_method='url_authenticated',
@@ -96,26 +95,22 @@ class TestSitePersistence(TestCase):
         user = db.session.merge(user)
 
         # P3P strategy should now be in view for test user
-        self.assertTrue(
-            INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
+        assert INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access
 
     def test_interventions(self):
         """Portions of the interventions migrated"""
         # confirm we see a sample of changes from the
         # defauls in add_static_interventions call
         # to what's expected in the persistence file
-        self.assertEqual(
-            INTERVENTION.CARE_PLAN.card_html,
-            ('<p>Organization and '
-             'support for the many details of life as a prostate cancer '
-             'survivor</p>'))
-        self.assertEqual(
-            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
-        self.assertEqual(
-            INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
+        assert (INTERVENTION.CARE_PLAN.card_html == (
+            '<p>Organization and support for the many details of life as a '
+            'prostate cancer survivor</p>'))
+        assert INTERVENTION.SELF_MANAGEMENT.description == 'Symptom Tracker'
+        assert (INTERVENTION.SELF_MANAGEMENT.link_label
+                == 'Go to Symptom Tracker')
 
     def test_app_text(self):
-        self.assertEqual(app_text('landing title'), 'Welcome to TrueNTH')
+        assert app_text('landing title') == 'Welcome to TrueNTH'
 
     def test_questionnaire_banks_recurs(self):
         # set up a few recurring instances
@@ -170,8 +165,8 @@ class TestSitePersistence(TestCase):
         results = mr_qb.as_json()
 
         copy = QuestionnaireBank.from_json(results)
-        self.assertEqual(copy.name, mr_qb.name)
-        self.assertEqual(copy.recurs, [initial_recur, every_six_thereafter])
+        assert copy.name == mr_qb.name
+        assert copy.recurs == [initial_recur, every_six_thereafter]
 
         # now, modify the persisted form, remove one recur and add another
         new_recur = Recur(
@@ -182,9 +177,8 @@ class TestSitePersistence(TestCase):
             initial_recur.as_json(), new_recur.as_json()]
         updated_copy = QuestionnaireBank.from_json(results)
 
-        self.assertEqual(
-            [r.as_json() for r in updated_copy.recurs],
-            [r.as_json() for r in (initial_recur, new_recur)])
+        assert ([r.as_json() for r in updated_copy.recurs]
+                == [r.as_json() for r in (initial_recur, new_recur)])
 
 
 class TestEpromsSitePersistence(TestCase):
@@ -199,7 +193,7 @@ class TestEpromsSitePersistence(TestCase):
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
-        self.assertTrue(Organization.query.count() > 5)
+        assert Organization.query.count() > 5
         tngr = Organization.query.filter(
-            Organization.name=='TrueNTH Global Registry').one()
-        self.assertEqual(tngr.id, 10000)
+            Organization.name == 'TrueNTH Global Registry').one()
+        assert tngr.id == 10000

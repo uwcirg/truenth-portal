@@ -126,7 +126,7 @@ class TestAppText(TestCase):
 
     def test_mail_resource(self):
         testvars = {"subjkey": "test",
-                    "bodykey1": u'\u2713',
+                    "bodykey1": '\u2713',
                     "bodykey2": "456",
                     "footerkey": "foot"}
         tmr = MailResource(None, locale_code='en_AU', variables=testvars)

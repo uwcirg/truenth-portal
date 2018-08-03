@@ -8,6 +8,8 @@ auditable_event()
 Audit data is also persisted in the database *audit* table.
 
 """
+from __future__ import unicode_literals  # isort:skip
+
 import logging
 import os
 import sys
@@ -32,7 +34,7 @@ def auditable_event(message, user_id, subject_id, context="other"):
     subject_id: The user id upon which the action was performed
 
     """
-    text = u"performed by {0} on {1}: {2}: {3}".format(
+    text = "performed by {0} on {1}: {2}: {3}".format(
         user_id, subject_id, context, message)
     current_app.logger.log(AUDIT, text)
 
@@ -52,8 +54,8 @@ def configure_audit_log(app):  # pragma: no cover
 
     """
     # Skip config when running tests or maintenance
-    if (sys.argv[0].endswith('/bin/flask') and 'run' not in sys.argv) or\
-       app.testing:
+    if ((sys.argv[0].endswith('/bin/flask') and 'run' not in sys.argv) or
+            app.testing):
         return
 
     logging.addLevelName('AUDIT', AUDIT)

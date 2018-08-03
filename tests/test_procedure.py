@@ -1,8 +1,9 @@
 """Unit test module for Procedure API and model"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime, timedelta
 import json
 import os
-import sys
 
 import dateutil
 from flask import current_app
@@ -24,31 +25,26 @@ from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestProcedure(TestCase):
 
     def test_procedureGET_404(self):
         self.add_procedure()
         self.login()
-        rv = self.client.get('/api/patient/666/procedure')
-        self.assert404(rv)
+        response = self.client.get('/api/patient/666/procedure')
+        assert response.status_code == 404
 
     def test_procedureGET(self):
         self.add_procedure()
         self.login()
-        rv = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
+        response = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
-        data = json.loads(rv.data)
-        self.assertEqual(
-            '367336001',
-            data['entry'][0]['resource']['code']['coding'][0]['code'])
-        self.assertEqual(
-            'Chemotherapy',
-            data['entry'][0]['resource']['code']['coding'][0]['display'])
-        self.assertEqual(
-            Reference.patient(TEST_USER_ID).as_fhir()['reference'],
-            data['entry'][0]['resource']['meta']['by']['reference'])
+        data = response.json
+        assert ('367336001'
+                == data['entry'][0]['resource']['code']['coding'][0]['code'])
+        assert ('Chemotherapy' ==
+                data['entry'][0]['resource']['code']['coding'][0]['display'])
+        assert (Reference.patient(TEST_USER_ID).as_fhir()['reference']
+                == data['entry'][0]['resource']['meta']['by']['reference'])
         last_updated = FHIR_datetime.parse(
             data['entry'][0]['resource']['meta']['lastUpdated'])
         self.assertAlmostEqual(
@@ -57,9 +53,8 @@ class TestProcedure(TestCase):
             data['entry'][0]['resource']['performedPeriod']['start'])
         self.assertAlmostEqual(
             datetime.utcnow(), start_time, delta=timedelta(seconds=5))
-        self.assertEqual(
-            current_app.config.metadata['version'],
-            data['entry'][0]['resource']['meta']['version'])
+        assert (current_app.config.metadata['version']
+                == data['entry'][0]['resource']['meta']['version'])
 
     def test_procedure_from_fhir(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -67,11 +62,9 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         proc = Procedure.from_fhir(data, Audit(user_id=TEST_USER_ID))
-        self.assertEqual(
-            proc.code.codings[0].system,
-            'http://snomed.info/sct')
-        self.assertEqual(proc.code.codings[0].code, '80146002')
-        self.assertEqual(proc.start_time, dateutil.parser.parse("2013-04-05"))
+        assert proc.code.codings[0].system == 'http://snomed.info/sct'
+        assert proc.code.codings[0].code == '80146002'
+        assert proc.start_time == dateutil.parser.parse("2013-04-05")
 
     def test_procedure_bad_date(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -79,16 +72,16 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
         data['performedDateTime'] = '1843-07-01'  # can't handle pre 1900
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
         data['performedDateTime'] = '1943-17-01'  # month 17 doesn't fly
-        rv = self.client.post(
+        response = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
-        self.assert400(rv)
+        assert response.status_code == 400
 
     def test_procedurePOST(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -96,19 +89,17 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
 
-        results = json.loads(rv.data)
+        results = response.json
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
-        self.assertEqual(
-            proc.code.codings[0].system,
-            'http://snomed.info/sct')
-        self.assertEqual(proc.user_id, 1)
-        self.assertEqual(proc.end_time, datetime(2011, 6, 27))
-        self.assertEqual(proc.encounter.user_id, TEST_USER_ID)
+        assert proc.code.codings[0].system == 'http://snomed.info/sct'
+        assert proc.user_id == 1
+        assert proc.end_time == datetime(2011, 6, 27)
+        assert proc.encounter.user_id == TEST_USER_ID
 
     def test_timezone_procedure_POST(self):
         with open(os.path.join(os.path.dirname(__file__),
@@ -123,29 +114,29 @@ class TestProcedure(TestCase):
         data['performedPeriod']['end'] = end_time
 
         self.login()
-        rv = self.client.post(
+        response = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
 
-        results = json.loads(rv.data)
+        results = response.json
         proc_id = results['procedure_id']
         proc = Procedure.query.get(proc_id)
 
-        self.assertEqual(proc.start_time.tzinfo, None)
-        self.assertEqual(proc.end_time.tzinfo, None)
+        assert proc.start_time.tzinfo is None
+        assert proc.end_time.tzinfo is None
         st = dateutil.parser.parse(start_time)
         st = st.astimezone(pytz.utc)
         st = st.replace(tzinfo=None)
-        self.assertEqual(proc.start_time, st)
+        assert proc.start_time == st
 
     def test_procedureDELETE(self):
         self.add_procedure()
         proc_id = Procedure.query.one().id
         self.login()
-        rv = self.client.delete('/api/procedure/{}'.format(proc_id))
-        self.assert200(rv)
-        self.assertRaises(NoResultFound, Procedure.query.one)
-        self.assertEqual(self.test_user.procedures.count(), 0)
+        response = self.client.delete('/api/procedure/{}'.format(proc_id))
+        response.status_code == 200
+        pytest.raises(NoResultFound, Procedure.query.one)
+        assert self.test_user.procedures.count() == 0
 
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
@@ -162,13 +153,17 @@ class TestProcedure(TestCase):
             ('33195004', 'External beam radiation therapy', SNOMED),
             ('228748004', 'Brachytherapy', SNOMED),
             ('707266006', 'Androgen deprivation therapy', SNOMED),
-            ('888', u'Other (free text)', ICHOM),
+            ('888', 'Other (free text)', ICHOM),
             ('118877007', 'Procedure on prostate', SNOMED),
-            ('999999999', u'Other primary treatment', SNOMED),
-            (u'androgen deprivation therapy - surgical orchiectomy', u'Androgen deprivation therapy (ADT) - Surgical orchiectomy', TRUENTH_CLINICAL_CODE_SYSTEM),
-            (u'androgen deprivation therapy - chemical', u'Androgen deprivation therapy (ADT) - Chemical', TRUENTH_CLINICAL_CODE_SYSTEM),
-            ('176307007', u'Whole-gland ablation', SNOMED),
-            ('438778003', u'Focal-gland ablation', SNOMED)
+            ('999999999', 'Other primary treatment', SNOMED),
+            ('androgen deprivation therapy - surgical orchiectomy',
+             'Androgen deprivation therapy (ADT) - Surgical orchiectomy',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('androgen deprivation therapy - chemical',
+             'Androgen deprivation therapy (ADT) - Chemical',
+             TRUENTH_CLINICAL_CODE_SYSTEM),
+            ('176307007', 'Whole-gland ablation', SNOMED),
+            ('438778003', 'Focal-gland ablation', SNOMED)
 
         }
         # confirm we have the whole list:
@@ -176,24 +171,23 @@ class TestProcedure(TestCase):
         for codeableconcept in TxStartedConstants():
             [found.add((cc.code, cc.display, cc.system)) for cc in
              codeableconcept.codings]
-        self.assertEqual(started_codes, found)
+        assert started_codes == found
 
         # prior to setting any procedures, should return false
-        self.assertFalse(known_treatment_started(self.test_user))
+        assert not known_treatment_started(self.test_user)
 
         for code, display, system in started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            self.assertTrue(known_treatment_started(self.test_user),
-                            "treatment {} didn't show as started".format(
-                (system, code)))
+            assert known_treatment_started(self.test_user),\
+                "treatment {} didn't show as started".format((system, code))
 
             # The "others" count as treatement started, but should NOT
             # return a date from latest_treatment - only specific treatments
             if code in ('888', '118877007'):
-                self.assertFalse(latest_treatment_started_date(self.test_user))
+                assert not latest_treatment_started_date(self.test_user)
             else:
-                self.assertTrue(latest_treatment_started_date(self.test_user))
+                assert latest_treatment_started_date(self.test_user)
 
             self.test_user.procedures.delete()  # reset for next iteration
 
@@ -208,12 +202,12 @@ class TestProcedure(TestCase):
         )
 
         # prior to setting any procedures, should return false
-        self.assertFalse(known_treatment_not_started(self.test_user))
+        assert not known_treatment_not_started(self.test_user)
 
         for code, display, system in not_started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            self.assertTrue(known_treatment_not_started(self.test_user),
-                            "treatment '{}' didn't show as not started".format(
-                                (system, code)))
+            assert known_treatment_not_started(self.test_user),\
+                "treatment '{}' didn't show as not started".format(
+                    (system, code))
             self.test_user.procedures.delete()  # reset for next iteration

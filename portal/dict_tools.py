@@ -1,4 +1,6 @@
 """Module for additional dictionary tools/utilities"""
+from __future__ import unicode_literals  # isort:skip
+
 import numbers
 
 
@@ -12,7 +14,7 @@ def dict_compare(d1, d2):
     intersect_keys = d1_keys.intersection(d2_keys)
     added = d1_keys - d2_keys
     removed = d2_keys - d1_keys
-    modified = {o : (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
+    modified = {o: (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
     same = set(o for o in intersect_keys if d1[o] == d2[o])
     return added, removed, modified, same
 
@@ -38,14 +40,14 @@ def dict_match(newd, oldd, diff_stream):
     else:
         if added:
             diff_stream.write(
-                u"added {}\n".format({k:newd.get(k) for k in added}))
+                "added {}\n".format({k: newd.get(k) for k in added}))
         if removed:
             diff_stream.write(
-                u"removed {}\n".format({k:oldd.get(k) for k in removed}))
+                "removed {}\n".format({k: oldd.get(k) for k in removed}))
         if modified:
             for k in modified.keys():
                 diff_stream.write(
-                    u"replace {} with {}\n".format(
+                    "replace {} with {}\n".format(
                         {k: oldd.get(k)}, {k: newd.get(k)}))
         return False
 
@@ -61,6 +63,7 @@ def strip_empties(d):
     to the default python `if value` check - both are retained.
 
     """
+
     def has_value(value):
         """Need to retain 'False' booleans and numeric 0 values"""
         if isinstance(value, (bool, numbers.Number)):

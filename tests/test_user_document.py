@@ -1,16 +1,13 @@
 """Unit test module for user document logic"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
-from builtins import str
 from datetime import datetime
-from io import BytesIO
 import os
-import sys
-from tempfile import NamedTemporaryFile
 
 from flask import current_app
 from flask_webtest import SessionScope
-import pytest
+from io import BytesIO
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -20,8 +17,7 @@ from portal.models.user import get_user
 from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
+
 class TestUserDocument(TestCase):
     """User Document tests"""
 
@@ -40,19 +36,18 @@ class TestUserDocument(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.client.get(
+        response = self.client.get(
             '/api/user/{}/user_documents'.format(TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['user_documents']), 2)
+        assert response.status_code == 200
+        assert len(response.json['user_documents']) == 2
         # tests document_type filter
-        rv = self.client.get(
+        response = self.client.get(
             '/api/user/{}/user_documents?document_type=TestFile'.format(
                 TEST_USER_ID))
-        self.assert200(rv)
-        self.assertEqual(len(rv.json['user_documents']), 1)
-        self.assertEqual(
-            rv.json['user_documents'][0]['uploaded_at'],
-            FHIR_datetime.as_fhir(now))
+        assert response.status_code == 200
+        assert len(response.json['user_documents']) == 1
+        assert (response.json['user_documents'][0]['uploaded_at']
+                == FHIR_datetime.as_fhir(now))
 
 
     def test_post_patient_report(self):
@@ -62,49 +57,36 @@ class TestUserDocument(TestCase):
         create_service_token(client=client, user=get_user(TEST_USER_ID))
         self.login()
 
-        test_contents = "This is a test."
-        with NamedTemporaryFile(
-            prefix='udoc_test_',
-            suffix='.pdf',
-            delete=True,
-        ) as temp_pdf:
-            temp_pdf.write(test_contents)
-            temp_pdf.seek(0)
-            tempfileIO = BytesIO(temp_pdf.read())
-            rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
-                                content_type='multipart/form-data', 
-                                data=dict({'file': (tempfileIO, temp_pdf.name)}))
-            self.assert200(rv)
+        test_contents = b"This is a test."
+        response = self.client.post(
+            '/api/user/{}/patient_report'.format(TEST_USER_ID),
+            content_type='multipart/form-data',
+            data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
+
+        assert response.status_code == 200
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
-        fpath = os.path.join(current_app.root_path,
-                            current_app.config.get("FILE_UPLOAD_DIR"),
-                            str(udoc.uuid))
-        with open(fpath, 'r') as udoc_file:
-            self.assertEqual(udoc_file.read(), test_contents)
+        fpath = os.path.join(
+            current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"),
+            str(udoc.uuid))
+        with open(fpath, 'rb') as udoc_file:
+            assert udoc_file.read() == test_contents
         os.remove(fpath)
 
-        self.assertEqual(udoc.user_id, TEST_USER_ID)
-        self.assertEqual(udoc.intervention.description,
-                          INTERVENTION.SEXUAL_RECOVERY.description)
-
+        assert udoc.user_id == TEST_USER_ID
+        assert (udoc.intervention.description
+                == INTERVENTION.SEXUAL_RECOVERY.description)
 
     def test_download_user_document(self):
         self.login()
-        test_contents = "This is a test."
-        with NamedTemporaryFile(
-            prefix='udoc_test_',
-            suffix='.pdf',
-            delete=True,
-        ) as temp_pdf:
-            temp_pdf.write(test_contents)
-            temp_pdf.seek(0)
-            tempfileIO = BytesIO(temp_pdf.read())
-            rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
-                                content_type='multipart/form-data', 
-                                data=dict({'file': (tempfileIO, temp_pdf.name)}))
-            self.assert200(rv)
+        test_contents = b"This is a test."
+        response = self.client.post(
+            '/api/user/{}/patient_report'.format(TEST_USER_ID),
+            content_type='multipart/form-data',
+            data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
+        assert response.status_code == 200
+
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
-        rv = self.client.get('/api/user/{}/user_documents/{}'.format(
-                            TEST_USER_ID, udoc.id))
-        self.assert200(rv)
-        self.assertEqual(rv.data, test_contents)
+        response = self.client.get('/api/user/{}/user_documents/{}'.format(
+            TEST_USER_ID, udoc.id))
+        assert response.status_code == 200
+        assert response.data == test_contents

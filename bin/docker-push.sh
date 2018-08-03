@@ -37,8 +37,8 @@ fi
 . "${bin_path}/utils.sh"
 
 # Default values (mirrors values in docker-compose.yaml)
-DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg-portal-docker.jfrog.io/}"
-DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-portal_web}"
+DOCKER_REPOSITORY="${DOCKER_REPOSITORY-uwcirg/}"
+DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-truenth_portal}"
 DOCKER_IMAGE_TAG="${DOCKER_IMAGE_TAG:-latest}"
 DOCKER_TAGS="${DOCKER_TAGS:-$(get_docker_tags)}"
 

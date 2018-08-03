@@ -1,6 +1,6 @@
 {% extends "exercise_diet/base.html" %}
 {% block main %}
-<main class="main">
+<main class="main exercise-diet">
     {{ super() }}
     <div class="module-assets">
         {% for asset in assets %}
@@ -11,7 +11,7 @@
 {% endblock %}
 {% block modal %}
     {{super()}}
-    {% for id, content in modals.iteritems() %}
+    {% for id, content in modals.items() %}
         <!-- Modal -->
         <div class="modal fade" id={{ id }} aria-hidden="true">
             <div class="modal-dialog">

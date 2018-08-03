@@ -28,8 +28,8 @@ def upgrade():
 
     sysuser = session.query(User).filter_by(username=sysname).first()
     if not sysuser:
-    	sysuser = User(username=sysname, first_name='System',
-                	   last_name='Admin')
+        sysuser = User(
+            username=sysname, first_name='System', last_name='Admin')
         session.add(sysuser)
         session.commit()
     # ### end Alembic commands ###

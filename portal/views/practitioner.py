@@ -14,7 +14,7 @@ from ..models.practitioner import Practitioner, PractitionerIdentifier
 from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
-from .portal import check_int
+from ..type_tools import check_int
 
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 

@@ -2,6 +2,9 @@
 input.clinic {
 	display: none;
 }
+#fillOrgs {
+	margin: 1em !important;
+}
 #fillOrgs .indent {
 	padding: 0 2.5em;
 }
@@ -16,10 +19,15 @@ input.clinic {
 @media (min-width: 1200px) {
 	#fillOrgs {
 		justify-content: space-between;
+		flex-wrap: nowrap;
 	}
 }
 #fillOrgs * {
 	font-size: 12px;
+}
+#fillOrgs .sub-text,
+#fillOrgs .json-link {
+	font-size: 10px;
 }
 #fillOrgs .text-muted,
 #fillOrgs .singleton {
@@ -39,7 +47,6 @@ input.clinic {
 }
 #fillOrgs .parent-org-container {
 	margin: 1em 0;
-	width: 550px;
 	max-width: 100%;
 }
 #fillOrgs .text-muter {
@@ -78,7 +85,45 @@ input.clinic {
 	background: #7C959E;
     color: #FFF;
 }
+#fillOrgs .parent-singleton .sub-text,
+#fillOrgs .parent-singleton .json-link  {
+	font-weight: 200;
+	font-size: 10px;
+}
 #fillOrgs .parent-singleton label {
 	top: 2px;
 	padding: 4px;
 }
+div.org-container label.org-label {
+	padding: 0.35em 0.25em;
+}
+.info {
+	margin: 1em 1em 0;
+    border: 1px solid;
+    padding: 0.5em;
+    display: inline-block;
+    color: #9a9894;
+    font-size: 0.9em;
+}
+.sub-text {
+	font-weight: 300;
+	font-size: 11px;
+	letter-spacing: 1px;
+}
+.json-link {
+	font-weight: 300;
+	margin-left: 1em;
+	display: inline-block;
+	font-size: 10px;
+	letter-spacing: 0.1rem;
+	text-decoration: underline;
+}
+legend .json-link {
+	color: #FFF;
+}
+legend .json-link:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color: #3B4551;
+}
+

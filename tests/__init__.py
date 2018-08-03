@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Unit tests for package
 
 to run:
@@ -7,6 +8,8 @@ options:
     py.test --help
 
 """
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
@@ -41,7 +44,7 @@ from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
-FIRST_NAME = u'\u2713'
+FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
@@ -281,6 +284,9 @@ class TestCase(Base):
                          backdate=None, setdate=None):
         """Bless given user with a valid consent with org
 
+        NB - if existing consent for user/org is present, simply update
+        with new date values
+
         :param backdate: timedelta value.  Define to mock consents
           happening said period in the past
 
@@ -288,17 +294,26 @@ class TestCase(Base):
           happening at exact time in the past
 
         """
-        audit = Audit(user_id=user_id, subject_id=user_id)
-        consent = UserConsent(
-            user_id=user_id, organization_id=org_id,
-            audit=audit, agreement_url='http://fake.org',
-            acceptance_date=calc_date_params(
-                backdate=backdate, setdate=setdate))
+        acceptance_date = calc_date_params(
+            backdate=backdate, setdate=setdate)
+        consent = UserConsent.query.filter(
+            UserConsent.user_id == user_id).filter(
+            UserConsent.organization_id == org_id).first()
+        if consent:
+            consent.acceptance_date = acceptance_date
+        else:
+            audit = Audit(user_id=user_id, subject_id=user_id)
+            consent = UserConsent(
+                user_id=user_id, organization_id=org_id,
+                audit=audit, agreement_url='http://fake.org',
+                acceptance_date=acceptance_date)
         with SessionScope(db):
-            db.session.add(consent)
+            if consent not in db.session:
+                db.session.add(consent)
             db.session.commit()
 
-    def bless_with_basics(self, backdate=None, setdate=None):
+    def bless_with_basics(
+            self, backdate=None, setdate=None, local_metastatic=None):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
@@ -308,14 +323,22 @@ class TestCase(Base):
         :param setdate: datetime value.  Define to mock consents
           happening at exact time in the past
 
+        :param local_metastatic: set to 'localized' or 'metastatic' for
+          tests needing those respective orgs assigned to the test user
+
         """
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
 
         # Register with a clinic
         self.shallow_org_tree()
-        org = Organization.query.filter(
-            Organization.partOf_id != None).first()
+
+        if local_metastatic:
+            org = Organization.query.filter(
+                Organization.name == local_metastatic).one()
+        else:
+            org = Organization.query.filter(
+                Organization.partOf_id.isnot(None)).first()
         assert org
         self.test_user.organizations.append(org)
 

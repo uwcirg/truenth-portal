@@ -840,20 +840,41 @@ class OrgTree(object):
             if other_organization_id in children:
                 return True
 
-    def find_top_level_org(self, organizations):
-        """Returns top level organization(s) based on the organizations provided
+    def at_and_above_ids(self, organization_id):
+        """Returns list of ids from any point in tree and up the parent stack
 
-        :param organizations: organizations against which top level organization(s) will be queried
-
-        :return: list of top level organization(s)
+        :param organization_id: node in tree, will be included in return list
+        :return: list of organization ids from the one given on up including
+            every parent found in chain
 
         """
-        orgs_list = []
+        ids = []
+        node = self.find(organization_id)
+        while node is not self.root:
+            ids.append(node.id)
+            node = node.parent
+        return ids
+
+    def find_top_level_orgs(self, organizations, first=False):
+        """Returns top level organization(s) from those provided
+
+        :param organizations: organizations against which top level
+         organization(s) will be queried
+        :param first: if set, return the first org in the result list
+         rather than a set of orgs.
+
+        :return: set of top level organization(s), or a single org if
+         ``first`` is set.
+
+        """
+        results = set()
         for org in (o for o in organizations if o.id):
             top_org_id = self.find(org.id).top_level()
-            orgs_list.append(Organization.query.get(top_org_id))
+            results.add(Organization.query.get(top_org_id))
 
-        return orgs_list
+        if first:
+            return next(iter(results)) if results else None
+        return results
 
     @staticmethod
     def all_ids_with_rp(research_protocol):

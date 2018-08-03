@@ -1,10 +1,10 @@
 """Unit test module for terms of use logic"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
-import sys
 
 from flask_webtest import SessionScope
-import pytest
 import pytz
 
 from portal.extensions import db
@@ -17,8 +17,6 @@ from tests import TEST_USER_ID, TestCase
 tou_url = 'http://fake-tou.org'
 
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
 class TestTou(TestCase):
     """Terms Of Use tests"""
 
@@ -29,24 +27,24 @@ class TestTou(TestCase):
         tou = ToU(audit=audit, agreement_url=tou_url,
                   type='website terms of use')
         results = "{}".format(tou)
-        self.assertTrue(tou_url in results)
+        assert tou_url in results
 
     def test_get_tou(self):
-        rv = self.client.get('/api/tou')
-        self.assert200(rv)
-        self.assertTrue('url' in rv.json)
+        response = self.client.get('/api/tou')
+        assert response.status_code == 200
+        assert 'url' in response.json
 
     def test_accept(self):
         self.login()
         data = {'agreement_url': tou_url}
-        rv = self.client.post(
+        response = self.client.post(
             '/api/tou/accepted',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
         tou = ToU.query.one()
-        self.assertEqual(tou.agreement_url, tou_url)
-        self.assertEqual(tou.audit.user_id, TEST_USER_ID)
+        assert tou.agreement_url == tou_url
+        assert tou.audit.user_id == TEST_USER_ID
 
     def test_accept_w_org(self):
         self.login()
@@ -54,28 +52,28 @@ class TestTou(TestCase):
         self.test_user = db.session.merge(self.test_user)
         org_id = self.test_user.organizations.first().id
         data = {'agreement_url': tou_url, 'organization_id': org_id}
-        rv = self.client.post(
+        response = self.client.post(
             '/api/tou/accepted',
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
         tou = ToU.query.filter(ToU.agreement_url == tou_url).one()
-        self.assertEqual(tou.agreement_url, tou_url)
-        self.assertEqual(tou.audit.user_id, TEST_USER_ID)
-        self.assertEqual(tou.organization_id, org_id)
+        assert tou.agreement_url == tou_url
+        assert tou.audit.user_id == TEST_USER_ID
+        assert tou.organization_id == org_id
 
     def test_service_accept(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'agreement_url': tou_url}
-        rv = self.client.post(
+        response = self.client.post(
             '/api/user/{}/tou/accepted'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data))
-        self.assert200(rv)
+        assert response.status_code == 200
         tou = ToU.query.one()
-        self.assertEqual(tou.agreement_url, tou_url)
-        self.assertEqual(tou.audit.user_id, TEST_USER_ID)
+        assert tou.agreement_url == tou_url
+        assert tou.audit.user_id == TEST_USER_ID
 
     def test_get(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
@@ -86,10 +84,10 @@ class TestTou(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.client.get('/api/user/{}/tou'.format(TEST_USER_ID))
-        doc = json.loads(rv.data)
-        self.assert200(rv)
-        self.assertEqual(len(doc['tous']), 1)
+        response = self.client.get('/api/user/{}/tou'.format(TEST_USER_ID))
+        doc = response.json
+        assert response.status_code == 200
+        assert len(doc['tous']) == 1
 
     def test_get_by_type(self):
         timestamp = datetime.utcnow()
@@ -102,14 +100,14 @@ class TestTou(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
-                             TEST_USER_ID))
-        self.assert200(rv)
+        response = self.client.get('/api/user/{}/tou/privacy-policy'.format(
+            TEST_USER_ID))
+        assert response.status_code == 200
         # result must be timezone aware isoformat, without microseconds
         tzaware = timestamp.replace(tzinfo=pytz.utc)
         wo_micro = tzaware.replace(microsecond=0)
-        self.assertEqual(rv.json['accepted'], wo_micro.isoformat())
-        self.assertEqual(rv.json['type'], 'privacy policy')
+        assert response.json['accepted'] == wo_micro.isoformat()
+        assert response.json['type'] == 'privacy policy'
 
     def test_deactivate_tous(self):
         timestamp = datetime.utcnow()
@@ -131,16 +129,16 @@ class TestTou(TestCase):
             db.session.merge, (self.test_user, pptou, wtou))
 
         # confirm active
-        self.assertTrue(all((pptou.active, wtou.active)))
+        assert all((pptou.active, wtou.active))
 
         # test deactivating single type
         self.test_user.deactivate_tous(self.test_user, ['privacy policy'])
-        self.assertFalse(pptou.active)
-        self.assertTrue(wtou.active)
+        assert not pptou.active
+        assert wtou.active
 
         # test deactivating all types
         self.test_user.deactivate_tous(self.test_user)
-        self.assertFalse(all((pptou.active, wtou.active)))
+        assert not all((pptou.active, wtou.active))
 
     def test_deactivate_tous_by_org(self):
         timestamp = datetime.utcnow()
@@ -191,26 +189,22 @@ class TestTou(TestCase):
             db.session.merge, tous)
 
         # confirm active
-        self.assertTrue(all((
-            pptou.active, pptou_2.active, wtou.active, wtou_2.active)))
+        assert all((pptou.active, pptou_2.active, wtou.active, wtou_2.active))
 
         # test deactivating single type by org - should miss second user
         update_tous(
             types=['privacy policy'], organization='101',
             notification='priv notif', deactivate=True)
-        self.assertFalse(pptou.active)
-        self.assertFalse(pptou_staff.active)
-        self.assertTrue(all(
-            (pptou_2.active, wtou.active, wtou_2.active, wtou_staff.active)))
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == TEST_USER_ID).count(), 1)
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == staff_id).count(), 1)
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == second_user_id).count(), 0)
+        assert not pptou.active
+        assert not pptou_staff.active
+        assert all((pptou_2.active, wtou.active, wtou_2.active,
+                    wtou_staff.active))
+        assert UserNotification.query.filter(
+            UserNotification.user_id == TEST_USER_ID).count() == 1
+        assert UserNotification.query.filter(
+            UserNotification.user_id == staff_id).count() == 1
+        assert UserNotification.query.filter(
+            UserNotification.user_id == second_user_id).count() == 0
 
         # test limiting to staff on org both staff and test_user belong to
         # only hits staff
@@ -218,14 +212,11 @@ class TestTou(TestCase):
             types=['website terms of use'], organization='101',
             roles=['staff', 'staff_admin'], notification='web notif',
             deactivate=True)
-        self.assertFalse(wtou_staff.active)
-        self.assertTrue(all((pptou_2.active, wtou.active, wtou_2.active)))
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == TEST_USER_ID).count(), 1)
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == staff_id).count(), 2)
-        self.assertEqual(
-            UserNotification.query.filter(
-                UserNotification.user_id == second_user_id).count(), 0)
+        assert not wtou_staff.active
+        assert all((pptou_2.active, wtou.active, wtou_2.active))
+        assert UserNotification.query.filter(
+            UserNotification.user_id == TEST_USER_ID).count() == 1
+        assert UserNotification.query.filter(
+            UserNotification.user_id == staff_id).count() == 2
+        assert UserNotification.query.filter(
+            UserNotification.user_id == second_user_id).count() == 0

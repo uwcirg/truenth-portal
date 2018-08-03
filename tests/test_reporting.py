@@ -1,11 +1,11 @@
 """Unit test module for stat reporting"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 from re import search
-import sys
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
-import pytest
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
@@ -22,8 +22,7 @@ from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
 from tests import TestCase
 
-if sys.version_info.major > 2:
-    pytest.skip(msg="not yet ported to python3", allow_module_level=True)
+
 class TestReporting(TestCase):
     """Reporting tests"""
 
@@ -83,17 +82,17 @@ class TestReporting(TestCase):
 
         stats = self.get_stats()
 
-        self.assertTrue('Decision Support P3P' not in stats['interventions'])
-        self.assertEqual(stats['interventions']['Community of Wellness'], 1)
+        assert 'Decision Support P3P' not in stats['interventions']
+        assert stats['interventions']['Community of Wellness'] == 1
 
-        self.assertEqual(stats['organizations']['testorg'], 2)
-        self.assertEqual(stats['organizations']['Unspecified'], 2)
+        assert stats['organizations']['testorg'] == 2
+        assert stats['organizations']['Unspecified'] == 2
 
-        self.assertEqual(stats['roles']['patient'], 3)
-        self.assertEqual(stats['roles']['staff'], 1)
-        self.assertEqual(stats['roles']['partner'], 1)
+        assert stats['roles']['patient'] == 3
+        assert stats['roles']['staff'] == 1
+        assert stats['roles']['partner'] == 1
 
-        self.assertEqual(len(stats['encounters']['all']), 5)
+        assert len(stats['encounters']['all']) == 5
 
         # test adding a new encounter, to confirm still using cached stats
         with SessionScope(db):
@@ -108,7 +107,7 @@ class TestReporting(TestCase):
         stats2 = self.get_stats(invalidate=False)
 
         # shold not have changed, if still using cached values
-        self.assertEqual(len(stats2['encounters']['all']), 5)
+        assert len(stats2['encounters']['all']) == 5
 
     def test_overdue_stats(self):
         self.promote_user(user=self.test_user, role_name=ROLE.PATIENT.value)
@@ -127,6 +126,7 @@ class TestReporting(TestCase):
             db.session.add(crv)
             db.session.commit()
         crv, epic26 = map(db.session.merge, (crv, epic26))
+        crv_id = crv.id
 
         bank = QuestionnaireBank(
             name='CRV', research_protocol_id=rp_id,
@@ -138,29 +138,30 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        self.test_user.organizations.append(crv)
+        self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        self.assertEqual(a_s.overall_status, 'Expired')
+        assert a_s.overall_status == 'Expired'
 
         ostats = self.get_ostats()
-        self.assertEqual(len(ostats), 0)
+        assert len(ostats) == 0
 
         # test user with status = 'Overdue' (should show up)
-        self.test_user.organizations.append(crv)
-        self.consent_with_org(org_id=crv.id, backdate=relativedelta(days=18))
+        self.consent_with_org(org_id=crv_id, backdate=relativedelta(days=18))
         with SessionScope(db):
             db.session.add(bank)
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
         a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        self.assertEqual(a_s.overall_status, 'Overdue')
+        assert a_s.overall_status == 'Overdue'
 
         ostats = self.get_ostats()
-        self.assertEqual(len(ostats), 1)
-        self.assertEqual(ostats[crv], [15])
+        assert len(ostats) == 1
+        assert ostats[crv] == [15]
 
     def test_overdue_table_html(self):
         org = Organization(name='OrgC', id=101)
@@ -192,16 +193,16 @@ class TestReporting(TestCase):
                                              user=user,
                                              top_org=org)
 
-        self.assertTrue('<table>' in table1)
-        self.assertTrue('<th>1-5 Days</th>' in table1)
-        self.assertTrue('<th>6-10 Days</th>' in table1)
-        self.assertTrue('<td>{}</td>'.format(org.name) in table1)
+        assert '<table>' in table1
+        assert '<th>1-5 Days</th>' in table1
+        assert '<th>6-10 Days</th>' in table1
+        assert '<td>{}</td>'.format(org.name) in table1
         org_row = (r'<td>{}<\/td>\s*<td>1<\/td>\s*'
                    '<td>2<\/td>\s*<td>3<\/td>'.format(org.name))
-        self.assertTrue(search(org_row, table1))
+        assert search(org_row, table1)
         # confirm alphabetical order
         org_order = r'{}[^O]*{}[^O]*{}'.format(org3.name, org2.name, org.name)
-        self.assertTrue(search(org_order, table1))
+        assert search(org_order, table1)
 
         # confirm that the table contains no orgs
         table2 = generate_overdue_table_html(cutoff_days=cutoffs,
@@ -209,8 +210,8 @@ class TestReporting(TestCase):
                                              user=user,
                                              top_org=false_org)
 
-        self.assertTrue('<table>' in table2)
+        assert '<table>' in table2
         # org should not show up, as the table's top_org=false_org
-        self.assertFalse('<td>{}</td>'.format(org.name) in table2)
+        assert not '<td>{}</td>'.format(org.name) in table2
         # false_org should not show up, as it's not in the ostats
-        self.assertFalse('<td>{}</td>'.format(false_org.name) in table2)
+        assert not '<td>{}</td>'.format(false_org.name) in table2

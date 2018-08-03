@@ -1,4 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from __future__ import unicode_literals  # isort:skip
+
 from datetime import datetime
 import json
 from pprint import pformat
@@ -50,7 +52,10 @@ from ..models.app_text import (
     app_text,
     get_terms,
 )
-from ..models.assessment_status import invalidate_assessment_status_cache
+from ..models.assessment_status import (
+    invalidate_assessment_status_cache,
+    overall_assessment_status
+)
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
@@ -72,6 +77,7 @@ from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
+from ..type_tools import check_int
 from .auth import logout, next_after_login
 from .crossdomain import crossdomain
 
@@ -85,8 +91,8 @@ def favicon():
 
 @portal.route('/no-script')
 def no_script():
-    return make_response(_(u"This application requires Javascript enabled.\
-                            Please check your browser settings."))
+    return make_response(_("This application requires Javascript enabled."
+                           " Please check your browser settings."))
 
 
 @portal.before_app_request
@@ -109,12 +115,15 @@ def debug_request_dump():
     if current_app.config.get("DEBUG_DUMP_REQUEST"):
         output = "{0.remote_addr} {0.method} {0.path}"
         if request.data:
-            output += " {0.data}"
+            output += " {data}"
         if request.args:
             output += " {0.args}"
         if request.form:
             output += " {0.form}"
-        current_app.logger.debug(output.format(request))
+        current_app.logger.debug(output.format(
+            request,
+            data=request.get_data(as_text=True),
+        ))
 
 
 @portal.after_app_request
@@ -549,8 +558,6 @@ def admin():
         org_list = Organization.query.all()
         users = User.query.filter_by(deleted=None).all()
 
-    for u in users:
-        u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template(
         'admin/admin.html', users=users, wide_container="true",
         org_list=list(org_list), user=user)
@@ -660,7 +667,13 @@ def patient_reminder_email(user_id):
             name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserReminderEmail_ATMA.name_key()
-        args = load_template_args(user=user)
+        questionnaire_bank_id = None
+        a_s, qbd = overall_assessment_status(user.id)
+        if qbd and qbd.questionnaire_bank:
+            questionnaire_bank_id = qbd.questionnaire_bank.id
+        # pass in questionnaire bank id to get at the questionnaire due date
+        args = load_template_args(user=user,
+                                  questionnaire_bank_id=questionnaire_bank_id)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
@@ -1077,7 +1090,7 @@ def stock_consent(org_name):
     :param org_name: the org_name to include in the agreement text
 
     """
-    body = _(u"I consent to sharing information with %(org_name)s",
+    body = _("I consent to sharing information with %(org_name)s",
              org_name=_(org_name))
     return render_template_string(
         """<!doctype html>
@@ -1091,18 +1104,9 @@ def stock_consent(org_name):
         body=body)
 
 
-def check_int(i):
-    try:
-        return int(i)
-    except ValueError:
-        abort(400, "invalid input '{}' - must be an integer".format(i))
-
-
 def get_asset(uuid):
-    url = "{LR_ORIGIN}/c/portal/truenth/asset/detailed?uuid={uuid}".format(
-        LR_ORIGIN=current_app.config["LR_ORIGIN"], uuid=uuid)
-    data = requests.get(url).content
-    return json.JSONDecoder().decode(data)['asset']
+    url = "{}/c/portal/truenth/asset/detailed".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 
 def get_any_tag_data(*anyTags):
@@ -1118,12 +1122,9 @@ def get_any_tag_data(*anyTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()
 
 
 def get_all_tag_data(*allTags):
@@ -1139,9 +1140,6 @@ def get_all_tag_data(*allTags):
         'sort': 'true',
         'sortType': 'DESC'
     }
-    url = ''.join([current_app.config["LR_ORIGIN"],
-                   "/c/portal/truenth/asset/query?",
-                   requests.compat.urlencode(liferay_qs_params,
-                                             doseq=True,)])
 
-    return requests.get(url).content
+    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    return requests.get(url, params=liferay_qs_params).json()
