@@ -37,9 +37,9 @@
                                     <filter-control v-bind:id="'psaTrackerResultFilter'" v-bind:prompt="filters.filterResultPrompt" v-bind:items="resultRange" v-bind:selectedvalue="filters.selectedFilterResultRange" v-on:changeevent="filterDataByResultEvent"></filter-control>
                                 </td>
                             </tr>
-                            <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row">
-                                <td class="result-cell"><div class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></div><span v-on:click="onEdit(item)">{{item.date}}</span></td>
-                                <td class="result-cell"><span v-on:click="onEdit(item)">{{item.result}}</span></td>
+                            <tr v-for="item in items" v-bind:data-id="item.id" v-bind:data-date="item.date" :key="item.id" class="result-row" v-on:click="onEdit(item)">
+                                <td class="result-cell"><div class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></div><span>{{item.date}}</span></td>
+                                <td class="result-cell"><span>{{item.result}}</span></td>
                             </tr>
                         </TBODY>
                         <TFOOT>
