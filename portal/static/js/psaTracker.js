@@ -595,7 +595,7 @@
                     .ticks(self.dateTicks)
                     .tickSize(0, 0, 0)
                     .tickFormat(timeFormat);
-              
+
                 var yAxis = d3.svg.axis()
                     .scale(y)
                     .ticks(10)
@@ -764,8 +764,7 @@
                             .style("fill", "#FFF")
                             .classed("focused", false);
                         tooltipContainer.transition().duration(500).style("opacity", 0);
-                    })
-                    .on("click", self.onEdit);
+                    });
 
                 // Add text labels
                 graphArea.selectAll("text.text-label")

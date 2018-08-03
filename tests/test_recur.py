@@ -38,7 +38,10 @@ class TestRecur(TestCase):
         result, ic = recur.active_interval_start(
             trigger_date=three_back, as_of_date=now)
         # should get three back plus start
-        assert pytest.approx(result) == three_back + timedelta(days=2)
+        assert (
+            pytest.approx(tuple(result.timetuple()))
+            == tuple((three_back + timedelta(days=2)).timetuple())
+        )
         assert ic == 0
 
     def test_third_interval(self):
@@ -48,5 +51,8 @@ class TestRecur(TestCase):
         result, ic = recur.active_interval_start(
             trigger_date=thirty_back, as_of_date=now)
         # should get back 30 back, plus 2 to start, plus 10*2
-        assert pytest.approx(result) == thirty_back + timedelta(days=22)
+        assert (
+            pytest.approx(tuple(result.timetuple()))
+            == tuple((thirty_back + timedelta(days=22)).timetuple())
+        )
         assert ic == 2
