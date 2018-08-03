@@ -233,6 +233,9 @@ option.select-option {
     }
     TR.result-row {
         border: 1px solid @cellBorderColor;
+        &:hover {
+            cursor: pointer;
+        }
         .edit-icon {
             display: none;
             position: absolute;
@@ -270,8 +273,6 @@ option.select-option {
             width: 100px;
             &:hover {
                 cursor:pointer;
-                color: @hoverColor;
-                cursor: pointer;
             }
         }
     }
