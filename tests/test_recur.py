@@ -39,8 +39,8 @@ class TestRecur(TestCase):
             trigger_date=three_back, as_of_date=now)
         # should get three back plus start
         assert (
-            pytest.approx(result.timetuple())
-            == (three_back + timedelta(days=2)).timetuple()
+            pytest.approx(tuple(result.timetuple()))
+            == tuple((three_back + timedelta(days=2)).timetuple())
         )
         assert ic == 0
 
@@ -52,7 +52,7 @@ class TestRecur(TestCase):
             trigger_date=thirty_back, as_of_date=now)
         # should get back 30 back, plus 2 to start, plus 10*2
         assert (
-            pytest.approx(result.timetuple())
-            == (thirty_back + timedelta(days=22)).timetuple()
+            pytest.approx(tuple(result.timetuple()))
+            == tuple((thirty_back + timedelta(days=22)).timetuple())
         )
         assert ic == 2
