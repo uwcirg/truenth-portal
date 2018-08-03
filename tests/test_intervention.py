@@ -288,7 +288,8 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             d = {'function': 'observation_check',
                  'kwargs': [
-                     {'name': 'display','value': CC.PCaDIAG.codings[0].display},
+                     {'name':
+                          'display', 'value': CC.PCaDIAG.codings[0].display},
                      {'name': 'boolean_value', 'value': 'true'}]}
             strat = AccessStrategy(
                 name="has PCa diagnosis",
